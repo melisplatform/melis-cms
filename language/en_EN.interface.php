@@ -1,0 +1,287 @@
+<?php 
+	return array(
+		'tr_meliscms_menu_sitetree_Name' => 'Site TreeView',
+			
+		'tr_meliscms_page_title_Create new page' => 'Create a new page',
+
+		'tr_meliscms_page_Page' => 'Page',
+		'tr_meliscms_page_Page last published on' => 'last published on',
+		'tr_meliscms_page_By' => 'by',
+		'tr_meliscms_page_Version edited an saved on' => 'Version <b>edited and saved</b> on',
+			
+		'tr_meliscms_page_actions' => 'Page actions',
+		'tr_meliscms_page_creation_actions' => 'Page creation actions',
+		'tr_meliscms_page_actions_Save' => 'Save',
+		'tr_meliscms_page_actions_Publish' => 'Publish', 
+		'tr_meliscms_page_actions_new' => 'New Page',
+	    'tr_meliscms_page_actions_delete' => 'Delete Page',
+	    
+	    'tr_meliscms_page_published_text' => 'Online',
+	    'tr_meliscms_page_unpublished_text' => 'Offline',
+	    'tr_meliscms_page_status_text' => 'Status',
+
+	    'tr_meliscms_page_actions_New' => 'New page',
+	    'tr_meliscms_page_actions_Delete Page' => 'Delete page',
+	    'tr_meliscms_page_actions_Create' => 'Create',
+		'tr_meliscms_page_actions_Unpublish' => 'Unpublish',
+		'tr_meliscms_page_actions_Publish Unpublish' => 'Publish / Unpublish',
+		'tr_meliscms_page_actions_Delete' => 'Delete',
+		'tr_meliscms_page_actions_Notes' => 'Notes',
+		'tr_meliscms_page_actions_Preview' => 'Preview',
+	    'tr_meliscms_page_actions_See' => 'See',
+		'tr_meliscms_page_actions_See Online' => 'See online',
+		'tr_meliscms_page_actions_display_Display' => 'Display',
+		'tr_meliscms_page_actions_display_Mobile' => 'Mobile',
+		'tr_meliscms_page_actions_display_Tablet' => 'Tablet',
+		'tr_meliscms_page_actions_display_Desktop' => 'Desktop',
+	    'tr_meliscms_page_action_clear' => 'Clear saved page',
+	    
+	    'tr_meliscms_delete_confirmation' => 'Clear edited datas of the page',
+	    'tr_meliscms_delete_confirmation_msg' => 'Are you sure you want to delete the edited datas of this page?',
+	    'tr_meliscms_delete_success' => 'Edited datas have been successfully deleted',
+	    'tr_meliscms_delete_no_saved_page' => 'This page has no edition in progress',
+			
+		'tr_meliscms_page_tab_edition_Edition' => 'Edition',
+		'tr_meliscms_page_tab_properties_Properties' => 'Properties',	
+		'tr_meliscms_page_tab_seo_Seo' => 'SEO',		
+
+	    'tr_meliscms_page_tab_edition_Edition_Page not editable' => 'This page is not editable',
+	    
+		'tr_meliscms_page_success_delete_Delete page' => 'Delete page',
+		'tr_meliscms_page_success_delete_Are you sure you want to delete this page' => 'Are you sure you want to delete this page?',
+			
+	    'tr_meliscms_page_new_page' => 'New Page',
+		'tr_meliscms_page_success_Page' => 'Page',
+		'tr_meliscms_page_success_Page new' => 'New',
+		'tr_meliscms_page_success_Page saved' => 'Page saved',
+		'tr_meliscms_page_success_Page published' => 'Page published',
+		'tr_meliscms_page_success_Page unpublished' => 'Page unpublished',
+		'tr_meliscms_page_success_Page deleted' => 'Page deleted',
+		'tr_meliscms_page_success_Page moved' => 'Page moved',
+		'tr_meliscms_page_success_Page delete' => 'Page delete',
+			
+		'tr_meliscms_page_save_error_Current page id has reached end of platform band' => 'Current page id has reached end of platform band',
+		'tr_meliscms_page_save_error_Current page id defined in platform is already used' => 'Current page id defined in platform is already used',
+		'tr_meliscms_page_error_Your rights don\'t allow you to see this page' => 'Your rights don\'t allow you to see this page',
+		'tr_meliscms_page_error_Your rights don\'t allow you to modify this page' => 'Your rights don\'t allow you to modify this page',
+		'tr_meliscms_page_error_You cannot delete a page having children pages' => 'You cannot delete a page having children pages',
+		'tr_meliscms_page_error_Children pages' => 'Children pages',
+		'tr_meliscms_page_error_No id found' => 'No id found',
+		'tr_meliscms_page_error_No id' => 'Pas d\'id',
+		'tr_meliscms_page_error_Page doesn\'t exist' => 'Page doesn\'t exist',
+		'tr_meliscms_page_error_Some errors occured while processing the request.' => 'Some errors occured while processing the request.',
+	    'tr_meliscms_page_error_Some errors occured while processing the request. Please find details bellow.' => 'Some errors occured while processing the request. Please find details bellow.',
+		'tr_meliscms_page_error_lebel_Rights' => 'Rights',
+		'tr_meliscms_page_save_error_SEO Url already used on' => 'SEO Url already used on',
+		'tr_meliscms_page_save_error_label_SEO Url' => 'SEO Url',
+			
+		'tr_meliscms_page_error_Page is not published yet' => 'Page is not published yet',
+			
+		'tr_meliscms_rights_Pages' => 'Pages',
+
+		// Rights
+		'tr_meliscms_meliscms' => 'MelisCms',
+		'tr_meliscms_toolstree' => 'Tools',
+		'tr_meliscms_pages_Page' => 'Page',
+		'tr_meliscms_pages_Page creation' => 'Page creation',
+		'tr_meliscms_pages_Page Tabs' => 'Page Tabs',
+	    
+	    'tr_meliscms_no_access' => 'You don\'t have access on this feature. please contact site admin.',
+			
+
+	    
+	    // tool Template Manager
+	    'tr_meliscms_tool_templates' => 'Template Manager', 
+	    
+	    'tr_meliscms_tool_templates_tpl_id' => 'ID',
+	    'tr_meliscms_tool_templates_tpl_site_id' => 'Site',
+	    'tr_meliscms_tool_templates_tpl_name' => 'Name',
+	    'tr_meliscms_tool_templates_tpl_type' => 'Type',
+	    'tr_meliscms_tool_templates_tpl_zf2_website_folder' => 'Web Folder',
+	    'tr_meliscms_tool_templates_tpl_zf2_layout' => 'Layout',
+	    'tr_meliscms_tool_templates_tpl_zf2_controller' => 'Controller/Action',
+	    'tr_meliscms_tool_templates_tpl_zf2_action' => 'Action',
+	    'tr_meliscms_tool_templates_tpl_php_path' => 'Path',
+	    'tr_meliscms_tool_templates_tpl_creation_date' => 'Creation Date',
+	    'tr_meliscms_tool_templates_tpl_last_user_id' => 'User ID',
+	    
+	    'tr_tool_templates_modal_tab_header' => 'Template Manager',
+	    'tr_tool_templates_modal_tab_text_add' => 'Add New Template',
+	    'tr_tool_templates_modal_tab_text_edit' => 'Edit Template',
+	    'tr_tool_templates_button_text_add' => 'New Template',
+	    
+	    'tr_tool_template_fm_new_title' => 'New Template',
+	    'tr_tool_template_fm_new_content' => 'New template has been added.',
+	    
+	    
+	    'tr_tool_template_fm_update_title' => 'Update Template',
+	    'tr_tool_template_fm_update_content' => 'Template has been updated successfully',
+	    'tr_tool_template_fm_update_content_error' => 'Unable to update template',
+	    
+	    'tr_tool_template_fm_delete_title' => 'Delete Template',
+	    'tr_tool_template_fm_delete_confirm' => 'Are you sure you want to delete this template?',
+	    'tr_tool_template_fm_delete_content' => 'Template has been deleted successfully',
+	    
+	    // Site Tool
+	    'tr_meliscms_tool_site' => 'Sites',
+	    'tr_meliscms_tool_site_col_site_id' => 'Site ID',
+	    'tr_meliscms_tool_site_col_site_name' => 'Site Name',
+	    'tr_meliscms_tool_site_col_site_scheme' => 'Site Scheme',
+	    'tr_meliscms_tool_site_col_site_domain' => 'Site Domain', 
+	    'tr_meliscms_tool_site_col_site_env' => 'Site Environment',
+	    
+	    'tr_meliscms_tool_site_add' => 'Add New Site',
+	    'tr_meliscms_tool_site_delete_success' => 'Site has been deleted successfully',
+	    'tr_meliscms_tool_site_delete_failed' => 'Unable to delete site, please try again later',
+	    
+	    'tr_meliscms_tool_site_delete_env_success' => 'Site environment has been deleted successully',
+	    'tr_meliscms_tool_site_delete_env_failed' => 'Unable to delete site envinroment, please try again later',
+	    
+	    'tr_meliscms_tool_site_add_success' => 'Site has been added successfully',
+	    'tr_meliscms_tool_site_add_failed' => 'Unable to add site, please try again later',
+	    
+	    'tr_meliscms_tool_site_edit_success' => 'Site has been updated successfully',
+	    'tr_meliscms_tool_site_edit_failed' => 'Unable to update site, please try again later',
+	    
+	    'tr_meliscms_tool_site_delete_confirm_title' => 'Delete site',
+	    'tr_meliscms_tool_site_delete_confirm' => 'Are you sure you want to delete this site?',
+	    
+	    'tr_meliscms_tool_site_env_delete_confirm_title' => 'Delete site environment',
+	    'tr_meliscms_tool_site_env_delete_confirm' => 'Are you sure you want to delete this environment?',
+	    
+	    'tr_meliscms_tool_site_delete_env' => 'Delete site environment',
+	    
+
+
+	    // standard words that is normally used on this application
+	    'tr_meliscms_action' => 'Action',
+	    'tr_tool_no_access' => 'You don\'t have enough permission to access this tool.',
+	    
+	    // treeview translations
+	    'tr_meliscms_menu_new' => 'New',
+	    'tr_meliscms_menu_edit' => 'Edit',
+	    'tr_meliscms_menu_delete' => 'Delete',
+	    
+	    'tr_meliscms_menu_cancel' => 'Cancel',
+	    
+	    'tr_meliscms_page_creation' => 'Page Creation',
+	    
+	    // tree button if pages is empty
+	    'tr_meliscms_create_page' => 'Create Page',
+	    
+	    // tree button if pages is empty
+	    'tr_meliscms_delete_confirmation' => 'Delete Page',
+	    'tr_meliscms_delete_confirmation_msg' => 'Are you sure you want to delete this page?',
+	    
+	    'tr_meliscms_common_edit' => 'Edit',
+	    'tr_meliscms_common_delete' => 'Delete',
+	    'tr_meliscms_common_refresh' => 'Refresh',
+	    'tr_meliscms_common_close' => 'Close',
+	    'tr_meliscms_common_save' => 'Save',
+	    
+	    'tr_meliscms_common_add' => 'Add',
+	    'tr_meliscms_common_apply' => 'Apply',
+	    
+	    //Language Tool Translation
+	    'tr_meliscms_tool_language' => 'Page\'s languages',
+	    'tr_meliscms_tool_language_header' => 'Header',
+	    'tr_meliscms_tool_language_content' => 'Content',
+	    'tr_meliscms_tool_language_modal' => 'Modals',
+	    'tr_meliscms_tool_language_lang_id' => 'ID',
+	    'tr_meliscms_tool_language_lang_locale' => 'Locale',
+	    'tr_meliscms_tool_language_lang_locale_long' => 'Locale value too long, it shoule be less than 10 characters',
+	    'tr_meliscms_tool_language_lang_locale_empty' => 'Locale is empty',
+	    'tr_meliscms_tool_language_lang_name' => 'Name',
+	    'tr_meliscms_tool_language_lang_name_long' => 'Name too long, it should be less than 45 characters',
+	    'tr_meliscms_tool_language_lang_name_empty' => 'Please enter the language name',
+	    'tr_meliscms_tool_language_new' => 'New Language',
+		'tr_meliscms_tool_language_edit' => 'Edit Language',
+	    'tr_meliscms_tool_language_add_success' => 'New language added successfully',
+	    'tr_meliscms_tool_language_add_failed' => 'Unable to add language, please try again',
+	    'tr_meliscms_tool_language_add_exists' => 'Locale already exists',
+	    'tr_meliscms_tool_language_edit_success' => 'Language updated successfully',
+	    'tr_meliscms_tool_language_edit_failed' => 'Unable to update language, please try again',
+	    'tr_meliscms_tool_language_delete_confirm' => 'Are you sure you want to delete this language?',
+	    'tr_meliscms_tool_language_delete_success' => 'Language deleted sucessfully',
+	    'tr_meliscms_tool_language_delete_failed' => 'Unable to delete language',
+	    'tr_meliscms_tool_language_permission' => 'Unable to add language, please check your rights to write files',
+	    'tr_meliscms_tool_language_forms_button_edit' => 'Edit',
+	    'tr_meliscms_tool_language_prompts_edit_failed' => 'Unable to update language, please try again',
+	    'tr_meliscms_tool_language_prompts_edit_success' => 'Platform has been updated successfully',
+	    
+		// Dashboard
+	    'tr_meliscms_dashboard_recent_activity_Pages' => 'Pages',
+	    
+	    //Page Status
+	    'tr_meliscms_page_status_last_published_on' => 'last published on',
+	    'tr_meliscms_page_status_last_unpublished_on' => 'last unpublished on',
+	    
+	    // Dashboard Pages Indicators
+	    'tr_meliscms_dashboard_pages_indicators' => 'Indicators',
+	    'tr_meliscms_dashboard_pages_indicators_site' => 'Site',
+	    'tr_meliscms_dashboard_pages_indicators_pages' => 'Page',
+	    'tr_meliscms_dashboard_pages_indicators_published' => 'Published',
+	    'tr_meliscms_dashboard_pages_indicators_unpublished' => 'Unpublished',
+	    
+	    //DataTables Translations
+	    'tr_meliscms_dt_sEmptyTable' => 'No data available in table',
+	    'tr_meliscms_dt_sInfo' => 'Showing _START_ to _END_ of _TOTAL_ entries',
+	    'tr_meliscms_dt_sInfoEmpty' => 'Showing 0 to 0 of 0 entries',
+	    'tr_meliscms_dt_sInfoFiltered' => ' ',
+	    'tr_meliscms_dt_sInfoPostFix' => ' ',
+	    'tr_meliscms_dt_sInfoThousands' => ' ',
+	    'tr_meliscms_dt_sLengthMenu' => 'Show _MENU_ entries',
+	    'tr_meliscms_dt_sLoadingRecords' => 'Loading...',
+	    'tr_meliscms_dt_sProcessing' => 'Processing...',
+	    'tr_meliscms_dt_sSearch' => 'Search:',
+	    'tr_meliscms_dt_sZeroRecords' => 'No matching records found',
+	    'tr_meliscms_dt_sFirst' => 'First',
+	    'tr_meliscms_dt_sLast' => 'Last',
+	    'tr_meliscms_dt_sNext' => 'Next',
+	    'tr_meliscms_dt_sPrevious' => 'Previous',
+	    'tr_meliscms_dt_sSortAscending' => 'activate to sort column ascending',
+	    'tr_meliscms_dt_sSortDescending' => ' activate to sort column descending',
+	    
+	    'tr_meliscms_tool_user_modal_empty' => 'No Access',
+	    
+	    // Platform ID Tool
+	    'tr_meliscms_tool_platform_ids' => 'Platforms IDs',
+	    'tr_meliscms_tool_platform_ids_header' => 'Header',
+	    'tr_meliscms_tool_platform_ids_content' => 'Content',
+	    'tr_meliscms_tool_platform_pids_id' => 'ID',
+	    'tr_meliscms_tool_platform_pids_name' => 'Platform Name',
+	    'tr_meliscms_tool_platform_pids_page_id_start' => 'Page ID Start',
+	    'tr_meliscms_tool_platform_pids_page_id_current' => 'Page ID Current',
+	    'tr_meliscms_tool_platform_pids_page_id_end' => 'Page ID End',
+	    'tr_meliscms_tool_platform_pids_tpl_id_start' => 'Template ID Start',
+	    'tr_meliscms_tool_platform_pids_tpl_id_current' => 'Template ID Current',
+	    'tr_meliscms_tool_platform_pids_tpl_id_end' => 'Template ID End',
+	    'tr_meliscms_tool_platform_ids_btn_add' => 'Add a range of ID\'s',
+	    'tr_meliscms_tool_platform_ids_btn_edit' => 'Update a range of ID\'s',
+	    'tr_meliscms_tool_platform_pids_name_empty' => 'Choose Platform',
+	    'tr_meliscms_tool_platform_ids_table' => 'Table',
+	    'tr_meliscms_tool_platform_ids_modal_content' => 'Add and Update Modal',
+	    
+	    // Platform Error Messages
+	    'tr_meliscms_tool_platform_add_error' => 'Unable to Add MelisCms Platform ID\'s',
+	    'tr_meliscms_tool_platform_update_error' => 'Unable to update MelisCms Platform ID\'s',
+	    'tr_meliscms_tool_platform_conflict_error' => 'Page or Template Platform ID\'s range is conflicting one of the exisitng Platform ID\'s range. <br>Please Adjust your Page or Template ID\'s range in order to proceed.',
+	    'tr_meliscms_tool_platform_invalid' => 'Invalid Platform',
+	    
+	    // Delete Messages
+	    'tr_meliscms_tool_platform_ids_confirm_msg' => 'Are you sure you want to delete this Range of Platform ID\'s?',
+	    'tr_meliscms_tool_platform_ids_deleted_title' => 'Platform ID',
+	    'tr_meliscms_tool_platform_ids_delete_success_msg' => 'Platform range ID successfully deleted',
+	    // Platform Id validation Messages
+	    'tr_meliscms_tool_platform_not_digit' => 'The input must contain only digits',
+	    'tr_meliscms_tool_platform_empty' => 'The input is required and can\'t be empty',
+	    'tr_meliscms_tool_platform_pageIdStart_must_lessThan_or_equalTo_pageIdEnd' => 'Page ID Start must less than or equal to Page ID End',
+	    'tr_meliscms_tool_platform_pageIdEnd_must_greaterThan_or_equalTo_pageIdStart' => 'Page ID End must greater than or equal to Page ID Start',
+	    'tr_meliscms_tool_platform_pageIdCurrent_must_greaterThan_or_equalTo_PageIdStart' => 'Page ID Current must greater than or equal to Page ID Start',
+	    'tr_meliscms_tool_platform_pageIdCurrent_must_lessThan_or_equalTo_pageIdEnd' => 'Page ID Current must less than or equal to Page ID End',
+	    'tr_meliscms_tool_platform_tplIdStart_must_lessThan_or_equalTo_tplIdEnd' => 'Template ID Start must less than or equal to Template ID End',
+	    'tr_meliscms_tool_platform_tplIdEnd_must_greaterThan_or_equalTo_tplIdStart' => 'Template ID End must greater than or equal to Template ID Start',
+	    'tr_meliscms_tool_platform_tplIdCreent_must_greaterThan_or_equalTo_tplIdStart' => 'Template ID Current must greater than or equal to Template ID Start',
+	    'tr_meliscms_tool_platform_tplIdCurrent_must_lessThan_or_equalTo_tplIdEnd' => 'Template ID Current must less than or equal to Template ID End',
+	   );
+?>

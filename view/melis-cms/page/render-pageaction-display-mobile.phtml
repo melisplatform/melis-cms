@@ -1,0 +1,12 @@
+<?php
+	$id = '';
+	if (!empty($this->zoneconfig['conf']['id']))
+		$id = ' id="' . $this->idPage . '_' . $this->zoneconfig['conf']['id'] . '"';
+	$data_melisKey = $this->melisKey;
+?>
+<li<?= $id; ?> data-melisKey='<?= $data_melisKey; ?>'>
+	<a data-toggle="tab" class="display-settings link" data-display="fa fa-mobile">
+		<span class="fa fa-mobile fa-color-red"></span>
+		<span><?php echo $this->translate('tr_meliscms_page_actions_display_Mobile') ?></span>
+	</a>
+</li>

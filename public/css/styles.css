@@ -1,0 +1,217 @@
+
+#id_meliscms_dashboard{
+	margin: 30px;
+	border: 1px solid black;		
+	padding: 10px;	
+	width: 250px;
+	height: 170px;	
+	float: left;	
+}
+
+#meliscms_dashboard_logo{
+	text-align: center;
+}
+
+#meliscms_dashboard_content{
+	margin: 20px;
+	text-align: center;
+}
+
+
+.meliscms_page_action_tabs {
+	margin-left: -40px !important; 
+}
+
+.meliscms_page_action_tabs li{
+	border: 1px solid black;	
+	display: inline;
+	padding: 10px;
+}
+
+.meliscms_center_page_tabs{
+	display: inline;	
+	margin-left: -40px !important;
+	width: 300px;	
+}
+
+.meliscms_center_page_tabs li{
+	display: inline;
+	border: 1px solid black;		
+	padding: 10px;	
+	float: left;	
+}
+
+hr{
+	margin: 20px;
+}
+
+
+/* tab head */
+.widget.widget-tabs-double-2>.widget-head ul li:hover{
+	height: 70px;
+}
+.page-content-container .widget.widget-tabs-double-2>.widget-head ul li a.glyphicons,
+.nav-tabs>li>a{
+	margin: 0;
+	border-bottom: 1px solid #e5e5e5;
+}
+.page-content-container .widget.widget-tabs-double-2>.widget-head ul li a.glyphicons{
+	min-width: 90px;
+}
+.widget.widget-tabs-double-2>.widget-head ul li.active{
+
+}
+/*
+.widget.widget-tabs>.widget-head ul li.active a{
+	border-color: transparent;
+    border-radius: 0;
+    margin: 0;
+    box-shadow: none;
+	text-shadow: none;
+}
+*/
+.nav-tabs>li>a:hover, 
+.nav-pills>li>a, 
+.nav-pills>li>a:hover{
+	background: #fff;
+	color: #cb4040;
+	text-shadow: none;
+}
+.sticky-pageactions{
+	position: fixed;
+    top: 47px;
+    z-index: 5;
+    border-top: 1px solid #e5e5e5;
+	border-bottom: 1px solid #e5e5e5;
+}
+
+
+
+
+/* iframe */
+.iframe-container .widget-head,
+.iframe-container .widget-body > div{
+	border-right: none !important;
+}
+.melis-iframe{
+	display: block;
+	margin: 0 auto;
+	width: 100%;
+	border: none;
+}
+ 
+/* Not editable zone */
+.melis-noteditable{
+	pading: 20px;
+	color: #932e2a;
+    font-size: 25px;	
+}
+
+
+/* SEO text counter */
+.text-counter-indicator{
+	font-size: 12px;
+    margin-left: 15px;
+    letter-spacing: .5px;
+    font-weight: 600;
+    color: #72af46;
+}
+.text-counter-indicator .fa{
+	font-size: 14px;
+    margin-right: 4px;
+    vertical-align: middle;
+    padding-bottom: 1px;
+}
+.limit{
+	color: #cb4040;
+}
+
+
+/* page title */
+div.content-heading h1{
+    font-size: 24px;
+    text-transform: uppercase;
+}
+#content .page-head-container .page-title{
+	padding: 15px; 
+}
+#content .page-head-container .page-title p{
+	margin: 0;
+    font-family: 'Open Sans', sans-serif;
+}
+#content .page-head-container .page-title .saved-version-notif{
+	display: block;
+	margin: 0;
+}
+#content .page-head-container .page-title .saved-version-notif b{
+	color: #F39A0D;
+    font-weight: 300;
+}
+#content .page-head-container .page-title span{
+    margin-top: 5px;
+    text-transform: initial;
+    font-weight: 300;
+    font-size: 14px;
+	color: #8E8E8E;
+	word-spacing: .5px; 
+}
+
+/* page tabs */
+#content .container-level-a .meliscms_center_tabs .dataTables_wrapper{
+	padding: 10px;
+}
+.page-content-container .widget.widget-tabs-double-2 .widget-body,
+.page-content-container .widget.widget-tabs-double-2 .widget-body-regular,
+.page-content-container .widget{
+	border: none;
+}
+.widget.widget-tabs-double-2>.widget-head{
+	border-bottom: 1px solid #e5e5e5;
+	height: 71px;
+}
+.nav-tabs>li>a:hover{ 
+	border-color: transparent transparent #e5e5e5 transparent;
+}
+
+
+
+/* ===============================================================[ -= RESPONSIVE =- ]==================================================================== */
+
+@media( min-width: 768px ){
+	
+	div.content-heading h1{
+		display: inline-block;
+	}
+	#content .page-head-container .page-title p{
+		display: inline-block;
+	}
+	
+	/* tab head */
+	.widget.widget-tabs-double-2>.widget-head ul li:hover{
+		height: 69px;
+	}
+	.widget.widget-tabs>.widget-head ul li.active a.glyphicons{
+		border-bottom-color: transparent;
+	}
+	
+}
+
+@media( min-width: 980px ){
+	#content .page-head-container .page-title p{
+		margin-left: 10px;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,12 @@
+<?php 
+$id = $this->zoneconfig['conf']['id'];
+$openAddNewSiteButton = $this->melisModalInvoker()->render(array(
+    'id' => $id,
+    'href' => '#modal-cms-tool-site',
+    'class' => 'btn btn-success',
+    'text' => '<i class="fa fa-plus"></i> '.$this->translate('tr_meliscms_tool_site_add'),
+    'data-melisKey' => $this->melisKey,
+), 'invoke');
+echo $openAddNewSiteButton;
+
+?>

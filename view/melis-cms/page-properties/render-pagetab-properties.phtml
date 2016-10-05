@@ -1,0 +1,25 @@
+<?php
+	$id = '';
+	if (!empty($this->zoneconfig['conf']['id']))
+		$id = ' id="' . $this->idPage . '_' . $this->zoneconfig['conf']['id'] . '"';
+	$data_melisKey = $this->melisKey;
+		
+?>
+<div<?= $id; ?> data-melisKey='<?= $data_melisKey; ?>' class="meliscms_center_tabs tab-pane clearfix">
+	<?php
+		$form = $this->meliscms_page_properties;
+	//	$formAppConfig = $form->getAppFormConfig();
+	//	$formPrefixIds = $form->getPrefixIds();
+		$form->prepare();
+	?>
+	
+	<div class="col-md-12">
+		<div class="widget row widget-inverse">
+			<div class="widget-body">
+            	<?= $this->form()->openTag($form); ?>
+            	<?= $this->melisFieldCollection($form); ?>
+            	<?= $this->form()->closeTag(); ?>
+			</div>
+		</div>
+	</div>
+</div>

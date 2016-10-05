@@ -1,0 +1,12 @@
+<?php
+    $id = '';
+    if (!empty($this->zoneconfig['conf']['id']))
+        $id = ' id="' . $this->idPage . '_' . $this->zoneconfig['conf']['id'] . '"';
+    $data_melisKey = $this->melisKey;
+?>
+<li<?= $id; ?> data-melisKey='<?= $data_melisKey; ?>'>
+	<a class="btn btn-default melis-newpage" data-pagenumber="<?= $this->idPage; ?>">
+	    <span class="fa fa-plus"></span>
+		<span><?php echo $this->translate('tr_meliscms_page_actions_new') ?></span>
+	</a>
+</li>

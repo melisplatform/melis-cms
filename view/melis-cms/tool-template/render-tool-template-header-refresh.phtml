@@ -1,0 +1,24 @@
+<?php 
+$id = $this->zoneconfig['conf']['id'];
+$refreshTable = $this->melisModalInvoker()->render(array(
+    'id' => $id,
+    'class' => 'btn btn-info btn-sm pull-right visible-lg hidden-md hidden-xs hidden-sm',
+    'text' => '<i class="fa fa-fw fa-refresh"></i> ',
+    'style' => 'margin-bottom:15px',
+    'onclick' => "toolTemplate.refreshTable()",
+    'title' => $this->translate('tr_meliscore_common_refresh'),
+    'data-melisKey' => $this->melisKey,
+), 'non-modal');
+
+$refreshTableDesktop = $this->melisModalInvoker()->render(array(
+    'id' => $id,
+    'class' => 'btn btn-info btn-sm pull-right hidden-lg visible-md visible-xs visible-sm col-xs-12',
+    'text' => '<i class="fa fa-fw fa-refresh"></i> '.$this->translate('tr_meliscore_common_refresh'),
+    'style' => 'margin-bottom:15px',
+    'onclick' => "toolTemplate.refreshTable()",
+    'title' => $this->translate('tr_meliscore_common_refresh'),
+    'data-melisKey' => $this->melisKey,
+), 'non-modal');
+
+echo $refreshTableDesktop.$refreshTable;
+?>

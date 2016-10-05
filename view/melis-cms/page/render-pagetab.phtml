@@ -1,0 +1,54 @@
+<?php
+	$id = '';
+	if (!empty($this->zoneconfig['conf']['id']))
+		$id = ' id="' . $this->idPage . '_' . $this->zoneconfig['conf']['id'] . '"';
+	$data_melisKey = $this->melisKey;
+?> 
+<div<?= $id; ?> data-melisKey='<?= $data_melisKey; ?>' class="page-content-container iframe-container">
+	<div class="widget widget-tabs widget-tabs-double-2 widget-tabs-responsive">
+		<div class="widget-head nav">
+			<ul class="tabs-label nav-tabs">
+				<?php 
+					if (!empty($this->zoneconfig['interface']))
+					{
+						foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig)
+						{
+							$id = '';
+							if (!empty($menuConfig['conf']['id']))
+								$id = ' id="' . $this->idPage . '_' . $menuConfig['conf']['id'] . '_title"';
+		
+							$tabname = 'Tab';
+							if (!empty($menuConfig['conf']) && !empty($menuConfig['conf']['name']))
+								$tabname = $menuConfig['conf']['name'];
+		
+							$icon = '';
+							if (!empty($menuConfig['conf']) && !empty($menuConfig['conf']['icon']))
+								$icon = $menuConfig['conf']['icon'];
+							
+							?>
+							<li> <!-- <?= $id; ?> -->
+								<a class="glyphicons <?= $icon; ?>" data-page-id="<?= $this->idPage ?>" data-toggle="tab" href="#<?= $this->idPage; ?>_<?= $menuConfig['conf']['id']; ?>">
+									<i> </i>
+									<span><?= $tabname; ?></span>
+								</a>
+							</li>
+							<?php 
+						}
+					}
+				?>
+			</ul>
+		</div>
+		<div class="widget-body tab-content">
+		<?php 
+			if (!empty($this->zoneconfig['interface']))
+			{
+				foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig)
+				{
+					echo $this->$keyConfig;
+				}
+			}
+		?>
+		</div>
+	</div>
+</div>
+

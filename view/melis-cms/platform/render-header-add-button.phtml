@@ -1,0 +1,8 @@
+<?php 
+    $id = '';
+    if (!empty($this->zoneconfig['conf']['id'])){
+        $id = ' id="'.$this->zoneconfig['conf']['id'] .'"';
+    }
+    $data_melisKey = 'data-melisKey="'.$this->melisKey.'"';
+?>
+<button class="btn btn-success" <?php echo $id.' '.$data_melisKey; ?>><i class="fa fa-plus"></i> <?php echo $this->translate('tr_meliscms_tool_platform_ids_btn_add')?></button>

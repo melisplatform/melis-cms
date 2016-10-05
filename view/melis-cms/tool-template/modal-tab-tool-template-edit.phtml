@@ -1,0 +1,21 @@
+<div id="templateupdateformalert"></div>
+<span id="tplid" class="hidden"></span>
+<?php 
+$form = $this->meliscms_tool_template_edit;
+echo $this->form()->openTag($form);
+echo $this->melisFieldCollection($form);
+echo $this->form()->closeTag();
+?>
+
+
+<?php 
+
+echo $this->melisModalInvoker()->render(
+    array(
+        'text' => '<i class="fa fa-times"></i> '.$this->translate('tr_meliscms_common_close'),
+        'class' => 'btn btn-danger pull-left'
+    ), 'dismiss');
+
+?>
+
+<a class="btn btn-success pull-right" id="btnTemplateUpdate"><i class="fa fa-save"></i>  <?= $this->translate('tr_meliscms_template_save'); ?></a>

@@ -1,0 +1,525 @@
+[
+  {
+    "parent": true,
+    "isFolder": false,
+    "expand": false,
+    "title": "Dashboard",
+    "iconTab": "fa fa-tachometer",
+    "context": true,
+    "context_target": "#context-menu",
+    "status": "publish",
+    "addClass": "dashboard",
+    "hideOption": true,
+    "noClosable": true,
+    "defaultOpen": true,
+      "typeContainer": "single",
+    "defaultTabs": "default",
+    "melisID": "55da1e00be9b7215f5ab3b-a1",
+    "melisData": {
+      "melisID": "55da1e00be9b7215f5ab3b-a1",
+      "melis_id": "55da1e00be9b7215f5ab3b-a1-b1",
+      "melis_param_index": 0,
+      "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+    },
+    "tabs": {
+      "default": {
+        "parentMelisID": "55da1e00be9b7215f5ab3b-a1",
+        "melisID": "55da1e00be9b7215f5ab3b-a1-b1",
+        "urlLoad": "/html/back/templates/view/dashboard.php",
+        "typeLoad": "xhr",
+        "title": "Dashboard",
+        "hide": false,
+        "active": true,
+        "melisData": {
+          "parentMelisID": "55da1e00be9b7215f5ab3b-a1",
+          "melisID": "55da1e00be9b7215f5ab3b-a1-b1",
+          "melis_id": "55da1e00be9b7215f5ab3b-a1-b1",
+          "melis_param_index": 0,
+          "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b",
+          "callback": "function A() { console.log('bla bla test');}; A(); MelisHelper.utils.version(); console.log(id); console.log(data); console.log('-------');"
+        }
+      }
+    }
+  },
+  {
+    "parent": true,
+    "isFolder": true,
+    "expand": true,
+    "title": "Site Nav",
+    "iconTab": "fa fa-reorder",
+    "context": true,
+    "context_target": "#context-menu",
+    "melisID": "55da1e00be9b7215f5ab3b-a2",
+    "melisData": {
+      "melisID": "55da1e00be9b7215f5ab3b-a2",
+      "melis_id": "55da1e00be9b7215f5ab3b-a2",
+      "melis_param_index": 0,
+      "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+    },
+    "children": [
+      {
+        "parent": false,
+        "isFolder": true,
+        "expand": true,
+        "title": "Niveau 2",
+        "iconTab": "fa fa-file-o",
+        "context": false,
+        "context_target": false,
+        "status": "st_inpublish",
+        "addClass": "",
+        "melisID": "55da1e00be9b7215f5ab3b-a2-b1",
+        "melisData": {
+          "parentMelisID": "55da1e00be9b7215f5ab3b-a2",
+          "melisID": "55da1e00be9b7215f5ab3b-a2-b1",
+          "melis_id": "55da1e00be9b7215f5ab3b-a2-b1",
+          "melis_param_index": 0,
+          "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+        },
+        "children": [
+          {
+            "parent": false,
+            "isFolder": true,
+            "expand": true,
+            "title": "Niveau 3",
+            "iconTab": "fa fa-file-o",
+            "context": true,
+            "context_target": "#context-menu",
+            "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1",
+            "melisData": {
+              "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1",
+              "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1",
+              "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1",
+              "melis_param_index": 0,
+              "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+            },
+            "children": [
+              {
+                "parent": false,
+                "isFolder": false,
+                "expand": false,
+                "title": "Melis Technology",
+                "iconTab": "fa fa-television",
+                "context": true,
+                "context_target": "#context-menu",
+                "status": "publish",
+                "addClass": "page page-melis-technologie",
+                "hideOption": false,
+                "noClosable": false,
+                "defaultOpen": false,
+                "typeContainer": "tabs",
+                "defaultTabs": "edit",
+                "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d1",
+                "melisData": {
+                  "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1",
+                  "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d1",
+                  "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d1",
+                  "melis_param_index": 0,
+                  "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+                },
+                "tabs": {
+                  "edit": {
+                    "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d1",
+                    "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d1-e1",
+                    "urlLoad": "http://melis2.melistechnology.fr/html/back/pages/test.html",
+                    "typeLoad": "iframe",
+                    "title": "Edit",
+                    "hide": false,
+                    "active": true,
+                    "default": true,
+                    "iconTab": "glyphicons edit",
+                    "melisData": {
+                      "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d1-e1",
+                      "melis_param_index": 0,
+                      "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b",
+                      "callback": "function A1() { console.log('Melis Technology :: Edit');}; A1(); MelisHelper.directive.load('bWVudS1iYXItb3B0aW9ucw=='); MelisHelper.utils.version(); console.log(id); console.log(data); console.log('-------');"
+                    }
+                  },
+                  "meta": {
+                    "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d1",
+                    "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d1-e2",
+                    "urlLoad": "http://melis2.melistechnology.fr/html/back/xhr/html/form_validator.html",
+                    "typeLoad": "xhr",
+                    "title": "Meta",
+                    "hide": false,
+                    "active": true,
+                    "default": false,
+                    "iconTab": "glyphicons tag",
+                    "melisData": {
+                      "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d1-e2",
+                      "melis_param_index": 0,
+                      "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b",
+                      "callback": "function A2() { console.log('Melise Technologie :: Meta');}; A2(); MelisHelper.utils.version(); console.log(id); console.log(data); console.log('-------');"
+                    }
+                  },
+                  "historique": {
+                    "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d1",
+                    "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d1-e3",
+                    "urlLoad": "http://www.melisagency.fr/",
+                    "typeLoad": "iframe",
+                    "title": "Historique",
+                    "hide": false,
+                    "active": true,
+                    "default": false,
+                    "iconTab": "glyphicons history",
+                    "melisData": {
+                      "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d1-e3",
+                      "melis_param_index": 0,
+                      "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b",
+                      "callback": "function A3() { console.log('Melise Technologie :: History');}; A3(); MelisHelper.utils.version(); console.log(id); console.log(data); console.log('-------');"
+                    }
+                  },
+                  "versionning": {
+                    "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d1",
+                    "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d1-e4",
+                    "urlLoad": "http://www.melisagency.fr/",
+                    "typeLoad": "iframe",
+                    "title": "Versionning",
+                    "hide": false,
+                    "active": true,
+                    "default": false,
+                    "iconTab": "glyphicons git_branch",
+                    "melisData": {
+                      "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d1-e4",
+                      "melis_param_index": 0,
+                      "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b",
+                      "callback": "function A4() { console.log('Melise Technologie :: Versionning');}; A4(); MelisHelper.utils.version(); console.log(id); console.log(data); console.log('-------');"
+                    }
+                  }
+                }
+              },
+              {
+                "parent": false,
+                "isFolder": false,
+                "expand": false,
+                "title": "Features",
+                "iconTab": "fa fa-television",
+                "context": true,
+                "context_target": "#context-menu",
+                "status": "publish",
+                "addClass": "page page-features",
+                "hideOption": false,
+                "noClosable": false,
+                "defaultOpen": false,
+                "typeContainer": "tabs",
+                "defaultTabs": "edit",
+                "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d2",
+                "melisData": {
+                  "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1",
+                  "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d2",
+                  "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d2",
+                  "melis_param_index": 0,
+                  "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+                },
+                "tabs": {
+                  "edit": {
+                    "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d2",
+                    "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d2-e1",
+                    "urlLoad": "http://www.melisagency.fr/",
+                    "typeLoad": "iframe",
+                    "title": "Edit",
+                    "hide": false,
+                    "active": true,
+                    "default": true,
+                    "iconTab": "glyphicons edit",
+                    "melisData": {
+                      "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d2-e1",
+                      "melis_param_index": 0,
+                      "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+                    }
+                  },
+                  "meta": {
+                    "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d2",
+                    "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d2-e2",
+                    "urlLoad": "http://melis2.melistechnology.fr/html/back/xhr/html/form_validator.html",
+                    "typeLoad": "xhr",
+                    "title": "Meta",
+                    "hide": false,
+                    "active": true,
+                    "default": false,
+                    "iconTab": "glyphicons tag",
+                    "melisData": {
+                      "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d2-e2",
+                      "melis_param_index": 0,
+                      "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+                    }
+                  },
+                  "historique": {
+                    "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d2",
+                    "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d2-e3",
+                    "urlLoad": "http://www.melisagency.fr/",
+                    "typeLoad": "iframe",
+                    "title": "Historique",
+                    "hide": false,
+                    "active": true,
+                    "default": false,
+                    "iconTab": "glyphicons history",
+                    "melisData": {
+                      "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d2-e3",
+                      "melis_param_index": 0,
+                      "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+                    }
+                  },
+                  "versionning": {
+                    "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d2",
+                    "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d2-e4",
+                    "urlLoad": "http://www.melisagency.fr/",
+                    "typeLoad": "iframe",
+                    "title": "Versionning",
+                    "hide": false,
+                    "active": true,
+                    "default": false,
+                    "iconTab": "glyphicons git_branch",
+                    "melisData": {
+                      "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d2-e4",
+                      "melis_param_index": 0,
+                      "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+                    }
+                  }
+                }
+              },
+              {
+                "parent": false,
+                "isFolder": false,
+                "expand": false,
+                "title": "Strategic Partner",
+                "iconTab": "fa fa-television",
+                "context": true,
+                "context_target": "#context-menu",
+                "status": "publish",
+                "addClass": "page page-strategic-partner",
+                "hideOption": false,
+                "noClosable": false,
+                "defaultOpen": false,
+                "typeContainer": "tabs",
+                "defaultTabs": "edit",
+                "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d3",
+                "melisData": {
+                  "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1",
+                  "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d3",
+                  "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d3",
+                  "melis_param_index": 0,
+                  "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+                },
+                "tabs": {
+                  "edit": {
+                    "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d3",
+                    "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d3-e1",
+                    "urlLoad": "http://www.melisagency.fr/",
+                    "typeLoad": "iframe",
+                    "title": "Edit",
+                    "hide": false,
+                    "active": true,
+                    "default": true,
+                    "iconTab": "glyphicons edit",
+                    "melisData": {
+                      "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d3-e1",
+                      "melis_param_index": 0,
+                      "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+                    }
+                  },
+                  "meta": {
+                    "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d3",
+                    "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d3-e2",
+                    "urlLoad": "http://www.melisagency.fr/",
+                    "urlLoad": "http://melis2.melistechnology.fr/html/back/xhr/html/form_validator.html",
+                    "typeLoad": "xhr",
+                    "hide": false,
+                    "active": true,
+                    "default": false,
+                    "iconTab": "glyphicons tag",
+                    "melisData": {
+                      "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d3-e2",
+                      "melis_param_index": 0,
+                      "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+                    }
+                  },
+                  "historique": {
+                    "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d3",
+                    "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d3-e3",
+                    "urlLoad": "http://www.melisagency.fr/",
+                    "typeLoad": "iframe",
+                    "title": "Historique",
+                    "hide": false,
+                    "active": true,
+                    "default": false,
+                    "iconTab": "glyphicons history",
+                    "melisData": {
+                      "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d3-e3",
+                      "melis_param_index": 0,
+                      "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+                    }
+                  },
+                  "versionning": {
+                    "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d3",
+                    "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d3-e4",
+                    "urlLoad": "http://www.melisagency.fr/",
+                    "typeLoad": "iframe",
+                    "title": "Versionning",
+                    "hide": false,
+                    "active": true,
+                    "default": false,
+                    "iconTab": "glyphicons git_branch",
+                    "melisData": {
+                      "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d3-e4",
+                      "melis_param_index": 0,
+                      "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+                    }
+                  }
+                }
+              },
+              {
+                "parent": false,
+                "isFolder": false,
+                "expand": false,
+                "title": "Support",
+                "iconTab": "fa fa-television",
+                "context": true,
+                "context_target": "#context-menu",
+                "status": "publish",
+                "addClass": "page page-support",
+                "hideOption": false,
+                "noClosable": false,
+                "defaultOpen": false,
+                "typeContainer": "tabs",
+                "defaultTabs": "edit",
+                "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d4",
+                "melisData": {
+                  "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1",
+                  "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d4",
+                  "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d4",
+                  "melis_param_index": 0,
+                  "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+                },
+                "tabs": {
+                  "edit": {
+                    "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d4",
+                    "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d4-e1",
+                    "urlLoad": "http://www.melisagency.fr/",
+                    "typeLoad": "iframe",
+                    "title": "Edit",
+                    "hide": false,
+                    "active": true,
+                    "default": false,
+                    "iconTab": "glyphicons edit",
+                    "melisData": {
+                      "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d4-e1",
+                      "melis_param_index": 0,
+                      "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+                    }
+                  },
+                  "meta": {
+                    "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d4",
+                    "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d4-e2",
+                    "urlLoad": "http://melis2.melistechnology.fr/html/back/xhr/html/form_validator.html",
+                    "typeLoad": "xhr",
+                    "title": "Meta",
+                    "hide": false,
+                    "active": true,
+                    "default": true,
+                    "iconTab": "glyphicons tag",
+                    "melisData": {
+                      "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d4-e2",
+                      "melis_param_index": 0,
+                      "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+                    }
+                  },
+                  "historique": {
+                    "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d4",
+                    "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d4-e3",
+                    "urlLoad": "http://www.melisagency.fr/",
+                    "typeLoad": "iframe",
+                    "title": "Historique",
+                    "hide": false,
+                    "active": true,
+                    "default": false,
+                    "iconTab": "glyphicons history",
+                    "melisData": {
+                      "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d4-e3",
+                      "melis_param_index": 0,
+                      "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+                    }
+                  },
+                  "versionning": {
+                    "parentMelisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d4",
+                    "melisID": "55da1e00be9b7215f5ab3b-a2-b1-c1-d4-e4",
+                    "urlLoad": "http://www.melisagency.fr/",
+                    "typeLoad": "iframe",
+                    "title": "Versionning",
+                    "hide": false,
+                    "active": true,
+                    "default": false,
+                    "iconTab": "glyphicons git_branch",
+                    "melisData": {
+                      "melis_id": "55da1e00be9b7215f5ab3b-a2-b1-c1-d4-e4",
+                      "melis_param_index": 0,
+                      "melis_param_guid": "24e53e1b-97ad-49c8-9b7d-b19192a2f29b"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "parent": true,
+    "title": "Settings",
+    "iconTab": "fa fa-cog",
+    "context": true,
+    "context_target": "#context-menu",
+    "melisID": "55da1e00be9b7215f5ab3b-a3",
+    "children": [
+      {
+        "title": "Sub-item 2.1",
+        "status": "st_inpublish",
+        "context": true,
+        "context_target": "#context-menu",
+        "isFolder": true,
+        "isLazy": true,
+        "isLazyXhr": "xhr/json/tree_lazy.json"
+      },
+      {
+        "title": "Sub-item 2.1.1",
+        "context": true,
+        "context_target": "#context-menu"
+      },
+      {
+        "title": "Sub-item 2.1.1.1",
+        "context": true,
+        "context_target": "#context-menu"
+      },
+      {
+        "title": "Sub-item 2.1.2.2",
+        "context": true,
+        "context_target": "#context-menu"
+      },
+      {
+        "title": "Sub-item 2.1.1.3",
+        "context": true,
+        "context_target": "#context-menu"
+      },
+      {
+        "title": "Sub-item 2.1.2.4",
+        "context": true,
+        "context_target": "#context-menu"
+      },
+      {
+        "title": "Sub-item 2.1.2",
+        "context": true,
+        "context_target": "#context-menu"
+      },
+      {
+        "title": "Sub-item 2.1.3",
+        "context": true,
+        "context_target": "#context-menu"
+      },
+      {
+        "title": "Sub-item 2.1.4",
+        "context": true,
+        "context_target": "#context-menu"
+      }
+    ]
+  }
+]

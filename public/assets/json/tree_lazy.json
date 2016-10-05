@@ -1,0 +1,21 @@
+[
+  {
+    "title": "SubItem 1",
+    "isFolder": true,
+    "isLazy": true,
+    "isLazyXhr": "/MelisCms/public/assets/json/tree_lazy.json",
+    "context": true,
+    "context_target": "#context-menu",
+    "tab": "page-1",
+    "load": "ifarame",
+    "href": "test.html"
+  },
+  {
+    "title": "SubFolder 2",
+    "isFolder": true,
+    "isLazy": true,
+    "isLazyXhr": "/MelisCms/public/assets/json/tree_lazy.json",
+    "context": true,
+    "context_target": "#context-menu"
+  }
+]

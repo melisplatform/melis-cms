@@ -1,0 +1,250 @@
+[
+    {
+        "parent": true,
+        "title": "Dashboard",
+        "icone": "icon-projector-screen-line",
+        "context": true,
+        "context_target": "#context-menu",
+        "addClass": "home",
+        "key": "home",
+        "hideOption": true
+    },
+    {
+        "parent": true,
+        "title": "Site Nav",
+        "icone": "icon-compose",
+        "context": true,
+        "context_target": "#context-menu",
+        "expand": true,
+        "children": [
+            {
+                "title": "Sub-item 2.1",
+                "status": "st_inpublish",
+                "context": true,
+                "context_target": "#context-menu",
+                "expand": true,
+                "children": [
+                    {
+                        "title": "Sub-item 2.1.1",
+                        "context": true,
+                        "context_target": "#context-menu",
+                        "expand": true,
+                        "children": [
+                            {
+                                "title": "Melise Technologie",
+                                "context": true,
+                                "context_target": "#context-menu",
+                                "iconeTab": "file",
+                                "tab": "cdss",
+                                "options": [
+                                    "edit",
+                                    "properties",
+                                    "versionning"
+                                ],
+                                "typeload": "iframe",
+                                "src": "http://www.melisagency.fr/",
+                                "optionsval": {
+                                    "edit": {
+                                        "typeload": "iframe",
+                                        "src": "http://www.melisagency.fr/"
+                                    },
+                                    "properties": {
+                                        "typeload": "iframe",
+                                        "src": "http://www.melisagency.fr/"
+                                    },
+                                    "versionning": {
+                                        "typeload": "iframe",
+                                        "src": "http://www.melisagency.fr/"
+                                    }
+                                }
+                            },
+                            {
+                                "title": "Features",
+                                "context": true,
+                                "context_target": "#context-menu",
+                                "iconeTab": "file",
+                                "options": [
+                                    "edit",
+                                    "meta",
+                                    "versionning"
+                                ],
+                                "typeload": "iframe",
+                                "src": "http://www.melistechnology.com/features/id/7",
+                                "optionsval": {
+                                    "edit": {
+                                        "typeload": "iframe",
+                                        "src": "http://www.melistechnology.com/features/id/7"
+                                    },
+                                    "meta": {
+                                        "typeload": "iframe",
+                                        "src": "http://www.melistechnology.com/features/id/7"
+                                    },
+                                    "versionning": {
+                                        "typeload": "iframe",
+                                        "src": "http://www.melistechnology.com/features/id/7"
+                                    }
+                                }
+                            },
+                            {
+                                "title": "Strategic Partner",
+                                "context": true,
+                                "context_target": "#context-menu",
+                                "iconeTab": "file",
+                                "options": [
+                                    "edit",
+                                    "properties",
+                                    "meta",
+                                    "versionning"
+                                ],
+                                "typeload": "iframe",
+                                "src": "http://www.melistechnology.com/partners/strategic-partner/id/31",
+                                "optionsval": {
+                                    "edit": {
+                                        "typeload": "iframe",
+                                        "src": "http://www.melistechnology.com/partners/strategic-partner/id/31"
+                                    },
+                                    "properties": {
+                                        "typeload": "iframe",
+                                        "src": "http://www.melistechnology.com/partners/strategic-partner/id/31"
+                                    },
+                                    "meta": {
+                                        "typeload": "iframe",
+                                        "src": "http://www.melistechnology.com/partners/strategic-partner/id/31"
+                                    },
+                                    "versionning": {
+                                        "typeload": "iframe",
+                                        "src": "http://www.melistechnology.com/partners/strategic-partner/id/31"
+                                    }
+                                }
+                            },
+                            {
+                                "title": "Support",
+                                "context": true,
+                                "context_target": "#context-menu",
+                                "iconeTab": "file",
+                                "options": [
+                                    "edit",
+                                    "properties",
+                                    "meta",
+                                    "versionning"
+                                ],
+                                "typeload": "iframe",
+                                "src": "http://www.melistechnology.com/support/editions-overview/id/38#professional",
+                                "optionsval": {
+                                    "edit": {
+                                        "typeload": "iframe",
+                                        "src": "http://www.melistechnology.com/support/editions-overview/id/38#professional"
+                                    },
+                                    "properties": {
+                                        "typeload": "iframe",
+                                        "src": "http://www.melistechnology.com/support/editions-overview/id/38#professional"
+                                    },
+                                    "meta": {
+                                        "typeload": "iframe",
+                                        "src": "http://www.melistechnology.com/support/editions-overview/id/38#professional"
+                                    },
+                                    "versionning": {
+                                        "typeload": "iframe",
+                                        "src": "http://www.melistechnology.com/support/editions-overview/id/38#professional"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "title": "Sub-item 2.1.2",
+                        "context": true,
+                        "context_target": "#context-menu",
+                        "iconeTab": "credit_card",
+                        "tab": "cdss",
+                        "options": [
+                            "edit",
+                            "properties",
+                            "versionning"
+                        ]
+                    },
+                    {
+                        "title": "Sub-item 2.1.3",
+                        "context": true,
+                        "context_target": "#context-menu",
+                        "iconeTab": "cogwheel",
+                        "tab": "cdss",
+                        "options": [
+                            "edit",
+                            "properties",
+                            "meta",
+                            "versionning"
+                        ]
+                    },
+                    {
+                        "title": "Sub-item 2.1.4",
+                        "context": true,
+                        "context_target": "#context-menu",
+                        "iconeTab": "circle_plus",
+                        "tab": "cdss",
+                        "options": [
+                            "edit",
+                            "properties",
+                            "versionning"
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "parent": true,
+        "title": "Settings",
+        "icone": "icon-settings-wheel-fill",
+        "context": true,
+        "context_target": "#context-menu",
+        "children": [
+            {
+                "title": "Sub-item 2.1",
+                "status": "st_inpublish",
+                "context": true,
+                "context_target": "#context-menu"
+            },
+            {
+                "title": "Sub-item 2.1.1",
+                "context": true,
+                "context_target": "#context-menu"
+            },
+            {
+                "title": "Sub-item 2.1.1.1",
+                "context": true,
+                "context_target": "#context-menu"
+            },
+            {
+                "title": "Sub-item 2.1.2.2",
+                "context": true,
+                "context_target": "#context-menu"
+            },
+            {
+                "title": "Sub-item 2.1.1.3",
+                "context": true,
+                "context_target": "#context-menu"
+            },
+            {
+                "title": "Sub-item 2.1.2.4",
+                "context": true,
+                "context_target": "#context-menu"
+            },
+            {
+                "title": "Sub-item 2.1.2",
+                "context": true,
+                "context_target": "#context-menu"
+            },
+            {
+                "title": "Sub-item 2.1.3",
+                "context": true,
+                "context_target": "#context-menu"
+            },
+            {
+                "title": "Sub-item 2.1.4",
+                "context": true,
+                "context_target": "#context-menu"
+            }
+        ]
+    }
+]

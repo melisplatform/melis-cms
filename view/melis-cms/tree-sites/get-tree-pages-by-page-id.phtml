@@ -1,0 +1,47 @@
+<?php
+
+	$name = '';
+	$id = '';
+	if (!empty($this->zoneconfig['conf']['name']))
+		$name = $this->zoneconfig['conf']['name'];
+	if (!empty($this->zoneconfig['conf']['id']))
+		$id = ' id="' . $this->zoneconfig['conf']['id'] . '"';
+	$data_melisKey = $this->melisKey;
+		
+?>
+<li<?= $id; ?> class="hasSubmenu" data-melisKey='<?= $data_melisKey; ?>'>
+    <a data-target="#treeview-container" data-toggle="collapse" class="collapsed">
+        <i class="fa fa-sitemap">
+        </i><span><?= $name; ?></span>
+    </a>
+    <div class="collapse" id="treeview-container">
+    	<div class="mod-menu-dynatree" id="id-mod-menu-dynatree">
+    	    
+    	   <?php
+    		/*    foreach ($this->pages as $page)
+    		    {
+    		    	$datas = '';
+    		    	foreach ($page as $item => $valueItem)
+    		    	{
+    		    		if ($item != 'item_datas')
+    		    			$datas .= ' data-' . $item . '="' . $valueItem . '"';
+    		    		else
+    		    			foreach ($valueItem as $subitem => $subvalueItem)
+    		    				$datas .= ' data-datas-' . $subitem . '="' . $subvalueItem . '"';
+    		    	}
+    		    	?>
+    	    		<li<?= $datas; ?> class="melis-opentreeview">
+    	    			<a href="#">
+    	    				<i class="fa fa-spinner"></i>
+    	    				<span><?= $page['item_name']; ?></span>
+    	    			</a>
+    	    			
+    	    		
+    	    		</li>
+    	    		<?php
+    		    }
+    	    */	?>
+    	    
+	     </div>
+    </div>
+</li>

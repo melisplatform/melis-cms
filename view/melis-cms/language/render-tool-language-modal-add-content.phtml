@@ -1,0 +1,18 @@
+<div id="languagealert"></div>
+
+<div id="languageadd">
+<?php 
+$form = $this->meliscms_tool_language_generic_form; 
+echo $this->form()->openTag($form);
+echo $this->melisFieldCollection($form);
+echo $this->form()->closeTag();
+
+echo $this->melisModalInvoker()->render(
+    array(
+        'text' => '<i class="fa fa-times"></i> '.$this->translate('tr_meliscms_common_close'),
+        'class' => 'btn btn-danger pull-left'
+    ), 'dismiss');
+?>
+
+<a class="btn btn-success pull-right" id="btnLangCmsAdd"><i class="fa fa-plus"></i>  <?= $this->translate('tr_meliscms_common_add'); ?></a>
+</div> 

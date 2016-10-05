@@ -1,0 +1,31 @@
+<?php
+
+	$id = '';
+	if (!empty($this->zoneconfig['conf']['id']))
+		$id = ' id="' . $this->zoneconfig['conf']['id'] . '"';
+	$namePlugin = '';
+	if (!empty($this->zoneconfig['conf']['name']))
+		$namePlugin = ' data-title="' . $this->zoneconfig['conf']['name'] . '"';
+	$data_melisKey = $this->melisKey;
+		
+?>
+<li<?= $id; ?> data-melisKey='<?= $data_melisKey; ?>' class="dropdown" <?= $namePlugin; ?>>
+	<a href="#" class="dropdown-toggle dropdown-hover">
+		<span class="langimg-cont"><img src="/MelisCore/assets/images/lang/<?= $this->currentLangLocale; ?>.png"></span>
+	</a> 
+	<ul class="dropdown-menu">
+		<?php 
+			foreach ($this->languages as $language)
+			{
+				$name = $language['lang_name'];
+				if ($this->currentLangId == $language['lang_id'])
+					$name = '<b>' . $name . '</b>';
+				
+				$lang = explode('_', $language['lang_locale']);
+		?>
+		<li class="active"><a href="" onclick="melisChangeLanguage(<?= $language['lang_cms_id']; ?>); return false;"><img src="/MelisCore/assets/images/lang/<?= $lang[0]; ?>.png"> <?= $name; ?></a></li>
+		<?php 		
+			}
+		?>
+	</ul>
+</li>

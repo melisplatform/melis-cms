@@ -1,0 +1,52 @@
+<?php 
+
+/**
+ * Melis Technology (http://www.melistechnology.com)
+ *
+ * @copyright Copyright (c) 2015 Melis Technology (http://www.melistechnology.com)
+ *
+ */
+
+namespace MelisCms\Listener;
+
+use Zend\EventManager\EventManagerInterface;
+use Zend\EventManager\ListenerAggregateInterface;
+use Zend\Mvc\MvcEvent;
+use Zend\Session\Container;
+
+use MelisCore\Listener\MelisCoreGeneralListener;
+
+class MelisCmsToolUserNewUserListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+{
+	 
+    public function attach(EventManagerInterface $events)
+    {
+        $sharedEvents      = $events->getSharedManager();
+        
+        $callBackHandler = $sharedEvents->attach(
+        	'MelisCore',
+        	'meliscore_tooluser_savenew_start', 
+        	function($e){
+
+        		$sm = $e->getTarget()->getServiceLocator();
+        		$container = new Container('meliscore');
+        		
+        		// Add MelisCMS rights management
+    			$request = $sm->get('request');
+    			$postUser = $request->getPost();
+    			$userId = null;
+    			if (!empty($postUser['usr_id']))
+    				$userId = $postUser['usr_id'];
+    				
+				if (empty($container['action-tool-user-setrights-tmp']))
+				    $container['action-tool-user-setrights-tmp'] = array();
+    				
+    			$melisCmsRights = $sm->get('MelisCmsRights');
+    			$melisCmsRights = $melisCmsRights->createXmlRightsValues($userId, $postUser);
+    			$container['action-tool-user-setrights-tmp'] = array_merge($container['action-tool-user-setrights-tmp'], $melisCmsRights);
+        	},
+        110);
+        
+        $this->listeners[] = $callBackHandler;
+    }
+}

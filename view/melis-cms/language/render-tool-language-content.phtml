@@ -1,0 +1,44 @@
+<?php 
+$id = '';
+if (!empty($this->zoneconfig['conf']['id']))
+    $id = ' id="' .$this->zoneconfig['conf']['id'] . '"';
+    $data_melisKey = $this->melisKey;
+
+?>
+
+<div <?= $id; ?> data-melisKey="<?= $data_melisKey; ?>">
+	<div class="spacing-x2 innerAll">
+		<?php 
+		$this->melisGenericTable()->setTable(array(
+		    'id' => 'tableLanguagesCms',
+		    'class' => 'table table-striped table-primary dt-responsive nowrap',
+		    'cellspacing' => '0',
+		    'width' => '100%'
+		));
+		
+		$columns = array();
+		$columnStyle = array();
+		
+		foreach($this->tableColumns as $columnText)
+		{
+		    $columns[] = $columnText['text'];
+		}
+
+		// set table columns
+		$this->MelisGenericTable()->setColumns($columns);
+
+		echo $this->melisGenericTable()->renderTable();
+		
+		?>
+		<script type="text/javascript">
+		// render table to DataTable plugin
+		$(document).ready(function() {
+			<?= $this->getToolDataTableConfig; ?>
+		});
+		</script>
+
+		
+		
+		
+	</div> 
+</div>

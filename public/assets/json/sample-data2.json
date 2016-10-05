@@ -1,0 +1,18 @@
+[
+  {
+    "title": "SubItem 1",
+    "isLazy": true,
+    "context": true,
+    "context_target": "#context-menu",
+    "tab": "page-1",
+    "load": "ifarame",
+    "href": "test.html"
+  },
+  {
+    "title": "SubFolder 2",
+    "isFolder": true,
+    "isLazy": true,
+    "context": true,
+    "context_target": "#context-menu"
+  }
+]

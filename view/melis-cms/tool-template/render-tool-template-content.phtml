@@ -1,0 +1,53 @@
+<?php 
+$id = '';
+if (!empty($this->zoneconfig['conf']['id']))
+    $id = ' id="' .$this->zoneconfig['conf']['id'] . '"';
+    $data_melisKey = $this->melisKey;
+    
+?>
+
+	
+<div <?= $id; ?> data-melisKey="<?= $data_melisKey; ?>">
+	<div class="spacing-x2 innerAll">
+    		<?php 
+    		
+    		// In order to display your data we can use Melis Generic Table Helper to help you setup your table
+    		$this->melisGenericTable()->setTable(array(
+    		    // unique identifier for your table
+    		    'id' => 'tableToolTemplateManager',
+    		    // used to render the display of your table, on this class, we will be using the site's template.
+    		    'class' => 'table table-striped table-primary dt-responsive nowrap',
+    		    'cellspacing' => '0',
+    		    'width' => '100%'
+    		));
+    		
+    		// next we need to get the columns texts and styles, since the column content is an array we need to extract it first so we can display our thead properly
+    		$columnsText = array();
+    		$columnsStyle= array();
+    		foreach($this->tableColumns as $columns)
+    		{
+    		    $columnsText[]  = $columns['text'];
+    		}
+
+    			
+    		/**
+    		 * Columns has been set, time to add it on our Melis Generic Table Helper
+    		 * $columnText and $columnStyle parameters are the one we set to display our text and configure the inline css style
+    		 * 'center' parameter tells the table to place the text in the center.
+    		 */
+    		$this->melisGenericTable()->setColumns($columnsText);
+
+    		echo $this->melisGenericTable()->renderTable();
+    
+    		?>
+    		<script>
+			// this script cannot be separated to this file since all table configuration and initialization are done here
+			// render table to DataTable plugin
+			$(document).ready(function() {
+				<?= $this->getToolDataTableConfig; ?>
+			});
+    		</script>
+	</div>
+</div>
+	
+

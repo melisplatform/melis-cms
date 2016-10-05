@@ -1,0 +1,25 @@
+<?php
+
+	$id = '';
+	if (!empty($this->zoneconfig['conf']['id']) && !$this->prefixId)
+		$id = ' id="' . $this->zoneconfig['conf']['id'] . '"';
+	else
+		$id = ' id="' . $this->idPage . '_' . $this->zoneconfig['conf']['id'] . '"';
+	$data_melisKey = $this->melisKey;
+	
+?>
+<div data-melisKey='<?= $data_melisKey; ?>'<?= $id; ?> class="tab-pane container-level-a">
+	<?php 
+		if ($this->isAccessible && !empty($this->zoneconfig['interface'])) 
+		{
+			foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig)
+			{
+				echo $this->$keyConfig;
+			}
+		}
+		
+		if (!$this->isAccessible)
+			echo $this->translate('tr_meliscms_page_error_Your rights don\'t allow you to see this page');
+		
+	?>
+</div>

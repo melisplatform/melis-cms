@@ -1,0 +1,26 @@
+<?php
+	$id = '';
+	if (!empty($this->zoneconfig['conf']['id']))
+		$id = ' id="' .$this->zoneconfig['conf']['id'] . '"';
+	$data_melisKey = $this->melisKey;
+    
+	
+?>
+<div<?= $id; ?>  class="tab-pane container-level-a" data-melisKey='<?= $data_melisKey; ?>'> 
+		<?php 
+		if(empty($this->noAccess))
+		{
+		    if(!empty($this->zoneconfig['interface'])) {
+		        foreach($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
+		            echo $this->$keyConfig;
+		        }
+		    }
+		}
+        else 
+        {
+            echo '<h4>'.$this->noAccess.'</h4>';
+        }
+        
+		?>
+</div>
+ 

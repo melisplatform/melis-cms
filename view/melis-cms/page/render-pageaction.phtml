@@ -1,0 +1,20 @@
+<?php
+	$id = '';
+	if (!empty($this->zoneconfig['conf']['id']))
+		$id = ' id="' . $this->idPage . '_' . $this->zoneconfig['conf']['id'] . '"';
+	$data_melisKey = $this->melisKey;
+	
+?>
+<div<?= $id; ?> data-melisKey='<?= $data_melisKey; ?>' class="bg-white innerAll transition3ms">
+	<ul id="<?= $this->idPage; ?>_id_meliscms_page_action_tabs" class="menubar menu-bar-options">
+		<?php 
+		if (!empty($this->zoneconfig['interface']))
+		{
+			foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig)
+			{ 
+				echo $this->$keyConfig;
+			}
+		}
+		?>
+	</ul>
+</div>
