@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * Melis Technology (http://www.melistechnology.com)
+ *
+ * @copyright Copyright (c) 2016 Melis Technology (http://www.melistechnology.com)
+ *
+ */
+
 namespace MelisCms\Controller;
 
 
@@ -9,6 +16,7 @@ use Zend\View\Model\JsonModel;
 use Zend\Session\Container;
 
 use MelisCore\Service\MelisCoreRightsService;
+
 /**
  * This class deals with the languages button in the header
  */
@@ -18,7 +26,7 @@ class LanguageController extends AbstractActionController
     const TOOL_KEY = 'meliscms_language_tool';
     const INTERFACE_KEY = 'meliscms_tool_language';
     
-    //Render section
+
     public function renderToolLanguageContainerAction()
     {
         $translator = $this->getServiceLocator()->get('translator');
@@ -37,7 +45,8 @@ class LanguageController extends AbstractActionController
         return $view;
     
     }
-    //Header
+
+    
     public function renderToolLanguageHeaderAction()
     {
         $translator = $this->getServiceLocator()->get('translator');
@@ -50,6 +59,7 @@ class LanguageController extends AbstractActionController
     
         return $view;
     }
+    
     public function renderToolLanguageHeaderAddAction()
     {
         $melisKey = $this->params()->fromRoute('melisKey', '');
@@ -59,9 +69,8 @@ class LanguageController extends AbstractActionController
     
         return $view;
     }
-    //End header
     
-    //Body section
+
     public function renderToolLanguageContentAction()
     {
         $translator = $this->getServiceLocator()->get('translator');
@@ -103,18 +112,12 @@ class LanguageController extends AbstractActionController
         return new ViewModel();
     }
     
-//     public function renderToolLanguageContentActionApplyAction()
-//     {
-//         return new ViewModel();
-//     }
     public function renderToolLanguageContentActionEditAction()
     {
         return new ViewModel();
     }
-    // END BODY SECTION
     
     
-    // MODAL SECTION
     public function renderToolLanguageModalAction()
     {
         $melisKey = $this->params()->fromRoute('melisKey', '');
@@ -185,6 +188,7 @@ class LanguageController extends AbstractActionController
     
         return $view;
     }
+    
     public function renderToolLanguageModalEditContentAction(){
         // declare the Tool service that we will be using to completely create our tool.
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
@@ -198,8 +202,6 @@ class LanguageController extends AbstractActionController
         
         return $view;
     }
-    
-
     
     public function getLanguagesAction()
     {
@@ -260,15 +262,11 @@ class LanguageController extends AbstractActionController
     
                 // manually modify value of the desired row
                 // no specific row to be modified
-    
-    
+                
                 // add DataTable RowID, this will be added in the <tr> tags in each rows
                 $tableData[$ctr]['DT_RowId'] = $tableData[$ctr]['lang_cms_id'];
-    
             }
-    
         }
-    
     
         return new JsonModel(array(
             'draw' => (int) $draw,
@@ -314,12 +312,11 @@ class LanguageController extends AbstractActionController
                 'sSortAscending' => $translator->translate('tr_meliscms_dt_sSortAscending'),
                 'sSortDescending' => $translator->translate('tr_meliscms_dt_sSortDescending'),
             ),
-    
-    
         );
     
         return new JsonModel($transData);
     }
+    
     public function getLanguageByIdAction()
     {
         $data = array();
@@ -335,12 +332,12 @@ class LanguageController extends AbstractActionController
             }
         
         }
+        
         return new JsonModel(array(
             'language' =>  $data
         ));
     }
    
-    // Add/Edit/Delete language
     public function addLanguageAction()
     {
         $response = array();
@@ -369,21 +366,14 @@ class LanguageController extends AbstractActionController
                 $data = $form->getData();
                 $isExistData = $langTable->getEntryByField('lang_cms_locale', $data['lang_cms_locale']);
                 $isExistData = $isExistData->current();
-                if(empty($isExistData)) {
-    
-    
-                //    $createTranslationFiles = $melisTranslation->addTranslationFiles($data['lang_cms_locale']);
-                //    if($createTranslationFiles) {
-                        $id = $langTable->save($data);
-                        $textMessage = 'tr_meliscms_tool_language_add_success';
-                        $success = 1;
-               //     }
-               //     else {
-               //         $textMessage = 'tr_meliscms_tool_language_permission';
-               //     }
-    
+                if(empty($isExistData)) 
+                {
+                    $id = $langTable->save($data);
+                    $textMessage = 'tr_meliscms_tool_language_add_success';
+                    $success = 1;
                 }
-                else {
+                else 
+                {
                     $errors = array(
                         'lang_cms_locale' => array(
                             'locale_exists' => $translator->translate('tr_meliscms_tool_language_add_exists')
@@ -495,7 +485,6 @@ class LanguageController extends AbstractActionController
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
         $textMessage = 'tr_meliscms_tool_language_delete_failed';
         $melisTranslation = $this->getServiceLocator()->get('MelisCoreTranslation');
-  //      $doNotDelete = array('en_EN.interface.php', 'en_EN.forms.php');
     
         $id = 0;
         $success = 0;
@@ -506,23 +495,9 @@ class LanguageController extends AbstractActionController
             $id = $this->getRequest()->getPost('id');
             if(is_numeric($id))
             {
-         //       $langData = $langTable->getEntryById($id);
-          //      $langData = $langData->current();
-    
-    //            if(!empty($langData) && ($langData->lang_cms_locale != 'en_EN'))
-     //           {
-                    // delete translation files
-   //                 $files = $melisTranslation->getFilesByLocale($langData->lang_cms_locale);
- /*                   foreach($files as $file) {
-                        if(!in_array($file, $doNotDelete)) {
-                            unlink($file);
-                        }
-    
-                    }*/
-                    $langTable->deleteById($id);
-                    $textMessage = 'tr_meliscms_tool_language_delete_success';
-                    $success = 1;
-     //           }
+                $langTable->deleteById($id);
+                $textMessage = 'tr_meliscms_tool_language_delete_success';
+                $success = 1;
             }
         }
     
@@ -535,13 +510,11 @@ class LanguageController extends AbstractActionController
     
         return new JsonModel($response);
     }
-    //End events
 
-    //USER ACCESS SECTION
-     /**
-     * Checks wether the user has access to this tools or not
-     * @return boolean
-     */
+   /**
+    * Checks wether the user has access to this tools or not
+    * @return boolean
+    */
     private function hasAccess($key)
     {
         $melisCmsAuth = $this->getServiceLocator()->get('MelisCoreAuth');

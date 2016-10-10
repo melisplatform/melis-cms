@@ -24,10 +24,10 @@
 			miniTemplates = [];
 	
 		<?php 
-	
+		
 			foreach ($this->configsTiny as $config)
 			{
-				require_once(MELIS_MODULES_FOLDER . $config);	
+				require_once($config);	
 				echo "\n";	
 			}
 	

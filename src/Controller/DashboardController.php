@@ -12,8 +12,12 @@ namespace MelisCms\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\Session\Container;
+
 /**
- * This class renders Melis CMS
+ * Dashboard controller for MelisCMS
+ * 
+ * Used to render dashboard components in MelisPlatform Back Office
+ *
  */
 class DashboardController extends AbstractActionController
 {

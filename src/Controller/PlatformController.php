@@ -14,10 +14,9 @@ use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 use MelisCore\Service\MelisCoreRightsService;
 use Zend\View\View;
+
 /**
- * 
  * Platform Tool Plugin
- *
  */
 class PlatformController extends AbstractActionController
 {
@@ -27,7 +26,7 @@ class PlatformController extends AbstractActionController
     
     /*
      * Render Tool Platform Container
-     * */
+     */
     public function renderContainerAction(){
         
         $translator = $this->getServiceLocator()->get('translator');
@@ -46,7 +45,7 @@ class PlatformController extends AbstractActionController
     
     /*
      * Render Header Title
-     * */
+     */
     public function renderHeaderAction(){
         
         $view = new ViewModel();
@@ -56,7 +55,7 @@ class PlatformController extends AbstractActionController
     
     /*
      * Render Header Add Button 
-     * */
+     */
     public function renderHeaderAddButtonAction(){
     
         $view = new ViewModel();
@@ -66,7 +65,7 @@ class PlatformController extends AbstractActionController
     
     /*
      * Render Platform Content
-     * */
+     */
     public function renderContentAction(){
     
         $view = new ViewModel();
@@ -76,7 +75,7 @@ class PlatformController extends AbstractActionController
     
     /*
      * Render Platform Table
-     * */
+     */
     public function renderContentPlatformTableAction(){
         
         $translator = $this->getServiceLocator()->get('translator');
@@ -95,7 +94,7 @@ class PlatformController extends AbstractActionController
     
     /*
      * Render Button for Platform ID Edition
-     * */
+     */
     public function renderActionEditAction(){
         $view = new ViewModel();
         $view->melisKey = $this->params()->fromRoute('melisKey', '');
@@ -104,7 +103,7 @@ class PlatformController extends AbstractActionController
     
     /*
      * Render Button for Platform ID Delete
-     * */
+     */
     public function renderActionDeleteAction(){
         $view = new ViewModel();
         $view->melisKey = $this->params()->fromRoute('melisKey', '');
@@ -113,21 +112,21 @@ class PlatformController extends AbstractActionController
     
     /*
      * Render Table Header Rows Limit page page
-     * */
+     */
     public function renderContentPlatformTableLimitAction(){
         return new ViewModel();
     }
     
     /*
      * Render Refresh Page
-     * */
+     */
     public function renderContentPlatformTableRefreshAction(){
         return new ViewModel();
     }
     
     /*
      * Render Platform Container Modal
-     * */
+     */
     public function renderPlatformModalAction(){
         $view = new ViewModel();
         $view->setTerminal(false);
@@ -140,7 +139,7 @@ class PlatformController extends AbstractActionController
     
     /*
      * Render Platform Content Modal
-     * */
+     */
     public function renderPlatformModalContentAction(){
         
         $pids_id = $this->params()->fromQuery('id');
@@ -196,7 +195,7 @@ class PlatformController extends AbstractActionController
     /*
      * Saving CMS Platform IDs
      * @return Json Array
-     * */
+     */
     public function savePlatformIdsRangeAction(){
         $translator = $this->getServiceLocator()->get('translator');
         
@@ -240,9 +239,8 @@ class PlatformController extends AbstractActionController
              
             $propertyForm->setData($datas);
              
-            if($propertyForm->isValid()) {
-                
-                                
+            if($propertyForm->isValid()) 
+            {
                 // Page extra validation
                 if ($datas['pids_page_id_start']>$datas['pids_page_id_end']){
                     $errors['pids_page_id_start'] = array(
@@ -354,7 +352,8 @@ class PlatformController extends AbstractActionController
     
     /*
      * Delete Platform ID
-     * */
+     *
+     */
     public function deletePlatformIdAction(){
         $translator = $this->getServiceLocator()->get('translator');
         
@@ -376,7 +375,7 @@ class PlatformController extends AbstractActionController
     /*
      * Get CMS Platform ID Datas for DataTable
      * @return Json
-     * */
+     */
     public function getPlatformDataAction(){
         $melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
         $translator = $this->getServiceLocator()->get('translator');
@@ -404,16 +403,9 @@ class PlatformController extends AbstractActionController
             $start = $this->getRequest()->getPost('start');
             $length =  $this->getRequest()->getPost('length');
         
-//             $search = $this->getRequest()->getPost('search');
-//             $search = $search['value'];
-        
             $dataCount = $melisEngineTablePlatformIds->getTotalData();
         
             $getData = $melisEngineTablePlatformIds->getPagedData(array(
-//                 'where' => array(
-//                     'key' => 'pids_id',
-//                     'value' => $search,
-//                 ),
                 'order' => array(
                     'key' => $selCol,
                     'dir' => $sortOrder,

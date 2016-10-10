@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Melis Technology (http://www.melistechnology.com)
  *
@@ -40,8 +41,6 @@ class PageEditionController extends AbstractActionController
     	$view = new ViewModel();
     	$view->idPage = $idPage;
     	$view->melisKey = $melisKey;
-    	
-    	
     	
     	if (empty($datasPageTree->page_tpl_id) || $datasPageTree->page_tpl_id == -1)
     	    $view->noTemplate = true;
@@ -85,14 +84,6 @@ class PageEditionController extends AbstractActionController
     				$container['content-pages'][$idPage] = array();
     			
     			// Get the value
-    			/* $value = '';
-    			if (!empty($postValues['myArray']))
-    				$value = $postValues['myArray']; */
-    			/* 
-				function replace_unicode_escape_sequence($match) {
-					return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
-				} */
-					/* $container['content-pages'][$idPage][$key] = $value; */
     			for($i=0; $i <= (count($postValues['myArray'])/2);$i++){
 					$container['content-pages'][$idPage][$postValues['myArray'][$i]['tagID']] = $postValues['myArray'][$i]['tagVal'];
 				}

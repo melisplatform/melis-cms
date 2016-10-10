@@ -3,7 +3,7 @@
 /**
  * Melis Technology (http://www.melistechnology.com)
  *
- * @copyright Copyright (c) 2015 Melis Technology (http://www.melistechnology.com)
+ * @copyright Copyright (c) 2016 Melis Technology (http://www.melistechnology.com)
  *
  */
 
@@ -14,10 +14,9 @@ use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 use MelisCore\Service\MelisCoreRightsService;
 use Zend\Config\Reader\Json;
+
 /**
- * 
  * Site Tool Plugin
- *
  */
 class SiteController extends AbstractActionController
 {
@@ -41,11 +40,9 @@ class SiteController extends AbstractActionController
         if(!$this->hasAccess(self::TOOL_KEY)) {
             $noAccessPrompt = $translator->translate('tr_tool_no_access');
         }
-        
 
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
-        
         
         $view = new ViewModel();
         
@@ -54,7 +51,6 @@ class SiteController extends AbstractActionController
         $view->noAccess  = $noAccessPrompt;
         
         return $view;
-        
     }
     
     /**
@@ -72,20 +68,18 @@ class SiteController extends AbstractActionController
         $view->title = $melisTool->getTitle();
         
         return $view;
-        
     }
     
     /**
      * Renders to the center content of the tool
      * @return \Zend\View\Model\ViewModel
      */
-    public function renderToolSiteContentAction() {
-    
+    public function renderToolSiteContentAction() 
+    {
         $translator = $this->getServiceLocator()->get('translator');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
-        
         
         $columns = $melisTool->getColumns();
         // pre-add Action Columns
@@ -95,7 +89,6 @@ class SiteController extends AbstractActionController
         $view->melisKey = $melisKey;
         $view->tableColumns = $columns;
         $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration();
-        
         
         return $view;
     }
@@ -127,8 +120,8 @@ class SiteController extends AbstractActionController
         return new ViewModel();
     }
     
-    public function renderToolSiteHeaderAddAction() {
-    
+    public function renderToolSiteHeaderAddAction()
+    {
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
         $view = new ViewModel();
@@ -141,8 +134,8 @@ class SiteController extends AbstractActionController
      * This is the container of the modal
      * @return \Zend\View\Model\ViewModel
      */
-    public function renderToolSiteModalContainerAction() {
-        
+    public function renderToolSiteModalContainerAction()
+    {
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
@@ -167,7 +160,8 @@ class SiteController extends AbstractActionController
      * This handler will be used whenever if the add tab should be displayed or not
      * @return \Zend\View\Model\ViewModel
      */
-    public function renderToolSiteModalAddHandlerAction() {
+    public function renderToolSiteModalAddHandlerAction() 
+    {
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
         // declare the Tool service that we will be using to completely create our tool.
@@ -187,7 +181,8 @@ class SiteController extends AbstractActionController
      * Displays the add form in the modal
      * @return \Zend\View\Model\ViewModel
      */
-    public function renderToolSiteModalAddAction() {
+    public function renderToolSiteModalAddAction() 
+    {
         // declare the Tool service that we will be using to completely create our tool.
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
     
@@ -201,7 +196,8 @@ class SiteController extends AbstractActionController
         return $view;
     }
     
-    public function renderToolSiteModalEditHandlerAction() {
+    public function renderToolSiteModalEditHandlerAction() 
+    {
         $melisKey = $this->params()->fromRoute('melisKey', '');
     
         // declare the Tool service that we will be using to completely create our tool.
@@ -217,7 +213,8 @@ class SiteController extends AbstractActionController
         return $view;
     }
     
-    public function renderToolSiteModalEditAction() {
+    public function renderToolSiteModalEditAction() 
+    {
         // declare the Tool service that we will be using to completely create our tool.
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
     
@@ -267,8 +264,8 @@ class SiteController extends AbstractActionController
     /**
      * Returns all the data from the site table, site domain and site 404
      */
-    public function getSiteDataAction() {
-        
+    public function getSiteDataAction() 
+    {
         $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
         $translator = $this->getServiceLocator()->get('translator');
         
@@ -280,8 +277,8 @@ class SiteController extends AbstractActionController
         $draw = 0;
         $tableData = array();
         
-        if($this->getRequest()->isPost()) {
-            
+        if($this->getRequest()->isPost()) 
+        {
             $colId = array_keys($melisTool->getColumns());
             
             $sortOrder = $this->getRequest()->getPost('order');
@@ -327,14 +324,10 @@ class SiteController extends AbstractActionController
                 // manually modify value of the desired row
                 // no specific row to be modified
                 
-                
                 // add DataTable RowID, this will be added in the <tr> tags in each rows
                 $tableData[$ctr]['DT_RowId'] = $tableData[$ctr]['site_id'];
-
             }
-            
         }
-        
         
         return new JsonModel(array(
             'draw' => (int) $draw,
@@ -367,8 +360,8 @@ class SiteController extends AbstractActionController
         // get the site form
         $newSiteForm = $melisTool->getForm('meliscms_site_tool_generic_form');
         
-        if($request->isPost()) {
-
+        if($request->isPost()) 
+        {
             $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
             $domainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
             $site404Table = $this->getServiceLocator()->get('MelisEngineTableSite404');
@@ -376,16 +369,16 @@ class SiteController extends AbstractActionController
             $postValues = get_object_vars($request->getPost());
             $newSiteForm->setData($postValues);
 
-            if($newSiteForm->isValid()) {
-                
+            if($newSiteForm->isValid()) 
+            {
                 $data = $newSiteForm->getData();
                 
                 $dataSite = array();
                 $dataDomain = array();
                 $dataSite404 = array();
                 
-                foreach($data as $dataKey => $dataValue) {
-                    
+                foreach($data as $dataKey => $dataValue) 
+                {
                     if(strpos($dataKey, self::SITE_TABLE_PREFIX) !== false) {
                         $sitePrefix = str_replace('ssite_', 'site_', $dataKey);
                         $dataSite[$sitePrefix] = $data[$dataKey];
@@ -398,7 +391,6 @@ class SiteController extends AbstractActionController
                     if(strpos($dataKey, self::DOMAIN_TABLE_PREFIX) !== false) {
                         $dataDomain[$dataKey] = $data[$dataKey];
                     }
-                    
                 }
 
                 $siteData = $siteTable->getEntryByField('site_name', $this->getRequest()->getPost('ssite_name'))->current();
@@ -474,12 +466,11 @@ class SiteController extends AbstractActionController
                     unset($dataSite404);
                     unset($dataDomain);
                     
-                    
-                    
                     $textMessage = $translator->translate('tr_meliscms_tool_site_add_success');
                     $status = 1;
                 }
-                else {
+                else 
+                {
                     // if data already exists then add manually the foreign site id key
                     $textMessage = $translator->translate('tr_meliscms_tool_site_error_prompt_add');
                     $errors= array(
@@ -490,7 +481,8 @@ class SiteController extends AbstractActionController
                 }
 
             }
-            else {
+            else 
+            {
                 $errors = $newSiteForm->getMessages();
                 $textMessage = $translator->translate('tr_meliscms_tool_site_error_prompt_add');
                 $status = 0;
@@ -568,8 +560,8 @@ class SiteController extends AbstractActionController
                 $dataDomain = array();
                 $dataSite404 = array();
                 
-                foreach($data as $dataKey => $dataValue) {
-                
+                foreach($data as $dataKey => $dataValue)
+                {
                     if(strpos($dataKey, self::SITE_TABLE_PREFIX) !== false) {
                         $sitePrefix = str_replace('ssite_', 'site_', $dataKey);
                         $dataSite[$sitePrefix] = $data[$dataKey];
@@ -804,17 +796,17 @@ class SiteController extends AbstractActionController
             $domainData = $domainTable->getDataBySiteIdAndEnv($siteID,$siteEnv);
             $domainData = $domainData->current();
             
-//             $site404Data = $site404Table->getDataBySiteIdAndPageId($siteID, $site404PageId)->current();
-            
-            if($domainData) {
+            if($domainData)
+            {
                 $domainId = $domainData->sdom_id;
-// //                 $site404Id = $site404Data->s404_id;
                 
                 $domainTable->deleteByField('sdom_id', $domainId);
                 
                 $success = 1;
                 $textMessage = $translator->translate('tr_meliscms_tool_site_delete_env_success');
-            }else{
+            }
+            else
+            {
                 $textMessage = $translator->translate('tr_meliscms_tool_site_delete_env_failed');
             }
         }

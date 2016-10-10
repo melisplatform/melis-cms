@@ -16,16 +16,6 @@ return array(
                     )
                 ),
         
-                'fileCreationTest' => array(
-                    'controller' => 'Diagnostic',
-                    'action' => 'fileCreationTest',
-                    'payload' => array(
-                        'label' => 'tr_melis_module_rights_dir',
-                        'path' => MELIS_MODULES_FOLDER.'MelisCms/public/',
-                        'file' => 'test_file_creation.txt'
-                    ),
-                ),
-        
                 'testModuleTables' => array(
                     'controller' => 'Diagnostic',
                     'action' => 'testModuleTables',

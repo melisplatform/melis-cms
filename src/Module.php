@@ -3,7 +3,7 @@
 /**
  * Melis Technology (http://www.melistechnology.com)
  *
- * @copyright Copyright (c) 2015 Melis Technology (http://www.melistechnology.com)
+ * @copyright Copyright (c) 2016 Melis Technology (http://www.melistechnology.com)
  *
  */
 
@@ -87,58 +87,6 @@ class Module
     }
 
     /**
-     * Dispatch to a module/controller/action to get back a json result
-     * With success/errors/datas returned
-     * Use the meliscms session container to add result in a queue for further use
-     * Used for handling save page
-     *
-     * @param MvcEvent $e
-     * @param String $nameVarSession
-     * @param String $disptachController
-     * @param array $dispatchVars
-     * @return array
-     */
-    /*   public function dispatchPluginAction($e, $nameVarSession, $disptachController, $dispatchVars)
-       {
-           // Get session of module
-           $container = new Container('meliscms');
-           
-           // Get the controller to be able to use forward
-           $oController = $e->getTarget();
-           $success = $container[$nameVarSession]['success'];
-           $errors = $container[$nameVarSession]['errors'];
-           $datas = $container[$nameVarSession]['datas'];
-           $resultTmp = $oController->forward()->dispatch($disptachController, $dispatchVars)->getVariables();
-           
-           // Check the result
-           if ($resultTmp['success'] == 0)
-               $success = 0;
-           
-           // Add errors to previously existing ones in session
-           if ($resultTmp['success'] == 0)
-           {
-               foreach ($resultTmp['errors'] as $error)
-               {
-                   foreach ($error as $keyError => $valError)
-                       $errors[$keyError] = $valError;
-               }
-           }
-           
-           // add datas to session
-           if (!empty($resultTmp['datas']))
-               $datas = array_merge($datas, $resultTmp['datas']);
-           
-           // Final table to send back
-           $result = array('success' => $success, 'errors' => $errors, 'datas' => $datas);
-           
-           // Copy new results in session
-           $container[$nameVarSession] = $result;
-           
-           // also return results
-           return array($success, $errors, $datas);
-       } */
-
-    /**
      * Create translations for this module
      * @param MvcEvent $e
      */
@@ -176,6 +124,17 @@ class Module
         }
 
         return $config;
+    }
+
+    public function getAutoloaderConfig()
+    {
+        return array(
+            'Zend\Loader\StandardAutoloader' => array(
+                'namespaces' => array(
+                    __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
+                ),
+            ),
+        );
     }
 
     public function getServiceConfig()

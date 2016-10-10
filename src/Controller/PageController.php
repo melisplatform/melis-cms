@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Melis Technology (http://www.melistechnology.com)
  *
@@ -533,6 +534,15 @@ class PageController extends AbstractActionController
 		// Get the list of TinyMce configuration files declared
         $config = $this->serviceLocator->get('config');
         $configTinyMce = $config['tinyMCE'];
+
+        $modulesSvc = $this->getServiceLocator()->get('ModulesService');
+        foreach ($configTinyMce as $key => $configTiny)
+        {
+            $nameModuleTab = explode('/', $configTiny);
+            $nameModule = $nameModuleTab[0];
+            $path = $modulesSvc->getModulePath($nameModule);
+            $configTinyMce[$key] = $path . str_replace($nameModule, '', $configTiny);
+        }
 		
 		$container = new Container('meliscore');
 	    $view = new ViewModel();
@@ -727,14 +737,6 @@ class PageController extends AbstractActionController
             $container = new Container('meliscms');
             if (!empty($container['content-pages'][$idPage])){
                 unset($container['content-pages'][$idPage]);
-                
-//                 $melisEngineSavedPublished = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
-//                 $publishedPageRes = $melisEngineSavedPublished->getEntryById($idPage);
-//                 $publishedPageData = $publishedPageRes->toArray();
-                
-//                 if (!empty($publishedPageData)){
-//                     $container['content-pages'][$idPage] = $publishedPageData[0];
-//                 }
             }
             
             $textMessage = $translator->translate('tr_meliscms_clear_success');
@@ -788,8 +790,6 @@ class PageController extends AbstractActionController
 	    			'success' => 1,
 	    			'errors' => array(),
 	    	);
-	    	
-
     	}
     	else
     	{
@@ -834,7 +834,6 @@ class PageController extends AbstractActionController
     		if (!empty($container['action-page-tmp']['datas']))
     			$datas = $container['action-page-tmp']['datas'];
     	}
-    	
     	 
     	// We unset this as it was used temporarily for saving the informations
     	// while the sub-save where beeing executed

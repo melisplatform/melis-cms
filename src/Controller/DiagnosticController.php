@@ -13,6 +13,12 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\Db\Sql\Sql;
 use Zend\Db\Adapter\Adapter as DbAdapter;
+
+/**
+ * Diagnostic controller.
+ * Associated with /config/diagnostic.config.php
+ * All tests run during diagnostics are found here
+ */
 class DiagnosticController extends AbstractActionController
 {
     private $odbAdapter;

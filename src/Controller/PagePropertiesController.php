@@ -226,8 +226,6 @@ class PagePropertiesController extends AbstractActionController
 		        'errors' => array($errors),
 		    ));
 		}
-		
-			
 			
 		/**
 		 * If page does not exist, let's create
