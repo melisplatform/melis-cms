@@ -3,9 +3,13 @@
     if (!empty($this->zoneconfig['conf']['id']))
         $id = ' id="' . $this->idPage . '_' . $this->zoneconfig['conf']['id'] . '"';
     $data_melisKey = $this->melisKey;
+    $disabled = '';
+    if($this->children > 0){
+        $disabled = 'disabled data-toggle="tooltip" data-placement="top" title="'.$this->translate("tr_meliscms_page_actions_delete_tooltip").'"';
+    }
 ?>
 <li<?= $id; ?> data-melisKey='<?= $data_melisKey; ?>'>
-	<a class="btn btn-default melis-deletepage" data-pagenumber="<?= $this->idPage; ?>">
+	<a class="btn btn-default melis-deletepage" data-pagenumber="<?= $this->idPage; ?>" <?= $disabled?> >
 	    <span class="fa fa-trash-o"></span>
 		<span><?php echo $this->translate('tr_meliscms_page_actions_delete') ?></span>
 	</a>

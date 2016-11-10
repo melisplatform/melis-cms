@@ -287,13 +287,14 @@ var melisCms = (function(){
 		var data = $(this).data();
 		var idPage = data.pagenumber;
 		var zoneId = activeTabId;
+		var confirmMsg = data.confirmmsg;
 		
   	  	// delete page confirmation 
   	  	melisCoreTool.confirm(
   			translations.tr_meliscms_page_action_clear,
 			translations.tr_meliscms_menu_cancel,
-			translations.tr_meliscms_clear_confirmation, 
-			translations.tr_meliscms_clear_confirmation_msg, 
+			translations.tr_meliscms_delete_saved_page_title, 
+			confirmMsg, 
 			function() {
   				// check if node has children if TRUE then cannot be deleted
   				$.ajax({
@@ -328,36 +329,43 @@ var melisCms = (function(){
 		var data = $(this).data();
 		var idPage = data.pagenumber;
 		var zoneId = activeTabId;
-		
-  	  	// delete page confirmation 
-  	  	melisCoreTool.confirm(
-  			translations.tr_meliscms_menu_delete,
-			translations.tr_meliscms_menu_cancel,
-			translations.tr_meliscms_delete_confirmation, 
-			translations.tr_meliscms_delete_confirmation_msg, 
-			function() {
-  				// check if node has children if TRUE then cannot be deleted
-  				$.ajax({
-  					url         : '/melis/MelisCms/Page/deletePage?idPage='+idPage,
-  					encode		: true 
-  				}).success(function(data){
-  					if( data.success === 1){
-  						//close the page 
-  						melisHelper.tabClose(zoneId);
-    				  
-  						// notify deleted page
-  						melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
-    				 
-  						// reload and expand the treeview
-  						melisCms.refreshTreeview(idPage);
-  					}
-  					else{
-  						melisHelper.melisKoNotification( data.textTitle, data.textMessage, data.errors, '#000' );
-  					}  
-  				}).error(function(xhr, textStatus, errorThrown){
-  					alert( translations.tr_meliscore_error_message );
-  				});
-		});
+		var attr = $(this).attr('disabled');
+		if(typeof attr === typeof undefined || attr === false){
+	  	  	// delete page confirmation 
+	  	  	melisCoreTool.confirm(
+	  			translations.tr_meliscms_menu_delete,
+				translations.tr_meliscms_menu_cancel,
+				translations.tr_meliscms_delete_confirmation, 
+				translations.tr_meliscms_delete_confirmation_msg, 
+				function() {
+	  				// check if node has children if TRUE then cannot be deleted
+	  				$.ajax({
+	  					url         : '/melis/MelisCms/Page/deletePage?idPage='+idPage,
+	  					encode		: true 
+	  				}).success(function(data){
+	  					if( data.success === 1){
+	  						//close the page 
+	  						melisHelper.tabClose(zoneId);
+	    				  
+	  						// notify deleted page
+	  						melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
+	  						
+	  						// update flash messenger values
+	  				    	melisCore.flashMessenger();
+	  				    	
+	  				    	alert();
+	  				    	
+	  						// reload and expand the treeview
+	  						melisCms.refreshTreeview(idPage);
+	  					}
+	  					else{
+	  						melisHelper.melisKoNotification( data.textTitle, data.textMessage, data.errors, '#000' );
+	  					}  
+	  				}).error(function(xhr, textStatus, errorThrown){
+	  					alert( translations.tr_meliscore_error_message );
+	  				});
+			});
+		}
 	}
 	
 	// RELOAD THE TREEVIEW AND SET A NODE PAGE ACTIVE

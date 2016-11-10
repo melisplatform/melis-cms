@@ -10,44 +10,58 @@
 		$title = $this->translate('tr_meliscms_page_title_Create new page');
 ?>
 <div<?= $id; ?> data-melisKey='<?= $data_melisKey; ?>' class="bg-white content-heading border-bottom page-title" data-pageid="<?= $this->idPage; ?>">
-		<h1> <?= $title; ?> </h1>
-		
-		<p>
-			<span>
+		<div class="pull-left">
+			<h1> <?= $title; ?> </h1>
+
+			<p>
+			<span class="title">
     			<?php // echo $this->translate('tr_meliscms_page_Page') . ' ' . $this->idPage; ?>
     		</span>
-    		
-    		<?php  
-    		if ($this->lastPublishedDate != '')
-    		{
-        	?>
-        	<span>
-        		
+
+				<?php
+				if ($this->lastPublishedDate != '')
+				{
+					?>
+					<span class="title">
+
         		<?= $this->pageCurrentStatus.' ' . $this->lastPublishedDate; ?>
-        		<?php 
-        			if (!empty($this->publishedName))
-        				echo ' ' . $this->translate('tr_meliscms_page_By') . ' ' . $this->publishedName;
-        		?>
+				<?php
+				if (!empty($this->publishedName))
+					echo ' ' . $this->translate('tr_meliscms_page_By') . ' ' . $this->publishedName;
+				?>
         	</span>
-        	<?php 
-        		}
-        	?>
-    	</p>
-        	
-    		
-    	<?php
-    		
-		if ($this->lastSavedDate != '')
-		{
-    	?>
-    	<span class="saved-version-notif">
+					<?php
+				}
+				?>
+			</p>
+
+
+			<?php
+
+			if ($this->lastSavedDate != '')
+			{
+				?>
+				<span class="title saved-version-notif">
     		<?= $this->translate('tr_meliscms_page_Version edited an saved on') . ' ' . $this->lastSavedDate; ?>
-    		<?php 
-    			if (!empty($this->savedName))
-    				echo ' ' . $this->translate('tr_meliscms_page_By') . ' ' . $this->savedName;
-    		?>
+			<?php
+			if (!empty($this->savedName))
+				echo ' ' . $this->translate('tr_meliscms_page_By') . ' ' . $this->savedName;
+			?>
     	</span>
-    	<?php 
-    		}
-    	?>
+				<?php
+			}
+			?>
+		</div>
+		<div class="pull-right">
+			<?php
+			if (!empty($this->zoneconfig['interface']))
+			{
+				foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig)
+				{
+					echo $this->$keyConfig;
+				}
+			}
+			?>
+		</div>
+		<div class="clearfix"></div>
 </div>

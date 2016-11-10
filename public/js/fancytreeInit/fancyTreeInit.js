@@ -71,6 +71,9 @@
 		  	                				  // notify deleted page
 		  	                				  melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
 		  	                				 
+			  	                				// update flash messenger values
+			  	          				    	melisCore.flashMessenger();
+		  	          				    	
 		  	    	            			  // reload and expand the treeview
 		  	    	            			  melisCms.refreshTreeview(parentNode);
 		  	                			  }

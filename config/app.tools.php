@@ -17,11 +17,6 @@ return array(
                         'ajaxCallback' => '',
                         'filters' => array(
                             'left' => array(
-                                'toolTemplates-search' => array(
-                                    'module' => 'MelisCms',
-                                    'controller' => 'ToolTemplate',
-                                    'action' => 'render-tool-template-content-filters-search',
-                                ),
                                 'toolTemplates-limit' => array(
                                     'module' => 'MelisCms',
                                     'controller' => 'ToolTemplate',
@@ -29,6 +24,11 @@ return array(
                                 ),
                             ),
                             'center' => array(
+                                'toolTemplates-search' => array(
+                                    'module' => 'MelisCms',
+                                    'controller' => 'ToolTemplate',
+                                    'action' => 'render-tool-template-content-filters-search',
+                                ),
                             ),
                             'right' => array(
                                 'toolTemplates-export' => array(
@@ -455,11 +455,6 @@ return array(
                         'ajaxCallback' => '',
                         'filters' => array(
                             'left' => array(
-                                'site-tool-table-search' => array(
-                                    'module' => 'MelisCms',
-                                    'controller' => 'Site',
-                                    'action' => 'render-tool-site-content-filter-search',
-                                ),
                                 'site-tool-table-limit' => array(
                                     'module' => 'MelisCms',
                                     'controller' => 'Site',
@@ -467,7 +462,11 @@ return array(
                                 ),
                             ),
                             'center' => array(
-                                
+                                'site-tool-table-search' => array(
+                                    'module' => 'MelisCms',
+                                    'controller' => 'Site',
+                                    'action' => 'render-tool-site-content-filter-search',
+                                ),
                             ),
                             'right' => array(
                                 'site-tool-table-refresh' => array(
@@ -870,11 +869,6 @@ return array(
                         'ajaxCallback' => 'initLangJs()',
                         'filters' => array(
                             'left' => array(
-                                'meliscms_tool_language_content_filters_search' => array(
-                                    'module' => 'MelisCms',
-                                    'controller' => 'Language',
-                                    'action' => 'render-tool-language-content-filters-search',
-                                ),
                                 'meliscms_tool_language_content_filters_limit' => array(
                                     'module' => 'MelisCms',
                                     'controller' => 'Language',
@@ -882,7 +876,11 @@ return array(
                                 ),
                             ),
                             'center' => array(
-                
+                                'meliscms_tool_language_content_filters_search' => array(
+                                    'module' => 'MelisCms',
+                                    'controller' => 'Language',
+                                    'action' => 'render-tool-language-content-filters-search',
+                                ),
                             ),
                             'right' => array(
                                 'meliscms_tool_language_content_filters_refresh' => array(
@@ -978,15 +976,13 @@ return array(
                                 array(
                                     'spec' => array(
                                         'name' => 'lang_cms_id',
-                                        'type' => 'MelisText',
+                                        'type' => 'hidden',
                                         'options' => array(
-                                        'label' => 'tr_meliscms_tool_language_lang_id',
+                                            'label' => 'tr_meliscms_tool_language_lang_id',
                                         ),
                                         'attributes' => array(
                                             'id' => 'id_lang_id',
-                                            'value' => '',
                                             'disabled' => 'disabled',
-                                            'class' => 'hidden'
                                         ),
                                     ),
                                 ),
@@ -1210,7 +1206,8 @@ return array(
                                         'type' => 'MelisCmsPlatformIDsSelect',
                                         'options' => array(
                                             'label' => 'tr_meliscms_tool_platform_pids_name',
-                                            //                                             'empty_option' => 'tr_meliscms_tool_platform_pids_name_empty',
+                                            'empty_option' => 'tr_meliscms_form_common_Choose',
+                                            'disable_inarray_validator' => true,
                                         ),
                                         'attributes' => array(
                                             'id' => 'pids_name_select',
@@ -1300,7 +1297,7 @@ return array(
                             'input_filter' => array(
                                 'pids_name_select' => array(
                                     'name'     => 'pids_name_select',
-                                    'required' => false,
+                                    'required' => true,
                                     'validators' => array(
                                         array(
                                             'name' => 'NotEmpty',
@@ -1485,7 +1482,6 @@ return array(
                 ),
                 /* END OF CMS PLATFORM TOOL */
             ),
-
         ),
     ),
 );  

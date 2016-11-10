@@ -244,11 +244,12 @@ class PageController extends AbstractActionController
     {
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
-         
+        $melisTree = $this->serviceLocator->get('MelisEngineTree');
+        $children = $melisTree->getPageChildren($idPage)->count();
         $view = new ViewModel();
         $view->idPage = $idPage;
         $view->melisKey = $melisKey;
-         
+        $view->children = $children; 
         return $view;
     }
     
@@ -276,13 +277,36 @@ class PageController extends AbstractActionController
      */
     public function renderPageactionClearAction()
     {
+        $translator = $this->getServiceLocator()->get('translator');
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
-         
+        
+        $melisEngineSavedPage = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+        $savedPageRes = $melisEngineSavedPage->getEntryById($idPage);
+        $savedPageData = $savedPageRes->current();
+        
+        // Checking Page Current Status
+        $melisEngineTablePagePublished = $this->serviceLocator->get('MelisEngineTablePagePublished');
+        $datasPagePublished = $melisEngineTablePagePublished->getEntryById($idPage);
+        $pagePublishedData = $datasPagePublished->current();
+        
+        $confirmMsg = '';
+        if (!empty($pagePublishedData))
+        {
+            // Delete Saved version and use published version
+            $confirmMsg = $translator->translate('tr_meliscms_delete_saved_use_publish_version_confirmation_msg');
+        }
+        else
+        {
+            // Revert template default datas
+            $confirmMsg = $translator->translate('tr_meliscms_delete_saved_use_tpl_default_confirmation_msg');
+        }
+        
         $view = new ViewModel();
         $view->idPage = $idPage;
         $view->melisKey = $melisKey;
-         
+        $view->confirmMsg = $confirmMsg;
+        $view->hasSavedVersion = ($savedPageData) ? true : false;
         return $view;
     }
     
@@ -722,7 +746,7 @@ class PageController extends AbstractActionController
         $success = 0;
         $errors = array();
         $datas = array();
-        $textTitle = $translator->translate('tr_meliscms_clear_confirmation');
+        $textTitle = $translator->translate('tr_meliscms_delete_saved_success_title');
         $textMessage = '';
         
         $melisEngineSavedPage = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
@@ -731,7 +755,30 @@ class PageController extends AbstractActionController
         
         if (!empty($savedPageData)){
             
-            $melisEngineSavedPage->deleteById($idPage);
+            // Checking Page Current Status
+            $melisEngineTablePagePublished = $this->serviceLocator->get('MelisEngineTablePagePublished');
+            $datasPagePublished = $melisEngineTablePagePublished->getEntryById($idPage);
+            $pagePublishedData = $datasPagePublished->current();
+            
+            if (!empty($pagePublishedData)){
+                $melisEngineSavedPage->deleteById($idPage);
+            }else{
+                // Update Save page Content to default value
+                // New page, create an empty content
+                $newXmlContent = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+                $newXmlContent .= '<document type="MelisCMS" author="MelisTechnology" version="2.0">' . "\n";
+                $newXmlContent .= '</document>';
+                $data['page_content'] = $newXmlContent;
+                $data['page_edit_date'] = date('Y-m-d H:i:s');
+                // Getting current user
+                $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
+                $user = $melisCoreAuth->getIdentity();
+                if (!empty($user))
+                {
+                    $data['page_last_user_id'] = $user->usr_id;
+                }
+                $melisEngineSavedPage->save($data, $idPage);
+            }
             
             // Get the MelisCms Module session as page is saved in it
             $container = new Container('meliscms');
@@ -739,10 +786,10 @@ class PageController extends AbstractActionController
                 unset($container['content-pages'][$idPage]);
             }
             
-            $textMessage = $translator->translate('tr_meliscms_clear_success');
+            $textMessage = $translator->translate('tr_meliscms_delete_saved_success');
             $success = 1;
         }else{
-            $textMessage = $translator->translate('tr_meliscms_clear_no_saved_page');
+            $textMessage = $translator->translate('tr_meliscms_delete_no_saved_page');
         }
         
         $response = array(
@@ -756,7 +803,6 @@ class PageController extends AbstractActionController
             $this->getEventManager()->trigger('meliscms_page_clear_saved_page_end', $this, $response);
         }
          
-        // Final Json sent back
         return new JsonModel($response);
     }
     
@@ -1232,11 +1278,11 @@ class PageController extends AbstractActionController
     		$textTitle =  $translator->translate('tr_meliscms_page_success_Page delete') . ': ' . $pageName;
     	}
     	if ($success == 1) {
-    	    $textTitle = $translator->translate('tr_meliscms_page_actions_Unpublish').' Page ' . $idPage;
-    	    $textMessage = $translator->translate('tr_meliscms_page_success_Page deleted');
+    	    $textTitle = ' Page ' . $idPage. ' '.$translator->translate('tr_meliscms_page_success_Page_deleted');
+    	    $textMessage = $translator->translate('tr_meliscms_page_success_Page deleted_success');
     	}
     	else {
-    	    $textTitle = $translator->translate('tr_meliscms_page_actions_Unpublish').' Page ' . $idPage;
+    	    $textTitle = $translator->translate('tr_meliscms_page_success_Page_deleted2').' Page ' . $idPage;
     	    $textMessage = $translator->translate('tr_meliscms_page_error_Some errors occured while processing the request. Please find details bellow.');
     	}
 

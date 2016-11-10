@@ -206,7 +206,7 @@ class PlatformController extends AbstractActionController
         $errors  = array();
         $textTitle = '';
         $responseData = array();
-        
+        $this->getEventManager()->trigger('meliscms_platform_IDs_save_start', $this, array());
         // Get Cms Platform ID form from  App Tool
         $melisMelisCoreConfig = $this->getServiceLocator()->get('MelisCoreConfig');
         $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_platform_tool/forms/meliscms_tool_platform_generic_form','meliscms_tool_platform_generic_form');
@@ -222,12 +222,11 @@ class PlatformController extends AbstractActionController
             $datas = get_object_vars($request->getPost());
             
             // Response Messages Initialization
+            $textTitle = $translator->translate('tr_meliscms_tool_platform_ids');
             if ($datas['pids_id']){
                 $textMessage = $translator->translate('tr_meliscms_tool_platform_update_error');
-                $textTitle = $translator->translate('tr_meliscms_tool_platform_btn_edit');
             }else{
                 $textMessage = $translator->translate('tr_meliscms_tool_platform_add_error');
-                $textTitle = $translator->translate('tr_meliscms_tool_platform_btn_add');
             }
             
             // Checking if the Post Data has CMS Platform ID, If the ID has value
@@ -307,14 +306,14 @@ class PlatformController extends AbstractActionController
                             // Updating exsiting Data
                             unset($datas['pids_name_select']);
                             $melisEngineTablePlatformIds->save($datas,$datas['pids_id']);
-                            $textMessage = '';
+                            $textMessage = $translator->translate('tr_meliscms_tool_platform_update_success');
                             $status = 1;
                         }else{
                             // Saving new Data
                             $datas['pids_id'] = $datas['pids_name_select'];
                             unset($datas['pids_name_select']);
                             $melisEngineTablePlatformIds->save($datas);
-                            $textMessage = '';
+                            $textMessage = $translator->translate('tr_meliscms_tool_platform_add_success');
                             $status = 1;
                         }
                         
@@ -346,7 +345,7 @@ class PlatformController extends AbstractActionController
             'errors' => $errors,
             'event' => $responseData
         );
-         
+        $this->getEventManager()->trigger('meliscms_platform_IDs_save_end', $this, $response);
         return new JsonModel($response);
     }
     

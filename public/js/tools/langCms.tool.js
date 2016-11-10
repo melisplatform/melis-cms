@@ -22,12 +22,14 @@ $(document).ready(function() {
 			if(data.success) {
 				$('#modal-language-cms').modal('hide');
 				melisHelper.zoneReload("id_meliscms_tool_language", "meliscms_tool_language");
+				melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
 			}
 			else {
 				melisCoreTool.alertDanger("#languagealert", '', data.textMessage + "<br/>");
 				melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 'closeByButtonOnly');
 				melisCoreTool.highlightErrors(data.success, data.errors, "idformlang");
 			}
+			
 			melisCoreTool.done("#btnLangCmsAdd");
     		melisCore.flashMessenger();
     		melisCoreTool.processDone();
@@ -120,6 +122,7 @@ $(document).ready(function() {
 		    	    		melisHelper.zoneReload("id_meliscms_tool_language_content", "meliscms_tool_language_content");
 		    	    		melisHelper.zoneReload("id_meliscms_header_language", "meliscms_header_language");
 		    	    		melisCore.flashMessenger();
+		    	    		melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
 		    	    	}
 		    	    	else {
 		    	    		melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 'closeByButtonOnly');

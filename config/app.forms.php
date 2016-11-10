@@ -65,11 +65,12 @@ return array(
 									'name' => 'plang_lang_id',
 									'type' => 'MelisCoreLanguageSelect',
 									'options' => array(
-											'label' => 'tr_meliscms_page_tab_properties_form_Language',
-											'empty_option' => 'tr_meliscms_form_common_Choose',
+										'label' => 'tr_meliscms_page_tab_properties_form_Language',
+										'empty_option' => 'tr_meliscms_form_common_Choose',
+									    'disable_inarray_validator' => true,
 									),
 									'attributes' => array( 
-											'id' => 'id_plang_lang_id',
+										'id' => 'id_plang_lang_id',
 									),
 								),
 							),
@@ -114,11 +115,12 @@ return array(
 									'name' => 'page_tpl_id',
 									'type' => 'MelisCmsTemplateSelect',
 									'options' => array(
-											'label' => 'tr_meliscms_page_tab_properties_form_Template',
-											'empty_option' => 'tr_meliscms_form_common_Choose',
+										'label' => 'tr_meliscms_page_tab_properties_form_Template',
+										'empty_option' => 'tr_meliscms_form_common_Choose',
+									    'disable_inarray_validator' => true,
 									),
 									'attributes' => array(
-											'id' => 'id_page_tpl_id',
+										'id' => 'id_page_tpl_id',
 									),
 								),
 							),
@@ -221,7 +223,7 @@ return array(
 								        'name' => 'NotEmpty',
 								        'options' => array(
 								            'messages' => array(
-								                \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melissb_comments_title_empty',
+								                \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_page_form_page_name_empty',
 								            ),
 								        ),
 								    ),
@@ -258,7 +260,7 @@ return array(
 					        ),
 							'plang_lang_id' => array(
 								'name'     => 'plang_lang_id',
-								'required' => false,
+								'required' => true,
 					            'validators' => array(
 					                array(
 					                    'name' => 'NotEmpty',
@@ -313,7 +315,7 @@ return array(
 					        ),
 					        'page_tpl_id' => array(
 								'name'     => 'page_tpl_id',
-								'required' => false,
+								'required' => true,
 								'validators' => array( 
 								    array(
 								        'name' => 'NotEmpty',

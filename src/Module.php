@@ -29,6 +29,7 @@ use MelisCms\Listener\MelisCmsNewSiteDomainListener;
 use MelisCms\Listener\MelisCmsDeleteSiteDomainListener;
 use MelisCms\Listener\MelisCmsInstallerLastProcessListener;
 use MelisCms\Listener\MelisCmsToolUserNewUserListener;
+use MelisCms\Listener\MelisCmsDeletePlatformListener;
 class Module
 {
     public function onBootstrap(MvcEvent $e)
@@ -44,29 +45,43 @@ class Module
         $this->createTranslations($e);
         $this->initSession();
 
-        /**
-         * Set default layout for this module
-         */
-        $eventManager->getSharedManager()->attach(__NAMESPACE__,
-            MvcEvent::EVENT_DISPATCH, function ($e) {
-                $e->getTarget()->layout('layout/layoutCms');
-            });
-        
-
-        $eventManager->attach(new MelisCmsGetRightsTreeViewListener());
-        $eventManager->attach(new MelisCmsSavePageListener());
-        $eventManager->attach(new MelisCmsPublishPageListener());
-        $eventManager->attach(new MelisCmsUnpublishPageListener());
-        $eventManager->attach(new MelisCmsDeletePageListener());
-        $eventManager->attach(new MelisCmsToolUserUpdateUserListener());
-        $eventManager->attach(new MelisCmsFlashMessengerListener());
-//         $eventManager->attach(new MelisCmsSiteDomainDeleteListener());
-//         $eventManager->attach(new MelisCmsPlatformIdListener());
-        $eventManager->attach(new MelisCmsNewSiteDomainListener());
-        $eventManager->attach(new MelisCmsDeleteSiteDomainListener());
-        $eventManager->attach(new MelisCmsInstallerLastProcessListener());
-        $eventManager->attach(new MelisCmsToolUserNewUserListener());
-
+        $sm = $e->getApplication()->getServiceManager();
+        $routeMatch = $sm->get('router')->match($sm->get('request'));
+        if (!empty($routeMatch))
+        {
+            $routeName = $routeMatch->getMatchedRouteName();
+            $module = explode('/', $routeName);
+             
+            if (!empty($module[0]))
+            {
+                if ($module[0] == 'melis-backoffice')
+                {
+                    /**
+                     * Set default layout for this module
+                     */
+                    $eventManager->getSharedManager()->attach(__NAMESPACE__,
+                        MvcEvent::EVENT_DISPATCH, function ($e) {
+                            $e->getTarget()->layout('layout/layoutCms');
+                        });
+                    
+            
+                    $eventManager->attach(new MelisCmsGetRightsTreeViewListener());
+                    $eventManager->attach(new MelisCmsSavePageListener());
+                    $eventManager->attach(new MelisCmsPublishPageListener());
+                    $eventManager->attach(new MelisCmsUnpublishPageListener());
+                    $eventManager->attach(new MelisCmsDeletePageListener());
+                    $eventManager->attach(new MelisCmsToolUserUpdateUserListener());
+                    $eventManager->attach(new MelisCmsFlashMessengerListener());
+            //         $eventManager->attach(new MelisCmsSiteDomainDeleteListener());
+            //         $eventManager->attach(new MelisCmsPlatformIdListener());
+                    $eventManager->attach(new MelisCmsNewSiteDomainListener());
+                    $eventManager->attach(new MelisCmsDeleteSiteDomainListener());
+                    $eventManager->attach(new MelisCmsInstallerLastProcessListener());
+                    $eventManager->attach(new MelisCmsToolUserNewUserListener());
+                    $eventManager->attach(new MelisCmsDeletePlatformListener());
+                }
+            }
+        }
     }
 
 

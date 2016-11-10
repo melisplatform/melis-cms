@@ -509,6 +509,16 @@ class ToolTemplateController extends AbstractActionController
                         ), $datasPlatformIds->pids_id);
                     }
                 }
+                else 
+                {
+                    $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                    $errors = array(
+                        'platform_ids' => array(
+                            'noPlatformIds' => $translator->translate('tr_meliscms_no_available_platform_ids'),
+                            'label' => $translator->translate('tr_meliscms_tool_platform_ids'),
+                        ),
+                    );
+                }
             }
             else {
                 $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
@@ -535,7 +545,7 @@ class ToolTemplateController extends AbstractActionController
         
 		$response = array(
             'success' => $status,
-            'textTitle' => $translator->translate('tr_tool_template_fm_update_title'),
+            'textTitle' => $translator->translate('tr_tool_templates_modal_tab_text_add'),
             'textMessage' => $translator->translate($textMessage),
             'errors' => $errors,
         );
@@ -863,7 +873,7 @@ class ToolTemplateController extends AbstractActionController
         $status  = false;
         $message = 'no data';
         $textMessage = '';
-        $textTitle = 'tr_tool_template_fm_delete_title';
+        $textTitle = 'tr_tool_template_fm_update_title';
         // make sure it's a POST call
         if($request->isPost()) {
             

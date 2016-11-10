@@ -4,9 +4,16 @@
         $id = ' id="' . $this->idPage . '_' . $this->zoneconfig['conf']['id'] . '"';
     $data_melisKey = $this->melisKey;
 ?>
-<li<?= $id; ?> data-melisKey='<?= $data_melisKey; ?>'>
-	<a class="btn btn-default melis-clearpage" data-pagenumber="<?= $this->idPage; ?>">
-	    <i class="fa fa-eraser"></i>
-		<span><?php echo $this->translate($this->zoneconfig['conf']['name']) ?></span>
-	</a>
+<li<?php echo $id; ?> data-melisKey='<?php echo $data_melisKey; ?>'>
+	<?php if ($this->hasSavedVersion):?>
+    	<a class="btn btn-default melis-clearpage" data-pagenumber="<?php echo $this->idPage; ?>" data-confirmmsg="<?php echo $this->confirmMsg ?>">
+    	    <i class="fa fa-eraser"></i>
+    		<span><?php echo $this->translate($this->zoneconfig['conf']['name']) ?></span>
+    	</a>
+	<?php else:?>
+    	<a class="btn btn-default" disabled>
+    	    <i class="fa fa-eraser"></i>
+    		<span><?php echo $this->translate($this->zoneconfig['conf']['name']) ?></span>
+    	</a>
+	<?php endif;?>
 </li>

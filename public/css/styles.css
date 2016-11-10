@@ -147,7 +147,7 @@ div.content-heading h1{
 	color: #F39A0D;
     font-weight: 300;
 }
-#content .page-head-container .page-title span{
+#content .page-head-container .page-title span.title{
     margin-top: 5px;
     text-transform: initial;
     font-weight: 300;
@@ -155,6 +155,11 @@ div.content-heading h1{
 	color: #8E8E8E;
 	word-spacing: .5px; 
 }
+#content .page-head-container .page-title .title-switch{
+	margin-top: -15px;
+	margin-right: -15px;
+}
+
 
 /* page tabs */
 #content .container-level-a .meliscms_center_tabs .dataTables_wrapper{

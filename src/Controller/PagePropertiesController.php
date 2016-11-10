@@ -134,7 +134,7 @@ class PagePropertiesController extends AbstractActionController
 		$formElements = $this->serviceLocator->get('FormElementManager');
 		$factory->setFormElementManager($formElements);
 		$propertyForm = $factory->createForm($appConfigForm);
-	
+		
 		return $propertyForm;
 	}
 	
@@ -181,133 +181,111 @@ class PagePropertiesController extends AbstractActionController
 		 * The page cannot be saved in page tree if at least the properties
 		 * are not filled correctly.
 		 */
-		$isValid = false;
 		$errors = array();
 		$propertyForm = $this->getPropertyPageForm($idPage, !$exist);
 		$request = $this->getRequest();
 		if ($request->isPost())
 		{
-		    
 			$postValues = get_object_vars($request->getPost());
 			$propertyForm->setData($postValues);
 			
-			$propertyForm->isValid();
-			    
-	        $datas = $propertyForm->getData();
-		        
-	        $language = $datas['plang_lang_id'];
-	        $template = $datas['page_tpl_id'];
-	        
-	        if(empty($template)) {
-	            $errors = array(
-	                'page_tpl_id' => array(
-	                    'errorMessage' => $translator->translate('tr_meliscms_page_form_page_tpl_id_invalid'),
-	                    'label' => $translator->translate('tr_meliscms_page_tab_properties_form_Template'),
-	                ),
-	            );
-	        }
+			if ($exist)
+			{
+			    // Set Page lang id not required
+			    $propertyForm->getInputFilter()->get('plang_lang_id')->setRequired(false);
+			}
 			
-			if(empty($errors))
+			if ($propertyForm->isValid())
 			{
-			    $isValid = true;
-			}
-		}
-		
-		/**
-		 * If datas are not valid, then we stop, no entry 
-		 * in pagetree if page properties are not ok
-		 */
-		if (!$isValid)
-		{
-		    
-		    return new JsonModel(array(
-		        'success' => 0,
-		        'data' => array(),
-		        'errors' => array($errors),
-		    ));
-		}
-			
-		/**
-		 * If page does not exist, let's create
-		 * If page exist, nothing to do, properties are saved in save-page-properties, handled through event
-		 */ 
-		if (!$exist)
-		{
-			// Get the order to be inserted
-			$order = 0;
-			$children = $melisEngineTablePageTree->getPageChildrenByidPage($fatherPageId);
-			if ($children)
-			{
-				$children = $children->toArray();
-				$order = count($children) + 1;
-			}
-
-			// Get the current page id from platform table
-			$melisModuleName = getenv('MELIS_PLATFORM');
-			$melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
-			$datasPlatformIds = $melisEngineTablePlatformIds->getPlatformIdsByPlatformName($melisModuleName);
-			$datasPlatformIds = $datasPlatformIds->current();
-
-			if ($datasPlatformIds)
-			{
-				 
-				/**
-				 * Check if we reached the end of the band page ids defined in platform
-				 */
-				if ($datasPlatformIds->pids_page_id_current >= $datasPlatformIds->pids_page_id_end)
-				{
-					return new JsonModel(array(
-							'success' => 0,
-							'datas' => array(),
-							'errors' => array(array('platform_current_page_id_max' => $translator->translate('tr_meliscms_page_save_error_Current page id has reached end of platform band')))
-					));
-				}
-				 
-				// Try/catch to save in case of pagetree id error
-				try
-				{
-					// Save the new entry in page_tree
-					$melisEngineTablePageTree->save(array(
-							'tree_page_id' => $datasPlatformIds->pids_page_id_current,
-							'tree_father_page_id' => $fatherPageId,
-							'tree_page_order' => $order,
-					));
-					$idPage = $datasPlatformIds->pids_page_id_current;
-				}
-				catch (\Exception $e)
-				{
-					return new JsonModel(array(
-							'success' => 0,
-							'datas' => array(),
-							'errors' => array(array('platform_current_page_id_used' => $translator->translate('tr_meliscms_page_save_error_Current page id defined in platform is already used')))
-					));
-				}
-				 
-				// save page lang relation
-				$langId = 1;		// default
-				$initial = 0;		// to be changed when functionality create page version lang done, this will set to plang_page_id_initial
-				 
-				// Get langId from posted values or put default 1
-				$request = $this->getRequest();
-				if ($request->isPost())
-				{
-					$postValues = get_object_vars($request->getPost());
-					if (!empty($postValues['plang_lang_id']))
-						$langId = $postValues['plang_lang_id'];
-				}
-				 
-				$melisEngineTablePageLang = $this->getServiceLocator()->get('MelisEngineTablePageLang');
-				$melisEngineTablePageLang->save(array(
-						'plang_page_id' => $datasPlatformIds->pids_page_id_current,
-						'plang_lang_id' => $langId,
-						'plang_page_id_initial' => $datasPlatformIds->pids_page_id_current,//$initial,
-				));
-				 
-				// Update current page id in platform
-				$melisEngineTablePlatformIds->save(array(
-						'pids_page_id_current' => $datasPlatformIds->pids_page_id_current + 1,
-				), $datasPlatformIds->pids_id);
-			}
+        		/**
+        		 * If page does not exist, let's create
+        		 * If page exist, nothing to do, properties are saved in save-page-properties, handled through event
+        		 */ 
+        		if (!$exist)
+        		{
+        			// Get the order to be inserted
+        			$order = 0;
+        			$children = $melisEngineTablePageTree->getPageChildrenByidPage($fatherPageId);
+        			if ($children)
+        			{
+        				$children = $children->toArray();
+        				$order = count($children) + 1;
+        			}
+        
+        			// Get the current page id from platform table
+        			$melisModuleName = getenv('MELIS_PLATFORM');
+        			$melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+        			$datasPlatformIds = $melisEngineTablePlatformIds->getPlatformIdsByPlatformName($melisModuleName);
+        			$datasPlatformIds = $datasPlatformIds->current();
+        
+        			if (!empty($datasPlatformIds))
+        			{
+        				 
+        				/**
+        				 * Check if we reached the end of the band page ids defined in platform
+        				 */
+        				if ($datasPlatformIds->pids_page_id_current >= $datasPlatformIds->pids_page_id_end)
+        				{
+        					return new JsonModel(array(
+        							'success' => 0,
+        							'datas' => array(),
+        							'errors' => array(array('platform_current_page_id_max' => $translator->translate('tr_meliscms_page_save_error_Current page id has reached end of platform band')))
+        					));
+        				}
+        				 
+        				// Try/catch to save in case of pagetree id error
+        				try
+        				{
+        					// Save the new entry in page_tree
+        					$melisEngineTablePageTree->save(array(
+        							'tree_page_id' => $datasPlatformIds->pids_page_id_current,
+        							'tree_father_page_id' => $fatherPageId,
+        							'tree_page_order' => $order,
+        					));
+        					$idPage = $datasPlatformIds->pids_page_id_current;
+        				}
+        				catch (\Exception $e)
+        				{
+        					return new JsonModel(array(
+        							'success' => 0,
+        							'datas' => array(),
+        							'errors' => array(array('platform_current_page_id_used' => $translator->translate('tr_meliscms_page_save_error_Current page id defined in platform is already used')))
+        					));
+        				}
+        				 
+        				// save page lang relation
+        				$langId = 1;		// default
+        				$initial = 0;		// to be changed when functionality create page version lang done, this will set to plang_page_id_initial
+        				 
+        				// Get langId from posted values or put default 1
+        				$request = $this->getRequest();
+        				if ($request->isPost())
+        				{
+        					if (!empty($postValues['plang_lang_id']))
+        						$langId = $postValues['plang_lang_id'];
+        				}
+        				 
+        				$melisEngineTablePageLang = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+        				$melisEngineTablePageLang->save(array(
+        						'plang_page_id' => $datasPlatformIds->pids_page_id_current,
+        						'plang_lang_id' => $langId,
+        						'plang_page_id_initial' => $datasPlatformIds->pids_page_id_current,//$initial,
+        				));
+        				 
+        				// Update current page id in platform
+        				$melisEngineTablePlatformIds->save(array(
+        						'pids_page_id_current' => $datasPlatformIds->pids_page_id_current + 1,
+        				), $datasPlatformIds->pids_id);
+        			}
+        		}
+    		}
+    		else 
+    		{
+    		    /**
+    		     * Form is not valid
+    		     * Error Messages will generated by saveProperties function
+    		     */
+    		}
 		}
 		
 		$result = array(
@@ -349,122 +327,150 @@ class PagePropertiesController extends AbstractActionController
 		$request = $this->getRequest();
 		if ($request->isPost())
 		{
-			// Get values posted and set them in form
-			$postValues = get_object_vars($request->getPost());
-			$propertyForm->setData($postValues);
-	
-			// Validate the form 
-			if ($propertyForm->isValid())
-			{
-				// Get datas validated
-				$datas = $propertyForm->getData();
-	
-				/**
-				 * First, let's copy the published table entry
-				 * inside the saved table if there's no entry in it.
-				 * Kind of special case, the page is not new, it's being edited after being published
-				 */
-				if (!$isNew)
-				{
-					$dataSaved = $melisPageSavedTable->getEntryById($idPage);
-					$dataSaved = $dataSaved->toArray();
-    				if (count($dataSaved) == 0)
-    				{
-    					$dataPublished = $melisPagePublishedTable->getEntryById($idPage);
-    					$dataPublished = $dataPublished->toArray();
-    					if (count($dataPublished) > 0)
-    					{
-    						$dataPublished = $dataPublished[0];
-    						$melisPageSavedTable->save($dataPublished, $idPage);
-    					}
-    				}
-				}
-				else
-				{
-					// New page, create an empty content
-					$newXmlContent = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-					$newXmlContent .= '<document type="MelisCMS" author="MelisTechnology" version="2.0">' . "\n";
-					$newXmlContent .= '</document>';
-					$datas['page_content'] = $newXmlContent;
-				}
-				
-				
-				/**
-				 * Datas are all saved in PageSave once validated.
-				 * This allow to add fields in the app.form and fields in the db.
-				 * It will then works with the new field as long as it's in the same table.
-				 * 
-				 * Useless fields from the form must be unset
-				 * Special fields must be set
-				 */
-
-				
-				$errors = array();
-				$success = 0;
-				$language = $datas['plang_lang_id'];
-				$template = $datas['page_tpl_id'];
-				
-				unset($datas['page_submit']);
-				unset($datas['page_creation_date']);
-				unset($datas['plang_lang_id']);
-				
-				$datas['page_id'] = $idPage;
-				
-				if(empty($template)) {
-				    $errors = array(
-				        'page_tpl_id' => array(
-				            'errorMessage' => $translator->translate('tr_meliscms_page_form_page_tpl_id_invalid'),
-				            'label' => $translator->translate('tr_meliscms_page_tab_properties_form_Template'),
-				        ),
-				    );
-				}
-				
-				if ($isNew) 
-				{
-				    $datas['page_creation_date'] = date('Y-m-d H:i:s');
-				    
-				    if(empty($language)) {
-				        $errors = array(
-				            'plang_lang_id' => array(
-				                'errorMessage' => $translator->translate('tr_meliscms_page_form_page_p_lang_id_invalid'),
-				                'label' => $translator->translate('tr_meliscms_page_tab_properties_form_Language'),
-				            ),
-				        );
-				    }
-				}
-				else 
-				{
-				    $datas['page_edit_date'] = date('Y-m-d H:i:s');
-				    
-				    $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
-				    $user = $melisCoreAuth->getIdentity();
-				    if (!empty($user))
-				    	$datas['page_last_user_id'] = $user->usr_id;
-				}
-					
-				
-					
-				if(empty($errors))	{
-				    $success = 1;
-				    $res = $melisPageSavedTable->save($datas, $idPage);
-				}
-				    
-	
-				$result = array(
-						'success' => $success,
-						'errors' => array($errors),
-				);
-
-			}
-			else
-			{
-				// Get validation errors
-				$result = array(
-						'success' => 0,
-						'errors' => array($propertyForm->getMessages()),
-				);
-
-			}
+		    // Get the current page id from platform table
+		    $melisModuleName = getenv('MELIS_PLATFORM');
+		    $melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+		    $datasPlatformIds = $melisEngineTablePlatformIds->getPlatformIdsByPlatformName($melisModuleName);
+		    $datasPlatformIds = $datasPlatformIds->current();
+		    
+		    if (!empty($datasPlatformIds))
+		    {
+        		// Get values posted and set them in form
+        		$postValues = get_object_vars($request->getPost());
+        		$propertyForm->setData($postValues);
+               
+                if (!$isNew)
+                {
+                    // Set Page lang id not required
+                    $propertyForm->getInputFilter()->get('plang_lang_id')->setRequired(false);
+                }
+        		
+        		// Validate the form 
+        		if ($propertyForm->isValid())
+        		{
+        			// Get datas validated
+        			$datas = $propertyForm->getData();
+        
+        			/**
+        			 * First, let's copy the published table entry
+        			 * inside the saved table if there's no entry in it.
+        			 * Kind of special case, the page is not new, it's being edited after being published
+        			 */
+        			if (!$isNew)
+        			{
+        				$dataSaved = $melisPageSavedTable->getEntryById($idPage);
+        				$dataSaved = $dataSaved->toArray();
+        				if (count($dataSaved) == 0)
+        				{
+        					$dataPublished = $melisPagePublishedTable->getEntryById($idPage);
+        					$dataPublished = $dataPublished->toArray();
+        					if (count($dataPublished) > 0)
+        					{
+        						$dataPublished = $dataPublished[0];
+        						$melisPageSavedTable->save($dataPublished, $idPage);
+        					}
+        				}
+        			}
+        			else
+        			{
+        				// New page, create an empty content
+        				$newXmlContent = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        				$newXmlContent .= '<document type="MelisCMS" author="MelisTechnology" version="2.0">' . "\n";
+        				$newXmlContent .= '</document>';
+        				$datas['page_content'] = $newXmlContent;
+        			}
+        			
+        			
+        			/**
+        			 * Datas are all saved in PageSave once validated.
+        			 * This allow to add fields in the app.form and fields in the db.
+        			 * It will then works with the new field as long as it's in the same table.
+        			 * 
+        			 * Useless fields from the form must be unset
+        			 * Special fields must be set
+        			 */
+        
+        			
+        			$errors = array();
+        			$success = 0;
+        			$language = $datas['plang_lang_id'];
+        			$template = $datas['page_tpl_id'];
+        			
+        			unset($datas['page_submit']);
+        			unset($datas['page_creation_date']);
+        			unset($datas['plang_lang_id']);
+        			
+        			$datas['page_id'] = $idPage;
+        			
+        			if(empty($template)) {
+        			    $errors = array(
+        			        'page_tpl_id' => array(
+        			            'errorMessage' => $translator->translate('tr_meliscms_page_form_page_tpl_id_invalid'),
+        			            'label' => $translator->translate('tr_meliscms_page_tab_properties_form_Template'),
+        			        ),
+        			    );
+        			}
+        			
+        			if ($isNew) 
+        			{
+        			    $datas['page_creation_date'] = date('Y-m-d H:i:s');
+        			    
+        			    if(empty($language)) {
+        			        $errors = array(
+        			            'plang_lang_id' => array(
+        			                'errorMessage' => $translator->translate('tr_meliscms_page_form_page_p_lang_id_invalid'),
+        			                'label' => $translator->translate('tr_meliscms_page_tab_properties_form_Language'),
+        			            ),
+        			        );
+        			    }
+        			}
+        			else 
+        			{
+        			    $datas['page_edit_date'] = date('Y-m-d H:i:s');
+        			    
+        			    $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
+        			    $user = $melisCoreAuth->getIdentity();
+        			    if (!empty($user))
+        			    	$datas['page_last_user_id'] = $user->usr_id;
+        			}
+        				
+        			
+        				
+        			if(empty($errors))	{
+        			    $success = 1;
+        			    $res = $melisPageSavedTable->save($datas, $idPage);
+        			}
+        			    
+        
+        			$result = array(
+        					'success' => $success,
+        					'errors' => array($errors),
+        			);
+        
+        		}
+        		else
+        		{
+        			// Get validation errors
+        			$result = array(
+        					'success' => 0,
+        					'errors' => array($propertyForm->getMessages()),
+        			);
+        		}
+		    }
+		    else 
+		    {
+		        $errors = array(
+		            'platform_ids' => array(
+		                'noPlatformIds' => $translator->translate('tr_meliscms_no_available_platform_ids'),
+		                'label' => $translator->translate('tr_meliscms_tool_platform_ids'),
+		            ),
+		        );
+		        
+		        $result = array(
+		            'success' => 0,
+		            'errors' => array($errors),
+		        );
+            }
 		}
 		else
 		{

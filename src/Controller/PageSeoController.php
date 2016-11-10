@@ -181,6 +181,15 @@ class PageSeoController extends AbstractActionController
 						}
 					}
 					
+					// Cleaning special char and white spaces on SEO Url
+					$enginePage = $this->getServiceLocator()->get('MelisEngineTree');
+					$datas['pseo_url'] = $enginePage->cleanString(mb_strtolower($datas['pseo_url']));
+					// Checking for spaces
+					if (preg_match('/\s/', $datas['pseo_url']))
+					{
+					    $datas['pseo_url'] = str_replace(" ", "", $datas['pseo_url']);
+					}
+					
 				    $res = $melisTablePageSeo->save($datas, $idPage);
 				}
 				else

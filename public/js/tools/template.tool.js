@@ -65,6 +65,7 @@ var toolTemplate = {
     	    		toolTemplate.refreshTable();
     	    		// clear Add Form
     	    		melisCoreTool.clearForm("id_tool_template_generic_form");
+    	    		melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
     	    	}
     	    	else {
 		    		melisCoreTool.alertDanger("#templateaddformalert", '', data.textMessage + "<br/>");
@@ -101,6 +102,7 @@ var toolTemplate = {
     	    		// clear Edit Form
     	    		melisCoreTool.clearForm("id_tool_template_generic_form");
     	    		melisCoreTool.resetLabels("#id_tool_template_generic_form");
+    	    		melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
     	    		
     	    	}
     	    	else {
@@ -159,6 +161,7 @@ var toolTemplate = {
 			    	    	if(data.success) {
 			    	    		toolTemplate.refreshTable();
 			    	    		melisCore.flashMessenger();
+			    	    		melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
 			    	    	}
 			    	    	melisCoreTool.done(".delTemplate");
 			    	    }).fail(function(){

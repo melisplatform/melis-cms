@@ -8,9 +8,10 @@
 	$status = ( $this->currentStatus ) ? 'checked' : '';
 ?>
 
-<li<?= $id; ?> data-melisKey='<?= $data_melisKey; ?>' >
-	<div data-pagenumber="<?= $this->idPage; ?>" class="make-switch page-publishunpublish" data-on-label="<?= $this->translate('tr_meliscms_page_published_text'); ?>" data-off-label="<?= $this->translate('tr_meliscms_page_unpublished_text'); ?>" data-text-label="<?= $this->translate('tr_meliscms_page_status_text'); ?>">
-        <input type="checkbox" data-pagenumber="<?= $this->idPage; ?>" <?= $status; ?>>
-    </div>
-</li>
- 
+<ul id="<?= $this->idPage; ?>_id_meliscms_page_publish_unpublish_switch" class="menubar menu-bar-options">
+	<li<?= $id; ?> data-melisKey='<?= $data_melisKey; ?>' >
+		<div data-pagenumber="<?= $this->idPage; ?>" class="make-switch page-publishunpublish title-switch" data-on-label="<?= $this->translate('tr_meliscms_page_published_text'); ?>" data-off-label="<?= $this->translate('tr_meliscms_page_unpublished_text'); ?>" data-text-label="<?= $this->translate('tr_meliscms_page_status_text'); ?>">
+			<input type="checkbox" data-pagenumber="<?= $this->idPage; ?>" <?= $status; ?>>
+		</div>
+	</li>
+</ul>
