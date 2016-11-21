@@ -30,6 +30,7 @@ use MelisCms\Listener\MelisCmsDeleteSiteDomainListener;
 use MelisCms\Listener\MelisCmsInstallerLastProcessListener;
 use MelisCms\Listener\MelisCmsToolUserNewUserListener;
 use MelisCms\Listener\MelisCmsDeletePlatformListener;
+
 class Module
 {
     public function onBootstrap(MvcEvent $e)
@@ -97,10 +98,6 @@ class Module
 
     }
 
-    public function init(ModuleManager $mm)
-    {
-    }
-
     /**
      * Create translations for this module
      * @param MvcEvent $e
@@ -148,20 +145,6 @@ class Module
                 'namespaces' => array(
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
                 ),
-            ),
-        );
-    }
-
-    public function getServiceConfig()
-    {
-        return array(
-            'factories' => array(
-                'MelisCms\Service\MelisCmsRightsService' => function ($sm) {
-                    $melisCmsRightsService = new \MelisCms\Service\MelisCmsRightsService();
-                    $melisCmsRightsService->setServiceLocator($sm);
-
-                    return $melisCmsRightsService;
-                },
             ),
         );
     }

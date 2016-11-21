@@ -107,26 +107,6 @@ hr{
     font-size: 25px;	
 }
 
-
-/* SEO text counter */
-.text-counter-indicator{
-	font-size: 12px;
-    margin-left: 15px;
-    letter-spacing: .5px;
-    font-weight: 600;
-    color: #72af46;
-}
-.text-counter-indicator .fa{
-	font-size: 14px;
-    margin-right: 4px;
-    vertical-align: middle;
-    padding-bottom: 1px;
-}
-.limit{
-	color: #cb4040;
-}
-
-
 /* page title */
 div.content-heading h1{
     font-size: 24px;

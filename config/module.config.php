@@ -64,7 +64,9 @@ return array(
     'service_manager' => array(
         'aliases' => array(
             'translator' => 'MvcTranslator',
-			'MelisCmsRights' => 'MelisCms\Service\MelisCmsRightsService',
+        ),
+        'factories' => array(
+			'MelisCmsRights' => 'MelisCms\Service\Factory\MelisCmsRightsServiceFactory',
         ),
     ),
     'controllers' => array(

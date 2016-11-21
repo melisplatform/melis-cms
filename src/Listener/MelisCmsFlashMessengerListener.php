@@ -27,11 +27,24 @@ class MelisCmsFlashMessengerListener extends MelisCoreGeneralListener implements
         
         $callBackHandler = $sharedEvents->attach(
         	'MelisCms',
-        	array('meliscms_page_save_end', 'meliscms_page_publish_end', 'meliscms_page_unpublish_end', 
-        	    'meliscms_page_delete_end', 'meliscms_template_savenew_end','meliscms_template_save_end', 
-        	    'meliscms_template_delete_end', 'meliscms_site_save_end', 'meliscms_site_delete_end', 'meliscms_site_save_new_end',
-        	    'meliscms_site_delete_by_id_end', 'meliscms_language_new_end', 'meliscms_language_delete_end',
-        	    'meliscms_language_update_end','meliscms_page_clear_saved_page_end','meliscms_platform_IDs_save_end'
+        	array(
+        	    'meliscms_page_save_end', 
+        	    'meliscms_page_publish_end', 
+        	    'meliscms_page_unpublish_end', 
+        	    'meliscms_page_delete_end', 
+        	    'meliscms_template_savenew_end',
+        	    'meliscms_template_save_end', 
+        	    'meliscms_template_delete_end', 
+        	    'meliscms_site_save_end', 
+        	    'meliscms_site_delete_end', 
+        	    'meliscms_site_save_new_end',
+        	    'meliscms_site_delete_by_id_end', 
+        	    'meliscms_language_new_end', 
+        	    'meliscms_language_delete_end',
+        	    'meliscms_language_update_end',
+        	    'meliscms_page_clear_saved_page_end',
+        	    'meliscms_platform_IDs_save_end', 
+        	    'meliscms_platform_IDs_delete_end'
         	),
         	function($e){
 

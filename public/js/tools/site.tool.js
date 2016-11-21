@@ -14,7 +14,8 @@ $(document).ready(function() {
 	// Add Event to "Edit Site" button
 	addEvent(".btnEditSite", function(e) {
 		melisCoreTool.showOnlyTab('#modal-cms-tool-site', '#id_meliscms_tool_site_modal_edit');
-
+		var tempLoader = '<div id="loader" class="overlay-loader"><img class="loader-icon spinning-cog" src="/MelisCore/assets/images/cog12.svg" data-cog="cog12"></div>';
+		$(".widget #idformsite").append(tempLoader);
 		var tdParent = $(this).parent();
 		var trParent = $(tdParent).parent();
 		var siteID = trParent.attr('id');
@@ -26,7 +27,7 @@ $(document).ready(function() {
 		$('label[for="id_site_id"]').show();
 		$(options).show();
 		$('label[for="id_select_env"]').show();
-		
+		melisCoreTool.clearForm("formsiteedit #idformsite");
 		// clear current environments first
 		$(options).html("");
 		
@@ -38,18 +39,25 @@ $(document).ready(function() {
 	        dataType    : 'json',
 	        encode		: true,
 	        success		: function(res) {
-	        	
+
 			    // environment retrieval
-	    		$.getJSON("/melis/MelisCms/Site/getSiteEnvironments", {siteId: siteID}, function(json) 
-	    		{		
-	    		    $.each(json.data, function(idx, item) 
+	    		$.getJSON("/melis/MelisCms/Site/getSiteEnvironments", {siteId: siteID}, function(json)
+	    		{
+	    		    $.each(json.data, function(idx, item)
 	    		    {
 	    		    	options.append($("<option />").val(item).text(item));
 	    		    });
 	    		    $('#formsiteedit #idformsite #id_sdom_env>option:eq(0)').prop('selected', true);
 				    var env = res.data;
 				    getSiteInfo(siteID, env);
-	    	    });	
+					var checkValue = setInterval(function() {
+						var value = $("#formsiteedit #idformsite #id_site_name").val();
+						if(value !== null || value !== "") {
+							clearInterval(checkValue);
+							$(".overlay-loader").remove();
+						}
+					},300);
+	    	    });
 	        }
 		});
 

@@ -212,7 +212,7 @@
 	    'tr_meliscms_tool_language_delete_success' => 'Langage supprimé avec succès',
 	    'tr_meliscms_tool_language_delete_failed' => 'Impossible de supprimer le langage',
 	    'tr_meliscms_tool_language_permission' => 'Impossible d\'ajouter un nouveau langage, veuillez vérifier vos droits pour éditer les fichiers',
-	    'tr_meliscms_tool_language_forms_button_edit' => 'Editer',
+	    'tr_meliscms_tool_language_forms_button_edit' => 'Sauvegarder',
 	    'tr_meliscms_tool_language_prompts_edit_failed' => 'Impossible de mettre à jour la langue, veuillez réessayer',
 	    'tr_meliscms_tool_language_prompts_edit_success' => 'Langage mis à jour avec succès',
 	    
@@ -281,8 +281,8 @@
 	    
 	    // Delete Messages
 	    'tr_meliscms_tool_platform_ids_confirm_msg' => 'Etes-vous sûr de vouloir supprimer cette plage d\'IDs ?',
-	    'tr_meliscms_tool_platform_ids_deleted_title' => 'Platform ID',
-	    'tr_meliscms_tool_platform_ids_delete_success_msg' => 'Platform range ID successfully deleted',
+	    'tr_meliscms_tool_platform_ids_deleted_title' => 'ID Plateformes',
+	    'tr_meliscms_tool_platform_ids_delete_success_msg' => 'Plage d\'IDs de la plateforme supprimée avec succès',
 	    // Platform Id validation Messages
 	    'tr_meliscms_tool_platform_not_digit' => 'The input must contain only digits',
 	    'tr_meliscms_tool_platform_empty' => 'Le champ ne peut être vide',

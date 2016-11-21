@@ -212,7 +212,7 @@
 	    'tr_meliscms_tool_language_delete_success' => 'Language deleted sucessfully',
 	    'tr_meliscms_tool_language_delete_failed' => 'Unable to delete language',
 	    'tr_meliscms_tool_language_permission' => 'Unable to add language, please check your rights to write files',
-	    'tr_meliscms_tool_language_forms_button_edit' => 'Edit',
+	    'tr_meliscms_tool_language_forms_button_edit' => 'Save',
 	    'tr_meliscms_tool_language_prompts_edit_failed' => 'Unable to update language, please try again',
 	    'tr_meliscms_tool_language_prompts_edit_success' => 'Language has been updated successfully',
 	    

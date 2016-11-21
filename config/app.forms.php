@@ -356,13 +356,15 @@ return array(
 							array(
 								'spec' => array(
 									'name' => 'pseo_meta_description',
-									'type' => 'MelisText',
+									'type' => 'Textarea',
 									'options' => array(
 											'label' => 'tr_meliscms_page_tab_seo_form_Meta Description',
 									),
 									'attributes' => array(
 											'id' => 'pseo_meta_description',
 											'value' => '',
+    									    'rows' => 5,
+    									    'class' => 'melis-seo-desc form-control'
 									),
 								),
 							),
@@ -385,6 +387,9 @@ return array(
 									'type' => 'MelisText',
 									'options' => array(
 											'label' => 'tr_meliscms_page_tab_seo_form_Url Redirect',
+    									    'label_options' => array(
+    									        'disable_html_escape' => true,
+    									    ),
 									),
 									'attributes' => array(
 											'id' => 'pseo_url_redirect',
@@ -398,6 +403,9 @@ return array(
 									'type' => 'MelisText',
 									'options' => array(
 											'label' => 'tr_meliscms_page_tab_seo_form_Url 301',
+    									    'label_options' => array(
+    									        'disable_html_escape' => true,
+    									    ),
 									),
 									'attributes' => array(
 											'id' => 'pseo_url_301',

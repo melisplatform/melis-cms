@@ -247,7 +247,7 @@ class SiteController extends AbstractActionController
     }
     
     /**
-     * Checks wether the user has access to this tools or not
+     * Checks whether the user has access to this tools or not
      * @return boolean
      */
     private function hasAccess($key)

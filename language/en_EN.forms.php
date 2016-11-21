@@ -34,8 +34,8 @@
 		'tr_meliscms_page_tab_seo_form_Meta Title' => 'Meta title',
 		'tr_meliscms_page_tab_seo_form_Meta Description' => 'Meta Description',
 		'tr_meliscms_page_tab_seo_form_Url' => 'URL',
-		'tr_meliscms_page_tab_seo_form_Url Redirect' => 'URL Redirection',
-		'tr_meliscms_page_tab_seo_form_Url 301' => 'URL 301',
+		'tr_meliscms_page_tab_seo_form_Url Redirect' => 'URL Redirection <i class="fa fa-info-circle fa-lg" title="For an internal page enter its ID or its URL"></i>',
+		'tr_meliscms_page_tab_seo_form_Url 301' => 'URL 301 <i class="fa fa-info-circle fa-lg" title="For an external page enter its complete URL with the http://"></i>',
 			
 	    // page prompts
 	    'tr_meliscms_page_form_page_name_empty' => 'Please enter the page name',

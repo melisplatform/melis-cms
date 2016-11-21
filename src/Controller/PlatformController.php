@@ -355,7 +355,7 @@ class PlatformController extends AbstractActionController
      */
     public function deletePlatformIdAction(){
         $translator = $this->getServiceLocator()->get('translator');
-        
+        $this->getEventManager()->trigger('meliscms_platform_IDs_delete_start', $this, array());
         $request = $this->getRequest();
         $datas = get_object_vars($request->getPost());
         
@@ -364,10 +364,10 @@ class PlatformController extends AbstractActionController
         
         $response = array(
             'success' => 1,
-            'textTitle' => $translator->translate('tr_meliscms_tool_platform_ids_deleted_title'),
+            'textTitle' => $translator->translate('tr_meliscms_tool_platform_ids'),
             'textMessage' => $translator->translate('tr_meliscms_tool_platform_ids_delete_success_msg'),
         );
-        
+        $this->getEventManager()->trigger('meliscms_platform_IDs_delete_end', $this, $response);
         return new JsonModel($response);
     }
     

@@ -37,8 +37,8 @@
 		'tr_meliscms_page_tab_seo_form_Meta Title' => 'Méta titre',
 		'tr_meliscms_page_tab_seo_form_Meta Description' => 'Méta Description',
 		'tr_meliscms_page_tab_seo_form_Url' => 'URL',
-		'tr_meliscms_page_tab_seo_form_Url Redirect' => 'URL Redirection',
-		'tr_meliscms_page_tab_seo_form_Url 301' => 'URL 301',
+		'tr_meliscms_page_tab_seo_form_Url Redirect' => 'URL Redirection <i class="fa fa-info-circle fa-lg" title="Pour une page interne saisir son ID ou son URL"></i>',
+		'tr_meliscms_page_tab_seo_form_Url 301' => 'URL 301 <i class="fa fa-info-circle fa-lg" title="Pour une page externe saisir l\'URL complète avec le http://"></i>',
 			
 			
 	    // page prompts
