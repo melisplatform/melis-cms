@@ -543,7 +543,6 @@ class PageController extends AbstractActionController
     
     /**
      * Used to check identity of the users to generate the edition page
-     * including tinyMCE configs.
      */
     public function checkIdentityAction()
     {
@@ -554,24 +553,8 @@ class PageController extends AbstractActionController
 		
 		if (empty($user))
 		    die;
-
-		// Get the list of TinyMce configuration files declared
-        $config = $this->serviceLocator->get('config');
-        $configTinyMce = $config['tinyMCE'];
-
-        $modulesSvc = $this->getServiceLocator()->get('ModulesService');
-        foreach ($configTinyMce as $key => $configTiny)
-        {
-            $nameModuleTab = explode('/', $configTiny);
-            $nameModule = $nameModuleTab[0];
-            $path = $modulesSvc->getModulePath($nameModule);
-            $configTinyMce[$key] = $path . str_replace($nameModule, '', $configTiny);
-        }
 		
-		$container = new Container('meliscore');
 	    $view = new ViewModel();
-	    $view->locale = $container['melis-lang-locale'];
-	    $view->configsTiny = $configTinyMce;
     	$view->idPage = $idPage;
 	     
 	    return $view;

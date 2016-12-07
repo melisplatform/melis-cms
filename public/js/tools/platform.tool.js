@@ -37,8 +37,8 @@ $(function(){
 			}else{
 				melisCoreTool.alertDanger("#cmsPlatformAlert", '', data.textMessage + "<br/>");
 				melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 'closeByButtonOnly');
-				melisCoreTool.highlightErrors(data.success, data.errors, "idformplatform");
 			}
+    		melisCoreTool.highlightErrors(data.success, data.errors, "idformplatform");
     	}).error(function(xhr, textStatus, errorThrown){
     		alert("ERROR !! Status = "+ textStatus + "\n Error = "+ errorThrown + "\n xhr = "+ xhr.statusText);
     	});

@@ -38,53 +38,52 @@
 	                	  var data = node.data;
 	              		  melisHelper.tabOpen( data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,  { idPage: data.melisData.page_id } ); 
 	                  }
-	                  if(action === 'delete'){
+						if(action === 'delete'){
 	
-	                	  var data = node.data;
-	                	  var zoneId = data.melisData.item_zoneid;
-	                	  var idPage = data.melisData.page_id;	  
-//	                	  var parentNode = ( node.getParent().key == 'root_1') ? -1 : node.getParent().key ;	
-	                	  var parentNode = ( node.key == 'root_1') ? -1 : node.key ;	
+							var data = node.data;
+							var zoneId = data.melisData.item_zoneid;
+							var idPage = data.melisData.page_id;	  
+//	                		  var parentNode = ( node.getParent().key == 'root_1') ? -1 : node.getParent().key ;	
+							var parentNode = ( node.key == 'root_1') ? -1 : node.key ;	
 	                	  
-	                	  // check if page to be delete is open or not
-	                	  var openedOrNot = $(".tabsbar a[data-id='"+zoneId+"']").parent("li");
+							// check if page to be delete is open or not
+							var openedOrNot = $(".tabsbar a[data-id='"+zoneId+"']").parent("li");
 	                	  
-	                	  // delete page confirmation 
-	                	  melisCoreTool.confirm(
+								// delete page confirmation 
+								melisCoreTool.confirm(
 	          					translations.tr_meliscms_menu_delete,
 	          					translations.tr_meliscms_menu_cancel,
 	          					translations.tr_meliscms_delete_confirmation, 
 	          					translations.tr_meliscms_delete_confirmation_msg, 
 	          					function() {
-	          						
-		          					  // check if node has children if TRUE then cannot be deleted
-		  	                    	  $.ajax({
-		  	                			  url         : '/melis/MelisCms/Page/deletePage?idPage='+idPage,
-		  	                			  encode		: true 
-		  	                		  }).success(function(data){
-		  	                			  if( data.success === 1){
-		  	                				  //close the page if its open. do nothing if its not open
-		  	                				  if(openedOrNot.length === 1){
-		  	                					  melisHelper.tabClose(zoneId);
-		  	                            	  }
+									// reload and expand the treeview
+	          						 melisCms.refreshTreeview(parentNode);
+		          					
+									// check if node has children if TRUE then cannot be deleted
+		  	                    	$.ajax({
+										url         : '/melis/MelisCms/Page/deletePage?idPage='+idPage,
+										encode		: true 
+		  	                		}).success(function(data){
+										if( data.success === 1){
+		  	                				//close the page if its open. do nothing if its not open
+		  	                				if(openedOrNot.length === 1){
+												melisHelper.tabClose(zoneId);
+		  	                            	}
 		  	                				  
-		  	                				  // notify deleted page
-		  	                				  melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
+		  	                				// notify deleted page
+		  	                				melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
 		  	                				 
-			  	                				// update flash messenger values
-			  	          				    	melisCore.flashMessenger();
-		  	          				    	
-		  	    	            			  // reload and expand the treeview
-		  	    	            			  melisCms.refreshTreeview(parentNode);
-		  	                			  }
-		  	                			  else{
-		  	                				  melisHelper.melisKoNotification( data.textTitle, data.textMessage, data.errors, '#000' );
-		  	                			  }  
-		  	                		  }).error(function(xhr, textStatus, errorThrown){
-		  	                			  alert( translations.tr_meliscore_error_message );
-		  	                		  });
-      					  });  
-	                  }
+			  	                			// update flash messenger values
+			  	          				    melisCore.flashMessenger();				    	
+		  	    	            			
+		  	    	            		} else {
+		  	                				melisHelper.melisKoNotification( data.textTitle, data.textMessage, data.errors, '#000' );
+		  	                			}
+		  	                		}).error(function(xhr, textStatus, errorThrown){
+										alert( translations.tr_meliscore_error_message );
+		  	                		});
+								});  
+						}
 	               }
 	        	},
 			    lazyLoad: function(event, data) {

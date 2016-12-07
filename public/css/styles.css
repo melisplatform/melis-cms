@@ -52,8 +52,8 @@ hr{
 }
 .page-content-container .widget.widget-tabs-double-2>.widget-head ul li a.glyphicons,
 .nav-tabs>li>a{
-	margin: 0;
-	border-bottom: 1px solid #e5e5e5;
+	/* margin: 0; */
+	/* border-bottom: 1px solid #e5e5e5; */
 }
 .page-content-container .widget.widget-tabs-double-2>.widget-head ul li a.glyphicons{
 	min-width: 90px;
@@ -152,14 +152,31 @@ div.content-heading h1{
 }
 .widget.widget-tabs-double-2>.widget-head{
 	border-bottom: 1px solid #e5e5e5;
-	height: 71px;
+	height: 70px;
 }
-.nav-tabs>li>a:hover{ 
-	border-color: transparent transparent #e5e5e5 transparent;
+.page-content-container .nav-tabs > li.active:focus > a,
+.page-content-container .nav-tabs > li.active:active,
+.page-content-container .nav-tabs > li.active {
+	background: #932E2A;
 }
-
-
-
+.page-content-container .nav-tabs > li.active,
+.page-content-container .nav-tabs > li:hover {
+	background: #fff;
+	border-bottom: 1px solid #e5e5e5;
+}
+.page-content-container .nav-tabs > li.active > a,
+.page-content-container .nav-tabs > li.active:focus > a,
+.page-content-container .nav-tabs > li.active:active > a {
+	background: #fff;
+	border: 1px solid #932E2A;
+	border-bottom: none;
+}
+.page-content-container .nav-tabs > li.active {
+	border-bottom: none;
+}
+.nav-tabs>li {
+	margin-bottom: 0;
+}
 /* ===============================================================[ -= RESPONSIVE =- ]==================================================================== */
 
 @media( min-width: 768px ){
@@ -173,10 +190,12 @@ div.content-heading h1{
 	
 	/* tab head */
 	.widget.widget-tabs-double-2>.widget-head ul li:hover{
-		height: 69px;
+		height: 70px;
+		border-bottom: 1px solid #e5e5e5;
 	}
 	.widget.widget-tabs>.widget-head ul li.active a.glyphicons{
-		border-bottom-color: transparent;
+		/* border-bottom-color: transparent; */
+		border-color: #eee;
 	}
 	
 }

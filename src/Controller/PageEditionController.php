@@ -225,19 +225,16 @@ class PageEditionController extends AbstractActionController
 		$success = 1;
 		$tinyTemplates = array();
 		
-		if (empty($idPage))
-			$success = 0;
-		else
+		// No pageId, return empty array 
+		if (!empty($idPage))
 		{
 			// Get datas from page
 			$melisPage = $this->getServiceLocator()->get('MelisEnginePage');
 			$datasPage = $melisPage->getDatasPage($idPage, 'saved');
 			$datasTemplate = $datasPage->getMelisTemplate();
 			
-			// No template, no success
-			if (empty($datasTemplate))
-				$success = 0;
-			else
+			// No template, return empty array 
+			if (!empty($datasTemplate))
 			{
 				// Get the path of mini-templates to this website
 				$folderSite = $datasTemplate->tpl_zf2_website_folder;
@@ -267,13 +264,7 @@ class PageEditionController extends AbstractActionController
 			}
 		}
 		
-		// Send back results
-		$result = array(
-			'success' => $success,
-			'templates' => $tinyTemplates
-		);
-		
-		return new JsonModel($result);
+		return new JsonModel($tinyTemplates);
 	}
 }
 

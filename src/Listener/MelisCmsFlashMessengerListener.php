@@ -44,7 +44,9 @@ class MelisCmsFlashMessengerListener extends MelisCoreGeneralListener implements
         	    'meliscms_language_update_end',
         	    'meliscms_page_clear_saved_page_end',
         	    'meliscms_platform_IDs_save_end', 
-        	    'meliscms_platform_IDs_delete_end'
+        	    'meliscms_platform_IDs_delete_end',
+        	    'meliscalendar_save_site_redirect_end',
+        	    'meliscalendar_delete_site_redirect_end',
         	),
         	function($e){
 

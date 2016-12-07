@@ -185,6 +185,8 @@
 	    'tr_meliscms_common_refresh' => 'Rafraichir',
 	    'tr_meliscms_common_close' => 'Annuler',
 	    'tr_meliscms_common_save' => 'Sauvegarder',
+	    'tr_meliscms_common_yes' => 'Oui',
+	    'tr_meliscms_common_no' => 'Non',
 	    
 	    'tr_meliscms_common_add' => 'Ajouter',
 	    'tr_meliscms_common_apply' => 'Apply',
@@ -264,7 +266,7 @@
 	    'tr_meliscms_tool_platform_pids_tpl_id_current' => 'Template ID actuel',
 	    'tr_meliscms_tool_platform_pids_tpl_id_end' => 'Template ID fin',
 	    'tr_meliscms_tool_platform_ids_btn_add' => 'Ajouter une plage d\'IDs',
-	    'tr_meliscms_tool_platform_ids_btn_edit' => 'Mettre à jour une plage IDs',
+	    'tr_meliscms_tool_platform_ids_btn_edit' => 'Editer une plage IDs',
 	    'tr_meliscms_tool_platform_pids_name_empty' => 'Choose Platform',
 	    'tr_meliscms_tool_platform_ids_table' => 'Tableau',
 	    'tr_meliscms_tool_platform_ids_modal_content' => 'Add and Update Modal',
@@ -297,5 +299,37 @@
 	
 	    //
 	    'tr_meliscms_no_available_platform_ids' => 'Pas d\'IDs de plateforme disponible pour la plateforme actuelle, veuillez vérifier les IDs de plateforme',
+
+	    // Site Redirect Tool
+        'tr_meliscms_tool_site_301' => 'Redirection 301',
+         
+        // interface name
+        'tr_meliscms_tool_site_301_header' => 'En-tête',
+        'tr_meliscms_tool_site_301_content' => 'Contenu',
+         
+        // Action button
+        'tr_meliscms_tool_site_301_add_site_redirect' => 'Ajouter une redirection 301',
+        'tr_meliscms_tool_site_301_edit_site_redirect' => 'Editer la redirection 301',
+        'tr_meliscms_tool_site_301_delete_site_redirect' => 'Supprimer la redirection 301',
+         
+        // Table Columns
+        'tr_meliscms_tool_site_301_s301_id' => 'ID',
+        'tr_meliscms_tool_site_301_s301_old_url' => 'Ancienne url',
+        'tr_meliscms_tool_site_301_s301_new_url' => 'Nouvelle url',
+	    'tr_meliscms_tool_site_301_test_action' => 'Tester',
+        'tr_meliscms_tool_site_301_edit_action' => 'Editer',
+        'tr_meliscms_tool_site_301_delete_action' => 'Supprimer',
+         
+        // Form messages
+        'meliscms_tool_site_301_add_success' => 'La redirection 301 a été rajoutée avec succès',
+        'meliscms_tool_site_301_edit_success' => 'La redirection 301 a été éditée avec succès',
+        'meliscms_tool_site_301_delete_success' => 'La redirection 301 a été supprimée avec succès',
+        'meliscms_tool_site_301_unable_to_add' => 'Impossible de rajouter la redirection 301',
+        'meliscms_tool_site_301_unable_to_edit' => 'Impossible d\'éditer la redirection 301',
+        'meliscms_tool_site_301_unable_to_delete' => 'Impossible de suprimer la redirection 301',
+        'meliscms_tool_site_301_value_too_long_255' => 'Valeur trop longue, elle doit être de moins de 255 caractères',
+        'meliscms_tool_site_301_value_empty' => 'Le champ est requis et ne peut être vide',
+        'meliscms_tool_site_301_old_url_exist' => 'L\'ancienne url existe déjà',
+        'meliscms_tool_site_301_delete_confirm_msg' => 'Etes-vous sûr de vouloir supprimer cette redirection 301 ?',
 	);
 ?>

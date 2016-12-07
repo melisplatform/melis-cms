@@ -185,6 +185,8 @@
 	    'tr_meliscms_common_refresh' => 'Refresh',
 	    'tr_meliscms_common_close' => 'Close',
 	    'tr_meliscms_common_save' => 'Save',
+	    'tr_meliscms_common_yes' => 'Yes',
+	    'tr_meliscms_common_no' => 'No',
 	    
 	    'tr_meliscms_common_add' => 'Add',
 	    'tr_meliscms_common_apply' => 'Apply',
@@ -297,5 +299,37 @@
 	    
 	    //
 	    'tr_meliscms_no_available_platform_ids' => 'No Platform ID\'s available for current Platform, Please check Platform ID\'s',
+	    
+	    // Site Redirect Tool
+	    'tr_meliscms_tool_site_301' => 'Site redirect',
+	    
+	    // interface name
+	    'tr_meliscms_tool_site_301_header' => 'Header',
+	    'tr_meliscms_tool_site_301_content' => 'Content',
+	    
+	    // Action button
+	    'tr_meliscms_tool_site_301_add_site_redirect' => 'Add site redirect',
+	    'tr_meliscms_tool_site_301_edit_site_redirect' => 'Edit site redirect',
+	    'tr_meliscms_tool_site_301_delete_site_redirect' => 'Delete site redirect',
+	    
+	    // Table Columns
+	    'tr_meliscms_tool_site_301_s301_id' => 'ID',
+	    'tr_meliscms_tool_site_301_s301_old_url' => 'Old url',
+	    'tr_meliscms_tool_site_301_s301_new_url' => 'New url',
+	    'tr_meliscms_tool_site_301_test_action' => 'Test',
+	    'tr_meliscms_tool_site_301_edit_action' => 'Edit',
+	    'tr_meliscms_tool_site_301_delete_action' => 'Delete',
+	    
+	    // Form messages
+	    'meliscms_tool_site_301_add_success' => 'The site redirect has been successfully added',
+	    'meliscms_tool_site_301_edit_success' => 'The site redirect has been successfully edited',
+	    'meliscms_tool_site_301_delete_success' => 'The site redirect has been successfully deleted',
+	    'meliscms_tool_site_301_unable_to_add' => 'Unable to add site redirect',
+	    'meliscms_tool_site_301_unable_to_edit' => 'Unable to edit site redirect',
+	    'meliscms_tool_site_301_unable_to_delete' => 'Unable to delete site redirect',
+	    'meliscms_tool_site_301_value_too_long_255' => 'The value too long, it should be less than 255 characters',
+	    'meliscms_tool_site_301_value_empty' => 'The input is required and can\'t be empty',
+	    'meliscms_tool_site_301_old_url_exist' => 'The old url is already exist',
+	    'meliscms_tool_site_301_delete_confirm_msg' => 'Are you sure you want to delete this site redirect?',
 	   );
 ?>

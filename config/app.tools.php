@@ -524,7 +524,7 @@ return array(
                         ),
                         'meliscms_tool_site_modal_add' => array(
                             'id' => 'id_meliscms_tool_site_modal_add',
-                            'class' => 'glyphicons book',
+                            'class' => 'glyphicons plus',
                             'tab-header' => '',
                             'tab-text' => 'tr_meliscms_tool_site_new_site',
                             'content' => array(
@@ -536,7 +536,7 @@ return array(
                         ),
                         'meliscms_tool_site_modal_edit' => array(
                             'id' => 'id_meliscms_tool_site_modal_edit',
-                            'class' => 'glyphicons book',
+                            'class' => 'glyphicons pencil',
                             'tab-header' => '',
                             'tab-text' => 'tr_meliscms_tool_site_update_site',
                             'content' => array(
@@ -942,9 +942,9 @@ return array(
                         ),
                         'meliscms_tool_language_modal_content_new' => array(
                             'id' => 'id_meliscms_tool_language_modal_content_new',
-                            'class' => 'glyphicons asterisk',
-                            'tab-header' => 'tr_meliscms_tool_language_new',
-                            'tab-text' => '',
+                            'class' => 'glyphicons plus',
+                            'tab-header' => '',
+                            'tab-text' => 'tr_meliscms_tool_language_new',
                             'content' => array(
                                 'module' => 'MelisCms',
                                 'controller' => 'Language',
@@ -953,9 +953,9 @@ return array(
                         ),
                         'meliscms_tool_language_modal_content_edit' => array(
                             'id' => 'id_meliscms_tool_language_modal_content_edit',
-                            'class' => 'glyphicons user',
-                            'tab-header' => 'tr_meliscms_tool_language_edit',
-                            'tab-text' => '',
+                            'class' => 'glyphicons pencil',
+                            'tab-header' => '',
+                            'tab-text' => 'tr_meliscms_tool_language_edit',
                             'content' => array(
                                 'module' => 'MelisCms',
                                 'controller' => 'Language',
@@ -1481,6 +1481,187 @@ return array(
                     ), // END FORM
                 ),
                 /* END OF CMS PLATFORM TOOL */
+                
+                // Site Redirect Tool
+                'meliscms_tool_site_301' => array(
+                    'conf' => array(
+                        'title' => 'tr_meliscms_tool_site_301',
+                        'id' => 'id_meliscms_tool_site_301',
+                    ),
+                    'table' => array(
+                        // table ID
+                        'target' => '#tableToolSite301',
+                        'ajaxUrl' => '/melis/MelisCms/SiteRedirect/getSiteRedirect',
+                        'dataFunction' => '',
+                        'ajaxCallback' => '',
+                        'filters' => array(
+                            'left' => array(
+                                'tool-site-redirect-limit' => array(
+                                    'module' => 'MelisCms',
+                                    'controller' => 'SiteRedirect',
+                                    'action' => 'render-tool-site-redirect-filters-limit',
+                                ),
+                            ),
+                            'center' => array(
+                                'tool-site-redirect-search' => array(
+                                    'module' => 'MelisCms',
+                                    'controller' => 'SiteRedirect',
+                                    'action' => 'render-tool-site-redirect-filters-search',
+                                ),
+                            ),
+                            'right' => array(
+                                'tool-site-redirect-refresh' => array(
+                                    'module' => 'MelisCms',
+                                    'controller' => 'SiteRedirect',
+                                    'action' => 'render-tool-site-redirect-filters-refresh',
+                                ),
+                            ),
+                        ),
+                        'columns' => array(
+                            's301_id' => array(
+                                'text' => 'tr_meliscms_tool_site_301_s301_id',
+                                'css' => array('width' => '1%'),
+                                'sortable' => true,
+                            ),
+                            's301_old_url' => array(
+                                'text' => 'tr_meliscms_tool_site_301_s301_old_url',
+                                'css' => array('width' => '45%'),
+                                'sortable' => true,
+                            ),
+                            's301_new_url' => array(
+                                'text' => 'tr_meliscms_tool_site_301_s301_new_url',
+                                'css' => array('width' => '45%'),
+                                'sortable' => true,
+                            ),
+                        ),
+                        // define what columns can be used in searching
+                        'searchables' => array('s301_id', 's301_old_url', 's301_new_url'),
+                        'actionButtons' => array(
+                            'test' => array(
+                                'module' => 'MelisCms',
+                                'controller' => 'SiteRedirect',
+                                'action' => 'render-tool-site-redirect-test',
+                            ),
+                            'edit' => array(
+                                'module' => 'MelisCms',
+                                'controller' => 'SiteRedirect',
+                                'action' => 'render-tool-site-redirect-edit',
+                            ),
+                            'delete' => array(
+                                'module' => 'MelisCms',
+                                'controller' => 'SiteRedirect',
+                                'action' => 'render-tool-site-redirect-delete',
+                            ),
+                        )
+                    ),
+                    'forms' => array(
+                        'meliscms_tool_site_301_generic_form' => array(
+                            'attributes' => array(
+                                'name' => 'siteRedirectForm',
+                                'id' => 'siteRedirectForm',
+                                'method' => 'Post',
+                                'action' => '',
+                            ),
+                            'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                            'elements' => array(
+                                array(
+                                    'spec' => array(
+                                        'name' => 's301_id',
+                                        'type' => 'hidden',
+                                        'options' => array(
+                                            'label' => ''
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 's301_id',
+                                        ),
+                                    ),
+                                ),
+                                array(
+                                    'spec' => array(
+                                        'name' => 's301_old_url',
+                                        'type' => 'MelisText',
+                                        'options' => array(
+                                            'label' => 'tr_meliscms_tool_site_301_s301_old_url'
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 's301_old_url',
+                                        ),
+                                    ),
+                                ),
+                                array(
+                                    'spec' => array(
+                                        'name' => 's301_new_url',
+                                        'type' => 'MelisText',
+                                        'options' => array(
+                                            'label' => 'tr_meliscms_tool_site_301_s301_new_url'
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 's301_old_url',
+                                        ),
+                                    ),
+                                ),
+                            ),
+                            'input_filter' => array(
+                                's301_old_url' => array(
+                                    'name'     => 's301_old_url',
+                                    'required' => true,
+                                    'validators' => array(
+                                        array(
+                                            'name'    => 'StringLength',
+                                            'options' => array(
+                                                'encoding' => 'UTF-8',
+                                                'max'      => 255,
+                                                'messages' => array(
+                                                    \Zend\Validator\StringLength::TOO_LONG => 'meliscms_tool_site_301_value_too_long_255',
+                                                ),
+                                            ),
+                                        ),
+                                        array(
+                                            'name' => 'NotEmpty',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'meliscms_tool_site_301_value_empty',
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    'filters'  => array(
+                                        array('name' => 'StripTags'),
+                                        array('name' => 'StringTrim'),
+                                    ),
+                                ),
+                                's301_new_url' => array(
+                                    'name'     => 's301_new_url',
+                                    'required' => true,
+                                    'validators' => array(
+                                        array(
+                                            'name'    => 'StringLength',
+                                            'options' => array(
+                                                'encoding' => 'UTF-8',
+                                                'max'      => 255,
+                                                'messages' => array(
+                                                    \Zend\Validator\StringLength::TOO_LONG => 'meliscms_tool_site_301_value_too_long_255',
+                                                ),
+                                            ),
+                                        ),
+                                        array(
+                                            'name' => 'NotEmpty',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'meliscms_tool_site_301_value_empty',
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    'filters'  => array(
+                                        array('name' => 'StripTags'),
+                                        array('name' => 'StringTrim'),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                )
             ),
         ),
     ),

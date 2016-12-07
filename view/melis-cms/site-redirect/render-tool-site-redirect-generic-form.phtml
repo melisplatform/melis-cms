@@ -1,9 +1,12 @@
-<?php 
-    $id = '';
-    if (!empty($this->zoneconfig['conf']['id'])){
-        $id = ' id="'.$this->zoneconfig['conf']['id'] .'"';
-    }
-    $data_melisKey = 'data-melisKey="'.$this->melisKey.'"';
+<?php
+	$name = '';
+	$id = '';
+	if (!empty($this->zoneconfig['conf']['name']))
+		$name = $this->zoneconfig['conf']['name'];
+	if (!empty($this->zoneconfig['conf']['id']))
+		$id = ' id="' . $this->zoneconfig['conf']['id'] . '"';
+	$data_melisKey = $this->melisKey;
+		
 ?>
 <div class="modal-content">
 	<div class="modal-body padding-none">
@@ -11,17 +14,16 @@
 			<div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none">
                 <div class="widget-head">
                 	<ul class="nav nav-tabs">
-                		<li class="active"><a href="#<?php echo $id ?>" class="glyphicons <?php echo ($this->pids_id) ? 'pencil' : 'plus'?>" data-toggle="tab" aria-expanded="true"><i></i> <?php echo $this->translate($this->tabTitle) ?></a></li>
+                		<li class="active"><a href="#<?php echo $id ?>" class="glyphicons <?php echo ($this->s301Id) ? 'pencil' : 'plus' ?>" data-toggle="tab" aria-expanded="true"><i></i> <?php echo $this->translate($this->title) ?></a></li>
             		</ul>
         		</div>
         		<div class="widget-body innerAll inner-2x">
         			<div class="tab-content">
         				<div class="tab-pane active" <?php echo $id ?>>
-        					<div id="cmsPlatformAlert"></div>
                             <div class="row">
                             	<div class="col-md-12">
                                     <?php
-                                    	$form = $this->meliscms_tool_platform_generic_form;
+                                    	$form = $this->meliscms_tool_site_301_generic_form;
                                     	$form->prepare();
                                     	echo $this->form()->openTag($form); 
                                     	echo $this->melisFieldCollection($form);
@@ -29,7 +31,7 @@
                                     ?>
                                  	<div align="right">
                                  		<a data-dismiss="modal" class="btn btn-danger pull-left"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscms_common_close')?></a>
-                                 		<a class="btn btn-success btnSavePlatfomrRange" data-id="<?php echo $this->pids_id?>"><i class="fa fa-save"></i> <?php echo $this->translate('tr_meliscms_common_save'); ?></a>
+                                 		<a class="btn btn-success saveSiteRedirect" data-s301id="<?php echo $this->s301Id?>"><i class="fa fa-save"></i>  <?php echo $this->translate('tr_meliscms_common_save'); ?></a>
                                  	</div>
                             	</div>
                             </div>

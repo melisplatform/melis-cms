@@ -1,0 +1,17 @@
+<?php
+	$id = '';
+	$data_melisKey = '';
+	
+	if (!empty($this->id))
+		$id = ' id="' . $this->id . '"';
+	
+	if (!empty($this->melisKey))
+		$data_melisKey = ' data-meliskey="' . $this->melisKey . '"';
+?>
+<div>
+    <div class="modal fade" id="<?php echo $this->id?>_container">
+        <div class="modal-dialog" role="documentxxxx">
+          	<div <?php echo $id.' '.$data_melisKey; ?> class="modal-content"></div>
+        </div>
+    </div>
+</div>

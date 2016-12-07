@@ -41,7 +41,7 @@ var melisCms = (function(){
 			
 			
 			// iframe offset top
-			// $("iframe.melis-iframe").offset().top;
+			$("iframe.melis-iframe").position().top;
 			
 			// iframe height
 			$("iframe.melis-iframe").height();
@@ -50,7 +50,7 @@ var melisCms = (function(){
 			var windowHeight = screen.height;
 			
 			// body scroll top position
-			bodyOffsetTop = $(window).scrollTop();
+			bodyOffsetTop = $(window)[0].scrollHeight;
 			
 			// dialog box height
 			var dialogHeight = $(".mce-window").outerHeight();
@@ -61,19 +61,14 @@ var melisCms = (function(){
 			console.log("windowHeight = " + windowHeight);
 			console.log("dialogHeight = " + dialogHeight);		
 			console.log("has popup = "+ dialogTop); */
-			// $(".mce-floatpanel.mce-window").css("top", dialogTop);
-			$("html, body").animate({scrollTop: 1000 }, 300);
+			$(".mce-floatpanel.mce-window").css("top", dialogTop);
+			$("html, body").animate({scrollTop: dialogTop }, 300);
 		}
 		else{
 			/* console.log("no popup"); */
 		}
 		
 	});
-	
-	
-	
-	
-	
 	
     // HIGHLIGHT ERROR COLORS
 	function colorRedError(success, errors, divContainer){
@@ -176,6 +171,7 @@ var melisCms = (function(){
 		});
 		
 	}
+	
 	// PUBLISH PAGE 
 	function publishPage(idPage){
 		var pageNumber = (typeof idPage === 'string') ? idPage :  $(this).data("pagenumber"); 
@@ -331,6 +327,7 @@ var melisCms = (function(){
 		var idPage = data.pagenumber;
 		var zoneId = activeTabId;
 		var attr = $(this).attr('disabled');
+		 /* var parentNode = ( node.key == 'root_1') ? -1 : node.key ; */
 		if(typeof attr === typeof undefined || attr === false){
 	  	  	// delete page confirmation 
 	  	  	melisCoreTool.confirm(
@@ -339,25 +336,27 @@ var melisCms = (function(){
 				translations.tr_meliscms_delete_confirmation, 
 				translations.tr_meliscms_delete_confirmation_msg, 
 				function() {
-	  				// check if node has children if TRUE then cannot be deleted
+					// reload and expand the treeview
+					melisCms.refreshTreeview(idPage);
+	  				
+					// check if node has children if TRUE then cannot be deleted					
 	  				$.ajax({
 	  					url         : '/melis/MelisCms/Page/deletePage?idPage='+idPage,
 	  					encode		: true 
 	  				}).success(function(data){
 	  					if( data.success === 1){
+							
+							console.log(idPage);
 	  						//close the page 
 	  						melisHelper.tabClose(zoneId);
-	    				  
+								    				  
 	  						// notify deleted page
 	  						melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
 	  						
 	  						// update flash messenger values
 	  				    	melisCore.flashMessenger();
 	  				    	
-//	  				    	alert();
-	  				    	
-	  						// reload and expand the treeview
-	  						melisCms.refreshTreeview(idPage);
+														
 	  					}
 	  					else{
 	  						melisHelper.melisKoNotification( data.textTitle, data.textMessage, data.errors, '#000' );
@@ -366,28 +365,26 @@ var melisCms = (function(){
 	  					alert( translations.tr_meliscore_error_message );
 	  				});
 			});
-		}
+		}		
 	}
 	
 	// RELOAD THE TREEVIEW AND SET A NODE PAGE ACTIVE
 	function refreshTreeview(pageNumber){
-		
 	  	$.ajax({
   	        url         : '/melis/MelisCms/TreeSites/getPageIdBreadcrumb?idPage='+pageNumber,
   	        encode		: true,
   	        dataType    : 'json',
   	    }).success(function(data){
-  	    	
+				
 		        //process array to add to make this format '1/3/5/6...'
 		        var newData = [];
-		        var parentNode;
+		        var parentNode;				
 		        $.each( data, function( key, value ) {
-		  	           newData.push("/"+value);
-		  	           if(key === 0){
-		  	        	   parentNode = value;
-		  	           }
+		  	        newData.push("/"+value);
+		  	        if(key === 0){
+		  	           parentNode = value;
+		  	        }
 		        });
-		        
 		        newData = newData.toString();
 		        newData = newData.replace(/,/g,'');
 		        
@@ -397,18 +394,18 @@ var melisCms = (function(){
 		    	tree.reload({
 		    		 url: '/melis/MelisCms/TreeSites/get-tree-pages-by-page-id'
 		    	}).done(function(){
-				        tree.loadKeyPath(newData, function(node, status){
-		        		    if (status == "ok"){
-		        		        node.setActive(true).done(function(){
-		        		    	   node.setExpanded(true);
-		        		        });
-		        		    }
-		        		}).done(function(){
-		        			// remove duplicated brach of the tree while rapidly refreshing the tree [ plugin bug fix ]
-		        			if ( $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").hasClass("fancytree-lastsib") === false){
-					    		$("#id-mod-menu-dynatree .ui-fancytree > li:last-child").remove();
-					    	}
-		        		});   
+				    tree.loadKeyPath(newData, function(node, status){
+		        	    if (status == "ok"){
+		        	        node.setActive(true).done(function(){
+		        	    	   node.setExpanded(true);
+		        	        });
+		        	    }
+		        	}).done(function(){
+		        		// remove duplicated brach of the tree while rapidly refreshing the tree [ plugin bug fix ]
+		        		if ( $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").hasClass("fancytree-lastsib") === false){
+							$("#id-mod-menu-dynatree .ui-fancytree > li:last-child").remove();
+						}
+		        	});   
 			    });
   	    	
   	    }).error(function(xhr, textStatus, errorThrown){

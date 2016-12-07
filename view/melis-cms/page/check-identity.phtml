@@ -1,64 +1,28 @@
-
- 
-	<?php 
-		if ($this->locale != 'en_EN')
-			$locale = $this->locale;
-		else 
-			$locale = 'en';
-	?>
-
-	var locale = '<?= $locale; ?>';
-	
-	var miniTemplates = [];
-	
-	$.ajax({
-		type        : 'GET', 
-	    url         : '/melis/MelisCms/PageEdition/getTinyTemplates?idPage=<?= $this->idPage; ?>',
-	    dataType    : 'json',
-	    encode		: true
-	}).success(function(data){
-	
-		if (data.success)
-			miniTemplates = data.templates;
-		else
-			miniTemplates = [];
-	
-		<?php 
-		
-			foreach ($this->configsTiny as $config)
-			{
-				require_once($config);	
-				echo "\n";	
-			}
-	
-		?>
-	});
+	// Editor the will use for Pages
+	melisTinyMCE.createTinyMCE("html", "div.html-editable", {templates: '/melis/MelisCms/PageEdition/getTinyTemplates?idPage=<?php echo $this->idPage; ?>'});
+	melisTinyMCE.createTinyMCE("textarea", "div.textarea-editable");
+	melisTinyMCE.createTinyMCE("media", "div.media-editable");
 	
 	
-	
-	//run this function when you click out of the tinymce
+	// run this function when you click out of the tinymce
 	$("body").on("blur", ".melis-editable", function(){
 
 			// get all data-attributes from the clicked
 			var currentdata = $(this).data();
 
-			//get the content of the active tinyMCE editor.
+			// get the content of the active tinyMCE editor.
 			var content = tinyMCE.activeEditor.getContent({format : 'html'});
         	
-
         	var data = {
 				tagId : currentdata.tagId,
 				tagValue : content,
             };
 			
-		
-
     		$.post("/melis/MelisCms/PageEdition/savePageTagSession?idPage="+currentdata.idPage,
     	    		data,
     	    		function(data, status){
     	    });
 	});
-	
 	
 		
 	// OPENING THE POPUP
@@ -89,7 +53,7 @@
 			
 		}
 		else{
-			console.log("no popup");
+			/* console.log("no popup"); */
 		}
 		
 	});

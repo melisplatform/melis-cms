@@ -83,6 +83,7 @@ return array(
             'MelisCms\Controller\Language' => 'MelisCms\Controller\LanguageController',
             'MelisCms\Controller\Platform' => 'MelisCms\Controller\PlatformController',
             'MelisCms\Controller\Diagnostic' => 'MelisCms\Controller\DiagnosticController',
+            'MelisCms\Controller\SiteRedirect' => 'MelisCms\Controller\SiteRedirectController',
         ),
     ),
     'form_elements' => array(
@@ -107,9 +108,9 @@ return array(
     ),
     // Config Files
     'tinyMCE' => array(
-    	'html' => 'MelisCms/public/js/tinyMCE/html.js',
-    	'textarea' => 'MelisCms/public/js/tinyMCE/textarea.js',
-    	'media' => 'MelisCms/public/js/tinyMCE/media.js',
+    	'html' => 'MelisCms/public/js/tinyMCE/html.php',
+    	'textarea' => 'MelisCms/public/js/tinyMCE/textarea.php',
+    	'media' => 'MelisCms/public/js/tinyMCE/media.php',
     ),
     'asset_manager' => array(
         'resolver_configs' => array(

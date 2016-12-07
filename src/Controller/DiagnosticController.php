@@ -22,7 +22,7 @@ use Zend\Db\Adapter\Adapter as DbAdapter;
 class DiagnosticController extends AbstractActionController
 {
     private $odbAdapter;
-
+    
     /**
      * This will just make a simple test if this function is properly working
      */
@@ -34,7 +34,7 @@ class DiagnosticController extends AbstractActionController
         $success = 0;
         $response = array();
         $error = null;
-
+        
         if($request) {
             $label = $request['label'];
             $success = 1;
@@ -47,7 +47,7 @@ class DiagnosticController extends AbstractActionController
                 'requestedModuleToTest' => 'unknown',
             );
         }
-
+        
         return new JsonModel(array(
             'label' => $label,
             'success' => $success,
@@ -55,11 +55,11 @@ class DiagnosticController extends AbstractActionController
             'error' => $error
         ));
     }
-
+    
     public function fileCreationTestAction()
     {
         $request = $this->params()->fromRoute('payload', $this->params()->fromQuery('payload', null));
-
+        
         $label = null;
         $success = 0;
         $response = array();
@@ -73,12 +73,12 @@ class DiagnosticController extends AbstractActionController
                     // then write the file
 
                     if(fopen($path.$file, 'w')) {
-
+                        
                         $cFile = fopen($path.$file, 'w');
                         $content = 'SAMPLE TEST DATA';
                         fwrite($cFile, $content);
                         fclose($cFile);
-
+                        
                         if(file_exists($path.$file)) {
                             $fileContent = file_get_contents($path.$file);
                             if(!empty($fileContent)) {
@@ -110,18 +110,18 @@ class DiagnosticController extends AbstractActionController
             else {
                 $error = $this->getTranslations('tr_melis_test_path_exists_false', array($path));
             }
-
+            
         }
-
+        
         $actionResponse = array_merge(array(
             'label' => $label,
             'success' => $success,
             'error' => $error
         ), array('result' => $response));
-
+        
         return new JsonModel($actionResponse);
     }
-
+    
     public function testModuleTablesAction()
     {
         $request = $this->params()->fromRoute('payload', $this->params()->fromQuery('payload', null));
