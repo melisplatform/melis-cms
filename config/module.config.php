@@ -82,7 +82,6 @@ return array(
             'MelisCms\Controller\Site' => 'MelisCms\Controller\SiteController',
             'MelisCms\Controller\Language' => 'MelisCms\Controller\LanguageController',
             'MelisCms\Controller\Platform' => 'MelisCms\Controller\PlatformController',
-            'MelisCms\Controller\Diagnostic' => 'MelisCms\Controller\DiagnosticController',
             'MelisCms\Controller\SiteRedirect' => 'MelisCms\Controller\SiteRedirectController',
         ),
     ),

@@ -593,6 +593,11 @@ class PageController extends AbstractActionController
     	$errors = array();
     	$datas = array();
     	
+    	if ($idPage){
+    	    $logTypeCode = 'CMS_PAGE_UPDATE';
+    	}else{
+    	    $logTypeCode = 'CMS_PAGE_ADD';
+    	}
 
     	// Update from the different save actions done
     	if (!empty($container['action-page-tmp']))
@@ -609,7 +614,6 @@ class PageController extends AbstractActionController
     	// while the sub-save where beeing executed
     	unset($container['action-page-tmp']);
 
-
     	if ($success == 1 && !empty($datas['idPage']))
     		$idPage = $datas['idPage'];
     	
@@ -621,7 +625,6 @@ class PageController extends AbstractActionController
     	$pageName = '';
     	if ($page && !empty($page->getMelisPageTree()))
     	{
-    		
     		$page = $page->getMelisPageTree();
     		$pageName = $page->page_name;
     		$textTitle =  $translator->translate('tr_meliscms_page_success_Page')
@@ -630,7 +633,6 @@ class PageController extends AbstractActionController
     	else
     		$textTitle =  $translator->translate('tr_meliscms_page_success_Page') . ': '
     						. $translator->translate('tr_meliscms_page_success_Page new');
-
     		
     	$pageMelisKey = 'meliscms_page';
     	$melisAppConfig =$this->getServiceLocator()->get('MelisCoreConfig');
@@ -674,11 +676,11 @@ class PageController extends AbstractActionController
     	
     	if ($success == 1)
     	{
-    	    $textMessage = $translator->translate('tr_meliscms_page_success_Page saved');
+    	    $textMessage = 'tr_meliscms_page_success_Page saved';
     	}
     	else 
     	{
-    	    $textMessage = $translator->translate('tr_meliscms_page_error_Some errors occured while processing the request.');
+    	    $textMessage = 'tr_meliscms_page_error_Some errors occured while processing the request.';
     	}
 
     	// Add labels of errors
@@ -711,7 +713,7 @@ class PageController extends AbstractActionController
     		'datas' => $datas,
     	);
     	
-    	$this->getEventManager()->trigger('meliscms_page_save_end', $this, $response);
+    	$this->getEventManager()->trigger('meliscms_page_save_end', $this, array_merge($response, array('typeCode' => $logTypeCode, 'itemId' => $idPage)));
     	
     	// Final Json sent back
     	return new JsonModel($response);
@@ -729,7 +731,7 @@ class PageController extends AbstractActionController
         $success = 0;
         $errors = array();
         $datas = array();
-        $textTitle = $translator->translate('tr_meliscms_delete_saved_success_title');
+        $textTitle = 'tr_meliscms_delete_saved_success_title';
         $textMessage = '';
         
         $melisEngineSavedPage = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
@@ -769,10 +771,10 @@ class PageController extends AbstractActionController
                 unset($container['content-pages'][$idPage]);
             }
             
-            $textMessage = $translator->translate('tr_meliscms_delete_saved_success');
+            $textMessage = 'tr_meliscms_delete_saved_success';
             $success = 1;
         }else{
-            $textMessage = $translator->translate('tr_meliscms_delete_no_saved_page');
+            $textMessage = 'tr_meliscms_delete_no_saved_page';
         }
         
         $response = array(
@@ -783,7 +785,7 @@ class PageController extends AbstractActionController
         );
          
         if($success){
-            $this->getEventManager()->trigger('meliscms_page_clear_saved_page_end', $this, $response);
+            $this->getEventManager()->trigger('meliscms_page_clear_saved_page_end', $this, array_merge($response, array('typeCode' => 'CMS_PAGE_CLEAR', 'itemId' => $idPage)));
         }
          
         return new JsonModel($response);
@@ -806,14 +808,18 @@ class PageController extends AbstractActionController
     	if ($dataSaved)
     	{
     		$dataSaved = $dataSaved->toArray();
-    		$dataSaved = $dataSaved[0];
+    		
+    		if ($dataSaved)
+    		{
+    		    $dataSaved = $dataSaved[0];
     		    
-    		$dataSaved['page_status'] = 1;
-    		$dataSaved['page_edit_date'] = date('Y-m-d H:i:s');
+    		    $dataSaved['page_status'] = 1;
+    		    $dataSaved['page_edit_date'] = date('Y-m-d H:i:s');
     		    
-    		$idPageTmp = $melisPagePublishedTable->save($dataSaved, $idPage);
-    		     
-    		$melisPageSavedTable->deleteById($idPage);
+    		    $idPageTmp = $melisPagePublishedTable->save($dataSaved, $idPage);
+    		    	
+    		    $melisPageSavedTable->deleteById($idPage);
+    		}
     		
 	    	$result = array(
 	    			'success' => 1,
@@ -929,10 +935,10 @@ class PageController extends AbstractActionController
 
     	$pageTxt = '"' . $datas['item_name'] . '"';
     	if ($success == 1) {
-    	    $textMessage = $translator->translate('tr_meliscms_page_success_Page published');
+    	    $textMessage = 'tr_meliscms_page_success_Page published';
     	}
     	else {
-    	    $textMessage = $translator->translate('tr_meliscms_page_error_Some errors occured while processing the request. Please find details bellow.');
+    	    $textMessage = 'tr_meliscms_page_error_Some errors occured while processing the request. Please find details bellow.';
     	}
     	 
     	if (!empty($datas['isNew']) && $datas['isNew'])
@@ -949,7 +955,7 @@ class PageController extends AbstractActionController
     			'datas' => $datas,
     	);
     	
-    	$this->getEventManager()->trigger('meliscms_page_publish_end', $this, $response);
+    	$this->getEventManager()->trigger('meliscms_page_publish_end', $this, array_merge($response, array('typeCode' => 'CMS_PAGE_PUBLISH', 'itemId' => $idPage)));
     	
     	 
     	// Final Json sent back
@@ -1082,7 +1088,7 @@ class PageController extends AbstractActionController
     			'datas' => array($datas),
     	);
 	    
-	    $this->getEventManager()->trigger('meliscms_page_unpublish_end', $this, $response);
+	    $this->getEventManager()->trigger('meliscms_page_unpublish_end', $this, array_merge($response, array('typeCode' => 'CMS_PAGE_UNPUBLISH', 'itemId' => $idPage)));
 	    
     	// Final Json sent back
     	return new JsonModel($response);
@@ -1262,22 +1268,22 @@ class PageController extends AbstractActionController
     	}
     	if ($success == 1) {
     	    $textTitle = ' Page ' . $idPage. ' '.$translator->translate('tr_meliscms_page_success_Page_deleted');
-    	    $textMessage = $translator->translate('tr_meliscms_page_success_Page deleted_success');
+    	    $textMessage = 'tr_meliscms_page_success_Page deleted_success';
     	}
     	else {
     	    $textTitle = $translator->translate('tr_meliscms_page_success_Page_deleted2').' Page ' . $idPage;
-    	    $textMessage = $translator->translate('tr_meliscms_page_error_Some errors occured while processing the request. Please find details bellow.');
+    	    $textMessage = 'tr_meliscms_page_error_Some errors occured while processing the request. Please find details bellow.';
     	}
 
     	$response = array(
-    			'success' => $success,
-    			'textTitle' => $textTitle,
-    			'textMessage' => $textMessage,
-    			'errors' => $errors,
-    			'datas' => array($datas),
+			'success' => $success,
+			'textTitle' => $textTitle,
+			'textMessage' => $textMessage,
+			'errors' => $errors,
+			'datas' => array($datas),
     	);
     	
-    	$this->getEventManager()->trigger('meliscms_page_delete_end', $this, $response);
+    	$this->getEventManager()->trigger('meliscms_page_delete_end', $this, array_merge($response, array('typeCode' => 'CMS_PAGE_DELETE', 'itemId' => $idPage)));
     	
     	// Final Json sent back
     	return new JsonModel($response);
@@ -1290,7 +1296,7 @@ class PageController extends AbstractActionController
      * @return \Zend\View\Model\JsonModel
      */
     public function movePageAction()
-    {
+    { 
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $oldFatherIdPage = $this->params()->fromRoute('oldFatherIdPage', $this->params()->fromQuery('oldFatherIdPage', ''));
         $newFatherIdPage = $this->params()->fromRoute('newFatherIdPage', $this->params()->fromQuery('newFatherIdPage', ''));
@@ -1312,43 +1318,43 @@ class PageController extends AbstractActionController
 		$children = $melisTree->getPageChildren($newFatherIdPage);
 		$children = $children->toArray();
 		
-		// First we move the page to its new father's page id
+		
+		$pageTree = array();
+		foreach ($children As $val)
+		{
+		    if ($val['tree_page_id'] != $idPage)
+		    {
+		        array_push($pageTree, $val['tree_page_id']);
+		    }
+		}
+		
+		// Inserting the page id with new order
+		array_splice($pageTree, ($newPositionIdPage - 1), 0, $idPage);
+		
 		$tablePageTree = $this->getServiceLocator()->get('MelisEngineTablePageTree');
-		$tablePageTree->save(array(
-				'tree_father_page_id' => $newFatherIdPage,
-				'tree_page_order' => $newPositionIdPage
-		), $idPage);
-		
-		// Now we update the order of the pages that are after the new position
-		$cpt = 0;
-		foreach ($children as $child)
+		foreach ($pageTree As $key => $val)
 		{
-			if ($child['tree_page_id'] == $idPage)
-				continue;
-			$cpt++;
-			if ($cpt < $newPositionIdPage)
-				continue;
-			else
-			{
-				if ($cpt == $newPositionIdPage)
-					$cpt++;
-				$tablePageTree->save(array('tree_page_order' => $cpt), $child['tree_page_id']);
-			}
+		    $tablePageTree->save(array(
+    				'tree_father_page_id' => $newFatherIdPage,
+    				'tree_page_order' => ($key + 1)
+        		), $val);
 		}
 		
-		// Now we update the children of the old father page id, for their page order now that
-		// the page has been deleted
-		$melisTree = $this->serviceLocator->get('MelisEngineTree');
-		$children = $melisTree->getPageChildren($oldFatherIdPage);
-		$children = $children->toArray();
-		$cpt = 1;
-		foreach ($children as $child)
-		{
-			$tablePageTree->save(array('tree_page_order' => $cpt), $child['tree_page_id']);
-			$cpt++;
-		}
+        if ($newFatherIdPage != $oldFatherIdPage)
+        {
+            // Now we update the children of the old father page id, for their page order now that
+            // the page has been deleted
+            $melisTree = $this->serviceLocator->get('MelisEngineTree');
+            $children = $melisTree->getPageChildren($oldFatherIdPage);
+            $children = $children->toArray();
+            $cpt = 1;
+            foreach ($children as $child)
+            {
+                $tablePageTree->save(array('tree_page_order' => $cpt), $child['tree_page_id']);
+                $cpt++;
+            }
+        }
 		
-
 		$textTitle = '';
 		$textMessage = '';
 		if ($success == 1)
@@ -1360,22 +1366,21 @@ class PageController extends AbstractActionController
 			{
 				$page = $page->getMelisPageTree();
 				$pageName = $page->page_name;
-				$textTitle =  $translator->translate('tr_meliscms_page_success_Page')
-				. ': ' . $pageName;
-				$textMessage = $translator->translate('tr_meliscms_page_success_Page moved');
+				$textTitle =  $translator->translate('tr_meliscms_page_success_Page'). ': ' . $pageName;
+				$textMessage = 'tr_meliscms_page_success_Page moved';
 			}
 		}
 		
-		$result = array(
+		$response = array(
 				'success' => $success,
 				'textTitle' => $textTitle,
 				'textMessage' => $textMessage,
 				'errors' => array(''),
 		);
 
-		$this->getEventManager()->trigger('meliscms_page_move_end', $this, $result);
+		$this->getEventManager()->trigger('meliscms_page_move_end', $this, array_merge($response, array('typeCode' => 'CMS_PAGE_MOVE', 'itemId' => $idPage)));
 		
-        return new JsonModel($result);
+        return new JsonModel($response);
     }
     
     /**
@@ -1455,4 +1460,81 @@ class PageController extends AbstractActionController
     	
     	return new JsonModel($result);
     }
+    
+    public function renderPageModalAction()
+    {
+        $id = $this->params()->fromQuery('id');
+        $view = new ViewModel();
+        $melisKey = $this->params()->fromRoute('melisKey', '');
+        $view->melisKey = $melisKey;
+        $view->id = $id;
+        $view->setTerminal(false);
+        return $view;
+    }
+    
+    public function renderPageTreeModalAction()
+    {
+        
+        $view = new ViewModel();
+        $melisKey = $this->params()->fromRoute('melisKey', '');
+        $view->melisKey = $melisKey;
+        $view->setTerminal(false);
+        return $view;
+    }
+    
+    public function searchTreePagesAction()
+    {
+        $result = array();        
+        $pageSvc = $this->getServiceLocator()->get('MelisEnginePage');
+        $treeSvc = $this->getServiceLocator()->get('MelisEngineTree');
+        
+        if($this->getRequest()->isPost()) {
+            $postValues = get_object_vars($this->getRequest()->getPost());
+            
+            $publishedPages = $pageSvc->searchPage($postValues['value'], 'published');
+            $savedPages = $pageSvc->searchPage($postValues['value'], 'saved');
+            
+            $pages = array_merge($publishedPages, $savedPages);
+            
+            foreach($pages as $page){
+                
+                $tmp = '';  
+                $tmp = $page->tree_page_id;
+                $pageId = $page->tree_page_id;
+                $fatherPage = $treeSvc->getPageFather($pageId)->toArray();
+                
+                while(!empty($fatherPage)){
+                   
+                    if(!empty($fatherPage[0]['tree_page_id'])){
+                       $tmp = $fatherPage[0]['tree_father_page_id']. '/'. $tmp;
+                       
+                       $fatherPage = $treeSvc->getPageFather($fatherPage[0]['tree_father_page_id'])->toArray();
+
+                    }else{
+                        break;
+                    }                    
+                    
+                }
+ 
+                $result[] = $tmp;
+            }
+            $result = array_unique($result);
+            sort($result, SORT_STRING | SORT_FLAG_CASE | SORT_NATURAL);
+        }
+
+        return new JsonModel($result);
+    }
+    
+    public function getPageLinkAction()
+    {
+        $link = array();
+        $idPage = $this->params()->fromQuery('idPage', '');
+        $melisKey = $this->params()->fromRoute('melisKey', '');
+        
+        $melisTree = $this->serviceLocator->get('MelisEngineTree');
+        $link['link'] = $melisTree->getPageLink($idPage);
+        
+        return new JsonModel($link);
+    }
+   
 }

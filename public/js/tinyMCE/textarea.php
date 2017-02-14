@@ -4,7 +4,6 @@
 		'selector' => 'textarea-editable-selector',
 		'language' => 'en',
 		'inline' => true,
-		'moxiemanager_title' => 'Media Library',		
 		'menubar' => false,
 		'force_br_newlines'  => false,
 		'force_p_newlines'  => false,
@@ -14,8 +13,9 @@
 		'plugins' => array(
 		    'advlist autolink lists link image charmap print preview anchor',
 		    'searchreplace visualblocks code fullscreen',
-		    'insertdatetime media table contextmenu paste'
+		    'insertdatetime media table contextmenu paste autoresize'
 	    ),
+	    'autoresize_on_init' => false,
 	    'toolbar' => 'undo redo link unlink | code',
 	    'init_instance_callback'  => 'tinyMceCleaner',
 	); 

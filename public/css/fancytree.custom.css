@@ -2,13 +2,13 @@
 /* fancytree custom CSS */
 #id-mod-menu-dynatree span.fa{
     margin: 5px 4px 0 7px;
-	color: #fff;
+    color: #fff;
 }
 #id-mod-menu-dynatree span.dynatree-expander{
-	color: #686868;
+    color: #686868;
 }
 #id-mod-menu-dynatree .fancytree-container{
-	padding: 10px 25px 12px 25px;
+    padding: 10px 25px 12px 25px;
 }
 
 #id-mod-menu-dynatree .fancytree-node.fancytree-active{
@@ -18,34 +18,34 @@
 
 #id-mod-menu-dynatree span.fancytree-expander{
     margin-top: 2px;
-	
-	margin-right: 10px;
+    
+    margin-right: 10px;
 }
 
 #id-mod-menu-dynatree span.fancytree-active .fancytree-title{
-	background: #3A3A3A;
+    background: #3A3A3A;
     border-radius: 22px;
 }
 
 #id-mod-menu-dynatree .fancytree-title{
     height: 24px;
-	padding: 1px 10px 0 0;
-	margin-right: 5px;
+    padding: 1px 10px 0 0;
+    margin-right: 5px;
 }
 
 #id-mod-menu-dynatree span.fancytree-node{
     padding: 0 4px 2px 5px;
-	margin-top: 3px;
-	height: 24px;
+    margin-top: 3px;
+    height: 24px;
 }
 
 span.fancytree-node{
-	padding: 2px 0;
+    padding: 2px 0;
 }
 
 ul.fancytree-container{
-	background: none;
-	border: none;
+    background: none;
+    border: none;
 }
 
 span.fancytree-title {
@@ -56,7 +56,7 @@ span.fancytree-selected span.fancytree-title,
 span.fancytree-active span.fancytree-title,
 .fancytree-treefocus span.fancytree-selected span.fancytree-title, 
 .fancytree-treefocus span.fancytree-active span.fancytree-title{
-	background: none;
+    background: none;
 }
 
 .fancytree-node .fancytree-icon:before, .fancytree-node .fancytree-expander:before {
@@ -69,12 +69,12 @@ span.fancytree-active span.fancytree-title,
     font-size: 14px;
     line-height: 16px;
     text-align: center;
-	color: #686868;
+    color: #686868;
 }
 
 .fancytree-node.fancytree-has-children .fancytree-expander:before {
     content: "\002B";
-	font-size: 18px;
+    font-size: 18px;
 }
 
 .fancytree-node.fancytree-expanded .fancytree-expander:before {
@@ -87,7 +87,7 @@ span.fancytree-active span.fancytree-title,
     position: relative;
 }
 .unpublish{
-	height: 10px;
+    height: 10px;
     width: 10px;
     background: #F39A0D;
     border-radius: 50px;
@@ -100,13 +100,121 @@ span.fancytree-active span.fancytree-title,
     top: 1px;
 }
 
-/* ------------------------=[ RESPONSIVE ]=-------------------------*/
-@media ( min-width: 768px ) {
-	.fancytree-node.fancytree-has-children .fancytree-expander:before {
-		font-size: 14px;
-	}
-	#id-mod-menu-dynatree span.fancytree-expander{
-		margin-right: 0;
-	}
+.light-tree span.fancytree-title {
+    color: #4e4e4e;
 }
 
+.light-tree span.fa{
+    margin: 5px 4px 0 7px;
+    color: #4e4e4e;
+}
+.light-tree span.dynatree-expander{
+    color: #686868;
+}
+.light-tree .fancytree-container{
+    padding: 10px 25px 12px 25px;
+}
+
+.light-tree .fancytree-node.fancytree-active{
+    background: #932e2a;
+    border-radius: 22px;
+    color: #fff;
+}
+
+.light-tree span.fancytree-expander{
+    margin-top: 2px;
+    
+    margin-right: 10px;
+}
+
+.light-tree span.fancytree-active .fancytree-title{
+    background: #932e2a;
+    border-radius: 22px;
+    color: #fff;
+}
+
+.light-tree span.fancytree-active span {
+    color: #fff;
+}
+
+.light-tree .fancytree-title{
+    height: 24px;
+    padding: 1px 10px 0 0;
+    margin-right: 5px;
+}
+
+.light-tree span.fancytree-node{
+    padding: 0 4px 2px 5px;
+    margin-top: 3px;
+    height: 24px;
+}
+
+.light-tree .fancytree-active .fancytree-icon:before, 
+.light-tree .fancytree-active .fancytree-expander:before {
+    color: #fff;
+}
+
+.light-tree.fancytree-ext-filter.fancytree-ext-filter-hide span.fancytree-title {
+    color: #4e4e4e;
+}
+
+.light-tree.fancytree-ext-filter.fancytree-ext-filter-hide span.fa{
+    margin: 5px 4px 0 7px;
+    color: #4e4e4e;
+}
+.light-tree.fancytree-ext-filter.fancytree-ext-filter-hide span.dynatree-expander{
+    color: #686868;
+}
+.light-tree.fancytree-ext-filter.fancytree-ext-filter-hide .fancytree-container{
+    padding: 10px 25px 12px 25px;
+}
+
+.light-tree.fancytree-ext-filter.fancytree-ext-filter-hide .fancytree-node.fancytree-active{
+    background: #932e2a;
+    border-radius: 22px;
+    color: #fff;
+}
+
+.light-tree.fancytree-ext-filter.fancytree-ext-filter-hide span.fancytree-expander{
+    margin-top: 2px;
+    
+    margin-right: 10px;
+}
+
+.light-tree.fancytree-ext-filter.fancytree-ext-filter-hide span.fancytree-active .fancytree-title{
+    background: #932e2a;
+    border-radius: 22px;
+    color: #fff;
+}
+
+.light-tree.fancytree-ext-filter.fancytree-ext-filter-hide span.fancytree-active span {
+    color: #fff;
+}
+
+.light-tree.fancytree-ext-filter.fancytree-ext-filter-hide .fancytree-title{
+    height: 24px;
+    padding: 1px 10px 0 0;
+    margin-right: 5px;
+}
+
+.light-tree.fancytree-ext-filter.fancytree-ext-filter-hide span.fancytree-node{
+    padding: 0 4px 2px 5px;
+    margin-top: 3px;
+    height: 24px;
+}
+
+.light-tree.fancytree-ext-filter.fancytree-ext-filter-hide .fancytree-active .fancytree-icon:before, 
+.light-tree.fancytree-ext-filter.fancytree-ext-filter-hide .fancytree-active .fancytree-expander:before {
+    color: #fff;
+}
+
+
+/* ------------------------=[ RESPONSIVE ]=-------------------------*/
+@media ( min-width: 768px ) {
+    .fancytree-node.fancytree-has-children .fancytree-expander:before {
+        font-size: 14px;
+    }
+    #id-mod-menu-dynatree span.fancytree-expander{
+        margin-right: 0;
+    }
+}

@@ -25,7 +25,7 @@
 		'tr_meliscms_page_tab_properties_form_Template_None' => 'Aucun',
 		'tr_meliscms_page_tab_properties_form_Meta Title' => 'Méta titre',
 		'tr_meliscms_page_tab_properties_form_Meta Keywords' => 'Méta keywords',
-		'tr_meliscms_page_tab_properties_form_Meta Description' => 'Méta Description',
+		'tr_meliscms_page_tab_properties_form_Meta Description' => 'Méta description',
 		'tr_meliscms_page_tab_properties_form_Creation date' => 'Date de création',
 		'tr_meliscms_page_tab_properties_form_submittext_Save' => 'Sauvegarder',
 	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomie',
@@ -35,9 +35,9 @@
 	    
 
 		'tr_meliscms_page_tab_seo_form_Meta Title' => 'Méta titre',
-		'tr_meliscms_page_tab_seo_form_Meta Description' => 'Méta Description',
+		'tr_meliscms_page_tab_seo_form_Meta Description' => 'Méta description',
 		'tr_meliscms_page_tab_seo_form_Url' => 'URL',
-		'tr_meliscms_page_tab_seo_form_Url Redirect' => 'URL Redirection <i class="fa fa-info-circle fa-lg" title="Pour une page interne saisir son ID ou son URL. Pour une page externe saisir l\'URL complète avec le http://"></i>',
+		'tr_meliscms_page_tab_seo_form_Url Redirect' => 'URL redirection <i class="fa fa-info-circle fa-lg" title="Pour une page interne saisir son ID ou son URL. Pour une page externe saisir l\'URL complète avec le http://"></i>',
 		'tr_meliscms_page_tab_seo_form_Url 301' => 'URL 301 <i class="fa fa-info-circle fa-lg" title="Pour une page interne saisir son ID ou son URL. Pour une page externe saisir l\'URL complète avec le http://"></i>',
 			
 			
@@ -67,7 +67,7 @@
 			 
 	    // for template tool forms
 	    'tr_meliscms_template_form_tpl_id' => 'Id',
-	    'tr_meliscms_template_form_site_id' => 'Id Site',
+	    'tr_meliscms_template_form_site_id' => 'Id site',
 	    'tr_meliscms_template_form_tpl_name' => 'Nom',
 	    'tr_meliscms_template_form_tpl_type' => 'Type',
 	    'tr_meliscms_template_form_tpl_zf2_website_folder' => 'Dossier',
@@ -111,25 +111,26 @@
 	    'tr_tool_template_fm_new_content_error' => 'Impossible de créer un template',
 	    
 	    // Site Tool
-        'tr_meliscms_tool_site_new_site' => 'Nouveau Site',
+        'tr_meliscms_tool_site_new_site' => 'Nouveau site',
         'tr_meliscms_tool_site_update_site' => 'Editer le site',
         
         'tr_meliscms_tool_site_id' => 'ID',
         'tr_meliscms_tool_site_site_name' => 'Nom: ',
         'tr_meliscms_tool_site_page_id' => 'ID page d\'accueil: ',
-        'tr_meliscms_tool_site_site_id' => 'ID du Domaine: ',
+        'tr_meliscms_tool_site_site_id' => 'ID du domaine: ',
         'tr_meliscms_tool_site_enviroment' => 'Plateforme: ',
         'tr_meliscms_tool_site_scheme' => 'Scheme: ',
         'tr_meliscms_tool_site_domain' => 'Domaine: ',
-        'tr_meliscms_tool_site_404_site_id' => 'ID 404 du Site: ',
+        'tr_meliscms_tool_site_404_site_id' => 'ID 404 du site: ',
         'tr_meliscms_tool_site_404_page_id' => 'ID page 404: ',
-        'tr_meliscms_tool_site_sel_env' => 'Selectionner l\'Environnement: ',
+        'tr_meliscms_tool_site_sel_env' => 'Selectionner l\'environnement: ',
         'tr_meliscms_tool_site_sel_env_add_new' => 'Ajouter un nouvel environnement...',
 	    'tr_meliscms_tool_site_sel_platform' => 'Selectionner un nouvel plateforme...',
 	    
 	    'tr_meliscms_tool_site_name_exists' => 'Site name already exists, please choose another',
         'tr_meliscms_tool_site_site_name_error_long' => 'Nom du site trop long, nombre de caractères maximum 45',
         'tr_meliscms_tool_site_site_name_error_empty' => 'Veuillez saisir le nom du site',
+	    'tr_meliscms_tool_site_no_platform_ids' => 'Aucune ID de plateforme disponible, Veuillez ajouter la première ID de la plateforme avant d\'ajouter le site.',
          
         'tr_meliscms_tool_site_page_id_not_int' => 'ID de la page invalide, ce doit être un nombre',
         'tr_meliscms_tool_site_page_id_error_empty' => 'Veuillez saisir l\'ID de la page du site',
@@ -160,5 +161,4 @@
 	    
 	    'tr_meliscms_tool_site_scheme_error_empty' => 'Valeur requise, ne peut pas être vide',
 	);
-	
 ?>

@@ -128,6 +128,7 @@ return array(
 				        '/MelisCms/js/tools/langCms.tool.js',
 				        '/MelisCms/js/tools/platform.tool.js',
 				        '/MelisCms/js/tools/site-redirect.tool.js',
+				        '/MelisCms/js/tools/findpage.tool.js',
 				),
 				'css' => array(
 				   
@@ -1151,5 +1152,33 @@ return array(
 	            ),
 	        ),
 	    ),
+	    'meliscms_find_page_modal' => array(
+	        'conf' => array(
+	            'id' => 'id_meliscms_find_page_modal',
+	            'name' => 'tr_meliscms_find_page_modal',
+	            'melisKey' => 'meliscms_find_page_modal',
+	        ),
+	        'forward' => array(
+	            'module' => 'MelisCms',
+	            'controller' => 'Page',
+	            'action' => 'render-page-modal',
+	        ),
+	        'interface' => array(
+	            'meliscms_find_page_tree' => array(
+	                'conf' => array(
+	                    'id' => 'id_meliscms_find_page_tree',
+	                    'name' => 'tr_meliscms_menu_sitetree_Name',
+	                    'melisKey' => 'meliscms_find_page_tree',
+	                    //'jscallback' => 'findPageTreeCallBack();',
+	                ),
+	                'forward' => array(
+	                    'module' => 'MelisCms',
+	                    'controller' => 'Page',
+	                    'action' => 'render-page-tree-modal',
+	                ),
+	            ),
+	        ),
+	    ),
+	    
 	)
 );

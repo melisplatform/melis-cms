@@ -1318,6 +1318,16 @@ return array(
                                     'required' => true,
                                     'validators' => array(
                                         array(
+                                            'name'    => 'StringLength',
+                                            'options' => array(
+                                                'encoding' => 'UTF-8',
+                                                'max'      => 11,
+                                                'messages' => array(
+                                                    \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_tool_platform_value_too_long',
+                                                ),
+                                            ),
+                                        ),
+                                        array(
                                             'name'    => 'Digits',
                                             'options' => array(
                                                 'messages' => array(
@@ -1346,6 +1356,16 @@ return array(
                                     'required' => true,
                                     'validators' => array(
                                         array(
+                                            'name'    => 'StringLength',
+                                            'options' => array(
+                                                'encoding' => 'UTF-8',
+                                                'max'      => 11,
+                                                'messages' => array(
+                                                    \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_tool_platform_value_too_long',
+                                                ),
+                                            ),
+                                        ),
+                                        array(
                                             'name'    => 'Digits',
                                             'options' => array(
                                                 'messages' => array(
@@ -1372,6 +1392,16 @@ return array(
                                     'name'     => 'pids_page_id_end',
                                     'required' => true,
                                     'validators' => array(
+                                        array(
+                                            'name'    => 'StringLength',
+                                            'options' => array(
+                                                'encoding' => 'UTF-8',
+                                                'max'      => 11,
+                                                'messages' => array(
+                                                    \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_tool_platform_value_too_long',
+                                                ),
+                                            ),
+                                        ),
                                         array(
                                             'name'    => 'Digits',
                                             'options' => array(
@@ -1400,6 +1430,16 @@ return array(
                                     'required' => true,
                                     'validators' => array(
                                         array(
+                                            'name'    => 'StringLength',
+                                            'options' => array(
+                                                'encoding' => 'UTF-8',
+                                                'max'      => 11,
+                                                'messages' => array(
+                                                    \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_tool_platform_value_too_long',
+                                                ),
+                                            ),
+                                        ),
+                                        array(
                                             'name'    => 'Digits',
                                             'options' => array(
                                                 'messages' => array(
@@ -1427,6 +1467,16 @@ return array(
                                     'required' => true,
                                     'validators' => array(
                                         array(
+                                            'name'    => 'StringLength',
+                                            'options' => array(
+                                                'encoding' => 'UTF-8',
+                                                'max'      => 11,
+                                                'messages' => array(
+                                                    \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_tool_platform_value_too_long',
+                                                ),
+                                            ),
+                                        ),
+                                        array(
                                             'name'    => 'Digits',
                                             'options' => array(
                                                 'messages' => array(
@@ -1453,6 +1503,16 @@ return array(
                                     'name'     => 'pids_tpl_id_end',
                                     'required' => true,
                                     'validators' => array(
+                                        array(
+                                            'name'    => 'StringLength',
+                                            'options' => array(
+                                                'encoding' => 'UTF-8',
+                                                'max'      => 11,
+                                                'messages' => array(
+                                                    \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_tool_platform_value_too_long',
+                                                ),
+                                            ),
+                                        ),
                                         array(
                                             'name'    => 'Digits',
                                             'options' => array(

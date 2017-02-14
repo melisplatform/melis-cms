@@ -65,11 +65,11 @@ var toolTemplate = {
     	    		toolTemplate.refreshTable();
     	    		// clear Add Form
     	    		melisCoreTool.clearForm("id_tool_template_generic_form");
-    	    		melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
+    	    		melisHelper.melisOkNotification( data.textTitle, data.textMessage );
     	    	}
     	    	else {
-		    		melisCoreTool.alertDanger("#templateaddformalert", '', data.textMessage + "<br/>");
-		    		melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 0);
+		    		melisCoreTool.alertDanger("#templateaddformalert", '', data.textMessage);
+		    		melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
 		    		melisCoreTool.highlightErrors(data.success, data.errors, "id_modal_tool_template_add #id_tool_template_generic_form");
     	    	}
     	    	melisCore.flashMessenger();
@@ -102,12 +102,11 @@ var toolTemplate = {
     	    		// clear Edit Form
     	    		melisCoreTool.clearForm("id_tool_template_generic_form");
     	    		melisCoreTool.resetLabels("#id_tool_template_generic_form");
-    	    		melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
-    	    		
+    	    		melisHelper.melisOkNotification( data.textTitle, data.textMessage);
     	    	}
     	    	else {
-		    		melisCoreTool.alertDanger("#templateupdateformalert", '', data.textMessage + "<br/>");
-		    		melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 0);
+		    		melisCoreTool.alertDanger("#templateupdateformalert", '', data.textMessage);
+		    		melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
 		    		melisCoreTool.highlightErrors(data.success, data.errors, "id_tool_template_generic_form");
     	    	}
     	    	melisCore.flashMessenger();
@@ -144,29 +143,29 @@ var toolTemplate = {
 		
 		deleteTemplate: function(id) {
 			melisCoreTool.confirm(
-					translations.tr_meliscore_common_yes,
-					translations.tr_meliscore_common_no,
-					translations.tr_tool_template_fm_delete_title, 
-					translations.tr_tool_template_fm_delete_confirm, 
-					function() {
-			    		$.ajax({
-			    	        type        : 'POST', 
-			    	        url         : '/melis/MelisCms/ToolTemplate/deleteTemplateData',
-			    	        data        : {templateId : id},
-			    	        dataType    : 'json',
-			    	        encode		: true
-			    	    }).done(function(data){
-			    	    	melisCoreTool.pending(".delTemplate");
-			    	    	// refresh the table after deleting an item
-			    	    	if(data.success) {
-			    	    		toolTemplate.refreshTable();
-			    	    		melisCore.flashMessenger();
-			    	    		melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
-			    	    	}
-			    	    	melisCoreTool.done(".delTemplate");
-			    	    }).fail(function(){
-			    	    	alert( translations.tr_meliscore_error_message );
-			    	    });
+				translations.tr_meliscore_common_yes,
+				translations.tr_meliscore_common_no,
+				translations.tr_tool_template_fm_delete_title, 
+				translations.tr_tool_template_fm_delete_confirm, 
+				function() {
+		    		$.ajax({
+		    	        type        : 'POST', 
+		    	        url         : '/melis/MelisCms/ToolTemplate/deleteTemplateData',
+		    	        data        : {templateId : id},
+		    	        dataType    : 'json',
+		    	        encode		: true
+		    	    }).done(function(data){
+		    	    	melisCoreTool.pending(".delTemplate");
+		    	    	// refresh the table after deleting an item
+		    	    	if(data.success) {
+		    	    		toolTemplate.refreshTable();
+		    	    		melisCore.flashMessenger();
+		    	    		melisHelper.melisOkNotification( data.textTitle, data.textMessage );
+		    	    	}
+		    	    	melisCoreTool.done(".delTemplate");
+		    	    }).fail(function(){
+		    	    	alert( translations.tr_meliscore_error_message );
+		    	    });
 			});
 		},
 };

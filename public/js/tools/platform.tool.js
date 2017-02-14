@@ -32,12 +32,12 @@ $(function(){
     		if(data.success) {
 				$('#platform_tool_modal_container').modal('hide');
 				melisHelper.zoneReload("id_meliscms_tool_platform_ids", "meliscms_tool_platform_ids");
-				melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
-				melisCore.flashMessenger();
+				melisHelper.melisOkNotification(data.textTitle, data.textMessage);
 			}else{
-				melisCoreTool.alertDanger("#cmsPlatformAlert", '', data.textMessage + "<br/>");
-				melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 'closeByButtonOnly');
+				melisCoreTool.alertDanger("#cmsPlatformAlert", '', data.textMessage);
+				melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
 			}
+    		melisCore.flashMessenger();
     		melisCoreTool.highlightErrors(data.success, data.errors, "idformplatform");
     	}).error(function(xhr, textStatus, errorThrown){
     		alert("ERROR !! Status = "+ textStatus + "\n Error = "+ errorThrown + "\n xhr = "+ xhr.statusText);
@@ -76,7 +76,7 @@ $(function(){
 			        encode		: true
 				}).done(function(data) {
 					melisHelper.zoneReload("id_meliscms_tool_platform_ids", "meliscms_tool_platform_ids");
-					melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
+					melisHelper.melisOkNotification(data.textTitle, data.textMessage);
 					melisCore.flashMessenger();
 				}).fail(function(){
 					alert( translations.tr_meliscore_error_message );

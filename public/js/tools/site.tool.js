@@ -16,9 +16,10 @@ $(document).ready(function() {
 		melisCoreTool.showOnlyTab('#modal-cms-tool-site', '#id_meliscms_tool_site_modal_edit');
 		var tempLoader = '<div id="loader" class="overlay-loader"><img class="loader-icon spinning-cog" src="/MelisCore/assets/images/cog12.svg" data-cog="cog12"></div>';
 		$(".widget #idformsite").append(tempLoader);
-		var tdParent = $(this).parent();
-		var trParent = $(tdParent).parent();
-		var siteID = trParent.attr('id');
+		var tdParent = $(this).parents("td");
+		var trParent = tdParent.parents("tr");
+		var siteID = trParent.attr("id");
+		console.log(siteID);
 		var options = $("#formsiteedit #idformsite #id_sdom_env");
 
 		$("#formsiteedit #idformsite #id_site_id").val(siteID);
@@ -85,7 +86,7 @@ $(document).ready(function() {
 			        success		: function(data){
 			        	melisCoreTool.pending(".btnDeleteSite");
 		    	    	if(data.success) {
-		    	    		melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
+		    	    		melisHelper.melisOkNotification(data.textTitle, data.textMessage);
 		    	    		melisHelper.zoneReload("id_meliscms_tool_site", "meliscms_tool_site");
 		    	    	}
 		    	    	else {
@@ -138,7 +139,7 @@ $(document).ready(function() {
 			        success		: function(data){
 		    	    	if(data.success) {
 		    	    		$(options).html("");
-		    	    		melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
+		    	    		melisHelper.melisOkNotification(data.textTitle, data.textMessage);
 		    	    		// environment retrieval
 		    	    		$.getJSON("/melis/MelisCms/Site/getSiteEnvironments", {siteId: siteID}, function(json) 
 		    	    		{		
@@ -150,8 +151,6 @@ $(document).ready(function() {
 		    	    		    var env = $(options).val();
 		    	    		    getSiteInfo(siteID, env);
 		    	    	    });	
-		    	    		
-		    	    		melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
 		    	    	}
 		    	    	else {
 		    	    		melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 0);
@@ -179,15 +178,14 @@ $(document).ready(function() {
 	        dataType    : 'json',
 	        encode		: true
 		}).done(function(data) {
-			if(data.success) {
+			if(data.success){
 				$('#modal-cms-tool-site').modal('hide');
 				melisHelper.zoneReload("id_meliscms_tool_site", "meliscms_tool_site");
 				melisHelper.zoneReload("id_meliscore_leftmenu", "meliscore_leftmenu");
-				melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
-			}
-			else {
-				melisCoreTool.alertDanger("#siteaddalert", '', data.textMessage + "<br/>");
-				melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 'closeByButtonOnly');
+				melisHelper.melisOkNotification(data.textTitle, data.textMessage);
+			}else{
+				melisCoreTool.alertDanger("#siteaddalert", '', data.textMessage);
+				melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
 				melisCoreTool.highlightErrors(data.success, data.errors, formId + " form#idformsite");
 			}
 			melisCoreTool.done("#btnSiteAdd");
@@ -196,8 +194,6 @@ $(document).ready(function() {
 		}).fail(function(){
 			alert( translations.tr_meliscore_error_message );
 		});
-		
-		
 	});
 	
 	addEvent(".btnSiteUpdate", function(e){ 
@@ -239,15 +235,14 @@ $(document).ready(function() {
 	        data		: dataString,
 	        dataType    : 'json',
 	        encode		: true
-		}).done(function(data) {
-			if(data.success) {
+		}).done(function(data){
+			if(data.success){
 				$('#modal-cms-tool-site').modal('hide');
 				melisHelper.zoneReload("id_meliscms_tool_site", "meliscms_tool_site");
-				melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
-			}
-			else {
-				melisCoreTool.alertDanger("#siteeditalert", '', data.textMessage + "<br/>");
-				melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 'closeByButtonOnly');
+				melisHelper.melisOkNotification(data.textTitle, data.textMessage);
+			}else{
+				melisCoreTool.alertDanger("#siteeditalert", '', data.textMessage);
+				melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
 				melisCoreTool.highlightErrors(data.success, data.errors, formId + " form#idformsite");
 			}
 			
@@ -257,8 +252,6 @@ $(document).ready(function() {
 		}).fail(function(){
 			alert( translations.tr_meliscore_error_message );
 		});
-		
-
 	});
 	
 	$("body").on("change", "#formsiteedit #idformsite #id_sdom_env", function(e){ 
@@ -298,7 +291,6 @@ $(document).ready(function() {
     				$("#formsiteedit #idformsite #id_sdom_env").val("");
     				$("#formsiteedit #idformsite #id_sdom_domain").val("");
     			}
-    			
     		});
 	    }).fail(function(){
 	    	alert( translations.tr_meliscore_error_message );

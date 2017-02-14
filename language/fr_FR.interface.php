@@ -10,7 +10,7 @@
 		'tr_meliscms_page_Version edited an saved on' => 'Version <b>editée et sauvegardée</b> le',
 
 		'tr_meliscms_page_actions' => 'Actions Page',
-		'tr_meliscms_page_creation_actions' => 'Actions Création Page',
+		'tr_meliscms_page_creation_actions' => 'Actions création page',
 		'tr_meliscms_page_actions_Save' => 'Sauvegarder',
 	    'tr_meliscms_page_actions_draft' => 'Brouillon',
 		'tr_meliscms_page_actions_Publish' => 'Publier',
@@ -53,11 +53,8 @@
 	    
 		'tr_meliscms_page_success_delete_Delete page' => 'Suppression page',
 		'tr_meliscms_page_success_delete_Are you sure you want to delete this page' => 'Etes-vous sûr de vouloir supprimer cette page ?',
-	    
-	    'tr_tool_text_prospect_validation_invalid_phone_num' => 'Invalid phone number',
-	    'tr_tool_text_prospect_validation_invalid_email' => 'Invalid Email Address',
         
-	    'tr_meliscms_page_new_page' => 'Nouvelle Page',
+	    'tr_meliscms_page_new_page' => 'Nouvelle page',
 		'tr_meliscms_page_success_Page' => 'Page',
 		'tr_meliscms_page_success_Page new' => 'Nouveau',
 		'tr_meliscms_page_success_Page saved' => 'Page sauvegardée',
@@ -65,7 +62,7 @@
 		'tr_meliscms_page_success_Page unpublished' => 'Page dépubliée',
 		'tr_meliscms_page_success_Page deleted' => 'Page supprimée',
 		'tr_meliscms_page_success_Page moved' => 'Page déplacée',
-		'tr_meliscms_page_success_Page delete' => 'Suppression Page',
+		'tr_meliscms_page_success_Page delete' => 'Suppression page',
 	    'tr_meliscms_page_success_Page_deleted' => 'Supprimée',
 	    'tr_meliscms_page_success_Page_deleted2' => 'Supprimer',
 	    'tr_meliscms_page_success_Page deleted_success' => 'La page a été supprimée avec succès',
@@ -92,8 +89,8 @@
 		'tr_meliscms_meliscms' => 'MelisCms',
 		'tr_meliscms_toolstree' => 'Outils',
 		'tr_meliscms_pages_Page' => 'Page',
-		'tr_meliscms_pages_Page creation' => 'Création Page',
-		'tr_meliscms_pages_Page Tabs' => 'Page Tabs',
+		'tr_meliscms_pages_Page creation' => 'Création page',
+		'tr_meliscms_pages_Page Tabs' => 'Page tabs',
 	    
 	    'tr_meliscms_no_access' => 'Vous n\'avez pas accès à cette fonctionnalité. Veuillez contacter l\'administrateur.',
 
@@ -118,7 +115,7 @@
 	    'tr_tool_templates_modal_tab_text_edit' => 'Editer un template',
 	    'tr_tool_templates_button_text_add' => 'Ajouter un template',
 	    
-	    'tr_tool_template_fm_new_title' => 'Nouveau Template',
+	    'tr_tool_template_fm_new_title' => 'Nouveau template',
 	    'tr_tool_template_fm_new_content' => 'Nouveau template ajouté',
 	    
 	    'tr_tool_template_fm_update_title' => 'Templates',
@@ -178,7 +175,7 @@
 	    
 	    // tree button if pages is empty
 	    'tr_meliscms_delete_confirmation' => 'Supprimer la page',
-	    'tr_meliscms_delete_confirmation_msg' => 'Êtes-vous sûr de vouloir supprimer cette page ?',
+	    'tr_meliscms_delete_confirmation_msg' => 'Êtes-vous sûr de vouloir supprimer cette page?',
 	    
 	    'tr_meliscms_common_edit' => 'Editer',
 	    'tr_meliscms_common_delete' => 'Supprimer',
@@ -254,11 +251,11 @@
 	    'tr_meliscms_tool_user_modal_empty' => 'No Access',
 	     
 	    // Platform ID Tool
-	    'tr_meliscms_tool_platform_ids' => 'IDs Plateformes',
+	    'tr_meliscms_tool_platform_ids' => 'IDs plateformes',
 	    'tr_meliscms_tool_platform_ids_header' => 'Header',
 	    'tr_meliscms_tool_platform_ids_content' => 'Contenu',
 	    'tr_meliscms_tool_platform_pids_id' => 'ID',
-	    'tr_meliscms_tool_platform_pids_name' => 'Plateforme Nom',
+	    'tr_meliscms_tool_platform_pids_name' => 'Plateforme nom',
 	    'tr_meliscms_tool_platform_pids_page_id_start' => 'Page ID début',
 	    'tr_meliscms_tool_platform_pids_page_id_current' => 'Page ID actuel',
 	    'tr_meliscms_tool_platform_pids_page_id_end' => 'Page ID fin',
@@ -267,9 +264,9 @@
 	    'tr_meliscms_tool_platform_pids_tpl_id_end' => 'Template ID fin',
 	    'tr_meliscms_tool_platform_ids_btn_add' => 'Ajouter une plage d\'IDs',
 	    'tr_meliscms_tool_platform_ids_btn_edit' => 'Editer une plage IDs',
-	    'tr_meliscms_tool_platform_pids_name_empty' => 'Choose Platform',
+	    'tr_meliscms_tool_platform_pids_name_empty' => 'Choose platform',
 	    'tr_meliscms_tool_platform_ids_table' => 'Tableau',
-	    'tr_meliscms_tool_platform_ids_modal_content' => 'Add and Update Modal',
+	    'tr_meliscms_tool_platform_ids_modal_content' => 'Add and update modal',
 	    
 	    //Platform Success messages
 	    'tr_meliscms_tool_platform_add_success' => 'Nouvelle plage d\'IDs de la plateforme ajoutée avec succès',
@@ -277,25 +274,26 @@
 	    
 	    // Platform Error Messages
 	    'tr_meliscms_tool_platform_add_error' => 'Impossible de rajouter la plage d\'IDs de la plateforme de MelisCms',
-	    'tr_meliscms_tool_platform_update_error' => 'Unable to update MelisCms Platform ID\'s',
+	    'tr_meliscms_tool_platform_update_error' => 'Unable to update MelisCms platform ID\'s',
 	    'tr_meliscms_tool_platform_conflict_error' => 'La plage d\'IDs de la plateforme de la page ou du template est en conflit avec l\'une des plages d\'IDs de la plateforme existante',
 	    'tr_meliscms_tool_platform_invalid' => 'Invalid Platform',
 	    
 	    // Delete Messages
 	    'tr_meliscms_tool_platform_ids_confirm_msg' => 'Etes-vous sûr de vouloir supprimer cette plage d\'IDs ?',
-	    'tr_meliscms_tool_platform_ids_deleted_title' => 'ID Plateformes',
+	    'tr_meliscms_tool_platform_ids_deleted_title' => 'ID plateformes',
 	    'tr_meliscms_tool_platform_ids_delete_success_msg' => 'Plage d\'IDs de la plateforme supprimée avec succès',
 	    // Platform Id validation Messages
-	    'tr_meliscms_tool_platform_not_digit' => 'The input must contain only digits',
+	    'tr_meliscms_tool_platform_value_too_long' => 'Value is too long, it should be less than 11 digits',
+	    'tr_meliscms_tool_platform_not_digit' => 'The value must be in digits',
 	    'tr_meliscms_tool_platform_empty' => 'Le champ ne peut être vide',
-	    'tr_meliscms_tool_platform_pageIdStart_must_lessThan_or_equalTo_pageIdEnd' => 'l\'ID de la Page de Début doit être inférieure ou égale à l\'ID de page de Fin',
+	    'tr_meliscms_tool_platform_pageIdStart_must_lessThan_or_equalTo_pageIdEnd' => 'l\'ID de la page de début doit être inférieure ou égale à l\'ID de page de Fin',
 	    'tr_meliscms_tool_platform_pageIdEnd_must_greaterThan_or_equalTo_pageIdStart' => 'L\'id de la page de FIn doit être supérieure ou égale à l\'ID de la Page de Début',
-	    'tr_meliscms_tool_platform_pageIdCurrent_must_greaterThan_or_equalTo_PageIdStart' => 'l\'ID de la Page actuelle doit être supérieure ou égale à l\'ID de page de Fin',
+	    'tr_meliscms_tool_platform_pageIdCurrent_must_greaterThan_or_equalTo_PageIdStart' => 'l\'ID de la page actuelle doit être supérieure ou égale à l\'ID de page de Fin',
 	    'tr_meliscms_tool_platform_pageIdCurrent_must_lessThan_or_equalTo_pageIdEnd' => 'L\'ID de la page actuelle doit être inférieure ou égale à l\'ID de la page de fin',
-	    'tr_meliscms_tool_platform_tplIdStart_must_lessThan_or_equalTo_tplIdEnd' => 'L\'ID du Template Actuel doit être inférieure ou égal à l\'ID du Template Fin',
-	    'tr_meliscms_tool_platform_tplIdEnd_must_greaterThan_or_equalTo_tplIdStart' => 'L\'ID du Template fin doit être supérieure ou égal à l\'ID du Template de Début',
-	    'tr_meliscms_tool_platform_tplIdCreent_must_greaterThan_or_equalTo_tplIdStart' => 'L\'ID du Template Actuel doit être surpérieur ou égal à l\'ID de la Page de Début',
-	    'tr_meliscms_tool_platform_tplIdCurrent_must_lessThan_or_equalTo_tplIdEnd' => 'L\'ID du Template Actuel doit être inférieure ou égal à l\'ID du Template fin',
+	    'tr_meliscms_tool_platform_tplIdStart_must_lessThan_or_equalTo_tplIdEnd' => 'L\'ID du template actuel doit être inférieure ou égal à l\'ID du template Fin',
+	    'tr_meliscms_tool_platform_tplIdEnd_must_greaterThan_or_equalTo_tplIdStart' => 'L\'ID du template fin doit être supérieure ou égal à l\'ID du template de Début',
+	    'tr_meliscms_tool_platform_tplIdCreent_must_greaterThan_or_equalTo_tplIdStart' => 'L\'ID du template Actuel doit être surpérieur ou égal à l\'ID de la page de début',
+	    'tr_meliscms_tool_platform_tplIdCurrent_must_lessThan_or_equalTo_tplIdEnd' => 'L\'ID du template actuel doit être inférieure ou égal à l\'ID du template fin',
 	
 	    //
 	    'tr_meliscms_no_available_platform_ids' => 'Pas d\'IDs de plateforme disponible pour la plateforme actuelle, veuillez vérifier les IDs de plateforme',
@@ -331,5 +329,8 @@
         'meliscms_tool_site_301_value_empty' => 'Le champ est requis et ne peut être vide',
         'meliscms_tool_site_301_old_url_exist' => 'L\'ancienne url existe déjà',
         'meliscms_tool_site_301_delete_confirm_msg' => 'Etes-vous sûr de vouloir supprimer cette redirection 301 ?',
+	    
+	    // Tool Sitetree view modal
+	    'tr_meliscms_form_btn_select' => 'Select',
 	);
 ?>

@@ -4,7 +4,6 @@
 		'selector' => 'html-editable-selector',
 		'language' => 'en',
 		'inline' => true,
-		'moxiemanager_title' => 'Media Library',
 		'templates'  => 'miniTemplates',
 		'menubar' => false,
 		'force_br_newlines'  => false,

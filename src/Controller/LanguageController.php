@@ -348,12 +348,12 @@ class LanguageController extends AbstractActionController
     
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
-        $id = 0;
+        $id = null;
         $form = $melisTool->getForm('meliscms_tool_language_generic_form');
     
         $success = 0;
         $errors  = array();
-        $textTitle = $melisTool->getTitle();
+        $textTitle = 'tr_meliscms_tool_language';
         $textMessage = 'tr_meliscms_tool_language_add_failed';
         $melisTranslation = $this->getServiceLocator()->get('MelisCoreTranslation');
         if($this->getRequest()->isPost()) {
@@ -403,12 +403,12 @@ class LanguageController extends AbstractActionController
     
         $response = array(
             'success' => $success,
-            'textTitle' => $translator->translate($textTitle),
-            'textMessage' => $translator->translate($textMessage),
+            'textTitle' => $textTitle,
+            'textMessage' => $textMessage,
             'errors' => $errors
         );
     
-        $this->getEventManager()->trigger('meliscms_language_new_end', $this, $response);
+        $this->getEventManager()->trigger('meliscms_language_new_end', $this, array_merge($response, array('typeCode' => 'CMS_LANGUAGE_ADD', 'itemId' => $id)));
          
         return new JsonModel($response);
     
@@ -419,7 +419,8 @@ class LanguageController extends AbstractActionController
         $this->getEventManager()->trigger('meliscms_platform_update_start', $this, $response);
         $platformTable = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
         $translator = $this->getServiceLocator()->get('translator');
-    
+        
+        $id = null;
         $success = 0;
         $errors  = array();
         $textTitle = 'tr_meliscms_tool_language';
@@ -443,8 +444,7 @@ class LanguageController extends AbstractActionController
                 $platformTable->save($data, $id);
                 $textMessage = 'tr_meliscms_tool_language_prompts_edit_success';
                 $success = 1;
-            }
-            else {
+            } else {
                 $errors = $form->getMessages();
             }
     
@@ -465,12 +465,12 @@ class LanguageController extends AbstractActionController
     
         $response = array(
             'success' => $success,
-            'textTitle' => $translator->translate($textTitle),
-            'textMessage' => $translator->translate($textMessage),
+            'textTitle' => $textTitle,
+            'textMessage' => $textMessage,
             'errors' => $errors
         );
     
-        $this->getEventManager()->trigger('meliscms_language_update_end', $this, $response);
+        $this->getEventManager()->trigger('meliscms_language_update_end', $this, array_merge($response, array('typeCode' => 'CMS_LANGUAGE_UPDATE', 'itemId' => $id)));
          
         return new JsonModel($response);
     }
@@ -486,7 +486,7 @@ class LanguageController extends AbstractActionController
         $textMessage = 'tr_meliscms_tool_language_delete_failed';
         $melisTranslation = $this->getServiceLocator()->get('MelisCoreTranslation');
     
-        $id = 0;
+        $id = null;
         $success = 0;
         $lang = '';
     
@@ -502,11 +502,12 @@ class LanguageController extends AbstractActionController
         }
     
         $response = array(
-            'textTitle' => $melisTool->getTitle(),
-            'textMessage' => $translator->translate($textMessage),
+            'textTitle' => 'tr_meliscms_tool_language',
+            'textMessage' => $textMessage,
             'success' => $success
         );
-        $this->getEventManager()->trigger('meliscms_language_delete_end', $this, $response);
+        
+        $this->getEventManager()->trigger('meliscms_language_delete_end', $this, array_merge($response, array('typeCode' => 'CMS_LANGUAGE_DELETE', 'itemId' => $id)));
     
         return new JsonModel($response);
     }

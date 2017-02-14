@@ -345,6 +345,7 @@ class SiteController extends AbstractActionController
     public function addSiteAction()
     {
         $request = $this->getRequest();
+        $siteId = null;
         $status  = 0;
         $errors  = array();
         $textMessage = '';
@@ -396,22 +397,6 @@ class SiteController extends AbstractActionController
                 $siteData = $siteTable->getEntryByField('site_name', $this->getRequest()->getPost('ssite_name'))->current();
 
                 if(empty($siteData)) {
-                    $siteId = $siteTable->save($dataSite);
-                    
-                    // after adding make sure to fetch again the data so the other site table can use the site id
-                    $siteData = $siteTable->getEntryByField('site_name', $dataSite['site_name']);
-                    $siteData = $siteData->current();
-                    
-                    // add the foreign id on the data arrays
-                    $dataDomain['sdom_site_id'] = $siteId;
-                    $dataSite404['s404_site_id'] = $siteId;
-                    
-                    $domainTable->save($dataDomain);
-                    
-                    // save if 404 page id has value
-                    if (!empty($dataSite404['s404_page_id'])) {
-                        $site404Table->save($dataSite404);
-                    }
                     
                     // create a site for this
                     $curPlatform = !empty(getenv('MELIS_PLATFORM'))  ? getenv('MELIS_PLATFORM') : 'development';
@@ -419,72 +404,106 @@ class SiteController extends AbstractActionController
                     $corePlatformData = $corePlatformTable->getEntryByField('plf_name', $curPlatform)->current();
                     
                     if($corePlatformData) {
+                        
                         $platformId = $corePlatformData->plf_id;
                         $cmsPlatformTable = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
                         $cmsPlatformData = $cmsPlatformTable->getEntryById($platformId)->current();
                         
-                        $currentPageId = (int) $cmsPlatformData->pids_page_id_current + 1;
-                        
-                        
-                        $pageTreeTable = $this->getServiceLocator()->get('MelisEngineTablePageTree');
-                        $treePageOrder = $pageTreeTable->getTotalData('tree_father_page_id','-1');
-                        
-                        $pageTreeTable->save(array(
-                           'tree_page_id' => $currentPageId,
-                           'tree_father_page_id' => -1,
-                           'tree_page_order' => $treePageOrder + 1,
-                        ));
-                        
-                        $pageLangTable = $this->getServiceLocator()->get('MelisEngineTablePageLang');
-                        $pageLangTable->save(array(
-                           'plang_page_id' => $currentPageId,
-                           'plang_lang_id' => 1,
-                           'plang_page_id_initial' => 1 
-                        ));
-                        
-                        $pageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
-                        $pageSavedTable->save(array(
-                            'page_id' => $currentPageId,
-                            'page_type' => 'SITE',
-                            'page_status' => 1,
-                            'page_menu' => 'LINK',
-                            'page_name' => $dataSite['site_name'],
-                            'page_tpl_id' => -1,
-                            'page_content' => '<?xml version="1.0" encoding="UTF-8"?>\n<document type="MelisCMS" author="MelisTechnology" version="2.0">\n	<melisTag id="home_002"><![CDATA[13:37Porto is <strong class="inverted"> <span class="word-rotate active" style="height: 54px;"> <span class="word-rotate-items"> incredibly especially extremely incredibly</span> </span> </strong> beautiful and fully responsive.]]></melisTag>\n</document>',
-                            'page_taxonomy' => '',
-                            'page_creation_date' => date('Y-m-d H:i:s')
-                        ));
-                        
-                        $cmsPlatformTable->save(array(
-                            'pids_page_id_current' => ((int) $currentPageId + 2)
-                        ), $platformId);
+                        if ($cmsPlatformData) {
+                            
+                            $currentPageId = (int) $cmsPlatformData->pids_page_id_current;
+                            
+                            $siteId = $siteTable->save($dataSite);
+                            
+                            // after adding make sure to fetch again the data so the other site table can use the site id
+                            $siteData = $siteTable->getEntryByField('site_name', $dataSite['site_name']);
+                            $siteData = $siteData->current();
+                            
+                            // add the foreign id on the data arrays
+                            $dataDomain['sdom_site_id'] = $siteId;
+                            $dataSite404['s404_site_id'] = $siteId;
+                            
+                            $domainTable->save($dataDomain);
+                            
+                            // save if 404 page id has value
+                            if (!empty($dataSite404['s404_page_id'])) {
+                                $site404Table->save($dataSite404);
+                            }
+                            
+                            
+                            $pageTreeTable = $this->getServiceLocator()->get('MelisEngineTablePageTree');
+                            $treePageOrder = $pageTreeTable->getTotalData('tree_father_page_id','-1');
+                            
+                            $pageTreeTable->save(array(
+                               'tree_page_id' => $currentPageId,
+                               'tree_father_page_id' => -1,
+                               'tree_page_order' => $treePageOrder + 1,
+                            ));
+                            
+                            $pageLangTable = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+                            $pageLangTable->save(array(
+                               'plang_page_id' => $currentPageId,
+                               'plang_lang_id' => 1,
+                               'plang_page_id_initial' => 1 
+                            ));
+                            
+                            $pageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+                            $pageSavedTable->save(array(
+                                'page_id' => $currentPageId,
+                                'page_type' => 'SITE',
+                                'page_status' => 1,
+                                'page_menu' => 'LINK',
+                                'page_name' => $dataSite['site_name'],
+                                'page_tpl_id' => -1,
+                                'page_content' => '<?xml version="1.0" encoding="UTF-8"?>\n<document type="MelisCMS" author="MelisTechnology" version="2.0">\n	<melisTag id="home_002"><![CDATA[13:37Porto is <strong class="inverted"> <span class="word-rotate active" style="height: 54px;"> <span class="word-rotate-items"> incredibly especially extremely incredibly</span> </span> </strong> beautiful and fully responsive.]]></melisTag>\n</document>',
+                                'page_taxonomy' => '',
+                                'page_creation_date' => date('Y-m-d H:i:s')
+                            ));
+                            
+                            $cmsPlatformTable->save(array(
+                                'pids_page_id_current' => ++$currentPageId //((int) $currentPageId + 2)
+                            ), $platformId);
+                            
+                            // free-up memory
+                            unset($data);
+                            unset($dataSite);
+                            unset($dataSite404);
+                            unset($dataDomain);
+                            
+                            $textMessage = 'tr_meliscms_tool_site_add_success';
+                            $status = 1;
+                        }
+                        else
+                        {
+                            // if there is no Platform Id available
+                            $textMessage = 'tr_meliscms_tool_site_error_prompt_add';
+                            $errors['platformId'] = array(
+                                'label' => $translator->translate('tr_meliscms_tool_platform_ids'),
+                                'noPlatformIds' => $translator->translate('tr_meliscms_tool_site_no_platform_ids')
+                            );
+                        }
                     }
-
-                    // free-up memory
-                    unset($data);
-                    unset($dataSite);
-                    unset($dataSite404);
-                    unset($dataDomain);
-                    
-                    $textMessage = $translator->translate('tr_meliscms_tool_site_add_success');
-                    $status = 1;
+                    else 
+                    {
+                        // If there is no Platform available on the database
+                        $textMessage = 'tr_meliscore_error_message';
+                    }
                 }
                 else 
                 {
                     // if data already exists then add manually the foreign site id key
-                    $textMessage = $translator->translate('tr_meliscms_tool_site_error_prompt_add');
+                    $textMessage = 'tr_meliscms_tool_site_error_prompt_add';
                     $errors= array(
                         'ssite_name' => array(
                             'siteAlreadyExists' => $translator->translate('tr_meliscms_tool_site_name_exists')
                         ),
                     );
                 }
-
             }
             else 
             {
                 $errors = $newSiteForm->getMessages();
-                $textMessage = $translator->translate('tr_meliscms_tool_site_error_prompt_add');
+                $textMessage = 'tr_meliscms_tool_site_error_prompt_add';
                 $status = 0;
             }
             
@@ -507,12 +526,12 @@ class SiteController extends AbstractActionController
         
         $response = array(
             'success' => $status,
-            'textTitle' => $translator->translate('tr_meliscms_tool_site'),
+            'textTitle' => 'tr_meliscms_tool_site',
             'textMessage' => $textMessage,
             'errors' => $errors,
         );
         
-        $this->getEventManager()->trigger('meliscms_site_save_new_end', $this, $response);
+        $this->getEventManager()->trigger('meliscms_site_save_new_end', $this, array_merge($response, array('typeCode' => 'CMS_SITE_ADD', 'itemId' => $siteId)));
         
         return new JsonModel($response);
     }
@@ -520,6 +539,7 @@ class SiteController extends AbstractActionController
     public function updateSiteAction() 
     {
         $request = $this->getRequest();
+        $siteID = null;
         $status  = 0;
         $errors  = array();
         $textMessage = '';
@@ -605,14 +625,14 @@ class SiteController extends AbstractActionController
                 }
                 
                 
-                $textMessage = $translator->translate('tr_meliscms_tool_site_edit_success');
+                $textMessage = 'tr_meliscms_tool_site_edit_success';
                 $status = 1;
                 
   
             }
             else {
                 $errors = $updateSiteForm->getMessages();
-                $textMessage = $translator->translate('tr_meliscms_tool_site_edit_failed');
+                $textMessage = 'tr_meliscms_tool_site_edit_failed';
                 $status = 0;
             }
         
@@ -635,12 +655,12 @@ class SiteController extends AbstractActionController
         
         $response = array(
             'success' => $status,
-            'textTitle' => $translator->translate('tr_meliscms_tool_site'),
+            'textTitle' => 'tr_meliscms_tool_site',
             'textMessage' => $textMessage,
             'errors' => $errors,
         );
         
-        $this->getEventManager()->trigger('meliscms_site_save_end', $this, $response);
+        $this->getEventManager()->trigger('meliscms_site_save_end', $this, array_merge($response, array('typeCode' => 'CMS_SITE_UPDATE', 'itemId' => $siteID)));
         
         return new JsonModel($response);
     }
@@ -652,11 +672,11 @@ class SiteController extends AbstractActionController
         $eventDatas = array();
         $this->getEventManager()->trigger('meliscms_site_delete_start', $this, $eventDatas);
          
-        
         $request = $this->getRequest();
+        $siteID = null;
         $status  = false;
         $textMessage = '';
-        $textTitle = $translator->translate('tr_meliscms_tool_site');
+        $textTitle = 'tr_meliscms_tool_site';
         // make sure it's a POST call
         if($request->isPost()) {
         
@@ -672,7 +692,7 @@ class SiteController extends AbstractActionController
                 $domainTable->deleteByField('sdom_site_id', $siteID);
                 $site404Table->deleteByField('s404_site_id', $siteID);
                 $status = true;
-                $textMessage = $translator->translate('tr_meliscms_tool_site_delete_success');
+                $textMessage = 'tr_meliscms_tool_site_delete_success';
             }
         }
         
@@ -681,7 +701,7 @@ class SiteController extends AbstractActionController
             'textTitle' => $textTitle,
             'textMessage' => $textMessage
         );
-        $this->getEventManager()->trigger('meliscms_site_delete_end', $this, $response);
+        $this->getEventManager()->trigger('meliscms_site_delete_end', $this, array_merge($response, array('typeCode' => 'CMS_SITE_DELETE', 'itemId' => $siteID)));
         
         return new JsonModel($response);
     }
@@ -777,8 +797,9 @@ class SiteController extends AbstractActionController
     {
         $translator = $this->getServiceLocator()->get('translator');
         $request = $this->getRequest();
+        $domainId = null;
         $success = 0;
-        $textTitle = $translator->translate('tr_meliscms_tool_site');
+        $textTitle = 'tr_meliscms_tool_site';
         $textMessage = '';
         
         $eventDatas = array();
@@ -803,11 +824,11 @@ class SiteController extends AbstractActionController
                 $domainTable->deleteByField('sdom_id', $domainId);
                 
                 $success = 1;
-                $textMessage = $translator->translate('tr_meliscms_tool_site_delete_env_success');
+                $textMessage = 'tr_meliscms_tool_site_delete_env_success';
             }
             else
             {
-                $textMessage = $translator->translate('tr_meliscms_tool_site_delete_env_failed');
+                $textMessage = 'tr_meliscms_tool_site_delete_env_failed';
             }
         }
         
@@ -817,7 +838,7 @@ class SiteController extends AbstractActionController
             'textMessage' => $textMessage,
         );
         
-        $this->getEventManager()->trigger('meliscms_site_delete_by_id_end', $this, $response);
+        $this->getEventManager()->trigger('meliscms_site_delete_by_id_end', $this, array_merge($response, array('typeCode' => 'CMS_SITE_ENV_DELETE', 'itemId' => $domainId)));
         
         return new JsonModel($response);
     }
@@ -836,5 +857,4 @@ class SiteController extends AbstractActionController
             $domainTable->deleteByField('sdom_env', $platform);
         }
     }
-    
 }

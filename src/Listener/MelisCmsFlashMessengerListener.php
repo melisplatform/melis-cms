@@ -32,6 +32,7 @@ class MelisCmsFlashMessengerListener extends MelisCoreGeneralListener implements
         	    'meliscms_page_publish_end', 
         	    'meliscms_page_unpublish_end', 
         	    'meliscms_page_delete_end', 
+        	    'meliscms_page_move_end',
         	    'meliscms_template_savenew_end',
         	    'meliscms_template_save_end', 
         	    'meliscms_template_delete_end', 

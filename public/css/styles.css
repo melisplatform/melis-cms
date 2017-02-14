@@ -45,6 +45,60 @@ hr{
 	margin: 20px;
 }
 
+.meliscms-search-box {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.meliscms-search-box input[type=text]::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: #a7a7a7;
+}
+
+.meliscms-search-box input[type=text]::-moz-placeholder { /* Chrome/Opera/Safari */
+  color: #a7a7a7;
+}
+
+.meliscms-search-box input[type=text]:-ms-input-placeholder { /* Chrome/Opera/Safari */
+  color: #a7a7a7;
+}
+
+.meliscms-search-box.searching .sbox-icon {
+	background-color: #eee;
+	color: #fff;
+}
+
+.meliscms-search-box .sbox-icon {
+    position: absolute;
+    top: 2px;
+    right: 40px;
+    padding: 5px 15px;
+    cursor: pointer;
+    background: #fff;
+}
+
+.meliscms-search-box .sbox-icon i {
+    font-size: 14px;
+    color: #b5b1b1;
+}
+
+.fancy-tree-container {
+    position: relative;
+}
+
+#find-page-dynatree {
+    height: 325px;
+    overflow-y: scroll;
+}
+
+#resetTreeView {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+}
+
+
+
 
 /* tab head */
 .widget.widget-tabs-double-2>.widget-head ul li:hover{
@@ -177,6 +231,30 @@ div.content-heading h1{
 .nav-tabs>li {
 	margin-bottom: 0;
 }
+
+.widget.widget-tabs-double>.widget-head ul li a.f-awesome, 
+.widget.widget-tabs-double>.widget-head ul li.active a.f-awesome {
+    position: relative;
+    padding: 9px 15px 0 38px;
+    color: #932e2a;
+    border-bottom-color: #eee;
+}
+
+.widget.widget-tabs-double>.widget-head ul li a.f-awesome .fa-sitemap,
+.widget.widget-tabs-double>.widget-head ul li.active a.f-awesome .fa-sitemap {
+    color: #932e2a;
+    font-size: 12px;
+    position: absolute;
+    top: 11px;
+    left: 12px;
+}
+
+.widget.widget-tabs>.widget-head ul li.active a.f-awesome i:before {
+    color: #932e2a;
+    font-size: 16px;
+}
+
+
 /* ===============================================================[ -= RESPONSIVE =- ]==================================================================== */
 
 @media( min-width: 768px ){
@@ -205,17 +283,3 @@ div.content-heading h1{
 		margin-left: 10px;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

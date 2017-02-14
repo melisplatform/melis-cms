@@ -331,10 +331,11 @@ class ToolTemplateController extends AbstractActionController
     public function newTemplateDataAction()
     {
         $request = $this->getRequest();
+        $tplId = null;
         $status  = 0;
         $errors  = array();
-        $textMessage = '';
         $textTitle = '';
+        $textMessage = '';
         
         // translator
         $translator = $this->getServiceLocator()->get('translator');
@@ -377,7 +378,8 @@ class ToolTemplateController extends AbstractActionController
                     $data = $templateUpdateForm->getData();
                     
                     // Set Template ID from Cms Platform ID
-                    $data['tpl_id'] = $datasPlatformIds->pids_tpl_id_current;
+                    $tplId = $datasPlatformIds->pids_tpl_id_current;
+                    $data['tpl_id'] = $tplId;
                     
                     $site = $data['tpl_site_id'];
                     $data['tpl_creation_date'] = date('Y-m-d H:i:s');
@@ -387,7 +389,7 @@ class ToolTemplateController extends AbstractActionController
                         $phpPath = $data['tpl_php_path'];
                         
                         if(empty($phpPath)) {
-                            $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                            $textMessage = 'tr_tool_template_fm_new_content_error';
                             $status = 0;
                             $errors= array(
                                 'tpl_php_path' => array(
@@ -396,7 +398,7 @@ class ToolTemplateController extends AbstractActionController
                             );
                         }
                         elseif(strlen($phpPath)>150) {
-                            $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                            $textMessage = 'tr_tool_template_fm_new_content_error';
                             $status = 0;
                             $errors= array(
                                 'tpl_php_path' => array(
@@ -405,7 +407,7 @@ class ToolTemplateController extends AbstractActionController
                             );
                         }
                         elseif(empty($site)){
-                            $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                            $textMessage = 'tr_tool_template_fm_new_content_error';
                             $status = 0;
                             $errors= array(
                                 'tpl_site_id' => array(
@@ -415,7 +417,7 @@ class ToolTemplateController extends AbstractActionController
                         }
                         else {
                             $templatesModel->save($data);
-                            $textMessage = $translator->translate('tr_tool_template_fm_new_content');
+                            $textMessage = 'tr_tool_template_fm_new_content';
                             $status = 1;
                         }
                     }
@@ -428,7 +430,7 @@ class ToolTemplateController extends AbstractActionController
                         
                         
                         if(empty($tplLayout)) {
-                            $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                            $textMessage = 'tr_tool_template_fm_new_content_error';
                             $status = 0;
                             $errors= array(
                                 'tpl_zf2_layout' => array(
@@ -437,7 +439,7 @@ class ToolTemplateController extends AbstractActionController
                             );
                         }
                         elseif(strlen($tplLayout)>50) {
-                            $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                            $textMessage = 'tr_tool_template_fm_new_content_error';
                             $status = 0;
                             $errors= array(
                                 'tpl_zf2_layout' => array(
@@ -448,7 +450,7 @@ class ToolTemplateController extends AbstractActionController
                     
                     
                         if(empty($tplController)) {
-                            $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                            $textMessage = 'tr_tool_template_fm_new_content_error';
                             $status = 0;
                             $errors= array(
                                 'tpl_zf2_controller' => array(
@@ -457,7 +459,7 @@ class ToolTemplateController extends AbstractActionController
                             );
                         }
                         elseif(strlen($tplController)>50) {
-                            $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                            $textMessage = 'tr_tool_template_fm_new_content_error';
                             $status = 0;
                             $errors= array(
                                 'tpl_zf2_controller' => array(
@@ -467,7 +469,7 @@ class ToolTemplateController extends AbstractActionController
                         }
                     
                         if(empty($tplAction)) {
-                            $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                            $textMessage = 'tr_tool_template_fm_new_content_error';
                             $status = 0;
                             $errors= array(
                                 'tpl_zf2_action' => array(
@@ -476,7 +478,7 @@ class ToolTemplateController extends AbstractActionController
                             );
                         }
                         elseif(strlen($tplAction)>50) {
-                            $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                            $textMessage = 'tr_tool_template_fm_new_content_error';
                             $status = 0;
                             $errors= array(
                                 'tpl_zf2_action' => array(
@@ -485,7 +487,7 @@ class ToolTemplateController extends AbstractActionController
                             );
                         }
                         elseif(empty($site)){
-                            $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                            $textMessage ='tr_tool_template_fm_new_content_error';
                             $status = 0;
                             $errors= array(
                                 'tpl_site_id' => array(
@@ -497,7 +499,7 @@ class ToolTemplateController extends AbstractActionController
                         
                         if(empty($errors)) {
                             $templatesModel->save($data);
-                            $textMessage = $translator->translate('tr_tool_template_fm_new_content');
+                            $textMessage = 'tr_tool_template_fm_new_content';
                             $status = 1;
                         }
                     }
@@ -511,7 +513,7 @@ class ToolTemplateController extends AbstractActionController
                 }
                 else 
                 {
-                    $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                    $textMessage = 'tr_tool_template_fm_new_content_error';
                     $errors = array(
                         'platform_ids' => array(
                             'noPlatformIds' => $translator->translate('tr_meliscms_no_available_platform_ids'),
@@ -521,7 +523,7 @@ class ToolTemplateController extends AbstractActionController
                 }
             }
             else {
-                $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                $textMessage = 'tr_tool_template_fm_new_content_error';
                 $errors = $templateUpdateForm->getMessages();
                 $status = 0;
             }
@@ -530,7 +532,7 @@ class ToolTemplateController extends AbstractActionController
             $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
             $appConfigForm = $melisMelisCoreConfig->getItem('meliscms/tools/meliscms_tool_templates/forms/meliscms_tool_template_generic_form');
             $appConfigForm = $appConfigForm['elements'];
-        
+            
             foreach ($errors as $keyError => $valueError)
             {
                 foreach ($appConfigForm as $keyForm => $valueForm)
@@ -540,17 +542,16 @@ class ToolTemplateController extends AbstractActionController
                         $errors[$keyError]['label'] = $valueForm['spec']['options']['label'];
                 }
             }
-            
         }
         
 		$response = array(
             'success' => $status,
-            'textTitle' => $translator->translate('tr_tool_templates_modal_tab_text_add'),
-            'textMessage' => $translator->translate($textMessage),
+            'textTitle' => 'tr_tool_templates_modal_tab_text_add',
+            'textMessage' => $textMessage,
             'errors' => $errors,
         );
         
-        $this->getEventManager()->trigger('meliscms_template_savenew_end', $this, $response);
+        $this->getEventManager()->trigger('meliscms_template_savenew_end', $this, array_merge($response, array('typeCode' => 'CMS_TEMPLATE_ADD', 'itemId' => $tplId)));
         
         return new JsonModel($response);
     }
@@ -660,6 +661,7 @@ class ToolTemplateController extends AbstractActionController
     public function updateTemplateDataAction()
     {
         $request = $this->getRequest();
+        $templateId = null;
         $status  = 0;
         $errors  = array();
         $textTitle = 'tr_tool_template_fm_update_title';
@@ -706,7 +708,7 @@ class ToolTemplateController extends AbstractActionController
                     $phpPath = $data['tpl_php_path'];
                 
                     if(empty($phpPath)) {
-                        $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                        $textMessage = 'tr_tool_template_fm_new_content_error';
                         $status = 0;
                         $errors= array(
                             'tpl_php_path' => array(
@@ -715,7 +717,7 @@ class ToolTemplateController extends AbstractActionController
                         );
                     }
                     elseif(strlen($phpPath)>150) {
-                        $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                        $textMessage = 'tr_tool_template_fm_new_content_error';
                         $status = 0;
                         $errors= array(
                             'tpl_php_path' => array(
@@ -724,7 +726,7 @@ class ToolTemplateController extends AbstractActionController
                         );
                     }
                     elseif(empty($site)){
-                        $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                        $textMessage = 'tr_tool_template_fm_new_content_error';
                         $status = 0;
                         $errors= array(
                             'tpl_site_id' => array(
@@ -746,7 +748,7 @@ class ToolTemplateController extends AbstractActionController
                     $tplAction = $data['tpl_zf2_action'];
                 
                     if(empty($tplLayout)) {
-                        $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                        $textMessage = 'tr_tool_template_fm_new_content_error';
                         $status = 0;
                         $errors= array(
                             'tpl_zf2_layout' => array(
@@ -755,7 +757,7 @@ class ToolTemplateController extends AbstractActionController
                         );
                     }
                     elseif(strlen($tplLayout)>50) {
-                        $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                        $textMessage = 'tr_tool_template_fm_new_content_error';
                         $status = 0;
                         $errors= array(
                             'tpl_zf2_layout' => array(
@@ -766,7 +768,7 @@ class ToolTemplateController extends AbstractActionController
                 
                 
                     if(empty($tplController)) {
-                        $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                        $textMessage = 'tr_tool_template_fm_new_content_error';
                         $status = 0;
                         $errors= array(
                             'tpl_zf2_controller' => array(
@@ -775,7 +777,7 @@ class ToolTemplateController extends AbstractActionController
                         );
                     }
                     elseif(strlen($tplController)>50) {
-                        $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                        $textMessage = 'tr_tool_template_fm_new_content_error';
                         $status = 0;
                         $errors= array(
                             'tpl_zf2_controller' => array(
@@ -785,7 +787,7 @@ class ToolTemplateController extends AbstractActionController
                     }
                 
                     if(empty($tplAction)) {
-                        $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                        $textMessage = 'tr_tool_template_fm_new_content_error';
                         $status = 0;
                         $errors= array(
                             'tpl_zf2_action' => array(
@@ -794,7 +796,7 @@ class ToolTemplateController extends AbstractActionController
                         );
                     }
                     elseif(strlen($tplAction)>50) {
-                        $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                        $textMessage = 'tr_tool_template_fm_new_content_error';
                         $status = 0;
                         $errors= array(
                             'tpl_zf2_action' => array(
@@ -803,7 +805,7 @@ class ToolTemplateController extends AbstractActionController
                         );
                     }
                     elseif(empty($site)){
-                        $textMessage = $translator->translate('tr_tool_template_fm_new_content_error');
+                        $textMessage = 'tr_tool_template_fm_new_content_error';
                         $status = 0;
                         $errors= array(
                             'tpl_site_id' => array(
@@ -841,17 +843,16 @@ class ToolTemplateController extends AbstractActionController
                         $errors[$keyError]['label'] = $valueForm['spec']['options']['label'];
                 }
             }
-
         }
-
+        
         $response = array(
             'success' => $status,
-            'textTitle' => $translator->translate($textTitle),
-            'textMessage' => $translator->translate($textMessage),
+            'textTitle' => $textTitle,
+            'textMessage' => $textMessage,
             'errors' => $errors,
         );
         
-        $this->getEventManager()->trigger('meliscms_template_save_end', $this, $response);
+        $this->getEventManager()->trigger('meliscms_template_save_end', $this, array_merge($response, array('typeCode' => 'CMS_TEMPLATE_UPDATE', 'itemId' => $templateId)));
         
         return new JsonModel($response);
     }
@@ -868,8 +869,8 @@ class ToolTemplateController extends AbstractActionController
     	$eventDatas = array();
     	$this->getEventManager()->trigger('meliscms_template_delete_start', $this, $eventDatas);
     	
-        
         $request = $this->getRequest();
+        $templateId = null;
         $status  = false;
         $message = 'no data';
         $textMessage = '';
@@ -893,13 +894,13 @@ class ToolTemplateController extends AbstractActionController
 
         $response = array(
            'success' => $status ,
-            'textTitle' => $translator->translate($textTitle),
-            'textMessage' => $translator->translate($textMessage)
+            'textTitle' => $textTitle,
+            'textMessage' => $textMessage
         );
-        $this->getEventManager()->trigger('meliscms_template_delete_end', $this, $response);
+        
+        $this->getEventManager()->trigger('meliscms_template_delete_end', $this, array_merge($response, array('typeCode' => 'CMS_TEMPLATE_DELETE', 'itemId' => $templateId)));
         
         return new JsonModel($response);
-            
     }
     
     /**

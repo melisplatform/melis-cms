@@ -1,0 +1,60 @@
+<?php 
+$id = '';
+if (!empty($this->zoneconfig['conf']['id']))
+    $id = $this->zoneconfig['conf']['id'];
+    $data_melisKey = $this->melisKey;
+?>
+
+<div class="modal-content">
+	<div class="modal-body padding-none">
+		<div class="wizard">
+			<div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none">
+                <div class="widget-head">
+                	<ul class="nav nav-tabs">
+                		<li class="active"><a href="#<?php echo $this->zoneconfig['conf']['id'] ?>" class="f-awesome" data-toggle="tab" aria-expanded="true"><i></i><?= $this->zoneconfig['conf']['name']?>
+                            <i class="fa fa-sitemap"></i>
+                		</a>
+                		
+                		</li>                		
+            		</ul>
+        		</div>
+        		<div class="widget-body innerAll inner-2x">
+        			<div class="tab-content page-evolution-content">
+        				<div class="tab-pane active" id="<?= $id ?>">
+                            <div class="row">
+                            	<div class="col-md-12">
+                                        <div class="meliscms-search-box">
+                                        
+                                            <input type="text" class="form-control" name="tree_search" id="tree_search" value="" placeholder="<?= $this->translate('tr_meliscms_form_search')?>..">
+                                            <div id="searchTreeView" class="sbox-icon" title="<?php echo $this->translate('tr_meliscms_form_search')?>">
+                                                <i class="fa fa-search" title=""></i>
+                                                
+                                            </div>
+                                            <div id="resetTreeView" class="sbox-icon sbox-icon-refresh" title="<?= $this->translate('tr_meliscms_form_btn_refresh')?>" style="top:2px;right: 2px;">
+                                            	<i class="fa fa-refresh"></i>
+                                            </div>
+                                           
+                                        </div>
+                                        <div class="fancy-tree-container">
+                                            
+                                            <div class="mod-menu-dynatree light-tree" id="find-page-dynatree"></div>
+                                        </div> 
+                                            
+                                        
+                                         <br> 	                
+                                 	<div align="right">
+                                 		<button data-dismiss="modal" class="btn btn-danger pull-left"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscmsnews_form_btn_cancel')?></button>
+                                 		<button class="btn btn-success" id="generateTreePageLink"><i class="fa fa-check"></i>  <?php echo $this->translate('tr_meliscms_form_btn_select') ?></button>
+                                 	</div>                                 	
+                            	</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    melisLinkTree.findPageMainTree();        
+</script>

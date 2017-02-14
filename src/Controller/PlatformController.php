@@ -201,6 +201,7 @@ class PlatformController extends AbstractActionController
         
         $request = $this->getRequest();
         // Default Values
+        $pids_id = null;
         $status  = 0;
         $textMessage = '';
         $errors  = array();
@@ -224,9 +225,12 @@ class PlatformController extends AbstractActionController
             // Response Messages Initialization
             $textTitle = $translator->translate('tr_meliscms_tool_platform_ids');
             if ($datas['pids_id']){
-                $textMessage = $translator->translate('tr_meliscms_tool_platform_update_error');
+                $pids_id = $datas['pids_id'];
+                $logTypeCode = 'CMS_PLATFORM_IDS_UPDATE';
+                $textMessage = 'tr_meliscms_tool_platform_update_error';
             }else{
-                $textMessage = $translator->translate('tr_meliscms_tool_platform_add_error');
+                $logTypeCode = 'CMS_PLATFORM_IDS_ADD';
+                $textMessage = 'tr_meliscms_tool_platform_add_error';
             }
             
             // Checking if the Post Data has CMS Platform ID, If the ID has value
@@ -305,20 +309,21 @@ class PlatformController extends AbstractActionController
                         if ($datas['pids_id']){
                             // Updating exsiting Data
                             unset($datas['pids_name_select']);
+                            $pids_id = $datas['pids_id'];
                             $melisEngineTablePlatformIds->save($datas,$datas['pids_id']);
-                            $textMessage = $translator->translate('tr_meliscms_tool_platform_update_success');
+                            $textMessage = 'tr_meliscms_tool_platform_update_success';
                             $status = 1;
                         }else{
                             // Saving new Data
                             $datas['pids_id'] = $datas['pids_name_select'];
+                            $pids_id = $datas['pids_id'];
                             unset($datas['pids_name_select']);
                             $melisEngineTablePlatformIds->save($datas);
-                            $textMessage = $translator->translate('tr_meliscms_tool_platform_add_success');
+                            $textMessage = 'tr_meliscms_tool_platform_add_success';
                             $status = 1;
                         }
-                        
                     }else{
-                        $textMessage = $translator->translate('tr_meliscms_tool_platform_conflict_error');
+                        $textMessage = 'tr_meliscms_tool_platform_conflict_error';
                     }
                 }
             }else{
@@ -345,7 +350,7 @@ class PlatformController extends AbstractActionController
             'errors' => $errors,
             'event' => $responseData
         );
-        $this->getEventManager()->trigger('meliscms_platform_IDs_save_end', $this, $response);
+        $this->getEventManager()->trigger('meliscms_platform_IDs_save_end', $this, array_merge($response, array('typeCode' => $logTypeCode, 'itemId' => $pids_id)));
         return new JsonModel($response);
     }
     
@@ -359,15 +364,16 @@ class PlatformController extends AbstractActionController
         $request = $this->getRequest();
         $datas = get_object_vars($request->getPost());
         
+        $pids_id = $datas['pid_id'];
         $melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
-        $melisEngineTablePlatformIds->deleteById($datas['pid_id']);
+        $melisEngineTablePlatformIds->deleteById($pids_id);
         
         $response = array(
             'success' => 1,
-            'textTitle' => $translator->translate('tr_meliscms_tool_platform_ids'),
-            'textMessage' => $translator->translate('tr_meliscms_tool_platform_ids_delete_success_msg'),
+            'textTitle' => 'tr_meliscms_tool_platform_ids',
+            'textMessage' => 'tr_meliscms_tool_platform_ids_delete_success_msg',
         );
-        $this->getEventManager()->trigger('meliscms_platform_IDs_delete_end', $this, $response);
+        $this->getEventManager()->trigger('meliscms_platform_IDs_delete_end', $this, array_merge($response, array('typeCode' => 'CMS_PLATFORM_IDS_DELETE', 'itemId' => $pids_id)));
         return new JsonModel($response);
     }
     

@@ -30,14 +30,12 @@ $(function(){
 	    	if(data.success) {
 	    		$("#id_meliscms_tool_site_301_generic_form_container").modal("hide");
 	    		// Notifications
-				melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
-				melisCore.flashMessenger();
-				
+				melisHelper.melisOkNotification(data.textTitle, data.textMessage);
 				melisHelper.zoneReload("id_meliscms_tool_site_301_content", "meliscms_tool_site_301_content");
 	    	}else{
-	    		//melisCoreTool.alertDanger("#siteaddalert", '', data.textMessage + "<br/>");
-				melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 'closeByButtonOnly');
+				melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
 	    	}
+	    	melisCore.flashMessenger();
 	    	melisCoreTool.highlightErrors(data.success, data.errors, "siteRedirectForm");
 		}).fail(function(){
 			alert( translations.tr_meliscore_error_message );
@@ -63,13 +61,12 @@ $(function(){
 		    }).done(function(data) {
 		    	if(data.success) {
 		    		// Notifications
-					melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
-					melisCore.flashMessenger();
-					
+					melisHelper.melisOkNotification(data.textTitle, data.textMessage);
 					melisHelper.zoneReload("id_meliscms_tool_site_301_content", "meliscms_tool_site_301_content");
 		    	}else{
-					melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 'closeByButtonOnly');
+					melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
 		    	}
+		    	melisCore.flashMessenger();
 			}).fail(function(){
 				alert( translations.tr_meliscore_error_message );
 			});

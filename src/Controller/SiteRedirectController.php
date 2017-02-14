@@ -321,7 +321,7 @@ class SiteRedirectController extends AbstractActionController
         $translator = $this->getServiceLocator()->get('translator');
         
         $request = $this->getRequest();
-        
+        $s301_id = null;
         $status  = 0;
         $textTitle = '';
         $textMessage = '';
@@ -331,6 +331,16 @@ class SiteRedirectController extends AbstractActionController
              
             $postValues = get_object_vars($request->getPost());
              
+            if ($postValues['s301_id'])
+            {
+                $s301_id = $postValues['s301_id'];
+                $logTypCode = 'CMS_SITE_REDIRECT_UPDATE';
+            }
+            else 
+            {
+                $logTypCode = 'CMS_SITE_REDIRECT_ADD';
+            }
+            
             if (!empty($postValues)){
                 
                 // Getting the Site Redirect Form from Tool config
@@ -350,21 +360,21 @@ class SiteRedirectController extends AbstractActionController
                     
                     $site301Table = $this->getServiceLocator()->get('MelisEngineTableSite301');
                     
-                    $textTitle = $translator->translate('tr_meliscms_tool_site_301_add_site_redirect');
-                    $textMessage = $translator->translate('meliscms_tool_site_301_add_success');
+                    $textTitle = 'tr_meliscms_tool_site_301_add_site_redirect';
+                    $textMessage = 'meliscms_tool_site_301_add_success';
                     if ($data['s301_id'])
                     {
-                        $textTitle = $translator->translate('tr_meliscms_tool_site_301_edit_site_redirect');
-                        $textMessage = $translator->translate('meliscms_tool_site_301_edit_success');
+                        $textTitle = 'tr_meliscms_tool_site_301_edit_site_redirect';
+                        $textMessage = 'meliscms_tool_site_301_edit_success';
                     }
                     else 
                     {
-                        $textMessage = $translator->translate('meliscms_tool_site_301_unable_to_add');
-                        
                         // Checking if the Old Url is existing on database
                         $s301Data = $site301Table->getEntryByField('s301_old_url', $data['s301_old_url'])->current();
                         if (!empty($s301Data))
                         {
+                            $textMessage = 'meliscms_tool_site_301_unable_to_add';
+                            
                             $errors['s301_old_url'] = array(
                                 'label' => $translator->translate('tr_meliscms_tool_site_301_s301_old_url'),
                                 'isExist' => $translator->translate('meliscms_tool_site_301_old_url_exist')
@@ -374,20 +384,19 @@ class SiteRedirectController extends AbstractActionController
                     
                     if (empty($errors))
                     {
-                        $s301_id = ($data['s301_id']) ? $data['s301_id'] : null;
                         unset($data['s301_id']);
-                        $site301Table->save($data, $s301_id);
+                        $s301_id = $site301Table->save($data, $s301_id);
                         $status  = 1;
                     }
                 }
                 else 
                 {
-                    $textTitle = $translator->translate('tr_meliscms_tool_site_301_add_site_redirect');
-                    $textMessage = $translator->translate('meliscms_tool_site_301_unable_to_add');
+                    $textTitle = 'tr_meliscms_tool_site_301_add_site_redirect';
+                    $textMessage = 'meliscms_tool_site_301_unable_to_add';
                     if ($postValues['s301_id'])
                     {
-                        $textTitle = $translator->translate('tr_meliscms_tool_site_301_edit_site_redirect');
-                        $textMessage = $translator->translate('meliscms_tool_site_301_unable_to_edit');
+                        $textTitle = 'tr_meliscms_tool_site_301_edit_site_redirect';
+                        $textMessage = 'meliscms_tool_site_301_unable_to_edit';
                     }
                     
                     $errors = $propertyForm->getMessages();
@@ -421,9 +430,7 @@ class SiteRedirectController extends AbstractActionController
             'errors' => $errors,
         );
         
-        if ($status){
-            $this->getEventManager()->trigger('meliscalendar_save_site_redirect_end', $this, $response);
-        }
+        $this->getEventManager()->trigger('meliscalendar_save_site_redirect_end', $this, array_merge($response, array('typeCode' => $logTypCode, 'itemId' => $s301_id)));
          
         return new JsonModel($response);
     }
@@ -438,8 +445,9 @@ class SiteRedirectController extends AbstractActionController
     
         $request = $this->getRequest();
         // Default Values
+        $s301_id = null;
         $status  = 0;
-        $textMessage = $translator->translate('meliscms_tool_site_301_unable_to_delete');
+        $textMessage = 'meliscms_tool_site_301_unable_to_delete';
         $errors  = array();
          
         if($request->isPost()) {
@@ -448,25 +456,25 @@ class SiteRedirectController extends AbstractActionController
              
             // Checking if the Site Redirect Id has value
             if (!empty($postValues['s301Id'])){
+                
+                $s301_id = $postValues['s301Id'];
                 // Deleting Site Redirect using Service manager
                 $site301Table = $this->getServiceLocator()->get('MelisEngineTableSite301');
                 $site301Table->deleteById($postValues['s301Id']);
                 
-                $textMessage = $translator->translate('meliscms_tool_site_301_delete_success');
+                $textMessage = 'meliscms_tool_site_301_delete_success';
                 $status = 1;
             }
         }
          
         $response = array(
             'success' => $status,
-            'textTitle' => $translator->translate('tr_meliscms_tool_site_301_delete_site_redirect'),
+            'textTitle' => 'tr_meliscms_tool_site_301_delete_site_redirect',
             'textMessage' => $textMessage,
             'errors' => $errors,
         );
-    
-        if ($status){
-            $this->getEventManager()->trigger('meliscalendar_delete_site_redirect_end', $this, $response);
-        }
+        
+        $this->getEventManager()->trigger('meliscalendar_delete_site_redirect_end', $this, array_merge($response, array('typeCode' => 'CMS_SITE_REDIRECT_DELETE', 'itemId' => $s301_id)));
          
         return new JsonModel($response);
     }
