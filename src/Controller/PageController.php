@@ -1537,4 +1537,34 @@ class PageController extends AbstractActionController
         return new JsonModel($link);
     }
    
+    private function updateUrlPage($idPage)
+    {
+        $melisTree = $this->serviceLocator->get('MelisEngineTree');
+        $tablePageDefaultUrls = $this->getServiceLocator()->get('MelisEngineTablePageDefaultUrls');
+        
+        $link = $melisTree->getPageLink($idPage);
+        $tablePageDefaultUrls->save(
+            array(
+                'purl_page_id' => $idPage,
+                'purl_page_url' => $link
+            ),
+            $idPage
+        );
+        
+        if ($link != '/') // No need to update if it's homepage, it doesn't change the link
+        {
+            $childrenPages = $melisTree->getPageChildren($idPage, 0);
+            foreach($childrenPages as $page)
+            {
+                $this->updateUrlPage($page->tree_page_id); 
+            }
+        }
+    }
+    
+    public function updateDefaultUrlsAction()
+    {
+        $idPage = $this->params()->fromQuery('idPage', '');
+        
+        $this->updateUrlPage($idPage);
+    }
 }

@@ -31,7 +31,7 @@ $(document).ready(function() {
 			}
 			
 			melisCoreTool.done("#btnLangCmsAdd");
-    		melisCore.flashMessenger();
+    		melisCore.flashMessenger();	
     		melisCoreTool.processDone();
 	     }).fail(function(){
 				alert( translations.tr_meliscore_error_message );
@@ -40,9 +40,7 @@ $(document).ready(function() {
 
 	addEvent("#btnLangCmsEdit", function() {
 		melisCoreTool.showOnlyTab('#modal-language-cms', '#id_meliscms_tool_language_modal_content_edit');
-		var tdParent = $(this).parent();
-		var trParent = $(tdParent).parent();
-		var getId = trParent.attr('id');
+		var getId = $(this).parents("tr").attr("id");
 		
 		$.ajax({
 	        type        : 'POST', 

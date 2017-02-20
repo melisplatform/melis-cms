@@ -30,6 +30,7 @@ use MelisCms\Listener\MelisCmsDeleteSiteDomainListener;
 use MelisCms\Listener\MelisCmsInstallerLastProcessListener;
 use MelisCms\Listener\MelisCmsToolUserNewUserListener;
 use MelisCms\Listener\MelisCmsDeletePlatformListener;
+use MelisCms\Listener\MelisCmsPageDefaultUrlsListener;
 
 class Module
 {
@@ -80,6 +81,7 @@ class Module
                     $eventManager->attach(new MelisCmsInstallerLastProcessListener());
                     $eventManager->attach(new MelisCmsToolUserNewUserListener());
                     $eventManager->attach(new MelisCmsDeletePlatformListener());
+                    $eventManager->attach(new MelisCmsPageDefaultUrlsListener());
                 }
             }
         }
