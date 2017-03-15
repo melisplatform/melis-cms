@@ -331,6 +331,7 @@
         'meliscms_tool_site_301_delete_confirm_msg' => 'Etes-vous sûr de vouloir supprimer cette redirection 301 ?',
 	    
 	    // Tool Sitetree view modal
-	    'tr_meliscms_form_btn_select' => 'Select',
+	    'tr_meliscms_form_btn_select' => 'Insérer',
+	    'tr_meliscms_form_btn_refresh' => 'Actualiser',
 	);
 ?>

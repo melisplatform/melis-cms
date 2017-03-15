@@ -857,4 +857,5 @@ class SiteController extends AbstractActionController
             $domainTable->deleteByField('sdom_env', $platform);
         }
     }
+    
 }

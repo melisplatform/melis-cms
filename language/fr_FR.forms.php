@@ -160,5 +160,8 @@
         'tr_meliscms_tool_site_error_prompt_edit' => 'Impossible d\'éditerle site, veuillez réessayer',
 	    
 	    'tr_meliscms_tool_site_scheme_error_empty' => 'Valeur requise, ne peut pas être vide',
+	    
+	    'tr_meliscms_form_search' => 'Rechercher',
 	);
+	
 ?>

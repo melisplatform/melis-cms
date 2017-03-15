@@ -111,11 +111,4 @@ return array(
     	'textarea' => 'MelisCms/public/js/tinyMCE/textarea.php',
     	'media' => 'MelisCms/public/js/tinyMCE/media.php',
     ),
-    'asset_manager' => array(
-        'resolver_configs' => array(
-            'aliases' => array(
-                'MelisCms/' => __DIR__ . '/../public/',
-            ),
-        ),
-    ),
 );
