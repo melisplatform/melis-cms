@@ -126,6 +126,8 @@
         'tr_meliscms_tool_site_sel_env' => 'Selectionner l\'environnement: ',
         'tr_meliscms_tool_site_sel_env_add_new' => 'Ajouter un nouvel environnement...',
 	    'tr_meliscms_tool_site_sel_platform' => 'Selectionner un nouvel plateforme...',
+
+        'tr_meliscms_tool_site_id_invalid' => 'Invalid ID',
 	    
 	    'tr_meliscms_tool_site_name_exists' => 'Site name already exists, please choose another',
         'tr_meliscms_tool_site_site_name_error_long' => 'Nom du site trop long, nombre de caractères maximum 45',
@@ -147,6 +149,7 @@
          
         'tr_meliscms_tool_site_domain_error_long' => 'Valeur du domaine trop longue, nombre de caractères maximum 50',
         'tr_meliscms_tool_site_domain_error_empty' => 'Veuillez saisir le domaine',
+        'tr_meliscms_tool_site_domain_invalid' => 'Please enter a valid domain',
          
         'tr_meliscms_tool_site_404_site_id_not_int' => 'ID 404 du site invalide, ce doit être un nombre',
         'tr_meliscms_tool_site_404_site_id_error_empty' => 'Veuillez saisir l\'ID 404 du site',

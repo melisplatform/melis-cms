@@ -363,6 +363,7 @@ class ToolTemplateController extends AbstractActionController
         {
         
             $postValues = get_object_vars($this->getRequest()->getPost());
+            $postValues = $melisTool->sanitizePost($postValues);
             $templateUpdateForm->setData($postValues);
         
             if($templateUpdateForm->isValid())
@@ -693,8 +694,9 @@ class ToolTemplateController extends AbstractActionController
         {
             
             $postValues = get_object_vars($this->getRequest()->getPost());
-            
-            $templateId = $request->getPost('tpl_id');
+            $postValues = $melisTool->sanitizePost($postValues);
+
+            $templateId = (int) $request->getPost('tpl_id');
             $templateUpdateForm->setData($postValues);
 
             if($templateUpdateForm->isValid())
@@ -880,7 +882,7 @@ class ToolTemplateController extends AbstractActionController
             
             // get the service for Templates Model & Table
             $templatesModel = $this->getServiceLocator()->get('MelisEngineTableTemplate');
-            $templateId = $request->getPost('templateId');
+            $templateId = (int) $request->getPost('templateId');
             
             // make sure our ID is not empty
             if(!empty($templateId))

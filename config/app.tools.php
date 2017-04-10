@@ -302,6 +302,12 @@ return array(
                                     'validators' => array(
                                         array(
                                             'name'    => 'IsInt',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\I18n\Validator\IsInt::NOT_INT => '',
+                                                    \Zend\I18n\Validator\IsInt::INVALID => '',
+                                                )
+                                            )
                                         ),
                                     ),
                                     'filters' => array(
@@ -657,6 +663,25 @@ return array(
                                 
                             ), // end elements
                             'input_filter' => array(
+                                'ssite_id' => array(
+                                    'name'     => 'ssite_id',
+                                    'required' => false,
+                                    'validators' => array(
+                                        array(
+                                            'name'    => 'IsInt',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_meliscms_tool_site_id_invalid',
+                                                    \Zend\I18n\Validator\IsInt::INVALID => 'tr_meliscms_tool_site_id_invalid',
+                                                )
+                                            )
+                                        ),
+                                    ),
+                                    'filters' => array(
+                                        array('name' => 'StripTags'),
+                                        array('name' => 'StringTrim'),
+                                    ),
+                                ),
                                 'ssite_name' => array(
                                     'name'     => 'ssite_name',
                                     'required' => true,
@@ -796,6 +821,14 @@ return array(
                                             ),
                                         ),
                                         array(
+                                            'name' => 'regex', false,
+                                            'options' => array(
+                                                'pattern' => '/(www\.)?([a-zA-Z0-9-_]+)\.([a-z]+)/',
+                                                'messages' => array(\Zend\Validator\Regex::NOT_MATCH => 'tr_meliscms_tool_site_domain_invalid'),
+                                                'encoding' => 'UTF-8',
+                                            ),
+                                        ),
+                                        array(
                                             'name' => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
@@ -847,9 +880,6 @@ return array(
                                     ),
                                 ),
                             ), // end input_filter
-                            'align_elements' => array('ssite_id', 'ssite_name', 'ssite_main_page_id', 's404_page_id', 'select_env', 'sdom_env', 'sdom_scheme', 'sdom_domain
-                                '),
-                            
                             
                         ), // end form
                     ),
@@ -1015,6 +1045,25 @@ return array(
                 
                             ),
                             'input_filter' => array(
+                                'lang_cms_id' => array(
+                                    'name'     => 'lang_cms_id',
+                                    'required' => false,
+                                    'validators' => array(
+                                        array(
+                                            'name'    => 'IsInt',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_meliscms_tool_platform_not_digit',
+                                                    \Zend\I18n\Validator\IsInt::INVALID => 'tr_meliscms_tool_platform_not_digit',
+                                                )
+                                            )
+                                        ),
+                                    ),
+                                    'filters' => array(
+                                        array('name' => 'StripTags'),
+                                        array('name' => 'StringTrim'),
+                                    ),
+                                ),
                                 'lang_cms_locale' => array(
                                     'name'     => 'lang_cms_locale',
                                     'required' => true,
@@ -1295,6 +1344,25 @@ return array(
                                 ),
                             ),
                             'input_filter' => array(
+                                'pids_id' => array(
+                                    'name'     => 'pids_page_id_start',
+                                    'required' => false,
+                                    'validators' => array(
+                                        array(
+                                            'name'    => 'Digits',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\Validator\Digits::NOT_DIGITS => 'tr_meliscms_tool_platform_not_digit',
+                                                    \Zend\Validator\Digits::STRING_EMPTY => '',
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    'filters'  => array(
+                                        array('name' => 'StripTags'),
+                                        array('name' => 'StringTrim'),
+                                    ),
+                                ),
                                 'pids_name_select' => array(
                                     'name'     => 'pids_name_select',
                                     'required' => true,
@@ -1662,6 +1730,25 @@ return array(
                                 ),
                             ),
                             'input_filter' => array(
+                                's301_id' => array(
+                                    'name'     => 's301_id',
+                                    'required' => false,
+                                    'validators' => array(
+                                        array(
+                                            'name'    => 'IsInt',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_meliscms_tool_platform_not_digit',
+                                                    \Zend\I18n\Validator\IsInt::INVALID => 'tr_meliscms_tool_platform_not_digit',
+                                                )
+                                            )
+                                        ),
+                                    ),
+                                    'filters' => array(
+                                        array('name' => 'StripTags'),
+                                        array('name' => 'StringTrim'),
+                                    ),
+                                ),
                                 's301_old_url' => array(
                                     'name'     => 's301_old_url',
                                     'required' => true,

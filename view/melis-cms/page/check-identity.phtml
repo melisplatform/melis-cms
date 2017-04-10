@@ -7,21 +7,22 @@
 	// run this function when you click out of the tinymce
 	$("body").on("blur", ".melis-editable", function(){
 
-			// get all data-attributes from the clicked
-			var currentdata = $(this).data();
+        // get all data-attributes from the clicked
+        var currentdata = $(this).data();
 
-			// get the content of the active tinyMCE editor.
-			var content = tinyMCE.activeEditor.getContent({format : 'html'});
-        	
-        	var data = {
-				tagId : currentdata.tagId,
-				tagValue : content,
-            };
-			
-    		$.post("/melis/MelisCms/PageEdition/savePageTagSession?idPage="+currentdata.idPage,
-    	    		data,
-    	    		function(data, status){
-    	    });
+        // get the content of the active tinyMCE editor.
+        var content = tinyMCE.activeEditor.getContent({format : 'html'});
+
+        var data = {
+            tagId : currentdata.tagId,
+            tagValue : content,
+        };
+        disableCmsButtons();
+        $.post("/melis/MelisCms/PageEdition/savePageTagSession?idPage="+currentdata.idPage,
+            data,
+            function(data, status){
+            enableCmsbuttons();
+        });
 	});
 	
 		
@@ -57,5 +58,19 @@
 		}
 		
 	});
+
+    function disableCmsButtons()
+    {
+        window.parent.$("div.make-switch label on, off").parent().css("z-index", -1).parents("div.make-switch").css("opacity", 0.5);
+        window.parent.$("div[data-melisKey='meliscms_page_actions']").find("a").attr("disabled", "disabled");
+    }
+
+    function enableCmsbuttons()
+    {
+        window.parent.$("div[data-melisKey='meliscms_page_actions']").find("a").removeAttr("disabled");
+        window.parent.$("div.make-switch label on, off").parent().css("z-index", 1).parents("div.make-switch").css("opacity", 1);
+    }
+
+    enableCmsbuttons();
 	
 

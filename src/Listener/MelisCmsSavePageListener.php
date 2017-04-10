@@ -95,8 +95,8 @@ class MelisCmsSavePageListener extends MelisCoreGeneralListener implements Liste
 	        				array_merge(array('action' => 'saveSeo'), $datas)
 	        		);
 	        		if (!$success)
-	        			return; 
-        		}	
+	        			return;
+        		}
         	},
         100);
         

@@ -186,7 +186,11 @@ class PagePropertiesController extends AbstractActionController
 		$request = $this->getRequest();
 		if ($request->isPost())
 		{
-			$postValues = get_object_vars($request->getPost());
+            $postValues = $this->params()->fromRoute();
+            if(!isset($postValues['page_duplicate_event_flag'])) {
+                $postValues = get_object_vars($request->getPost());
+            }
+
 			$propertyForm->setData($postValues);
 			
 			if ($exist)
@@ -322,7 +326,7 @@ class PagePropertiesController extends AbstractActionController
 	
 		$melisPageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
     	$melisPagePublishedTable = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
-	
+        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
 		// Check if post
 		$request = $this->getRequest();
 		if ($request->isPost())
@@ -336,7 +340,12 @@ class PagePropertiesController extends AbstractActionController
 		    if (!empty($datasPlatformIds))
 		    {
         		// Get values posted and set them in form
-        		$postValues = get_object_vars($request->getPost());
+                $postValues = $this->params()->fromRoute();
+                if(!isset($postValues['page_duplicate_event_flag'])) {
+                    $postValues = get_object_vars($request->getPost());
+                    $postValues = $melisTool->sanitizePost($postValues);
+                }
+
         		$propertyForm->setData($postValues);
                
                 if (!$isNew)

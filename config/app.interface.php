@@ -129,6 +129,7 @@ return array(
 				        '/MelisCms/js/tools/platform.tool.js',
 				        '/MelisCms/js/tools/site-redirect.tool.js',
 				        '/MelisCms/js/tools/findpage.tool.js',
+				        '/MelisCms/js/tools/page-duplicate.tool.js',
 				),
 				'css' => array(
 				   
@@ -916,6 +917,20 @@ return array(
 				    			),
 					    	),
 						),
+                        'meliscms_page_action_duplicate' => array(
+                            'conf' => array(
+                                'id' => 'id_meliscms_page_action_duplicate',
+                                'name' => 'tr_meliscms_page_action_duplicate',
+                                'melisKey' => 'meliscms_page_action_duplicate'
+                            ),
+                            'forward' => array(
+                                'module' => 'MelisCms',
+                                'controller' => 'PageDuplication',
+                                'action' => 'render-page-duplicate-button',
+                                'jscallback' => '',
+                                'jsdatas' => array()
+                            ),
+                        )
 					),
 				),
 				'meliscms_page_creation_actions' =>  array(

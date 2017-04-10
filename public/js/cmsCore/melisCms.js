@@ -367,6 +367,18 @@ var melisCms = (function(){
 			});
 		}		
 	}
+
+    function disableCmsButtons()
+    {
+        $("div.make-switch label on, off").parent().css("z-index", -1).parents("div.make-switch").css("opacity", 0.5);
+        $("div[data-melisKey='meliscms_page_actions']").find("a").attr("disabled", "disabled");
+    }
+
+    function enableCmsbuttons()
+    {
+        $("div[data-melisKey='meliscms_page_actions']").find("a").removeAttr("disabled");
+        $("div.make-switch label on, off").parent().css("z-index", 1).parents("div.make-switch").css("opacity", 1);
+    }
 	
 	// RELOAD THE TREEVIEW AND SET A NODE PAGE ACTIVE
 	function refreshTreeview(pageNumber){
@@ -613,6 +625,8 @@ var melisCms = (function(){
 		
 		//refresh treeview
 		refreshTreeview									:			refreshTreeview,
+        disableCmsButtons								: 			disableCmsButtons,
+		enableCmsButtons								: 			enableCmsbuttons
 	};
 
 })();

@@ -83,6 +83,7 @@ return array(
             'MelisCms\Controller\Language' => 'MelisCms\Controller\LanguageController',
             'MelisCms\Controller\Platform' => 'MelisCms\Controller\PlatformController',
             'MelisCms\Controller\SiteRedirect' => 'MelisCms\Controller\SiteRedirectController',
+            'MelisCms\Controller\PageDuplication' => 'MelisCms\Controller\PageDuplicationController',
         ),
     ),
     'form_elements' => array(

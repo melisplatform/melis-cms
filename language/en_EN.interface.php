@@ -37,6 +37,7 @@
 		'tr_meliscms_page_actions_display_Tablet' => 'Tablet',
 		'tr_meliscms_page_actions_display_Desktop' => 'Desktop',
 	    'tr_meliscms_page_action_clear' => 'Clear saved page',
+        'tr_meliscms_page_action_duplicate' => 'Duplicate',
 	    
 	    'tr_meliscms_delete_saved_page_title' => 'Erase saved version',
 	    'tr_meliscms_delete_saved_use_publish_version_confirmation_msg' => 'Are you sure you want to erase the saved version and go back to the published version?',
@@ -336,5 +337,10 @@
 	    // Tool Sitetree view modal
 	    'tr_meliscms_form_btn_select' => 'Insert',
 	    'tr_meliscms_form_btn_refresh' => 'Refresh',
+
+        'tr_meliscms_duplicate_page_title' => 'Page Duplication',
+        'tr_meliscms_duplicate_error' => 'Unable to duplicate page',
+        'tr_melis_cms_duplicate_success' => 'Page "%s" successfully duplicated',
+        'tr_melis_cms_duplicate_text_identifier' => '[Duplicated]',
 	   );
 ?>

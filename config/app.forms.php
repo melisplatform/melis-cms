@@ -124,45 +124,6 @@ return array(
 									),
 								),
 							),
-					/*		array(
-								'spec' => array(
-									'name' => 'page_meta_title',
-									'type' => 'MelisText',
-									'options' => array(
-											'label' => 'tr_meliscms_page_tab_properties_form_Meta Title',
-									),
-									'attributes' => array(
-											'id' => 'page_meta_title',
-											'value' => '',
-									),
-								),
-							),
-							array(
-								'spec' => array(
-									'name' => 'page_meta_keywords',
-									'type' => 'MelisText',
-									'options' => array(
-											'label' => 'tr_meliscms_page_tab_properties_form_Meta Keywords',
-									),
-									'attributes' => array(
-											'id' => 'page_meta_keywords',
-											'value' => '',
-									),
-								),
-							),
-							array(
-								'spec' => array(
-									'name' => 'page_meta_description',
-									'type' => 'MelisText',
-									'options' => array(
-											'label' => 'tr_meliscms_page_tab_properties_form_Meta Description',
-									),
-									'attributes' => array(
-											'id' => 'page_meta_description',
-											'value' => '',
-									),
-								),
-							),*/
 							array(
 								'spec' => array(
 									'name' => 'page_creation_date',

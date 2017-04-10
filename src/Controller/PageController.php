@@ -1564,7 +1564,10 @@ class PageController extends AbstractActionController
     public function updateDefaultUrlsAction()
     {
         $idPage = $this->params()->fromQuery('idPage', '');
+        if($idPage) {
+            $this->updateUrlPage($idPage);
+        }
         
-        $this->updateUrlPage($idPage);
+
     }
 }

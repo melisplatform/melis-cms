@@ -216,12 +216,13 @@ class PlatformController extends AbstractActionController
         $formElements = $this->serviceLocator->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $propertyForm = $factory->createForm($appConfigForm);
-         
+        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+
         if($request->isPost()) {
              
             // Getting Post Datas
             $datas = get_object_vars($request->getPost());
-            
+            $postValues = $melisTool->sanitizePost($datas);
             // Response Messages Initialization
             $textTitle = $translator->translate('tr_meliscms_tool_platform_ids');
             if ($datas['pids_id']){
@@ -364,7 +365,7 @@ class PlatformController extends AbstractActionController
         $request = $this->getRequest();
         $datas = get_object_vars($request->getPost());
         
-        $pids_id = $datas['pid_id'];
+        $pids_id = (int) $datas['pid_id'];
         $melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
         $melisEngineTablePlatformIds->deleteById($pids_id);
         
@@ -427,7 +428,7 @@ class PlatformController extends AbstractActionController
                 // apply text limits
                 foreach($tableData[$ctr] as $vKey => $vValue)
                 {
-                    $tableData[$ctr][$vKey] = $melisTool->limitedText($vValue);
+                    $tableData[$ctr][$vKey] = $melisTool->limitedText($melisTool->escapeHtml($vValue));
                     
                     $tableData[$ctr]['pids_name'] = $translator->translate('Deleted ('.$tableData[$ctr]['pids_id'].')');
                     

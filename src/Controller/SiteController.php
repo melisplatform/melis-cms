@@ -318,7 +318,7 @@ class SiteController extends AbstractActionController
                 // apply text limits
                 foreach($tableData[$ctr] as $vKey => $vValue)
                 {
-                    $tableData[$ctr][$vKey] = $melisTool->limitedText($vValue);
+                    $tableData[$ctr][$vKey] = $melisTool->limitedText($melisTool->escapeHtml($vValue));
                 }
             
                 // manually modify value of the desired row
@@ -368,6 +368,7 @@ class SiteController extends AbstractActionController
             $site404Table = $this->getServiceLocator()->get('MelisEngineTableSite404');
             
             $postValues = get_object_vars($request->getPost());
+            $postValues = $melisTool->sanitizePost($postValues);
             $newSiteForm->setData($postValues);
 
             if($newSiteForm->isValid()) 
@@ -568,6 +569,7 @@ class SiteController extends AbstractActionController
 
         
             $postValues = get_object_vars($request->getPost());
+            $postValues = $melisTool->sanitizePost($postValues);
             $updateSiteForm->setData($postValues);
         
             if($updateSiteForm->isValid()) {

@@ -257,7 +257,7 @@ class LanguageController extends AbstractActionController
                 // apply text limits
                 foreach($tableData[$ctr] as $vKey => $vValue)
                 {
-                    $tableData[$ctr][$vKey] = $melisTool->limitedText($vValue);
+                    $tableData[$ctr][$vKey] = $melisTool->limitedText($melisTool->escapeHtml($vValue));
                 }
     
                 // manually modify value of the desired row
@@ -359,6 +359,7 @@ class LanguageController extends AbstractActionController
         if($this->getRequest()->isPost()) {
     
             $postValues = get_object_vars($this->getRequest()->getPost());
+            $postValues = $melisTool->sanitizePost($postValues);
             $form->setData($postValues);
     
             if($form->isValid()) {
@@ -434,6 +435,7 @@ class LanguageController extends AbstractActionController
         if($this->getRequest()->isPost()) {
     
             $postValues = get_object_vars($this->getRequest()->getPost());
+            $postValues = $melisTool->sanitizePost($postValues);
             $form->setData($postValues);
     
             if($form->isValid()) {
@@ -492,7 +494,7 @@ class LanguageController extends AbstractActionController
     
         if($this->getRequest()->isPost())
         {
-            $id = $this->getRequest()->getPost('id');
+            $id = (int) $this->getRequest()->getPost('id');
             if(is_numeric($id))
             {
                 $langTable->deleteById($id);

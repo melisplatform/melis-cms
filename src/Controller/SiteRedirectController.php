@@ -326,10 +326,12 @@ class SiteRedirectController extends AbstractActionController
         $textTitle = '';
         $textMessage = '';
         $errors  = array();
-         
+
+        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         if($request->isPost()) {
              
             $postValues = get_object_vars($request->getPost());
+            $postValues = $melisTool->sanitizePost($postValues);
              
             if ($postValues['s301_id'])
             {

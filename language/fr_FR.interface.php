@@ -37,6 +37,7 @@
 		'tr_meliscms_page_actions_display_Tablet' => 'Tablette',
 		'tr_meliscms_page_actions_display_Desktop' => 'Ordinateur',
 	    'tr_meliscms_page_action_clear' => 'Effacer page',
+        'tr_meliscms_page_action_duplicate' => 'Dupliquer',
 	    
 	    'tr_meliscms_delete_saved_page_title' => 'Effacer la version sauvegardée',
 	    'tr_meliscms_delete_saved_use_publish_version_confirmation_msg' => 'Etes-vous sûr de vouloir effacer la version sauvegardée et revenir à la version publiée?',
@@ -333,5 +334,10 @@
 	    // Tool Sitetree view modal
 	    'tr_meliscms_form_btn_select' => 'Insérer',
 	    'tr_meliscms_form_btn_refresh' => 'Actualiser',
+
+        'tr_meliscms_duplicate_page_title' => 'Duplication de page',
+        'tr_meliscms_duplicate_error' => 'Impossible de dupliquer la page',
+        'tr_melis_cms_duplicate_success' => 'Page "%s" dupliquée avec succès',
+        'tr_melis_cms_duplicate_text_identifier' => '[Dupliquée]',
 	);
 ?>
