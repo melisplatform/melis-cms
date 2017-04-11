@@ -40,29 +40,34 @@ var melisCms = (function(){
 		if(mcePopUp){
 			
 			
-			// iframe offset top
-			$("iframe.melis-iframe").position().top;
-			
-			// iframe height
-			$("iframe.melis-iframe").height();
-			
-			// window height
-			var windowHeight = screen.height;
-			
-			// body scroll top position
-			bodyOffsetTop = $(window)[0].scrollHeight;
-			
-			// dialog box height
-			var dialogHeight = $(".mce-window").outerHeight();
-			
-			var dialogTop = (bodyOffsetTop + windowHeight) - dialogHeight;
-			
-			/* console.log("bodyOffsetTop = " + bodyOffsetTop);
-			console.log("windowHeight = " + windowHeight);
-			console.log("dialogHeight = " + dialogHeight);		
-			console.log("has popup = "+ dialogTop); */
-			$(".mce-floatpanel.mce-window").css("top", dialogTop);
-			$("html, body").animate({scrollTop: dialogTop }, 300);
+			if($("iframe.melis-iframe").length){
+				// iframe offset top
+				$("iframe.melis-iframe").position().top;
+				
+				// iframe height
+				$("iframe.melis-iframe").height();
+				
+				// window height
+				var windowHeight = screen.height;
+				
+				// body scroll top position
+				bodyOffsetTop = $(window)[0].scrollHeight;
+				
+				// dialog box height
+				var dialogHeight = $(".mce-window").outerHeight();
+				
+				var dialogTop = (bodyOffsetTop + windowHeight) - dialogHeight;
+				
+				/* console.log("bodyOffsetTop = " + bodyOffsetTop);
+				console.log("windowHeight = " + windowHeight);
+				console.log("dialogHeight = " + dialogHeight);		
+				console.log("has popup = "+ dialogTop); */
+				$(".mce-floatpanel.mce-window").css("top", dialogTop);
+				$("html, body").animate({scrollTop: dialogTop }, 300);
+			}else{
+				$("#mce-modal-block").css('z-index',500);
+				$(".mce-floatpanel.mce-window").css('z-index', 501);
+			}
 		}
 		else{
 			/* console.log("no popup"); */

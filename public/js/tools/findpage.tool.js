@@ -105,6 +105,7 @@
 //      var inputBox = $('.melis-iframe').contents().find('#mce-link-tree').prev().val(dataUrl);
 //  	 var inputBox = $('#mce-link-tree').parent().find('input').val(dataUrl);
     	var inputBox = $('.melis-iframe').contents().find('#mce-link-tree').parent().find('input').val(dataUrl);
+    	$(".mce-floatpanel.mce-window").find('#mce-link-tree').parent().find('input').val(dataUrl);
   }
 
     function checkBtn() {
