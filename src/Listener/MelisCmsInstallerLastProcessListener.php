@@ -110,6 +110,7 @@ class MelisCmsInstallerLastProcessListener extends MelisCoreGeneralListener impl
                 if(isset($environment['new']) && !empty($environment['new'])) {
                     foreach($environment['new'] as $sitePlatform => $siteDomains) {
                         foreach($siteDomains as $siteDomain) {
+                            unset($siteDomain['app_interface_conf']);
                             $tableSiteDomain->save($siteDomain);
                         }
                     }

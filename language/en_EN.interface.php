@@ -36,7 +36,7 @@
 		'tr_meliscms_page_actions_display_Mobile' => 'Mobile',
 		'tr_meliscms_page_actions_display_Tablet' => 'Tablet',
 		'tr_meliscms_page_actions_display_Desktop' => 'Desktop',
-	    'tr_meliscms_page_action_clear' => 'Clear saved page',
+	    'tr_meliscms_page_action_clear' => 'Erase draft',
         'tr_meliscms_page_action_duplicate' => 'Duplicate',
 	    
 	    'tr_meliscms_delete_saved_page_title' => 'Erase saved version',

@@ -30,7 +30,7 @@ class MelisCmsNewSiteDomainListener extends MelisCoreGeneralListener implements 
         		$sm = $e->getTarget()->getServiceLocator();
         		$params = $e->getParams();
         		
-        		$updatePlatformDomain = $params['platformDomain'];
+        		$currentPlatform = $params['currentPlatform'];
         		$siteDomains = $params['siteDomain'];
         		$scheme = $sm->get('Application')->getMvcEvent()->getRequest()->getUri()->getScheme();
         		$defaultSiteID =  1;
@@ -40,10 +40,12 @@ class MelisCmsNewSiteDomainListener extends MelisCoreGeneralListener implements 
         		$container = new Container('melisinstaller');
         		
     		    $container->environments =  array('default_environment' => array(
-    		            'data' =>array('sdom_domain' => $updatePlatformDomain),
+    		            'data' =>array('sdom_domain' => $currentPlatform['platform_domain']),
     		            'wildcard' => array('sdom_env' => $defaultEnv),
                         'app_interface_conf' => [
-
+                            'send_email'      => $currentPlatform['send_email'],
+                            'error_reporting' => $currentPlatform['error_reporting'],
+                            'display_error'   => $currentPlatform['display_error']
                         ]
 		        )); 
 
@@ -58,6 +60,7 @@ class MelisCmsNewSiteDomainListener extends MelisCoreGeneralListener implements 
         		            'sdom_scheme' => $scheme,
         		            'sdom_domain' => $site['domain'],
                             'app_interface_conf' => [
+                                'send_email'      => $site['send_email']  == 'on' ? 1 : 0,
                                 'error_reporting' => $site['error_reporting'],
                                 'display_error'   => $site['display_error'] == 'on' ? 1 : 0
                             ]
@@ -71,6 +74,7 @@ class MelisCmsNewSiteDomainListener extends MelisCoreGeneralListener implements 
         		            'sdom_scheme' => $scheme,
         		            'sdom_domain' => $site['domain'],
                             'app_interface_conf' => [
+                                'send_email'      => $site['send_email']  == 'on' ? 1 : 0,
                                 'error_reporting' => $site['error_reporting'],
                                 'display_error'   => $site['display_error'] == 'on' ? 1 : 0
                             ]
