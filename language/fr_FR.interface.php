@@ -36,7 +36,7 @@
 		'tr_meliscms_page_actions_display_Mobile' => 'Mobile',
 		'tr_meliscms_page_actions_display_Tablet' => 'Tablette',
 		'tr_meliscms_page_actions_display_Desktop' => 'Ordinateur',
-	    'tr_meliscms_page_action_clear' => 'Effacer page',
+	    'tr_meliscms_page_action_clear' => 'Effacer brouillon / Erase draft',
         'tr_meliscms_page_action_duplicate' => 'Dupliquer',
 	    
 	    'tr_meliscms_delete_saved_page_title' => 'Effacer la version sauvegardée',

@@ -41,10 +41,12 @@ class MelisCmsNewSiteDomainListener extends MelisCoreGeneralListener implements 
         		
     		    $container->environments =  array('default_environment' => array(
     		            'data' =>array('sdom_domain' => $updatePlatformDomain),
-    		            'wildcard' => array('sdom_env' => $defaultEnv)
+    		            'wildcard' => array('sdom_env' => $defaultEnv),
+                        'app_interface_conf' => [
+
+                        ]
 		        )); 
-    		    
-    		    
+
         		foreach($siteDomains as $site) {
         		    
         		    //$siteData = $tableSiteDomains->getEntryByField('sdom_env', $site['environment']);
@@ -54,7 +56,11 @@ class MelisCmsNewSiteDomainListener extends MelisCoreGeneralListener implements 
         		           'sdom_site_id' => $defaultSiteID,
         		            'sdom_env' => $site['environment'],
         		            'sdom_scheme' => $scheme,
-        		            'sdom_domain' => $site['domain']
+        		            'sdom_domain' => $site['domain'],
+                            'app_interface_conf' => [
+                                'error_reporting' => $site['error_reporting'],
+                                'display_error'   => $site['display_error'] == 'on' ? 1 : 0
+                            ]
         		        );
         		    }
         		    else {
@@ -63,7 +69,11 @@ class MelisCmsNewSiteDomainListener extends MelisCoreGeneralListener implements 
         		           'sdom_site_id' => $defaultSiteID,
         		            'sdom_env' => $site['environment'],
         		            'sdom_scheme' => $scheme,
-        		            'sdom_domain' => $site['domain']
+        		            'sdom_domain' => $site['domain'],
+                            'app_interface_conf' => [
+                                'error_reporting' => $site['error_reporting'],
+                                'display_error'   => $site['display_error'] == 'on' ? 1 : 0
+                            ]
         		        );
         		    }
         		}

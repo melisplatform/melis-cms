@@ -685,7 +685,7 @@ class SiteController extends AbstractActionController
             $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
             $domainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
             $site404Table = $this->getServiceLocator()->get('MelisEngineTableSite404');
-            $siteID = $request->getPost('id');
+            $siteID = (int) $request->getPost('id');
         
             // make sure our ID is not empty
             if(!empty($siteID))

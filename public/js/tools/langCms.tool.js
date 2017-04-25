@@ -97,10 +97,7 @@ $(document).ready(function() {
 		});
 	});
 	addEvent("#btnLangCmsDelete", function() {
-		//alert('test');
-		var tdParent = $(this).parent();
-		var trParent = $(tdParent).parent();
-		var getId = trParent.attr('id');
+		var getId = $(this).parents("tr").attr("id");
 		
 		melisCoreTool.confirm(
 			translations.tr_meliscore_common_yes, 

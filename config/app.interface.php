@@ -1172,6 +1172,7 @@ return array(
 	            'id' => 'id_meliscms_find_page_modal',
 	            'name' => 'tr_meliscms_find_page_modal',
 	            'melisKey' => 'meliscms_find_page_modal',
+	            'rightsDisplay' => 'none',
 	        ),
 	        'forward' => array(
 	            'module' => 'MelisCms',

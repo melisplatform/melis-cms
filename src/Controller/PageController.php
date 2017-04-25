@@ -1165,7 +1165,7 @@ class PageController extends AbstractActionController
     				$tablePageSaved->deleteById($idPage);
     					
     				$tablePageLang = $this->getServiceLocator()->get('MelisEngineTablePageLang');
-    				$tablePageLang->deleteById('plang_page_id', $idPage);
+    				$tablePageLang->deleteByField('plang_page_id', $idPage);
     					
     					
     				// updating pages order after deleting
