@@ -123,7 +123,10 @@ class Module
                 'forms',
             );
             
-            $translationList = include 'module/MelisModuleConfig/config/translation.list.php';
+        $translationList = array();
+            if(file_exists($_SERVER['DOCUMENT_ROOT'].'/../module/MelisModuleConfig/config/translation.list.php')){
+                $translationList = include 'module/MelisModuleConfig/config/translation.list.php';
+            }
             
             foreach($translationType as $type){
             
