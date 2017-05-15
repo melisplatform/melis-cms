@@ -132,8 +132,8 @@
 	    
 	    // Site Tool
 	    'tr_meliscms_tool_site' => 'Sites',
-	    'tr_meliscms_tool_site_col_site_id' => 'Site ID',
-	    'tr_meliscms_tool_site_col_site_name' => 'Site name',
+	    'tr_meliscms_tool_site_col_site_id' => 'ID',
+	    'tr_meliscms_tool_site_col_site_name' => 'Name',
 	    'tr_meliscms_tool_site_col_site_scheme' => 'Site scheme',
 	    'tr_meliscms_tool_site_col_site_domain' => 'Site domain', 
 	    'tr_meliscms_tool_site_col_site_env' => 'Site environment',
@@ -234,7 +234,7 @@
 	    'tr_meliscms_dashboard_pages_indicators_unpublished' => 'Unpublished',
 	    
 	    //DataTables Translations
-	    'tr_meliscms_dt_sEmptyTable' => 'No data available in table',
+	    'tr_meliscms_dt_sEmptyTable' => 'No data available in the table',
 	    'tr_meliscms_dt_sInfo' => 'Showing _START_ to _END_ of _TOTAL_ entries',
 	    'tr_meliscms_dt_sInfoEmpty' => 'Showing 0 to 0 of 0 entries',
 	    'tr_meliscms_dt_sInfoFiltered' => ' ',
@@ -259,7 +259,7 @@
 	    'tr_meliscms_tool_platform_ids_header' => 'Header',
 	    'tr_meliscms_tool_platform_ids_content' => 'Content',
 	    'tr_meliscms_tool_platform_pids_id' => 'ID',
-	    'tr_meliscms_tool_platform_pids_name' => 'Platform name',
+	    'tr_meliscms_tool_platform_pids_name' => 'Name',
 	    'tr_meliscms_tool_platform_pids_page_id_start' => 'Page ID start',
 	    'tr_meliscms_tool_platform_pids_page_id_current' => 'Page ID current',
 	    'tr_meliscms_tool_platform_pids_page_id_end' => 'Page ID end',

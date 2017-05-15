@@ -8,7 +8,6 @@ $(document).ready(function() {
 		$("#formsiteadd #idformsite #id_site_id").hide();
 		$("#formsiteadd form#idformsite select#id_select_env").hide();
 		$('label[for="id_site_id"]').hide();
-		$('label[for="id_sdom_env"]').hide();
 	});
 	
 	// Add Event to "Edit Site" button

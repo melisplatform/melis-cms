@@ -111,7 +111,7 @@
 	    'tr_meliscms_tool_site_update_site' => 'Update site',
 	    
 	    'tr_meliscms_tool_site_id' => 'Site ID',
-	    'tr_meliscms_tool_site_site_name' => 'Site name: ',
+	    'tr_meliscms_tool_site_site_name' => 'Name: ',
 	    'tr_meliscms_tool_site_page_id' => 'Home page ID: ',
 	    'tr_meliscms_tool_site_site_id' => 'Domain site ID: ',
 	    'tr_meliscms_tool_site_enviroment' => 'Platform: ',

@@ -256,7 +256,7 @@
 	    'tr_meliscms_tool_platform_ids_header' => 'Header',
 	    'tr_meliscms_tool_platform_ids_content' => 'Contenu',
 	    'tr_meliscms_tool_platform_pids_id' => 'ID',
-	    'tr_meliscms_tool_platform_pids_name' => 'Plateforme nom',
+	    'tr_meliscms_tool_platform_pids_name' => 'Nom',
 	    'tr_meliscms_tool_platform_pids_page_id_start' => 'Page ID début',
 	    'tr_meliscms_tool_platform_pids_page_id_current' => 'Page ID actuel',
 	    'tr_meliscms_tool_platform_pids_page_id_end' => 'Page ID fin',
