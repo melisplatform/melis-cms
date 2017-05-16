@@ -146,12 +146,5 @@ class MelisCmsControllerTest extends AbstractHttpControllerTestCase
         $this->assertEquals("equalvalue", "equalvalue");
     }
 
-    public function testBasicMelisCmsTestError()
-    {
-        $this->assertEquals("supposed-to", "display-an-error");
-    }
-
-
-
 }
 
