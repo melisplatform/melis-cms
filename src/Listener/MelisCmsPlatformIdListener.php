@@ -34,15 +34,31 @@ class MelisCmsPlatformIdListener extends MelisCoreGeneralListener implements Lis
         		$id      = (int) $params['id'];
         		
         		if($success == 1) {
-        		    $platformIdTable->save(array(
+        		    
+        		    $data = $platformIdTable->getLastPlatformRange()->current();
+        		    
+        		    $pageMaxEnd = !empty($data->pids_page_id_end_max)? $data->pids_page_id_end_max : 0;
+        		    $tplMaxEnd = !empty($data->pids_tpl_id_end_max)? $data->pids_tpl_id_end_max : 0;
+        		    
+        		    // computes the starting range based on the max page ids
+        		    $pageIdRangeStart = ceil($pageMaxEnd / 1000) * 1000;
+        		    $pageIdRangeEnd = ceil(($pageIdRangeStart + 1) / 1000) * 1000;
+        		    
+        		    //computes the starting range based onthe max tpl ids
+        		    $tplIdRangeStart = ceil($tplMaxEnd / 1000) * 1000;
+        		    $tplIdRangeEnd = ceil(($tplIdRangeStart + 1) / 1000) * 1000;
+        		    
+        		    $platformIdData = array(
         		        'pids_id' => $id,
-//         		        'pids_page_id_start' => 0,
-//         		        'pids_page_id_current' => 0,
-//         		        'pids_page_id_end' => 0,
-//         		        'pids_tpl_id_start' => 0,
-//         		        'pids_tpl_id_current' => 0,
-//         		        'pids_tpl_id_end' => 0
-        		    ));
+        		        'pids_page_id_start' => $pageIdRangeStart +1,
+        		        'pids_page_id_current' => $pageIdRangeStart +1,
+        		        'pids_page_id_end' => $pageIdRangeEnd,
+        		        'pids_tpl_id_start' => $tplIdRangeStart +1,
+        		        'pids_tpl_id_current' => $tplIdRangeStart +1,
+        		        'pids_tpl_id_end' => $tplIdRangeEnd,
+        		    );
+        		    
+        		    $platformIdTable->save($platformIdData);
         		}
         		
 

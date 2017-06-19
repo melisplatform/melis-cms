@@ -118,6 +118,27 @@ class ToolTemplateController extends AbstractActionController
     {
         return new ViewModel();
     }
+
+    /**
+     * Renders to the site filter selection in the filter bar in the datatable
+     * @return \Zend\View\Model\ViewModel
+     */
+    public function renderToolTemplateContentFiltersSitesAction()
+    {
+        $translator = $this->getServiceLocator()->get('translator');
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        
+        $sites = array();
+        $sites[] = '<option value="">'. $translator->translate('tr_meliscms_tool_templates_tpl_label_choose') .'</option>';
+       
+       foreach($siteTable->fetchAll() as $site){
+           $sites[] = '<option value="'.$site->site_id.'">'. $site->site_name .'</option>';
+       }
+       
+       $view = new ViewModel();
+       $view->sites = $sites;
+       return $view;
+    }
     
     /**
      * Renders to the search input in the filter bar in the datatable
@@ -345,7 +366,7 @@ class ToolTemplateController extends AbstractActionController
         
         // get the service for Templates Model & Table
         $templatesModel = $this->getServiceLocator()->get('MelisEngineTableTemplate');
-        
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
         // declare the Tool service that we will be using to completely create our tool.
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         
@@ -385,6 +406,9 @@ class ToolTemplateController extends AbstractActionController
                     $site = $data['tpl_site_id'];
                     $data['tpl_creation_date'] = date('Y-m-d H:i:s');
                     $data['tpl_last_user_id'] = $userAuthDatas->usr_id;
+                    
+                    $siteData = $siteTable->getEntryById($site)->current();
+                    $data['tpl_zf2_website_folder'] = !empty($siteData->site_name)? $siteData->site_name : '';
                     
                     if($data['tpl_type'] == 'PHP') {
                         $phpPath = $data['tpl_php_path'];
@@ -586,7 +610,13 @@ class ToolTemplateController extends AbstractActionController
         
         // make sure that the request is an AJAX call
         if($this->getRequest()->isPost()) {
-
+            $optionFilter = array();
+            
+            if(!empty($this->getRequest()->getPost('tpl_site_id'))){
+                $optionFilter['tpl_site_id'] = $this->getRequest()->getPost('tpl_site_id');
+            }
+            
+            
             // get the tool columns
             $columns = $melisTool->getColumns();
             
@@ -608,7 +638,7 @@ class ToolTemplateController extends AbstractActionController
             
             $dataCount = $templatesModel->getTotalData();
             
-            $getData = $templatesModel->getPagedData(array(
+            $dataQuery = array(
                 'where' => array(
                     'key' => 'tpl_id',
                     'value' => $search,
@@ -621,9 +651,12 @@ class ToolTemplateController extends AbstractActionController
                 'limit' => $length,
                 'columns' => $melisTool->getSearchableColumns(),
                 'date_filter' => array(),
-            ));
+            );
+            
+            $getData = $templatesModel->getPagedData($dataQuery, null, $optionFilter);
 
             $tableData = $getData->toArray();
+            
             for($ctr = 0; $ctr < count($tableData); $ctr++)
             {
                 // apply text limits
@@ -643,7 +676,7 @@ class ToolTemplateController extends AbstractActionController
 
             }
         }
-    
+        
         return new JsonModel(array(
             'draw' => (int) $draw,
             'recordsTotal' => $dataCount,
@@ -676,7 +709,7 @@ class ToolTemplateController extends AbstractActionController
         
         // get the service for Templates Model & Table
         $templatesModel = $this->getServiceLocator()->get('MelisEngineTableTemplate');
-        
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
         // declare the Tool service that we will be using to completely create our tool.
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         
@@ -705,6 +738,9 @@ class ToolTemplateController extends AbstractActionController
                 $data['tpl_creation_date'] = date('Y-m-d H:i:s');
                 $data['tpl_last_user_id'] = $userAuthDatas->usr_id;
                 $site = $data['tpl_site_id'];
+                
+                $siteData = $siteTable->getEntryById($site)->current();
+                $data['tpl_zf2_website_folder'] = !empty($siteData->site_name)? $siteData->site_name : '';
                 
                 if($data['tpl_type'] == 'PHP') {
                     $phpPath = $data['tpl_php_path'];

@@ -100,9 +100,13 @@
 	    
 	    // tool Template Manager
 	    'tr_meliscms_tool_templates' => 'Template manager', 
+	    'tr_meliscms_tool_templates_text_info' => 'Manage here the templates associated to each site and declare the physical files representing them.', 
 	    
 	    'tr_meliscms_tool_templates_tpl_id' => 'ID',
 	    'tr_meliscms_tool_templates_tpl_site_id' => 'Site',
+	    'tr_meliscms_tool_templates_tpl_site_id tooltip' => 'Site of the template',
+	    'tr_meliscms_tool_templates_tpl_site site' => 'Site',
+	    'tr_meliscms_tool_templates_tpl_site_text' => 'Manage here the sites of the platform as well as their associated domains, home page and 404 page',
 	    'tr_meliscms_tool_templates_tpl_name' => 'Name',
 	    'tr_meliscms_tool_templates_tpl_type' => 'Type',
 	    'tr_meliscms_tool_templates_tpl_zf2_website_folder' => 'Web folder',
@@ -112,6 +116,7 @@
 	    'tr_meliscms_tool_templates_tpl_php_path' => 'Path',
 	    'tr_meliscms_tool_templates_tpl_creation_date' => 'Creation date',
 	    'tr_meliscms_tool_templates_tpl_last_user_id' => 'User ID',
+	    'tr_meliscms_tool_templates_tpl_label_choose' => 'Choose',
 	    
 	    'tr_tool_templates_modal_tab_header' => 'Template manager',
 	    'tr_tool_templates_modal_tab_text_add' => 'Add new template',
@@ -155,12 +160,14 @@
 	    'tr_meliscms_tool_site_delete_confirm' => 'Are you sure you want to delete this site?',
 	    
 	    'tr_meliscms_tool_site_env_delete_confirm_title' => 'Delete site environment',
+	    'tr_meliscms_tool_site_delete_env title' => 'Delete the domain of this platform',
 	    'tr_meliscms_tool_site_env_delete_confirm' => 'Are you sure you want to delete this environment?',
 	    
 	    'tr_meliscms_tool_site_delete_env' => 'Delete site environment',
+	    'tr_meliscms_tool_site_info' => 'Declare or edit here a site managed on Melis Platform.<br>At the creation of a new site, a home page is automatically created as well as the module of the site (filesystem and first template).',
+	    'tr_meliscms_tool_site_info2' => 'The section below allows to enter a domain for the site on each environment <br>(ex: development / production)',
+	    'tr_meliscms_tool_template_info' => 'Declare or edit here a template for an existing site on Melis Platform.<br>Each template can be linked to only one site and must be associated to a layout and to a controller/action displaying the main content.',
 	    
-
-
 	    // standard words that is normally used on this application
 	    'tr_meliscms_action' => 'Action',
 	    'tr_tool_no_access' => 'You don\'t have enough permission to access this tool.',
@@ -243,7 +250,7 @@
 	    'tr_meliscms_dt_sLengthMenu' => 'Show _MENU_ entries',
 	    'tr_meliscms_dt_sLoadingRecords' => 'Loading...',
 	    'tr_meliscms_dt_sProcessing' => 'Processing...',
-	    'tr_meliscms_dt_sSearch' => 'Search:',
+	    'tr_meliscms_dt_sSearch' => 'Search',
 	    'tr_meliscms_dt_sZeroRecords' => 'No matching records found',
 	    'tr_meliscms_dt_sFirst' => 'First',
 	    'tr_meliscms_dt_sLast' => 'Last',
@@ -256,21 +263,31 @@
 	    
 	    // Platform ID Tool
 	    'tr_meliscms_tool_platform_ids' => 'Platforms IDs',
+	    'tr_meliscms_tool_platform_ids info' => 'Melis Platform allows to declare ranges of identifiers for each declared platform. <br>This tool allows to each platform to have its own identifiers (pages and templates) and to ensure unicity of those identifiers on each platform, like for example when releasing to production. Each platform must have its own range of identifiers.',
 	    'tr_meliscms_tool_platform_ids_header' => 'Header',
 	    'tr_meliscms_tool_platform_ids_content' => 'Content',
 	    'tr_meliscms_tool_platform_pids_id' => 'ID',
+	    'tr_meliscms_tool_platform_pids_id tooltip' => 'Identifier of the range of identifiers',
 	    'tr_meliscms_tool_platform_pids_name' => 'Name',
+	    'tr_meliscms_tool_platform_pids_name tooltip' => 'Name of the corresponding platform. (The platform must be created first from the Platforms tool)',
 	    'tr_meliscms_tool_platform_pids_page_id_start' => 'Page ID start',
+	    'tr_meliscms_tool_platform_pids_page_id_start tooltip' => 'The pages identifiers start from this identifier for the selected platform',
 	    'tr_meliscms_tool_platform_pids_page_id_current' => 'Page ID current',
+	    'tr_meliscms_tool_platform_pids_page_id_current tooltip' => 'The next page created on the selected platform will have this identifier',
 	    'tr_meliscms_tool_platform_pids_page_id_end' => 'Page ID end',
+	    'tr_meliscms_tool_platform_pids_page_id_end tooltip' => 'The pages identifiers end at this identifier for the selected platform',
 	    'tr_meliscms_tool_platform_pids_tpl_id_start' => 'Template ID start',
+	    'tr_meliscms_tool_platform_pids_tpl_id_start tooltip' => 'The templates identifiers start from this identifier for the selected platform',
 	    'tr_meliscms_tool_platform_pids_tpl_id_current' => 'Template ID current',
+	    'tr_meliscms_tool_platform_pids_tpl_id_current tooltip' => 'The next template created on the selected platform will have this identifier',
 	    'tr_meliscms_tool_platform_pids_tpl_id_end' => 'Template ID end',
+	    'tr_meliscms_tool_platform_pids_tpl_id_end tooltip' => 'The pages identifiers end at this identifier for the selected platform',
 	    'tr_meliscms_tool_platform_ids_btn_add' => 'Add a range of ID\'s',
 	    'tr_meliscms_tool_platform_ids_btn_edit' => 'Update a range of ID\'s',
 	    'tr_meliscms_tool_platform_pids_name_empty' => 'Choose platform',
 	    'tr_meliscms_tool_platform_ids_table' => 'Table',
 	    'tr_meliscms_tool_platform_ids_modal_content' => 'Add and update modal',
+	    'tr_meliscms_tool_platform_modal_info' => 'Declare here the range of identifiers of a specific platform',
 	    
 	    //Platform Success messages
 	    'tr_meliscms_tool_platform_add_success' => 'New platform IDs added successfully',
@@ -304,6 +321,7 @@
 	    
 	    // Site Redirect Tool
 	    'tr_meliscms_tool_site_301' => 'Site redirect',
+	    'tr_meliscms_tool_site_301 info' => 'Declare here redirections towards specific pages for specific URL. <br>This fonctionality can be used for example in the case of a site migration in order to link old URL to the new ones.',
 	    
 	    // interface name
 	    'tr_meliscms_tool_site_301_header' => 'Header',
@@ -316,8 +334,17 @@
 	    
 	    // Table Columns
 	    'tr_meliscms_tool_site_301_s301_id' => 'ID',
+	    'tr_meliscms_tool_site_301_s301_modal_info' => 'Declare here a redirection to a specific site (a domain)',
+	    'tr_meliscms_tool_site_301_s301_site' => 'Site',
+	    'tr_meliscms_tool_site_301_s301_site tooltip' => 'Site/domain on which the URL will be verified',
 	    'tr_meliscms_tool_site_301_s301_old_url' => 'Old url',
+	    'tr_meliscms_tool_site_301_s301_old_url holder' => '/myoldurl',
+	    'tr_meliscms_tool_site_301_s301_old_url tooltip' => 'Old URL under the format /myoldurl',
 	    'tr_meliscms_tool_site_301_s301_new_url' => 'New url',
+	    'tr_meliscms_tool_site_301_s301_old_url_site_error' => 'The old URL exist already for this site',
+	    'tr_meliscms_tool_site_301_s301_new_url holder' => 'http://www.mysite.com or /mynewsite/id/300',
+	    'tr_meliscms_tool_site_301_s301_new_url tooltip' => 'New URL under the format http://www.mysite.com or /mynewsite/id/300',
+
 	    'tr_meliscms_tool_site_301_test_action' => 'Test',
 	    'tr_meliscms_tool_site_301_edit_action' => 'Edit',
 	    'tr_meliscms_tool_site_301_delete_action' => 'Delete',
@@ -331,8 +358,9 @@
 	    'meliscms_tool_site_301_unable_to_delete' => 'Unable to delete site redirect',
 	    'meliscms_tool_site_301_value_too_long_255' => 'The value too long, it should be less than 255 characters',
 	    'meliscms_tool_site_301_value_empty' => 'The input is required and can\'t be empty',
-	    'meliscms_tool_site_301_old_url_exist' => 'The old url is already exist',
+	    'meliscms_tool_site_301_old_url_exist' => 'The old URL exist already for this site',
 	    'meliscms_tool_site_301_delete_confirm_msg' => 'Are you sure you want to delete this site redirect?',
+	    'tr_meliscms_tool_site_301_s301_new_url_mismatch' => 'The new url domain does not match the site domain',
 	    
 	    // Tool Sitetree view modal
 	    'tr_meliscms_form_btn_select' => 'Insert',

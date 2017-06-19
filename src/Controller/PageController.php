@@ -212,11 +212,19 @@ class PageController extends AbstractActionController
     {
 		$idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
     	$melisKey = $this->params()->fromRoute('melisKey', '');
+    	$page_tpl_id = null;
+    	
+    	$melisPage = $this->serviceLocator->get('MelisEnginePage');
+    	if(!empty($idPage)){
+    	    $datasPage = $melisPage->getDatasPage($idPage, 'saved');
+    	    $datasPageTree = $datasPage->getMelisPageTree();
+    	    $page_tpl_id = $datasPageTree->page_tpl_id;
+    	}
     	
     	$view = new ViewModel();
     	$view->idPage = $idPage;
     	$view->melisKey = $melisKey;
-    	
+    	$view->page_tpl_id = $page_tpl_id;
     	return $view;
     }
     

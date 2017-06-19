@@ -75,7 +75,7 @@ class Module
                     $eventManager->attach(new MelisCmsToolUserUpdateUserListener());
                     $eventManager->attach(new MelisCmsFlashMessengerListener());
             //         $eventManager->attach(new MelisCmsSiteDomainDeleteListener());
-            //         $eventManager->attach(new MelisCmsPlatformIdListener());
+                    $eventManager->attach(new MelisCmsPlatformIdListener());
                     $eventManager->attach(new MelisCmsNewSiteDomainListener());
                     $eventManager->attach(new MelisCmsDeleteSiteDomainListener());
                     $eventManager->attach(new MelisCmsInstallerLastProcessListener());

@@ -86,6 +86,11 @@ $(function(){
 			alert( translations.tr_meliscore_error_message );
 		}
 	});
+	
+	$body.on("change", "#redirectSiteSelect", function(){
+		var tableId = $(this).parents().eq(6).find('table').attr('id');
+		$("#"+tableId).DataTable().ajax.reload();
+	});
 });
 
 // Site Redirect mdoal form
@@ -94,4 +99,11 @@ window.createSite301Modal = function(s301Id = 0){
 	melisKey = 'meliscms_tool_site_301_generic_form';
 	modalUrl = '/melis/MelisCms/SiteRedirect/renderToolSiteRedirectModal';
 	melisHelper.createModal(zoneId, melisKey, false, {s301Id: s301Id}, modalUrl);
+}
+
+window.initRedirectTemplateList = function(data, tblSettings){
+	if($('#redirectSiteSelect').length){
+		data.s301_site_id = $('#redirectSiteSelect').val();
+	}
+		
 }

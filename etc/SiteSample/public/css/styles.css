@@ -1,0 +1,20 @@
+
+html{
+	margin: auto;
+	width: 1000px;
+}
+
+#leftmenu{
+	float: left;	
+	height: 300px;
+	width: 200px;
+}
+
+#footer{
+	clear: both;
+}
+
+a{
+	text-decoration: none;
+	color: black;
+}

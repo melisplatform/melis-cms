@@ -65,8 +65,8 @@ var melisCms = (function(){
 				$(".mce-floatpanel.mce-window").css("top", dialogTop);
 				$("html, body").animate({scrollTop: dialogTop }, 300);
 			}else{
-				$("#mce-modal-block").css('z-index',500);
-				$(".mce-floatpanel.mce-window").css('z-index', 501);
+				$("#mce-modal-block").css('z-index',1049);
+				$(".mce-floatpanel.mce-window").css('z-index', 1050);
 			}
 		}
 		else{
@@ -373,15 +373,18 @@ var melisCms = (function(){
 		}		
 	}
 
-    function disableCmsButtons()
+    function disableCmsButtons(id)
     {
         $("div.make-switch label on, off").parent().css("z-index", -1).parents("div.make-switch").css("opacity", 0.5);
-        $("div[data-melisKey='meliscms_page_actions']").find("a").attr("disabled", "disabled");
+        $("#"+id+"_id_meliscms_page_action_tabs").addClass('relative').prepend("<li class='btn-disabled'></li>");
     }
 
     function enableCmsbuttons()
     {
-        $("div[data-melisKey='meliscms_page_actions']").find("a").removeAttr("disabled");
+        $("#"+id+"_id_meliscms_page_action_tabs").removeClass('relative');
+        $("#"+id+"_id_meliscms_page_action_tabs li.btn-disabled").remove();
+
+
         $("div.make-switch label on, off").parent().css("z-index", 1).parents("div.make-switch").css("opacity", 1);
     }
 	

@@ -155,8 +155,15 @@
         modalUrl = 'melis/MelisCms/Page/renderPageModal';
 
         // requesitng to create modal and display after
+        if($('#id_meliscms_find_page_tree_container').length){
+        	$('#id_meliscms_find_page_tree_container').parent().remove();
+        }
+        
         window.parent.melisHelper.createModal(zoneId, melisKey, false, {}, modalUrl, function() {
         });
+        
+        $("#mce-link-tree").closest('.mce-panel').css('z-index', 1049);
+        $("#mce-modal-block").css('z-index', 1048);
     }
 
     function selectedNodes() {

@@ -375,7 +375,20 @@ return array(
                                         'jsdatas' => array()
                                     ),
                                     'interface' => array(
-                                    
+                                        'meliscms_tool_site_new_site_confirmation_modal' => array(
+                                            'conf' => array(
+                                                'id' => 'id_meliscms_tool_site_new_site_confirmation_modal',
+                                                'name' => 'tr_meliscms_tool_site_new_site_confirmation_modal',
+                                                'melisKey' => 'meliscms_tool_site_new_site_confirmation_modal',
+                                            ),
+                                            'forward' => array(
+                                                'module' => 'MelisCms',
+                                                'controller' => 'Site',
+                                                'action' => 'render-tool-site-new-site-confirmation-modal',
+                                                'jscallback' => '',
+                                                'jsdatas' => array()
+                                            ),
+                                        )
                                     ),
                                 ), // end contents
                                 'meliscms_tool_site_modals' => array(

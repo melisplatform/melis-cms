@@ -62,12 +62,13 @@
     function disableCmsButtons()
     {
         window.parent.$("div.make-switch label on, off").parent().css("z-index", -1).parents("div.make-switch").css("opacity", 0.5);
-        window.parent.$("div[data-melisKey='meliscms_page_actions']").find("a").attr("disabled", "disabled");
+        window.parent.$("div[data-melisKey='meliscms_page_actions']").find("a").attr("disabled", "disabled").click(false);
     }
 
     function enableCmsbuttons()
     {
-        window.parent.$("div[data-melisKey='meliscms_page_actions']").find("a").removeAttr("disabled");
+        window.parent.$("#<?php echo $this->idPage; ?>_id_meliscms_page_action_tabs").removeClass('relative');
+        window.parent.$("#<?php echo $this->idPage; ?>_id_meliscms_page_action_tabs li.btn-disabled").remove();
         window.parent.$("div.make-switch label on, off").parent().css("z-index", 1).parents("div.make-switch").css("opacity", 1);
     }
 

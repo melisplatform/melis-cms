@@ -124,6 +124,7 @@ class SiteRedirectController extends AbstractActionController
     public function getSiteRedirectAction()
     {
         $site301Table = $this->getServiceLocator()->get('MelisEngineTableSite301');
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
         $translator = $this->getServiceLocator()->get('translator');
         // Getting the Site Redirect Table configuration from Tool config
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
@@ -136,6 +137,13 @@ class SiteRedirectController extends AbstractActionController
         
         if($this->getRequest()->isPost())
         {
+            
+            $optionFilter = array();
+            
+            if(!empty($this->getRequest()->getPost('s301_site_id'))){
+                $optionFilter['s301_site_id'] = $this->getRequest()->getPost('s301_site_id');
+            }
+            
             $colId = array_keys($melisTool->getColumns());
         
             $sortOrder = $this->getRequest()->getPost('order');
@@ -154,7 +162,7 @@ class SiteRedirectController extends AbstractActionController
         
             $dataCount = $site301Table->getTotalData();
         
-            $getData = $site301Table->getPagedData(array(
+            $dataQuery = array(
                 'where' => array(
                     'key' => 's301_id',
                     'value' => $search,
@@ -167,12 +175,21 @@ class SiteRedirectController extends AbstractActionController
                 'limit' => $length,
                 'columns' => $melisTool->getSearchableColumns(),
                 'date_filter' => array()
-            ));
+            );
+            
+            $getData = $site301Table->getPagedData($dataQuery, null, $optionFilter);
         
             $tableData = $getData->toArray();
             
             foreach ($tableData As $key => $val)
             {
+                
+                if(array_key_exists('s301_site_id', $val)){
+                    
+                    $site = $siteTable->getEntryById($val['s301_site_id'])->current();
+                    $tableData[$key]['s301_site_id'] = !empty($site->site_name)? $site->site_name : '';
+                }
+                
                 $tableData[$key]['DT_RowId'] = $val['s301_id'];
             }
         }
@@ -216,6 +233,28 @@ class SiteRedirectController extends AbstractActionController
     {
         $view = new ViewModel();
         return $view;
+    }
+    
+    /**
+     * Render site dropdown filter
+     * 
+     * @return \Zend\View\Model\ViewModel
+     */
+    public function renderToolSiteRedirectFiltersSitesAction()
+    {
+        $translator = $this->getServiceLocator()->get('translator');
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        
+        $sites = array();
+        $sites[] = '<option value="">'. $translator->translate('tr_meliscms_tool_templates_tpl_label_choose') .'</option>';
+       
+       foreach($siteTable->fetchAll() as $site){
+           $sites[] = '<option value="'.$site->site_id.'">'. $site->site_name .'</option>';
+       }
+       
+       $view = new ViewModel();
+       $view->sites = $sites;
+       return $view;
     }
     
     /**
@@ -327,6 +366,8 @@ class SiteRedirectController extends AbstractActionController
         $textMessage = '';
         $errors  = array();
 
+        $siteDomainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
+        
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         if($request->isPost()) {
              
@@ -369,20 +410,23 @@ class SiteRedirectController extends AbstractActionController
                         $textTitle = 'tr_meliscms_tool_site_301_edit_site_redirect';
                         $textMessage = 'meliscms_tool_site_301_edit_success';
                     }
-                    else 
-                    {
-                        // Checking if the Old Url is existing on database
-                        $s301Data = $site301Table->getEntryByField('s301_old_url', $data['s301_old_url'])->current();
-                        if (!empty($s301Data))
+                    
+                    // Checking if the Old Url is existing on database
+                    $s301Data = $site301Table->getEntryByField('s301_old_url', $data['s301_old_url']);
+                    
+                    foreach($s301Data as $s301){
+                    
+                        if ($s301->s301_site_id == $data['s301_site_id'] && $data['s301_id'] != $s301->s301_id)
                         {
                             $textMessage = 'meliscms_tool_site_301_unable_to_add';
-                            
+                    
                             $errors['s301_old_url'] = array(
                                 'label' => $translator->translate('tr_meliscms_tool_site_301_s301_old_url'),
                                 'isExist' => $translator->translate('meliscms_tool_site_301_old_url_exist')
                             );
                         }
                     }
+                    
                     
                     if (empty($errors))
                     {

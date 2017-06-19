@@ -1,18 +1,20 @@
 <div id="siteaddalert"></div>
-
-<div id="formsiteadd">
+<p class="modal-text-info" style="margin-bottom: 0px;"><?= $this->translate('tr_meliscms_tool_site_info') ?></p>
 <?php 
-$form = $this->meliscms_site_tool_generic_form;
-echo $this->form()->openTag($form);
-echo $this->melisFieldCollection($form);
-echo $this->form()->closeTag();
-
-echo $this->melisModalInvoker()->render(
-    array(
-        'text' => '<i class="fa fa-times"></i> '.$this->translate('tr_meliscms_common_close'),
-        'class' => 'btn btn-danger pull-left'
+    $form = $this->meliscms_site_tool_creation_form;
+    echo $this->form()->openTag($form);
+    echo $this->melisFieldCollection($form);
+    echo $this->form()->closeTag();
+    
+    echo $this->melisModalInvoker()->render(array(
+            'text' => '<i class="fa fa-times"></i> '.$this->translate('tr_meliscms_common_close'),
+            'class' => 'btn btn-danger pull-left'
     ), 'dismiss');
 ?>
-
 <a class="btn btn-success pull-right" id="btnSiteAdd"><i class="fa fa-save"></i>  <?= $this->translate('tr_meliscms_template_save'); ?></a>
-</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var message = '<div class=\"pdc-content border-bottom modal-form-text-fix\"></div><div class=\"pdc-content modal-form-text-fix\" style=\"padding-top : 5px;\"><p class=\"modal-text-info\">' + '<?= $this->translate('tr_meliscms_tool_site_info2') ?>' + '</p></div>';
+    	$('#siteCreationForm fieldset div:nth-child(2)').closest('div').append(message);
+	});
+</script>

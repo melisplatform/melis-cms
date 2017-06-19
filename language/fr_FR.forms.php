@@ -21,6 +21,7 @@
 		'tr_meliscms_page_tab_properties_form_showmenu_No link' => 'Texte sans lien',
 		'tr_meliscms_page_tab_properties_form_showmenu_None' => 'Aucun',
 		'tr_meliscms_page_tab_properties_form_Language' => 'Langue',
+		'tr_meliscms_page_tab_properties_form_Language tooltip' => 'Langage des pages',
 		'tr_meliscms_page_tab_properties_form_Template' => 'Template',
 		'tr_meliscms_page_tab_properties_form_Template_None' => 'Aucun',
 		'tr_meliscms_page_tab_properties_form_Meta Title' => 'Méta titre',
@@ -37,8 +38,10 @@
 		'tr_meliscms_page_tab_seo_form_Meta Title' => 'Méta titre',
 		'tr_meliscms_page_tab_seo_form_Meta Description' => 'Méta description',
 		'tr_meliscms_page_tab_seo_form_Url' => 'URL',
-		'tr_meliscms_page_tab_seo_form_Url Redirect' => 'URL redirection <i class="fa fa-info-circle fa-lg" title="Pour une page interne saisir son ID ou son URL. Pour une page externe saisir l\'URL complète avec le http://"></i>',
-		'tr_meliscms_page_tab_seo_form_Url 301' => 'URL 301 <i class="fa fa-info-circle fa-lg" title="Pour une page interne saisir son ID ou son URL. Pour une page externe saisir l\'URL complète avec le http://"></i>',
+		'tr_meliscms_page_tab_seo_form_Url Redirect' => 'URL redirection',
+		'tr_meliscms_page_tab_seo_form_Url Redirect tooltip' => 'Pour une page interne saisir son ID ou son URL. Pour une page externe saisir l\'URL complète avec le http://',
+		'tr_meliscms_page_tab_seo_form_Url 301' => 'URL 301',
+		'tr_meliscms_page_tab_seo_form_Url 301 tooltip' => 'Pour une page interne saisir son ID ou son URL. Pour une page externe saisir l\'URL complète avec le http://',
 			
 			
 	    // page prompts
@@ -66,14 +69,20 @@
 		'tr_meliscms_pageseo_form_page_url_too_long'  => 'URL trop longue, elle doit être de moins de 255 caractères',
 			 
 	    // for template tool forms
-	    'tr_meliscms_template_form_tpl_id' => 'Id',
-	    'tr_meliscms_template_form_site_id' => 'Id site',
+	    'tr_meliscms_template_form_tpl_id' => 'ID',
+	    'tr_meliscms_template_form_tpl_info' => 'Déclarez ou éditez ici un template pour un site existant sur Melis Platform. <br>Chaque template ne peut être lié qu&lsquo;à un seul site et doit être associé à un layout et à un controller/action affichant le contenu principal.',
+	    'tr_meliscms_template_form_tpl_id tooltip' => 'Identifiant du template',
+	    'tr_meliscms_template_form_site_id' => 'ID site',
 	    'tr_meliscms_template_form_tpl_name' => 'Nom',
+	    'tr_meliscms_template_form_tpl_name tooltip' => 'Nom du template',
 	    'tr_meliscms_template_form_tpl_type' => 'Type',
 	    'tr_meliscms_template_form_tpl_zf2_website_folder' => 'Dossier',
 	    'tr_meliscms_template_form_tpl_zf2_layout' => 'Layout',
+	    'tr_meliscms_template_form_tpl_zf2_layout tooltip' => 'Nom du layout tel que défini dans la configuration ZF2 du module du site',
 	    'tr_meliscms_template_form_tpl_zf2_controller' => 'Controller',
+	    'tr_meliscms_template_form_tpl_zf2_controller tooltip' => 'Nom du controller (sans &quot;Controller&quot; et sans extension php)',
 	    'tr_meliscms_template_form_tpl_zf2_action' => 'Action',
+	    'tr_meliscms_template_form_tpl_zf2_action tooltip' => 'Methode du controller (sans &quot;Action&quot;)',
 	    'tr_meliscms_template_form_tpl_php_path' => 'Path',
 	    'tr_meliscms_template_save' => 'Sauvegarder',
 	    'tr_meliscms_template_add' => 'Ajouter',
@@ -115,25 +124,45 @@
         'tr_meliscms_tool_site_update_site' => 'Editer le site',
         
         'tr_meliscms_tool_site_id' => 'ID',
-        'tr_meliscms_tool_site_site_name' => 'Nom: ',
-        'tr_meliscms_tool_site_page_id' => 'ID page d\'accueil: ',
-        'tr_meliscms_tool_site_site_id' => 'ID du domaine: ',
-        'tr_meliscms_tool_site_enviroment' => 'Plateforme: ',
-        'tr_meliscms_tool_site_scheme' => 'Scheme: ',
-        'tr_meliscms_tool_site_domain' => 'Domaine: ',
-        'tr_meliscms_tool_site_404_site_id' => 'ID 404 du site: ',
-        'tr_meliscms_tool_site_404_page_id' => 'ID page 404: ',
-        'tr_meliscms_tool_site_sel_env' => 'Selectionner l\'environnement: ',
-        'tr_meliscms_tool_site_sel_env_add_new' => 'Ajouter un nouvel environnement...',
-	    'tr_meliscms_tool_site_sel_platform' => 'Selectionner un nouvel plateforme...',
+        'tr_meliscms_tool_site_id tooltip' => 'Identifiant du site',
+        'tr_meliscms_tool_site_site_name' => 'Nom',
+        'tr_meliscms_tool_site_site_name tooltip' => 'Nom du site',
+        'tr_meliscms_tool_site_page_id' => 'ID page d&#39;accueil',
+        'tr_meliscms_tool_site_page_id tooltip' => 'Identifiant de la page d&#39;accueil',
+        'tr_meliscms_tool_site_site_id' => 'ID du domaine',
+        'tr_meliscms_tool_site_enviroment' => 'Plateforme',
 
-        'tr_meliscms_tool_site_id_invalid' => 'Invalid ID',
+        'tr_meliscms_tool_site_enviroment tooltip' => 'Choix de la plateforme pour associer le domaine au site',
+        'tr_meliscms_tool_site_scheme' => 'Scheme',
+        'tr_meliscms_tool_site_scheme tooltip' => 'Protocole http ou https',
+        'tr_meliscms_tool_site_domain' => 'Domaine',
+        'tr_meliscms_tool_site_domain tooltip' => 'Domaine sur lequel le site est accessible (ex : www.monsite.com)',
+
+        'tr_meliscms_tool_site_404_site_id' => 'ID 404 du site ',
+        'tr_meliscms_tool_site_404_page_id' => 'ID page 404',
+        'tr_meliscms_tool_site_404_page_id tooltip' => 'Identifiant de la page 404',
+        'tr_meliscms_tool_site_sel_env' => 'Selectionner l\'environnement ',
+        'tr_meliscms_tool_site_sel_env_add_new' => 'Ajouter un nouvel environnement...',
+	    'tr_meliscms_tool_site_sel_platform' => 'Selectionner un nouvel plateforme... ',
+
+        'tr_meliscms_tool_site_id_invalid' => 'ID invalide',
 	    
-	    'tr_meliscms_tool_site_name_exists' => 'Site name already exists, please choose another',
+	    'tr_meliscms_tool_site_name_exists' => 'Le nom du site existe déjà, veuillez en choisir un autre',
+	    'tr_meliscms_tool_site_name_invalid' => 'Nom de site invalide, alphanumerique et underscore sont les seul caractères autorisés',
         'tr_meliscms_tool_site_site_name_error_long' => 'Nom du site trop long, nombre de caractères maximum 45',
         'tr_meliscms_tool_site_site_name_error_empty' => 'Veuillez saisir le nom du site',
 	    'tr_meliscms_tool_site_no_platform_ids' => 'Aucune ID de plateforme disponible, Veuillez ajouter la première ID de la plateforme avant d\'ajouter le site.',
-         
+	    'tr_meliscms_tool_site_directory_exist' => 'Le dossier du site existe déjà, souhaitez-vous continuer sans créer le module du site dans le dossier MelisSites',
+	    'tr_meliscms_tool_site_directory_not_writable' => 'Autorisation d\'accès refusée, veuillez configurer /module/MelisSites inscriptible',
+	    'tr_meliscms_tool_site_melissites_directory_not_exist' => 'Le dossier de destination n\'existe pas, veuillez créer le dossier /module/MelisSites',
+	    'tr_meliscms_tool_site_site_created_title' => 'a été créé avec succès',
+	    'tr_meliscms_tool_site_site_created_message' => 'Votre nouveau site a été créé avec <b>Site module</b>, <b>Pages</b> et <b>Templates</b> générés.',
+	    'tr_meliscms_tool_site_site_name' => 'Nom du site',
+	    'tr_meliscms_tool_site_site_module' => 'Module du site',
+	    'tr_meliscms_tool_site_site_layout' => 'layout du site',
+	    'tr_meliscms_tool_site_homepage' => 'Page d\'accueil',
+	    'tr_meliscms_tool_site_page_404' => 'Page 404',
+	    
         'tr_meliscms_tool_site_page_id_not_int' => 'ID de la page invalide, ce doit être un nombre',
         'tr_meliscms_tool_site_page_id_error_empty' => 'Veuillez saisir l\'ID de la page du site',
         'tr_meliscms_tool_site_page_id_error_long' => 'l\'ID de la page ne doit pas être supérieur à 11 chiffres',
@@ -149,7 +178,7 @@
          
         'tr_meliscms_tool_site_domain_error_long' => 'Valeur du domaine trop longue, nombre de caractères maximum 50',
         'tr_meliscms_tool_site_domain_error_empty' => 'Veuillez saisir le domaine',
-        'tr_meliscms_tool_site_domain_invalid' => 'Please enter a valid domain',
+        'tr_meliscms_tool_site_domain_invalid' => 'Veuillez saisir un nom de domaine valide',
          
         'tr_meliscms_tool_site_404_site_id_not_int' => 'ID 404 du site invalide, ce doit être un nombre',
         'tr_meliscms_tool_site_404_site_id_error_empty' => 'Veuillez saisir l\'ID 404 du site',
@@ -166,5 +195,4 @@
 	    
 	    'tr_meliscms_form_search' => 'Rechercher',
 	);
-	
 ?>

@@ -99,8 +99,15 @@
 		'tr_meliscms_meliscms' => 'MelisCms',
 
 	    'tr_meliscms_tool_templates' => 'Templates',
+	    'tr_meliscms_tool_templates_text_info' => 'Gérez ici les templates associés à chaque site et déclarez les fichiers physiques qui les représentent.',
+	    
 	    'tr_meliscms_tool_templates_tpl_id' => 'ID',
 	    'tr_meliscms_tool_templates_tpl_site_id' => 'Site',
+
+	    'tr_meliscms_tool_templates_tpl_site_id tooltip' => 'Choix du site associé au template',
+
+	    'tr_meliscms_tool_templates_tpl_site site' => 'Site',
+	    'tr_meliscms_tool_templates_tpl_site_text' => 'Gérez ici les sites de la plateforme ainsi que leurs domaines associés, page d\'accueil et page 404',
 	    'tr_meliscms_tool_templates_tpl_name' => 'Nom',
 	    'tr_meliscms_tool_templates_tpl_type' => 'Type',
 	    'tr_meliscms_tool_templates_tpl_zf2_website_folder' => 'Dossier',
@@ -110,6 +117,7 @@
 	    'tr_meliscms_tool_templates_tpl_php_path' => 'Path',
 	    'tr_meliscms_tool_templates_tpl_creation_date' => 'Date de création',
 	    'tr_meliscms_tool_templates_tpl_last_user_id' => 'Id User',
+	    'tr_meliscms_tool_templates_tpl_label_choose' => 'Choisir',
 	     
 	    'tr_tool_templates_modal_tab_header' => 'Gestion des templates',
 	    'tr_tool_templates_modal_tab_text_add' => 'Templates',
@@ -154,9 +162,15 @@
         'tr_meliscms_tool_site_delete_confirm' => 'Etes-vous sûr de vouloir supprimer ce site ?',
 	    
 	    'tr_meliscms_tool_site_env_delete_confirm_title' => 'Supprimer l\'environnement',
+	    'tr_meliscms_tool_site_delete_env title' => 'Supprimer le domaine de cette plateforme',
 	    'tr_meliscms_tool_site_env_delete_confirm' => 'Etes-vous sûr de vouloir supprimer cet environnement?',
 	    
 	    'tr_meliscms_tool_site_delete_env' => 'Supprimer l\'environnement',
+
+	    'tr_meliscms_tool_site_info' => "Déclarez ou éditez ici un site fonctionnant sur Melis Platform. <br>Lors de la création d&#39;un nouveau site, une page d&#39;Accueil est automatiquement créée ainsi que la structure physique du site (arborescence basique de fichiers et 1er template).",
+	    'tr_meliscms_tool_site_info2' => 'La partie ci-dessous permet de saisir le domaine du site sur chaque environnement (ex: Développement / Production)',
+	    
+	    'tr_meliscms_tool_template_info' => 'Déclarez ou éditez ici un template pour un site existant sur Melis Platform.<br>Chaque template ne peut être lié qu&lsquo;à un seul site et doit être associé à un layout et à un controller/action affichant le contenu principal.',
 	    
 	    // standard words that is normally used on this application
 	    'tr_meliscms_action' => 'Action',
@@ -240,7 +254,7 @@
 	    'tr_meliscms_dt_sLengthMenu' => 'Afficher _MENU_ &eacute;l&eacute;ments',
 	    'tr_meliscms_dt_sLoadingRecords' => 'Chargement en cours...',
 	    'tr_meliscms_dt_sProcessing' => 'Traitement en cours...',
-	    'tr_meliscms_dt_sSearch' => 'Rechercher&nbsp;:',
+	    'tr_meliscms_dt_sSearch' => 'Rechercher&nbsp;',
 	    'tr_meliscms_dt_sZeroRecords' => 'Aucun &eacute;l&eacute;ment &agrave; afficher',
 	    'tr_meliscms_dt_sFirst' => 'Premier',
 	    'tr_meliscms_dt_sLast' => 'Dernier',
@@ -253,21 +267,31 @@
 	     
 	    // Platform ID Tool
 	    'tr_meliscms_tool_platform_ids' => 'IDs plateformes',
+	    'tr_meliscms_tool_platform_ids info' => 'Melis Platform permet de créer des plages d\'identifiants pour chaque plateforme déclarée. <br>Cet outil permet à chaque plateforme d\'avoir ses propres identifiants (pages et templates) et ainsi d\'être sûr de leur unicité, comme par exemple lors d\'un passage en production. Chaque plateforme doit avoir sa propre plage d\'identifiants.',
 	    'tr_meliscms_tool_platform_ids_header' => 'Header',
 	    'tr_meliscms_tool_platform_ids_content' => 'Contenu',
 	    'tr_meliscms_tool_platform_pids_id' => 'ID',
+	    'tr_meliscms_tool_platform_pids_id tooltip' => 'Identifiant de la plage d&#39;identifiants',
 	    'tr_meliscms_tool_platform_pids_name' => 'Nom',
+	    'tr_meliscms_tool_platform_pids_name tooltip' => 'Nom de la plateforme correspondante. (La plateforme doit être créée au préalable depuis l&lsquo;outil Plateformes)',
 	    'tr_meliscms_tool_platform_pids_page_id_start' => 'Page ID début',
+	    'tr_meliscms_tool_platform_pids_page_id_start tooltip' => 'Les identifiants de pages commencent à cet identifiant pour la plateforme sélectionnée',
 	    'tr_meliscms_tool_platform_pids_page_id_current' => 'Page ID actuel',
+	    'tr_meliscms_tool_platform_pids_page_id_current tooltip' => 'La prochaine page créée sur la plateforme sélectionnée aura cet identifiant',
 	    'tr_meliscms_tool_platform_pids_page_id_end' => 'Page ID fin',
+	    'tr_meliscms_tool_platform_pids_page_id_end tooltip' => 'Les identifiants de pages se terminent à cet identifiant pour la plateforme sélectionnée',
 	    'tr_meliscms_tool_platform_pids_tpl_id_start' => 'Template ID début',
+	    'tr_meliscms_tool_platform_pids_tpl_id_start tooltip' => 'Les identifiants de templates commencent à cet identifiant pour la plateforme sélectionnée',
 	    'tr_meliscms_tool_platform_pids_tpl_id_current' => 'Template ID actuel',
+	    'tr_meliscms_tool_platform_pids_tpl_id_current tooltip' => 'Le prochain template créé sur la plateforme sélectionnée aura cet identifiant',
 	    'tr_meliscms_tool_platform_pids_tpl_id_end' => 'Template ID fin',
+	    'tr_meliscms_tool_platform_pids_tpl_id_end tooltip' => 'Les identifiants de templates se terminent à cet identifiant pour la plateforme sélectionnée',
 	    'tr_meliscms_tool_platform_ids_btn_add' => 'Ajouter une plage d\'IDs',
 	    'tr_meliscms_tool_platform_ids_btn_edit' => 'Editer une plage IDs',
 	    'tr_meliscms_tool_platform_pids_name_empty' => 'Choose platform',
 	    'tr_meliscms_tool_platform_ids_table' => 'Tableau',
 	    'tr_meliscms_tool_platform_ids_modal_content' => 'Add and update modal',
+	    'tr_meliscms_tool_platform_modal_info' => 'Déclarez ici la plage d\'identifiants d\'une plateforme spécifique',
 	    
 	    //Platform Success messages
 	    'tr_meliscms_tool_platform_add_success' => 'Nouvelle plage d\'IDs de la plateforme ajoutée avec succès',
@@ -301,6 +325,7 @@
 
 	    // Site Redirect Tool
         'tr_meliscms_tool_site_301' => 'Redirection 301',
+        'tr_meliscms_tool_site_301 info' => 'Déclarez ici des redirections vers des pages spécifiques pour des URL spécifiques. <br>Cette fonctionnalité peut être utilisée par exemple dans le cas d\'une migration de site afin de faire correspondre d\'anciennes URL vers les nouvelles.',
          
         // interface name
         'tr_meliscms_tool_site_301_header' => 'En-tête',
@@ -313,8 +338,18 @@
          
         // Table Columns
         'tr_meliscms_tool_site_301_s301_id' => 'ID',
+	    'tr_meliscms_tool_site_301_s301_modal_info' => 'Déclarez ici une redirection pour un site spécifique (donc un domaine)',
+	    'tr_meliscms_tool_site_301_s301_site' => 'Site',
+	    'tr_meliscms_tool_site_301_s301_site tooltip' => 'Site/Domaine sur lequel l&#39;url sera vérifiée',
         'tr_meliscms_tool_site_301_s301_old_url' => 'Ancienne url',
+	    'tr_meliscms_tool_site_301_s301_old_url holder' => '/monancienneurl',
+        'tr_meliscms_tool_site_301_s301_old_url tooltip' => 'Ancienne URL au format &quot;/monancienneurl&quot;',
         'tr_meliscms_tool_site_301_s301_new_url' => 'Nouvelle url',
+
+        'tr_meliscms_tool_site_301_s301_old_url_site_error' => 'L&#39;ancienne URL existe déjà pour ce site',
+	    'tr_meliscms_tool_site_301_s301_new_url holder' => 'http://www.monsite.com ou /monnouveausite/id/300',
+        'tr_meliscms_tool_site_301_s301_new_url tooltip' => 'Nouvelle URL (format externe &quot;http://www.monsite.com&quot; ou format interne &quot;/monnouveausite/id/300&quot;)',
+
 	    'tr_meliscms_tool_site_301_test_action' => 'Tester',
         'tr_meliscms_tool_site_301_edit_action' => 'Editer',
         'tr_meliscms_tool_site_301_delete_action' => 'Supprimer',
@@ -328,8 +363,9 @@
         'meliscms_tool_site_301_unable_to_delete' => 'Impossible de suprimer la redirection 301',
         'meliscms_tool_site_301_value_too_long_255' => 'Valeur trop longue, elle doit être de moins de 255 caractères',
         'meliscms_tool_site_301_value_empty' => 'Le champ est requis et ne peut être vide',
-        'meliscms_tool_site_301_old_url_exist' => 'L\'ancienne url existe déjà',
+        'meliscms_tool_site_301_old_url_exist' => 'L&#39;ancienne URL existe déjà pour ce site',
         'meliscms_tool_site_301_delete_confirm_msg' => 'Etes-vous sûr de vouloir supprimer cette redirection 301 ?',
+	    'tr_meliscms_tool_site_301_s301_new_url_mismatch' => 'The new url domain does not match the site domain',
 	    
 	    // Tool Sitetree view modal
 	    'tr_meliscms_form_btn_select' => 'Insérer',

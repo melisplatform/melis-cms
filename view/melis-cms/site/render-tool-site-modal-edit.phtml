@@ -1,18 +1,18 @@
-<div id="siteeditalert"></div><!-- 
-<p><label for="select_env">Select Environment: </label></p>
-<select name="select_env" id="id_select_env" class="form-control"></select>
-<hr/> -->
-<div id="formsiteedit">
-<span class="hidden" id="s404pid">this should be hidden</span>
+<div id="siteeditalert"></div>
+<p class="modal-text-info"><?= $this->translate('tr_meliscms_tool_site_info') ?></p>
 <?php 
-$form = $this->meliscms_site_tool_generic_form;
-echo $this->form()->openTag($form);
-echo $this->melisFieldCollection($form);
-echo $this->form()->closeTag();
+    $form = $this->meliscms_site_tool_edition_form;
+    echo $this->form()->openTag($form);
+    echo $this->melisFieldCollection($form);
+    echo $this->form()->closeTag();
 ?>
-<div class="col-sm-12"><a href="#" class="small"  id="btnDelEnv"><i class="fa fa-times"></i> <?= $this->translate('tr_meliscms_tool_site_delete_env'); ?></a></div>
-<br/><br/>
-
+<div class="col-sm-12">
+	<a href="#" class="small"  id="btnDelEnv">
+		<i class="fa fa-times"></i> <?= $this->translate('tr_meliscms_tool_site_delete_env'); ?>
+	</a>
+</div>
+<br/>
+<br/>
 <?php 
 echo $this->melisModalInvoker()->render(
     array(
@@ -21,8 +21,10 @@ echo $this->melisModalInvoker()->render(
     ), 'dismiss');
 
 ?>
-
 <a class="btn btn-success pull-right btnSiteUpdate"><i class="fa fa-save"></i>  <?= $this->translate('tr_meliscms_template_save'); ?></a>
-
-
-</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var message = '<div class=\"pdc-content border-bottom modal-form-text-fix\" style=\"padding-top: 15px;\"></div><div class=\"pdc-content modal-form-text-fix\" style=\"padding-top : 5px;\"><p class=\"modal-text-info\">' + '<?= $this->translate('tr_meliscms_tool_site_info2') ?>' + '</p></div>';
+    	$('#siteEditionForm fieldset div:nth-child(4)').closest('div').append(message);
+	});
+</script>

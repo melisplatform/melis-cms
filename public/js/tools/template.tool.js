@@ -31,6 +31,11 @@ $(document).ready(function() {
 		}
 		
 	});
+	
+	$("body").on("change", "#templatesSiteSelect", function(){
+		var tableId = $(this).parents().eq(6).find('table').attr('id');
+		$("#"+tableId).DataTable().ajax.reload();
+	});
 });
 var toolTemplate = { 
 
@@ -169,3 +174,10 @@ var toolTemplate = {
 			});
 		},
 };
+
+window.initTemplateList = function(data, tblSettings){
+	if($('#templatesSiteSelect').length){
+		data.tpl_site_id = $('#templatesSiteSelect').val();
+	}
+		
+}
