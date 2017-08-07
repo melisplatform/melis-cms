@@ -87,6 +87,7 @@
 
 		'tr_meliscms_rights_Pages' => 'Pages',
 			
+	    // Rights
 		'tr_meliscms_meliscms' => 'MelisCms',
 		'tr_meliscms_toolstree' => 'Outils',
 		'tr_meliscms_pages_Page' => 'Page',
@@ -98,6 +99,7 @@
 		// Rights
 		'tr_meliscms_meliscms' => 'MelisCms',
 
+	    // tool Template Manager
 	    'tr_meliscms_tool_templates' => 'Templates',
 	    'tr_meliscms_tool_templates_text_info' => 'Gérez ici les templates associés à chaque site et déclarez les fichiers physiques qui les représentent.',
 	    
@@ -129,12 +131,11 @@
 	    
 	    'tr_tool_template_fm_update_title' => 'Templates',
 	    'tr_tool_template_fm_update_content' => 'Template mis à jour',
+	    'tr_tool_template_fm_update_content_error' => 'Impossible de mettre à jour le template',
 	    
 	    'tr_tool_template_fm_delete_title' => 'Supprimer un template',
 	    'tr_tool_template_fm_delete_confirm' => 'Etes-vous sûr de vouloir supprimer ce template?',
 	    'tr_tool_template_fm_delete_content' => 'Le template a été supprimé',
-	    
-	    'tr_tool_template_fm_update_content_error' => 'Impossible de mettre à jour le template',
 	    
 	    // Site Tool
         'tr_meliscms_tool_site' => 'Sites',
@@ -156,7 +157,6 @@
         
         'tr_meliscms_tool_site_edit_success' => 'Le site a été mis à jour avec succès',
         'tr_meliscms_tool_site_edit_failed' => 'Impossible de mettre à jour le site, veuillez réessayer',
-        
         
         'tr_meliscms_tool_site_delete_confirm_title' => 'Supprimer le site',
         'tr_meliscms_tool_site_delete_confirm' => 'Etes-vous sûr de vouloir supprimer ce site ?',
@@ -180,6 +180,15 @@
 	    'tr_meliscms_menu_new' => 'Nouvelle page',
 	    'tr_meliscms_menu_edit' => 'Editer',
 	    'tr_meliscms_menu_delete' => 'Supprimer',
+	    'tr_meliscms_menu_dupe' => 'Dupliquer l&#39;arborescence',
+	    'tr_meliscms_menu_dupe_fail' => 'Echec de la duplication de l&#39;arborescence',
+	    'tr_meliscms_menu_dupe_success' => 'L&#39;arborescence a été dupliquée avec succès',
+	    'tr_meliscms_menu_dupe_destination_fail' => 'La page de destination n&#39;existe pas',
+	    'tr_meliscms_menu_dupe_source_fail' => 'La page d&#39;origine n&#39;existe pas',
+	    'tr_meliscms_tree_sites_duplication_source' => 'ID page d&#39;origine',
+	    'tr_meliscms_tree_sites_duplication_source tooltip' => 'Identifiant de la page de l&#39;arborescence à dupliquer',
+	    'tr_meliscms_tree_sites_duplication_destination' => 'ID page de destination',
+	    'tr_meliscms_tree_sites_duplication_destination tooltip' => 'Identifiant de la page de destination de l&#39;arboresence dupliquée ou cochez &#34;Racine&#34; pour mettre l&#39;arborescence à la racine',
 	    
 	    'tr_meliscms_menu_cancel' => 'Annuler',
 	    
@@ -202,17 +211,22 @@
 	    
 	    'tr_meliscms_common_add' => 'Ajouter',
 	    'tr_meliscms_common_apply' => 'Apply',
+	    'tr_meliscms_common_apply_language' => 'Changer le langage courrant vers ',
 			
 	  	 //Language Tool Translation
 	    'tr_meliscms_tool_language' => 'Langages des pages',
+	    'tr_meliscms_tool_description' => 'Définissez ici les différents langages que peuvent utiliser les pages.',
+	    'tr_meliscms_tool_modal_text' => 'Chaque langage doit avoir un nom et sa "locale" définis.',
 	    'tr_meliscms_tool_language_header' => 'Header',
 	    'tr_meliscms_tool_language_content' => 'Content',
 	    'tr_meliscms_tool_language_modal' => 'Modals',
 	    'tr_meliscms_tool_language_lang_id' => 'ID',
 	    'tr_meliscms_tool_language_lang_locale' => 'Locale',
+// 	    'tr_meliscms_tool_language_lang_locale tooltip' => 'tr_meliscms_tool_language_lang_locale tooltip text',
 	    'tr_meliscms_tool_language_lang_locale_long' => 'Valeur de la locale trop longue, elle doit être de moins de 10 caractères',
 	    'tr_meliscms_tool_language_lang_locale_empty' => 'Veuillez saisir la locale',
 	    'tr_meliscms_tool_language_lang_name' => 'Nom',
+	    'tr_meliscms_tool_language_lang_name tooltip' => 'tr_meliscms_tool_language_lang_name tooltip text',
 	    'tr_meliscms_tool_language_lang_name_long' => 'Nom trop long, il doit être de moins de 45 caractères',
 	    'tr_meliscms_tool_language_lang_name_empty' => 'Veuillez saisir un nom',
 	    'tr_meliscms_tool_language_new' => 'Nouveau langage',
@@ -309,7 +323,7 @@
 	    'tr_meliscms_tool_platform_ids_delete_success_msg' => 'Plage d\'IDs de la plateforme supprimée avec succès',
 	    // Platform Id validation Messages
 	    'tr_meliscms_tool_platform_value_too_long' => 'Value is too long, it should be less than 11 digits',
-	    'tr_meliscms_tool_platform_not_digit' => 'The value must be in digits',
+	    'tr_meliscms_tool_platform_not_digit' => 'Champ requis, ne peut être vide',
 	    'tr_meliscms_tool_platform_empty' => 'Le champ ne peut être vide',
 	    'tr_meliscms_tool_platform_pageIdStart_must_lessThan_or_equalTo_pageIdEnd' => 'l\'ID de la page de début doit être inférieure ou égale à l\'ID de page de Fin',
 	    'tr_meliscms_tool_platform_pageIdEnd_must_greaterThan_or_equalTo_pageIdStart' => 'L\'id de la page de FIn doit être supérieure ou égale à l\'ID de la Page de Début',
@@ -364,7 +378,7 @@
         'meliscms_tool_site_301_value_too_long_255' => 'Valeur trop longue, elle doit être de moins de 255 caractères',
         'meliscms_tool_site_301_value_empty' => 'Le champ est requis et ne peut être vide',
         'meliscms_tool_site_301_old_url_exist' => 'L&#39;ancienne URL existe déjà pour ce site',
-        'meliscms_tool_site_301_delete_confirm_msg' => 'Etes-vous sûr de vouloir supprimer cette redirection 301 ?',
+        'meliscms_tool_site_301_delete_confirm_msg' => 'Etes-vous sûr de vouloir supprimer cette redirection 301?',
 	    'tr_meliscms_tool_site_301_s301_new_url_mismatch' => 'The new url domain does not match the site domain',
 	    
 	    // Tool Sitetree view modal
@@ -375,5 +389,40 @@
         'tr_meliscms_duplicate_error' => 'Impossible de dupliquer la page',
         'tr_melis_cms_duplicate_success' => 'Page "%s" dupliquée avec succès',
         'tr_melis_cms_duplicate_text_identifier' => '[Dupliquée]',
+	    
+	    // plugins edition
+	    'tr_meliscms_plugins_modal_cancel' => 'Annuler',
+	    'tr_meliscms_plugins_modal_apply' => 'Appliquer',
+	    
+	    'tr_meliscms_page_tree_no_selected_page' => 'No page selected, please select a page and try again',
+	    
+	    // tool style
+	    'tr_meliscms_tool_styles' => 'Styles',
+	    'tr_meliscms_tool_styles_mgr' => 'Gestionnaire de styles',
+	    'tr_meliscore_tool_styles_new' => 'Nouveau style',
+	    'tr_meliscore_tool_styles_edit' => 'Editer le style',
+	    'tr_meliscms_tool_style_id' => 'ID',
+	    'tr_meliscms_tool_style_id tooltip' => 'Identifiant du style',
+	    'tr_meliscms_tool_style_name' => 'Nom',
+	    'tr_meliscms_tool_style_name_properties' => 'Nom du style',
+	    'tr_meliscms_tool_style_name tooltip' => 'Nom du style',
+	    'tr_meliscms_tool_style_page_id' => 'Page ID',
+	    'tr_meliscms_tool_style_page_id tooltip' => ' Tooltip Page ID',
+	    'tr_meliscms_tool_style_page_status' => 'Statut',
+	    'tr_meliscms_tool_style_page_status tooltip' => 'Active ou désactive le style',
+	    'tr_meliscms_tool_style_page_status_off' => 'Inactif',
+	    'tr_meliscms_tool_style_page_status_on' => 'Actif',
+	    'tr_meliscms_tool_style_path' => 'Chemin',
+	    'tr_meliscms_tool_style_path tooltip' => 'Chemin du fichier css, il peut être interne (ex : /mysite/myfolder/mystyle.css) ou externe (ex : http://www.mysite.com/myfolder/mystyle.css)',
+	    'tr_meliscms_tool_styles_save_fail' => 'Echec de la sauvegarde des détails du style',
+	    'tr_meliscms_tool_styles_save_success' => 'Le style a été sauvegardé avec succès',
+	    'tr_meliscms_tool_styles_delete_title' => 'Supprimer le style',
+	    'tr_meliscms_tool_styles_delete_details' => 'Etes-vous sûr de vouloir supprimer ce style ?',
+	    'tr_meliscms_tool_styles_delete_fail' => 'Echec de la suppression du style',
+	    'tr_meliscms_tool_styles_delete_success' => 'Le style a été supprimé avec succès',
+	    'tr_meliscms_tool_styles_save_page_style_fail' => 'Echec de l&#39;ajout du style',
+	    
+	    'tr_meliscms_tool_duplicate_field_empty' => 'Valeur requise, ne peut être vide',
+	    'tr_meliscms_tool_duplicate_field_digits' => 'La saisie ne doit contenir que des chiffres',
 	);
 ?>

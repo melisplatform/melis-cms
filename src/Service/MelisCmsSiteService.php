@@ -50,7 +50,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
         
     }
     
-	public function saveSite($site, $siteDomain, $site404, $siteLangId = null, $siteId = null, $genSiteModule = false)
+    public function saveSite($site, $siteDomain, $site404, $siteLangId = null, $siteId = null, $genSiteModule = false, $siteModule = null)
 	{
 	    $results = array(
 	        'site_id' => null,
@@ -103,6 +103,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
         }
         else 
         {
+            
             $curPlatform = !empty(getenv('MELIS_PLATFORM'))  ? getenv('MELIS_PLATFORM') : 'development';
             $corePlatformTable = $this->getServiceLocator()->get('MelisCoreTablePlatform');
             $corePlatformData = $corePlatformTable->getEntryByField('plf_name', $curPlatform)->current();
@@ -119,9 +120,13 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                         'success' => true
                     );
                     
+                    $siteModuleName = null;
+                    
                     if ($arrayParameters['genSiteModule'])
                     {
-                        $tempRes = $this->createSiteModule($siteName);
+                        $siteModuleName = $this->generateModuleNameCase($arrayParameters['siteModule']);
+                        
+                        $tempRes = $this->createSiteModule($siteModuleName);
                     }
                     
                     if ($tempRes['success'])
@@ -136,24 +141,27 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                         $savedSiteId = $siteTable->save($arrayParameters['site']);
                         
                         // Creating Site Homepage template
-                        $templateId = $this->createSitePageTemplate($tplId, $savedSiteId, $siteName, $siteName.' Home', 'Index', 'index', $platformId);
+                        $templateId = $this->createSitePageTemplate($tplId, $savedSiteId, $siteModuleName, $siteName.' Home', 'Index', 'index', $platformId);
                         
                         // Creating Site homepage
                         $this->createSitePage($siteName, -1, $siteLangId, 'SITE', $pageId, $tplId, $platformId);
                         
-                        // Getting the DemoSite config
-                        $melisSite = $_SERVER['DOCUMENT_ROOT'].'/../module/MelisSites';
-                        $outputFileName = 'module.config.php';
-                        $moduleConfigDir = $melisSite.'/'.$siteName.'/config/'.$outputFileName;
-                        
-                        // Replacing the Site homepage id to site module sonfig
-                        $moduleConfig = file_get_contents($moduleConfigDir);
-                        $moduleConfig = str_replace('\'homePageId\'', $pageId, $moduleConfig);
-                        file_put_contents($moduleConfigDir, $moduleConfig);
+                        if (!is_null($siteModuleName))
+                        {
+                            // Getting the DemoSite config
+                            $melisSite = $_SERVER['DOCUMENT_ROOT'].'/../module/MelisSites';
+                            $outputFileName = 'module.config.php';
+                            $moduleConfigDir = $melisSite.'/'.$siteModuleName.'/config/'.$outputFileName;
+                            
+                            // Replacing the Site homepage id to site module sonfig
+                            $moduleConfig = file_get_contents($moduleConfigDir);
+                            $moduleConfig = str_replace('\'homePageId\'', $pageId, $moduleConfig);
+                            file_put_contents($moduleConfigDir, $moduleConfig);
+                        }
                         
                         // Creating Site 40 page template
                         $nxtTplId = ++$tplId;
-                        $templateId = $this->createSitePageTemplate($nxtTplId, $savedSiteId, $siteName, $siteName.' 404', 'Page404', 'index', $platformId);
+                        $templateId = $this->createSitePageTemplate($nxtTplId, $savedSiteId, $siteModuleName, $siteName.' 404', 'Page404', 'index', $platformId);
                         
                         // Creating Site 404 page
                         $page404Id = $pageId + 1;
@@ -192,8 +200,15 @@ class MelisCmsSiteService extends MelisCoreGeneralService
             $siteDomainTable->save($siteDomain, $siteDomainId);
             
             // Saving Site 404 page
-            $site404['s404_site_id'] = $savedSiteId;
-            $site404Table->save($site404, $site404Id);
+            if (!empty($site404['s404_page_id']))
+            {
+                $site404['s404_site_id'] = $savedSiteId;
+                $site404Table->save($site404, $site404Id);
+            }
+            elseif (!is_null($site404Id)) 
+            {
+                $site404Table->deleteById($site404Id);
+            }
             
             $results = array(
                 'site_id' => $savedSiteId,
@@ -267,7 +282,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
 	        'page_menu' => 'LINK',
 	        'page_name' => $arrayParameters['siteName'],
 	        'page_tpl_id' => $arrayParameters['templateId'],
-	        'page_content' => '<?xml version="1.0" encoding="UTF-8"?>\n<document type="MelisCMS" author="MelisTechnology" version="2.0">\n</document>',
+	        'page_content' => '<?xml version="1.0" encoding="UTF-8"?><document type="MelisCMS" author="MelisTechnology" version="2.0"></document>',
 	        'page_taxonomy' => '',
 	        'page_creation_date' => date('Y-m-d H:i:s')
 	    ));
@@ -493,6 +508,22 @@ class MelisCmsSiteService extends MelisCoreGeneralService
 	    }
 	    
 	    return $result;
+	}
+	
+	/**
+	 * This will modified a string to valid zf2 module name
+	 * @param unknown $str
+	 * @return string
+	 */
+	private function generateModuleNameCase($str) {
+	    $i = array("-","_");
+	    $str = preg_replace('/([a-z])([A-Z])/', "$1 $2", $str);
+	    $str = preg_replace('@[^a-zA-Z0-9-_ ]+@', '', $str);
+	    $str = str_replace($i, ' ', $str);
+	    $str = str_replace(' ', '', ucwords(strtolower($str)));
+	    $str = strtolower(substr($str,0,1)).substr($str,1);
+	    $str = ucfirst($str);
+	    return $str;
 	}
 	
 	/**

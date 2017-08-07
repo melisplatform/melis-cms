@@ -1,0 +1,52 @@
+<?php 
+
+$id = '';
+if (!empty($this->zoneconfig['conf']['id']))
+    $id = $this->zoneconfig['conf']['id'];
+    $data_melisKey = $this->melisKey;
+?>
+
+<div class="modal-content">
+	<div class="modal-body padding-none">
+		<div class="wizard">
+			<div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none">
+                <div class="widget-head">
+                	<ul class="nav nav-tabs">
+                		<li class="active"><a href="#<?php echo $this->zoneconfig['conf']['id'] ?>" class="glyphicons notes" data-toggle="tab" aria-expanded="true"><i></i><?php echo $this->zoneconfig['conf']['name']; ?>  
+                		</a></li>
+            		</ul>
+        		</div>
+        		<div class="widget-body innerAll inner-2x">
+        			<div class="tab-content">
+        				<div class="tab-pane active" id="<?= $id ?>">
+                            <div class="row">
+                            	<div class="col-md-12" id="duplicateTree">
+                            		<p class="modal-text-info"><?= $this->translate('')?> </p>
+                                          <?php 
+                                          echo $this->form()->openTag($this->form);
+                                          echo $this->melisFieldCollection($this->form);
+                                          ?>
+                                  	<div class="checkbox cb-cont form-group">
+                                       <label class="remember-me-cont">
+                                            <span class="cbmask-outer">
+                                            	<span  class="cbmask-inner"></span>
+                                           	</span>
+                                            <input type="hidden" name="use_root" value="0" >
+                                            <input type="checkbox" name="use_root" value="1"> <?= $this->translate('tr_meliscms_tree_sites_duplication_use_root'); ?>
+                                       </label>
+                                  </div>
+                                  <?php echo $this->form()->closeTag();?>
+                                  <br>
+                                 	<div align="right">
+                                 		<button data-dismiss="modal" class="btn btn-danger pull-left"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscms_menu_cancel')?></button>
+                                 		<button class="btn btn-success" id="duplicatePageTree" data-style-id="<?= $this->styleId?>"><i class="fa fa-save"></i>  <?php echo $this->translate('tr_meliscms_common_save') ?></button>
+                                 	</div>                                 	
+                            	</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

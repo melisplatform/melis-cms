@@ -38,6 +38,8 @@ class PageEditionController extends AbstractActionController
          	$datasTemplate = $datasPage->getMelisTemplate();
     	}
     	
+    	$this->loadPageContentPluginsInSession($idPage);  
+    	
     	$view = new ViewModel();
     	$view->idPage = $idPage;
     	$view->melisKey = $melisKey;
@@ -54,87 +56,151 @@ class PageEditionController extends AbstractActionController
     	
     	return $view;
     }
-	
+    
+    public function loadPageContentPluginsInSession($idPage)
+    {
+        // Create container if needed to save in session tags modified
+        $container = new Container('meliscms');
+        
+        if (empty($container['content-pages']))
+            $container['content-pages'] = array();
+        if (empty($container['content-pages'][$idPage]))
+            $container['content-pages'][$idPage] = array();
+        else
+            // We don't want to delete former values that can be in session
+            // It might be useful to have them reloaded on opening of the page
+            // In order to delete values in session, there is a "delete draft" button
+            return; 
+
+        $newcontentValuesArray = array();
+        
+        // Lets get the current content from database into an array
+        $melisPageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+        $datas = $melisPageSavedTable->getEntryById($idPage);
+        $datas = $datas->toArray();
+        
+        if (count($datas) == 0)
+        {
+            // No datas saved, then let's get the published datas
+            $melisPagePublishedTable = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
+            $datas = $melisPagePublishedTable->getEntryById($idPage);
+            $datas = $datas->toArray();
+        }
+        
+        if (count($datas) != 0)
+        {
+            $datas = $datas[0];
+            $xml = simplexml_load_string($datas['page_content']);
+            if ($xml)
+            {
+                foreach ($xml as $namePlugin => $valuePlugin)
+                {
+                    if (empty($newcontentValuesArray[$namePlugin]))
+                        $newcontentValuesArray[$namePlugin] = array();
+                         
+                    $idPluginItem = (string)$valuePlugin->attributes()->id;
+                     
+                    $newcontentValuesArray[$namePlugin][$idPluginItem] = $valuePlugin->asXML();
+                }
+                
+                $container['content-pages'][$idPage] = $newcontentValuesArray;
+            }
+        }
+        
+    }
+
+
     /**
      * Saves datas edited in a page and posted to this function
      * Save is made in SESSION.
-     * 
+     *
      * @return \Zend\View\Model\JsonModel
      */
-    public function savePageTagSessionAction()
+    public function savePageSessionPluginAction()
     {
-    	$idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
-		$translator = $this->serviceLocator->get('translator');
-		
-		$postValues = array();
-    	$request = $this->getRequest();
-    	if (!empty($idPage) && $request->isPost())
-    	{
-    		// Get values posted and set them in form
-    		$postValues = get_object_vars($request->getPost());
-			
+        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $translator = $this->serviceLocator->get('translator');
+    
+        $postValues = array();
+        $request = $this->getRequest();
+        if (!empty($idPage) && $request->isPost())
+        {
+            // Get values posted and set them in form
+            $postValues = get_object_vars($request->getPost());
+            	
+    
+            // Send the event and let listeners do their job to catch and format their plugins values
+            $eventDatas = array('idPage' => $idPage, 'postValues' => $postValues);
+            $this->getEventManager()->trigger('meliscms_page_savesession_plugin_start', $this, $eventDatas);
+             
+            $result = array(
+                'success' => 1,
+                'errors' => array()
+            );
+        }
+        else
+        {
+            $result = array(
+                'success' => 0,
+                'errors' => array(array('empty' => $translator->translate('tr_meliscms_form_common_errors_Empty datas')))
+            );
+        }
+         
+        return new JsonModel($result);
+    }
 
-			if(!empty($postValues['myArray']))
-			{
-				// Create container if needed to save in session tags modified
-    			$container = new Container('meliscms');
-    			if (empty($container['content-pages']))
-    				$container['content-pages'] = array();
-    			if (empty($container['content-pages'][$idPage]))
-    				$container['content-pages'][$idPage] = array();
-    			
-    			// Get the value
-    			for($i=0; $i <= (count($postValues['myArray'])/2);$i++){
-					$container['content-pages'][$idPage][$postValues['myArray'][$i]['tagID']] = $postValues['myArray'][$i]['tagVal'];
-				}
-    			
-				$result = array(
-    					'success' => 1,
-    					'errors' => array()
-    			);				
-				
-			}
-			else if (empty($postValues['tagId']))
-    		{
-    			$result = array(
-    					'success' => 0,
-    					'errors' => array(array('notagid' => $translator->translate('tr_meliscms_page_tab_edition_save_tag_Error while saving')))
-    			);
-    		} 
-			else
-			{
-    			// Create container if needed to save in session tags modified
-    			$container = new Container('meliscms');
-    			if (empty($container['content-pages']))
-    				$container['content-pages'] = array();
-    			if (empty($container['content-pages'][$idPage]))
-    				$container['content-pages'][$idPage] = array();
-    			
-    			// Get the value
-    			$value = '';
-    			if (!empty($postValues['tagValue']))
-    				$value = $postValues['tagValue'];
-    			
-    			// Save in session
-    			$container['content-pages'][$idPage][$postValues['tagId']] = $value;
-    			
-				$result = array(
-    					'success' => 1,
-    					'errors' => array()
-    			);
-    		}
-    	}		
-		else
-    	{
-    		$result = array(
-    				'success' => 0,
-    				'errors' => array(array('empty' => $translator->translate('tr_meliscms_form_common_errors_Empty datas')))
-    		);
-    	}
-    	/* Saving elements to sessions */
-		
-		
-    	return new JsonModel($result);
+
+    /**
+     * Remove a specific plugin from a pageId
+     * Save is made in SESSION.
+     *
+     * @return \Zend\View\Model\JsonModel
+     */
+    public function removePageSessionPluginAction()
+    {
+        $module = $this->getRequest()->getQuery('module', null);
+        $pluginName = $this->getRequest()->getQuery('pluginName', '');
+        $pageId = $this->getRequest()->getQuery('pageId', null);
+        $pluginId = $this->getRequest()->getQuery('pluginId', null);
+        $pluginTag = $this->getRequest()->getQuery('pluginTag', null);
+        
+        $parameters = array(
+            'module' => $module,
+            'pluginName' => $pluginName,
+            'pageId' => $pageId,
+            'pluginId' => $pluginId,
+            'pluginTag' => $pluginTag,
+        );
+        
+        $translator = $this->serviceLocator->get('translator');
+
+        if (empty($module) || empty($pluginName) || empty($pageId) || empty($pluginId))
+        {
+
+            $result = array(
+                'success' => 0,
+                'errors' => array(array('empty' => $translator->translate('tr_meliscms_form_common_errors_Empty datas')))
+            );
+        }
+        else
+        {
+
+            $this->getEventManager()->trigger('meliscms_page_removesession_plugin_start', null, $parameters);
+            
+            // removing plugin from session
+            $container = new Container('meliscms');
+            if (!empty($container['content-pages'][$pageId][$pluginTag][$pluginId]))
+                unset($container['content-pages'][$pageId][$pluginTag][$pluginId]);
+            
+            $this->getEventManager()->trigger('meliscms_page_removesession_plugin_end', null, $parameters);
+            
+            $result = array(
+                'success' => 1,
+                'errors' => array()
+            );
+        }
+         
+        return new JsonModel($result);
     }
     
 	/**
@@ -159,46 +225,24 @@ class PageEditionController extends AbstractActionController
 		}
 		else
 		{
-			// If there's modifications, otherwise nothing to do
+		    // Resave XML of the page
 			if (!empty($container['content-pages'][$idPage]))
 			{
-				$melisPageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
-				$newTagsArray = array();
-				
-				// Lets get the current content from database into an array
-				$dataSaved = $melisPageSavedTable->getEntryById($idPage);
-				$dataSaved = $dataSaved->toArray();
-				
-				if (count($dataSaved) != 0)
-				{
-					$dataSaved = $dataSaved[0];
-					$xml = simplexml_load_string($dataSaved['page_content']);
-					if ($xml)
-					{
-						foreach ($xml->melisTag as $melisTag)
-						{
-							$id = (string)$melisTag->attributes()->id;
-							$newTagsArray[$id] = (string)$melisTag;
-						}
-					}	
-				}
-				
-				// Now lets merge it with the edited content
-				$newTagsArray = array_merge($newTagsArray, $container['content-pages'][$idPage]);
-				
 				// Create the new XML
 				$newXmlContent = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 				$newXmlContent .= '<document type="MelisCMS" author="MelisTechnology" version="2.0">' . "\n";
-				foreach ($newTagsArray as $idTag => $valueTag)
+				foreach ($container['content-pages'][$idPage] as $namePlugin => $pluginEntries)
 				{
-					$newXmlContent .= "\t" . '<melisTag id="' . $idTag . '"><![CDATA[' . $valueTag . ']]></melisTag>' . "\n";
+				    foreach ($pluginEntries as $idEntry => $valueEntry)
+				        $newXmlContent .= "\t" . $valueEntry . "\n";
 				}
 				$newXmlContent .= '</document>';
 				
 				// Save the result
+                $melisPageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
 				$melisPageSavedTable->save(array('page_content' => $newXmlContent), $idPage);
 				
-			}		
+			}	
 
 			$result = array(
 					'success' => 1,

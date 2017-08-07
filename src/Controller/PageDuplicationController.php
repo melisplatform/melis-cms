@@ -60,7 +60,7 @@ class PageDuplicationController extends AbstractActionController
             if(empty($pageData->getMelisTemplate())) {
                 $pageData    = $pageService->getDatasPage($pageId, 'saved');
             }
-
+            
             $templateData = $pageData->getMelisTemplate();
             $pageTreeData = $pageData->getMelisPageTree();
 

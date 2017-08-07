@@ -9,7 +9,9 @@
 			
 		'tr_meliscms_page_tab_properties_form_Id' => 'Id',
 		'tr_meliscms_page_tab_properties_form_Name' => 'Nom',
+		'tr_meliscms_page_tab_properties_form_Name tooltip' => 'Nom de la page',
 		'tr_meliscms_page_tab_properties_form_Type' => 'Type',
+		'tr_meliscms_page_tab_properties_form_Type tooltip' => 'Choisissez si la page créée est un nouveau site, un dossier qui contiendra d&#39;autres pages ou une simple page du site',
 		'tr_meliscms_page_tab_properties_form_type_Site' => 'Site',
 		'tr_meliscms_page_tab_properties_form_type_Folder' => 'Dossier',
 		'tr_meliscms_page_tab_properties_form_type_Page' => 'Page',
@@ -17,31 +19,40 @@
 		'tr_meliscms_page_tab_properties_form_status_Online' => 'En ligne',
 		'tr_meliscms_page_tab_properties_form_status_Offline' => 'Hors ligne',
 		'tr_meliscms_page_tab_properties_form_Show Menu' => 'Affichage Menu',
+		'tr_meliscms_page_tab_properties_form_Show Menu tooltip' => 'Sélectionnez &#34;Lien&#34; pour afficher la page dans le menu et intégrer son lien de redirection, &#34;Texte sans lien&#34; pour afficher le nom de la page dans le menu sans son lien de redirection ou &#34;Aucun&#34; pour ne pas afficher la page dans le menu',
 		'tr_meliscms_page_tab_properties_form_showmenu_Link' => 'Lien',
 		'tr_meliscms_page_tab_properties_form_showmenu_No link' => 'Texte sans lien',
 		'tr_meliscms_page_tab_properties_form_showmenu_None' => 'Aucun',
 		'tr_meliscms_page_tab_properties_form_Language' => 'Langue',
+		'tr_meliscms_page_tab_properties_form_Language2 tooltip' => 'Langage du site',
 		'tr_meliscms_page_tab_properties_form_Language tooltip' => 'Langage des pages',
 		'tr_meliscms_page_tab_properties_form_Template' => 'Template',
+		'tr_meliscms_page_tab_properties_form_Template tooltip' => 'Sélectionnez le template de la page parmi les templates enregistrés dans l&#39;outil &#34;Templates&#34; ou sélectionnez &#34;Aucun&#34; si la page ne sera pas publiée',
 		'tr_meliscms_page_tab_properties_form_Template_None' => 'Aucun',
 		'tr_meliscms_page_tab_properties_form_Meta Title' => 'Méta titre',
 		'tr_meliscms_page_tab_properties_form_Meta Keywords' => 'Méta keywords',
 		'tr_meliscms_page_tab_properties_form_Meta Description' => 'Méta description',
 		'tr_meliscms_page_tab_properties_form_Creation date' => 'Date de création',
+		'tr_meliscms_page_tab_properties_form_Creation date tooltip' => 'Date à laquelle la page a été créée',
 		'tr_meliscms_page_tab_properties_form_submittext_Save' => 'Sauvegarder',
-	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomie',
+// 	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomie',
+	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomie * <i class="fa fa-info-circle fa-lg" data-toggle="tooltip" data-placement="left" title="" data-original-title="Saisissez les termes pour classer votre page. Séparez chaque terme par une virgule"></i>',
 	    'tr_meliscms_page_tab_properties_form_taxonomy_placeholder' => 'Séparer les mots clefs avec une virgule',
-			
+	    'tr_meliscms_page_tab_properties_form_taxonomy_placeholder tooltip' => 'Saisissez les termes pour classer votre page. Séparez chaque terme par une virgule',
+		'tr_meliscms_tool_style_name_properties tooltip' => 'Sélectionnez un style à ajouter à votre page parmi les styles créés depuis l&#39;outil &#34;Styles&#34;', 	
 		'tr_meliscms_page_tab_properties_form_errors_' => 'Sauvegarder',
 	    
 
 		'tr_meliscms_page_tab_seo_form_Meta Title' => 'Méta titre',
+		'tr_meliscms_page_tab_seo_form_Meta Title tooltip' => 'Méta titre de la page',
 		'tr_meliscms_page_tab_seo_form_Meta Description' => 'Méta description',
+		'tr_meliscms_page_tab_seo_form_Meta Description tooltip' => 'Méta description de la page',
 		'tr_meliscms_page_tab_seo_form_Url' => 'URL',
+		'tr_meliscms_page_tab_seo_form_Url tooltip' => 'URL de la page',
 		'tr_meliscms_page_tab_seo_form_Url Redirect' => 'URL redirection',
-		'tr_meliscms_page_tab_seo_form_Url Redirect tooltip' => 'Pour une page interne saisir son ID ou son URL. Pour une page externe saisir l\'URL complète avec le http://',
+		'tr_meliscms_page_tab_seo_form_Url Redirect tooltip' => 'URL de redirection de la page si celle-ci est publiée. Pour une page interne saisir son ID ou son URL, pour une page externe saisir l&#39;URL complète avec le http://',
 		'tr_meliscms_page_tab_seo_form_Url 301' => 'URL 301',
-		'tr_meliscms_page_tab_seo_form_Url 301 tooltip' => 'Pour une page interne saisir son ID ou son URL. Pour une page externe saisir l\'URL complète avec le http://',
+		'tr_meliscms_page_tab_seo_form_Url 301 tooltip' => 'URL de redirection de la page si celle-ci est dépubliée. Pour une page interne saisir son ID ou son URL, pour une page externe saisir l&#39;URL complète avec le http://',
 			
 			
 	    // page prompts
@@ -194,5 +205,9 @@
 	    'tr_meliscms_tool_site_scheme_error_empty' => 'Valeur requise, ne peut pas être vide',
 	    
 	    'tr_meliscms_form_search' => 'Rechercher',
+	    
+	    'tr_meliscms_tool_style_page_id_too_long' => 'Page ID is too long',
+	    'tr_meliscms_tool_style_page_is_empty' => 'Le champ ne peut être vide',
+	    'tr_meliscms_tree_sites_duplication_use_root' => 'Racine',
 	);
 ?>

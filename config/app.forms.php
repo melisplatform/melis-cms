@@ -33,11 +33,13 @@ return array(
 									'type' => 'MelisText',
 									'options' => array(
 										'label' => 'tr_meliscms_page_tab_properties_form_Name',
+										'tooltip' => 'tr_meliscms_page_tab_properties_form_Name tooltip',
 									),
 									'attributes' => array(
 										'id' => 'id_page_name',
 										'value' => '',
-									    'placeholder' => 'tr_meliscms_page_tab_properties_form_Name'
+									    'placeholder' => 'tr_meliscms_page_tab_properties_form_Name',
+									    'required' => 'required',
 									),
 								),
 							),
@@ -47,6 +49,7 @@ return array(
 									'type' => 'Zend\Form\Element\Select',
 									'options' => array(
 										'label' => 'tr_meliscms_page_tab_properties_form_Type',
+										'tooltip' => 'tr_meliscms_page_tab_properties_form_Type tooltip',
 										'empty_option' => 'tr_meliscms_form_common_Choose',
 										'value_options' => array(
 											'SITE' => 'tr_meliscms_page_tab_properties_form_type_Site',
@@ -57,20 +60,23 @@ return array(
 									'attributes' => array(
 										'id' => 'id_page_type',
 										'value' => '',
+									    'required' => 'required',
 									),
 								),
 							),
 							array(
 								'spec' => array(
 									'name' => 'plang_lang_id',
-									'type' => 'MelisCoreLanguageSelect',
+									'type' => 'MelisCmsLanguageSelect',
 									'options' => array(
 										'label' => 'tr_meliscms_page_tab_properties_form_Language',
+										'tooltip' => 'tr_meliscms_page_tab_properties_form_Language2 tooltip',
 										'empty_option' => 'tr_meliscms_form_common_Choose',
 									    'disable_inarray_validator' => true,
 									),
 									'attributes' => array( 
 										'id' => 'id_plang_lang_id',
+									    'required' => 'required',
 									),
 								),
 							),
@@ -97,6 +103,7 @@ return array(
 									'type' => 'Zend\Form\Element\Select',
 									'options' => array(
 										'label' => 'tr_meliscms_page_tab_properties_form_Show Menu',
+										'tooltip' => 'tr_meliscms_page_tab_properties_form_Show Menu tooltip',
 										'empty_option' => 'tr_meliscms_form_common_Choose',
 										'value_options' => array(
 											'LINK' => 'tr_meliscms_page_tab_properties_form_showmenu_Link',
@@ -105,8 +112,9 @@ return array(
 										),
 									),
 									'attributes' => array(
-											'id' => 'id_page_menu',
-											'value' => '',
+										'id' => 'id_page_menu',
+										'value' => '',
+									    'required' => 'required',
 									),
 								),
 							),
@@ -116,11 +124,13 @@ return array(
 									'type' => 'MelisCmsTemplateSelect',
 									'options' => array(
 										'label' => 'tr_meliscms_page_tab_properties_form_Template',
+										'tooltip' => 'tr_meliscms_page_tab_properties_form_Template tooltip',
 										'empty_option' => 'tr_meliscms_form_common_Choose',
 									    'disable_inarray_validator' => true,
 									),
 									'attributes' => array(
 										'id' => 'id_page_tpl_id',
+									    'required' => 'required',
 									),
 								),
 							),
@@ -130,6 +140,7 @@ return array(
 									'type' => 'MelisText',
 									'options' => array(
 											'label' => 'tr_meliscms_page_tab_properties_form_Creation date',
+											'tooltip' => 'tr_meliscms_page_tab_properties_form_Creation date tooltip',
 									),
 									'attributes' => array(
 											'id' => 'page_creation_date',
@@ -152,6 +163,21 @@ return array(
     					            ),
     					        ),
     					    ),
+    					    array(
+    					        'spec' => array(
+    					            'name' => 'style_id',
+    					            'type' => 'MelisCmsStyleSelect',
+    					            'options' => array(
+    					                'label' => 'tr_meliscms_tool_style_name_properties',
+    					                'tooltip' => 'tr_meliscms_tool_style_name_properties tooltip',
+    					                'empty_option' => 'tr_meliscms_form_common_Choose',
+    					                'disable_inarray_validator' => true,
+    					            ),
+    					            'attributes' => array(
+    					                'id' => 'id_page_style_id',
+    					            ),
+    					        ),
+					       ),
 						),
 						'input_filter' => array(      
 							'page_id' => array(
@@ -290,6 +316,13 @@ return array(
 								'filters'  => array(
 								),
 					        ),
+						    'style_id' => array(
+						        'name'     => 'style_id',
+						        'required' => false,
+						        'validators' => array(),
+						        'filters'  => array(
+						        ),
+						    ),
 						),
 					),
 				'meliscms_page_seo' => array(
@@ -307,6 +340,7 @@ return array(
 									'type' => 'MelisText',
 									'options' => array(
 											'label' => 'tr_meliscms_page_tab_seo_form_Meta Title',
+											'tooltip' => 'tr_meliscms_page_tab_seo_form_Meta Title tooltip',
 									),
 									'attributes' => array(
 											'id' => 'pseo_meta_title',
@@ -320,6 +354,7 @@ return array(
 									'type' => 'Textarea',
 									'options' => array(
 											'label' => 'tr_meliscms_page_tab_seo_form_Meta Description',
+											'tooltip' => 'tr_meliscms_page_tab_seo_form_Meta Description tooltip',
 									),
 									'attributes' => array(
 											'id' => 'pseo_meta_description',
@@ -335,6 +370,7 @@ return array(
 									'type' => 'MelisText',
 									'options' => array(
 											'label' => 'tr_meliscms_page_tab_seo_form_Url',
+											'tooltip' => 'tr_meliscms_page_tab_seo_form_Url tooltip',
 									),
 									'attributes' => array(
 											'id' => 'pseo_url',

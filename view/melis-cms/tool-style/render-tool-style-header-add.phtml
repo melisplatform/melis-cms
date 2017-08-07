@@ -1,0 +1,11 @@
+<?php 
+$id = $this->zoneconfig['conf']['id'];
+$openAddNewTemplateButton = $this->melisModalInvoker()->render(array(
+    'id' => $id,
+    'class' => 'btn btn-success',
+    'text' => '<i class="fa fa-plus"></i> '.$this->translate($this->zoneconfig['conf']['name']),
+    'data-melisKey' => $this->melisKey,
+), 'invoke');
+echo $openAddNewTemplateButton;
+
+?>

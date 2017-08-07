@@ -3,15 +3,16 @@
     // On Load
     $(window).on('load', function () {
     	
-    	window.mainTree = function(){
+    	window.mainTree = function(completeEvent){
     		
 	        $('#id-mod-menu-dynatree').fancytree({
-	        	extensions: ['contextMenu', 'dnd'],
+	        	extensions: ['contextMenu', 'dnd', 'filter'],
 	        	activeVisible: false,
 	        	debugLevel: 0,
 	        	autoScroll: false,
 	        	generateIds: true, 
 	        	idPrefix: "mt_",
+	        	tabindex: "",
 	            toggleEffect: {
 	                height: "toggle",
 	                duration: 250
@@ -25,6 +26,7 @@
 	                  'new': { 'name': translations.tr_meliscms_menu_new, 'icon': 'paste' },
 	                  'edit': { 'name': translations.tr_meliscms_menu_edit, 'icon': 'edit' },
 	                  'delete': { 'name': translations.tr_meliscms_menu_delete, 'icon': 'delete' },
+	                  'dupe': { 'name': translations.tr_meliscms_menu_dupe, 'icon': 'copy' },
 	                },
 	                actions: function(node, action, options) {
 	                  if(action === 'new'){
@@ -43,9 +45,9 @@
 							var data = node.data;
 							var zoneId = data.melisData.item_zoneid;
 							var idPage = data.melisData.page_id;	  
-//	                		  var parentNode = ( node.getParent().key == 'root_1') ? -1 : node.getParent().key ;	
-							var parentNode = ( node.key == 'root_1') ? -1 : node.key ;	
-	                	  
+	                		  var parentNode = ( node.getParent().key == 'root_1') ? -1 : node.getParent().key ;
+//							var parentNode = ( node.key == 'root_1') ? -1 : node.getParent().key ;	
+	                		
 							// check if page to be delete is open or not
 							var openedOrNot = $(".tabsbar a[data-id='"+zoneId+"']").parent("li");
 	                	  
@@ -57,7 +59,7 @@
 	          					translations.tr_meliscms_delete_confirmation_msg, 
 	          					function() {
 									// reload and expand the treeview
-	          						 melisCms.refreshTreeview(parentNode);
+	          						 melisCms.refreshTreeview(parentNode, 1);
 		          					
 									// check if node has children if TRUE then cannot be deleted
 		  	                    	$.ajax({
@@ -84,6 +86,18 @@
 		  	                		});
 								});  
 						}
+						if(action === 'dupe'){
+		                	  var data = node.data;
+//		              		  melisHelper.tabOpen( data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,  { sourcePageId: data.melisData.page_id } ); 
+		              		
+		              		  // initialation of local variable
+		          			zoneId = 'id_meliscms_tools_tree_modal_form_handler';
+		          			melisKey = 'meliscms_tools_tree_modal_form_handler';
+		          			modalUrl = 'melis/MelisCms/TreeSites/renderTreeSitesModalContainer';
+		          			// requesitng to create modal and display after
+		          	    	melisHelper.createModal(zoneId, melisKey, false, { 'sourcePageId' : data.melisData.page_id }, modalUrl, function(){
+		          	    	});
+		                }
 	               }
 	        	},
 			    lazyLoad: function(event, data) {
@@ -98,6 +112,14 @@
 			    		  cache: false
 			      }
 			    },
+    			create: function(event, data) {
+    				melisHelper.loadingZone($('#treeview-container'));
+				},
+    			init: function(event, data, flag) {
+			    	melisHelper.removeLoadingZone($('#treeview-container'));
+        			// focus search box
+        			$("input[name=left_tree_search]").focus();
+				},
 	        	click: function (event, data) {
 	        		targetType = data.targetType;
 	        		if(targetType === "title"){
@@ -129,58 +151,61 @@
 	            	// if there is no/empty pages in the treeview
 	            	var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
 	  			    
-	  			    // PAGE ACCESS user rights checking 
-	  			    $.ajax({
-	  			        url         : '/melis/MelisCms/TreeSites/canEditPages',
-	  			        encode		: true
-	  			    }).success(function(data){
-	  			    	// has no access
-	  			    	if(data.edit === 0){
-	  			    		$("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='no-access'>" + translations.tr_meliscms_no_access + "</span></div>");
-	  			    	}
-	  			    	// has access
-	  			    	else{
-	  			    		 if(tree.count() === 0){
-	  			    			 $("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='btn btn-success'>"+ translations.tr_meliscms_create_page +"</span></div>");
-	  			    		 }
-	  			    		 else{
-	  			    			 $("#id-mod-menu-dynatree .create-newpage").remove();
-	  			    		 }
-	  			    	}
-	  			    }).error(function(xhr, textStatus, errorThrown){
-	  			    	alert( translations.tr_meliscore_error_message );
-	  			    });
+	  			    // // PAGE ACCESS user rights checking
+	  			    // $.ajax({
+	  			    //     url         : '/melis/MelisCms/TreeSites/canEditPages',
+	  			    //     encode		: true
+	  			    // }).success(function(data){
+	  			    // 	// has no access
+	  			    // 	if(data.edit === 0){
+  			    	// 	 	$(".meliscms-search-box.sidebar-treeview-search").hide();
+	  			    // 		$("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='no-access'>" + translations.tr_meliscms_no_access + "</span></div>");
+	  			    // 	}
+	  			    // 	// has access
+	  			    // 	else{
+	  			    // 		 if(tree.count() === 0){
+						// 		$(".meliscms-search-box.sidebar-treeview-search").hide();
+						// 		$("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='btn btn-success'>"+ translations.tr_meliscms_create_page +"</span></div>");
+	  			    // 		 }
+	  			    // 		 else{
+						// 		$(".meliscms-search-box.sidebar-treeview-search").show();
+	  			    // 			$("#id-mod-menu-dynatree .create-newpage").remove();
+	  			    // 		 }
+	  			    // 	}
+	  			    // }).error(function(xhr, textStatus, errorThrown){
+	  			    // 	alert( translations.tr_meliscore_error_message );
+	  			    // });
 	  			    
 	  			    
-	  			    // SAVE user rights checking 
-	  			    $.ajax({
-	  			        url         : '/melis/MelisCms/Page/isActionActive?actionwanted=save',
-	  			        encode		: true
-	  			    }).success(function(data){
-	  			    	if(data.active === 0){
-	  			    		$("body").addClass('disable-create');
-	  			    	}
-	  			    	else{
-	  			    		$("body").removeClass('disable-create');
-	  			    	}
-	  			    }).error(function(xhr, textStatus, errorThrown){
-	  			    	alert( translations.tr_meliscore_error_message );
-	  			    });
-	  			    
-	  			    // DELETE user rights checking 
-	  			    $.ajax({
-	  			        url         : '/melis/MelisCms/Page/isActionActive?actionwanted=delete',
-	  			        encode		: true
-	  			    }).success(function(data){
-	  			    	if(data.active === 0){
-	  			    		$("body").addClass('disable-delete');
-	  			    	}
-	  			    	else{
-	  			    		$("body").removeClass('disable-delete');
-	  			    	}
-	  			    }).error(function(xhr, textStatus, errorThrown){
-	  			    	alert( translations.tr_meliscore_error_message );
-	  			    });    
+	  			    // // SAVE user rights checking
+	  			    // $.ajax({
+	  			    //     url         : '/melis/MelisCms/Page/isActionActive?actionwanted=save',
+	  			    //     encode		: true
+	  			    // }).success(function(data){
+	  			    // 	if(data.active === 0){
+	  			    // 		$("body").addClass('disable-create');
+	  			    // 	}
+	  			    // 	else{
+	  			    // 		$("body").removeClass('disable-create');
+	  			    // 	}
+	  			    // }).error(function(xhr, textStatus, errorThrown){
+	  			    // 	alert( translations.tr_meliscore_error_message );
+	  			    // });
+	  			    //
+	  			    // // DELETE user rights checking
+	  			    // $.ajax({
+	  			    //     url         : '/melis/MelisCms/Page/isActionActive?actionwanted=delete',
+	  			    //     encode		: true
+	  			    // }).success(function(data){
+	  			    // 	if(data.active === 0){
+	  			    // 		$("body").addClass('disable-delete');
+	  			    // 	}
+	  			    // 	else{
+	  			    // 		$("body").removeClass('disable-delete');
+	  			    // 	}
+	  			    // }).error(function(xhr, textStatus, errorThrown){
+	  			    // 	alert( translations.tr_meliscore_error_message );
+	  			    // });
 	            },
 	            renderNode: function (event, data) {
 	            	// removed .fancytree-icon class and replace it with font-awesome icons
@@ -287,6 +312,8 @@
     	// initialize the tree
     	mainTree();
 
+		
+	
     });
     
     // create page if treeview page is empty
@@ -294,11 +321,75 @@
     	melisHelper.tabOpen( translations.tr_meliscms_page_creation, 'fa-file-text-o', '0_id_meliscms_page', 'meliscms_page_creation',  { idPage: 0, idFatherPage: '-1' } );  
     });
     
+    $("body").on("click", '#sourcePageIdFindPageTree span', function(){
+		melisLinkTree.createInputTreeModal('#sourcePageId');
+	});
+    
+    $("body").on("click", '#destinationPageIdFindPageTree span', function(){
+		melisLinkTree.createInputTreeModal('#destinationPageId');
+	});
+    
+    $("body").on("click", 'button[data-inputid="#destinationPageId"]', function(){
+    	$('[name="use_root"]').each(function(){
+    		if($(this).is(':checked')){
+    			$(this).prop( "checked", false );
+    		}
+    	})
+    	$('.remember-me-cont .cbmask-inner').removeClass('cb-active');
+    	$("#destinationPageId").prop('disabled', false);
+    });
+    
+    $("body").on('change', '[name="use_root"]', function(){
+    	
+    	if($('[name="use_root"]:checked').length){
+    		
+    		$("#destinationPageId").val("");
+    		$("#destinationPageId").prop('disabled', true);
+    	}else{
+    		
+    	$("#destinationPageId").prop('disabled', false);
+    	}
+	})
+    
     // use this callback to re-initialize the tree when its zoneReloaded
     window.treeCallBack = function(){
     	if( $("#id-mod-menu-dynatree").children().length == 0 ){
     		mainTree();
     	}
     }
+    
+    $("body").on("click", "#duplicatePageTree", function(){
+    	var dataString = $('#duplicatePageTreeForm').serializeArray();
+    	var parentNode = $('#duplicatePageTreeForm input[name="destinationPageId"]').val();	
+    	melisCoreTool.pending("#duplicatePageTree");
+    	$("#duplicatePageTree").find('i').removeClass();
+    	$("#duplicatePageTree").find('i').addClass('fa fa-spinner fa-spin');
+		$.ajax({
+	        type        : 'POST', 
+	        url         : '/melis/MelisCms/TreeSites/duplicateTreePage',
+	        data        : dataString,
+	        dataType    : 'json',
+	        encode		: true
+	    }).done(function(data) {
+	    	
+	    	if(data.success) {
+	    		$('#id_meliscms_tools_tree_modal_form_handler_container').modal('hide');
+	    		melisCms.refreshTreeview(parentNode, 1);
+	    		// clear Add Form
+	    		melisHelper.melisOkNotification( data.textTitle, data.textMessage );
+	    	}
+	    	else {
+	    		melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
+	    		melisCoreTool.highlightErrors(data.success, data.errors, "stylesForm");
+	    	}
+	    	melisCore.flashMessenger();
+	    	melisCoreTool.done("#duplicatePageTree");
+	    	$("#duplicatePageTree").find('i').removeClass();
+	    	$("#duplicatePageTree").find('i').addClass('fa fa-save');
+	    }).fail(function(){
+	    	alert( translations.tr_meliscore_error_message );
+	    });
+    })
  
 })(jQuery, window);
+

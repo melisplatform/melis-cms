@@ -1,5 +1,41 @@
 $(document).ready(function() {
 	
+	var meliscmsSiteSelectorInputDom = '';
+	addEvent("#meliscms-site-selector", function(){
+		// initialation of local variable
+        zoneId = 'id_meliscms_page_tree_id_selector';
+        melisKey = 'meliscms_page_tree_id_selector';
+        modalUrl = 'melis/MelisCms/Page/renderPageModal';
+        
+        meliscmsSiteSelectorInputDom = $(this).parents(".input-group").find("input");
+        
+        melisHelper.createModal(zoneId, melisKey, false, {}, modalUrl, function(){
+        	// Removing Content menu of Fancytree
+    		$.contextMenu("destroy", ".fancytree-title");
+        });
+	});
+	
+	addEvent("#selectPageId", function(){
+        
+        var tartGetId = $('#find-page-dynatree .fancytree-active').parent('li').attr('id');
+        
+        if(typeof tartGetId !== "undefined"){
+        	// Getting the id from Id attribute
+        	var pageId = tartGetId.split("_")[1];
+        	
+        	if(meliscmsSiteSelectorInputDom.length){
+        		// Assigning id to page id input
+            	meliscmsSiteSelectorInputDom.val(pageId);
+            	// Close modal
+            	$(this).closest(".modal").modal("hide");
+            }else{
+            	melisHelper.melisKoNotification("tr_meliscms_menu_sitetree_Name", "tr_meliscore_error_message");
+            }
+        }else{
+        	melisHelper.melisKoNotification("tr_meliscms_menu_sitetree_Name", "tr_meliscms_page_tree_no_selected_page");
+        }
+    });
+	
 	// Add Event to "Add New Site" button
 	addEvent("#id_meliscms_tool_site_header_add", function(e) {
 		melisCoreTool.showOnlyTab('#modal-cms-tool-site', '#id_meliscms_tool_site_modal_add');

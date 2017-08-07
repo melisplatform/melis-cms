@@ -359,7 +359,7 @@ class LanguageController extends AbstractActionController
         if($this->getRequest()->isPost()) {
     
             $postValues = get_object_vars($this->getRequest()->getPost());
-            $postValues = $melisTool->sanitizePost($postValues);
+            $postValues = $melisTool->sanitize($postValues);
             $form->setData($postValues);
     
             if($form->isValid()) {
@@ -435,7 +435,7 @@ class LanguageController extends AbstractActionController
         if($this->getRequest()->isPost()) {
     
             $postValues = get_object_vars($this->getRequest()->getPost());
-            $postValues = $melisTool->sanitizePost($postValues);
+            $postValues = $melisTool->sanitize($postValues);
             $form->setData($postValues);
     
             if($form->isValid()) {

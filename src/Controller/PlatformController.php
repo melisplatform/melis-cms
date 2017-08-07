@@ -129,7 +129,7 @@ class PlatformController extends AbstractActionController
      */
     public function renderPlatformModalAction(){
         $view = new ViewModel();
-        $view->setTerminal(false);
+        $view->setTerminal(true);
         
         $view->id = $this->params()->fromRoute('id', $this->params()->fromQuery('id', ''));
         $view->melisKey = $this->params()->fromRoute('melisKey', $this->params()->fromQuery('melisKey', ''));

@@ -11,8 +11,11 @@
 		if (!empty($this->zoneconfig['interface']))
 		{
 			foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig)
-			{ 
-				echo $this->$keyConfig;
+			{
+				if(!in_array($keyConfig, $this->exclude)) {
+					echo $this->$keyConfig;
+				}
+
 			}
 		}
 		?>

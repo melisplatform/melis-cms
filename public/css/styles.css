@@ -249,11 +249,105 @@ div.content-heading h1{
     left: 12px;
 }
 
+.widget.widget-tabs-double>.widget-head .melis-whead-box ul li a.f-awesome .fa,
+.widget.widget-tabs-double>.widget-head .melis-whead-box ul li.active a.f-awesome .fa {
+    color: #932e2a;
+    font-size: 12px;
+    position: absolute;
+    top: 11px;
+    left: 12px;
+}
+
 .widget.widget-tabs>.widget-head ul li.active a.f-awesome i:before {
     color: #932e2a;
     font-size: 16px;
 }
 
+.meliscms_center_tabs {
+	position: relative;
+}
+
+.melis-whead-box {
+  float: left;
+  height: 40px;
+  overflow: hidden;
+}
+.widget.widget-tabs-double>.widget-head .melis-whead-box ul {
+/*   -webkit-transition: all 0.4s ease-in-out;
+-moz-transition: all 0.4s ease-in-out;
+-ms-transition: all 0.4s ease-in-out;
+-o-transition: all 0.4s ease-in-out;
+transition: all 0.4s ease-in-out; */
+}
+.widget.widget-tabs-double>.widget-head .melis-whead-box ul li {
+	border-right: 0;
+	border-left: 0;
+}
+.widget.widget-tabs-double>.widget-head .melis-whead-box ul li a.f-awesome {
+	margin: 0;
+	color: #fff;
+}
+.widget.widget-tabs-double>.widget-head .melis-whead-box ul li a.f-awesome:hover {
+	color: #932e2a;
+}
+.widget.widget-tabs-double>.widget-head .melis-whead-box ul li a.f-awesome:hover i:before {
+	color: #932e2a;
+}
+.widget.widget-tabs-double>.widget-head .melis-whead-box ul li a.f-awesome i:before {
+	color: #fff;
+	font-size: 16px;
+}
+.widget.widget-tabs-double>.widget-head .melis-whead-box ul li.active a.f-awesome {
+	color: #932e2a;
+}
+.widget.widget-tabs-double>.widget-head .melis-whead-box ul li.active a.f-awesome i:before {
+	color: #932e2a;
+	font-size: 16px;
+}
+
+.widget-melis-tabprev {
+  display: none;
+  float: left;
+  cursor: pointer;
+  -webkit-transition: all 0.4s ease-in-out;
+  -moz-transition: all 0.4s ease-in-out;
+  -ms-transition: all 0.4s ease-in-out;
+  -o-transition: all 0.4s ease-in-out;
+  transition: all 0.4s ease-in-out;
+}
+.widget-melis-tabprev .fa {
+    padding: 9px 10px;
+    color: #fff;
+}
+.widget-melis-tabnext {
+	display: none;
+	float: right;
+	cursor: pointer;
+	-webkit-transition: all 0.4s ease-in-out;
+	-moz-transition: all 0.4s ease-in-out;
+	-ms-transition: all 0.4s ease-in-out;
+	-o-transition: all 0.4s ease-in-out;
+	transition: all 0.4s ease-in-out;
+}
+.widget-melis-tabnext .fa {
+    padding: 9px 10px;
+    color: #fff;
+}
+.widget-melis-tabprev:hover,
+.widget-melis-tabnext:hover {
+	background: #fff;
+}
+.widget-melis-tabprev:hover .fa,
+.widget-melis-tabnext:hover .fa {
+	color: #932e2a;
+}
+.widget-melis-tabprev.active {
+	display: inline-block;
+}
+
+.widget-melis-tabnext.active {
+	display: inline-block;
+}
 .modal-form-text-fix {
 	padding: 0 0 0px;
 }
@@ -269,6 +363,71 @@ div.content-heading h1{
 	height: 100%;
 	z-index: 99;
 	cursor: wait;
+}
+
+/* Search Box in Treeview */
+.meliscms-search-box.sidebar-treeview-search {
+	margin: 10px 10px 0px;
+	position: relative;
+}
+
+.meliscms-search-box.sidebar-treeview-search input {
+    padding-right: 85px;
+    color: #9a9a9a;
+	background: #2c2c2c;
+    border-color: #525252;
+}
+
+.meliscms-search-box.sidebar-treeview-search .sbox-icon {
+    background: #383838;
+    right: 44px;
+    -webkit-transition: all 0.4s ease-in-out;
+    -moz-transition: all 0.4s ease-in-out;
+    -ms-transition: all 0.4s ease-in-out;
+    transition: all 0.4s ease-in-out;
+}
+.meliscms-search-box.sidebar-treeview-search .sbox-icon i {
+    -webkit-transition: all 0.4s ease-in-out;
+    -moz-transition: all 0.4s ease-in-out;
+    -ms-transition: all 0.4s ease-in-out;
+    transition: all 0.4s ease-in-out;
+}
+
+.meliscms-search-box.sidebar-treeview-search .sbox-icon:hover {
+    background: #932e2a;
+}
+.meliscms-search-box.sidebar-treeview-search .sbox-icon:hover i {
+	color: #fff;
+}
+.melis-overlay-loading {
+display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(100% - 45px);
+    height: 100%;
+    cursor: wait;
+    background: rgba(0, 0, 0, 0.3);
+}
+.melis-search-overlay {
+    position: absolute;
+    top: 0;
+    background: #932e2a;
+    color: #fff;
+    width: 100%;
+    height: 34px;
+    text-align: center;
+    line-height: 34px;
+    font-family: 'Open Sans', sans-serif;
+    letter-spacing: 0.4px;
+    z-index: 1;
+}
+
+body.modal-open {
+	overflow: hidden !important;
+}
+.widget-dnd-modal {
+
 }
 /* ===============================================================[ -= RESPONSIVE =- ]==================================================================== */
 
@@ -291,6 +450,17 @@ div.content-heading h1{
 		border-color: #eee;
 	}
 	
+}
+
+@media (max-width: 991px) {
+	.widget-dnd-modal .widget-head {
+		height: 39px !important;
+	}
+	.widget-dnd-modal > .widget-head .melis-whead-box ul li {
+		float: left !important;
+		white-space: nowrap;
+		overflow: hidden;
+	}
 }
 
 @media( min-width: 980px ){

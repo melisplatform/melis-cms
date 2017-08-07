@@ -45,14 +45,14 @@ class MelisCmsSavePageListener extends MelisCoreGeneralListener implements Liste
         		if (!$success)
         			return;
         		
-        		
+    			$fatherPageId = $e->getParam('fatherPageId', '-1');
         		// Create page entry / check existence of idPage in PageTree
         		list($success, $errors, $datas) = $melisCoreDispatchService->dispatchPluginAction(
         				$e,
         				'meliscms',
         				'action-page-tmp',
         				'MelisCms\Controller\PageProperties',
-        				array('action' => 'savePageTree')
+        				array('action' => 'savePageTree', 'fatherPageId' => $fatherPageId)
         		); 
         		if (!$success)
         			return;
@@ -71,7 +71,19 @@ class MelisCmsSavePageListener extends MelisCoreGeneralListener implements Liste
         		);
         		if (!$success)
         			return;
-        				
+        		
+        		// Save page style
+        		list($success, $errors, $datas) = $melisCoreDispatchService->dispatchPluginAction(
+        				$e,
+        				'meliscms',
+        				'action-page-tmp',
+        				'MelisCms\Controller\ToolStyle',
+        				array_merge(array('action' => 'savePageStyle',
+        					  'actionwanted' => 'save'),
+        				    $datas)
+        		);
+        		if (!$success)
+        			return;
 
         		// Save properties tab
         		list($success, $errors, $datas) = $melisCoreDispatchService->dispatchPluginAction(

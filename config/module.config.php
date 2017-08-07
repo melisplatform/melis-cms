@@ -67,7 +67,8 @@ return array(
         ),
         'factories' => array(
 			'MelisCmsRights' => 'MelisCms\Service\Factory\MelisCmsRightsServiceFactory',
-			'MelisCmsSiteService' => 'MelisCms\Service\Factory\MelisCmsSiteServiceFactory',
+            'MelisCmsSiteService' => 'MelisCms\Service\Factory\MelisCmsSiteServiceFactory',
+            'MelisCms\Listener\MelisCmsPluginSaveEditionSessionListener' => 'MelisCms\Listener\Factory\MelisCmsPluginSaveEditionSessionListenerFactory'
         ),
     ),
     'controllers' => array(
@@ -80,10 +81,13 @@ return array(
             'MelisCms\Controller\PageSeo' => 'MelisCms\Controller\PageSeoController',
             'MelisCms\Controller\PageEdition' => 'MelisCms\Controller\PageEditionController',
             'MelisCms\Controller\ToolTemplate' => 'MelisCms\Controller\ToolTemplateController',
+            'MelisCms\Controller\ToolStyle' => 'MelisCms\Controller\ToolStyleController',
             'MelisCms\Controller\Site' => 'MelisCms\Controller\SiteController',
             'MelisCms\Controller\Language' => 'MelisCms\Controller\LanguageController',
             'MelisCms\Controller\Platform' => 'MelisCms\Controller\PlatformController',
             'MelisCms\Controller\SiteRedirect' => 'MelisCms\Controller\SiteRedirectController',
+            'MelisCms\Controller\FrontPlugins' => 'MelisCms\Controller\FrontPluginsController',
+            'MelisCms\Controller\FrontPluginsModal' => 'MelisCms\Controller\FrontPluginsModalController',
             'MelisCms\Controller\PageDuplication' => 'MelisCms\Controller\PageDuplicationController',
         ),
     ),
@@ -93,6 +97,11 @@ return array(
             'MelisCmsPlatformSelect' => 'MelisCms\Form\Factory\PlatformSelectFactory',
             'MelisMultiValInput' => 'MelisCms\Form\Factory\MelisMultiValueInputFactory',
             'MelisCmsPlatformIDsSelect' => 'MelisCms\Form\Factory\PlatformIDsCmsSelectFactory', 
+            'MelisCmsPluginSiteSelect' => 'MelisCms\Form\Factory\Plugin\MelisCmsPluginSiteSelectFactory', 
+            'MelisCmsPluginSiteModuleSelect' => 'MelisCms\Form\Factory\Plugin\MelisCmsPluginSiteModuleSelectFactory', 
+            'MelisCmsStyleSelect' => 'MelisCms\Form\Factory\MelisCmsStyleSelectFactory', 
+            'MelisSwitch' => 'MelisCms\Form\Factory\MelisSwitchFactory',
+            'MelisCmsLanguageSelect' => 'MelisCms\Form\Factory\MelisCmsLanguageSelectFactory',
         ),
     ),
     'view_manager' => array(

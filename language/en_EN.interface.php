@@ -96,12 +96,12 @@
 	    
 	    'tr_meliscms_no_access' => 'You don\'t have access on this feature. please contact site admin.',
 			
-
+	    // Rights
+	    'tr_meliscms_meliscms' => 'MelisCms',
 	    
 	    // tool Template Manager
 	    'tr_meliscms_tool_templates' => 'Template manager', 
 	    'tr_meliscms_tool_templates_text_info' => 'Manage here the templates associated to each site and declare the physical files representing them.', 
-	    
 	    'tr_meliscms_tool_templates_tpl_id' => 'ID',
 	    'tr_meliscms_tool_templates_tpl_site_id' => 'Site',
 	    'tr_meliscms_tool_templates_tpl_site_id tooltip' => 'Site of the template',
@@ -125,7 +125,6 @@
 	    
 	    'tr_tool_template_fm_new_title' => 'New template',
 	    'tr_tool_template_fm_new_content' => 'New template has been added.',
-	    
 	    
 	    'tr_tool_template_fm_update_title' => 'Update template',
 	    'tr_tool_template_fm_update_content' => 'Template has been updated successfully',
@@ -176,6 +175,15 @@
 	    'tr_meliscms_menu_new' => 'New',
 	    'tr_meliscms_menu_edit' => 'Edit',
 	    'tr_meliscms_menu_delete' => 'Delete',
+	    'tr_meliscms_menu_dupe' => 'Duplicate tree',
+	    'tr_meliscms_menu_dupe_fail' => 'Failed to duplicate page tree',
+	    'tr_meliscms_menu_dupe_success' => 'Page tree has been duplicated successfully',
+	    'tr_meliscms_menu_dupe_destination_fail' => 'The destination page doesn&#39;t exist',
+	    'tr_meliscms_menu_dupe_source_fail' => 'The source page doesn&#39;t exist',
+	    'tr_meliscms_tree_sites_duplication_source' => 'Source page ID',
+	    'tr_meliscms_tree_sites_duplication_source tooltip' => 'Identifier of the page tree to be duplicated',
+	    'tr_meliscms_tree_sites_duplication_destination' => 'Destination page ID',
+	    'tr_meliscms_tree_sites_duplication_destination tooltip' => ' Identifier of the destination page of the duplicated page tree or check &#34;Root&#34; to put the duplicated page tree at the root',
 	    
 	    'tr_meliscms_menu_cancel' => 'Cancel',
 	    
@@ -198,17 +206,22 @@
 	    
 	    'tr_meliscms_common_add' => 'Add',
 	    'tr_meliscms_common_apply' => 'Apply',
+	    'tr_meliscms_common_apply_language' => 'Switch the current language to ',
 	    
 	    //Language Tool Translation
-	    'tr_meliscms_tool_language' => 'Page\'s languages',
+	    'tr_meliscms_tool_language' => 'Page&#39;s languages',
+	    'tr_meliscms_tool_description' => 'Define here the different languages that the pages can use.',
+	    'tr_meliscms_tool_modal_text' => 'Each language must have a name and its "locale" defined.',
 	    'tr_meliscms_tool_language_header' => 'Header',
 	    'tr_meliscms_tool_language_content' => 'Content',
 	    'tr_meliscms_tool_language_modal' => 'Modals',
 	    'tr_meliscms_tool_language_lang_id' => 'ID',
 	    'tr_meliscms_tool_language_lang_locale' => 'Locale',
+// 	    'tr_meliscms_tool_language_lang_locale tooltip' => 'tr_meliscms_tool_language_lang_locale tooltip text',
 	    'tr_meliscms_tool_language_lang_locale_long' => 'Locale value too long, it should be less than 10 characters',
 	    'tr_meliscms_tool_language_lang_locale_empty' => 'Please enter the language locale',
 	    'tr_meliscms_tool_language_lang_name' => 'Name',
+	    'tr_meliscms_tool_language_lang_name tooltip' => 'tr_meliscms_tool_language_lang_name tooltip text',
 	    'tr_meliscms_tool_language_lang_name_long' => 'Name too long, it should be less than 45 characters',
 	    'tr_meliscms_tool_language_lang_name_empty' => 'Please enter the language name',
 	    'tr_meliscms_tool_language_new' => 'New language',
@@ -370,5 +383,40 @@
         'tr_meliscms_duplicate_error' => 'Unable to duplicate page',
         'tr_melis_cms_duplicate_success' => 'Page "%s" successfully duplicated',
         'tr_melis_cms_duplicate_text_identifier' => '[Duplicated]',
+	    
+	    // plugins edition
+	    'tr_meliscms_plugins_modal_cancel' => 'Cancel',
+	    'tr_meliscms_plugins_modal_apply' => 'Apply',
+	    
+	    'tr_meliscms_page_tree_no_selected_page' => 'No page selected, please select a page and try again',
+	    
+	    // tool style
+	    'tr_meliscms_tool_styles' => 'Styles',
+	    'tr_meliscms_tool_styles_mgr' => 'Style manager',
+	    'tr_meliscore_tool_styles_new' => 'New style',
+	    'tr_meliscore_tool_styles_edit' => 'Edit style',
+	    'tr_meliscms_tool_style_id' => 'ID',
+	    'tr_meliscms_tool_style_id tooltip' => 'Style identifie',
+	    'tr_meliscms_tool_style_name' => 'Name',
+	    'tr_meliscms_tool_style_name_properties' => 'Style name',
+	    'tr_meliscms_tool_style_name tooltip' => 'ID tooltip',
+	    'tr_meliscms_tool_style_page_id' => 'Page ID',
+	    'tr_meliscms_tool_style_page_id tooltip' => ' Tooltip Page ID',
+	    'tr_meliscms_tool_style_page_status' => 'Status',
+	    'tr_meliscms_tool_style_page_status tooltip' => 'Activate or deactivate the style',
+	    'tr_meliscms_tool_style_page_status_off' => 'Inactive',
+	    'tr_meliscms_tool_style_page_status_on' => 'Active',
+	    'tr_meliscms_tool_style_path' => 'Path',
+	    'tr_meliscms_tool_style_path tooltip' => 'Path of the css file, it can be internal (ex: /mysite/myfolder/mystyle.css) or external (ex: http://www.mysite.com/myfolder/mystyle.css)',
+	    'tr_meliscms_tool_styles_save_fail' => 'Failed to save style details',
+	    'tr_meliscms_tool_styles_save_success' => 'The style has been saved sucessfully',
+	    'tr_meliscms_tool_styles_delete_title' => 'Delete style',
+	    'tr_meliscms_tool_styles_delete_details' => 'Are you sure you want to delete this style?',
+	    'tr_meliscms_tool_styles_delete_fail' => 'Failed to delete style',
+	    'tr_meliscms_tool_styles_delete_success' => 'The style has been deleted successfully',
+	    'tr_meliscms_tool_styles_save_page_style_fail' => 'Failed to add style',
+	    
+	    'tr_meliscms_tool_duplicate_field_empty' => 'Value is required and can&#39;t be empty',
+	    'tr_meliscms_tool_duplicate_field_digits' => 'The input must contain only digits',
 	   );
 ?>

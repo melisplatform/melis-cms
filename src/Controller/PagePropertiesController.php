@@ -30,13 +30,14 @@ class PagePropertiesController extends AbstractActionController
 	{
 		$idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
 		$melisKey = $this->params()->fromRoute('melisKey', '');
-		
+		$pageStyle = null;
 		$pathAppConfigForm = self::PagePropertiesAppConfigPath;
 		 
 		/**
 		 * Get the config for this form
 		 */
 		$melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+		$pageStyleTable = $this->getServiceLocator()->get('MelisEngineTablePageStyle');
 		
 		$appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered(
 		    self::PagePropertiesAppConfigPath,
@@ -59,6 +60,7 @@ class PagePropertiesController extends AbstractActionController
 			$melisPage = $this->serviceLocator->get('MelisEnginePage');
 			$datasPage = $melisPage->getDatasPage($idPage, 'saved');
 			$datasPageTree = $datasPage->getMelisPageTree();
+			$pageStyle = $pageStyleTable->getEntryByField('pstyle_page_id', $idPage)->current();
 		}
 		else
 			$datasPageTree = null;
@@ -85,7 +87,11 @@ class PagePropertiesController extends AbstractActionController
 		    $datasPageTree->page_edit_date = strftime($melisTranslation->getDateFormatByLocate($locale), strtotime($datasPageTree->page_edit_date));
             $propertyForm->bind($datasPageTree);
 		}
-		 
+		
+		if(!empty($pageStyle)){
+		    $propertyForm->setData(array('style_id' => $pageStyle->pstyle_style_id));
+		}
+		
 		/**
 		 * Send back the view and add the form config inside
 		*/
@@ -161,7 +167,7 @@ class PagePropertiesController extends AbstractActionController
 		$this->getEventManager()->trigger('meliscms_page_savetree_start', null, $eventDatas);
 		
 		$melisEngineTablePageTree = $this->getServiceLocator()->get('MelisEngineTablePageTree');
-		 
+		
 		// Check if the page really exist to avoid ghost datas
 		$exist = false;
 		if (!empty($idPage))
@@ -408,6 +414,7 @@ class PagePropertiesController extends AbstractActionController
         			unset($datas['page_submit']);
         			unset($datas['page_creation_date']);
         			unset($datas['plang_lang_id']);
+        			unset($datas['style_id']);
         			
         			$datas['page_id'] = $idPage;
         			

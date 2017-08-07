@@ -30,7 +30,7 @@
     	var tree = $("#find-page-dynatree").fancytree("getTree");
     	tree.clearFilter();
 		$("#find-page-dynatree").fancytree("getRootNode").visit(function(node){
-	        node.setExpanded(false);
+            node.setExpanded(false);
 	    });
 	    setTimeout(function(){
 	    	melisHelper.removeLoadingZone($('.page-evolution-content'));
@@ -57,6 +57,17 @@
 
     });
     
+    $body.on("click", "#generateTreePageId", function(){
+    	melisCoreTool.pending('#generateTreePageLink');
+    	var id = $('#find-page-dynatree .fancytree-active').parent('li'). attr('id').split("_")[1];
+    	var inputId = $('#generateTreePageId').data('inputid');
+    	$(inputId).val(id);
+    	
+    	$('#id_meliscms_input_page_tree_container').modal("hide");
+    	
+    	melisCoreTool.done('#generateTreePageLink');
+    });
+    
     function startTreeSearch() {
     	var match = $("input[name=tree_search]").val();
 		var tree = $("#find-page-dynatree").fancytree("getTree");
@@ -66,10 +77,12 @@
 		 
 		 tree.clearFilter();
 		 $("#find-page-dynatree").fancytree("getRootNode").visit(function(node){
-	        node.setExpanded(false);
+	        node.resetLazy();
 	     });
 		 $("input[name=tree_search]").prop('disabled', true);
-         $(".meliscms-search-box").addClass("searching");
+         var searchContainer = $("input[name=tree_search]").closest(".meliscms-search-box");
+         searchContainer.addClass("searching");
+
 		 $.ajax({
 	        type        : 'POST', 
 	        url         : 'melis/MelisCms/Page/searchTreePages',
@@ -77,23 +90,36 @@
 	        dataType    : 'json',
 	        encode		: true
 	     }).success(function(data){
-	    	 var arr = $.map(data, function(el) { return el });
+            if(!$.trim(data)) {
+                searchContainer.append("<div class='melis-search-overlay'>Not Found</div>").hide().fadeIn(600);
+                setTimeout(function() {
+                    $(".melis-search-overlay").fadeOut(600, function() {
+                        $(this).remove();
+                    });
+                    $("input[name=tree_search]").prop('disabled', false);
+                    $("input[name=tree_search]").focus();
+                }, 1000);
+            } else {
+    	    	var arr = $.map(data, function(el) { return el });
 
-    		tree.loadKeyPath(arr, function(node, status){
-    			switch( status ) {
-				case "loaded":							
-					node.makeVisible();		
-					break;
-				case "ok":
-					node.makeVisible();
-					break;
-    			}
-    			filterFunc.call(tree, match, opts);					
-			}).done(function(){
-				$("input[name=tree_search]").prop('disabled', false);
-                 $(".meliscms-search-box").removeClass("searching");
+        		tree.loadKeyPath(arr, function(node, status){
+                    if(!node.isVisible()) {
+            			switch( status ) {
+        				case "loaded":							
+        					node.makeVisible();		
+        					break;
+        				case "ok":
+        					node.makeVisible();
+        					break;
+            			}
 
-			});					
+                    }
+        			filterFunc.call(tree, match, opts);					
+    			}).done(function(){
+    				$("input[name=tree_search]").prop('disabled', false);
+                    searchContainer.removeClass("searching");
+    			});					
+            }
 	    	
 		
 	     }).error(function(){
@@ -165,6 +191,24 @@
         $("#mce-link-tree").closest('.mce-panel').css('z-index', 1049);
         $("#mce-modal-block").css('z-index', 1048);
     }
+    
+    // used in regular form buttons
+    function createInputTreeModal(id) {
+    	
+    	// initialation of local variable
+    	zoneId = 'id_meliscms_input_page_tree';
+    	melisKey = 'meliscms_input_page_tree';
+    	modalUrl = 'melis/MelisCms/Page/renderPageModal';
+    	
+    	// requesitng to create modal and display after
+    	if($('#id_meliscms_input_page_tree_container').length){
+    		$('#id_meliscms_input_page_tree_container').parent().remove();
+    	}
+    	
+    	window.parent.melisHelper.createModal(zoneId, melisKey, false, {'pageTreeInputId' : id}, modalUrl, function() {
+    	});
+    	
+    }
 
     function selectedNodes() {
         var title = $(this).closest('li').attr('id');
@@ -232,6 +276,7 @@
 
     return {
         createTreeModal         :       createTreeModal,
+        createInputTreeModal	: 		createInputTreeModal,
         findPageMainTree        :       findPageMainTree,
         checkBtn                :       checkBtn,
         showUrl                 :       showUrl,

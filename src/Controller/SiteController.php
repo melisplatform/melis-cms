@@ -314,6 +314,7 @@ class SiteController extends AbstractActionController
             $dataCount = $siteTable->getTotalData();
 
             $getData = $siteTable->getSitesData($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length);
+            $dataFilter = $siteTable->getSitesData($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder, null, null);
 
             $tableData = $getData->toArray();
             for($ctr = 0; $ctr < count($tableData); $ctr++)
@@ -335,7 +336,7 @@ class SiteController extends AbstractActionController
         return new JsonModel(array(
             'draw' => (int) $draw,
             'recordsTotal' => $dataCount,
-            'recordsFiltered' =>  $siteTable->getTotalFiltered(),
+            'recordsFiltered' =>  $dataFilter->count(),
             'data' => $tableData,
         ));
         
@@ -447,7 +448,7 @@ class SiteController extends AbstractActionController
                     $genSiteModule = !empty($request->getPost('gen_site_mod')) ? true : false;
                     
                     $cmsSiteSrv = $this->getServiceLocator()->get('MelisCmsSiteService');
-                    $saveSiteResult = $cmsSiteSrv->saveSite($dataSite, $dataDomain, $dataSite404, $dataSiteLang, $siteId, $genSiteModule);
+                    $saveSiteResult = $cmsSiteSrv->saveSite($dataSite, $dataDomain, $dataSite404, $dataSiteLang, $siteId, $genSiteModule, $dataSite['site_name']);
                     
                     if ($saveSiteResult['success'])
                     {

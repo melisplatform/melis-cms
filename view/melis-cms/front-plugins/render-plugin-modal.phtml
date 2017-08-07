@@ -1,0 +1,91 @@
+<div>
+    <div class="modal fade" id="id_meliscms_plugin_modal_container"
+    	data-melis-id-page="<?= $this->idPage; ?>" data-melis-plugin-module="<?= $this->module; ?>" 
+    	data-melis-plugin-name="<?= $this->pluginName; ?>" data-melis-plugin-id="<?= $this->pluginId; ?>"
+    	data-melis-plugin-tag="<?= $this->tag; ?>"
+    	data-melis-site-module="<?= $this->siteModule; ?>">
+    	<div class="plugin-hardcoded-conf" style="display:none;">
+    		<?php 
+    		      echo serialize($this->pluginHardcodedConfig);
+    		?>
+    	</div>
+        <div class="modal-dialog" role="test">
+          	<div id="id_meliscms_plugin_modal" data-melisKey="<?= $this->melisKey; ?>" class="modal-content">
+              	<div class="modal-content">
+                	<div class="modal-body padding-none">
+                		<div class="wizard">
+                			<div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none widget-dnd-modal">
+                                <div class="widget-head">
+                                    <span class="widget-melis-tabprev">
+                                        <i class="fa fa-angle-left"></i>
+                                    </span>
+                                    <div class="melis-whead-box">
+                                        <ul class="nav nav-tabs">
+                                            <?php 
+                                              foreach ($this->tabs as $key => $tab)
+                                              {
+                                                  $tabName = '';
+                                                  if (!empty($tab['name']))
+                                                      $tabName = $tab['name'];
+                                                  
+                                                  $icon = '';
+                                                  if (!empty($tab['icon']))
+                                                      $icon = '<i class="' . $tab['icon'] . '"></i>';
+                                                  
+                                            ?>
+                                            <li <?php if ($key == 0) echo 'class="active"'; ?>>
+                                                <a href="#plugin_modal_id_tab_<?= $key; ?>" class="f-awesome" data-toggle="tab" aria-expanded="true"><?= $icon; ?><?= $tabName; ?></a>
+                                            </li>    
+                                            <?php 
+                                              }    
+                                            ?>              
+                                        </ul>
+                                    </div>
+                                    <span class="widget-melis-tabnext">
+                                        <i class="fa fa-angle-right"></i>
+                                    </span>
+                        		</div>
+                        		<div class="widget-body innerAll inner-2x">
+                        			<div class="tab-content page-evolution-content">
+                                		<?php 
+                                		  foreach ($this->tabs as $key => $tab)
+                                		  {
+                                		      $html = '';
+                                		      if (!empty($tab['html']))
+                                		          $html = $tab['html'];
+                                		?>
+                        				<div class="tab-pane <?php if ($key == 0) echo 'active'; ?>" id="plugin_modal_id_tab_<?= $key; ?>">
+                                            <div class="row">
+                                            	<div class="col-md-12">
+                                                    <div class="plugin-container">
+                                                        <?= $html; ?>    
+                                                    </div>
+                                            	</div>
+                                            </div>
+                                        </div> 
+                                		<?php 
+                                		  }    
+                                		?> 
+                                    </div>
+                                    <br>
+                                    <br>
+                                    <div class="clearfix">
+                                        <button data-dismiss="modal" class="btn btn-danger pull-left"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscms_plugins_modal_cancel')?></button>
+                                        <?php 
+                                            if (empty($this->tabs[0]['empty']) || !$this->tabs[0]['empty'])
+                                            {
+                                        ?>
+                                        <button id="pluginModalBtnApply" class="btn btn-success pull-right"><i class="fa fa-save"></i> <?php echo $this->translate('tr_meliscms_plugins_modal_apply')?></button>                 
+                                        <?php 
+                                            }
+                                        ?>
+                                	</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+          	</div>
+        </div>
+    </div>
+</div>

@@ -11,8 +11,11 @@
 				<?php 
 					if (!empty($this->zoneconfig['interface']))
 					{
-						foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig)
+
+                        foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig)
 						{
+                            if(!in_array($keyConfig, $this->exclude)) {
+
 							$id = '';
 							if (!empty($menuConfig['conf']['id']))
 								$id = ' id="' . $this->idPage . '_' . $menuConfig['conf']['id'] . '_title"';
@@ -32,7 +35,8 @@
 									<span><?= $tabname; ?></span>
 								</a>
 							</li>
-							<?php 
+							<?php
+                            }
 						}
 					}
 				?>

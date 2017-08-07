@@ -39,6 +39,24 @@
     height: 24px;
 }
 
+#id-mod-menu-dynatree.fancytree-ext-filter-hide tr.fancytree-match span.fancytree-title, 
+#id-mod-menu-dynatree.fancytree-ext-filter-hide span.fancytree-node.fancytree-match span.fancytree-title,
+#id-mod-menu-dynatree.fancytree-ext-filter-dimm tr.fancytree-match span.fancytree-title, 
+#id-mod-menu-dynatree.fancytree-ext-filter-dimm span.fancytree-node.fancytree-match span.fancytree-title,
+#id-mod-menu-dynatree.fancytree-ext-filter-dimm tr.fancytree-submatch span.fancytree-title, 
+#id-mod-menu-dynatree.fancytree-ext-filter-dimm span.fancytree-node.fancytree-submatch span.fancytree-title {
+    color: #fff;
+    font-weight: normal;
+}
+
+#id-mod-menu-dynatree.fancytree-ext-filter-hide tr.fancytree-match span.fancytree-title mark, 
+#id-mod-menu-dynatree.fancytree-ext-filter-hide span.fancytree-node.fancytree-match span.fancytree-title mark,
+#id-mod-menu-dynatree.fancytree-ext-filter-dimm tr.fancytree-match span.fancytree-title mark, 
+#id-mod-menu-dynatree.fancytree-ext-filter-dimm span.fancytree-node.fancytree-match span.fancytree-title mark {
+    background-color: #932e2a;
+    color: #fff;
+}
+
 span.fancytree-node{
     padding: 2px 0;
 }

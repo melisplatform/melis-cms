@@ -94,7 +94,8 @@ $(function(){
 });
 
 // Site Redirect mdoal form
-window.createSite301Modal = function(s301Id = 0){
+window.createSite301Modal = function(s301Id){
+	if(typeof s301Id === "undefined") s301Id = null;
 	zoneId = 'id_meliscms_tool_site_301_generic_form';
 	melisKey = 'meliscms_tool_site_301_generic_form';
 	modalUrl = '/melis/MelisCms/SiteRedirect/renderToolSiteRedirectModal';

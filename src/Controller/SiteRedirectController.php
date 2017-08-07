@@ -301,7 +301,7 @@ class SiteRedirectController extends AbstractActionController
         $melisKey = $this->params()->fromQuery('melisKey');
         
         $view = new ViewModel();
-        $view->setTerminal(false);
+        $view->setTerminal(true);
         $view->id = $id;
         $view->melisKey = $melisKey;
         return $view;
