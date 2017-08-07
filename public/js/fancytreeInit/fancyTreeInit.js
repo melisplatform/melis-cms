@@ -115,11 +115,21 @@
     			create: function(event, data) {
     				melisHelper.loadingZone($('#treeview-container'));
 				},
-    			init: function(event, data, flag) {
-			    	melisHelper.removeLoadingZone($('#treeview-container'));
-        			// focus search box
-        			$("input[name=left_tree_search]").focus();
-				},
+				init: function(event, data, flag) {
+			        melisHelper.removeLoadingZone($('#treeview-container'));
+			           // focus search box
+			           $("input[name=left_tree_search]").focus();
+
+			        var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
+			        
+		           if(tree.count() === 0) {
+			            $(".meliscms-search-box.sidebar-treeview-search").hide();
+			            $("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='btn btn-success'>"+ translations.tr_meliscms_create_page +"</span></div>");
+		            } else {
+			            $(".meliscms-search-box.sidebar-treeview-search").show();
+			            $("#id-mod-menu-dynatree .create-newpage").remove();
+		            }
+			    },
 	        	click: function (event, data) {
 	        		targetType = data.targetType;
 	        		if(targetType === "title"){
