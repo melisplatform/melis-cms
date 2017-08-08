@@ -134,10 +134,11 @@
 
     });
 
+    // Tooltip
     $(".melis-cms-plugin-snippets").tooltip({
     	position: {
 	        my: "left center",
-	        at: "left+100% center",
+	        at: "left+110% center",
 	        using: function( position, feedback ) {
 	        	$( this ).css( position );
 	        	$(this)

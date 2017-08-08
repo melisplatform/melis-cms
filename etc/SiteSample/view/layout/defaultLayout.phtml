@@ -1,6 +1,11 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 	<head>
-		<?= $this->headTitle('SiteSample'); ?>
+      	<title>SiteSample</title>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 		<?= $this->headLink()->appendStylesheet('/SiteSample/css/styles.css'); ?>
 	</head>
 	<body>
@@ -8,14 +13,13 @@
 			<?= $this->content; ?>
 		</div>
 		<div id="footer">
-	<!-- 		Datas Page : 
+	        <!-- Datas Page : 
 			idPage = <?= $this->idPage; ?> /
 			pageLangId = <?= $this->pageLangId; ?> /
 			pageLangLocale = <?= $this->pageLangLocale; ?> /
 			renderType = <?= $this->renderType; ?> /
 			renderMode = <?= $this->renderMode; ?>
-			 -->
+			-->
 		</div>
-		<script type="text/javascript" src="/MelisCore/assets/components/library/jquery/jquery.min.js?v=v1.2.3"></script>
 	</body>
 </html>
