@@ -68,6 +68,7 @@ return array(
         'factories' => array(
 			'MelisCmsRights' => 'MelisCms\Service\Factory\MelisCmsRightsServiceFactory',
             'MelisCmsSiteService' => 'MelisCms\Service\Factory\MelisCmsSiteServiceFactory',
+            'MelisCmsPageGetterService' => 'MelisCms\Service\Factory\MelisCmsPageGetterServiceFactory',
             'MelisCms\Listener\MelisCmsPluginSaveEditionSessionListener' => 'MelisCms\Listener\Factory\MelisCmsPluginSaveEditionSessionListenerFactory'
         ),
     ),
