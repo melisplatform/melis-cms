@@ -624,6 +624,44 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
     -o-animation: spinning-cog 1.3s infinite ease;
     animation: spinning-cog 1.3s infinite ease;
 }
+.btn-pulse {
+    position: absolute;
+    top: 300px;
+    right: 20%;
+    background: #932e2a;
+    border: none;
+    border-radius: 100%;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    box-shadow: 0 0 0 0 rgb(147, 46, 42);
+    -webkit-animation: pulse 1.25s infinite cubic-bezier(0.66, 0, 0, 1);
+    -moz-animation: pulse 1.25s infinite cubic-bezier(0.66, 0, 0, 1);
+    -ms-animation: pulse 1.25s infinite cubic-bezier(0.66, 0, 0, 1);
+    animation: pulse 1.25s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+.btn-pulse:hover {
+    -webkit-animation: none;
+    -moz-animation: none;
+    -ms-animation: none;animation: none;
+}
+
+.melis-float-plugins {
+    margin: 0 -15px;
+    border: 1px solid darkred;
+}
+
+.melis-float-plugins:after {
+    content: "";
+    clear: both;
+    display: block;
+}
+
+.melis-float-plugins .melis-ui-outlined {
+    float: left;
+    margin: 0 15px;
+}
+
 @-webkit-keyframes spinning-cog {
     0% { -webkit-transform: rotate(0deg) }
     20% { -webkit-transform: rotate(-45deg) }
@@ -671,3 +709,8 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
     -o-animation: shrinking-cog .3s 1 ease forwards;
     animation: shrinking-cog .3s 1 ease forwards;
 }
+
+@-webkit-keyframes pulse {to {box-shadow: 0 0 0 45px rgba(147, 46, 42, 0);}}
+@-moz-keyframes pulse {to {box-shadow: 0 0 0 45px rgba(147, 46, 42, 0);}}
+@-ms-keyframes pulse {to {box-shadow: 0 0 0 45px rgba(147, 46, 42, 0);}}
+@keyframes pulse {to {box-shadow: 0 0 0 45px rgba(147, 46, 42, 0);}}
