@@ -25,6 +25,7 @@ var melisPluginEdition = (function($, window) {
         $(this).removeClass("melis-focus");
     });
 
+    $("body").on("dblclick", ".ui-resizable-e", changeWidth);
 
     // Submit form in modal
     function submitPluginForms(e) {
@@ -542,19 +543,148 @@ var melisPluginEdition = (function($, window) {
         });
     }
 
+    //  Resize Plugin
+    function initResizable() {
+        var totalWidth,
+            parentWidth;
+        var percentTotalWidth;
+
+        $(".melis-dragdropzone .melis-ui-outlined").resizable({
+            containment: ".melis-dragdropzone",
+            start: function(event, ui){
+                var widthIndicator =  '<div class="ui-resize-indicator"></div>';
+                parentWidth = ui.originalElement.parent().outerWidth();
+                // width indicator
+                $(ui.originalElement).append(widthIndicator);
+
+                if($(ui.originalElement).find(".ui-resize-input")) {
+                    $(ui.originalElement).find(".ui-resize-input").remove();
+                }
+            },
+            resize: function(event, ui) {
+                totalWidth = ui.size.width;
+                ui.originalElement.css('height', 'auto');
+                // convert px to percent
+                percentTotalWidth = (100 * totalWidth / parentWidth);
+                percentTotalWidth = percentTotalWidth.toFixed(2);
+                ui.originalElement.css('width', percentTotalWidth + '%');
+                $(ui.originalElement).find(".ui-resize-indicator").text(percentTotalWidth + " %");
+            },
+            stop: function(event, ui) {
+
+                // get all data attributes
+                var toolBox = $(ui.originalElement).find(".melis-plugin-tools-box");
+                if(toolBox) {
+                    var pluginList = new Object();
+                    $(toolBox).map(function() {
+                        pluginList['melisIdPage'] = $(this).data("plugin-id");
+                        pluginList['melisModule'] = $(this).data("module");
+                        pluginList['melisPluginName'] = $(this).data("plugin");
+                        pluginList['melisPluginId'] = $(this).data("plugin-id");
+                        pluginList['melisPluginTag'] = $(this).data("melis-tag");
+                    });
+                    // set data attribute for width
+                    pluginList['melisPluginWidth'] = percentTotalWidth;
+                    // pass is to savePageSession
+                    savePluginUpdate(pluginList);
+
+                }
+                // remove indicator
+                $(ui.originalElement).find(".ui-resize-indicator").remove();
+                // check if below 50% and if melis-float-plugin available
+                if(percentTotalWidth <= 50 && $(ui.element[0]).parent('.melis-float-plugins').length <= 0) {
+                    if($(ui.element[0]).next('.btn-pulse').length <= 0) {
+                        // create button get the current height of left plugin
+                        var btnAddPluginBox = '<button class="btn-pulse" title="Add Plugin Box"><i class="fa fa-plus"></i></button>';
+                        var elHeight = $(ui.element[0]).height(),
+                            btnPosTop = elHeight / 2;
+                        // add button
+                        $(btnAddPluginBox).insertAfter($(ui.element[0]));
+                        if($(ui.element[0]).next('.btn-pulse').length >= 1) {
+                            var elPos = $(this).position();
+                            $(this).next('.btn-pulse').css('top', btnPosTop + elPos.top);
+                        }
+                        $("body").on("click", ".btn-pulse", addPluginFloatBox);
+                    }
+                } else {
+                    if($(ui.element[0]).next('.btn-pulse').length) {
+                        $(ui.element[0]).next().remove();
+                    }
+                }
+
+            }
+        });
+    }
+
+
+
+    // Wrap in Float Box and reinit
+    function addPluginFloatBox() {
+        $($(this).prev()).wrap('<div class="melis-float-plugins"></div>');
+        $(this).remove();
+        $(".melis-float-plugins").sortable({
+            connectWith: ".melis-dragdropzone",
+            handle: ".m-move-handle",
+            forcePlaceholderSize: false,
+            cursor: "move",
+            cursorAt: { top: 0, left: 0 },
+            zIndex: 999999,
+            placeholder: "ui-state-highlight",
+            tolerance: "pointer",
+        }).disableSelection();
+    }
+
+    function changeWidth() {
+        var el = $(this).parent();
+        var parentWidth = el.parent().width();
+        var elWidth = el.width();
+        // convert px to percent
+        elWidth = (100 * elWidth / parentWidth);
+        elWidth = elWidth.toFixed(2);
+        var resizeBox =  '<div class="ui-resize-input" title="Edit plugin width"><input id="pluginWidthResize" type="text" value="'+elWidth+'"/>% <div>';
+        el.append(resizeBox);
+
+        // get input value when press enter
+        $('#pluginWidthResize').keypress(function(event){
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if(keycode == '13'){
+                var inputVal = $(this).val();
+                if( $.isNumeric(inputVal) && inputVal >= 1 && inputVal <= 100) {
+                    var parent = $(this).parent().closest(".melis-ui-outlined");
+                    parent.css('width', inputVal + '%');
+
+                } else {
+                    $(this).val(elWidth);
+                }
+            }
+            event.stopPropagation();
+        });
+    }
+
+
+    $(".melis-dragdropzone .melis-ui-outlined").map(function() {
+        var pluginWidth = $(this).find(".melis-plugin-tools-box").data("plugin-width");
+        $(this).css('width', pluginWidth + '%');
+    });
+
+
+    // init resize
+    initResizable();
+
     return {
-        submitPluginForms   :   submitPluginForms,
-        pluginRenderer      :   pluginRenderer,
-        checkFunctionExists :   checkFunctionExists,
-        checkLinkExists     :   checkLinkExists,
-        checkScriptExists   :   checkScriptExists,
-        calcFrameHeight     :   calcFrameHeight,
-        savePluginUpdate    :   savePluginUpdate,
-        sendDragnDropList   :   sendDragnDropList,
-        removePlugins       :   removePlugins,
-        checkToolSize       :   checkToolSize,
-        disableLinks        :   disableLinks,
-        processPluginResources : processPluginResources,
+        submitPluginForms       :       submitPluginForms,
+        pluginRenderer          :       pluginRenderer,
+        checkFunctionExists     :       checkFunctionExists,
+        checkLinkExists         :       checkLinkExists,
+        checkScriptExists       :       checkScriptExists,
+        calcFrameHeight         :       calcFrameHeight,
+        savePluginUpdate        :       savePluginUpdate,
+        sendDragnDropList       :       sendDragnDropList,
+        removePlugins           :       removePlugins,
+        checkToolSize           :       checkToolSize,
+        disableLinks            :       disableLinks,
+        processPluginResources  :       processPluginResources,
+        initResizable           :       initResizable
     }
 
 })(jQuery, window);

@@ -15,7 +15,6 @@
     $("body").on("click", "#melisPluginBtn", showPluginMenu);
     $("body").on("click", ".melis-cms-filter-btn", showPlugLists);
     $("body").on("click", ".melis-cms-category-btn", showCatPlugLists);
-
     /* ==================================
             Drag & Drop
     ====================================*/
@@ -154,59 +153,6 @@
         $(this).children(".melis-plugin-tooltip").fadeIn();
     });
 
-    //  Resize Plugin
-    function initResizable() {
-        var totalWidth,
-            parentWidth;
-
-        $(".melis-dragdropzone .melis-ui-outlined").resizable({
-            containment: ".melis-dragdropzone",
-            start: function(event, ui){
-                parentWidth = ui.originalElement.parent().outerWidth();
-            },
-            resize: function(event, ui) {
-                totalWidth = ui.size.width;
-                ui.originalElement.css('height', 'auto');
-            },
-            stop: function(event, ui) {
-                var percentTotalWidth = (100 * totalWidth / parentWidth);
-                // convert px to percent
-                ui.originalElement.css('width', percentTotalWidth + '%');
-                // check if below 50% and if melis-float-plugin available
-                if(percentTotalWidth <= 50 && $(ui.element[0]).parent('.melis-float-plugins').length <= 0) {
-                    if($(ui.element[0]).next('.btn-pulse').length <= 0) {
-                        // create button get the current height of left plugin
-                        var btnAddPluginBox = '<button class="btn-pulse" title="Add Plugin Box"><i class="fa fa-plus"></i></button>';
-                        var elHeight = $(ui.element[0]).height(),
-                            btnPosTop = elHeight / 2 - 25;
-                        // add button
-                        $(btnAddPluginBox).insertAfter($(ui.element[0]));
-                        $("body").on("click", ".btn-pulse", addPluginBox);
-                    }
-                } else {
-                    if($(ui.element[0]).next('.btn-pulse').length) {
-                        $(ui.element[0]).next().remove();
-                    }
-                }
-
-            }
-        });
-    }
-
-    function addPluginBox() {
-        $($(this).prev()).wrap('<div class="melis-float-plugins"></div>');
-        $(this).remove();
-        $(".melis-float-plugins").sortable({
-            connectWith: ".melis-dragdropzone",
-            handle: ".m-move-handle",
-            forcePlaceholderSize: false,
-            cursor: "move",
-            cursorAt: { top: 0, left: 0 },
-            zIndex: 999999,
-            placeholder: "ui-state-highlight",
-            tolerance: "pointer",
-        }).disableSelection();
-    }
     // $( ".melis-editable" ).resizable({ disabled: true, handles: 'e' });
 
     function requestPlugin(module, plugin, dropzone, pageId, dropLocation, siteModule) {
@@ -283,7 +229,8 @@
                     
                     // Processing the plugin resources and initialization
                     melisPluginEdition.processPluginResources(plugin.init, idPlugin);
-                    initResizable();
+                    // Init Resizable
+                    melisPluginEdition.initResizable();
                     // remove plugin
                     $(dropLocation).remove();
                     // send new plugin list
@@ -364,9 +311,6 @@
     }
 
     pluginScrollPos();
-
-    // init resize
-    initResizable();
 
     return {
         requestPlugin           :       requestPlugin,

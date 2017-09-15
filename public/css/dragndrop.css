@@ -326,7 +326,12 @@ body {
     font-weight: normal;
     font-style: normal;
     font-size: 14px;
-    line-height: 25px;	
+    line-height: 25px;
+    transition: all 0.4s ease-in-out;
+}
+.melis-ui-outlined.ui-sortable-helper,
+.melis-ui-outlined.ui-resizable-resizing {
+    transition: none;
 }
 
 .melis-ui-outlined:after {
@@ -626,7 +631,6 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 }
 .btn-pulse {
     position: absolute;
-    top: 300px;
     right: 20%;
     background: #932e2a;
     border: none;
@@ -660,6 +664,34 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 .melis-float-plugins .melis-ui-outlined {
     float: left;
     margin: 0 15px;
+}
+
+.ui-resize-indicator,
+.ui-resize-input {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 75px;
+    height: 25px;
+    color: #fff;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-align: center;
+    background: #932e2a;
+    border-bottom-left-radius: 2px;
+}
+.ui-resize-input input {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #fff;
+    text-align: center;
+    height: auto;
+    width: 25px;
+    font-size: 10px;
+    font-weight: bold;
 }
 
 @-webkit-keyframes spinning-cog {
