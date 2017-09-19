@@ -545,9 +545,9 @@ var melisPluginEdition = (function($, window) {
 
     //  Resize Plugin
     function initResizable() {
-        var totalWidth,
-            parentWidth;
+        var totalWidth, parentWidth, mobileWidth, tabletWidth, desktopWidth;
         var percentTotalWidth;
+        var iframe = window.parent.$("#"+ parent.activeTabId).find('iframe');
 
         $(".melis-dragdropzone .melis-ui-outlined").resizable({
             containment: ".melis-dragdropzone",
@@ -571,6 +571,8 @@ var melisPluginEdition = (function($, window) {
                 $(ui.originalElement).find(".ui-resize-indicator").text(percentTotalWidth + " %");
             },
             stop: function(event, ui) {
+                console.log('iframe ID ', window.parent.$("#"+ parent.activeTabId).find('iframe').data('iframe-id'));
+                console.log('Width ', window.parent.$("#"+ parent.activeTabId).find('iframe').width());
 
                 // get all data attributes
                 var toolBox = $(ui.originalElement).find(".melis-plugin-tools-box");
@@ -582,9 +584,32 @@ var melisPluginEdition = (function($, window) {
                         pluginList['melisPluginName'] = $(this).data("plugin");
                         pluginList['melisPluginId'] = $(this).data("plugin-id");
                         pluginList['melisPluginTag'] = $(this).data("melis-tag");
+                        mobileWidth = $(this).data("plugin-mobile-width");
+                        tabletWidth = $(this).data("plugin-tablet-width");
                     });
+
+                    if(iframe.width() <= 480) {
+                        console.log('mobile');
+                        mobileWidth = percentTotalWidth;
+                    }
+
+                    if(iframe.width() > 481 && iframe.width() <= 980) {
+                        console.log('tablet');
+                        tabletWidth = percentTotalWidth;
+                    }
+
+                    if(iframe.width() >= 981) {
+                        console.log('desktop');
+                        desktopWidth = percentTotalWidth;
+                    }
+
                     // set data attribute for width
                     pluginList['melisPluginWidth'] = percentTotalWidth;
+                    pluginList['melisPluginMobileWidth'] = mobileWidth;
+                    pluginList['melisPluginTabletWidth'] = tabletWidth;
+                    pluginList['melisPluginDesktopWidth'] = desktopWidth;
+
+
                     // pass is to savePageSession
                     savePluginUpdate(pluginList);
 
@@ -611,7 +636,6 @@ var melisPluginEdition = (function($, window) {
                         $(ui.element[0]).next().remove();
                     }
                 }
-
             }
         });
     }
@@ -651,10 +675,12 @@ var melisPluginEdition = (function($, window) {
                 var inputVal = $(this).val();
                 if( $.isNumeric(inputVal) && inputVal >= 1 && inputVal <= 100) {
                     var parent = $(this).parent().closest(".melis-ui-outlined");
+                    console.log('parent ', parent);
                     parent.css('width', inputVal + '%');
-
+                    // remove width indicator
+                    $(this).closest(".ui-resize-input").remove();
                 } else {
-                    $(this).val(elWidth);
+                    $(this).val(parentWidth.css('width'));
                 }
             }
             event.stopPropagation();
@@ -662,10 +688,17 @@ var melisPluginEdition = (function($, window) {
     }
 
 
+
     $(".melis-dragdropzone .melis-ui-outlined").map(function() {
         var pluginWidth = $(this).find(".melis-plugin-tools-box").data("plugin-width");
         $(this).css('width', pluginWidth + '%');
     });
+
+    // check if resize in mobile, tablet, or desktop
+    // 
+
+
+
 
 
     // init resize
