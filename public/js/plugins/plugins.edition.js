@@ -588,23 +588,28 @@ var melisPluginEdition = (function($, window) {
                         tabletWidth = $(this).data("plugin-tablet-width");
                     });
 
+                    // check if resize in mobile, tablet, or desktop
                     if(iframe.width() <= 480) {
                         console.log('mobile');
-                        mobileWidth = percentTotalWidth;
+                        mobileWidth  = percentTotalWidth;
+                        tabletWidth  = pluginWidth($(ui.originalElement)).tablet;
+                        desktopWidth = pluginWidth($(ui.originalElement)).desktop;
                     }
 
                     if(iframe.width() > 481 && iframe.width() <= 980) {
                         console.log('tablet');
+                        mobileWidth  = pluginWidth($(ui.originalElement)).mobile;
                         tabletWidth = percentTotalWidth;
+                        desktopWidth = pluginWidth($(ui.originalElement)).desktop;
                     }
 
                     if(iframe.width() >= 981) {
                         console.log('desktop');
+                        mobileWidth  = pluginWidth($(ui.originalElement)).mobile;
+                        tabletWidth = pluginWidth($(ui.originalElement)).tablet;
                         desktopWidth = percentTotalWidth;
                     }
-
                     // set data attribute for width
-                    pluginList['melisPluginWidth'] = percentTotalWidth;
                     pluginList['melisPluginMobileWidth'] = mobileWidth;
                     pluginList['melisPluginTabletWidth'] = tabletWidth;
                     pluginList['melisPluginDesktopWidth'] = desktopWidth;
@@ -640,6 +645,15 @@ var melisPluginEdition = (function($, window) {
         });
     }
 
+    function pluginWidth(plugin) {
+        var data = $(plugin).find(".melis-plugin-tools-box").data();
+        var pluginWidth = {
+            mobile:  data.pluginWidthMobile,
+            tablet:  data.pluginWidthTablet,
+            desktop: data.pluginWidthDesktop,
+        };
+        return pluginWidth;
+    }
 
 
     // Wrap in Float Box and reinit
@@ -688,18 +702,11 @@ var melisPluginEdition = (function($, window) {
     }
 
 
-
+    // set each width plugins
     $(".melis-dragdropzone .melis-ui-outlined").map(function() {
-        var pluginWidth = $(this).find(".melis-plugin-tools-box").data("plugin-width");
+        var pluginWidth = $(this).find(".melis-plugin-tools-box").data("plugin-width-desktop");
         $(this).css('width', pluginWidth + '%');
     });
-
-    // check if resize in mobile, tablet, or desktop
-    // 
-
-
-
-
 
     // init resize
     initResizable();
