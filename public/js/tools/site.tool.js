@@ -287,7 +287,39 @@ $(document).ready(function() {
 	$("body").on("change", "#siteEditionForm #id_sdom_env", function(e){ 
 		var siteId = $("#siteEditionForm #id_site_id").val();
 		var siteEnv = $("#siteEditionForm #id_sdom_env").val();
-		getSiteInfo(siteId, siteEnv);
+		//getSiteInfo(siteId, siteEnv);
+		var updateForm = "#siteEditionForm";
+		melisCoreTool.resetLabels(updateForm);
+		$.ajax({
+	        type        : 'POST', 
+	        url         : '/melis/MelisCms/Site/getSiteByIdAndEnvironment',
+	        data        : {siteId : siteId, siteEnv : siteEnv},
+	        dataType    : 'json',
+	        encode		: true
+	    }).done(function(data){
+	    	
+	    	// set Site Domain default value
+			$("#siteEditionForm #id_sdom_domain").val("");
+			
+    		$.each(data, function(index, value) {
+    			// append data to your update form
+    			$(updateForm + " input").each(function(index) {
+    				var name = $(this).attr('name');
+
+    				$(updateForm + " #" + $(this).attr('id')).val(value[name]);
+    				
+    				if(value["sdom_scheme"] === null) {
+    					$('#siteEditionForm #id_sdom_scheme>option:eq(0)').prop('selected', true);
+    				}
+    			});
+    			
+    			if(siteEnv === "selnewsite") {
+    				$("#siteEditionForm #id_sdom_env").val("");
+    				$("#siteEditionForm #id_sdom_domain").val("");
+    			}
+    		});
+    		
+	    })
 	});
 	
 	function newSiteConfirmation(siteId) {
