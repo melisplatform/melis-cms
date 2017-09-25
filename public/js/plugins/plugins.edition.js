@@ -575,45 +575,47 @@ var melisPluginEdition = (function($, window) {
                 console.log('Width ', window.parent.$("#"+ parent.activeTabId).find('iframe').width());
 
                 // get all data attributes
-                var toolBox = $(ui.originalElement).find(".melis-plugin-tools-box");
+                var toolBox = $(ui.originalElement).children(".melis-plugin-tools-box");
                 if(toolBox) {
+
+
                     var pluginList = new Object();
+                    // get data first load
                     $(toolBox).map(function() {
                         pluginList['melisIdPage'] = $(this).data("plugin-id");
                         pluginList['melisModule'] = $(this).data("module");
                         pluginList['melisPluginName'] = $(this).data("plugin");
                         pluginList['melisPluginId'] = $(this).data("plugin-id");
                         pluginList['melisPluginTag'] = $(this).data("melis-tag");
-                        mobileWidth = $(this).data("plugin-mobile-width");
-                        tabletWidth = $(this).data("plugin-tablet-width");
+                        mobileWidth  = $(this).attr("data-plugin-width-mobile");
+                        tabletWidth  = $(this).attr("data-plugin-width-tablet");
+                        desktopWidth  = $(this).attr("data-plugin-width-desktop");
                     });
 
-                    // check if resize in mobile, tablet, or desktop
+                    // check if resize in mobile
                     if(iframe.width() <= 480) {
-                        console.log('mobile');
                         mobileWidth  = percentTotalWidth;
-                        tabletWidth  = pluginWidth($(ui.originalElement)).tablet;
-                        desktopWidth = pluginWidth($(ui.originalElement)).desktop;
+                        // update DOM data attribute
+                        $(toolBox).attr("data-plugin-width-mobile", mobileWidth);
                     }
-
-                    if(iframe.width() > 481 && iframe.width() <= 980) {
-                        console.log('tablet');
-                        mobileWidth  = pluginWidth($(ui.originalElement)).mobile;
+                    // check if resize in tablet
+                    if(iframe.width() > 490 && iframe.width() <= 980) {
                         tabletWidth = percentTotalWidth;
-                        desktopWidth = pluginWidth($(ui.originalElement)).desktop;
+                        $(toolBox).attr("data-plugin-width-tablet", tabletWidth);
+                    }
+                    // check if resize in desktop
+                    if(iframe.width() >= 981) {
+                        desktopWidth = percentTotalWidth;
+                        $(toolBox).attr("data-plugin-width-desktop", desktopWidth);
                     }
 
-                    if(iframe.width() >= 981) {
-                        console.log('desktop');
-                        mobileWidth  = pluginWidth($(ui.originalElement)).mobile;
-                        tabletWidth = pluginWidth($(ui.originalElement)).tablet;
-                        desktopWidth = percentTotalWidth;
-                    }
                     // set data attribute for width
                     pluginList['melisPluginMobileWidth'] = mobileWidth;
                     pluginList['melisPluginTabletWidth'] = tabletWidth;
                     pluginList['melisPluginDesktopWidth'] = desktopWidth;
-
+                    console.log('mobileWidth ', mobileWidth);
+                    console.log('tabletWidth ', tabletWidth);
+                    console.log('desktopWidth ', desktopWidth);
 
                     // pass is to savePageSession
                     savePluginUpdate(pluginList);
@@ -643,16 +645,6 @@ var melisPluginEdition = (function($, window) {
                 }
             }
         });
-    }
-
-    function pluginWidth(plugin) {
-        var data = $(plugin).find(".melis-plugin-tools-box").data();
-        var pluginWidth = {
-            mobile:  data.pluginWidthMobile,
-            tablet:  data.pluginWidthTablet,
-            desktop: data.pluginWidthDesktop,
-        };
-        return pluginWidth;
     }
 
 
@@ -703,10 +695,28 @@ var melisPluginEdition = (function($, window) {
 
 
     // set each width plugins
+/*    $(".melis-dragdropzone .melis-ui-outlined").map(function() {
+        var test = $(this).find('[class^=plugin-width]').filter(function() {
+            return this.className.match(/\plugin-width/);
+        });
+
+
+
+        /!*var pluginWidth = $(this).find(".melis-plugin-tools-box").data("plugin-width-desktop");
+        var pluginW = $(this).find(".melis-plugin-tools-box").next().width();
+        $(this).css('width', pluginW);*!/
+    });*/
+    // move plugins width class to it's container
     $(".melis-dragdropzone .melis-ui-outlined").map(function() {
-        var pluginWidth = $(this).find(".melis-plugin-tools-box").data("plugin-width-desktop");
-        $(this).css('width', pluginWidth + '%');
+        var pluginClasses;
+        $(this).children('[class^=plugin-width]').removeClass(function(index, classes) {
+            var matches = classes.match(/\bplugin-width\S+/ig);
+            pluginClasses = classes;
+            return (matches) ? matches.join(' ') : '';
+        });
+        $(this).addClass(pluginClasses);
     });
+
 
     // init resize
     initResizable();
