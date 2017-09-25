@@ -50,6 +50,7 @@ class MelisCmsFlashMessengerListener extends MelisCoreGeneralListener implements
                 'meliscms_page_duplicate_end',
         	    'meliscms_style_save_details_end',
         	    'meliscms_style_delete_end',
+        	    'meliscms_create_new_page_lang_end',
         	),
         	function($e){
 

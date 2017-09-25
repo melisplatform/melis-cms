@@ -69,7 +69,8 @@ return array(
 			'MelisCmsRights' => 'MelisCms\Service\Factory\MelisCmsRightsServiceFactory',
             'MelisCmsSiteService' => 'MelisCms\Service\Factory\MelisCmsSiteServiceFactory',
             'MelisCmsPageGetterService' => 'MelisCms\Service\Factory\MelisCmsPageGetterServiceFactory',
-            'MelisCms\Listener\MelisCmsPluginSaveEditionSessionListener' => 'MelisCms\Listener\Factory\MelisCmsPluginSaveEditionSessionListenerFactory'
+            'MelisCms\Listener\MelisCmsPluginSaveEditionSessionListener' => 'MelisCms\Listener\Factory\MelisCmsPluginSaveEditionSessionListenerFactory',
+            'MelisCmsPageService' => 'MelisCms\Service\Factory\MelisCmsPageServiceFactory',
         ),
     ),
     'controllers' => array(
@@ -90,6 +91,7 @@ return array(
             'MelisCms\Controller\FrontPlugins' => 'MelisCms\Controller\FrontPluginsController',
             'MelisCms\Controller\FrontPluginsModal' => 'MelisCms\Controller\FrontPluginsModalController',
             'MelisCms\Controller\PageDuplication' => 'MelisCms\Controller\PageDuplicationController',
+            'MelisCms\Controller\PageLanguages' => 'MelisCms\Controller\PageLanguagesController',
         ),
     ),
     'form_elements' => array(
@@ -103,6 +105,7 @@ return array(
             'MelisCmsStyleSelect' => 'MelisCms\Form\Factory\MelisCmsStyleSelectFactory', 
             'MelisSwitch' => 'MelisCms\Form\Factory\MelisSwitchFactory',
             'MelisCmsLanguageSelect' => 'MelisCms\Form\Factory\MelisCmsLanguageSelectFactory',
+            'MelisCmsPageLanguagesSelect' => 'MelisCms\Form\Factory\MelisCmsPageLanguagesSelectFactory',
         ),
     ),
     'view_manager' => array(

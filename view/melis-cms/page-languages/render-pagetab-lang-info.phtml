@@ -1,0 +1,15 @@
+<?php
+    $id = $this->idPage.'_'.$this->zoneconfig['conf']['id'];
+    $data_melisKey = $this->zoneconfig['conf']['melisKey'];
+?>
+<?php if (!empty($this->pageInfo)){?>
+    <div class="widget" id="<?= $id; ?>" data-melisKey='<?= $data_melisKey; ?>'>
+        <div class="widget-body padding-none">
+            <div class="bg-white margin-none">
+            	<?php  ?>
+                <p class="pagelang-p"><?php echo $this->pageInfo?></p>
+            </div>
+        </div>
+    </div>
+    <hr>
+<?php }?>

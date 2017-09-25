@@ -1,0 +1,33 @@
+<?php
+    $id = $this->idPage.'_'.$this->zoneconfig['conf']['id'];
+    $data_melisKey = $this->zoneconfig['conf']['melisKey'];
+?>
+<div class="widget" <?= $id; ?> data-melisKey='<?= $data_melisKey; ?>'>
+    <div class="widget-body padding-none">
+        <div class="bg-white margin-none">
+            <p class="pagelang-p"><?php echo $this->translate('tr_meliscms_page_lang_list')?></p>
+        	<ul class="fa-ul">
+                <?php foreach ($this->pagesData As $val){?>
+                	<li class="open-page-from-lan-tab"
+                	    <?php if ($this->idPage != $val->tree_page_id){?>
+                    		data-opentab
+                    		data-tabicon="fa-file-o" 
+                			data-name="<?php echo $val->page_name ?>" 
+                			data-id="<?php echo $val->tree_page_id ?>_id_meliscms_page" 
+                			data-meliskey="meliscms_page"
+                			data-pageid="<?php echo $val->tree_page_id ?>"
+            			<?php }?>>
+                		<span class="fa fa-li fa-check fa-color-green"></span> 
+                		<strong>
+            				<?php echo $val->lang_cms_name.' - '.$val->page_name.' ('.$val->tree_page_id.')'?>
+            			</strong>
+            			<?php if ($this->idPage == $val->tree_page_id){?>
+            				<i>(<?php echo $this->translate('tr_meliscms_page_lang_list_current_page_lbl')?>)</i>
+            			<?php }?>
+        			</li>
+                <?php }?>
+            </ul>
+        </div>
+    </div>
+</div>
+<hr>

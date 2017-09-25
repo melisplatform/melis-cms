@@ -430,6 +430,20 @@ body.modal-open {
 .widget-dnd-modal {
 
 }
+
+.pagelang-p{
+    margin-bottom: 15px;
+    font-size: 21px;
+    font-weight: 200;
+}
+
+.open-page-from-lan-tab[data-opentab]{
+	cursor: pointer;
+}
+
+.open-page-from-lan-tab[data-opentab]:hover{
+    color: #932e2a;
+}
 /* ===============================================================[ -= RESPONSIVE =- ]==================================================================== */
 
 @media( min-width: 768px ){
