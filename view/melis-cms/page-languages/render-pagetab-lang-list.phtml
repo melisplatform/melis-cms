@@ -5,8 +5,8 @@
 <div class="widget" <?= $id; ?> data-melisKey='<?= $data_melisKey; ?>'>
     <div class="widget-body padding-none">
         <div class="bg-white margin-none">
-            <p class="pagelang-p"><?php echo $this->translate('tr_meliscms_page_lang_list')?></p>
-        	<ul class="fa-ul">
+            <h4 class="pagelang-title"><?php echo $this->translate('tr_meliscms_page_lang_list')?></h4>
+        	<ul class="language-lists">
                 <?php foreach ($this->pagesData As $val){?>
                 	<li class="open-page-from-lan-tab"
                 	    <?php if ($this->idPage != $val->tree_page_id){?>
@@ -17,12 +17,13 @@
                 			data-meliskey="meliscms_page"
                 			data-pageid="<?php echo $val->tree_page_id ?>"
             			<?php }?>>
-                		<span class="fa fa-li fa-check fa-color-green"></span> 
-                		<strong>
+                        <img src="/MelisCore/assets/images/lang/en.png">
+<!--                		<span class="fa fa-li fa-check fa-color-green"></span> -->
+                		<span class="txt-lang">
             				<?php echo $val->lang_cms_name.' - '.$val->page_name.' ('.$val->tree_page_id.')'?>
-            			</strong>
+            			</span>
             			<?php if ($this->idPage == $val->tree_page_id){?>
-            				<i>(<?php echo $this->translate('tr_meliscms_page_lang_list_current_page_lbl')?>)</i>
+            				<span class="c-page">(<?php echo $this->translate('tr_meliscms_page_lang_list_current_page_lbl')?>)</span>
             			<?php }?>
         			</li>
                 <?php }?>
@@ -30,4 +31,4 @@
         </div>
     </div>
 </div>
-<hr>
+<hr class="hr-fw">
