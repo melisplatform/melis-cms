@@ -119,7 +119,20 @@ class PageLanguagesController extends AbstractActionController
             {
                 $pageData = $pageSrv->getDatasPage($val->plang_page_id)->getMelisPageTree();
                 
-                array_push($pagesData, $pageData);
+                if (!empty($pageData))
+                {
+                    // Adding language flag
+                    $langFlag = '/MelisCms/images/lang-flags/default.png';
+                    if (file_exists(__DIR__.'/../../public/images/lang-flags/'.$pageData->lang_cms_locale.'.png'))
+                    {
+                        $langFlag = '/MelisCms/images/lang-flags/'.$pageData->lang_cms_locale.'.png';
+                    }
+                    
+                    $pageData->lang_cms_flag = $langFlag;
+                    
+                    array_push($pagesData, $pageData);
+                }
+                
             }
         }
         

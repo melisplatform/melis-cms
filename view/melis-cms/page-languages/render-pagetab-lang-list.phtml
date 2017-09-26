@@ -2,6 +2,7 @@
     $id = $this->idPage.'_'.$this->zoneconfig['conf']['id'];
     $data_melisKey = $this->zoneconfig['conf']['melisKey'];
 ?>
+
 <div class="widget" <?= $id; ?> data-melisKey='<?= $data_melisKey; ?>'>
     <div class="widget-body padding-none">
         <div class="bg-white margin-none">
@@ -17,7 +18,7 @@
                 			data-meliskey="meliscms_page"
                 			data-pageid="<?php echo $val->tree_page_id ?>"
             			<?php }?>>
-                        <img src="/MelisCore/assets/images/lang/en.png">
+                        <img src="<?php echo $val->lang_cms_flag ?>">
 <!--                		<span class="fa fa-li fa-check fa-color-green"></span> -->
                 		<span class="txt-lang">
             				<?php echo $val->lang_cms_name.' - '.$val->page_name.' ('.$val->tree_page_id.')'?>
