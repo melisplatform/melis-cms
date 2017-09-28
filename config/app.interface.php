@@ -1208,7 +1208,7 @@ return array(
 							    'meliscms_page_languages' =>  array(
 							        'conf' => array(
 							            'id' => 'id_meliscms_center_page_language',
-							            'name' => 'Languages',
+							            'name' => 'tr_meliscms_page_languages',
 							            'melisKey' => 'meliscms_page_languages',
 							            'icon' => 'font',
 							        ),

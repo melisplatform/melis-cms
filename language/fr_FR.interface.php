@@ -426,19 +426,21 @@
 	    'tr_meliscms_tool_duplicate_field_digits' => 'La saisie ne doit contenir que des chiffres',
 	    
 	    // Page languages
-	    'tr_meliscms_page_languages' => 'Langages de la page',
+	    'tr_meliscms_page_languages' => 'Langages',
 	    'tr_meliscms_page_lang_info_interface' => 'Info langages de la page',
 	    'tr_meliscms_page_lang_list' => 'Liste des langages',
 	    'tr_meliscms_page_lang_create' => 'Formulaire de création de langage de page',
-	    'tr_meliscms_page_lang_info' => 'Cette page a été créée en <strong>%s</strong> avec la page <strong %s>%s</strong>',
+	    'tr_meliscms_page_lang_info' => 'Cett page a été créée initiallement en <strong>%s</strong>. Page d\'origine: <strong %s>%s</strong>',
 	    'tr_meliscms_page_lang_list' => 'Cette page a été traduite dans les langages suivants :',
 	    'tr_meliscms_page_lang_list_current_page_lbl' => 'Page actuelle',
-	    'tr_meliscms_page_lang_create_form' => 'Créer une nouvelle version de langage de page',
-	    'tr_meliscms_page_lang_language_field' => 'Langage de page',
-	    'tr_meliscms_page_lang_language_field tooltip' => 'Choisissez le langage de page',
+	    'tr_meliscms_page_lang_create_form' => 'Créer une nouvelle version de la page',
+	    'tr_meliscms_page_lang_language_field' => 'Langage',
+	    'tr_meliscms_page_lang_language_field tooltip' => 'Choisissez le langage de la page',
 	    'tr_meliscms_page_lang_choose_opt' => 'Choisir',
+	    'tr_meliscms_page_lang_create_btn' => 'Créer la page',
 	    'tr_meliscms_page_lang_no_lang_selected' => 'Veuillez choisir le langage de la page',
-	    'tr_meliscms_page_lang_create_success' => 'Le langage de la page a été créé avec succès',
-	    'tr_meliscms_page_lang_create_failed' => 'Impossible de créer le langage de page, veuillez réessayer',
+	    'tr_meliscms_page_lang_create_title' => 'Langage de la page',
+	    'tr_meliscms_page_lang_create_success' => 'La page a été créée avec succès',
+	    'tr_meliscms_page_lang_create_failed' => 'Impossible de créer la page, veuillez réessayer',
 	);
 ?>

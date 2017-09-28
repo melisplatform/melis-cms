@@ -420,20 +420,22 @@
 	    'tr_meliscms_tool_duplicate_field_digits' => 'The input must contain only digits',
 	    
 	    // Page languages
-	    'tr_meliscms_page_languages' => 'Page languages',
+	    'tr_meliscms_page_languages' => 'Languages',
 	    'tr_meliscms_page_lang_info_interface' => 'Page language info',
 	    'tr_meliscms_page_lang_list' => 'Page language list',
 	    'tr_meliscms_page_lang_create' => 'Page language create form',
-	    'tr_meliscms_page_lang_info' => 'This page was initialy created in <strong>%s</strong> with page <strong %s>%s</strong>',
+	    'tr_meliscms_page_lang_info' => 'This page was initially created in <strong>%s</strong>. Original page: <strong %s>%s</strong>',
 	    'tr_meliscms_page_lang_list' => 'This page was translated in the following languages:',
 	    'tr_meliscms_page_lang_list_current_page_lbl' => 'current page',
 	    'tr_meliscms_page_lang_create_form' => 'Create new Page language version',
-	    'tr_meliscms_page_lang_language_field' => 'Page language',
-	    'tr_meliscms_page_lang_language_field tooltip' => 'Select page language',
+	    'tr_meliscms_page_lang_language_field' => 'Language',
+	    'tr_meliscms_page_lang_language_field tooltip' => 'Select the page language',
 	    'tr_meliscms_page_lang_choose_opt' => 'Choose',
-	    'tr_meliscms_page_lang_no_lang_selected' => 'Please select language of the page',
-	    'tr_meliscms_page_lang_create_success' => 'Page language has been created successfully',
-	    'tr_meliscms_page_lang_create_failed' => 'Unable to create page language, please try again',
+	    'tr_meliscms_page_lang_create_btn' => 'Create page',
+	    'tr_meliscms_page_lang_no_lang_selected' => 'Please select a language',
+	    'tr_meliscms_page_lang_create_title' => 'Page language',
+	    'tr_meliscms_page_lang_create_success' => 'The page has been created successfully',
+	    'tr_meliscms_page_lang_create_failed' => 'Unable to create the page, please try again',
 	    
 	);
 ?>

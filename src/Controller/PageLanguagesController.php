@@ -203,6 +203,10 @@ class PageLanguagesController extends AbstractActionController
                     'tree_father_page_id' => $data['pageLangPageId']
                 );
                 
+                $cmsLangTbl = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+                $cmsLangData = $cmsLangTbl->getEntryById($data['pageLangId'])->current();
+                $cmsLangPrefix = !empty($cmsLangData)? ' ('.strtolower(substr($cmsLangData->lang_cms_locale, 0, 2)).')': '';
+                
                 /**
                  * Retrieving the published data of the current page and 
                  * use to create the new Page
@@ -213,6 +217,8 @@ class PageLanguagesController extends AbstractActionController
                 if (!empty($currentPage))
                 {
                     $pagePublished = get_object_vars($currentPage);
+                    // Adding prefix of the language to page name
+                    $pagePublished['page_name'] .= $cmsLangPrefix;
                     // Set new page language version to unpublish
                     $pagePublished['page_status'] = 0;
                 }
@@ -227,6 +233,8 @@ class PageLanguagesController extends AbstractActionController
                 if (!empty($currentPage))
                 {
                     $pageSaved = get_object_vars($currentPage);
+                    // Adding prefix of the language to page name
+                    $pageSaved['page_name'] .= $cmsLangPrefix;
                     // Set new page language version to unpublish
                     $pageSaved['page_status'] = 0;
                 }
@@ -318,7 +326,7 @@ class PageLanguagesController extends AbstractActionController
         
         $response = array(
             'success' => $status,
-            'textTitle' => 'tr_meliscms_page_languages',
+            'textTitle' => 'tr_meliscms_page_lang_create_title',
             'textMessage' => $textMessage,
             'errors' => $errors,
             'pageInfo' => $pageInfo,
