@@ -213,6 +213,8 @@ class PageLanguagesController extends AbstractActionController
                 if (!empty($currentPage))
                 {
                     $pagePublished = get_object_vars($currentPage);
+                    // Set new page language version to unpublish
+                    $pagePublished['page_status'] = 0;
                 }
                 
                 /**
@@ -225,6 +227,8 @@ class PageLanguagesController extends AbstractActionController
                 if (!empty($currentPage))
                 {
                     $pageSaved = get_object_vars($currentPage);
+                    // Set new page language version to unpublish
+                    $pageSaved['page_status'] = 0;
                 }
                 
                 /**
