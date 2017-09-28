@@ -430,7 +430,7 @@
 	    'tr_meliscms_page_lang_info_interface' => 'Info langages de la page',
 	    'tr_meliscms_page_lang_list' => 'Liste des langages',
 	    'tr_meliscms_page_lang_create' => 'Formulaire de création de langage de page',
-	    'tr_meliscms_page_lang_info' => 'Cett page a été créée initiallement en <strong>%s</strong>. Page d\'origine: <strong %s>%s</strong>',
+	    'tr_meliscms_page_lang_info' => 'Cette page a été créée initiallement en <strong>%s</strong>. Page d\'origine : <strong %s>%s</strong>',
 	    'tr_meliscms_page_lang_list' => 'Cette page a été traduite dans les langages suivants :',
 	    'tr_meliscms_page_lang_list_current_page_lbl' => 'Page actuelle',
 	    'tr_meliscms_page_lang_create_form' => 'Créer une nouvelle version de la page',
