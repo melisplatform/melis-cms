@@ -680,6 +680,7 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
     text-align: center;
     background: #932e2a;
     border-bottom-left-radius: 2px;
+    z-index: 1;
 }
 .ui-resize-input input {
     margin: 0;

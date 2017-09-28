@@ -139,7 +139,7 @@ var melisPluginEdition = (function($, window) {
         var tempLoader = '<div id="loader" class="overlay-loader"><img class="loader-icon spinning-cog" src="/MelisCore/assets/images/cog12.svg" data-cog="cog12"></div>';
         $(layout).addClass("melis-loader").prepend(tempLoader);
 
-        var layoutHeight = $(layout).outerHeight()
+        var layoutHeight = $(layout).outerHeight();
         $(layout).height(layoutHeight);
 
         $.ajax({
@@ -188,6 +188,10 @@ var melisPluginEdition = (function($, window) {
                         
                         calcFrameHeight();
                         disableLinks('a');
+
+                        // re init resize
+                        $(".melis-dragdropzone .melis-ui-outlined").resizable("destroy");
+                        initResizable();
                     }
                 }, 300);
             }, 
@@ -571,9 +575,6 @@ var melisPluginEdition = (function($, window) {
                 $(ui.originalElement).find(".ui-resize-indicator").text(percentTotalWidth + " %");
             },
             stop: function(event, ui) {
-                console.log('iframe ID ', window.parent.$("#"+ parent.activeTabId).find('iframe').data('iframe-id'));
-                console.log('Width ', window.parent.$("#"+ parent.activeTabId).find('iframe').width());
-
                 // get all data attributes
                 var toolBox = $(ui.originalElement).children(".melis-plugin-tools-box");
                 if(toolBox) {
@@ -613,12 +614,11 @@ var melisPluginEdition = (function($, window) {
                     pluginList['melisPluginMobileWidth'] = mobileWidth;
                     pluginList['melisPluginTabletWidth'] = tabletWidth;
                     pluginList['melisPluginDesktopWidth'] = desktopWidth;
-                    console.log('mobileWidth ', mobileWidth);
-                    console.log('tabletWidth ', tabletWidth);
-                    console.log('desktopWidth ', desktopWidth);
 
                     // pass is to savePageSession
                     savePluginUpdate(pluginList);
+
+                    // check data type
 
                 }
                 // remove indicator
@@ -671,15 +671,15 @@ var melisPluginEdition = (function($, window) {
         // convert px to percent
         elWidth = (100 * elWidth / parentWidth);
         elWidth = elWidth.toFixed(2);
-        var resizeBox =  '<div class="ui-resize-input" title="Edit plugin width"><input id="pluginWidthResize" type="text" value="'+elWidth+'"/>% <div>';
+        var resizeBox = '<div class="ui-resize-input" title="Edit plugin width"><input id="pluginWidthResize" type="text" value="' + elWidth + '"/>% <div>';
         el.append(resizeBox);
 
         // get input value when press enter
-        $('#pluginWidthResize').keypress(function(event){
+        $('#pluginWidthResize').keypress(function (event) {
             var keycode = (event.keyCode ? event.keyCode : event.which);
-            if(keycode == '13'){
+            if (keycode == '13') {
                 var inputVal = $(this).val();
-                if( $.isNumeric(inputVal) && inputVal >= 1 && inputVal <= 100) {
+                if ($.isNumeric(inputVal) && inputVal >= 1 && inputVal <= 100) {
                     var parent = $(this).parent().closest(".melis-ui-outlined");
                     console.log('parent ', parent);
                     parent.css('width', inputVal + '%');
@@ -693,20 +693,6 @@ var melisPluginEdition = (function($, window) {
         });
     }
 
-
-    // set each width plugins
-/*    $(".melis-dragdropzone .melis-ui-outlined").map(function() {
-        var test = $(this).find('[class^=plugin-width]').filter(function() {
-            return this.className.match(/\plugin-width/);
-        });
-
-
-
-        /!*var pluginWidth = $(this).find(".melis-plugin-tools-box").data("plugin-width-desktop");
-        var pluginW = $(this).find(".melis-plugin-tools-box").next().width();
-        $(this).css('width', pluginW);*!/
-    });*/
-    // move plugins width class to it's container
     $(".melis-dragdropzone .melis-ui-outlined").map(function() {
         var pluginClasses;
         $(this).children('[class^=plugin-width]').removeClass(function(index, classes) {
