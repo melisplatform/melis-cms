@@ -263,12 +263,11 @@ class FrontPluginsController extends AbstractActionController
     public function checkSessionPageAction()
     {
         $container = new Container('meliscms');
-        $pages = $container['content-pages'];
-        
-        echo '<pre>';
+        $pages = $container->getArrayCopy();//$container['content-pages'];
+
+//        \Zend\Debug\Debug::dump($pages);
         print_r($pages);
-        echo '</pre>';
-        
+
         die;
     }
 }
