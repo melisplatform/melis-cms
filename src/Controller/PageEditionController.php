@@ -109,6 +109,17 @@ class PageEditionController extends AbstractActionController
         
     }
 
+    public function getContainerUniqueIdAction()
+    {
+        $success  = 1;
+        $uniqueId = 'plugin_container_id_'.time();
+
+        return new JsonModel(array(
+            'success' => $success,
+            'id'      => $uniqueId
+        ));
+    }
+
 
     /**
      * Saves datas edited in a page and posted to this function
