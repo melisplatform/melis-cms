@@ -272,6 +272,7 @@ var melisPluginEdition = (function($, window) {
                         var functionName = urlStr.substr(0, urlStr.indexOf(".init")) + "_init";
                         
                         checkFunctionExists(eval(functionName), pluginId);
+                        calcFrameHeight();
                     });
                 	
                 }else{
@@ -474,6 +475,7 @@ var melisPluginEdition = (function($, window) {
 
                     if(data.success) {
                         pluginContainer.remove();
+                        calcFrameHeight();
                         sendDragnDropList(dropzone, melisIdPage);
 
 
@@ -494,7 +496,7 @@ var melisPluginEdition = (function($, window) {
     function calcFrameHeight() {
         // recalculate frame height
         var frameHeight = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe").contents().find("body").height();
-        var frame = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe")
+        var frame = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe");
         frame.height(frameHeight);
     }
 

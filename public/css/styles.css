@@ -430,6 +430,53 @@ body.modal-open {
 .widget-dnd-modal {
 
 }
+/* melis cms languages */
+.pagelang-title {
+	margin-bottom: 25px;
+	padding-top: 10px;
+	font-weight: 300;
+}
+.pagelang-title strong {
+	color: #90312e;
+}
+
+.language-lists {
+	margin-bottom: 30px;
+	padding-left: 15px;
+	list-style: none;
+}
+.language-lists li {
+	margin-bottom: 12px;
+}
+.language-lists li .txt-lang {
+	margin-left: 5px;
+	font-weight: bold;
+}
+
+.language-lists li .c-page {
+	font-style: normal;
+	font-weight: bold;
+	color: #72af46;
+	font-size: 13px;
+	margin-left: 5px;
+}
+.pagelang-p{
+    margin-bottom: 15px;
+    font-size: 21px;
+    font-weight: 200;
+}
+
+.open-page-from-lan-tab[data-opentab]{
+	cursor: pointer;
+}
+
+.open-page-from-lan-tab[data-opentab]:hover{
+    color: #932e2a;
+}
+
+.hr-fw {
+	margin: 20px 0;
+}
 /* ===============================================================[ -= RESPONSIVE =- ]==================================================================== */
 
 @media( min-width: 768px ){

@@ -209,7 +209,7 @@
 	    'tr_meliscms_common_apply_language' => 'Switch the current language to ',
 	    
 	    //Language Tool Translation
-	    'tr_meliscms_tool_language' => 'Page&#39;s languages',
+	    'tr_meliscms_tool_language' => 'Page\'s languages',
 	    'tr_meliscms_tool_description' => 'Define here the different languages that the pages can use.',
 	    'tr_meliscms_tool_modal_text' => 'Each language must have a name and its "locale" defined.',
 	    'tr_meliscms_tool_language_header' => 'Header',
@@ -418,5 +418,24 @@
 	    
 	    'tr_meliscms_tool_duplicate_field_empty' => 'Value is required and can&#39;t be empty',
 	    'tr_meliscms_tool_duplicate_field_digits' => 'The input must contain only digits',
-	   );
+	    
+	    // Page languages
+	    'tr_meliscms_page_languages' => 'Languages',
+	    'tr_meliscms_page_lang_info_interface' => 'Page language info',
+	    'tr_meliscms_page_lang_list' => 'Page language list',
+	    'tr_meliscms_page_lang_create' => 'Page language create form',
+	    'tr_meliscms_page_lang_info' => 'This page was initially created in <strong>%s</strong>. Original page : <strong %s>%s</strong>',
+	    'tr_meliscms_page_lang_list' => 'This page was translated in the following languages:',
+	    'tr_meliscms_page_lang_list_current_page_lbl' => 'current page',
+	    'tr_meliscms_page_lang_create_form' => 'Create new Page language version',
+	    'tr_meliscms_page_lang_language_field' => 'Language',
+	    'tr_meliscms_page_lang_language_field tooltip' => 'Select the page language',
+	    'tr_meliscms_page_lang_choose_opt' => 'Choose',
+	    'tr_meliscms_page_lang_create_btn' => 'Create page',
+	    'tr_meliscms_page_lang_no_lang_selected' => 'Please select a language',
+	    'tr_meliscms_page_lang_create_title' => 'Page language',
+	    'tr_meliscms_page_lang_create_success' => 'The page has been created successfully',
+	    'tr_meliscms_page_lang_create_failed' => 'Unable to create the page, please try again',
+	    
+	);
 ?>

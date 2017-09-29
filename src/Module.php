@@ -31,6 +31,7 @@ use MelisCms\Listener\MelisCmsInstallerLastProcessListener;
 use MelisCms\Listener\MelisCmsToolUserNewUserListener;
 use MelisCms\Listener\MelisCmsDeletePlatformListener;
 use MelisCms\Listener\MelisCmsPageDefaultUrlsListener;
+use MelisCms\Listener\MelisCmsPageGetterListener;
 
 class Module
 {
@@ -83,11 +84,12 @@ class Module
                     $eventManager->attach(new MelisCmsDeletePlatformListener());
                     $eventManager->attach(new MelisCmsPageDefaultUrlsListener());
                     
-
                     // Saving Plugin Tag values, Melis Side
                     $eventManager->attach($sm->get('MelisCms\Listener\MelisCmsPluginSaveEditionSessionListener'));
-
                 }
+                
+                // Page Cache Listener
+                $eventManager->attach(new MelisCmsPageGetterListener());
             }
         }
     }
@@ -166,6 +168,8 @@ class Module
             include __DIR__ . '/../config/app.forms.php',
             include __DIR__ . '/../config/app.tools.php',
             include __DIR__ . '/../config/diagnostic.config.php',
+            include __DIR__ . '/../config/diagnostic.config.php',
+            include __DIR__ . '/../config/app.microservice.php',
         );
 
         foreach ($configFiles as $file) {
