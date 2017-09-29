@@ -691,8 +691,11 @@ var melisPluginEdition = (function($, window) {
 
     // Wrap in Float Box and reinit
     function addPluginFloatBox() {
-        $($(this).prev()).wrap('<div class="melis-float-plugins"></div>');
+        var pluginContainerId = getPluginContainerId();
+
+        $($(this).prev()).wrap('<div id="'+ pluginContainerId +'" class="melis-float-plugins"></div>');
         $(this).remove();
+
         $(".melis-float-plugins").sortable({
             connectWith: ".melis-dragdropzone",
             handle: ".m-move-handle",
@@ -703,6 +706,23 @@ var melisPluginEdition = (function($, window) {
             placeholder: "ui-state-highlight",
             tolerance: "pointer",
         }).disableSelection();
+
+        $("#"+pluginContainerId).children(".melis-ui-outlined").map(function() {
+            $(this).attr("data-plugin-container", pluginContainerId);
+        });
+    }
+
+    // get plugin container id
+    function getPluginContainerId() {
+        var pluginId = "";
+        $.ajax({
+            type: 'GET',
+            async: false,
+            url: "/melis/MelisCms/PageEdition/getContainerUniqueId",
+            success: function(data) { pluginId = data.id; },
+            error: function(data) { console.log("Error", data); }
+        });
+        return pluginId;
     }
 
     function changeWidth() {
