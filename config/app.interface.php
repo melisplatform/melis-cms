@@ -118,7 +118,7 @@ return array(
 			'conf' => array(
 				'id' => 'id_melis_cms',
 				'name' => 'tr_meliscms_meliscms',
-				'rights_checkbox_disable' => true,
+			    'rightsDisplay' => 'none',
 			),
 			'ressources' => array(
 				'js' => array(
@@ -480,6 +480,7 @@ return array(
                                                 'id' => 'id_meliscms_tool_site_new_site_confirmation_modal',
                                                 'name' => 'tr_meliscms_tool_site_new_site_confirmation_modal',
                                                 'melisKey' => 'meliscms_tool_site_new_site_confirmation_modal',
+                                                'rightsDisplay' => 'none',
                                             ),
                                             'forward' => array(
                                                 'module' => 'MelisCms',
@@ -597,6 +598,7 @@ return array(
 			                                    'id' => 'id_meliscms_tool_site_301_generic_form',
 			                                    'melisKey' => 'meliscms_tool_site_301_generic_form',
 			                                    'name' => 'tr_meliscms_tool_site_301_generic_form',
+			                                    'rightsDisplay' => 'none',
 			                                ),
 			                                'forward' => array(
 			                                    'module' => 'MelisCms',
@@ -1398,6 +1400,7 @@ return array(
 	            'id' => 'id_meliscms_plugin_modal',
 	            'name' => 'tr_meliscms_plugin_modal',
 	            'melisKey' => 'meliscms_plugin_modal',
+	            'rightsDisplay' => 'none',
 	        ),
 	        'forward' => array(
 	            'module' => 'MelisCms',
@@ -1410,6 +1413,7 @@ return array(
 	            'id' => 'id_meliscms_tools_tree_content_modal',
 	            'name' => 'tr_meliscms_tools_tree_content_modal',
 	            'melisKey' => 'meliscms_tools_tree_content_modal',
+	            'rightsDisplay' => 'none',
 	        ),
 	        'forward' => array(
 	            'module' => 'MelisCms',
