@@ -247,7 +247,9 @@ class FrontPluginsController extends AbstractActionController
             if(!$response['success']) {
                 $success = 0;
             }
-            
+
+
+
         }
         $finalErrors = $errorsTabs;
         

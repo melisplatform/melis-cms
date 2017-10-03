@@ -21,8 +21,8 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
 
     public function attach(EventManagerInterface $events)
     {
-        $sharedEvents      = $events->getSharedManager();
-
+        $priority        = -10000;
+        $sharedEvents    = $events->getSharedManager();
         $callBackHandler = $sharedEvents->attach(
             'MelisCms',
             array(
@@ -56,9 +56,9 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
                                     $pageContents[$pageId][$plugin][$pluginId] : null;
 
                                 if($pluginContent) {
-                                    $desktopWidth  = isset($post['melisPluginDesktopWidth']) ? (float) $post['melisPluginDesktopWidth'] : 100;
-                                    $tabletWidth   = isset($post['melisPluginTabletWidth'])  ? (float) $post['melisPluginTabletWidth']  : 100;
-                                    $mobileWidth   = isset($post['melisPluginMobileWidth'])  ? (float) $post['melisPluginMobileWidth']  : 100;
+                                    $desktopWidth  = isset($post['melisPluginDesktopWidth']) ? (float) $post['melisPluginDesktopWidth'] : null;
+                                    $tabletWidth   = isset($post['melisPluginTabletWidth'])  ? (float) $post['melisPluginTabletWidth']  : null;
+                                    $mobileWidth   = isset($post['melisPluginMobileWidth'])  ? (float) $post['melisPluginMobileWidth']  : null;
 
                                     if($pluginTag != 'melisTag') {
                                         $desktopXml    = '<width_desktop><![CDATA['.$desktopWidth.']]></width_desktop>';
@@ -87,31 +87,48 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
 
                                     }
                                     else {
-                                        // preserve the value
-                                        $dom = new \DOMDocument('1.0', 'utf-8');
-                                        $dom->loadXML($pluginContent);
-                                        $dom->preserveWhiteSpace = false;
-                                        $value = $dom->getElementsByTagName('melisTag')->item(0)->nodeValue;
-//echo 'this is the found content: ' . $value . PHP_EOL;
 
-                                        $pluginContent = $this->insertOrReplaceAttributeValue($pluginContent, 'desktop', $desktopWidth);
-                                        $pluginContent = $this->insertOrReplaceAttributeValue($pluginContent, 'tablet', $tabletWidth);
-                                        $pluginContent = $this->insertOrReplaceAttributeValue($pluginContent, 'mobile', $mobileWidth);
+                                        if($desktopWidth || $tabletWidth || $mobileWidth) {
 
-                                        // remove end tag so we can insert our value
-//                                        $pluginContent = str_replace('</melisTag>', '<![CDATA['.$value.']]></melisTag>', $pluginContent);
+                                            $widths = array(
+                                                'plugin_id'     => $pluginId,
+                                                'width_desktop' => $desktopWidth,
+                                                'width_tablet'  => $tabletWidth,
+                                                'width_mobile'  => $mobileWidth
+                                            );
 
-                                        $_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId] = $pluginContent;
+                                            if(isset($_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId]))
+                                                $_SESSION['meliscms']['content-pages'][$pageId]['melisTag:size'][$pluginId] = json_encode($widths);
+                                        }
+                                        else {
+                                            // check if the size of melis tag plugin exists
+                                            if(isset($_SESSION['meliscms']['content-pages'][$pageId]['melisTag:size'][$pluginId])) {
+
+                                                $pattern = '/type\=\"([html|media|textarea]*\")/';
+                                                if(preg_match($pattern, $pluginContent, $matches)) {
+                                                    $type = isset($matches[0]) ? $matches[0] : null;
+                                                    if($type) {
+
+                                                        // apply sizes
+                                                        $widths        = (array) json_decode($_SESSION['meliscms']['content-pages'][$pageId]['melisTag:size'][$pluginId]);
+                                                        $replacement   = $type .' width_desktop="'.$widths['width_desktop'].'" width_tablet="'.$widths['width_tablet'].'" width_mobile="'.$widths['width_mobile'].'"';
+                                                        $pluginContent = preg_replace($pattern, $replacement, $pluginContent);
+
+                                                        $_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId] = $pluginContent;
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
-
                             }
                         }
+                        // end checker for $plugin and $pluginIds
                     }
                 }
             },
             // lowest priority so we can process this algorithm in the background
-            -10000);
+            $priority);
 
         $this->listeners[] = $callBackHandler;
     }
@@ -128,14 +145,6 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
             $newContent = $content . $replace;
 
         }
-
-        return $newContent;
-    }
-
-    private function insertOrReplaceAttributeValue($content, $search, $newValue)
-    {
-        $regexSearch = '/width\_'.$search.'\=\"([0-9]*?)\"/';
-        $newContent = preg_replace($regexSearch, 'width_'.$search.'="'.$newValue.'"', $content);
 
         return $newContent;
     }
