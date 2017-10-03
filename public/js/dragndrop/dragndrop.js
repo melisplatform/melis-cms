@@ -225,8 +225,14 @@ var melisDragnDrop = (function($, window) {
 
                     // adding plugin in dropzone
                     // $('div[data-dragdropzone-id='+ dropzone +']').append(plugin.html);
-                    $(plugin.html).insertAfter(dropLocation);
-
+                    var dropPlugin = $(plugin.html).insertAfter(dropLocation);
+                    var pluginContainer = dropPlugin.closest(".melis-float-plugins");
+                    if( $(pluginContainer).length ) {
+                        var pluginContainerId = $(pluginContainer).attr("id");
+                        $(pluginContainer).children(".melis-ui-outlined").each(function() {
+                            $(this).find(".melis-plugin-tools-box").attr("data-plugin-container", pluginContainerId);
+                        });
+                    }
                     // Processing the plugin resources and initialization
                     melisPluginEdition.processPluginResources(plugin.init, idPlugin);
                     // Init Resizable

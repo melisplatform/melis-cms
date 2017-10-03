@@ -15,7 +15,7 @@ var melisPluginEdition = (function($, window) {
 
     $("body").on("click", ".m-trash-handle", removePlugins);
 
-    $body.on("click", "#pluginModalBtnApply", submitPluginForms); // $body because it is modal and it's located in parent 
+    $body.on("click", "#pluginModalBtnApply", submitPluginForms); // $body because it is modal and it's located in parent
 
     $("body").on("focus", ".melis-ui-outlined .melis-editable", function() {
         $(this).closest(".melis-ui-outlined").addClass("melis-focus");
@@ -39,7 +39,7 @@ var melisPluginEdition = (function($, window) {
             melisPluginTag = $(this).closest("#id_meliscms_plugin_modal_container").data("melis-plugin-tag"),
             melisSiteModule = $(this).closest("#id_meliscms_plugin_modal_container").data("melis-site-module"),
             dataString = $(this).closest('.modal-content').find("form");
-            
+
         pluginHardcodedConfig = $.trim($(this).closest("#id_meliscms_plugin_modal_container").find(".plugin-hardcoded-conf").text());
 
         // Construct data string
@@ -74,8 +74,8 @@ var melisPluginEdition = (function($, window) {
                     setTimeout(function() {
 
                         pluginRenderer(melisPluginModule, melisPluginName, melisIdPage, melisPluginId, false, window.fromdragdropzone, siteModule);
-                        setTimeout(function(){ 
-                            checkToolSize(); 
+                        setTimeout(function(){
+                            checkToolSize();
                         }, 300);
                         window.parent.$("#id_meliscms_plugin_modal_container").modal('hide');
 
@@ -155,12 +155,12 @@ var melisPluginEdition = (function($, window) {
                         var elType;
                         var jsUrl;
                         var idPlugin;
-                        
+
                         var plugin = data.datas;
-                        
+
                         // remove old plugin
                         $(layoutId).children().not("#loader.overlay-loader").remove();
-                        
+
                         // add new plugin
                         $(layout).prepend(plugin.html);
 
@@ -173,19 +173,19 @@ var melisPluginEdition = (function($, window) {
                         dataPluginID = pluginOutlined.find("[id*='"+melisPluginID+"']").attr("id");
 
                         if(typeof dataPluginID !== "undefined") {
-                            // get plugin id 
+                            // get plugin id
                             idPlugin = dataPluginID;
                         }
-                        
+
                         // Processing the plugin resources and initialization
                     	processPluginResources(plugin.init, idPlugin);
-                        
+
                         // hide the loader
                         $(layout).removeClass("melis-loader");
                         $('.loader-icon').removeClass('spinning-cog').addClass('shrinking-cog');
                         $("#loader.overlay-loader").remove();
                         $(layout).height('auto');
-                        
+
                         calcFrameHeight();
                         disableLinks('a');
 
@@ -194,7 +194,7 @@ var melisPluginEdition = (function($, window) {
                         initResizable();
                     }
                 }, 300);
-            }, 
+            },
             error: function(data) {
                 // hide the loader
                 $(layout).removeClass("melis-loader");
@@ -205,34 +205,34 @@ var melisPluginEdition = (function($, window) {
             }
         });
     }
-    
+
     /**
      * This method will process plugin resources "js and css"
      * and plugin initialization
      */
     function processPluginResources(pluginResources, pluginId){
-    	
+
     	var jsUrl;
     	// Plugins URL's handler variable
         var pluginJs = new Array;
         var pluginJsInitFunction = new Array;
-        
+
         $.each(pluginResources, function(i, pluginVal) {
-            // check resources css / js 
+            // check resources css / js
             if(pluginVal.ressources) {
                 $.each(pluginVal.ressources, function(i, value) {
-                	
+
                     // check if css / js
                     if(i == "css") {
                         elType = "css";
                     } else if (i == "js") {
                         elType = "js";
                     }
-                    
+
                     // loop css and js
                     $.each(value, function(key, val) {
                         var pluginLink = val;
-                        
+
                         if(pluginLink.length) {
                             if(elType == "css") {
                                 checkLinkExists(pluginLink);
@@ -244,7 +244,7 @@ var melisPluginEdition = (function($, window) {
                                 if($.inArray(pluginLink, pluginJs) == -1){
                                 	pluginJs.push(pluginLink);
                                 }
-                                
+
                                 if(pluginLink.indexOf(".init") !== -1 && $.inArray(pluginLink, pluginJsInitFunction) == -1){
                                 	pluginJsInitFunction.push(pluginLink);
                                 }
@@ -254,40 +254,40 @@ var melisPluginEdition = (function($, window) {
                 });
             }
         });
-        
+
         var loadedJs = new Array;
         var ctr = 0;
         var curUrlxmlReq = null;
         $tmp = setInterval(function(){
-        	
+
         	if(pluginJs[ctr] !== 'undefined'){
-        		
+
         		var url = pluginJs[ctr];
         		if(ctr == pluginJs.length){
-        			
+
         			// Clearing the time interval to exit
                 	clearInterval($tmp);
-                    
+
                     calcFrameHeight();
                     disableLinks('a');
-                    
+
                 	$.each(pluginJsInitFunction, function(i, val){
                     	// Execution of the plugin js function initialization
                         var urlStr = val.substr(val.indexOf(".") + 1);
                         var functionName = urlStr.substr(0, urlStr.indexOf(".init")) + "_init";
-                        
+
                         checkFunctionExists(eval(functionName), pluginId);
                         calcFrameHeight();
                     });
-                	
+
                 }else{
                 	/**
                 	 * Checking if the Js url is already loaded,
-                	 * else this will try to loop and try again until the js url 
+                	 * else this will try to loop and try again until the js url
                 	 * is successfully loaded
                 	 */
                 	if($.inArray(url, loadedJs) == -1){
-                		
+
                 		/**
                 		 * Checking if the Js url is arleady exist,
                 		 * else this will procced to the next js url
@@ -295,29 +295,29 @@ var melisPluginEdition = (function($, window) {
                 		if($(document.body).find("script[src='"+url+"']").length){
                 			ctr++;
                 		}else{
-                			
+
                 			if(curUrlxmlReq != url){
-                				
+
                 				curUrlxmlReq = url;
-                				
+
                     			// Creates an object which can read files from the server
                     	        var reader = new XMLHttpRequest();
-                    	        
+
                     	        // Opens the file and specifies the method (get)
                     	        // Asynchronous is true
                     	        reader.open('get', url, true);
-                    	        
+
                     	        //check each time the ready state changes
                     	        //to see if the object is ready
                     	        reader.onreadystatechange = checkReadyState;
-                    	        
+
                     	        function checkReadyState() {
-                    	        	
+
                     	            if (reader.readyState === 4) {
-                    	            	
+
                     	                //check to see whether request for the file failed or succeeded
                     	                if ((reader.status == 200) || (reader.status == 0)) {
-                    	                	
+
                     	                	// Adding the Js element to the body
                                     		var el = document.createElement('script');
                                             el.src = url;
@@ -325,26 +325,26 @@ var melisPluginEdition = (function($, window) {
                                             document.body.appendChild(el);
                                             // Adding the Js url to added url's handler variable
                                             loadedJs.push(url);
-                                            
+
                                             /**
                                              * Event of Js DOM once this successfully load to the body
                                              */
                                             $(document.body).find("script[src='"+url+"']").on("load", function(){
                                             	/**
-                                            	 * For debugging 
+                                            	 * For debugging
                                             	 * To determine the time JS finaly loaded
-                                            	 * 
+                                            	 *
                                             	 * var d = new Date();
                                             	 * console.log(url+" : "+d.getMinutes()+":"+d.getSeconds()+":"+d.getMilliseconds());
                                             	 */
-                                	        	
+
                                 	        	/**
                                 	        	 * Inceamenting Counter variable in-order to process
                                 	        	 * the next js
                                 	        	 */
                                 	        	ctr++;
                                 	        });
-                                            
+
                     	                }else{
                     	                	console.log("Javascript Url \""+url+"\" does not exist, please make sure javascript url is accessible");
                     	                	// Clearing the time interval to exit
@@ -352,7 +352,7 @@ var melisPluginEdition = (function($, window) {
                     	                }
                     	            }//end of if (reader.readyState === 4)
                     	        }// end of checkReadyState()
-                    	        
+
                     	        // Sends the request for the file data to the server
                     	        // Use null for "get" mode
                     	        reader.send(null);
@@ -385,7 +385,7 @@ var melisPluginEdition = (function($, window) {
         pluginList['melisPluginId'] = dragdropzonePluginId;
         pluginList['melisPluginTag'] = dragdropzoneMelisTag;
         pluginList['melisDragDropZoneListPlugin'] = new Object();
-        
+
         // loop all plugins in dropzone
         $.each(pluginListEl, function(key, value) {
 
@@ -458,7 +458,7 @@ var melisPluginEdition = (function($, window) {
         el.media  = "screen";
         el.type = "text/css";
         document.head.appendChild(el);
-    }	
+    }
 
     function generateScript(url) {
         var el = document.createElement('script');
@@ -533,11 +533,11 @@ var melisPluginEdition = (function($, window) {
         modalUrl = '/melis/MelisCms/FrontPlugins/renderPluginModal';
 
         var modalParams = {
-            pluginFrontConfig : pluginFrontConfig, 
-            module: module, 
-            pluginName: pluginName, 
-            pluginId : pluginId, 
-            melisActivePageId : melisActivePageId, 
+            pluginFrontConfig : pluginFrontConfig,
+            module: module,
+            pluginName: pluginName,
+            pluginId : pluginId,
+            melisActivePageId : melisActivePageId,
             siteModule : siteModule
         };
 
@@ -879,12 +879,12 @@ var melisCmsFormHelper = (function($, window) {
                 errorTexts += '</p><br/>';
             }
         });
-        
+
         var div = '<div class="melis-modaloverlay '+ closeByButtonOnly +'"></div>';
         div += '<div class="melis-modal-cont KOnotif">  <div class="modal-content">'+ errorTexts +' <span class="btn btn-block btn-primary">' + translations.tr_meliscore_notification_modal_Close +'</span></div> </div>';
         $body.append(div);
     }
-    
+
     function highlightMultiErrors(success, errors){
         // remove red color for correctly inputted fields
     	$body.find("#id_meliscms_plugin_modal .form-group label").css("color", "inherit");
@@ -895,9 +895,9 @@ var melisCmsFormHelper = (function($, window) {
             });
         }
     }
-    
+
     return {
         melisMultiKoNotification : melisMultiKoNotification
     }
-    
+
 })(jQuery, window);
