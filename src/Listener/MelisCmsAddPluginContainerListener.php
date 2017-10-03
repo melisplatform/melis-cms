@@ -14,7 +14,7 @@ use Zend\EventManager\ListenerAggregateInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\Session\Container;
 use MelisCore\Listener\MelisCoreGeneralListener;
-
+use Zend\Stdlib\ArrayUtils;
 class MelisCmsAddPluginContainerListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
 {
 
@@ -70,7 +70,7 @@ class MelisCmsAddPluginContainerListener extends MelisCoreGeneralListener implem
 
                                     if(isset($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId])) {
                                         $currentData = (array) json_decode($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId]);
-                                        $data        = array_merge($currentData, $data);
+                                        $data        = ArrayUtils::merge($currentData[0], $data);
                                     }
 
                                     $_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId] = json_encode($data);

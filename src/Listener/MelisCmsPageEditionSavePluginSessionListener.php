@@ -14,7 +14,7 @@ use Zend\EventManager\ListenerAggregateInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\Session\Container;
 use MelisCore\Listener\MelisCoreGeneralListener;
-
+use Zend\Stdlib\ArrayUtils;
 class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
 {
 
@@ -105,11 +105,15 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
                                             );
 
                                             if(isset($_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId])) {
-                                                $data = array($widths);
+                                                $data = $widths;
 
                                                 if(isset($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId])) {
                                                     $currentData = (array) json_decode($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId]);
-                                                    $data        = array_merge($currentData, $data);
+
+//                                                    print_r($currentData);
+                                                    $data        = ArrayUtils::merge($currentData, $data);
+//
+//                                                    print_r($data);
                                                 }
                                                 $_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId] = json_encode($data);
                                                 $this->updateMelisTagContent($pageId, $plugin, $pluginId, $pluginContent);
@@ -180,8 +184,10 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
 
                 // apply sizes
                 $widths        = (array) json_decode($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId]);
-                $replacement   = $type .' width_desktop="'.$widths['width_desktop'].'" width_tablet="'.$widths['width_tablet'].'" width_mobile="'.$widths['width_mobile'].'"';
-                $pluginContent = preg_replace($pattern, $replacement, $pluginContent);
+                if($widths) {
+                    $replacement   = $type .' width_desktop="'.$widths['width_desktop'].'" width_tablet="'.$widths['width_tablet'].'" width_mobile="'.$widths['width_mobile'].'"';
+                    $pluginContent = preg_replace($pattern, $replacement, $pluginContent);
+                }
 
                 $_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId] = $this->getPluginContentWithInsertedContainerId($pageId, $plugin, $pluginId, $pluginContent);
             }
