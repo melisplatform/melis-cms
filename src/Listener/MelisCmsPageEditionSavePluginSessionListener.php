@@ -105,7 +105,13 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
                                             );
 
                                             if(isset($_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId])) {
-                                                $_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId] = json_encode($widths);
+                                                $data = array($widths);
+
+                                                if(isset($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId])) {
+                                                    $currentData = (array) json_decode($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId]);
+                                                    $data        = array_merge($currentData, $data);
+                                                }
+                                                $_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId] = json_encode($data);
                                                 $this->updateMelisTagContent($pageId, $plugin, $pluginId, $pluginContent);
                                             }
 

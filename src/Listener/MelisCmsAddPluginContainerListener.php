@@ -53,6 +53,12 @@ class MelisCmsAddPluginContainerListener extends MelisCoreGeneralListener implem
                                     $pluginContent = isset($pageContents[$pageId][$plugin][$pluginId]) ?
                                         $pageContents[$pageId][$plugin][$pluginId] : null;
 
+                                    // remove first the attribute if exists
+                                    $pluginContainerPattern = '/\splugin_container_id\=\"(.*?)\"/';
+                                    if(preg_match($pluginContainerPattern, $pluginContent)) {
+                                        $pluginContent = preg_replace($pluginContainerPattern, '', $pluginContent);
+                                    }
+
                                     $pattern = '/'.$plugin.'\sid\=\"(.*?)\"/';
                                     $replace = $plugin . ' id="'.$pluginId.'" plugin_container_id="'.$pluginContainerId.'"';
                                     $newValue = preg_replace($pattern, $replace, $pluginContent);
