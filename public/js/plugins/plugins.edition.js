@@ -5,7 +5,7 @@ var melisPluginEdition = (function($, window) {
     ====================================*/
     var $body = window.parent.$("body");
     var fromdragdropzone = window.fromdragdropzone;
-
+    var iframe = window.parent.$("#"+parent.activeTabId).find(".melis-iframe");
     var pluginHardcodedConfig;
 
     /* ==================================
@@ -635,8 +635,15 @@ var melisPluginEdition = (function($, window) {
             });
 
             // custom action check if plugin tags
-            if(editable) {
-                $(editable).focus();
+            if( $(editable).length ) {
+                var data = $(editable).data();
+                // trigger focus to saveSession
+                 $(editable).focus().removeClass("mce-edit-focus");
+                // hide tinymce option while resizing
+                var inst = tinyMCE.EditorManager.get(data.pluginId);
+                inst.fire("blur");
+                iframe.blur();
+
                 $(editable).map(function() {
                     pluginList['tagType']   =   $(this).data("tag-type");
                     pluginList['tagId']     =   $(this).data("tag-id");
@@ -783,6 +790,15 @@ var melisPluginEdition = (function($, window) {
     function moveResponsiveClass() {
         $(".melis-dragdropzone .melis-ui-outlined").map(function() {
             var pluginClasses;
+            var melisTag = $(this).find(".melis-editable");
+            if($(melisTag).length) {
+                var data = $(melisTag).data();
+                var pluginContainer = $('div[data-melis-plugin-tag-container="'+ data.pluginId +'"]');
+                // remove div
+                $(pluginContainer).contents().unwrap();
+                $(this).addClass($(pluginContainer).attr("class"));
+
+            }
             $(this).children('[class^=plugin-width]').removeClass(function(index, classes) {
                 var matches = classes.match(/\bplugin-width\S+/ig);
                 pluginClasses = classes;
