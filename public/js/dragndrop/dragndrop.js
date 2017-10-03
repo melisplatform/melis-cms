@@ -241,6 +241,7 @@ var melisDragnDrop = (function($, window) {
 
                     melisPluginEdition.calcFrameHeight()
                     melisPluginEdition.disableLinks('a');
+                    melisPluginEdition.moveResponsiveClass();
                 }
             },
             error: function() {

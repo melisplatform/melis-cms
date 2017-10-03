@@ -579,6 +579,10 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
   /*background: rgba(255, 255, 255, 0.4);*/
 }
 
+.melis-float-plugins .ui-state-highlight {
+    float: left;
+}
+
 .melis-loader {
   position: relative;
 }
@@ -652,7 +656,8 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 
 .melis-float-plugins {
     margin: 0 -15px;
-    border: 1px solid darkred;
+    border: 1px dashed #90312e;
+    box-shadow: 0 0 0 0 rgb(147, 46, 42);
 }
 
 .melis-float-plugins:after {
@@ -747,3 +752,7 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 @-moz-keyframes pulse {to {box-shadow: 0 0 0 45px rgba(147, 46, 42, 0);}}
 @-ms-keyframes pulse {to {box-shadow: 0 0 0 45px rgba(147, 46, 42, 0);}}
 @keyframes pulse {to {box-shadow: 0 0 0 45px rgba(147, 46, 42, 0);}}
+@-webkit-keyframes pulse-sm {to {box-shadow: 0 0 0 15px rgba(147, 46, 42, 0);}}
+@-moz-keyframes pulse-sm {to {box-shadow: 0 0 0 15px rgba(147, 46, 42, 0);}}
+@-ms-keyframes pulse-sm {to {box-shadow: 0 0 0 15px rgba(147, 46, 42, 0);}}
+@keyframes pulse-sm {to {box-shadow: 0 0 0 15px rgba(147, 46, 42, 0);}}
