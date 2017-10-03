@@ -38,8 +38,8 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
                     $tag    = isset($params['melisPluginTag']) ? $params['melisPluginTag'] : null;
                     if($pageId && $post) {
 
-                        $plugin    = isset($post['melisPluginTag']) ? $post['melisPluginTag'] : null;
-                        $pluginId  = isset($post['melisPluginId'])  ? $post['melisPluginId']  : null;
+                        $plugin    = isset($post['melisPluginTag'])  ? $post['melisPluginTag']  : null;
+                        $pluginId  = isset($post['melisPluginId'])   ? $post['melisPluginId']   : null;
                         $pluginTag = isset($post['melisPluginTag'])  ? $post['melisPluginTag']  : null;
                         $container = new Container('meliscms');
 
@@ -78,12 +78,6 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
                                         if($mobileWidth)
                                             $pluginContentWithoutEndTag = $this->insertOrReplaceTag($pluginContentWithoutEndTag, 'width_mobile', $mobileXml);
 
-                                        // include the plugin container ID
-                                        $pluginContainerId = null;
-                                        if(isset($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId])) {
-                                            $pluginContainerId = (array) json_decode($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId]);
-                                            $pluginContainerId = $pluginContainerId['plugin_container_id'];
-                                        }
 
                                         $pluginContent = $pluginContentWithoutEndTag . $endPluginTag;
 
@@ -109,12 +103,9 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
 
                                                 if(isset($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId])) {
                                                     $currentData = (array) json_decode($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId]);
-
-//                                                    print_r($currentData);
                                                     $data        = ArrayUtils::merge($currentData, $data);
-//
-//                                                    print_r($data);
                                                 }
+
                                                 $_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId] = json_encode($data);
                                                 $this->updateMelisTagContent($pageId, $plugin, $pluginId, $pluginContent);
                                             }

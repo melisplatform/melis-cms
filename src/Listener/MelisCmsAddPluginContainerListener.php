@@ -70,7 +70,7 @@ class MelisCmsAddPluginContainerListener extends MelisCoreGeneralListener implem
 
                                     if(isset($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId])) {
                                         $currentData = (array) json_decode($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId]);
-                                        $data        = ArrayUtils::merge($currentData[0], $data);
+                                        $data        = array_merge($currentData, $data);
                                     }
 
                                     $_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId] = json_encode($data);
