@@ -33,6 +33,7 @@ use MelisCms\Listener\MelisCmsDeletePlatformListener;
 use MelisCms\Listener\MelisCmsPageDefaultUrlsListener;
 use MelisCms\Listener\MelisCmsPageGetterListener;
 use MelisCms\Listener\MelisCmsPageEditionSavePluginSessionListener;
+use MelisCms\Listener\MelisCmsAddPluginContainerListener;
 
 class Module
 {
@@ -85,6 +86,7 @@ class Module
                     $eventManager->attach(new MelisCmsDeletePlatformListener());
                     $eventManager->attach(new MelisCmsPageDefaultUrlsListener());
                     $eventManager->attach(new MelisCmsPageEditionSavePluginSessionListener());
+                    $eventManager->attach(new MelisCmsAddPluginContainerListener());
 
                     // Saving Plugin Tag values, Melis Side
                     $eventManager->attach($sm->get('MelisCms\Listener\MelisCmsPluginSaveEditionSessionListener'));

@@ -245,7 +245,7 @@ class PageEditionController extends AbstractActionController
 				$newXmlContent .= '<document type="MelisCMS" author="MelisTechnology" version="2.0">' . "\n";
 				foreach ($container['content-pages'][$idPage] as $namePlugin => $pluginEntries)
 				{
-                    if($namePlugin != 'melisTag:size') {
+                    if($namePlugin != 'private:melisPluginSettings') {
                         foreach ($pluginEntries as $idEntry => $valueEntry) {
                             $newXmlContent .= "\t" . $valueEntry . "\n";
                         }
