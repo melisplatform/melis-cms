@@ -97,26 +97,16 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
                                                 'width_mobile'  => $mobileWidth
                                             );
 
-                                            if(isset($_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId]))
+                                            if(isset($_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId])) {
                                                 $_SESSION['meliscms']['content-pages'][$pageId]['melisTag:size'][$pluginId] = json_encode($widths);
+                                                $this->updateMelisTagContent($pageId, $plugin, $pluginId, $pluginContent);
+                                            }
+
                                         }
                                         else {
                                             // check if the size of melis tag plugin exists
                                             if(isset($_SESSION['meliscms']['content-pages'][$pageId]['melisTag:size'][$pluginId])) {
-
-                                                $pattern = '/type\=\"([html|media|textarea]*\")/';
-                                                if(preg_match($pattern, $pluginContent, $matches)) {
-                                                    $type = isset($matches[0]) ? $matches[0] : null;
-                                                    if($type) {
-
-                                                        // apply sizes
-                                                        $widths        = (array) json_decode($_SESSION['meliscms']['content-pages'][$pageId]['melisTag:size'][$pluginId]);
-                                                        $replacement   = $type .' width_desktop="'.$widths['width_desktop'].'" width_tablet="'.$widths['width_tablet'].'" width_mobile="'.$widths['width_mobile'].'"';
-                                                        $pluginContent = preg_replace($pattern, $replacement, $pluginContent);
-
-                                                        $_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId] = $pluginContent;
-                                                    }
-                                                }
+                                                $this->updateMelisTagContent($pageId, $plugin, $pluginId, $pluginContent);
                                             }
                                         }
                                     }
@@ -147,5 +137,24 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
         }
 
         return $newContent;
+    }
+
+    private function updateMelisTagContent($pageId, $plugin, $pluginId, $content)
+    {
+        $pluginContent = $content;
+
+        $pattern = '/type\=\"([html|media|textarea]*\")/';
+        if(preg_match($pattern, $pluginContent, $matches)) {
+            $type = isset($matches[0]) ? $matches[0] : null;
+            if($type) {
+
+                // apply sizes
+                $widths        = (array) json_decode($_SESSION['meliscms']['content-pages'][$pageId]['melisTag:size'][$pluginId]);
+                $replacement   = $type .' width_desktop="'.$widths['width_desktop'].'" width_tablet="'.$widths['width_tablet'].'" width_mobile="'.$widths['width_mobile'].'"';
+                $pluginContent = preg_replace($pattern, $replacement, $pluginContent);
+
+                $_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId] = $pluginContent;
+            }
+        }
     }
 }
