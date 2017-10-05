@@ -30,7 +30,7 @@ var melisDragnDrop = (function($, window) {
     });
 
     $(".melis-dragdropzone").sortable({
-        connectWith: ".melis-draggable, .melis-dragdropzone .melis-float-plugins",
+        connectWith: ".melis-draggable, .melis-dragdropzone, .melis-float-plugins",
         handle: ".m-move-handle",
         forcePlaceholderSize: false,
         cursor: "move",
@@ -38,6 +38,8 @@ var melisDragnDrop = (function($, window) {
         zIndex: 999999,
         placeholder: "ui-state-highlight",
         tolerance: "pointer",
+        items: ".melis-ui-outlined",
+        // cancel: ".melis-float-plugins",
         start: function(event, ui) {
             $(".melis-dragdropzone").sortable("refresh");
             // hide tinyMCE panel
@@ -98,7 +100,7 @@ var melisDragnDrop = (function($, window) {
             });
         },
         receive: function( event, ui ) {
-
+            console.log('receive');
             if(ui.helper) {
                 var moduleName = $(ui.helper[0]).data("module-name");
                 var pluginName = $(ui.helper[0]).data("plugin-name");

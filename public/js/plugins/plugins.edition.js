@@ -403,7 +403,7 @@ var melisPluginEdition = (function($, window) {
             pluginList['melisDragDropZoneListPlugin'][key]['melisPluginName'] = melisPluginName;
             pluginList['melisDragDropZoneListPlugin'][key]['melisPluginId'] = melisPluginID;
             pluginList['melisDragDropZoneListPlugin'][key]['melisPluginTag'] = melisPluginTag;
-            if ( $(melisPluginContainer) ) {
+            if ( $("#"+melisPluginContainerId).length ) {
                 pluginList['melisDragDropZoneListPlugin'][key]['melisPluginContainer'] = melisPluginContainer;
             } else {
                 pluginList['melisDragDropZoneListPlugin'][key]['melisPluginContainer'] = " ";
@@ -636,10 +636,12 @@ var melisPluginEdition = (function($, window) {
 
             // custom action check if plugin tags
             if( $(editable).length ) {
+
                 var data = $(editable).data();
                 // trigger focus to saveSession
                  $(editable).focus().removeClass("mce-edit-focus");
                 // hide tinymce option while resizing
+                console.log('sulod ', data);
                 var inst = tinyMCE.EditorManager.get(data.pluginId);
                 inst.fire("blur");
                 iframe.blur();
@@ -650,6 +652,7 @@ var melisPluginEdition = (function($, window) {
                     pluginList['tagValue']  =   tinyMCE.activeEditor.getContent({format : 'html'});
                 });
             }
+            console.log('gawas ', data);
 
 
             // check if resize in mobile
@@ -713,13 +716,11 @@ var melisPluginEdition = (function($, window) {
         $(this).remove();
         $("#"+pluginContainerId).find(".melis-ui-outlined .melis-plugin-tools-box").attr("data-plugin-container", pluginContainerId);
 
-        // save session
-        sendDragnDropList(dropzone, melisIdPage);
-
-
-        $(".melis-float-plugins").sortable({
-            connectWith: ".melis-dragdropzone",
-            handle: ".m-move-handle",
+/*        $(".melis-float-plugins").sortable({
+            // connectWith: ".melis-dragdropzone, .melis-float-plugins",
+            // connectToSortable: ".melis-dragdropzone",
+            disabled: true,
+            handle: "false",
             forcePlaceholderSize: false,
             cursor: "move",
             cursorAt: { top: 0, left: 0 },
@@ -727,18 +728,24 @@ var melisPluginEdition = (function($, window) {
             placeholder: "ui-state-highlight",
             tolerance: "pointer",
             receive: function( event, ui ) {
-                $(ui.item[0]).find(".melis-plugin-tools-box").attr("data-plugin-container", pluginContainerId);
+                console.log('melis float test');
+                $(ui.item[0]).find(".melis-plugin-tools-box").data("plugin-container", pluginContainerId);
             },
             over: function( event, ui ) {
                 var sizeW = $(ui.item[0]).width();
                 var sizeH = $(ui.item[0]).height();
                 $(".melis-float-plugins .ui-state-highlight").width(sizeW).height(sizeH);
             },
-        }).disableSelection();
+        }).disableSelection();*/
 
         $("#"+pluginContainerId).children(".melis-ui-outlined").map(function() {
-            $(this).attr("data-plugin-container", pluginContainerId);
+            console.log('children ', pluginContainerId);
+            $(this).find(".melis-plugin-tools-box").data("plugin-container", pluginContainerId);
         });
+
+        // save session
+        sendDragnDropList(dropzone, melisIdPage);
+
     }
 
     // get plugin container id
@@ -808,6 +815,12 @@ var melisPluginEdition = (function($, window) {
         });
     }
 
+    function wrapPlugins() {
+        $(".melis-dragdropzone .melis-ui-outlined").map(function() {
+
+        });
+    }
+
 
     // remove inline width when changing viewport
     window.parent.$("#"+ parent.activeTabId).find('iframe').on("resize", function() {
@@ -816,9 +829,33 @@ var melisPluginEdition = (function($, window) {
         });
     });
 
+    $(".melis-float-plugins").sortable({
+        connectWith: ".melis-dragdropzone, .melis-float-plugins",
+        connectToSortable: ".melis-dragdropzone",
+        handle: "false",
+        forcePlaceholderSize: false,
+        cursor: "move",
+        cursorAt: { top: 0, left: 0 },
+        zIndex: 999999,
+        placeholder: "ui-state-highlight",
+        tolerance: "pointer",
+        receive: function( event, ui ) {
+            var parentID = $(ui.item[0]).closest(".melis-float-plugins").attr("id");
+            console.log("parentID ", parentID);
+            $(ui.item[0]).find(".melis-plugin-tools-box").data("plugin-container", parentID);
+        },
+        over: function( event, ui ) {
+            var sizeW = $(ui.item[0]).width();
+            var sizeH = $(ui.item[0]).height();
+            $(".melis-float-plugins .ui-state-highlight").width(sizeW).height(40);
+        },
+    }).disableSelection();
+
     // init resize
     initResizable();
     moveResponsiveClass();
+    // on load wrap plugins
+    wrapPlugins();
 
     return {
         submitPluginForms       :       submitPluginForms,

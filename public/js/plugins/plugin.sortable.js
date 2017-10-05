@@ -17,9 +17,18 @@ var melisPluginSortable = (function($, window) {
                 var pluginName = plugin.data("plugin");
                 var pluginId = plugin.data("plugin-id");
                 var melisTag = plugin.data("melis-tag");
+                var pluginContainer = plugin.closest(".melis-float-plugins");
                 var pageId = window.parent.$("#"+parent.activeTabId).find(".melis-iframe").data("iframe-id");
                 var dropzone = plugin.closest(".melis-dragdropzone");
                 var dropzoneData = dropzone.data("plugin-id");
+
+                // check plugin if wrap
+				if( $(pluginContainer).length ) {
+					console.log('has wrapper');
+				} else {
+					$(plugin).data("plugin-container", "");
+                    console.log('no wrapper', $(plugin));
+                }
 
 				melisPluginEdition.sendDragnDropList(dropzoneData, pageId);
             }
