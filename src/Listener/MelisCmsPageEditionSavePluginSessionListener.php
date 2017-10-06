@@ -59,35 +59,41 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
                                     $tabletWidth   = isset($post['melisPluginTabletWidth'])  ? (float) $post['melisPluginTabletWidth']  : null;
                                     $mobileWidth   = isset($post['melisPluginMobileWidth'])  ? (float) $post['melisPluginMobileWidth']  : null;
 
-                                        if($desktopWidth || $tabletWidth || $mobileWidth) {
+                                    // check whether any of these 3 widths is set or changed
+                                    if($desktopWidth || $tabletWidth || $mobileWidth) {
 
-                                            $widths = array(
-                                                'plugin_id'     => $pluginId,
-                                                'width_desktop' => $desktopWidth,
-                                                'width_tablet'  => $tabletWidth,
-                                                'width_mobile'  => $mobileWidth
-                                            );
+                                        $widths = array(
+                                            'plugin_id'     => $pluginId,
+                                            'width_desktop' => $desktopWidth,
+                                            'width_tablet'  => $tabletWidth,
+                                            'width_mobile'  => $mobileWidth
+                                        );
 
-                                            if(isset($_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId])) {
+                                        // check if the plugin exists in the session
+                                        if(isset($_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId])) {
 
-                                                $data = $widths;
+                                            $data = $widths;
 
-                                                if(isset($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId])) {
-                                                    $currentData = (array) json_decode($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId]);
-                                                    $data        = ArrayUtils::merge($currentData, $data);
-                                                }
-
-                                                $_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId] = json_encode($data);
-                                                $this->updateMelisPlugin($pageId, $plugin, $pluginId, $pluginContent);
-                                            }
-
-                                        }
-                                        else {
-                                            // check if the size of melis tag plugin exists
+                                            // check if the session settings of the plugin exists
                                             if(isset($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId])) {
-                                                $this->updateMelisPlugin($pageId, $plugin, $pluginId, $pluginContent);
+                                                $currentData = (array) json_decode($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId]);
+                                                $data        = ArrayUtils::merge($currentData, $data);
                                             }
+
+                                            // update the session settings of the plugin
+                                            $_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId] = json_encode($data);
+
+                                            // and also the plugin itself
+                                            $this->updateMelisPlugin($pageId, $plugin, $pluginId, $pluginContent);
                                         }
+
+                                    }
+                                    else {
+                                        // check if the size of melis tag plugin exists in session settings and just re-apply it
+                                        if(isset($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId])) {
+                                            $this->updateMelisPlugin($pageId, $plugin, $pluginId, $pluginContent);
+                                        }
+                                    }
 
                                 }
                             }
