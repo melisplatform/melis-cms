@@ -206,9 +206,14 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
             $_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId] =
                 $this->getPluginContentWithInsertedContainerId($pageId, $plugin, $pluginId, $pluginContent);
 
+            $pluginContent = $_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId];
             if($updateSettings) {
-                $pluginContent = $_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId];
+
                 $_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId] = $this->reapplySettings($pageId, $plugin, $pluginId, $pluginContent);
+            }
+
+            if($plugin == 'melisTag') {
+                $_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId] = $this->updateContent($pageId, $plugin, $pluginId, $pluginContent);
             }
 
         }
@@ -279,6 +284,19 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
         }
 
         return $content;
+
+    }
+
+    public function updateContent($pageId, $plugin, $pluginId, $content)
+    {
+        if(isset($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId])) {
+            $pattern = '\<div data\-melis\-plugin\-tag\-id\=\"[a-zA-Z0-9-_]+\"\sclass\=\"[a-zA-Z0-9-_\s]*\"\>';
+            $content = preg_replace('/'.$pattern.'/', '', $content);
+            $content = str_replace('</div>]]></melisTag>', ']]></melisTag>', $content);
+        }
+
+        return $content;
+
 
     }
 }
