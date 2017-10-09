@@ -572,7 +572,7 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 }
 .ui-sortable-placeholder.ui-state-highlight {
   padding: 0;
-  margin: 0;
+  margin: 0 0 20px;
   background: #932e2a;
   transition: all 0.4s ease-in-out;
   height: 40px;
@@ -636,19 +636,27 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 .btn-pulse {
     position: absolute;
     right: 20%;
-    background: #932e2a;
+    color: #932e2a;
+    background: #fff;
     border: none;
     border-radius: 100%;
     width: 50px;
     height: 50px;
-    line-height: 50px;
+    line-height: 46px;
+    border: 2px solid #932e2a;
     box-shadow: 0 0 0 0 rgb(147, 46, 42);
+    -webkit-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    -ms-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
     -webkit-animation: pulse 1.25s infinite cubic-bezier(0.66, 0, 0, 1);
     -moz-animation: pulse 1.25s infinite cubic-bezier(0.66, 0, 0, 1);
     -ms-animation: pulse 1.25s infinite cubic-bezier(0.66, 0, 0, 1);
     animation: pulse 1.25s infinite cubic-bezier(0.66, 0, 0, 1);
 }
 .btn-pulse:hover {
+    color: #fff;
+    background: #932e2a;
     -webkit-animation: none;
     -moz-animation: none;
     -ms-animation: none;animation: none;
@@ -656,6 +664,7 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 
 .melis-float-plugins {
     margin: 0 -15px;
+    padding: 15px 0;
     border: 1px dashed #90312e;
     box-shadow: 0 0 0 0 rgb(147, 46, 42);
 }

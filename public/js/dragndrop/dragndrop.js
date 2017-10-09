@@ -27,10 +27,19 @@ var melisDragnDrop = (function($, window) {
         connectToSortable: ".melis-dragdropzone",
         revert: true,
         helper: "clone",
+        start: function( event, ui ) {
+            $(".melis-dragdropzone").addClass("highlight");
+            $(".ui-sortable-placeholder").css("background", "#fff");
+        },
+        stop: function( event, ui ) {
+            $(".melis-dragdropzone").removeClass("highlight");
+        }
     });
 
     $(".melis-dragdropzone").sortable({
-        connectWith: ".melis-draggable, .melis-dragdropzone, .melis-float-plugins",
+        connectWith: ".melis-float-plugins",
+        // connectWith: ".melis-draggable, .melis-dragdropzone, .melis-float-plugins",
+        connectToSortable: ".melis-float-plugins",
         handle: ".m-move-handle",
         forcePlaceholderSize: false,
         cursor: "move",
@@ -38,12 +47,17 @@ var melisDragnDrop = (function($, window) {
         zIndex: 999999,
         placeholder: "ui-state-highlight",
         tolerance: "pointer",
-        items: ".melis-ui-outlined",
-        // cancel: ".melis-float-plugins",
+        items: ".melis-ui-outlined, .melis-float-plugins",
         start: function(event, ui) {
             $(".melis-dragdropzone").sortable("refresh");
             // hide tinyMCE panel
             $(".mce-tinymce.mce-panel.mce-floatpanel").hide();
+
+            $(".melis-dragdropzone").addClass("highlight");
+            $(".ui-sortable-helper").css("z-index", "9999999");
+
+            // remove float wrap button
+            $(".btn-pulse").remove();
 
             $(window).mousemove(function (e) {
                 var top;
@@ -100,7 +114,6 @@ var melisDragnDrop = (function($, window) {
             });
         },
         receive: function( event, ui ) {
-            console.log('receive');
             if(ui.helper) {
                 var moduleName = $(ui.helper[0]).data("module-name");
                 var pluginName = $(ui.helper[0]).data("plugin-name");
@@ -247,7 +260,7 @@ var melisDragnDrop = (function($, window) {
                     $(layout).removeClass("melis-loader");
                     $("#loader").remove();
 
-                    melisPluginEdition.calcFrameHeight()
+                    melisPluginEdition.calcFrameHeight();
                     melisPluginEdition.disableLinks('a');
                     melisPluginEdition.moveResponsiveClass();
                 }
