@@ -437,5 +437,9 @@
 	    'tr_meliscms_page_lang_create_success' => 'The page has been created successfully',
 	    'tr_meliscms_page_lang_create_failed' => 'Unable to create the page, please try again',
 	    
+	    // User Access rights
+	    'tr_meliscms_page_user_access_rights' => 'User page access rights',
+	    'tr_meliscms_page_user_access_rights_no_access' => 'Your rights do not allow you to perform this action, please see with the administrator',
+	    
 	);
 ?>

@@ -442,5 +442,9 @@
 	    'tr_meliscms_page_lang_create_title' => 'Langage de la page',
 	    'tr_meliscms_page_lang_create_success' => 'La page a été créée avec succès',
 	    'tr_meliscms_page_lang_create_failed' => 'Impossible de créer la page, veuillez réessayer',
+	    
+	    // User Access rights
+	    'tr_meliscms_page_user_access_rights' => 'User page access rights',
+	    'tr_meliscms_page_user_access_rights_no_access' => 'Vos droits ne vous permettent pas d\'effectuer cette action, veuillez voir avec l\'administrateur',
 	);
 ?>

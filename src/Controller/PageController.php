@@ -642,132 +642,141 @@ class PageController extends AbstractActionController
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $fatherPageId = $this->params()->fromRoute('fatherPageId', $this->params()->fromQuery('fatherPageId', ''));
         $translator = $this->serviceLocator->get('translator');
-
-        $eventDatas = array('idPage' => $idPage);
-        if(!empty($fatherPageId)){
-            $eventDatas['fatherPageId'] = $fatherPageId;
-        }
-
-        $this->getEventManager()->trigger('meliscms_page_save_start', $this, $eventDatas);
-
-        // Get the MelisCms Module session as page is saved in it
-        $container = new Container('meliscms');
-
+        
         $success = 0;
         $errors = array();
         $datas = array();
-
+        
         if ($idPage){
             $logTypeCode = 'CMS_PAGE_UPDATE';
         }else{
             $logTypeCode = 'CMS_PAGE_ADD';
         }
-
-        // Update from the different save actions done
-        if (!empty($container['action-page-tmp']))
+        
+        // Checking if user has page access rights
+        $usrAccess = $this->checkoutUserPageRightsAccess($idPage);
+        if ($usrAccess['hasAccess'])
         {
-            if (!empty($container['action-page-tmp']['success']))
-                $success = $container['action-page-tmp']['success'];
-            if (!empty($container['action-page-tmp']['errors']))
-                $errors = $container['action-page-tmp']['errors'];
-            if (!empty($container['action-page-tmp']['datas']))
-                $datas = $container['action-page-tmp']['datas'];
-        }
-
-        // We unset this as it was used temporarily for saving the informations
-        // while the sub-save where beeing executed
-        unset($container['action-page-tmp']);
-
-        if ($success == 1 && !empty($datas['idPage']))
-            $idPage = $datas['idPage'];
-
-        $textTitle = '';
-        $textMessage = '';
-        $melisPage = $this->serviceLocator->get('MelisEnginePage');
-        $page = $melisPage->getDatasPage($idPage, 'saved');
-
-        $pageName = '';
-        if ($page && !empty($page->getMelisPageTree()))
-        {
-            $page = $page->getMelisPageTree();
-            $pageName = $page->page_name;
-            $textTitle =  $translator->translate('tr_meliscms_page_success_Page')
-                . ': ' . $pageName;
-        }
-        else
-            $textTitle =  $translator->translate('tr_meliscms_page_success_Page') . ': '
-                . $translator->translate('tr_meliscms_page_success_Page new');
-
-        $pageMelisKey = 'meliscms_page';
-        $melisAppConfig =$this->getServiceLocator()->get('MelisCoreConfig');
-        $appsConfig = $melisAppConfig->getItem($pageMelisKey);
-
-        if (!empty($appsConfig['conf']['id']))
-            $zoneId = $appsConfig['conf']['id'];
-        else
-            $zoneId = 'id_meliscms_page';
-
-        $data_icon = '';
-        if (!empty($page) && !empty($page->page_type))
-        {
-            if ($page->page_type == 'PAGE')
-                $data_icon = 'fa fa-file-o';
-            if ($page->page_type == 'SITE')
-                $data_icon = 'fa fa-home';
-            if ($page->page_type == 'FOLDER')
-                $data_icon = 'fa fa-folder-open-o';
-        }
-        $datas['item_icon'] = $data_icon;
-        $datas['item_name'] = $pageName;
-
-        if (!empty($datas['isNew']) && $datas['isNew'])
-            $datas['item_zoneid'] = '0_' . $zoneId;
-        else
-            $datas['item_zoneid'] = $idPage . '_' . $zoneId;
-        $datas['item_melisKey'] = $pageMelisKey;
-
-
-        $pageTxt = '';
-        if($idPage == 0)
-        {
-            $pageTxt = ' '.$translator->translate('tr_meliscms_page_new_page');
-        }
-        else
-        {
-            $pageTxt = ' Page "' . $datas['item_name'] . '"';
-        }
-
-
-        if ($success == 1)
-        {
-            $textMessage = 'tr_meliscms_page_success_Page saved';
-        }
-        else
-        {
-            $textMessage = 'tr_meliscms_page_error_Some errors occured while processing the request.';
-        }
-
-        // Add labels of errors
-        $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
-
-        $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered(
-            PagePropertiesController::PagePropertiesAppConfigPath,
-            'meliscms_page_properties',
-            $idPage . '_'
-        );
-
-        $appConfigForm = $appConfigForm['elements'];
-
-        foreach ($errors as $keyError => $valueError)
-        {
-            foreach ($appConfigForm as $keyForm => $valueForm)
+            $eventDatas = array('idPage' => $idPage);
+            if(!empty($fatherPageId)){
+                $eventDatas['fatherPageId'] = $fatherPageId;
+            }
+            
+            $this->getEventManager()->trigger('meliscms_page_save_start', $this, $eventDatas);
+            
+            // Get the MelisCms Module session as page is saved in it
+            $container = new Container('meliscms');
+            
+            // Update from the different save actions done
+            if (!empty($container['action-page-tmp']))
             {
-                if ($valueForm['spec']['name'] == $keyError &&
-                    !empty($valueForm['spec']['options']['label']))
-                    $errors[$keyError]['label'] = $valueForm['spec']['options']['label'];
+                if (!empty($container['action-page-tmp']['success']))
+                    $success = $container['action-page-tmp']['success'];
+                if (!empty($container['action-page-tmp']['errors']))
+                    $errors = $container['action-page-tmp']['errors'];
+                if (!empty($container['action-page-tmp']['datas']))
+                    $datas = $container['action-page-tmp']['datas'];
+            }
+    
+            // We unset this as it was used temporarily for saving the informations
+            // while the sub-save where beeing executed
+            unset($container['action-page-tmp']);
+    
+            if ($success == 1 && !empty($datas['idPage']))
+                $idPage = $datas['idPage'];
+    
+            $textTitle = '';
+            $textMessage = '';
+            $melisPage = $this->serviceLocator->get('MelisEnginePage');
+            $page = $melisPage->getDatasPage($idPage, 'saved');
+    
+            $pageName = '';
+            if ($page && !empty($page->getMelisPageTree()))
+            {
+                $page = $page->getMelisPageTree();
+                $pageName = $page->page_name;
+                $textTitle =  $translator->translate('tr_meliscms_page_success_Page')
+                    . ': ' . $pageName;
+            }
+            else
+                $textTitle =  $translator->translate('tr_meliscms_page_success_Page') . ': '
+                    . $translator->translate('tr_meliscms_page_success_Page new');
+    
+            $pageMelisKey = 'meliscms_page';
+            $melisAppConfig =$this->getServiceLocator()->get('MelisCoreConfig');
+            $appsConfig = $melisAppConfig->getItem($pageMelisKey);
+    
+            if (!empty($appsConfig['conf']['id']))
+                $zoneId = $appsConfig['conf']['id'];
+            else
+                $zoneId = 'id_meliscms_page';
+    
+            $data_icon = '';
+            if (!empty($page) && !empty($page->page_type))
+            {
+                if ($page->page_type == 'PAGE')
+                    $data_icon = 'fa fa-file-o';
+                if ($page->page_type == 'SITE')
+                    $data_icon = 'fa fa-home';
+                if ($page->page_type == 'FOLDER')
+                    $data_icon = 'fa fa-folder-open-o';
+            }
+            $datas['item_icon'] = $data_icon;
+            $datas['item_name'] = $pageName;
+    
+            if (!empty($datas['isNew']) && $datas['isNew'])
+                $datas['item_zoneid'] = '0_' . $zoneId;
+            else
+                $datas['item_zoneid'] = $idPage . '_' . $zoneId;
+            $datas['item_melisKey'] = $pageMelisKey;
+    
+    
+            $pageTxt = '';
+            if($idPage == 0)
+            {
+                $pageTxt = ' '.$translator->translate('tr_meliscms_page_new_page');
+            }
+            else
+            {
+                $pageTxt = ' Page "' . $datas['item_name'] . '"';
+            }
+    
+    
+            if ($success == 1)
+            {
+                $textMessage = 'tr_meliscms_page_success_Page saved';
+            }
+            else
+            {
+                $textMessage = 'tr_meliscms_page_error_Some errors occured while processing the request.';
+            }
+    
+            // Add labels of errors
+            $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+    
+            $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered(
+                PagePropertiesController::PagePropertiesAppConfigPath,
+                'meliscms_page_properties',
+                $idPage . '_'
+            );
+    
+            $appConfigForm = $appConfigForm['elements'];
+    
+            foreach ($errors as $keyError => $valueError)
+            {
+                foreach ($appConfigForm as $keyForm => $valueForm)
+                {
+                    if ($valueForm['spec']['name'] == $keyError &&
+                        !empty($valueForm['spec']['options']['label']))
+                        $errors[$keyError]['label'] = $valueForm['spec']['options']['label'];
+                }
             }
         }
-
+        else 
+        {
+            $textTitle = $usrAccess['textTitle'];
+            $textMessage = $usrAccess['textMessage'];
+        }
 
         $response = array(
             'success' => $success,
@@ -797,49 +806,59 @@ class PageController extends AbstractActionController
         $datas = array();
         $textTitle = 'tr_meliscms_delete_saved_success_title';
         $textMessage = '';
-
-        $melisEngineSavedPage = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
-        $savedPageRes = $melisEngineSavedPage->getEntryById($idPage);
-        $savedPageData = $savedPageRes->current();
-
-        $this->getEventManager()->trigger('meliscms_page_clear_saved_page_start', $this, array('idPage' => $idPage));
-        if (!empty($savedPageData)){
-
-            // Checking Page Current Status
-            $melisEngineTablePagePublished = $this->serviceLocator->get('MelisEngineTablePagePublished');
-            $datasPagePublished = $melisEngineTablePagePublished->getEntryById($idPage);
-            $pagePublishedData = $datasPagePublished->current();
-
-            if (!empty($pagePublishedData)){
-                $melisEngineSavedPage->deleteById($idPage);
-            }else{
-                // Update Save page Content to default value
-                // New page, create an empty content
-                $newXmlContent = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-                $newXmlContent .= '<document type="MelisCMS" author="MelisTechnology" version="2.0">' . "\n";
-                $newXmlContent .= '</document>';
-                $data['page_content'] = $newXmlContent;
-                $data['page_edit_date'] = date('Y-m-d H:i:s');
-                // Getting current user
-                $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
-                $user = $melisCoreAuth->getIdentity();
-                if (!empty($user))
-                {
-                    $data['page_last_user_id'] = $user->usr_id;
+        
+        // Checking if user has page access rights
+        $usrAccess = $this->checkoutUserPageRightsAccess($idPage);
+        if ($usrAccess['hasAccess'])
+        {
+            $melisEngineSavedPage = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+            $savedPageRes = $melisEngineSavedPage->getEntryById($idPage);
+            $savedPageData = $savedPageRes->current();
+    
+            $this->getEventManager()->trigger('meliscms_page_clear_saved_page_start', $this, array('idPage' => $idPage));
+            if (!empty($savedPageData)){
+    
+                // Checking Page Current Status
+                $melisEngineTablePagePublished = $this->serviceLocator->get('MelisEngineTablePagePublished');
+                $datasPagePublished = $melisEngineTablePagePublished->getEntryById($idPage);
+                $pagePublishedData = $datasPagePublished->current();
+    
+                if (!empty($pagePublishedData)){
+                    $melisEngineSavedPage->deleteById($idPage);
+                }else{
+                    // Update Save page Content to default value
+                    // New page, create an empty content
+                    $newXmlContent = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+                    $newXmlContent .= '<document type="MelisCMS" author="MelisTechnology" version="2.0">' . "\n";
+                    $newXmlContent .= '</document>';
+                    $data['page_content'] = $newXmlContent;
+                    $data['page_edit_date'] = date('Y-m-d H:i:s');
+                    // Getting current user
+                    $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
+                    $user = $melisCoreAuth->getIdentity();
+                    if (!empty($user))
+                    {
+                        $data['page_last_user_id'] = $user->usr_id;
+                    }
+                    $melisEngineSavedPage->save($data, $idPage);
                 }
-                $melisEngineSavedPage->save($data, $idPage);
+    
+                // Get the MelisCms Module session as page is saved in it
+                $container = new Container('meliscms');
+                if (!empty($container['content-pages'][$idPage])){
+                    unset($container['content-pages'][$idPage]);
+                }
+    
+                $textMessage = 'tr_meliscms_delete_saved_success';
+                $success = 1;
+            }else{
+                $textMessage = 'tr_meliscms_delete_no_saved_page';
             }
-
-            // Get the MelisCms Module session as page is saved in it
-            $container = new Container('meliscms');
-            if (!empty($container['content-pages'][$idPage])){
-                unset($container['content-pages'][$idPage]);
-            }
-
-            $textMessage = 'tr_meliscms_delete_saved_success';
-            $success = 1;
-        }else{
-            $textMessage = 'tr_meliscms_delete_no_saved_page';
+        }
+        else
+        {
+            $textTitle = $usrAccess['textTitle'];
+            $textMessage = $usrAccess['textMessage'];
         }
 
         $response = array(
@@ -867,7 +886,7 @@ class PageController extends AbstractActionController
 
         $melisPageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
         $melisPagePublishedTable = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
-
+        
         $dataSaved = $melisPageSavedTable->getEntryById($idPage);
         if ($dataSaved)
         {
@@ -899,6 +918,7 @@ class PageController extends AbstractActionController
                     'label' => $translator->translate('tr_meliscms_form_common_errors_Datas'))),
             );
         }
+        
         return new JsonModel($result);
     }
 
@@ -922,98 +942,112 @@ class PageController extends AbstractActionController
         $success = 0;
         $errors = array();
         $datas = array();
-
-        // Update from the different save actions done
-        if (!empty($container['action-page-tmp']))
-        {
-            if (!empty($container['action-page-tmp']['success']))
-                $success = $container['action-page-tmp']['success'];
-            if (!empty($container['action-page-tmp']['errors']))
-                $errors = $container['action-page-tmp']['errors'];
-            if (!empty($container['action-page-tmp']['datas']))
-                $datas = $container['action-page-tmp']['datas'];
-        }
-
-        // We unset this as it was used temporarily for saving the informations
-        // while the sub-save where beeing executed
-        unset($container['action-page-tmp']);
-
+        $textTitle= '';
         $textMessage = '';
-
-        $melisPage = $this->serviceLocator->get('MelisEnginePage');
-        $page = $melisPage->getDatasPage($idPage, 'saved');
-
-        if ($page && !empty($page->getMelisPageTree()))
+        
+        // Checking if user has page access rights
+        $usrAccess = $this->checkoutUserPageRightsAccess($idPage);
+        if ($usrAccess['hasAccess'])
         {
-            $page = $page->getMelisPageTree();
-            $pageName = $page->page_name;
-        }
-
-        // Add labels of errors
-        $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
-
-        $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered(
-            PagePropertiesController::PagePropertiesAppConfigPath,
-            'meliscms_page_properties',
-            $idPage . '_'
-        );
-
-        $appConfigForm = $appConfigForm['elements'];
-
-        foreach ($errors as $keyError => $valueError)
-        {
-            foreach ($appConfigForm as $keyForm => $valueForm)
+            // Update from the different save actions done
+            if (!empty($container['action-page-tmp']))
             {
-                if ($valueForm['spec']['name'] == $keyError &&
-                    !empty($valueForm['spec']['options']['label']))
-                    $errors[$keyError]['label'] = $valueForm['spec']['options']['label'];
+                if (!empty($container['action-page-tmp']['success']))
+                    $success = $container['action-page-tmp']['success'];
+                if (!empty($container['action-page-tmp']['errors']))
+                    $errors = $container['action-page-tmp']['errors'];
+                if (!empty($container['action-page-tmp']['datas']))
+                    $datas = $container['action-page-tmp']['datas'];
             }
+    
+            // We unset this as it was used temporarily for saving the informations
+            // while the sub-save where beeing executed
+            unset($container['action-page-tmp']);
+    
+            
+    
+            $melisPage = $this->serviceLocator->get('MelisEnginePage');
+            $page = $melisPage->getDatasPage($idPage, 'saved');
+    
+            if ($page && !empty($page->getMelisPageTree()))
+            {
+                $page = $page->getMelisPageTree();
+                $pageName = $page->page_name;
+            }
+    
+            // Add labels of errors
+            $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+    
+            $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered(
+                PagePropertiesController::PagePropertiesAppConfigPath,
+                'meliscms_page_properties',
+                $idPage . '_'
+            );
+    
+            $appConfigForm = $appConfigForm['elements'];
+    
+            foreach ($errors as $keyError => $valueError)
+            {
+                foreach ($appConfigForm as $keyForm => $valueForm)
+                {
+                    if ($valueForm['spec']['name'] == $keyError &&
+                        !empty($valueForm['spec']['options']['label']))
+                        $errors[$keyError]['label'] = $valueForm['spec']['options']['label'];
+                }
+            }
+    
+            if(!empty($errors)) {
+                $success = 0;
+            }
+    
+            $pageMelisKey = 'meliscms_page';
+            $melisAppConfig =$this->getServiceLocator()->get('MelisCoreConfig');
+            $appsConfig = $melisAppConfig->getItem($pageMelisKey);
+    
+            if (!empty($appsConfig['conf']['id']))
+                $zoneId = $appsConfig['conf']['id'];
+            else
+                $zoneId = 'id_meliscms_page';
+    
+            $data_icon = '';
+            if (!empty($page) && !empty($page->page_type))
+            {
+                if ($page->page_type == 'PAGE')
+                    $data_icon = 'fa fa-file-o';
+                if ($page->page_type == 'SITE')
+                    $data_icon = 'fa fa-home';
+                if ($page->page_type == 'FOLDER')
+                    $data_icon = 'fa fa-folder-open-o';
+            }
+            $datas['item_icon'] = $data_icon;
+            $datas['item_name'] = $pageName;
+    
+    
+            $pageTxt = '"' . $datas['item_name'] . '"';
+            if ($success == 1) {
+                $textMessage = 'tr_meliscms_page_success_Page published';
+            }
+            else {
+                $textMessage = 'tr_meliscms_page_error_Some errors occured while processing the request. Please find details bellow.';
+            }
+    
+            if (!empty($datas['isNew']) && $datas['isNew'])
+                $datas['item_zoneid'] = '0_' . $zoneId;
+            else
+                $datas['item_zoneid'] = $idPage . '_' . $zoneId;
+            $datas['item_melisKey'] = $pageMelisKey;
+            
+            $textTitle = $translator->translate('tr_meliscms_page_actions_Publish').' Page ' . $pageTxt;
         }
-
-        if(!empty($errors)) {
-            $success = 0;
-        }
-
-        $pageMelisKey = 'meliscms_page';
-        $melisAppConfig =$this->getServiceLocator()->get('MelisCoreConfig');
-        $appsConfig = $melisAppConfig->getItem($pageMelisKey);
-
-        if (!empty($appsConfig['conf']['id']))
-            $zoneId = $appsConfig['conf']['id'];
-        else
-            $zoneId = 'id_meliscms_page';
-
-        $data_icon = '';
-        if (!empty($page) && !empty($page->page_type))
+        else 
         {
-            if ($page->page_type == 'PAGE')
-                $data_icon = 'fa fa-file-o';
-            if ($page->page_type == 'SITE')
-                $data_icon = 'fa fa-home';
-            if ($page->page_type == 'FOLDER')
-                $data_icon = 'fa fa-folder-open-o';
+            $textTitle = $usrAccess['textTitle'];
+            $textMessage = $usrAccess['textMessage'];
         }
-        $datas['item_icon'] = $data_icon;
-        $datas['item_name'] = $pageName;
-
-
-        $pageTxt = '"' . $datas['item_name'] . '"';
-        if ($success == 1) {
-            $textMessage = 'tr_meliscms_page_success_Page published';
-        }
-        else {
-            $textMessage = 'tr_meliscms_page_error_Some errors occured while processing the request. Please find details bellow.';
-        }
-
-        if (!empty($datas['isNew']) && $datas['isNew'])
-            $datas['item_zoneid'] = '0_' . $zoneId;
-        else
-            $datas['item_zoneid'] = $idPage . '_' . $zoneId;
-        $datas['item_melisKey'] = $pageMelisKey;
 
         $response = array(
             'success' => $success,
-            'textTitle' => $translator->translate('tr_meliscms_page_actions_Publish').' Page ' . $pageTxt,
+            'textTitle' => $textTitle,
             'textMessage' => $textMessage,
             'errors' => $errors,
             'datas' => $datas,
@@ -1036,30 +1070,30 @@ class PageController extends AbstractActionController
         $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $translator = $this->getServiceLocator()->get('translator');
         $melisPagePublishedTable = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
-
+        
         $dataPublished = $melisPagePublishedTable->getEntryById($idPage);
         if ($dataPublished)
         {
             $dataPublished = $dataPublished->toArray();
             if (count($dataPublished) > 0)
             {
-
+                
                 $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
-
+                
                 $userAuthDatas =  $melisCoreAuth->getStorage()->read();
                 $userId = (int) $userAuthDatas->usr_id;
-
+                
                 $melisPagePublishedTable->save(array(
                     'page_status' => 0,
                     'page_edit_date' => date('Y-m-d H:i:s'),
                     'page_last_user_id' => $userId
                 ), $idPage);
-
+                
                 $result = array(
                     'success' => 1,
                     'datas' => array('idPage' => $idPage, 'isNew' => 0),
                     'errors' => array(),
-
+                    
                 );
             }
             else
@@ -1083,7 +1117,7 @@ class PageController extends AbstractActionController
                     'label' => $translator->translate('tr_meliscms_form_common_errors_Datas'))),
             );
         }
-
+        
         return new JsonModel($result);
     }
 
@@ -1096,57 +1130,72 @@ class PageController extends AbstractActionController
     {
         $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $translator = $this->serviceLocator->get('translator');
-
-        $eventDatas = array('idPage' => $idPage);
-        $this->getEventManager()->trigger('meliscms_page_unpublish_start', $this, $eventDatas);
-
-
-        // Get the MelisCms Module session as page is saved in it
-        $container = new Container('meliscms');
-
-        $success = 0;
-        $errors = array();
-        $datas = array();
-
-        // Update from the different save actions done
-        if (!empty($container['action-page-tmp']))
+        
+        // Checking if user has page access rights
+        $usrAccess = $this->checkoutUserPageRightsAccess($idPage);
+        if ($usrAccess['hasAccess'])
         {
-            if (!empty($container['action-page-tmp']['success']))
-                $success = $container['action-page-tmp']['success'];
-            if (!empty($container['action-page-tmp']['errors']))
-                $errors = $container['action-page-tmp']['errors'];
-            if (!empty($container['action-page-tmp']['datas']))
-                $datas = $container['action-page-tmp']['datas'];
+            $eventDatas = array('idPage' => $idPage);
+            $this->getEventManager()->trigger('meliscms_page_unpublish_start', $this, $eventDatas);
+    
+    
+            // Get the MelisCms Module session as page is saved in it
+            $container = new Container('meliscms');
+    
+            $success = 0;
+            $errors = array();
+            $datas = array();
+            $titleMessage = '';
+            $textMessage = '';
+    
+            // Update from the different save actions done
+            if (!empty($container['action-page-tmp']))
+            {
+                if (!empty($container['action-page-tmp']['success']))
+                    $success = $container['action-page-tmp']['success'];
+                if (!empty($container['action-page-tmp']['errors']))
+                    $errors = $container['action-page-tmp']['errors'];
+                if (!empty($container['action-page-tmp']['datas']))
+                    $datas = $container['action-page-tmp']['datas'];
+            }
+    
+            // We unset this as it was used temporarily for saving the informations
+            // while the sub-save where beeing executed
+            unset($container['action-page-tmp']);
+    
+            
+            $melisPage = $this->serviceLocator->get('MelisEnginePage');
+            $page = $melisPage->getDatasPage($idPage, 'saved');
+    
+    
+            if ($page && !empty($page->getMelisPageTree()))
+            {
+                $page = $page->getMelisPageTree();
+                $pageName = $page->page_name;
+                $textTitle =  $translator->translate('tr_meliscms_page_success_Page') . ': ' . $pageName;
+            }
+            if ($success == 1) {
+                $textMessage = $translator->translate('tr_meliscms_page_success_Page unpublished');
+            }
+            else {
+                $textMessage = $translator->translate('tr_meliscms_page_error_Some errors occured while processing the request. Please find details bellow.');
+            }
+    
+            $datas['idPage'] = $idPage;
+            $datas['isNew']  = 0;
+            
+            $titleMessage = $translator->translate('tr_meliscms_page_actions_Unpublish').' Page ' . $idPage;
         }
-
-        // We unset this as it was used temporarily for saving the informations
-        // while the sub-save where beeing executed
-        unset($container['action-page-tmp']);
-
-        $textMessage = '';
-        $melisPage = $this->serviceLocator->get('MelisEnginePage');
-        $page = $melisPage->getDatasPage($idPage, 'saved');
-
-
-        if ($page && !empty($page->getMelisPageTree()))
+        else
         {
-            $page = $page->getMelisPageTree();
-            $pageName = $page->page_name;
-            $textTitle =  $translator->translate('tr_meliscms_page_success_Page') . ': ' . $pageName;
+            $success = 0;
+            $titleMessage = $usrAccess['textTitle'];
+            $textMessage = $usrAccess['textTitle'];
         }
-        if ($success == 1) {
-            $textMessage = $translator->translate('tr_meliscms_page_success_Page unpublished');
-        }
-        else {
-            $textMessage = $translator->translate('tr_meliscms_page_error_Some errors occured while processing the request. Please find details bellow.');
-        }
-
-        $datas['idPage'] = $idPage;
-        $datas['isNew']  = 0;
-
+        
         $response = array(
             'success' => $success,
-            'textTitle' => $translator->translate('tr_meliscms_page_actions_Unpublish').' Page ' . $idPage,
+            'textTitle' => $titleMessage,
             'textMessage' => $textMessage,
             'errors' => $errors,
             'datas' => array($datas),
@@ -1296,50 +1345,61 @@ class PageController extends AbstractActionController
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $translator = $this->serviceLocator->get('translator');
 
-        $eventDatas = array('idPage' => $idPage);
-        $this->getEventManager()->trigger('meliscms_page_delete_start', $this, $eventDatas);
-
-        // Get the MelisCms Module session as page is saved in it
-        $container = new Container('meliscms');
-
-        $success = 0;
-        $errors = array();
-        $datas = array();
-
-        // Update from the different save actions done
-        if (!empty($container['action-page-tmp']))
+        // Checking if user has page access rights
+        $usrAccess = $this->checkoutUserPageRightsAccess($idPage);
+        if ($usrAccess['hasAccess'])
         {
-            if (!empty($container['action-page-tmp']['success']))
-                $success = $container['action-page-tmp']['success'];
-            if (!empty($container['action-page-tmp']['errors']))
-                $errors = $container['action-page-tmp']['errors'];
-            if (!empty($container['action-page-tmp']['datas']))
-                $datas = $container['action-page-tmp']['datas'];
+            $eventDatas = array('idPage' => $idPage);
+            $this->getEventManager()->trigger('meliscms_page_delete_start', $this, $eventDatas);
+    
+            // Get the MelisCms Module session as page is saved in it
+            $container = new Container('meliscms');
+    
+            $success = 0;
+            $errors = array();
+            $datas = array();
+    
+            // Update from the different save actions done
+            if (!empty($container['action-page-tmp']))
+            {
+                if (!empty($container['action-page-tmp']['success']))
+                    $success = $container['action-page-tmp']['success'];
+                if (!empty($container['action-page-tmp']['errors']))
+                    $errors = $container['action-page-tmp']['errors'];
+                if (!empty($container['action-page-tmp']['datas']))
+                    $datas = $container['action-page-tmp']['datas'];
+            }
+    
+            // We unset this as it was used temporarily for saving the informations
+            // while the sub-save where beeing executed
+            unset($container['action-page-tmp']);
+    
+            $textTitle = '';
+            $textMessage = '';
+            $melisPage = $this->serviceLocator->get('MelisEnginePage');
+            $page = $melisPage->getDatasPage($idPage, 'saved');
+            $datas['idPage'] = $idPage;
+    
+            if ($page && !empty($page->getMelisPageTree()))
+            {
+                $page = $page->getMelisPageTree();
+                $pageName = $page->page_name;
+                $textTitle =  $translator->translate('tr_meliscms_page_success_Page delete') . ': ' . $pageName;
+            }
+            if ($success == 1) {
+                $textTitle = ' Page ' . $idPage. ' '.$translator->translate('tr_meliscms_page_success_Page_deleted');
+                $textMessage = 'tr_meliscms_page_success_Page deleted_success';
+            }
+            else {
+                $textTitle = $translator->translate('tr_meliscms_page_success_Page_deleted2').' Page ' . $idPage;
+                $textMessage = 'tr_meliscms_page_error_Some errors occured while processing the request. Please find details bellow.';
+            }
         }
-
-        // We unset this as it was used temporarily for saving the informations
-        // while the sub-save where beeing executed
-        unset($container['action-page-tmp']);
-
-        $textTitle = '';
-        $textMessage = '';
-        $melisPage = $this->serviceLocator->get('MelisEnginePage');
-        $page = $melisPage->getDatasPage($idPage, 'saved');
-        $datas['idPage'] = $idPage;
-
-        if ($page && !empty($page->getMelisPageTree()))
+        else 
         {
-            $page = $page->getMelisPageTree();
-            $pageName = $page->page_name;
-            $textTitle =  $translator->translate('tr_meliscms_page_success_Page delete') . ': ' . $pageName;
-        }
-        if ($success == 1) {
-            $textTitle = ' Page ' . $idPage. ' '.$translator->translate('tr_meliscms_page_success_Page_deleted');
-            $textMessage = 'tr_meliscms_page_success_Page deleted_success';
-        }
-        else {
-            $textTitle = $translator->translate('tr_meliscms_page_success_Page_deleted2').' Page ' . $idPage;
-            $textMessage = 'tr_meliscms_page_error_Some errors occured while processing the request. Please find details bellow.';
+            $success = 0;
+            $textTitle = $usrAccess['textTitle'];
+            $textMessage = $usrAccess['textTitle'];
         }
 
         $response = array(
@@ -1618,6 +1678,38 @@ class PageController extends AbstractActionController
         $link['link'] = $melisTree->getPageLink($idPage);
 
         return new JsonModel($link);
+    }
+    
+    /**
+     * Checking melis page user access rights
+     * @param int $idPage
+     * 
+     * @return array[]
+     */
+    private function checkoutUserPageRightsAccess($idPage)
+    {
+        $hasAccess = false;
+        $textTitle = 'tr_meliscms_page_user_access_rights';
+        $textMessage = 'tr_meliscms_page_user_access_rights_no_access';
+        
+        // Checking if user has page access rights
+        $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
+        $melisCmsRights = $this->getServiceLocator()->get('MelisCmsRights');
+        $xmlRights = $melisCoreAuth->getAuthRights();
+        $isAccessible = $melisCmsRights->isAccessible($xmlRights, MelisCmsRightsService::MELISCMS_PREFIX_PAGES, $idPage);
+        
+        if ($isAccessible)
+        {
+            $hasAccess = true;
+            $textTitle = '';
+            $textMessage = '';
+        }
+        
+        return array(
+            'hasAccess' => $hasAccess,
+            'textTitle' => $textTitle,
+            'textMessage' => $textMessage
+        );
     }
 
     private function updateUrlPage($idPage)
