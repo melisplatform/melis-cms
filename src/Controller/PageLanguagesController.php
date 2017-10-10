@@ -58,29 +58,26 @@ class PageLanguagesController extends AbstractActionController
         {
             $pageInitialId = $pageLang->plang_page_id_initial;
             
-            if ($idPage != $pageInitialId)
+            $pageSrv = $this->getServiceLocator()->get('MelisEnginePage');
+            $pageData = $pageSrv->getDatasPage($pageInitialId)->getMelisPageTree();
+            
+            if (!empty($pageData))
             {
-                $pageSrv = $this->getServiceLocator()->get('MelisEnginePage');
-                $pageData = $pageSrv->getDatasPage($pageInitialId)->getMelisPageTree();
+                // Adding attribute of the Page name label
+                $tabAttr = array(
+                    'class="open-page-from-lan-tab"',
+                    'data-opentab',
+                    'data-tabicon="fa-file-o"',
+                    'data-name="'.$pageData->page_name.'"',
+                    'data-id="'.$pageData->tree_page_id.'_id_meliscms_page"',
+                    'data-meliskey="meliscms_page"',
+                    'data-pageid="'.$pageData->tree_page_id.'"'
+                );
                 
-                if (!empty($pageData))
-                {
-                    // Adding attribute of the Page name label
-                    $tabAttr = array(
-                        'class="open-page-from-lan-tab"',
-                        'data-opentab',
-                        'data-tabicon="fa-file-o"',
-                        'data-name="'.$pageData->page_name.'"',
-                        'data-id="'.$pageData->tree_page_id.'_id_meliscms_page"',
-                        'data-meliskey="meliscms_page"',
-                        'data-pageid="'.$pageData->tree_page_id.'"'
-                    );
-                    
-                    $tabAttr = implode(' ', $tabAttr);
-                    
-                    $translate = $this->getServiceLocator()->get('translator');
-                    $pageInfo = sprintf($translate->translate('tr_meliscms_page_lang_info'),  $pageData->lang_cms_name, $tabAttr, $pageData->page_name.' ('.$pageData->tree_page_id.')');
-                }
+                $tabAttr = implode(' ', $tabAttr);
+                
+                $translate = $this->getServiceLocator()->get('translator');
+                $pageInfo = sprintf($translate->translate('tr_meliscms_page_lang_info'),  $pageData->lang_cms_name, $tabAttr, $pageData->page_name.' ('.$pageData->tree_page_id.')');
             }
         }
         
@@ -117,7 +114,12 @@ class PageLanguagesController extends AbstractActionController
             $pageSrv = $this->getServiceLocator()->get('MelisEnginePage');
             foreach ($pages As $val)
             {
-                $pageData = $pageSrv->getDatasPage($val->plang_page_id)->getMelisPageTree();
+                $pageData = $pageSrv->getDatasPage($val->plang_page_id, 'saved')->getMelisPageTree();
+                
+                if (empty($pageData->page_id))
+                {
+                    $pageData = $pageSrv->getDatasPage($val->plang_page_id)->getMelisPageTree();
+                }
                 
                 if (!empty($pageData))
                 {
@@ -289,7 +291,7 @@ class PageLanguagesController extends AbstractActionController
                      * Retrieving the new created page for response of the request call
                      */
                     $pageSrv = $this->getServiceLocator()->get('MelisEnginePage');
-                    $pageData = $pageSrv->getDatasPage($pageId)->getMelisPageTree();
+                    $pageData = $pageSrv->getDatasPage($pageId, 'saved')->getMelisPageTree();
                     
                     $pageInfo = array(
                         'tabicon' => 'fa-file-o',

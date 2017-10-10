@@ -2373,7 +2373,7 @@ return array(
                                array(
                                    'spec' => array(
                                        'name' => 'lang_id',
-                                       'type' => 'MelisCoreLanguageSelect',
+                                       'type' => 'MelisCmsLanguageSelect',
                                        'options' => array(
                                            'label' => 'tr_meliscms_page_tab_properties_form_Language',
                                            'tooltip' => 'tr_meliscms_page_tab_properties_form_Language tooltip',

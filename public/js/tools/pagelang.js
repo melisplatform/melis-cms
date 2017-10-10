@@ -26,8 +26,8 @@ $(function(){
 					refreshTreeview(data.pageInfo.pageid);
 				}
 				
-				// Close current page
-				melisHelper.tabClose(pageId+"_id_meliscms_page");
+				// Reload the parent page
+				melisHelper.zoneReload(pageId+"_id_meliscms_page", "meliscms_page", {idPage : pageId});
 				
 				melisHelper.melisOkNotification(data.textTitle, data.textMessage);
 			}else{

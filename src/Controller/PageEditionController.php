@@ -109,6 +109,17 @@ class PageEditionController extends AbstractActionController
         
     }
 
+    public function getContainerUniqueIdAction()
+    {
+        $success  = 1;
+        $uniqueId = 'plugin_container_id_'.time();
+
+        return new JsonModel(array(
+            'success' => $success,
+            'id'      => $uniqueId
+        ));
+    }
+
 
     /**
      * Saves datas edited in a page and posted to this function
@@ -228,13 +239,17 @@ class PageEditionController extends AbstractActionController
 		    // Resave XML of the page
 			if (!empty($container['content-pages'][$idPage]))
 			{
+
 				// Create the new XML
 				$newXmlContent = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 				$newXmlContent .= '<document type="MelisCMS" author="MelisTechnology" version="2.0">' . "\n";
 				foreach ($container['content-pages'][$idPage] as $namePlugin => $pluginEntries)
 				{
-				    foreach ($pluginEntries as $idEntry => $valueEntry)
-				        $newXmlContent .= "\t" . $valueEntry . "\n";
+                    if($namePlugin != 'private:melisPluginSettings') {
+                        foreach ($pluginEntries as $idEntry => $valueEntry) {
+                            $newXmlContent .= "\t" . $valueEntry . "\n";
+                        }
+                    }
 				}
 				$newXmlContent .= '</document>';
 				

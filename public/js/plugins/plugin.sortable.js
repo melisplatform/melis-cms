@@ -7,20 +7,28 @@ var melisPluginSortable = (function($, window) {
     $(".melis-dragdropzone").sortable({
     	// when changing plugins order
     	stop: function(event, ui) {
+            $(".melis-dragdropzone").removeClass("highlight");
+
             if(ui.item[0]) { 
             	// reset items index
 	            $(ui.item[0]).css({"z-index": "1"});
 
             	var plugin = $(ui.item[0]).find(".melis-plugin-tools-box");
-            	// console.log("Plugin ", plugin);
                 var moduleName = plugin.data("module");
                 var pluginName = plugin.data("plugin");
                 var pluginId = plugin.data("plugin-id");
                 var melisTag = plugin.data("melis-tag");
+                var pluginContainer = plugin.closest(".melis-float-plugins");
                 var pageId = window.parent.$("#"+parent.activeTabId).find(".melis-iframe").data("iframe-id");
                 var dropzone = plugin.closest(".melis-dragdropzone");
                 var dropzoneData = dropzone.data("plugin-id");
 
+                // check plugin if wrap
+				if( $(pluginContainer).length <= 0 ) {
+                    $(plugin).data("plugin-container", "");
+				}
+				
+                melisPluginEdition.pluginContainerChecker();
 				melisPluginEdition.sendDragnDropList(dropzoneData, pageId);
             }
     	},

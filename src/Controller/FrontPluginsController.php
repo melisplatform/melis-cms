@@ -247,7 +247,9 @@ class FrontPluginsController extends AbstractActionController
             if(!$response['success']) {
                 $success = 0;
             }
-            
+
+
+
         }
         $finalErrors = $errorsTabs;
         
@@ -263,12 +265,33 @@ class FrontPluginsController extends AbstractActionController
     public function checkSessionPageAction()
     {
         $container = new Container('meliscms');
-        $pages = $container['content-pages'];
-        
-        echo '<pre>';
+        $pages = $container->getArrayCopy();//$container['content-pages'];
+
+//        \Zend\Debug\Debug::dump($pages);
         print_r($pages);
-        echo '</pre>';
-        
+
+        die;
+    }
+
+    public function testingAreaAction()
+    {
+        $plugin = 'melisCmsSlider';
+        $pluginId = 'showslider_1507005296';
+
+        $text = '<melisCmsSlider id="showslider_1507009618" plugin_container_id="plugin_container_id_1507009628" plugin_container_id="plugin_container_id_1507009628" plugin_container_id="plugin_container_id_1507009628" plugin_container_id="plugin_container_id_1507009628" plugin_container_id="plugin_container_id_1507009628">	';
+        $pattern = '/\splugin_container_id\=\"(.*?)\"/';
+
+        $replace = $plugin . ' id="'.$pluginId.'" plugin_container_id="this_is_the_id_1823121"';
+
+        $newValue = $text;
+        if(preg_match($pattern, $text)) {
+            $newValue = preg_replace($pattern, '', $text);
+        }
+
+
+        echo trim($newValue);
+
+
         die;
     }
 }

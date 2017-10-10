@@ -318,15 +318,20 @@ body {
 /* Mini Menu */
 .melis-ui-outlined {
     position: relative;
-  z-index: 1;
-  min-width: 150px;
+    z-index: 1;
+    min-width: 150px;
     transition-property: outline-color, transform;
-  transition-duration: 0.4s, 0.4s;
+    transition-duration: 0.4s, 0.4s;
     font-family: 'Lato', sans-serif;
     font-weight: normal;
     font-style: normal;
     font-size: 14px;
-    line-height: 25px;	
+    line-height: 25px;
+    transition: all 0.4s ease-in-out;
+}
+.melis-ui-outlined.ui-sortable-helper,
+.melis-ui-outlined.ui-resizable-resizing {
+    transition: none;
 }
 
 .melis-ui-outlined:after {
@@ -567,11 +572,15 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 }
 .ui-sortable-placeholder.ui-state-highlight {
   padding: 0;
-  margin: 0;
+  margin: 0 0 20px;
   background: #932e2a;
   transition: all 0.4s ease-in-out;
   height: 40px;
   /*background: rgba(255, 255, 255, 0.4);*/
+}
+
+.melis-float-plugins .ui-state-highlight {
+    float: left;
 }
 
 .melis-loader {
@@ -624,6 +633,82 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
     -o-animation: spinning-cog 1.3s infinite ease;
     animation: spinning-cog 1.3s infinite ease;
 }
+.btn-pulse {
+    position: absolute;
+    right: 20%;
+    color: #932e2a;
+    background: #fff;
+    border: none;
+    border-radius: 100%;
+    width: 50px;
+    height: 50px;
+    line-height: 46px;
+    border: 2px solid #932e2a;
+    box-shadow: 0 0 0 0 rgb(147, 46, 42);
+    -webkit-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    -ms-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+    -webkit-animation: pulse 1.25s infinite cubic-bezier(0.66, 0, 0, 1);
+    -moz-animation: pulse 1.25s infinite cubic-bezier(0.66, 0, 0, 1);
+    -ms-animation: pulse 1.25s infinite cubic-bezier(0.66, 0, 0, 1);
+    animation: pulse 1.25s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+.btn-pulse:hover {
+    color: #fff;
+    background: #932e2a;
+    -webkit-animation: none;
+    -moz-animation: none;
+    -ms-animation: none;animation: none;
+}
+
+.melis-float-plugins {
+    margin: 0 -15px;
+    padding: 15px 0;
+    border: 1px dashed #90312e;
+    box-shadow: 0 0 0 0 rgb(147, 46, 42);
+}
+
+.melis-float-plugins:after {
+    content: "";
+    clear: both;
+    display: block;
+}
+
+.melis-float-plugins .melis-ui-outlined {
+    float: left;
+    /*margin: 15px;*/
+}
+
+.ui-resize-indicator,
+.ui-resize-input {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 75px;
+    height: 25px;
+    color: #fff;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-align: center;
+    background: #932e2a;
+    border-bottom-left-radius: 2px;
+    z-index: 1;
+}
+.ui-resize-input input {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #fff;
+    text-align: center;
+    height: auto;
+    width: 25px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
 @-webkit-keyframes spinning-cog {
     0% { -webkit-transform: rotate(0deg) }
     20% { -webkit-transform: rotate(-45deg) }
@@ -671,3 +756,12 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
     -o-animation: shrinking-cog .3s 1 ease forwards;
     animation: shrinking-cog .3s 1 ease forwards;
 }
+
+@-webkit-keyframes pulse {to {box-shadow: 0 0 0 45px rgba(147, 46, 42, 0);}}
+@-moz-keyframes pulse {to {box-shadow: 0 0 0 45px rgba(147, 46, 42, 0);}}
+@-ms-keyframes pulse {to {box-shadow: 0 0 0 45px rgba(147, 46, 42, 0);}}
+@keyframes pulse {to {box-shadow: 0 0 0 45px rgba(147, 46, 42, 0);}}
+@-webkit-keyframes pulse-sm {to {box-shadow: 0 0 0 15px rgba(147, 46, 42, 0);}}
+@-moz-keyframes pulse-sm {to {box-shadow: 0 0 0 15px rgba(147, 46, 42, 0);}}
+@-ms-keyframes pulse-sm {to {box-shadow: 0 0 0 15px rgba(147, 46, 42, 0);}}
+@keyframes pulse-sm {to {box-shadow: 0 0 0 15px rgba(147, 46, 42, 0);}}
