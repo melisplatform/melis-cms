@@ -2,24 +2,22 @@
     $id = $this->idPage.'_'.$this->zoneconfig['conf']['id'];
     $data_melisKey = $this->zoneconfig['conf']['melisKey'];
 ?>
-<div class="row">
-    <div class="col-xs-12 col-md-6">
-        <div class="widget" <?= $id; ?> data-melisKey='<?= $data_melisKey; ?>'>
-            <div class="widget-body padding-none">
-                <div class="bg-white margin-none">
-                    <p class="pagelang-p"><?php echo $this->translate('tr_meliscms_page_lang_create_form')?></p>
-                    <?php
-                    $form = $this->createPageLangform;
-                    $form->prepare();
-                    $form->setAttribute('id', $this->idPage.'_'.$form->getAttribute('id'));
-                    $formId = $form->getAttribute('id');
-                    echo $this->form()->openTag($form);
-                    echo $this->melisFieldCollection($form);
-                    echo $this->form()->closeTag();
-                    ?>
-                    <div class="form-group">
-                        <button class="btn btn-success pull-right pageLangCreate" data-pageid="<?php echo $idPage?>" data-formid="<?php echo $formId?>"><?php echo $this->translate('tr_meliscms_page_lang_create_btn')?></button>
-                    </div>
+<div class="col-xs-12 col-md-6">
+    <div class="widget" <?= $id; ?> data-melisKey='<?= $data_melisKey; ?>'>
+        <div class="widget-body padding-none">
+            <div class="bg-white margin-none">
+                <p class="pagelang-p"><?php echo $this->translate('tr_meliscms_page_lang_create_form')?></p>
+                <?php
+                $form = $this->createPageLangform;
+                $form->prepare();
+                $form->setAttribute('id', $this->idPage.'_'.$form->getAttribute('id'));
+                $formId = $form->getAttribute('id');
+                echo $this->form()->openTag($form);
+                echo $this->melisFieldCollection($form);
+                echo $this->form()->closeTag();
+                ?>
+                <div class="form-group">
+                    <button class="btn btn-success pull-right pageLangCreate" data-pageid="<?php echo $idPage?>" data-formid="<?php echo $formId?>"><?php echo $this->translate('tr_meliscms_page_lang_create_btn')?></button>
                 </div>
             </div>
         </div>
