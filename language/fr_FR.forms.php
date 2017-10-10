@@ -205,6 +205,7 @@
 	    'tr_meliscms_tool_site_scheme_error_empty' => 'Valeur requise, ne peut pas être vide',
 	    
 	    'tr_meliscms_form_search' => 'Rechercher',
+	    'tr_meliscms_form_search_not_found' => 'Aucun résultat',
 	    
 	    'tr_meliscms_tool_style_page_id_too_long' => 'Page ID is too long',
 	    'tr_meliscms_tool_style_page_is_empty' => 'Le champ ne peut être vide',
