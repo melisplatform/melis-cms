@@ -6,20 +6,51 @@
     <div class="widget" <?= $id; ?> data-melisKey='<?= $data_melisKey; ?>'>
         <div class="widget-body padding-none">
             <div class="bg-white margin-none">
-                <p class="pagelang-p"><?php echo $this->translate('tr_meliscms_page_lang_create_form')?></p>
+                <h4 class="pagelang-title"><?php echo $this->translate('tr_meliscms_page_lang_create_form')?></h4>
+
                 <?php
                 $form = $this->createPageLangform;
                 $form->prepare();
                 $form->setAttribute('id', $this->idPage.'_'.$form->getAttribute('id'));
                 $formId = $form->getAttribute('id');
-                echo $this->form()->openTag($form);
-                echo $this->melisFieldCollection($form);
-                echo $this->form()->closeTag();
+                $form->get('pageLangId')->setAttribute('class', 'dropdown-lang');
+                //echo $this->formRow($form->get('pageLangId'));
                 ?>
-                <div class="form-group">
-                    <button class="btn btn-success pull-right pageLangCreate" data-pageid="<?php echo $idPage?>" data-formid="<?php echo $formId?>"><?php echo $this->translate('tr_meliscms_page_lang_create_btn')?></button>
+                <div class="dropdown-lang-box">
+                    <select name="" id="" class="dropdown-lang">
+                        <option value="" disabled="" selected="">Select Language</option>
+                        <option value="fr_FR" data-class="flag-france">France</option>
+                        <option value="en_EN" data-class="flag-english">English</option>
+                    </select>
+                    <div class="form-group">
+                        <button class="btn btn-success pull-right pageLangCreate" data-pageid="<?php echo $idPage?>" data-formid="<?php echo $formId?>"><?php echo $this->translate('tr_meliscms_page_lang_create_btn')?></button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script>
+
+
+    $(function() {
+        var langlists = $('select.dropdown-lang');
+        $('div.loadAttrCont').hide();
+        langlists.fadeIn();
+        langlists.select2({
+            placeholder: 'Choose a Language',
+            templateResult: formatState,
+        });
+        $("langlists").next(".select2").addClass("select-lang");
+        function formatState (state) {
+            if (!state.id) {
+                return state.text;
+            }
+            var baseUrl = "/MelisCms/images/lang-flags/";
+            var $state = $(
+                '<span><img src="' + baseUrl + '/' + state.element.value.toLowerCase() + '.png" class="img-flag" /> ' + state.text + '</span>'
+            );
+            return $state;
+        };
+    });
+</script>

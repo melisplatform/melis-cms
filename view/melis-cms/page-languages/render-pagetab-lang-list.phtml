@@ -53,15 +53,17 @@
                                         data-pageid="<?php echo $val->tree_page_id ?>"
                                     <?php }?>>
                                     <div class="lang-img">
-                                        <img src="<?php echo $val->lang_cms_flag ?>">
+<!--                                        <img class="img-responsive" src="--><?php //echo $val->lang_cms_flag ?><!--">-->
+                                        <img class="img-responsive" src="/MelisCms/images/lang-flags/en_EN2x.png">
                                     </div>
                                     <!--                		<span class="fa fa-li fa-check fa-color-green"></span> -->
-                                    <span class="language">
-                                        <?php echo $val->lang_cms_name.' - '.$val->page_name.' ('.$val->tree_page_id.')'?>
-                                    </span>
-                                    <?php if ($this->idPage == $val->tree_page_id){?>
-                                        <span class="c-page">(<?php echo $this->translate('tr_meliscms_page_lang_list_current_page_lbl')?>)</span>
-                                    <?php }?>
+                                    <span class="site"><?= $val->page_name ?><i>(<?= $val->tree_page_id ?>)</i></span>
+                                    <div class="lang-indicator">
+                                        <span class="language"><?= $val->lang_cms_name ?></span>
+                                        <?php if ($this->idPage == $val->tree_page_id){?>
+                                            <span class="c-page">(<?php echo $this->translate('tr_meliscms_page_lang_list_current_page_lbl')?>)</span>
+                                        <?php }?>
+                                    </div>
                                 </div>
                             </div>
                         <?php }?>
