@@ -442,5 +442,8 @@
 	    'tr_meliscms_page_lang_create_title' => 'Langage de la page',
 	    'tr_meliscms_page_lang_create_success' => 'La page a été créée avec succès',
 	    'tr_meliscms_page_lang_create_failed' => 'Impossible de créer la page, veuillez réessayer',
+	    'tr_meliscms_page_lang_create_right_interface' => 'Création page',
+		'tr_meliscms_page_lang_info_right_interface' => 'Page d\'origine',
+		'tr_meliscms_page_lang_list_right_interface' => 'Traduction page',
 	);
 ?>
