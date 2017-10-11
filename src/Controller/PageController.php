@@ -1037,7 +1037,7 @@ class PageController extends AbstractActionController
                 $datas['item_zoneid'] = $idPage . '_' . $zoneId;
             $datas['item_melisKey'] = $pageMelisKey;
             
-            $textTitle = $translator->translate('tr_meliscms_page_actions_Publish').' Page ' . $pageTxt;
+            $textTitle = $translator->translate('tr_meliscms_page_actions_Publish').' page ' . $pageTxt;
         }
         else 
         {
@@ -1162,19 +1162,15 @@ class PageController extends AbstractActionController
             // We unset this as it was used temporarily for saving the informations
             // while the sub-save where beeing executed
             unset($container['action-page-tmp']);
-    
             
-            $melisPage = $this->serviceLocator->get('MelisEnginePage');
-            $page = $melisPage->getDatasPage($idPage, 'saved');
-    
-    
-            if ($page && !empty($page->getMelisPageTree()))
-            {
-                $page = $page->getMelisPageTree();
-                $pageName = $page->page_name;
-                $textTitle =  $translator->translate('tr_meliscms_page_success_Page') . ': ' . $pageName;
-            }
             if ($success == 1) {
+                
+                $melisPage = $this->serviceLocator->get('MelisEnginePage');
+                $pageData = $melisPage->getDatasPage($idPage, 'saved');
+                $page = $pageData->getMelisPageTree();
+                $pageName= '"' . $page->page_name. '"';
+                $textTitle =  $translator->translate('tr_meliscms_page_actions_Unpublish') . ' page ' . $pageName;
+                
                 $textMessage = $translator->translate('tr_meliscms_page_success_Page unpublished');
             }
             else {
@@ -1183,19 +1179,17 @@ class PageController extends AbstractActionController
     
             $datas['idPage'] = $idPage;
             $datas['isNew']  = 0;
-            
-            $titleMessage = $translator->translate('tr_meliscms_page_actions_Unpublish').' Page ' . $idPage;
         }
         else
         {
             $success = 0;
-            $titleMessage = $usrAccess['textTitle'];
+            $textTitle= $usrAccess['textTitle'];
             $textMessage = $usrAccess['textTitle'];
         }
         
         $response = array(
             'success' => $success,
-            'textTitle' => $titleMessage,
+            'textTitle' => $textTitle,
             'textMessage' => $textMessage,
             'errors' => $errors,
             'datas' => array($datas),
