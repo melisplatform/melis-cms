@@ -445,5 +445,10 @@
 	    'tr_meliscms_page_lang_create_right_interface' => 'Création page',
 		'tr_meliscms_page_lang_info_right_interface' => 'Page d\'origine',
 		'tr_meliscms_page_lang_list_right_interface' => 'Traduction page',
+	    
+	    // User Access rights
+	    'tr_meliscms_page_user_access_rights' => 'Droits d\'accès utilisateur',
+	    'tr_meliscms_page_user_access_rights_no_access' => 'Vos droits ne vous permettent pas d\'effectuer cette action, veuillez voir avec l\'administrateur',
+
 	);
 ?>
