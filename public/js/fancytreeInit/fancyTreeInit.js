@@ -123,8 +123,16 @@
 			        var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
 			        
 		           if(tree.count() === 0) {
+		        	   
 			            $(".meliscms-search-box.sidebar-treeview-search").hide();
-			            $("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='btn btn-success'>"+ translations.tr_meliscms_create_page +"</span></div>");
+			            // Checking if the user has a Page rights to access
+			            // -1 is the value for creating new page right
+			            $.get('/melis/MelisCms/TreeSites/checkUserPageTreeAccress', {idPage: -1}, function(res){
+			            	if(res.isAccessible){
+			            		$("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='btn btn-success'>"+ translations.tr_meliscms_create_page +"</span></div>");
+			            	}
+			            });
+			            
 		            } else {
 			            $(".meliscms-search-box.sidebar-treeview-search").show();
 			            $("#id-mod-menu-dynatree .create-newpage").remove();
