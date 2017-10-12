@@ -32,7 +32,7 @@
 </div>
 <script>
     $(function() {
-        var langlists = $('select.dropdown-lang');
+        var langlists = $('form#<?php echo $form->getAttribute('id')?> select.dropdown-lang');
         $('div.loadAttrCont').hide();
         langlists.fadeIn();
         langlists.select2({
@@ -46,7 +46,7 @@
             }
             var baseUrl = "/MelisCms/images/lang-flags/";
             var $state = $(
-                '<span><img src="' + baseUrl + '/' + state.element.value.toLowerCase() + '.png" class="img-flag" /> ' + state.text + '</span>'
+                '<span><img src="' + baseUrl + '/' + state.element.value + '.png" class="img-flag" /> ' + state.text + '</span>'
             );
             return $state;
         };
