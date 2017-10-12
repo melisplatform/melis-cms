@@ -48,7 +48,7 @@ class MelisCmsPageLanguagesSelectFactory extends MelisSelectFactory
 		{
 		    if (!in_array($val->lang_cms_id, $pagesLang))
 		    {
-		        $valueoptions[$val->lang_cms_id] = $val->lang_cms_name;
+		        $valueoptions[$val->lang_cms_locale] = $val->lang_cms_name;
 		    }
 		}
 		
