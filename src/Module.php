@@ -85,8 +85,8 @@ class Module
                     $eventManager->attach(new MelisCmsToolUserNewUserListener());
                     $eventManager->attach(new MelisCmsDeletePlatformListener());
                     $eventManager->attach(new MelisCmsPageDefaultUrlsListener());
-                    $eventManager->attach(new MelisCmsPageEditionSavePluginSessionListener());
-                    $eventManager->attach(new MelisCmsAddPluginContainerListener());
+                    //$eventManager->attach(new MelisCmsPageEditionSavePluginSessionListener());
+                    //$eventManager->attach(new MelisCmsAddPluginContainerListener());
 
                     // Saving Plugin Tag values, Melis Side
                     $eventManager->attach($sm->get('MelisCms\Listener\MelisCmsPluginSaveEditionSessionListener'));
