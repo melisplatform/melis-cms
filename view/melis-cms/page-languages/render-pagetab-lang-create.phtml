@@ -51,7 +51,7 @@
             }
             
             var $state = $(
-    			$("#<?php echo$this->idPage?>_pageLangFlagsPath #<?php echo $this->idPage?>"+state.element.value)
+    			'<span>'+$("#<?php echo$this->idPage?>_pageLangFlagsPath #<?php echo $this->idPage?>"+state.element.value).html()+'<span>'
             );
             
             return $state;
