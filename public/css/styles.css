@@ -496,12 +496,12 @@ body.modal-open {
 
 .language-list {
 	margin-bottom: 30px;
-	text-align: center;
+	text-align: left;
 }
 
 .language-list .lang-img {
-	margin: 0 auto;
-	margin-bottom: 15px;
+	display: inline-block;
+	margin: 0 auto 15px;
 }
 
 .language-list .lang-img .img-responsive {
@@ -524,6 +524,7 @@ body.modal-open {
 
 .language-list .site i {
 	margin-left: 8px;
+	font-size: 13px;
 	font-style: normal;
 	letter-spacing: 1px;
 	color: #932e2a;
