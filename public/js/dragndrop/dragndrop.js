@@ -251,7 +251,7 @@ var melisDragnDrop = (function($, window) {
                     // Processing the plugin resources and initialization
                     melisPluginEdition.processPluginResources(plugin.init, idPlugin);
                     // Init Resizable
-                    melisPluginEdition.initResizable();
+                    // melisPluginEdition.initResizable(); // disable for now
                     // remove plugin
                     $(dropLocation).remove();
                     // send new plugin list
@@ -262,7 +262,7 @@ var melisDragnDrop = (function($, window) {
 
                     melisPluginEdition.calcFrameHeight();
                     melisPluginEdition.disableLinks('a');
-                    melisPluginEdition.moveResponsiveClass();
+                    // melisPluginEdition.moveResponsiveClass(); // disable for now
                 }
             },
             error: function() {

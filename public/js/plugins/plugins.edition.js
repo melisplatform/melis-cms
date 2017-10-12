@@ -25,7 +25,7 @@ var melisPluginEdition = (function($, window) {
         $(this).removeClass("melis-focus");
     });
 
-    $("body").on("dblclick", ".ui-resizable-e", changeWidth);
+    // $("body").on("dblclick", ".ui-resizable-e", changeWidth); // disable for now
 
     // Submit form in modal
     function submitPluginForms(e) {
@@ -193,8 +193,8 @@ var melisPluginEdition = (function($, window) {
                         disableLinks('a');
 
                         // re init resize
-                        $(".melis-dragdropzone .melis-ui-outlined").resizable("destroy");
-                        initResizable();
+                        // $(".melis-dragdropzone .melis-ui-outlined").resizable("destroy"); // disable for now
+                        // initResizable();
                     }
                 }, 300);
             },
@@ -852,8 +852,8 @@ var melisPluginEdition = (function($, window) {
     }).disableSelection();
 
     // init resize
-    initResizable();
-    moveResponsiveClass();
+    // initResizable(); // disable for now
+    // moveResponsiveClass();
 
     return {
         submitPluginForms       :       submitPluginForms,
@@ -868,9 +868,9 @@ var melisPluginEdition = (function($, window) {
         checkToolSize           :       checkToolSize,
         disableLinks            :       disableLinks,
         processPluginResources  :       processPluginResources,
-        initResizable           :       initResizable,
+        /*initResizable           :       initResizable,
         moveResponsiveClass     :       moveResponsiveClass,
-        pluginContainerChecker  :       pluginContainerChecker,
+        pluginContainerChecker  :       pluginContainerChecker,*/ // disable for now
     }
 
 })(jQuery, window);

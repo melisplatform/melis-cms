@@ -28,7 +28,7 @@ var melisPluginSortable = (function($, window) {
                     $(plugin).data("plugin-container", "");
 				}
 				
-                melisPluginEdition.pluginContainerChecker();
+                // melisPluginEdition.pluginContainerChecker(); // disable for now
 				melisPluginEdition.sendDragnDropList(dropzoneData, pageId);
             }
     	},
