@@ -30,7 +30,8 @@ return array(
 										'id' => 'siteId',
 										'value' => '',
 										'class' => '',
-										'placeholder' => 'Enter siteId',
+										'placeholder' => '1',
+										'data-type' => 'int'
 									),
 								),
 							),
