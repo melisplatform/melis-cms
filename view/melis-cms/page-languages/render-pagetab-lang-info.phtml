@@ -3,12 +3,13 @@
     $data_melisKey = $this->zoneconfig['conf']['melisKey'];
 ?>
 <?php if (!empty($this->pageInfo)){?>
-    <div class="widget" id="<?= $id; ?>" data-melisKey='<?= $data_melisKey; ?>'>
-        <div class="widget-body padding-none">
-            <div class="bg-white margin-none">
-                <h4 class="pagelang-title"> <?php echo $this->pageInfo?></h4>
+    <div class="col-xs-12">
+        <div class="widget" id="<?= $id; ?>" da     ta-melisKey='<?= $data_melisKey; ?>'>
+            <div class="widget-body padding-none">
+                <div class="bg-white margin-none">
+                    <h2 class="pagelang-head-title"> <?php echo $this->pageInfo?></h2>
+                </div>
             </div>
         </div>
     </div>
-    <hr class="hr-fw">
 <?php }?>

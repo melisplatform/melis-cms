@@ -206,7 +206,8 @@ class PageLanguagesController extends AbstractActionController
                 );
                 
                 $cmsLangTbl = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
-                $cmsLangData = $cmsLangTbl->getEntryById($data['pageLangId'])->current();
+                $cmsLangData = $cmsLangTbl->getEntryByField('lang_cms_locale', $data['pageLangLocale'])->current();
+                
                 $cmsLangPrefix = !empty($cmsLangData)? ' ('.strtolower(substr($cmsLangData->lang_cms_locale, 0, 2)).')': '';
                 
                 /**
@@ -258,7 +259,7 @@ class PageLanguagesController extends AbstractActionController
                  * using the current page as parent page id
                  */
                 $pageLang = array(
-                    'plang_lang_id' => $data['pageLangId'],
+                    'plang_lang_id' => $cmsLangData->lang_cms_id,
                     'plang_page_id_initial' => $data['pageLangPageId'],
                 );
                 

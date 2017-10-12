@@ -1136,7 +1136,7 @@ return array(
 							            'meliscms_page_lang_info' => array(
 							                'conf' => array(
 							                    'id' => 'id_meliscms_page_lang_info',
-							                    'name' => 'tr_meliscms_page_lang_info',
+							                    'name' => 'tr_meliscms_page_lang_info_right_interface',
 							                    'melisKey' => 'meliscms_page_lang_info',
 							                ),
 							                'forward' => array(
@@ -1150,7 +1150,7 @@ return array(
 							            'meliscms_page_lang_list' => array(
 							                'conf' => array(
 							                    'id' => 'id_meliscms_page_lang_list',
-							                    'name' => 'tr_meliscms_page_lang_list',
+							                    'name' => 'tr_meliscms_page_lang_list_right_interface',
 							                    'melisKey' => 'meliscms_page_lang_list',
 							                ),
 							                'forward' => array(
@@ -1164,7 +1164,7 @@ return array(
 							            'meliscms_page_lang_create' => array(
 							                'conf' => array(
 							                    'id' => 'id_meliscms_page_lang_create',
-							                    'name' => 'tr_meliscms_page_lang_create',
+							                    'name' => 'tr_meliscms_page_lang_create_right_interface',
 							                    'melisKey' => 'meliscms_page_lang_create',
 							                ),
 							                'forward' => array(

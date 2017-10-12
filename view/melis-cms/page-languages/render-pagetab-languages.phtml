@@ -7,19 +7,21 @@ $data_melisKey = $this->melisKey;
 ?>
 
 <div<?= $id; ?> data-melisKey='<?= $data_melisKey; ?>' class="meliscms_center_tabs tab-pane clearfix">
-	<div class="col-md-12">
-		<div class="widget row widget-inverse">
-			<div class="widget-body">
-				<?php 
-            		if (!empty($this->zoneconfig['interface'])) 
-            		{
-            			foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig)
-            			{
-            				echo $this->$keyConfig;
-            			}
-            		}
-        		?>
-			</div>
-		</div>
-	</div>
+    <div class="col-md-12">
+        <div class="widget row widget-inverse">
+            <div class="widget-body">
+                <div class="row">
+                    <?php
+                        if (!empty($this->zoneconfig['interface']))
+                        {
+                            foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig)
+                            {
+                                echo $this->$keyConfig;
+                            }
+                        }
+                    ?>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

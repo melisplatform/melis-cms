@@ -527,7 +527,7 @@ return array(
 			            ),
 			            array(
 			                'spec' => array(
-			                    'name' => 'pageLangId',
+			                    'name' => 'pageLangLocale',
 			                    'type' => 'MelisCmsPageLanguagesSelect',
 			                    'options' => array(
 			                        'label' => 'tr_meliscms_page_lang_language_field',
@@ -536,15 +536,15 @@ return array(
 			                        'disable_inarray_validator' => true,
 			                    ),
 			                    'attributes' => array(
-			                        'id' => 'pageLangId',
+			                        'id' => 'pageLangLocale',
 			                        'value' => '',
 			                    ),
 			                ),
 			            ),
 			        ),
 			        'input_filter' => array(
-			            'pageLangId' => array(
-			                'name'     => 'pageLangId',
+			            'pageLangLocale' => array(
+			                'name'     => 'pageLangLocale',
 			                'required' => true,
 			                'validators' => array(
 			                    array(
