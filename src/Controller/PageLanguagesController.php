@@ -156,6 +156,41 @@ class PageLanguagesController extends AbstractActionController
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage'));
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
+        
+        $pageLangTbl = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+        $pageLang = $pageLangTbl->getEntryByField('plang_page_id', $idPage)->current();
+        
+        $pagesLang = array();
+        if (!empty($pageLang))
+        {
+            $pageInitialId = $pageLang->plang_page_id_initial;
+            $pageLang = $pageLangTbl->getEntryByField('plang_page_id_initial', $pageInitialId);
+            
+            foreach ($pageLang As $val)
+            {
+                array_push($pagesLang, $val->plang_lang_id);
+            }
+        }
+        
+        $tableLang = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+        $languages = $tableLang->fetchAll();
+        
+        $langFlags = '';
+        foreach ($languages As $val)
+        {
+            if (!in_array($val->lang_cms_id, $pagesLang))
+            {
+                // Adding language flag
+                $langFlag = '/MelisCms/images/lang-flags/default.png';
+                if (file_exists(__DIR__.'/../../public/images/lang-flags/'.$val->lang_cms_locale.'.png'))
+                {
+                    $langFlag = '/MelisCms/images/lang-flags/'.$val->lang_cms_locale.'.png';
+                }
+                
+                $langFlags .= '<span id="'.$idPage.$val->lang_cms_locale.'"><img src="'.$langFlag.'" class="img-flag" /> '.$val->lang_cms_name.'</span>'.PHP_EOL;
+            }
+        }
+        
         // Page language create from
         $form = $this->pageLangCreateForm();
         
@@ -166,6 +201,7 @@ class PageLanguagesController extends AbstractActionController
         $view->idPage = $idPage;
         $view->melisKey = $melisKey;
         $view->createPageLangform = $form;
+        $view->langFlags = $langFlags;
         
         return $view;
     }
