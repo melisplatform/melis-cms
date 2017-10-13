@@ -464,6 +464,15 @@ body.modal-open {
 	font-size: 13px;
 	margin-left: 5px;
 }
+
+.language-list .site-origin {
+	margin-left: 5px;
+	color: #74ad51;
+	font-size: 12px;
+	letter-spacing: 0.4px;
+	font-family: 'Open Sans', sans-serif;
+}
+
 .pagelang-p{
     margin-bottom: 15px;
     font-size: 21px;
@@ -511,7 +520,7 @@ body.modal-open {
 
 .language-list .site {
 	display: block;
-	font-size: 16px;
+	font-size: 14px;
 	font-weight: bold;
 	font-family: "Montserrat", sans-serif;
 	color: #3a3a3a;
