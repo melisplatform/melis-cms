@@ -28,11 +28,12 @@ var melisDragnDrop = (function($, window) {
         revert: true,
         helper: "clone",
         start: function( event, ui ) {
-            $(".melis-dragdropzone").addClass("highlight");
+            $(".melis-dragdropzone").addClass("highlight").removeClass("no-content");
             $(".ui-sortable-placeholder").css("background", "#fff");
         },
         stop: function( event, ui ) {
             $(".melis-dragdropzone").removeClass("highlight");
+            melisPluginEdition.pluginDetector();
         }
     });
 
@@ -144,9 +145,15 @@ var melisDragnDrop = (function($, window) {
 
         update: function( event, ui ) {
             $(".ui-sortable-helper").remove();
-        }
+        },
+        over: function( event, ui) {
+            melisPluginEdition.pluginDetector();
+        },
+
 
     });
+
+
 
     // Tooltip
     $(".melis-cms-plugin-snippets").tooltip({
@@ -262,6 +269,7 @@ var melisDragnDrop = (function($, window) {
 
                     melisPluginEdition.calcFrameHeight();
                     melisPluginEdition.disableLinks('a');
+                    melisPluginEdition.pluginDetector();
                     // melisPluginEdition.moveResponsiveClass(); // disable for now
                 }
             },

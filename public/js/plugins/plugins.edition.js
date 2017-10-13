@@ -492,6 +492,7 @@ var melisPluginEdition = (function($, window) {
                         calcFrameHeight();
                         sendDragnDropList(dropzone, melisIdPage);
                         pluginContainerChecker();
+                        pluginDetector();
                     } else {
                         melisCmsFormHelper.melisMultiKoNotification(data.errors);
                     }
@@ -504,6 +505,17 @@ var melisPluginEdition = (function($, window) {
         });
 
 
+    }
+
+    function pluginDetector() {
+        $(".melis-dragdropzone").each(function() {
+            var checkContent = $(this).find(".melis-ui-outlined");
+            if( $(checkContent).length) {
+                $(this).removeClass("no-content");
+            } else {
+                $(this).addClass("no-content");
+            }
+        });
     }
 
     function pluginContainerChecker() {
@@ -854,6 +866,7 @@ var melisPluginEdition = (function($, window) {
     // init resize
     // initResizable(); // disable for now
     // moveResponsiveClass();
+    pluginDetector();
 
     return {
         submitPluginForms       :       submitPluginForms,
@@ -868,6 +881,7 @@ var melisPluginEdition = (function($, window) {
         checkToolSize           :       checkToolSize,
         disableLinks            :       disableLinks,
         processPluginResources  :       processPluginResources,
+        pluginDetector          :       pluginDetector,
         /*initResizable           :       initResizable,
         moveResponsiveClass     :       moveResponsiveClass,
         pluginContainerChecker  :       pluginContainerChecker,*/ // disable for now

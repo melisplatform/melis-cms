@@ -30,6 +30,7 @@ var melisPluginSortable = (function($, window) {
 				
                 // melisPluginEdition.pluginContainerChecker(); // disable for now
 				melisPluginEdition.sendDragnDropList(dropzoneData, pageId);
+                melisPluginEdition.pluginDetector();
             }
     	},
     });
