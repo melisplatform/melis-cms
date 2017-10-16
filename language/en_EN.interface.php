@@ -427,7 +427,7 @@
 	    'tr_meliscms_page_lang_create_right_interface' => 'Create page',
 	    'tr_meliscms_page_lang_info' => 'This page was initially created in <strong>%s</strong>. Original page : <strong %s>%s</strong>',
 	    'tr_meliscms_page_lang_info_right_interface' => 'Original Page',
-	    'tr_meliscms_page_lang_list' => 'This page was translated in the following languages:',
+	    'tr_meliscms_page_lang_list' => 'This page exists in the following languages:',
 	    'tr_meliscms_page_lang_list_right_interface' => 'Page translated',
 	    'tr_meliscms_page_lang_list_current_page_lbl' => 'current page',
 	    'tr_meliscms_page_lang_create_form' => 'Create new Page language version',
