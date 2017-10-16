@@ -2,38 +2,6 @@
     $id = $this->idPage.'_'.$this->zoneconfig['conf']['id'];
     $data_melisKey = $this->zoneconfig['conf']['melisKey'];
 ?>
-
-<!--<div class="widget" id="<?/*= $id; */?>" data-melisKey='<?/*= $data_melisKey; */?>'>
-    <div class="widget-body padding-none">
-        <div class="bg-white margin-none">
-            <h4 class="pagelang-title"><?php /*echo $this->translate('tr_meliscms_page_lang_list')*/?></h4>
-        	<ul class="language-lists">
-                <?php /*foreach ($this->pagesData As $val){*/?>
-                	<li class="open-page-from-lan-tab"
-                	    <?php /*if ($this->idPage != $val->tree_page_id){*/?>
-                    		data-opentab
-                    		data-tabicon="fa-file-o" 
-                			data-name="<?php /*echo $val->page_name */?>"
-                			data-id="<?php /*echo $val->tree_page_id */?>_id_meliscms_page"
-                			data-meliskey="meliscms_page"
-                			data-pageid="<?php /*echo $val->tree_page_id */?>"
-            			<?php /*}*/?>>
-                        <img src="<?php /*echo $val->lang_cms_flag */?>">
-                		<span class="fa fa-li fa-check fa-color-green"></span>
-                		<span class="txt-lang">
-            				<?php /*echo $val->lang_cms_name.' - '.$val->page_name.' ('.$val->tree_page_id.')'*/?>
-            			</span>
-            			<?php /*if ($this->idPage == $val->tree_page_id){*/?>
-            				<span class="c-page">(<?php /*echo $this->translate('tr_meliscms_page_lang_list_current_page_lbl')*/?>)</span>
-            			<?php /*}*/?>
-        			</li>
-                <?php /*}*/?>
-            </ul>
-        </div>
-    </div>
-</div>
-<hr class="hr-fw">
-<!-- ================================================================================================================= -->
 <div class="col-xs-12 col-md-6" id="<?= $id; ?>" data-melisKey='<?= $data_melisKey; ?>'>
     <div class="widget">
         <div class="widget-body padding-none">
@@ -52,13 +20,10 @@
                                         data-meliskey="meliscms_page"
                                         data-pageid="<?php echo $val->tree_page_id ?>"
                                     <?php }?>>
-
-                                    <!--                		<span class="fa fa-li fa-check fa-color-green"></span> -->
-                                    <span class="site"><?= $val->page_name ?><i>(<?= $val->tree_page_id ?>)</i> <span class="site-origin">(initial)</span></span>
+                                    <span class="site"><?= $val->page_name ?><i>(<?= $val->tree_page_id ?>)</i> <span class="site-origin"><?php echo ($this->initialPageId ==  $val->tree_page_id) ? '(initial)' : ''?></span></span>
                                     <div class="lang-indicator">
                                         <div class="lang-img">
                                             <img src="<?php echo $val->lang_cms_flag ?>">
-<!--                                        <img class="img-responsive" src="/MelisCms/images/lang-flags/en_EN2x.png">-->
                                         </div>
                                         <span class="language"><?= $val->lang_cms_name ?></span>
                                         <?php if ($this->idPage == $val->tree_page_id){?>

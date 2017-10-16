@@ -45,6 +45,17 @@ class MelisCmsDeletePageListener extends MelisCoreGeneralListener implements Lis
         		if (!$success)
         			return;
         		
+    			// Re-assign page language initial
+    			list($success, $errors, $datas) = $melisCoreDispatchService->dispatchPluginAction(
+    			    $e,
+    			    'meliscms',
+    			    'action-page-tmp',
+    			    'MelisCms\Controller\Pagelanguages',
+    			    array_merge(array('action' => 'setInitialPageLanguage'))
+    			    );
+    			if (!$success)
+    			    return;
+        		
         		// Delete the page
         		list($success, $errors, $datas) = $melisCoreDispatchService->dispatchPluginAction(
 	    				$e,
@@ -66,7 +77,6 @@ class MelisCmsDeletePageListener extends MelisCoreGeneralListener implements Lis
 	    		);
 	    		if (!$success)
 	    			return;
-	    			
         	},
         80);
         

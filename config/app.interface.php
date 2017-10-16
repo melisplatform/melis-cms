@@ -1133,20 +1133,6 @@ return array(
 							            'jsdatas' => array()
 							        ),
 							        'interface' => array(
-							            'meliscms_page_lang_info' => array(
-							                'conf' => array(
-							                    'id' => 'id_meliscms_page_lang_info',
-							                    'name' => 'tr_meliscms_page_lang_info_right_interface',
-							                    'melisKey' => 'meliscms_page_lang_info',
-							                ),
-							                'forward' => array(
-							                    'module' => 'MelisCms',
-							                    'controller' => 'PageLanguages',
-							                    'action' => 'render-pagetab-lang-info',
-							                    'jscallback' => '',
-							                    'jsdatas' => array()
-							                ),
-							            ),
 							            'meliscms_page_lang_list' => array(
 							                'conf' => array(
 							                    'id' => 'id_meliscms_page_lang_list',
