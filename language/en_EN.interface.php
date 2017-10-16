@@ -434,6 +434,7 @@
 	    'tr_meliscms_page_lang_language_field' => 'Language',
 	    'tr_meliscms_page_lang_language_field tooltip' => 'Select the page language',
 	    'tr_meliscms_page_lang_choose_opt' => 'Choose',
+        'tr_meliscms_page_lang_no_result_opt' => 'No Results Found',
 	    'tr_meliscms_page_lang_create_btn' => 'Create page',
 	    'tr_meliscms_page_lang_no_lang_selected' => 'Please select a language',
 	    'tr_meliscms_page_lang_create_title' => 'Page language',
