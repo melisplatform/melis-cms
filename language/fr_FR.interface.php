@@ -429,6 +429,7 @@
 	    'tr_meliscms_page_languages' => 'Langages',
 	    'tr_meliscms_page_lang_info_interface' => 'Info langages de la page',
 	    'tr_meliscms_page_lang_list' => 'Liste des langages',
+	    'tr_meliscms_page_lang_list_initial' => 'Initiale',
 	    'tr_meliscms_page_lang_create' => 'Formulaire de création de langage de page',
 	    'tr_meliscms_page_lang_info' => 'Cette page a été créée initiallement en <strong>%s</strong>. Page d\'origine : <strong %s>%s</strong>',
 	    'tr_meliscms_page_lang_list' => 'Cette page existe dans les langages suivants : ',

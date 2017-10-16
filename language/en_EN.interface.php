@@ -423,6 +423,7 @@
 	    'tr_meliscms_page_languages' => 'Languages',
 	    'tr_meliscms_page_lang_info_interface' => 'Page language info',
 	    'tr_meliscms_page_lang_list' => 'Page language list',
+	    'tr_meliscms_page_lang_list_initial' => 'Initial',
 	    'tr_meliscms_page_lang_create' => 'Page language create form',
 	    'tr_meliscms_page_lang_create_right_interface' => 'Create page',
 	    'tr_meliscms_page_lang_info' => 'This page was initially created in <strong>%s</strong>. Original page : <strong %s>%s</strong>',
