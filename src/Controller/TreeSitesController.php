@@ -49,9 +49,31 @@ class TreeSitesController extends AbstractActionController
 			$response = $this->formatTreeResponse($triggerResponse[0]);
 		else
 			$response = $this->formatTreeResponse($final);
+			
 
 		return $response;
 
+	}
+	
+	public function checkUserPageTreeAccressAction()
+	{
+	    $idPage = $this->params()->fromQuery('idPage');
+	    
+	    $isAccessible = false;
+	    
+	    if ($idPage)
+	    {
+	        $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
+	        $melisCmsRights = $this->getServiceLocator()->get('MelisCmsRights');
+	        $xmlRights = $melisCoreAuth->getAuthRights();
+	        $isAccessible = $melisCmsRights->isAccessible($xmlRights, MelisCmsRightsService::MELISCMS_PREFIX_PAGES, $idPage);
+	    }
+	    
+	    $response = array(
+	        'isAccessible' => $isAccessible
+        );
+	    
+	    return new JsonModel($response);
 	}
 
 	/**

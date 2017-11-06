@@ -39,60 +39,6 @@ class PageLanguagesController extends AbstractActionController
     }
     
     /**
-     * This method render the Header information zone of the page
-     * 
-     * @return \Zend\View\Model\ViewModel
-     */
-    public function renderPagetabLangInfoAction()
-    {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage'));
-        $melisKey = $this->params()->fromRoute('melisKey', '');
-        
-        $pageLangTbl = $this->getServiceLocator()->get('MelisEngineTablePageLang');
-        
-        $pageLang = $pageLangTbl->getEntryByField('plang_page_id', $idPage)->current();
-        
-        $pageInfo = null;
-        
-        if (!empty($pageLang))
-        {
-            $pageInitialId = $pageLang->plang_page_id_initial;
-            
-            if ($idPage != $pageInitialId)
-            {
-                $pageSrv = $this->getServiceLocator()->get('MelisEnginePage');
-                $pageData = $pageSrv->getDatasPage($pageInitialId)->getMelisPageTree();
-                
-                if (!empty($pageData))
-                {
-                    // Adding attribute of the Page name label
-                    $tabAttr = array(
-                        'class="open-page-from-lan-tab"',
-                        'data-opentab',
-                        'data-tabicon="fa-file-o"',
-                        'data-name="'.$pageData->page_name.'"',
-                        'data-id="'.$pageData->tree_page_id.'_id_meliscms_page"',
-                        'data-meliskey="meliscms_page"',
-                        'data-pageid="'.$pageData->tree_page_id.'"'
-                    );
-                    
-                    $tabAttr = implode(' ', $tabAttr);
-                    
-                    $translate = $this->getServiceLocator()->get('translator');
-                    $pageInfo = sprintf($translate->translate('tr_meliscms_page_lang_info'),  $pageData->lang_cms_name, $tabAttr, $pageData->page_name.' ('.$pageData->tree_page_id.')');
-                }
-            }
-        }
-        
-        $view = new ViewModel();
-        $view->idPage = $idPage;
-        $view->melisKey = $melisKey;
-        $view->pageInfo = $pageInfo;
-        
-        return $view;
-    }
-    
-    /**
      * This menthod render the List of languages versions of the current page
      * 
      * @return \Zend\View\Model\ViewModel
@@ -108,6 +54,8 @@ class PageLanguagesController extends AbstractActionController
         
         $pagesData = array();
         
+        $pageInitialId = null;
+        
         if (!empty($pageLang))
         {
             $pageInitialId = $pageLang->plang_page_id_initial;
@@ -117,7 +65,12 @@ class PageLanguagesController extends AbstractActionController
             $pageSrv = $this->getServiceLocator()->get('MelisEnginePage');
             foreach ($pages As $val)
             {
-                $pageData = $pageSrv->getDatasPage($val->plang_page_id)->getMelisPageTree();
+                $pageData = $pageSrv->getDatasPage($val->plang_page_id, 'saved')->getMelisPageTree();
+                
+                if (empty($pageData->page_id))
+                {
+                    $pageData = $pageSrv->getDatasPage($val->plang_page_id)->getMelisPageTree();
+                }
                 
                 if (!empty($pageData))
                 {
@@ -140,6 +93,7 @@ class PageLanguagesController extends AbstractActionController
         $view->idPage = $idPage;
         $view->melisKey = $melisKey;
         $view->pagesData= $pagesData;
+        $view->initialPageId = $pageInitialId;
         
         return $view;
     }
@@ -154,6 +108,41 @@ class PageLanguagesController extends AbstractActionController
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage'));
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
+        
+        $pageLangTbl = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+        $pageLang = $pageLangTbl->getEntryByField('plang_page_id', $idPage)->current();
+        
+        $pagesLang = array();
+        if (!empty($pageLang))
+        {
+            $pageInitialId = $pageLang->plang_page_id_initial;
+            $pageLang = $pageLangTbl->getEntryByField('plang_page_id_initial', $pageInitialId);
+            
+            foreach ($pageLang As $val)
+            {
+                array_push($pagesLang, $val->plang_lang_id);
+            }
+        }
+        
+        $tableLang = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+        $languages = $tableLang->fetchAll();
+        
+        $langFlags = '';
+        foreach ($languages As $val)
+        {
+            if (!in_array($val->lang_cms_id, $pagesLang))
+            {
+                // Adding language flag
+                $langFlag = '/MelisCms/images/lang-flags/default.png';
+                if (file_exists(__DIR__.'/../../public/images/lang-flags/'.$val->lang_cms_locale.'.png'))
+                {
+                    $langFlag = '/MelisCms/images/lang-flags/'.$val->lang_cms_locale.'.png';
+                }
+                
+                $langFlags .= '<span id="'.$idPage.$val->lang_cms_locale.'"><img src="'.$langFlag.'" class="img-flag" /> '.$val->lang_cms_name.'</span>'.PHP_EOL;
+            }
+        }
+        
         // Page language create from
         $form = $this->pageLangCreateForm();
         
@@ -164,6 +153,7 @@ class PageLanguagesController extends AbstractActionController
         $view->idPage = $idPage;
         $view->melisKey = $melisKey;
         $view->createPageLangform = $form;
+        $view->langFlags = $langFlags;
         
         return $view;
     }
@@ -204,7 +194,8 @@ class PageLanguagesController extends AbstractActionController
                 );
                 
                 $cmsLangTbl = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
-                $cmsLangData = $cmsLangTbl->getEntryById($data['pageLangId'])->current();
+                $cmsLangData = $cmsLangTbl->getEntryByField('lang_cms_locale', $data['pageLangLocale'])->current();
+                
                 $cmsLangPrefix = !empty($cmsLangData)? ' ('.strtolower(substr($cmsLangData->lang_cms_locale, 0, 2)).')': '';
                 
                 /**
@@ -256,7 +247,7 @@ class PageLanguagesController extends AbstractActionController
                  * using the current page as parent page id
                  */
                 $pageLang = array(
-                    'plang_lang_id' => $data['pageLangId'],
+                    'plang_lang_id' => $cmsLangData->lang_cms_id,
                     'plang_page_id_initial' => $data['pageLangPageId'],
                 );
                 
@@ -289,7 +280,7 @@ class PageLanguagesController extends AbstractActionController
                      * Retrieving the new created page for response of the request call
                      */
                     $pageSrv = $this->getServiceLocator()->get('MelisEnginePage');
-                    $pageData = $pageSrv->getDatasPage($pageId)->getMelisPageTree();
+                    $pageData = $pageSrv->getDatasPage($pageId, 'saved')->getMelisPageTree();
                     
                     $pageInfo = array(
                         'tabicon' => 'fa-file-o',
@@ -362,5 +353,49 @@ class PageLanguagesController extends AbstractActionController
         $form = $factory->createForm($appConfigForm);
         
         return $form;
+    }
+    
+    /**
+     * This method will set another page as initial page language
+     * after deletion of the original page
+     * 
+     */
+    public function setInitialPageLanguageAction()
+    {
+        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        
+        $cmsPageLangTbl = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+        $cmsPageLang = $cmsPageLangTbl->getEntryByField('plang_page_id', $idPage)->current();
+        
+        if (!empty($cmsPageLang))
+        {
+            if ($cmsPageLang->plang_page_id_initial == $idPage)
+            {
+                $cmsPageLangs = $cmsPageLangTbl->getEntryByField('plang_page_id_initial', $idPage);
+                
+                $newInitialPageId = null;
+                
+                // Assigning new initail page to other pages
+                foreach ($cmsPageLangs As $val)
+                {
+                    if ($val->plang_page_id !==  $idPage)
+                    {
+                        if (is_null($newInitialPageId))
+                        {
+                            $newInitialPageId = $val->plang_page_id;
+                        }
+                        
+                        if (!is_null($newInitialPageId))
+                        {
+                            $cmsPageLangTbl->save(array(
+                                'plang_page_id_initial' => $newInitialPageId
+                            ), $val->plang_id);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return new JsonModel(array('success' => 1));
     }
 }

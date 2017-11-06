@@ -4,12 +4,18 @@
     $(window).on('load', function () {
     	
     	window.mainTree = function(completeEvent){
-    		
+            var melisExtensions;
+            if( melisCore.screenSize <= 767 ) {
+                melisExtensions = ['contextMenu',  'filter'];
+			} else {
+                melisExtensions = ['contextMenu', 'dnd', 'filter'];
+			}
+
 	        $('#id-mod-menu-dynatree').fancytree({
-	        	extensions: ['contextMenu', 'dnd', 'filter'],
+	        	extensions: melisExtensions,
 	        	activeVisible: false,
 	        	debugLevel: 0,
-	        	autoScroll: false,
+	        	autoScroll: true,
 	        	generateIds: true, 
 	        	idPrefix: "mt_",
 	        	tabindex: "",
@@ -123,8 +129,16 @@
 			        var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
 			        
 		           if(tree.count() === 0) {
+		        	   
 			            $(".meliscms-search-box.sidebar-treeview-search").hide();
-			            $("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='btn btn-success'>"+ translations.tr_meliscms_create_page +"</span></div>");
+			            // Checking if the user has a Page rights to access
+			            // -1 is the value for creating new page right
+			            $.get('/melis/MelisCms/TreeSites/checkUserPageTreeAccress', {idPage: -1}, function(res){
+			            	if(res.isAccessible){
+			            		$("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='btn btn-success'>"+ translations.tr_meliscms_create_page +"</span></div>");
+			            	}
+			            });
+			            
 		            } else {
 			            $(".meliscms-search-box.sidebar-treeview-search").show();
 			            $("#id-mod-menu-dynatree .create-newpage").remove();
@@ -253,50 +267,50 @@
 			                  }
 			                  else{
 			                	  return true;
-			                  } 
+			                  }
 		            	 }
 		            	 else{
 		            		 return false;
-		            	 }  
+		            	 }
 	                },
 	                dragEnter: function(node, data) {
 	                  return true;
 	                },
 	                dragOver: function(node, data) {
-	
+
 	                },
 	                dragLeave: function(node, data) {
-	                	
+
 	                },
 	                dragStop: function(node, data) {
-		
+
 	                },
 	                dragDrop: function(node, data) {
 	                    // This function MUST be defined to enable dropping of items on the tree.
 	                    // data.hitMode is 'before', 'after', or 'over'.
 	                    // We could for example move the source to the new target:
-	                	
+
 	                  	// catch if its 'root_*' parent
-	                  	var isRootOldParentId = data.otherNode.getParent().key.toString(); 
+	                  	var isRootOldParentId = data.otherNode.getParent().key.toString();
 	                	var oldParentId = ( isRootOldParentId.includes('root') ) ? -1 : data.otherNode.getParent().key ;
-	                	
+
 	                	// move the node to drag parent ------------------------------------------------
 	                    data.otherNode.moveTo(node, data.hitMode);
-	                  
+
 	                    var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
-	              	
+
 						var draggedPage = data.otherNode.key
-						
+
 						// catch if its 'root_*' parent
 						var isRootNewParentId = node.getParent().key.toString();
-						var newParentId  = ( isRootNewParentId.includes('root') ) ? -1 : node.getParent().key ;	
-						
+						var newParentId  = ( isRootNewParentId.includes('root') ) ? -1 : node.getParent().key ;
+
 						if(data.hitMode == 'over'){
 							newParentId  =  data.node.key ;
 						}
-	
+
 						var newIndexPosition = data.otherNode.getIndex()+1;
-						
+
 	                	//send data to apply new position of the dragged node
 						var datastring = {
 							idPage				:  draggedPage,
@@ -304,7 +318,7 @@
 							newFatherIdPage		:  newParentId,
 							newPositionIdPage	: newIndexPosition
 						};
-						
+
 	                	$.ajax({
 	                	    url         : '/melis/MelisCms/Page/movePage',
 	                	    data        : datastring,
@@ -315,7 +329,7 @@
 	                		alert( translations.tr_meliscore_error_message );
 	                	});
 	                }
-	              },  
+	              },
 	        });
         }
     	

@@ -37,7 +37,7 @@
                     node.resetLazy();
                 }
             });
-
+ 
 		     // disable searchbar while searchign
 			$("input[name=left_tree_search]").prop('disabled', true);
             var searchContainer = $("input[name=left_tree_search]").closest(".meliscms-search-box");
@@ -50,13 +50,17 @@
 		        encode		: true
 		     }).success(function(data){
                 if(!$.trim(data)) {
-                    searchContainer.append("<div class='melis-search-overlay'>Not Found</div>").hide().fadeIn(600);
+                    searchContainer.append("<div class='melis-search-overlay'>"+translations.tr_meliscms_form_search_not_found+"</div>").hide().fadeIn(600);
                     setTimeout(function() {
-                    $(".melis-search-overlay").fadeOut(600, function() {
-                        $(this).remove();
-                    });
+                    	
+	                    $(".melis-search-overlay").fadeOut(600, function() {
+	                        $(this).remove();
+	                    });
+	                    
                         $("input[name=left_tree_search]").prop('disabled', false);
                         $("input[name=left_tree_search]").focus();
+                        
+                        $(".meliscms-search-box.sidebar-treeview-search .melis-overlay-loading").remove();
                     }, 1000);
 
                 } else {

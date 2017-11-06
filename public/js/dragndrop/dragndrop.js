@@ -1,37 +1,46 @@
- var melisDragnDrop = (function($, window) {
+var melisDragnDrop = (function($, window) {
 
     // cache DOM
-/*    var currentFrame,
-        dndHeight,
-        stickyHead;*/
+    /*    var currentFrame,
+     dndHeight,
+     stickyHead;*/
 
     var scrollBool = true;
     var centerWindow;
     var scrollH = window.parent.$("body")[0].scrollHeight;
-    
+
     /* ==================================
-            Binding Events
-    ====================================*/
+     Binding Events
+     ====================================*/
     $("body").on("click", "#melisPluginBtn", showPluginMenu);
     $("body").on("click", ".melis-cms-filter-btn", showPlugLists);
     $("body").on("click", ".melis-cms-category-btn", showCatPlugLists);
-
     /* ==================================
-            Drag & Drop
-    ====================================*/
+     Drag & Drop
+     ====================================*/
 
     $( ".melis-cms-plugin-snippets" ).draggable({
-        start: function(event, ui) {             
-            $(ui.helper).find('.melis-plugin-tooltip').hide();            
-        }, 
+        start: function(event, ui) {
+            $(ui.helper).find('.melis-plugin-tooltip').hide();
+        },
         connectWith: ".melis-draggable",
         connectToSortable: ".melis-dragdropzone",
-        revert: true, 
+        revert: true,
         helper: "clone",
+        start: function( event, ui ) {
+            $(".melis-dragdropzone").addClass("highlight").removeClass("no-content");
+            $(".ui-sortable-placeholder").css("background", "#fff");
+        },
+        stop: function( event, ui ) {
+            $(".melis-dragdropzone").removeClass("highlight");
+            melisPluginEdition.pluginDetector();
+        }
     });
 
     $(".melis-dragdropzone").sortable({
-        connectWith: ".melis-draggable, .melis-dragdropzone",
+        connectWith: ".melis-float-plugins",
+        // connectWith: ".melis-draggable, .melis-dragdropzone, .melis-float-plugins",
+        connectToSortable: ".melis-float-plugins",
         handle: ".m-move-handle",
         forcePlaceholderSize: false,
         cursor: "move",
@@ -39,21 +48,28 @@
         zIndex: 999999,
         placeholder: "ui-state-highlight",
         tolerance: "pointer",
+        items: ".melis-ui-outlined, .melis-float-plugins",
         start: function(event, ui) {
             $(".melis-dragdropzone").sortable("refresh");
             // hide tinyMCE panel
             $(".mce-tinymce.mce-panel.mce-floatpanel").hide();
+
+            $(".melis-dragdropzone").addClass("highlight");
+            $(".ui-sortable-helper").css("z-index", "9999999");
+
+            // remove float wrap button
+            $(".btn-pulse").remove();
 
             $(window).mousemove(function (e) {
                 var top;
                 var frameTop = window.parent.$("#"+parent.activeTabId).find(".melis-iframe").offset().top + 10;
 
                 if(window.parent.$(".sticky-pageactions")) {
-                    top = $(window.parent).scrollTop() - 130;      
+                    top = $(window.parent).scrollTop() - 130;
                 } else {
                     top = 0;
                 }
-                
+
                 // check if there is a plugin being drag
                 if ($('.ui-sortable-helper') && $('.ui-sortable-helper').length > 0) {
                     var bottom = $(window.parent).height();
@@ -63,7 +79,7 @@
                         $(".melis-cms-dnd-box").removeClass("show");
                     }
 
-                    
+
                     if (e.clientY >= ($(window.parent).scrollTop() + $(window.parent).height() - frameTop) ) {
                         // detect IE8 and above, and edge
                         if (document.documentMode || /Edge/.test(navigator.userAgent)) {
@@ -99,12 +115,11 @@
             });
         },
         receive: function( event, ui ) {
-
-            if(ui.helper) { 
+            if(ui.helper) {
                 var moduleName = $(ui.helper[0]).data("module-name");
                 var pluginName = $(ui.helper[0]).data("plugin-name");
                 var siteModule = $(ui.helper[0]).data("plugin-site-module");
-                // get id of current dragzone 
+                // get id of current dragzone
                 var dropzone = $(event.target).data("dragdropzone-id");
                 var tabId = window.parent.$("#"+parent.activeTabId).find(".melis-iframe").data("iframe-id");
 
@@ -127,38 +142,38 @@
                 melisPluginEdition.sendDragnDropList(dragZoneSenderPluginId, tabId)
             }
         },
-        
+
         update: function( event, ui ) {
             $(".ui-sortable-helper").remove();
-        }
+        },
+        over: function( event, ui) {
+            melisPluginEdition.pluginDetector();
+        },
+
 
     });
 
+
+
     // Tooltip
     $(".melis-cms-plugin-snippets").tooltip({
-    	position: {
-	        my: "left center",
-	        at: "left+110% center",
-	        using: function( position, feedback ) {
-	        	$( this ).css( position );
-	        	$(this)
-	            	.addClass( "melis-plugin-tooltip" )
-	            	.addClass( feedback.vertical )
-	            	.addClass( feedback.horizontal )
-	            	.appendTo( this );
-	        }
-      	},
+        position: {
+            my: "left center",
+            at: "left+110% center",
+            using: function( position, feedback ) {
+                $( this ).css( position );
+                $(this)
+                    .addClass( "melis-plugin-tooltip" )
+                    .addClass( feedback.vertical )
+                    .addClass( feedback.horizontal )
+                    .appendTo( this );
+            }
+        },
     });
 
     $(".melis-cms-plugin-snippets").hover(function() {
         $(this).children(".melis-plugin-tooltip").fadeIn();
     });
-
-    function initResizable() {
-        $(".melis-ui-outlined").resizable({
-            containment: ".melis-dragdropzone"
-        });
-    }
 
     // $( ".melis-editable" ).resizable({ disabled: true, handles: 'e' });
 
@@ -182,23 +197,23 @@
                     elAttribute;
                 // hide the loader
                 $('.loader-icon').removeClass('spinning-cog').addClass('shrinking-cog');
-                
+
                 if(plugins.success) {
-                	
+
                     var elType;
                     var dataPluginID;
                     var idPlugin;
                     var jsUrl;
-                    
+
                     // iterate object
-                	plugin = plugins.datas;
-                	
+                    plugin = plugins.datas;
+
                     // get the html
                     var vhtml = plugin.html;
                     var melisIdPage = window.parent.$("#"+ parent.activeTabId).find('iframe').data('iframe-id');
                     var pluginToolBox = $(vhtml).find(".melis-plugin-tools-box");
                     var pluginHardCodedConfigEl = $(vhtml).find(".plugin-hardcoded-conf");
-                    
+
                     // extract the data keys
                     var melisPluginModuleName = typeof pluginToolBox.data("module") != "undefined" ? pluginToolBox.data("module") : '';
                     var melisPluginName = typeof pluginToolBox.data("plugin") != "undefined" ? pluginToolBox.data("plugin") : '';
@@ -212,7 +227,7 @@
                     dataPluginID = pluginOutlined.find("[id*='"+melisPluginID+"']").attr("id");
 
                     if(typeof dataPluginID !== "undefined") {
-                        // get plugin id 
+                        // get plugin id
                         idPlugin = dataPluginID;
                     }
 
@@ -232,21 +247,30 @@
 
                     // adding plugin in dropzone
                     // $('div[data-dragdropzone-id='+ dropzone +']').append(plugin.html);
-                    $(plugin.html).insertAfter(dropLocation);
-                    
+                    var dropPlugin = $(plugin.html).insertAfter(dropLocation);
+                    var pluginContainer = dropPlugin.closest(".melis-float-plugins");
+                    if( $(pluginContainer).length ) {
+                        var pluginContainerId = $(pluginContainer).attr("id");
+                        $(pluginContainer).children(".melis-ui-outlined").each(function() {
+                            $(this).find(".melis-plugin-tools-box").attr("data-plugin-container", pluginContainerId);
+                        });
+                    }
                     // Processing the plugin resources and initialization
                     melisPluginEdition.processPluginResources(plugin.init, idPlugin);
-                    
+                    // Init Resizable
+                    // melisPluginEdition.initResizable(); // disable for now
                     // remove plugin
                     $(dropLocation).remove();
                     // send new plugin list
                     melisPluginEdition.sendDragnDropList(dropzone, pageId);
-                    
+
                     $(layout).removeClass("melis-loader");
                     $("#loader").remove();
-                    
-                    melisPluginEdition.calcFrameHeight()
+
+                    melisPluginEdition.calcFrameHeight();
                     melisPluginEdition.disableLinks('a');
+                    melisPluginEdition.pluginDetector();
+                    // melisPluginEdition.moveResponsiveClass(); // disable for now
                 }
             },
             error: function() {
@@ -266,7 +290,7 @@
         } else {
             $(".melis-cms-filter-btn.active").removeClass("active").siblings(".melis-cms-plugin-snippets-box").slideUp();
             $(this).addClass("active");
-            $(".melis-cms-filter-btn.active").siblings(".melis-cms-plugin-snippets-box").slideDown(); 
+            $(".melis-cms-filter-btn.active").siblings(".melis-cms-plugin-snippets-box").slideDown();
         }
     }
 
@@ -276,7 +300,7 @@
         } else {
             $(".melis-cms-category-btn.active").removeClass("active").siblings(".melis-cms-category-plugins-box").slideUp();
             $(this).addClass("active");
-            $(".melis-cms-category-btn.active").siblings(".melis-cms-category-plugins-box").slideDown(); 
+            $(".melis-cms-category-btn.active").siblings(".melis-cms-category-plugins-box").slideDown();
         }
     }
     function pluginScrollPos() {
@@ -303,7 +327,7 @@
         // For IE scroll giving different value
         if (window.parent) {
             window.parent.$("body").scroll(function() {
-               if( (stickyHead.offset().top + stickyHead.height() + 30) >= currentFrame.offset().top ) {
+                if( (stickyHead.offset().top + stickyHead.height() + 30) >= currentFrame.offset().top ) {
                     $(".melis-cms-dnd-box").css("top", stickyHead.offset().top - currentFrame.offset().top + stickyHead.height() + 30);
                 } else {
                     $(".melis-cms-dnd-box").css({"top": 0, "height": $(window.parent).height() - stickyHead.height() - widgetHeight.height() - 15});
@@ -324,5 +348,5 @@
         pluginScrollPos         :       pluginScrollPos,
     }
 
- })(jQuery, window);
+})(jQuery, window);
 
