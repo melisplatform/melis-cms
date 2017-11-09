@@ -341,7 +341,25 @@ class SiteController extends AbstractActionController
         ));
         
     }
-    
+    /**
+     * Return site domain
+     *
+     * return array()
+     */
+    public function getSiteDomainPlatform()
+    {
+        $data = array();
+
+        if($this->getRequest()->isGet()){
+            $siteDomain = $this->getServiceLocator()->get('SiteDomain');
+
+            $data = $siteDomain->getSiteDomain();
+        }
+
+
+        return $data;
+    }
+
     /**
      * Add New Site
      * @return \Zend\View\Model\JsonModel
@@ -720,5 +738,7 @@ class SiteController extends AbstractActionController
             $domainTable->deleteByField('sdom_env', $platform);
         }
     }
+
+
     
 }

@@ -289,7 +289,27 @@ class SiteRedirectController extends AbstractActionController
         $view = new ViewModel();
         return $view;
     }
-    
+
+    /**
+     * Return original page direction
+     *
+     * @param pageId
+     * return link
+     */
+    public function getOriginalPageDirectionAction($pageId)
+    {
+        $success      = 0;
+        $link         = "";
+        $siteRedirect = $this->getServiceLocator()->get("Sitedomain");
+
+        if($this->getRequest()->isPost()){
+
+            $link = $siteRedirect->getOriginalPageDirection($pageId);
+        }
+
+        return $link;
+    }
+
     /**
      * Render Site Redirect Modal container
      * 
@@ -524,4 +544,6 @@ class SiteRedirectController extends AbstractActionController
          
         return new JsonModel($response);
     }
+
+
 }

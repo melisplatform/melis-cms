@@ -157,7 +157,29 @@ class PageLanguagesController extends AbstractActionController
         
         return $view;
     }
-    
+
+    public function convertLanguageByLocale()
+    {
+        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+
+        $cmsPageLangTbl = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+        $cmsPageLang = $cmsPageLangTbl->getEntryByField('plang_page_id', $idPage)->current();
+
+        if (!empty($cmsPageLang))
+        {
+            if ($cmsPageLang->plang_page_id_initial == $idPage)
+            {
+                $cmsPageLangs = $cmsPageLangTbl->getEntryByField('plang_page_id_initial', $idPage);
+
+                $newInitialPageId = null;
+
+
+            }
+        }
+
+        return new JsonModel(array('success' => 0));
+    }
+
     /**
      * This method validate and save the submitted form
      * and create a new Page language version
@@ -354,6 +376,7 @@ class PageLanguagesController extends AbstractActionController
         
         return $form;
     }
+
     
     /**
      * This method will set another page as initial page language
@@ -398,4 +421,7 @@ class PageLanguagesController extends AbstractActionController
         
         return new JsonModel(array('success' => 1));
     }
+
+
+
 }
