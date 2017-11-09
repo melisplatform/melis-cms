@@ -118,7 +118,21 @@ class FrontPluginsController extends AbstractActionController
         $view->siteModule = $siteModule;
         return $view;
     }
-    
+
+    /**
+     * This method will get the session
+     * data of the current page
+     */
+    public function getSessionDataAction()
+    {
+        $success = 1;
+        $data    = array();
+
+        $translator = $this->getServiceLocator()->get('translator');
+        $data       = "";
+
+        return $data;
+    }
     
     public function renderPluginModalAction()
     {
@@ -294,4 +308,5 @@ class FrontPluginsController extends AbstractActionController
 
         die;
     }
+
 }

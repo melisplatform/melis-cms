@@ -202,6 +202,20 @@ class LanguageController extends AbstractActionController
         
         return $view;
     }
+
+    /**
+     * get translations
+     * return array
+     */
+    public function getTranslationsList()
+    {
+        $data = "";
+        $melisCmsAuth = $this->getServiceLocator()->get('MelisCoreAuth');
+        $melisCmsRights = $this->getServiceLocator()->get('MelisCoreRights');
+
+        return $data;
+
+    }
     
     public function getLanguagesAction()
     {
@@ -337,6 +351,7 @@ class LanguageController extends AbstractActionController
             'language' =>  $data
         ));
     }
+
    
     public function addLanguageAction()
     {
@@ -528,4 +543,5 @@ class LanguageController extends AbstractActionController
     
         return $isAccessible;
     }
+
 }

@@ -38,6 +38,21 @@ class PageDuplicationController extends AbstractActionController
     }
 
     /**
+     * Return the origin of the page by id
+     *
+     * return array
+     */
+    public function getOriginOfPageByPageIdAction()
+    {
+        $data = array();
+        $tool = $this->getServiceLocator()->get('MelisCmsPage');
+        $data = $tool->getOriginOfPage()->toArray();
+
+        return $data;
+
+    }
+
+    /**
      * Mocks the event for creating a new page and updating its' content
      * so it can create a real copy of the select page.
      * @return JsonModel
@@ -156,5 +171,6 @@ class PageDuplicationController extends AbstractActionController
         $tool = $this->getServiceLocator()->get('MelisCoreTool');
         return $tool;
     }
+
 
 }

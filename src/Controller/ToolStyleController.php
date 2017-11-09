@@ -555,8 +555,26 @@ class ToolStyleController extends AbstractActionController
         
         return new JsonModel($response);
     }
-   
-    
+
+    /**
+     *  Return style of a page
+     *
+     * return array
+     */
+    public function getStyleByPageId($pageId)
+    {
+        $style = "";
+
+        $pageStyle  = $this->getServiceLocator()->get('MelisPageStyle');
+        if($pageStyle){
+            $dataStyle  = $pageStyle->getStyleByPageId($pageId);
+
+            $style = $dataStyle;
+        }
+
+        return $style;
+    }
+
     /**
      * Checks wether the user has access to this tools or not
      * @return boolean
