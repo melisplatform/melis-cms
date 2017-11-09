@@ -147,5 +147,18 @@ class DashboardController extends AbstractActionController
     
         return $view;
     }
-	
+
+    public function getDashboardDataAction()
+    {
+        $success = 0;
+        $data    = array();
+
+        if($data){
+            $melisCmsData = $this->getServiceLocator()->get('MelisCmsDashboard');
+
+            $data = $melisCmsData->getDashboardData();
+        }
+
+        return $data;
+    }
 }

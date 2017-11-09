@@ -470,7 +470,28 @@ class TreeSitesController extends AbstractActionController
     	
     	return false;
     }
-    
+
+    /**
+     * Return parent of child node
+     * @param pageID int
+     *
+     * return array
+     */
+    public function getParentByPageId($pageId)
+    {
+        $data = array();
+        $success = 0;
+
+        $treeSite = $this->getServiceLocator()->get('MelisSiteTree');
+
+        if($treeSite){
+            $data  = $treeSite->getParentByPageId($pageId);
+        }
+
+
+        return $data;
+    }
+
     /**
      * Sends back the pageId breadcrumb
      * 
@@ -741,5 +762,7 @@ class TreeSitesController extends AbstractActionController
         
         return $results;
     }
+
+
     
 }

@@ -794,6 +794,21 @@ class PageController extends AbstractActionController
     }
 
     /**
+     * Return all page data
+     *
+     * return array
+     */
+    public function getPageDataAction()
+    {
+        $data = array();
+
+        $melisData = $this->serviceLocator->get('MelisPage');
+        $data      = $melisData->fetchAll();
+
+        return $data;
+    }
+
+    /**
      * Delete Saved and Session of the current Page
      * @return \Zend\View\Model\JsonModel
      */
@@ -1737,4 +1752,5 @@ class PageController extends AbstractActionController
             $this->updateUrlPage($idPage);
         }
     }
+
 }

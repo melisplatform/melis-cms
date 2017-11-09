@@ -213,7 +213,24 @@ class PageEditionController extends AbstractActionController
          
         return new JsonModel($result);
     }
-    
+
+    /**
+     * Returns edition log of page edition
+     * @param pageId
+     * return array
+     */
+    public function getEditionLogOfPageEditionById($pageId)
+    {
+        $data = array();
+
+        $pageEdition = $this->getServiceLocator()->get('MelisEnginePage');
+        $dataLogs    = $pageEdition->getEditionLogsOfPage($pageId);
+
+        $data = $dataLogs;
+
+        return $data;
+    }
+
 	/**
 	 * Save Page edition
 	 * @return \Zend\View\Model\JsonModel
@@ -325,5 +342,6 @@ class PageEditionController extends AbstractActionController
 		
 		return new JsonModel($tinyTemplates);
 	}
+
 }
 
