@@ -463,11 +463,14 @@ return array(
                                 array(
                                     'spec' => array(
                                         'name' => 'style_status',
-                                        'type' => 'MelisSwitch',
+                                        'type' => 'Checkbox',
                                         'disable_html_escape' => true,
                                         'options' => array(
                                             'label' => 'tr_meliscms_tool_style_page_status',
                                             'tooltip' => 'tr_meliscms_tool_style_page_status tooltip',
+                                            'use_hidden_element' => false,
+                                            'checked_value' => 1,
+                                            'unchecked_value' => 0,
                                             'switchOptions' => array(
                                                 'label' => "<i class='glyphicon glyphicon-resize-horizontal'></i>",  
                                                 'label-off' => 'tr_meliscms_tool_style_page_status_off',  
