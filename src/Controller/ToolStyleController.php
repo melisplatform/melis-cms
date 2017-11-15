@@ -392,7 +392,7 @@ class ToolStyleController extends AbstractActionController
                 $styleId = !empty($data['style_id'])? $data['style_id'] : null;
                 unset($data['style_id']);
                 
-                $data['style_status'] = ($data['style_status']) ? 1 : 0;
+                $data['style_status'] = ($data['style_status']) ? 1 : 0; 
                 
                 $resultId = $styleService->saveStyle($data, $styleId);
                 

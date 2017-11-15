@@ -479,7 +479,7 @@ return array(
                                         ),
                                         'attributes' => array(
                                             'id' => 'id_style_page_id',
-                                        ),
+                                        ), 
                                     ),
                                 ),
                                 array(
