@@ -337,7 +337,29 @@ class ToolTemplateController extends AbstractActionController
         
         return $view;
     }
-    
+
+    /**
+     * Return template of a page
+     *
+     * return array
+     */
+    public function getTemplateByPageIdAction()
+    {
+        $success = 0;
+        $request = $this->getRequest();
+        $data    = array();
+        if($request->isPost())
+        {
+            $template = $this->getServiceLocator()->get("MelisPageTemplate");
+            $success = 2;
+
+            $data = $template->getTemplate($pageId);
+        }
+
+        return $data;
+
+    }
+
     /** TOOL CRUD
      *  Below are the functions that will be used in
      *  Adding, updating, displaying and deleting an entry 
@@ -991,5 +1013,6 @@ class ToolTemplateController extends AbstractActionController
         
         return $isAccessible;
     }
+
 
 }

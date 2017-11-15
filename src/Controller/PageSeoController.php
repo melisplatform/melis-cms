@@ -92,7 +92,22 @@ class PageSeoController extends AbstractActionController
 	
 		return $seoForm;
 	}
-	
+
+    /**
+     * Return seo keywords
+     * @param pageId integer
+     */
+    public function getSeoKeywordsByPageId($pageId)
+    {
+        $pageId = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $data = array();
+
+        $seoKeywords = $pageId->getSeoKeywords($pageId);
+        $data        = $seoKeywords;
+
+        return $data;
+    }
+
 	/**
 	 * This function saves the page seo form
 	 * @return \Zend\View\Model\JsonModel
@@ -269,4 +284,6 @@ class PageSeoController extends AbstractActionController
 		
 		return new JsonModel($result);
 	}
+
+
 }

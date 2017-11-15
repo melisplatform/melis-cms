@@ -392,21 +392,7 @@ class ToolStyleController extends AbstractActionController
                 $styleId = !empty($data['style_id'])? $data['style_id'] : null;
                 unset($data['style_id']);
                 
-                foreach($data as $key => $val){
-                    if(empty($val)){
-                        $data[$key] = NULL;
-                    }
-                   
-                    if($key == 'style_status'){
-                       
-                        if($data[$key] == 'on'){
-                            $data[$key] = 1;
-                        }else{
-                            
-                            $data[$key] = 0;
-                        }
-                    }
-                }
+                $data['style_status'] = ($data['style_status']) ? 1 : 0; 
                 
                 $resultId = $styleService->saveStyle($data, $styleId);
                 
@@ -555,8 +541,26 @@ class ToolStyleController extends AbstractActionController
         
         return new JsonModel($response);
     }
-   
-    
+
+    /**
+     *  Return style of a page
+     *
+     * return array
+     */
+    public function getStyleByPageId($pageId)
+    {
+        $style = "";
+
+        $pageStyle  = $this->getServiceLocator()->get('MelisPageStyle');
+        if($pageStyle){
+            $dataStyle  = $pageStyle->getStyleByPageId($pageId);
+
+            $style = $dataStyle;
+        }
+
+        return $style;
+    }
+
     /**
      * Checks wether the user has access to this tools or not
      * @return boolean

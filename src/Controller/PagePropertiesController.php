@@ -143,7 +143,28 @@ class PagePropertiesController extends AbstractActionController
 		
 		return $propertyForm;
 	}
-	
+
+    /**
+     * Return requested properties
+     * @param property array()
+     *
+     * return array
+     */
+    public function getPageProperties($properties = array())
+    {
+        $success = 0;
+        $data    = array();
+
+        $page = $this->getServiceLocator()->get("MelisPageProperty");
+
+        if(is_array($property))
+        {
+            $data = $page->getPageProperties($properties);
+        }
+
+        return $data;
+    }
+
 	/**
 	 * This function saves the entry in PageTree if needed
 	 * It is not the page entry, but as no page entry will be saved if the pagetree entry doesn't exist,
@@ -500,4 +521,5 @@ class PagePropertiesController extends AbstractActionController
 		
 		return new JsonModel($result);
 	}
+
 }

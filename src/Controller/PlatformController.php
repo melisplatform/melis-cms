@@ -191,7 +191,27 @@ class PlatformController extends AbstractActionController
         $view->melisKey = $this->params()->fromRoute('melisKey', '');
         return $view;
     }
-    
+
+    /**
+     * Return list of platform
+     *
+     * return array
+     */
+    public function getPlatformList()
+    {
+        $success = 0;
+        $data    = array();
+
+        if($this->getRequest()->isPost()){
+            $success = 0;
+            $platform = $this->getServiceLocator()->get("Melisplatform");
+
+            $data = $platform->getPlatformList();
+        }
+
+        return $data;
+    }
+
     /*
      * Saving CMS Platform IDs
      * @return Json Array
@@ -477,4 +497,5 @@ class PlatformController extends AbstractActionController
         $isAccessible = $melisCmsRights->isAccessible($xmlRights, MelisCoreRightsService::MELISCORE_PREFIX_TOOLS, $key);
         return $isAccessible;
     }
+
 }
