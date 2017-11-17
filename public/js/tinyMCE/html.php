@@ -6,11 +6,9 @@
 		'inline' => true,
 		'templates'  => 'miniTemplates',
 		'menubar' => false,
-		'force_br_newlines'  => false,
-		'force_p_newlines'  => false,
+        'forced_root_block'  => 'p',
 		'cleanup'  => false,
 		'verify_html'  => false,
-		'forced_root_block'  => '',
 		'plugins' => array(
 		    'advlist autolink lists link image charmap print preview anchor',
 		    'searchreplace visualblocks code fullscreen',
