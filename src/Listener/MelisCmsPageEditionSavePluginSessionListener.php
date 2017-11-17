@@ -189,11 +189,15 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
             if(preg_match('/'.$pattern.'/', $pluginContent, $matches)) {
                 $id = isset($matches[0]) ? $matches[0] : null;
 
+                $pluginDesktop = isset($pluginSettings['width_desktop']) ? $pluginSettings['width_desktop'] : 100;
+                $pluginTablet  = isset($pluginSettings['width_tablet'])  ? $pluginSettings['width_tablet']  : 100;
+                $pluginMobile  = isset($pluginSettings['width_mobile'])  ? $pluginSettings['width_mobile']  : 100;
+
                 if($id) {
                     if($pluginSettings) {
-                        $replacement   = $id .' width_desktop="'.$pluginSettings['width_desktop'].
-                            '" width_tablet="'.$pluginSettings['width_tablet'].
-                            '" width_mobile="'.$pluginSettings['width_mobile'].'"';
+                        $replacement   = $id .' width_desktop="'.$pluginDesktop.
+                            '" width_tablet="'.$pluginTablet.
+                            '" width_mobile="'.$pluginMobile.'"';
                         $pluginContent = preg_replace('/'.$pattern.'/', $replacement, $pluginContent);
                     }
 

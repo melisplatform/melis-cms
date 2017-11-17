@@ -1,3 +1,4 @@
+
 var melisDragnDrop = (function($, window) {
 
     // cache DOM
@@ -8,6 +9,7 @@ var melisDragnDrop = (function($, window) {
     var scrollBool = true;
     var centerWindow;
     var scrollH = window.parent.$("body")[0].scrollHeight;
+    var currentFrame = window.parent.$("#"+parent.activeTabId).find(".melis-iframe");
 
     /* ==================================
      Binding Events
@@ -20,14 +22,12 @@ var melisDragnDrop = (function($, window) {
      ====================================*/
 
     $( ".melis-cms-plugin-snippets" ).draggable({
-        start: function(event, ui) {
-            $(ui.helper).find('.melis-plugin-tooltip').hide();
-        },
         connectWith: ".melis-draggable",
         connectToSortable: ".melis-dragdropzone",
         revert: true,
         helper: "clone",
         start: function( event, ui ) {
+            $(ui.helper).find('.melis-plugin-tooltip').hide();
             $(".melis-dragdropzone").addClass("highlight").removeClass("no-content");
             $(".ui-sortable-placeholder").css("background", "#fff");
         },
@@ -42,23 +42,26 @@ var melisDragnDrop = (function($, window) {
         // connectWith: ".melis-draggable, .melis-dragdropzone, .melis-float-plugins",
         connectToSortable: ".melis-float-plugins",
         handle: ".m-move-handle",
-        forcePlaceholderSize: false,
         cursor: "move",
         cursorAt: { top: 0, left: 0 },
         zIndex: 999999,
         placeholder: "ui-state-highlight",
         tolerance: "pointer",
-        items: ".melis-ui-outlined, .melis-float-plugins",
+        items: ".melis-ui-outlined",
+
         start: function(event, ui) {
             $(".melis-dragdropzone").sortable("refresh");
             // hide tinyMCE panel
             $(".mce-tinymce.mce-panel.mce-floatpanel").hide();
-
             $(".melis-dragdropzone").addClass("highlight");
             $(".ui-sortable-helper").css("z-index", "9999999");
 
-            // remove float wrap button
-            $(".btn-pulse").remove();
+            // item percentage width
+            var placeholderWidth = ( 100 * parseFloat($(ui.helper[0]).css("width")) / parseFloat($(ui.helper[0]).parent().css('width')) ) + '%';
+            $(ui.placeholder[0]).css("width", placeholderWidth);
+
+
+
 
             $(window).mousemove(function (e) {
                 var top;
@@ -115,6 +118,7 @@ var melisDragnDrop = (function($, window) {
             });
         },
         receive: function( event, ui ) {
+            console.log('receive');
             if(ui.helper) {
                 var moduleName = $(ui.helper[0]).data("module-name");
                 var pluginName = $(ui.helper[0]).data("plugin-name");
@@ -147,12 +151,48 @@ var melisDragnDrop = (function($, window) {
             $(".ui-sortable-helper").remove();
         },
         over: function( event, ui) {
+            setPluginWidth(ui);
+            console.log('Over');
             melisPluginEdition.pluginDetector();
+        },
+        change: function( event, ui ) {
+            setPluginWidth(ui);
+            console.log('Change');
         },
 
 
     });
 
+    // set plugin container width by placeholder
+    function setPluginWidth(ui) {
+        var prevSibling = $(".ui-sortable-placeholder.ui-state-highlight").prev();
+        if( $(prevSibling).hasClass("melis-cms-plugin-snippets")) {
+            prevSibling = $(prevSibling).prev();
+        }
+        console.log('prevSibling ', prevSibling);
+        var prevSiblingWidth = ( 100 * parseFloat($(prevSibling).css("width")) / parseFloat($(prevSibling).parent().css('width')) );
+        var availableSpace;
+
+        /*if( $(ui.item[0]).hasClass("melis-cms-plugin-snippets") ) {
+         $(ui.placeholder[0]).css("width", "100%");
+         }*/
+
+        if($(ui.item[0]).hasClass("melis-cms-plugin-snippets") && prevSiblingWidth > 90 ) {
+            $(ui.placeholder[0]).css("width", "100%");
+            console.log('prevSiblingWidth > 90');
+        }
+        if($(ui.item[0]).hasClass("melis-cms-plugin-snippets") && prevSiblingWidth < 90 ) {
+            availableSpace = 100 - prevSiblingWidth - 2 ;
+            availableSpace = Math.floor(availableSpace);
+            $(ui.placeholder[0]).css("width", availableSpace + "%");
+            console.log('prevSiblingWidth < 90', prevSibling);
+        }
+
+
+
+
+
+    }
 
 
     // Tooltip
@@ -212,6 +252,7 @@ var melisDragnDrop = (function($, window) {
                     var vhtml = plugin.html;
                     var melisIdPage = window.parent.$("#"+ parent.activeTabId).find('iframe').data('iframe-id');
                     var pluginToolBox = $(vhtml).find(".melis-plugin-tools-box");
+                    var pluginData = pluginToolBox.data();
                     var pluginHardCodedConfigEl = $(vhtml).find(".plugin-hardcoded-conf");
 
                     // extract the data keys
@@ -240,6 +281,9 @@ var melisDragnDrop = (function($, window) {
                         datastring.push({name: "melisPluginName", value: melisPluginName});
                         datastring.push({name: "melisPluginId", value: melisPluginID});
                         datastring.push({name: "melisPluginTag", value: melisPluginTag});
+                        datastring.push({name: "melisPluginMobileWidth", value: pluginData.pluginWidthMobile});
+                        datastring.push({name: "melisPluginTabletWidth", value: pluginData.pluginWidthTablet});
+                        datastring.push({name: "melisPluginDesktopWidth", value: pluginData.pluginWidthDesktop});
 
                         // pass it in savePluginUpdate
                         melisPluginEdition.savePluginUpdate(datastring);
@@ -248,6 +292,7 @@ var melisDragnDrop = (function($, window) {
                     // adding plugin in dropzone
                     // $('div[data-dragdropzone-id='+ dropzone +']').append(plugin.html);
                     var dropPlugin = $(plugin.html).insertAfter(dropLocation);
+                    console.log('HTML ', $(plugin.html));
                     var pluginContainer = dropPlugin.closest(".melis-float-plugins");
                     if( $(pluginContainer).length ) {
                         var pluginContainerId = $(pluginContainer).attr("id");
@@ -258,7 +303,7 @@ var melisDragnDrop = (function($, window) {
                     // Processing the plugin resources and initialization
                     melisPluginEdition.processPluginResources(plugin.init, idPlugin);
                     // Init Resizable
-                    // melisPluginEdition.initResizable(); // disable for now
+                    melisPluginEdition.initResizable(); // disable for now
                     // remove plugin
                     $(dropLocation).remove();
                     // send new plugin list
@@ -270,7 +315,7 @@ var melisDragnDrop = (function($, window) {
                     melisPluginEdition.calcFrameHeight();
                     melisPluginEdition.disableLinks('a');
                     melisPluginEdition.pluginDetector();
-                    // melisPluginEdition.moveResponsiveClass(); // disable for now
+                    melisPluginEdition.moveResponsiveClass(); // disable for now
                 }
             },
             error: function() {
@@ -304,43 +349,47 @@ var melisDragnDrop = (function($, window) {
         }
     }
     function pluginScrollPos() {
-        var currentFrame = window.parent.$("#"+parent.activeTabId).find(".melis-iframe");
-        var dndHeight = $(window.parent).height() - currentFrame.offset().top - 5;
-        var stickyHead = window.parent.$("#"+parent.activeTabId).find(".bg-white.innerAll");
-        var widgetHeight = window.parent.$("#"+parent.activeTabId).find(".widget-head.nav");
+        // if( $(currentFrame).length ) {
+            console.log('ok', $(currentFrame).length);
+            var dndHeight = $(window.parent).height() - currentFrame.offset().top - 5;
+            var stickyHead = window.parent.$("#"+parent.activeTabId).find(".bg-white.innerAll");
+            var widgetHeight = window.parent.$("#"+parent.activeTabId).find(".widget-head.nav");
 
-        // Chrome, Firefox etc browser
-        $(window.parent).scroll(function() {
-            if( (stickyHead.offset().top + stickyHead.height() + 30) >= currentFrame.offset().top ) {
-                $(".melis-cms-dnd-box").css("top", stickyHead.offset().top - currentFrame.offset().top + stickyHead.height() + 30);
-                dndHeight = $(window.parent).height() - stickyHead.height() - widgetHeight.height() - 15;
-                $(".melis-cms-dnd-box").height(dndHeight);
-
-            } else {
-                dndHeight = $(window.parent).height() - currentFrame.offset().top - 5;
-                $(".melis-cms-dnd-box").css("top", 0);
-                $(".melis-cms-dnd-box").height(dndHeight);
-            }
-
-        });
-
-        // For IE scroll giving different value
-        if (window.parent) {
-            window.parent.$("body").scroll(function() {
+            // Chrome, Firefox etc browser
+            $(window.parent).scroll(function() {
                 if( (stickyHead.offset().top + stickyHead.height() + 30) >= currentFrame.offset().top ) {
                     $(".melis-cms-dnd-box").css("top", stickyHead.offset().top - currentFrame.offset().top + stickyHead.height() + 30);
+                    dndHeight = $(window.parent).height() - stickyHead.height() - widgetHeight.height() - 15;
+                    $(".melis-cms-dnd-box").height(dndHeight);
+
                 } else {
-                    $(".melis-cms-dnd-box").css({"top": 0, "height": $(window.parent).height() - stickyHead.height() - widgetHeight.height() - 15});
-
+                    dndHeight = $(window.parent).height() - currentFrame.offset().top - 5;
+                    $(".melis-cms-dnd-box").css("top", 0);
+                    $(".melis-cms-dnd-box").height(dndHeight);
                 }
+
             });
-        }
 
-        $(".melis-cms-dnd-box").height(dndHeight);
+            // For IE scroll giving different value
+            if (window.parent) {
+                window.parent.$("body").scroll(function() {
+                    if( (stickyHead.offset().top + stickyHead.height() + 30) >= currentFrame.offset().top ) {
+                        $(".melis-cms-dnd-box").css("top", stickyHead.offset().top - currentFrame.offset().top + stickyHead.height() + 30);
+                    } else {
+                        $(".melis-cms-dnd-box").css({"top": 0, "height": $(window.parent).height() - stickyHead.height() - widgetHeight.height() - 15});
 
+                    }
+                });
+            }
+
+            $(".melis-cms-dnd-box").height(dndHeight);
+        /*} else {
+            console.log('nope', $(currentFrame).length);
+        }*/
     }
-
-    pluginScrollPos();
+    if( $(currentFrame).length ) {
+        pluginScrollPos();
+    }
 
     return {
         requestPlugin           :       requestPlugin,
@@ -349,4 +398,7 @@ var melisDragnDrop = (function($, window) {
     }
 
 })(jQuery, window);
+
+
+
 
