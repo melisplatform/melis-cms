@@ -1681,10 +1681,10 @@ class PageController extends AbstractActionController
     {
         $link = array();
         $idPage = $this->params()->fromQuery('idPage', '');
-        $melisKey = $this->params()->fromRoute('melisKey', '');
+        $absolute = $this->params()->fromQuery('absolute', false);
 
         $melisTree = $this->serviceLocator->get('MelisEngineTree');
-        $link['link'] = $melisTree->getPageLink($idPage);
+        $link['link'] = $melisTree->getPageLink($idPage, $absolute);
 
         return new JsonModel($link);
     }
