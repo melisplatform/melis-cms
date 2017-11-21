@@ -223,7 +223,6 @@ var melisPluginEdition = (function($, window) {
             // check resources css / js
             if(pluginVal.ressources) {
                 $.each(pluginVal.ressources, function(i, value) {
-
                     // check if css / js
                     if(i == "css") {
                         elType = "css";
@@ -618,26 +617,6 @@ var melisPluginEdition = (function($, window) {
 
                     // remove indicator
                     $(ui.originalElement).find(".ui-resize-indicator").remove();
-                    // check if below 50% and if melis-float-plugin available
-                    /*if(percentTotalWidth <= 50 && $(ui.element[0]).parent('.melis-float-plugins').length <= 0) {
-                     if($(ui.element[0]).next('.btn-pulse').length <= 0) {
-                     // create button get the current height of left plugin
-                     var btnAddPluginBox = '<button class="btn-pulse" title="Add Plugin Box"><i class="fa fa-plus"></i></button>';
-                     var elHeight = $(ui.element[0]).height(),
-                     btnPosTop = elHeight / 2;
-                     // add button
-                     $(btnAddPluginBox).insertAfter($(ui.element[0]));
-                     if($(ui.element[0]).next('.btn-pulse').length >= 1) {
-                     var elPos = $(this).position();
-                     $(this).next('.btn-pulse').css('top', btnPosTop + elPos.top);
-                     }
-                     $("body").on("click", ".btn-pulse", addPluginFloatBox);
-                     }
-                     } else {
-                     if($(ui.element[0]).next('.btn-pulse').length) {
-                     $(ui.element[0]).next().remove();
-                     }
-                     }*/
                 }
             });
         }
@@ -688,7 +667,10 @@ var melisPluginEdition = (function($, window) {
                 // update DOM data attribute
                 $(toolBox).attr("data-plugin-width-mobile", mobileWidth);
                 currentClass = "plugin-width-xs-";
-                newClass = "plugin-width-xs-"+Math.floor(percentTotalWidth); // removed when css is ready
+
+                var strPercentTotalWidth = percentTotalWidth;
+                 // newClass = "plugin-width-xs-"+Math.floor(percentTotalWidth); // removed when css is ready
+                newClass = "plugin-width-xs-"+strPercentTotalWidth.replace(".", "-"); // removed when css is ready
                 $.each(classes, function(key, value) {
                     if( value.indexOf(currentClass) != -1 ) {
                         parentOutlined.removeClass(value).addClass(newClass);
@@ -700,7 +682,9 @@ var melisPluginEdition = (function($, window) {
                 tabletWidth = percentTotalWidth;
                 $(toolBox).attr("data-plugin-width-tablet", tabletWidth);
                 currentClass = "plugin-width-md-";
-                newClass = "plugin-width-md-"+Math.floor(percentTotalWidth); // removed when css is ready
+                var strPercentTotalWidth = percentTotalWidth;
+                // newClass = "plugin-width-md-"+Math.floor(percentTotalWidth); // removed when css is ready
+                newClass = "plugin-width-lg-"+strPercentTotalWidth.replace(".", "-"); // removed when css is ready
                 $.each(classes, function(key, value) {
                     if( value.indexOf(currentClass) != -1 ) {
                         parentOutlined.removeClass(value).addClass(newClass);
@@ -712,7 +696,9 @@ var melisPluginEdition = (function($, window) {
                 desktopWidth = percentTotalWidth;
                 $(toolBox).attr("data-plugin-width-desktop", desktopWidth);
                 currentClass = "plugin-width-lg-";
-                newClass = "plugin-width-lg-"+Math.floor(percentTotalWidth); // removed when css is ready
+                var strPercentTotalWidth = percentTotalWidth;
+                // newClass = "plugin-width-lg-"+Math.floor(percentTotalWidth); // removed when css is ready
+                newClass = "plugin-width-lg-" + strPercentTotalWidth.replace(".", "-"); // removed when css is ready
                 $.each(classes, function(key, value) {
                     if( value.indexOf(currentClass) != -1 ) {
                         parentOutlined.removeClass(value).addClass(newClass);
@@ -728,6 +714,7 @@ var melisPluginEdition = (function($, window) {
             // pass is to savePageSession
             savePluginUpdate(pluginList);
 
+            // get plugin ID and re init
             // check if owl re init
             var owlCheck = $(parentOutlined).find(".owl-carousel");
             if( $(owlCheck).length ) {
@@ -872,7 +859,6 @@ var melisPluginEdition = (function($, window) {
     pluginDetector();
 
     $(window).load(function() {
-        console.log('poop');
         calcFrameHeight();
     });
     return {
