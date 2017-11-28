@@ -111,21 +111,19 @@ return array(
 					),
 					'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
 					'elements' => array(  
-							array(
-								'spec' => array(
-									...
-								),
+						array(
+							'spec' => array(
+								...
 							),
+						),
 					),
 					'input_filter' => array(      
 						'page_id' => array(
 							...
 						),   
 					),
-				 ),
-				 
-			 ),
-			 
+				),
+			),
 		),
 	),
 ),
@@ -163,7 +161,6 @@ public function attach(EventManagerInterface $events)
     		$sm = $e->getTarget()->getServiceLocator();
     		
     		// Custom Code here
-    		
     	},
     100);
     
