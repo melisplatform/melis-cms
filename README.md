@@ -49,7 +49,7 @@ $pageSrv = $this->getServiceLocator()->get('MelisCmsPageService');
 $pageId = $pageSrv->savePage($pageTree, $pagePublished, $pageSaved, $pageSeo, $pageLang, $pageStyle);  
 ```
 
-* MelisCmsSiteService
+* MelisCmsSiteService  
 Save a site, get the list of pages of a site and many more.  
 File: /melis-cms/src/Service/MelisCmsSiteService.php  
 ```
@@ -59,7 +59,7 @@ $cmsSiteSrv = $this->getServiceLocator()->get('MelisCmsSiteService');
 $sitePages = $cmsSiteSrv->getSitePages($siteId);  
 ```
 
-* MelisCmsPageGetterService
+* MelisCmsPageGetterService  
 Get the full HTML of a page. 
 This service works with the cache system. A page must have been generated at least one, so that the cache is generated and available to be used by the service.  
 Cache is generated in this folder: /cache  
@@ -72,7 +72,7 @@ $pageContent = $cmsSiteSrv->getPageContent($pageId);
 ```
 
 * MelisCmsRightsService  
-Get the rights defined for the user and adapt access to the different elements of the interface: 
+Get the rights defined for the user and adapt access to the different elements of the interface:  
 File: /melis-cms/src/Service/MelisCmsRightsService.php    
 ```
 // Get the service  
