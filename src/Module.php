@@ -35,6 +35,11 @@ use MelisCms\Listener\MelisCmsPageGetterListener;
 use MelisCms\Listener\MelisCmsPageEditionSavePluginSessionListener;
 use MelisCms\Listener\MelisCmsAddPluginContainerListener;
 
+/**
+ * Class Module
+ * @package MelisCms
+ * @require melis-core|melis-engine|melis-front
+ */
 class Module
 {
     public function onBootstrap(MvcEvent $e)
