@@ -391,15 +391,9 @@ class ToolStyleController extends AbstractActionController
 
                 $styleId = !empty($data['style_id'])? $data['style_id'] : null;
                 unset($data['style_id']);
-<<<<<<< HEAD
-                
-                $data['style_status'] = ($data['style_status']) ? 1 : 0;
-                
-=======
 
                 $data['style_status'] = ($data['style_status']) ? 1 : 0;
 
->>>>>>> dd7162d96c4fc90ba18d5cda302e9aad5306480f
                 $resultId = $styleService->saveStyle($data, $styleId);
 
                 if(!empty($resultId)){
@@ -408,7 +402,8 @@ class ToolStyleController extends AbstractActionController
                     $textMessage = 'tr_meliscms_tool_styles_save_success';
                 }
 
-            }else{
+            }
+            else {
 
                 $errors = $form->getMessages();
 
