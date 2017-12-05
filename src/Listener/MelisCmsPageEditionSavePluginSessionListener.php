@@ -84,6 +84,7 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
                                             $_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId] = json_encode($data);
 
                                             // and also the plugin itself
+
                                             $this->updateMelisPlugin($pageId, $plugin, $pluginId, $pluginContent, true);
 
                                         }
@@ -164,24 +165,32 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
      */
     private function updateMelisPlugin($pageId, $plugin, $pluginId, $content, $updateSettings = false)
     {
-        $pluginContent  = $content;
-        $pluginSettings = (array) json_decode($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId]);
+
+        $pluginContent         = $content;
+        $pluginSessionSettings = isset($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId]) ?
+            $_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId] : '';
+        $pluginSettings        = (array) json_decode($pluginSessionSettings);
+
 
         if($plugin == 'melisTag') {
             $pattern = '/type\=\"([html|media|textarea]*\")/';
             if(preg_match($pattern, $pluginContent, $matches)) {
                 $type = isset($matches[0]) ? $matches[0] : null;
                 if($type) {
-
                     // apply sizes
                     if($pluginSettings) {
                         $replacement   = $type .' width_desktop="'.$pluginSettings['width_desktop'].
                             '" width_tablet="'.$pluginSettings['width_tablet'].
                             '" width_mobile="'.$pluginSettings['width_mobile'].'"';
                         $pluginContent = preg_replace($pattern, $replacement, $pluginContent);
+
+
                     }
                 }
             }
+            // remove the div plugin-width within the content
+            $pluginContent = preg_replace('/\<\!\[CDATA\[\<div(.+?)\>/', '<![CDATA[', $pluginContent);
+            $pluginContent = preg_replace('/\<\/div\>\]\]\>/', ']]>', $pluginContent);
         }
         else {
             $pattern = '\<'.$plugin.'\sid\=\"(.*?)*\"';
@@ -217,7 +226,11 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
             }
 
             if($plugin == 'melisTag') {
-                $_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId] = $this->updateContent($pageId, $plugin, $pluginId, $pluginContent);
+                $content =  $this->updateContent($pageId, $plugin, $pluginId, $pluginContent);
+//                echo $content;
+//                echo PHP_EOL;
+//                echo $_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId];
+                $_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId] = $content;
             }
 
         }
@@ -280,7 +293,8 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
 
         if(isset($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId])) {
             $settings = (array) json_decode($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId]);
-            $settings = $settings['settings'];
+
+            $settings = isset($settings['settings']) ? $settings['settings'] : '';
 
             $pluginEndTag = '</'.$plugin.'>';
             $content = str_replace($pluginEndTag, $settings.$pluginEndTag, $content);
@@ -293,10 +307,12 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
 
     public function updateContent($pageId, $plugin, $pluginId, $content)
     {
+
         if(isset($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId])) {
             $pattern = '\<div data\-melis\-plugin\-tag\-id\=\"[a-zA-Z0-9-_]+\"\sclass\=\"[a-zA-Z0-9-_\s]*\"\>';
             $content = preg_replace('/'.$pattern.'/', '', $content);
             $content = str_replace('</div>]]></melisTag>', ']]></melisTag>', $content);
+            $content = preg_replace('/\<div(.+?)\>/', '', $content);
         }
 
         return $content;
