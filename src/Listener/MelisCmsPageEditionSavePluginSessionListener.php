@@ -314,7 +314,7 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
                 $content = preg_replace('/'.$pattern1.'/', '', $content);
             }
 
-            $content = str_replace('</div>]]></melisTag>', ']]></melisTag>', $content);
+
         }
 
         return $content;
