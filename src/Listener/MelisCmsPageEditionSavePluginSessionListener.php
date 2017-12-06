@@ -173,6 +173,7 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
 
 
         if($plugin == 'melisTag') {
+
             $pattern = '/type\=\"([html|media|textarea]*\")/';
             if(preg_match($pattern, $pluginContent, $matches)) {
                 $type = isset($matches[0]) ? $matches[0] : null;
@@ -188,9 +189,6 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
                     }
                 }
             }
-            // remove the div plugin-width within the content
-            $pluginContent = preg_replace('/\<\!\[CDATA\[\<div(.+?)\>/', '<![CDATA[', $pluginContent);
-            $pluginContent = preg_replace('/\<\/div\>\]\]\>/', ']]>', $pluginContent);
         }
         else {
             $pattern = '\<'.$plugin.'\sid\=\"(.*?)*\"';
@@ -227,9 +225,6 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
 
             if($plugin == 'melisTag') {
                 $content =  $this->updateContent($pageId, $plugin, $pluginId, $pluginContent);
-//                echo $content;
-//                echo PHP_EOL;
-//                echo $_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId];
                 $_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId] = $content;
             }
 
@@ -308,11 +303,10 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
     public function updateContent($pageId, $plugin, $pluginId, $content)
     {
 
-        if(isset($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId])) {
+        if(isset($_SESSION['meliscms']['content-pages'][$pageId]['melisTag'][$pluginId])) {
             $pattern = '\<div data\-melis\-plugin\-tag\-id\=\"[a-zA-Z0-9-_]+\"\sclass\=\"[a-zA-Z0-9-_\s]*\"\>';
             $content = preg_replace('/'.$pattern.'/', '', $content);
             $content = str_replace('</div>]]></melisTag>', ']]></melisTag>', $content);
-            $content = preg_replace('/\<div(.+?)\>/', '', $content);
         }
 
         return $content;
