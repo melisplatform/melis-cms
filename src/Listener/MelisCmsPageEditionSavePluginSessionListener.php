@@ -304,8 +304,16 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
     {
 
         if(isset($_SESSION['meliscms']['content-pages'][$pageId]['melisTag'][$pluginId])) {
-            $pattern = '\<div data\-melis\-plugin\-tag\-id\=\"[a-zA-Z0-9-_]+\"\sclass\=\"[a-zA-Z0-9-_\s]*\"\>';
-            $content = preg_replace('/'.$pattern.'/', '', $content);
+            $pattern = '\<div\sdata\-melis\-plugin\-tag\-id\=\"[a-zA-Z0-9-_]+\"\sclass\=\"[a-zA-Z0-9-_\s]*\"\>';
+            if(preg_match('/'.$pattern.'/', $content)) {
+                $content = preg_replace('/'.$pattern.'/', '', $content);
+            }
+
+            $pattern1 = '\<div\sclass\=\"[a-zA-Z0-9-_\s]*\"\sdata\-melis\-plugin\-tag\-id\=\"[a-zA-Z0-9-_]+\"\>';
+            if(preg_match('/'.$pattern1.'/', $content)) {
+                $content = preg_replace('/'.$pattern1.'/', '', $content);
+            }
+
             $content = str_replace('</div>]]></melisTag>', ']]></melisTag>', $content);
         }
 
