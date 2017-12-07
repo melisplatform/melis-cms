@@ -9,7 +9,7 @@ This Melis Platform module is made to work with the MelisCore.
 
 ### Prerequisites
 
-You will need to install melisplatform/melis-core in order to have this module running.  
+You will need to install melisplatform/melis-core and melisplatform/melis-engine in order to have this module running.  
 This will automatically be done when using composer.
 
 ### Installing
