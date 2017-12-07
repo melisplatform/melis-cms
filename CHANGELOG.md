@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed  
 * Page edition and plugin: updates of drag'n'drop zone  
+* composer.json and dependencies  
 
 ### Removed  
 
