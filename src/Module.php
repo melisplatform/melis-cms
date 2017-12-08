@@ -35,6 +35,11 @@ use MelisCms\Listener\MelisCmsPageGetterListener;
 use MelisCms\Listener\MelisCmsPageEditionSavePluginSessionListener;
 use MelisCms\Listener\MelisCmsAddPluginContainerListener;
 
+/**
+ * Class Module
+ * @package MelisCms
+ * @require melis-core|melis-engine|melis-front
+ */
 class Module
 {
     public function onBootstrap(MvcEvent $e)
@@ -85,8 +90,7 @@ class Module
                     $eventManager->attach(new MelisCmsToolUserNewUserListener());
                     $eventManager->attach(new MelisCmsDeletePlatformListener());
                     $eventManager->attach(new MelisCmsPageDefaultUrlsListener());
-                    //$eventManager->attach(new MelisCmsPageEditionSavePluginSessionListener());
-                    //$eventManager->attach(new MelisCmsAddPluginContainerListener());
+                    $eventManager->attach(new MelisCmsPageEditionSavePluginSessionListener());
 
                     // Saving Plugin Tag values, Melis Side
                     $eventManager->attach($sm->get('MelisCms\Listener\MelisCmsPluginSaveEditionSessionListener'));

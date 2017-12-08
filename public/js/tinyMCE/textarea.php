@@ -5,9 +5,7 @@
 		'language' => 'en',
 		'inline' => true,
 		'menubar' => false,
-		'force_br_newlines'  => false,
-		'force_p_newlines'  => false,
-		'forced_root_block'  => '',
+		'forced_root_block'  => 'p',
 		'cleanup'  => false,
 		'verify_html'  => false,
 		'plugins' => array(
