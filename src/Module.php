@@ -136,6 +136,7 @@ class Module
             $translationType = array(
                 'interface',
                 'forms',
+                'install',
             );
             
         $translationList = array();
@@ -178,6 +179,7 @@ class Module
             include __DIR__ . '/../config/diagnostic.config.php',
             include __DIR__ . '/../config/diagnostic.config.php',
             include __DIR__ . '/../config/app.microservice.php',
+            include __DIR__ . '/../config/app.install.php',
         );
 
         foreach ($configFiles as $file) {
