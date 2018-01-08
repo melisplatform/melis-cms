@@ -416,7 +416,7 @@ return array(
                                 'attributes' => array(
                                     'id' => 'sdom_scheme',
                                     'value' => '',
-                                    'placeholder' => 'tr_melis_installer_sdom_scheme',
+                                    'placeholder' => 'http / https',
                                 )
                             )
                         ),

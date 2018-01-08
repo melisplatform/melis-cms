@@ -55,7 +55,49 @@ return array(
             		  
                     ),
                 ),
-            ),	    
+            ),
+
+            /*
+             * This route will handle the
+             * alone setup of a module
+             */
+            'setup-melis-core' => array(
+                'type'    => 'Literal',
+                'options' => array(
+                    'route'    => '/MelisCms',
+                    'defaults' => array(
+                        '__NAMESPACE__' => 'MelisCms\Controller',
+                        'controller'    => '',
+                        'action'        => '',
+                    ),
+                ),
+                'may_terminate' => true,
+                'child_routes' => array(
+                    'default' => array(
+                        'type'    => 'Segment',
+                        'options' => array(
+                            'route'    => '/[:controller[/:action]]',
+                            'constraints' => array(
+                                'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                                'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
+                            ),
+                            'defaults' => array(
+//
+                            ),
+                        ),
+                    ),
+                    'setup' => array(
+                        'type' => 'Segment',
+                        'options' => array(
+                            'route' => '/setup',
+                            'defaults' => array(
+                                'controller' => 'MelisCms\Controller\MelisSetup',
+                                'action' => 'setup-form',
+                            ),
+                        ),
+                    ),
+                ),
+            ),
         ),
     ),
     'translator' => array(

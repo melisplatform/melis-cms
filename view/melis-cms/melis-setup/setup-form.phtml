@@ -9,7 +9,7 @@ $pmethod = $formPlatformId['attributes']['method'];
 
 $pelements = $formPlatformId['elements'];
 ?>
-
+<h3>MelisCms Setup</h3>
 <form  name="<?= $pname ?>" id="<?= $pfrmId ?>" >
     <div class="environment-cont entry">
     <?php for($i = 0; $i < count($pelements); $i++):?>
@@ -110,7 +110,9 @@ $delements = $formDomain['elements'];
 
         <?php endfor;?>
     </div>
+    <button id="melis-cms-start-setup-btn" type="submit">Start setup</button>
 </form>
+
 
 
 
