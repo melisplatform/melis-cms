@@ -61,7 +61,7 @@ return array(
              * This route will handle the
              * alone setup of a module
              */
-            'setup-melis-core' => array(
+            'setup-melis-cms' => array(
                 'type'    => 'Literal',
                 'options' => array(
                     'route'    => '/MelisCms',
