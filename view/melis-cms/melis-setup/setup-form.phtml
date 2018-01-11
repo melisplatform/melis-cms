@@ -1,0 +1,123 @@
+<!--PlatformID-->
+<h3>Platform Id</h3>
+<?php
+$formPlatformId   = $this->formPlatformId;
+
+$pname   = $formPlatformId['attributes']['name'];
+$pfrmId  = $formPlatformId['attributes']['id'];
+$pmethod = $formPlatformId['attributes']['method'];
+
+$pelements = $formPlatformId['elements'];
+?>
+<h3>MelisCms Setup</h3>
+<form  name="<?= $pname ?>" id="<?= $pfrmId ?>" >
+    <div class="environment-cont entry">
+    <?php for($i = 0; $i < count($pelements); $i++):?>
+        <?php
+            $pinput = $pelements[$i]['spec'];
+            $pname  = $pinput['name'];
+            $ptype  = $pinput['type'];
+            $plabel = $pinput['options']['label'];
+
+            $ptoolTip     = $pinput['options']['tooltip'];
+            $pinputId     = $pinput['attributes']['id'];
+            $pplaceholder = $pinput['attributes']['placeholder'];
+
+        ?>
+
+        <div class="form-group">
+            <label><?= $this->translate($plabel); ?>
+                <i class="fa fa-info-circle fa-lg pull-right" data-toggle="tooltip" data-placement="left" title="<?= $this->translate($ptoolTip) ?>" data-original-title=""></i>
+            </label>
+            <input type="text" name="<?= $pname ?>" class="form-control" placeholder="<?= $this->translate($pplaceholder); ?>"  required>
+        </div>
+
+    <?php endfor;?>
+    </div>
+</form>
+
+<!--Site-->
+<h3>Site</h3>
+<?php
+$formSite   = $this->formSite;
+
+$sname  = $formSite['attributes']['name'];
+$sfrmId  = $formSite['attributes']['id'];
+$smethod = $formSite['attributes']['method'];
+
+$selements = $formSite['elements'];
+?>
+
+<form  name="<?= $sname ?>" id="<?= $sfrmId ?>" >
+    <div class="environment-cont entry">
+        <?php for($i = 0; $i < count($selements); $i++):?>
+            <?php
+            $sinput = $selements[$i]['spec'];
+            $sname  = $sinput['name'];
+            $stype  = $sinput['type'];
+            $slabel = $sinput['options']['label'];
+
+            $stoolTip     = $sinput['options']['tooltip'];
+            $sinputId     = $sinput['attributes']['id'];
+            $splaceholder = $sinput['attributes']['placeholder'];
+
+            ?>
+
+            <div class="form-group">
+                <label><?= $this->translate($slabel); ?>
+                    <i class="fa fa-info-circle fa-lg pull-right" data-toggle="tooltip" data-placement="left" title="<?= $this->translate($stoolTip) ?>" data-original-title=""></i>
+                </label>
+                <input type="text" name="<?= $sname ?>" class="form-control" placeholder="<?= $this->translate($splaceholder); ?>"  required>
+            </div>
+
+        <?php endfor;?>
+    </div>
+</form>
+
+<!--Domain-->
+<h3>Domain</h3>
+<?php
+$formDomain   = $this->formDomain;
+
+$dname  = $formDomain['attributes']['name'];
+$dfrmId  = $formDomain['attributes']['id'];
+$dmethod = $formDomain['attributes']['method'];
+
+$delements = $formDomain['elements'];
+?>
+
+<form  name="<?= $dname ?>" id="<?= $dfrmId ?>" >
+    <div class="environment-cont entry">
+        <?php for($i = 0; $i < count($delements); $i++):?>
+            <?php
+            $dinput = $delements[$i]['spec'];
+            $dname  = $dinput['name'];
+            $dtype  = $dinput['type'];
+            $dlabel = $dinput['options']['label'];
+
+            $dtoolTip     = $dinput['options']['tooltip'];
+            $dinputId     = $dinput['attributes']['id'];
+            $dplaceholder = $dinput['attributes']['placeholder'];
+
+            ?>
+
+            <div class="form-group">
+                <label><?= $this->translate($dlabel); ?>
+                    <i class="fa fa-info-circle fa-lg pull-right" data-toggle="tooltip" data-placement="left" title="<?= $this->translate($dtoolTip) ?>" data-original-title=""></i>
+                </label>
+                <input type="text" name="<?= $dname ?>" class="form-control" placeholder="<?= $this->translate($dplaceholder); ?>"  required>
+            </div>
+
+        <?php endfor;?>
+    </div>
+    <button id="melis-cms-start-setup-btn" type="submit">Start setup</button>
+</form>
+
+
+
+
+
+
+
+
+
