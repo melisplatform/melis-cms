@@ -1,3 +1,5 @@
+
+<h3>MelisCms Setup</h3>
 <!--PlatformID-->
 <h3>Platform Id</h3>
 <?php
@@ -9,7 +11,6 @@ $pmethod = $formPlatformId['attributes']['method'];
 
 $pelements = $formPlatformId['elements'];
 ?>
-<h3>MelisCms Setup</h3>
 <form  name="<?= $pname ?>" id="<?= $pfrmId ?>" >
     <div class="environment-cont entry">
     <?php for($i = 0; $i < count($pelements); $i++):?>
@@ -36,43 +37,6 @@ $pelements = $formPlatformId['elements'];
     </div>
 </form>
 
-<!--Site-->
-<h3>Site</h3>
-<?php
-$formSite   = $this->formSite;
-
-$sname  = $formSite['attributes']['name'];
-$sfrmId  = $formSite['attributes']['id'];
-$smethod = $formSite['attributes']['method'];
-
-$selements = $formSite['elements'];
-?>
-
-<form  name="<?= $sname ?>" id="<?= $sfrmId ?>" >
-    <div class="environment-cont entry">
-        <?php for($i = 0; $i < count($selements); $i++):?>
-            <?php
-            $sinput = $selements[$i]['spec'];
-            $sname  = $sinput['name'];
-            $stype  = $sinput['type'];
-            $slabel = $sinput['options']['label'];
-
-            $stoolTip     = $sinput['options']['tooltip'];
-            $sinputId     = $sinput['attributes']['id'];
-            $splaceholder = $sinput['attributes']['placeholder'];
-
-            ?>
-
-            <div class="form-group">
-                <label><?= $this->translate($slabel); ?>
-                    <i class="fa fa-info-circle fa-lg pull-right" data-toggle="tooltip" data-placement="left" title="<?= $this->translate($stoolTip) ?>" data-original-title=""></i>
-                </label>
-                <input type="text" name="<?= $sname ?>" class="form-control" placeholder="<?= $this->translate($splaceholder); ?>"  required>
-            </div>
-
-        <?php endfor;?>
-    </div>
-</form>
 
 <!--Domain-->
 <h3>Domain</h3>

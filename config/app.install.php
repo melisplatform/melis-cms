@@ -23,7 +23,7 @@ return array(
                                 'attributes' => array(
                                     'id' => 'pids_id',
                                     'value' => '',
-                                    'placeholder' => 'tr_melis_installer_platform_id',
+                                    'placeholder' => '1',
                                 )
                             )
                         ),
@@ -38,7 +38,7 @@ return array(
                                 'attributes' => array(
                                     'id' => 'pids_page_id_start',
                                     'value' => '',
-                                    'placeholder' => 'tr_melis_installer_pids_page_id_start',
+                                    'placeholder' => '1',
                                 )
                             )
                         ),
@@ -53,7 +53,24 @@ return array(
                                 'attributes' => array(
                                     'id' => 'pids_page_id_current',
                                     'value' => '',
-                                    'placeholder' => 'tr_melis_installer_pids_page_id_current',
+                                    'placeholder' => '1',
+                                    'class' => 'form-control',
+                                ),
+                            ),
+                        ),
+                        
+                        array(
+                            'spec' => array(
+                                'name' => 'pids_page_id_end',
+                                'type' => 'MelisText',
+                                'options' => array(
+                                    'label' => 'tr_melis_installer_pids_page_id_end',
+                                    'tooltip' => 'tr_melis_installer_pids_page_id_end_info',
+                                ),
+                                'attributes' => array(
+                                    'id' => 'pids_page_id_current',
+                                    'value' => '',
+                                    'placeholder' => '1000',
                                     'class' => 'form-control',
                                 ),
                             ),
@@ -69,7 +86,7 @@ return array(
                                 'attributes' => array(
                                     'id' => 'pids_tpl_id_start',
                                     'value' => '',
-                                    'placeholder' => 'tr_melis_installer_pids_tpl_id_start',
+                                    'placeholder' => '1',
                                     'class' => 'form-control',
                                 ),
                             ),
@@ -85,7 +102,7 @@ return array(
                                 'attributes' => array(
                                     'id' => 'pids_tpl_id_current',
                                     'value' => '',
-                                    'placeholder' => 'tr_melis_installer_pids_tpl_id_current',
+                                    'placeholder' => '1',
                                 )
                             )
                         ),
@@ -100,7 +117,7 @@ return array(
                                 'attributes' => array(
                                     'id' => 'pids_tpl_id_end',
                                     'value' => '',
-                                    'placeholder' => 'tr_melis_installer_pids_tpl_id_end',
+                                    'placeholder' => '1000',
                                 )
                             )
                         ),
@@ -317,70 +334,6 @@ return array(
                         ),
                     ), // end input_filter
                 ), // end melis_installer_platform_id
-                'melis_installer_site_' => array(
-                    'attributes' => array(
-                        'name' => 'form_melis_installer_site',
-                        'id'   => 'id_form_melis_installer_site',
-                        'method' => 'POST',
-                        'action' => '',
-                    ),
-                    'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
-                    'elements'  => array(
-                        array(
-                            'spec' => array(
-                                'name' => 'sitename',
-                                'type' => 'MelisText',
-                                'options' => array(
-                                    'label' => 'tr_melis_installer_site_name',
-                                    'tooltip' => 'tr_melis_installer_site_name_info',
-                                ),
-                                'attributes' => array(
-                                    'id' => 'login',
-                                    'value' => '',
-                                    'placeholder' => 'tr_melis_installer_site_name',
-                                )
-                            )
-                        ),
-                    ), // end elements
-                    'input_filter' => array(
-                        'sitename' => array(
-                            'name'     => 'sitename',
-                            'required' => true,
-                            'validators' => array(
-                                array(
-                                    'name'    => 'StringLength',
-                                    'options' => array(
-                                        'encoding' => 'UTF-8',
-                                        'max'      => 255,
-                                        'messages' => array(
-                                            \Zend\Validator\StringLength::TOO_LONG => 'tr_melis_installer_new_user_login_max',
-                                        ),
-                                    ),
-                                ),
-                                array(
-                                    'name' => 'NotEmpty',
-                                    'options' => array(
-                                        'messages' => array(
-                                            \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_installer_new_user_login_empty',
-                                        ),
-                                    ),
-                                ),
-                                array(
-                                    'name' => 'regex', false,
-                                    'options' => array(
-                                        'pattern' => '/^[A-Za-z][A-Za-z0-9]*$/',
-                                        'messages' => array(\Zend\Validator\Regex::NOT_MATCH => 'tr_melis_installer_new_user_login_invalid'),
-                                        'encoding' => 'UTF-8',
-                                    ),
-                                ),
-                            ),
-                            'filters'  => array(
-                                array('name' => 'StripTags'),
-                                array('name' => 'StringTrim'),
-                            ),
-                        ),
-                    ), // end input_filter
-                ), // end melis_installer_site_
                 'melis_installer_domain' => array(
                     'attributes' => array(
                         'name' => 'form_melis_installer_domain',

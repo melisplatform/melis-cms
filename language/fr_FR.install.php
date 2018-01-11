@@ -6,6 +6,7 @@ return array(
     'tr_melis_installer_pids_page_id_start' => 'Page id start',
     'tr_melis_installer_pids_page_id_current' => 'Page id current',
     'tr_melis_installer_pids_tpl_id_start' => 'Tpl id start',
+    'tr_melis_installer_pids_page_id_end' => 'Tpl id end',
     'tr_melis_installer_pids_tpl_id_current' => 'Tpl id current',
     'tr_melis_installer_pids_tpl_id_end' => 'Tpl id end',
 
