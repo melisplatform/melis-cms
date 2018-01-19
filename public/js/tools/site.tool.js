@@ -6,7 +6,8 @@ $(document).ready(function() {
         zoneId = 'id_meliscms_page_tree_id_selector';
         melisKey = 'meliscms_page_tree_id_selector';
         modalUrl = 'melis/MelisCms/Page/renderPageModal';
-        
+
+        $('#melis-modals-container').find('#id_meliscms_page_tree_id_selector_container').remove();
         meliscmsSiteSelectorInputDom = $(this).parents(".input-group").find("input");
         
         melisHelper.createModal(zoneId, melisKey, false, {}, modalUrl, function(){
