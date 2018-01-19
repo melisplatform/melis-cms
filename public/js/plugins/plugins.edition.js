@@ -375,7 +375,7 @@ var melisPluginEdition = (function($, window) {
         var dragdropzonePlugin = $('div[data-dragdropzone-id='+ dropzone +']').data("plugin");
         var dragdropzonePluginId = $('div[data-dragdropzone-id='+ dropzone +']').data("plugin-id");
         var dragdropzoneMelisTag = $('div[data-dragdropzone-id='+ dropzone +']').data("melis-tag");
-        var pluginListEl = $('div[data-dragdropzone-id='+ dropzone +']').find(".melis-ui-outlined");
+        var pluginListEl = $('div[data-dragdropzone-id='+ dropzone +']').children(".melis-ui-outlined");
 
         var dragzone = [];
         var pluginList = new Object();
