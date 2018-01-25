@@ -551,7 +551,7 @@ var melisPluginEdition = (function($, window) {
         // initialation of local variable
         zoneId = 'id_meliscms_plugin_modal_interface';
         melisKey = 'meliscms_plugin_modal_interface';
-        modalUrl = '/melis/MelisCms/FrontPlugins/renderPluginModal';
+        modalUrl = '/melis/MelisCms/FrontPlugins/renderPluginModal?melisSite='+siteModule;
 
         var modalParams = {
             pluginFrontConfig : pluginFrontConfig,
