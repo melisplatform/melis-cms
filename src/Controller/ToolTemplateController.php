@@ -638,10 +638,6 @@ class ToolTemplateController extends AbstractActionController
                 $optionFilter['tpl_site_id'] = $this->getRequest()->getPost('tpl_site_id');
             }
             
-            
-            // get the tool columns
-            $columns = $melisTool->getColumns();
-            
             $colId = array_keys($melisTool->getColumns());
             
             $sortOrder = $this->getRequest()->getPost('order');
@@ -657,28 +653,14 @@ class ToolTemplateController extends AbstractActionController
             
             $search = $this->getRequest()->getPost('search');
             $search = $search['value'];
-            
-            $dataCount = $templatesModel->getTotalData();
-            
-            $dataQuery = array(
-                'where' => array(
-                    'key' => 'tpl_id',
-                    'value' => $search,
-                ),
-                'order' => array(
-                    'key' => $selCol,
-                    'dir' => $sortOrder,
-                ),
-                'start' => $start,
-                'limit' => $length,
-                'columns' => $melisTool->getSearchableColumns(),
-                'date_filter' => array(),
-            );
-            
-            $getData = $templatesModel->getPagedData($dataQuery, null, $optionFilter);
 
+            $dataCount = $templatesModel->getTotalData();
+
+            $getData = $templatesModel->getData($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length);
             $tableData = $getData->toArray();
-            
+
+
+
             for($ctr = 0; $ctr < count($tableData); $ctr++)
             {
                 // apply text limits
@@ -688,17 +670,13 @@ class ToolTemplateController extends AbstractActionController
                 }
                 
                 $tableData[$ctr]['DT_RowId'] = $tableData[$ctr]['tpl_id'];
-                // instead of showing the Site ID, replace it with Site name
-                $siteData = $tableSite->getEntryById($tableData[$ctr]['tpl_site_id']);
-                $siteText = $siteData->current();
-                $tableData[$ctr]['tpl_site_id'] = !empty($siteText->site_name) ? $siteText->site_name : '';
                 
                 // display controller and action in Controller Column
                 $tableData[$ctr]['tpl_zf2_controller'] = !empty($tableData[$ctr]['tpl_zf2_action']) ? $tableData[$ctr]['tpl_zf2_controller'] . '/' . $tableData[$ctr]['tpl_zf2_action'] : $tableData[$ctr]['tpl_zf2_controller'];
 
             }
         }
-        
+
         return new JsonModel(array(
             'draw' => (int) $draw,
             'recordsTotal' => $dataCount,

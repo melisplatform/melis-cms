@@ -56,7 +56,7 @@ return array(
 
                             ),
 
-                            'tpl_site_id' => array(
+                            'site_name' => array(
                                 'text' => 'tr_meliscms_tool_templates_tpl_site_id',
                                 'css' => array('width' => '20%', 'padding-right' => '0'),
                                 'sortable' => true,
@@ -86,7 +86,7 @@ return array(
                         ),
 
                         // define what columns can be used in searching
-                        'searchables' => array('tpl_id', 'tpl_name', 'tpl_zf2_website_folder', 'tpl_zf2_layout', 'tpl_site_id', 'tpl_type', 'tpl_zf2_controller', 'tpl_php_path'),
+                        'searchables' => array('tpl_id', 'site_name', 'tpl_name', 'tpl_zf2_website_folder', 'tpl_zf2_layout', 'tpl_site_id', 'tpl_type', 'tpl_zf2_controller', 'tpl_php_path'),
 
                         'actionButtons' => array(
                             'edit' => array(
