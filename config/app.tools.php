@@ -2142,7 +2142,7 @@ return array(
                                 'css' => array('width' => '1%'),
                                 'sortable' => true,
                             ),
-                            's301_site_id' => array(
+                            'site_name' => array(
                                 'text' => 'tr_meliscms_tool_site_301_s301_site',
                                 'css' => array('width' => '30%'),
                                 'sortable' => true,
@@ -2159,7 +2159,7 @@ return array(
                             ),
                         ),
                         // define what columns can be used in searching
-                        'searchables' => array('s301_id', 's301_old_url', 's301_new_url'),
+                        'searchables' => array('site_name', 's301_old_url', 's301_new_url'),
                         'actionButtons' => array(
                             'test' => array(
                                 'module' => 'MelisCms',

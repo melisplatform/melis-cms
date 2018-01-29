@@ -137,63 +137,44 @@ class SiteRedirectController extends AbstractActionController
         
         if($this->getRequest()->isPost())
         {
-            
+
             $optionFilter = array();
-            
+
             if(!empty($this->getRequest()->getPost('s301_site_id'))){
                 $optionFilter['s301_site_id'] = $this->getRequest()->getPost('s301_site_id');
             }
-            
+
+            $siteId = $this->getRequest()->getPost('s301_site_id');
+            $siteId = !empty($siteId)? $siteId : null;
+
             $colId = array_keys($melisTool->getColumns());
-        
+
             $sortOrder = $this->getRequest()->getPost('order');
             $sortOrder = $sortOrder[0]['dir'];
-        
+
             $selCol = $this->getRequest()->getPost('order');
             $selCol = $colId[$selCol[0]['column']];
-        
+
             $draw = $this->getRequest()->getPost('draw');
-        
+
             $start = $this->getRequest()->getPost('start');
             $length =  $this->getRequest()->getPost('length');
-        
+
             $search = $this->getRequest()->getPost('search');
             $search = $search['value'];
-        
+
             $dataCount = $site301Table->getTotalData();
-        
-            $dataQuery = array(
-                'where' => array(
-                    'key' => 's301_id',
-                    'value' => $search,
-                ),
-                'order' => array(
-                    'key' => $selCol,
-                    'dir' => $sortOrder,
-                ),
-                'start' => $start,
-                'limit' => $length,
-                'columns' => $melisTool->getSearchableColumns(),
-                'date_filter' => array()
-            );
-            
-            $getData = $site301Table->getPagedData($dataQuery, null, $optionFilter);
-        
+
+            $getData = $site301Table->getData($search, $siteId, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length);
+
             $tableData = $getData->toArray();
-            
+
             foreach ($tableData As $key => $val)
             {
-                
-                if(array_key_exists('s301_site_id', $val)){
-                    
-                    $site = $siteTable->getEntryById($val['s301_site_id'])->current();
-                    $tableData[$key]['s301_site_id'] = !empty($site->site_name)? $site->site_name : '';
-                }
-                
                 $tableData[$key]['DT_RowId'] = $val['s301_id'];
             }
         }
-        
+
         return new JsonModel(array(
             'draw' => (int) $draw,
             'recordsTotal' => $dataCount,
