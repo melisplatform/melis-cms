@@ -82,7 +82,9 @@
 		'tr_meliscms_page_error_lebel_Rights' => 'Rights',
 		'tr_meliscms_page_save_error_SEO Url already used on' => 'SEO url already used on',
 		'tr_meliscms_page_save_error_label_SEO Url' => 'SEO url',
-			
+		'tr_meliscms_page_save_error_platform_id_max' => 'Page id',
+		'tr_meliscms_page_save_error_platform_id_used' => 'Page id used',
+
 		'tr_meliscms_page_error_Page is not published yet' => 'Page is not published yet',
 			
 		'tr_meliscms_rights_Pages' => 'Pages',
