@@ -632,11 +632,9 @@ class ToolTemplateController extends AbstractActionController
         
         // make sure that the request is an AJAX call
         if($this->getRequest()->isPost()) {
-            $optionFilter = array();
-            
-            if(!empty($this->getRequest()->getPost('tpl_site_id'))){
-                $optionFilter['tpl_site_id'] = $this->getRequest()->getPost('tpl_site_id');
-            }
+
+            $siteId = $this->getRequest()->getPost('tpl_site_id');
+            $siteId = !empty($siteId)? $siteId : null;
             
             $colId = array_keys($melisTool->getColumns());
             
@@ -656,7 +654,7 @@ class ToolTemplateController extends AbstractActionController
 
             $dataCount = $templatesModel->getTotalData();
 
-            $getData = $templatesModel->getData($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length);
+            $getData = $templatesModel->getData($search, $siteId, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length);
             $tableData = $getData->toArray();
 
 

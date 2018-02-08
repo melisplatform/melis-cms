@@ -5,7 +5,7 @@ body {
     position: fixed;
     top: 0;
     right: -4px;
-    width: 224px;
+    width: 200px;
     height: 100%;
     font-family: 'Lato', sans-serif;
     font-weight: normal;
@@ -15,10 +15,10 @@ body {
     border-bottom: 4px solid #932e2a;
     border-left: 4px solid #932e2a;
     background: #373737;
-    transform: translate3d(224px, 0, 0);
-    -webkit-transform: translate3d(224px, 0, 0);
-    -moz-transform: translate3d(224px, 0, 0);
-    -ms-transform: translate3d(224px, 0, 0);
+    transform: translate3d(200px, 0, 0);
+    -webkit-transform: translate3d(200px, 0, 0);
+    -moz-transform: translate3d(200px, 0, 0);
+    -ms-transform: translate3d(200px, 0, 0);
     transition: transform 0.4s, height 0.4s;
     -webkit-transition: transform 0.4s, height 0.4s;
     -moz-transition: transform 0.4s, height 0.4s;
@@ -123,7 +123,7 @@ body {
     margin-top: 10px;
     color: #fff;
     letter-spacing: 0.4px;
-
+    font-size: 10px;
     transition: color 0.4s;
     -webkit-transition: color 0.4s;
     -moz-transition: color 0.4s;
@@ -145,7 +145,7 @@ body {
     font-weight: normal;
     letter-spacing: 1px;
     color: #fff;
-    font-size: 14px;
+    font-size: 10px;
     letter-spacing: 1px;
     border-radius: 2px;
     border-bottom: 1px solid #2c2c2c;
@@ -252,11 +252,12 @@ body {
     padding: 0 15px;
     letter-spacing: 4px;
     text-align: center;
+    font-size: 12px;
 }
 
 .melis-cms-category-btn {
     padding: 4px 15px 4px 30px;
-    font-size: 12px;
+    font-size: 10px;
 }
 .melis-cms-category-btn:hover {
     border-color: #373737;
@@ -765,3 +766,31 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 @-moz-keyframes pulse-sm {to {box-shadow: 0 0 0 15px rgba(147, 46, 42, 0);}}
 @-ms-keyframes pulse-sm {to {box-shadow: 0 0 0 15px rgba(147, 46, 42, 0);}}
 @keyframes pulse-sm {to {box-shadow: 0 0 0 15px rgba(147, 46, 42, 0);}}
+
+
+
+/* Media Queries */
+@media screen and (min-width: 768px) {
+    .melis-cms-dnd-box {
+        width: 224px;
+        transform: translate3d(224px, 0, 0);
+        -webkit-transform: translate3d(224px, 0, 0);
+        -moz-transform: translate3d(224px, 0, 0);
+        -ms-transform: translate3d(224px, 0, 0);
+    }
+    .melis-cms-ps-box .melis-cms-filter-btn,
+    .melis-cms-category-btn {
+        font-size: 14px;
+    }
+
+    .melis-cms-plugin-title {
+        font-size: 14px;
+    }
+    .melis-cms-dnd-title {
+        font-size: 14px;
+    }
+
+    .melis-cms-category-btn {
+        font-size: 12px;
+    }
+}

@@ -61,61 +61,64 @@ var melisDragnDrop = (function($, window) {
             $(ui.placeholder[0]).css("width", placeholderWidth);
 
 
+            if( $(window).width() >= 768) {
 
+                $(window).mousemove(function (e) {
+                    var top;
+                    var frameTop = window.parent.$("#" + parent.activeTabId).find(".melis-iframe").offset().top + 10;
 
-            $(window).mousemove(function (e) {
-                var top;
-                var frameTop = window.parent.$("#"+parent.activeTabId).find(".melis-iframe").offset().top + 10;
-
-                if(window.parent.$(".sticky-pageactions")) {
-                    top = $(window.parent).scrollTop() - 130;
-                } else {
-                    top = 0;
-                }
-
-                // check if there is a plugin being drag
-                if ($('.ui-sortable-helper') && $('.ui-sortable-helper').length > 0) {
-                    var bottom = $(window.parent).height();
-
-                    // hide plugin panel when dragging a plugin
-                    if($(".melis-cms-dnd-box").hasClass("show")) {
-                        $(".melis-cms-dnd-box").removeClass("show");
-                    }
-
-
-                    if (e.clientY >= ($(window.parent).scrollTop() + $(window.parent).height() - frameTop) ) {
-                        // detect IE8 and above, and edge
-                        if (document.documentMode || /Edge/.test(navigator.userAgent)) {
-                            // activate scrollTop on IE
-                            window.parent.$('html').css({'overflow': 'auto', 'height': 'auto'});
-                        }
-
-                        window.parent.$('html, body').animate({
-                            scrollTop: $(window.parent).scrollTop() + ($(window.parent).height() / 2)
-                        }, 300);
-                    }
-                    else if (e.clientY <= top && $(window.parent).scrollTop() > 0) {
-                        // detect IE8 and above, and edge
-                        if (document.documentMode || /Edge/.test(navigator.userAgent)) {
-                            // activate scrollTop on IE
-                            window.parent.$('html').css({'overflow': 'auto', 'height': 'auto'});
-                        }
-
-                        window.parent.$('html, body').animate({
-                            scrollTop: $(window.parent).scrollTop() - ($(window.parent).height() / 2)
-                        }, 300);
-
+                    if (window.parent.$(".sticky-pageactions")) {
+                        top = $(window.parent).scrollTop() - 130;
                     } else {
-                        window.parent.$('html, body').stop();
+                        top = 0;
                     }
-                } else {
-                    // detect IE8 and above, and edge
-                    if (document.documentMode || /Edge/.test(navigator.userAgent)) {
-                        // activate scrollTop on IE
-                        window.parent.$('html').css({'overflow': 'hidden', 'height': '100%'});
+
+                    // check if there is a plugin being drag
+                    if ($('.ui-sortable-helper') && $('.ui-sortable-helper').length > 0) {
+                        var bottom = $(window.parent).height();
+
+                        // hide plugin panel when dragging a plugin
+                        if ($(".melis-cms-dnd-box").hasClass("show")) {
+                            $(".melis-cms-dnd-box").removeClass("show");
+                        }
+
+
+                        if (e.clientY >= ($(window.parent).scrollTop() + $(window.parent).height() - frameTop)) {
+                            // detect IE8 and above, and edge
+                            if (document.documentMode || /Edge/.test(navigator.userAgent)) {
+                                // activate scrollTop on IE
+                                window.parent.$('html').css({'overflow': 'auto', 'height': 'auto'});
+                            }
+
+                            window.parent.$('html, body').animate({
+                                scrollTop: $(window.parent).scrollTop() + ($(window.parent).height() / 2)
+                            }, 300);
+                        }
+                        else if (e.clientY <= top && $(window.parent).scrollTop() > 0) {
+                            // detect IE8 and above, and edge
+                            if (document.documentMode || /Edge/.test(navigator.userAgent)) {
+                                // activate scrollTop on IE
+                                window.parent.$('html').css({'overflow': 'auto', 'height': 'auto'});
+                            }
+
+                            window.parent.$('html, body').animate({
+                                scrollTop: $(window.parent).scrollTop() - ($(window.parent).height() / 2)
+                            }, 300);
+
+                        } else {
+                            window.parent.$('html, body').stop();
+                        }
+                    } else {
+                        // detect IE8 and above, and edge
+                        if (document.documentMode || /Edge/.test(navigator.userAgent)) {
+                            // activate scrollTop on IE
+                            window.parent.$('html').css({'overflow': 'hidden', 'height': '100%'});
+                        }
                     }
-                }
-            });
+                });
+            } else {
+                $(".melis-cms-dnd-box").removeClass("show");
+            }
         },
         receive: function( event, ui ) {
             if(ui.helper) {
@@ -368,20 +371,29 @@ var melisDragnDrop = (function($, window) {
             var stickyHead = window.parent.$("#"+parent.activeTabId).find(".bg-white.innerAll");
             var widgetHeight = window.parent.$("#"+parent.activeTabId).find(".widget-head.nav");
 
-            // Chrome, Firefox etc browser
-            $(window.parent).scroll(function() {
-                if( (stickyHead.offset().top + stickyHead.height() + 30) >= currentFrame.offset().top ) {
-                    $(".melis-cms-dnd-box").css("top", stickyHead.offset().top - currentFrame.offset().top + stickyHead.height() + 30);
-                    dndHeight = $(window.parent).height() - stickyHead.height() - widgetHeight.height() - 15;
-                    $(".melis-cms-dnd-box").height(dndHeight);
-
+        // Chrome, Firefox etc browser
+        $(window.parent).scroll(function() {
+            if( (stickyHead.offset().top + stickyHead.height() + 30) >= currentFrame.offset().top ) {
+                $(".melis-cms-dnd-box").css("top", stickyHead.offset().top - currentFrame.offset().top + stickyHead.height() + 30);
+                dndHeight = $(window.parent).height() - stickyHead.height() - widgetHeight.height() - 15;
+                $(".melis-cms-dnd-box").height(dndHeight);
+            } else {
+                if( $(window).width() <= 767){
+                    var mobileHeader =(mobileHeader !== 'undefined') ? window.parent.$('body').find("#id_meliscore_header") : '';
+                    if( $(mobileHeader).length ) {
+                        var topPosition = window.parent.$('body').find("#id_meliscore_header").offset().top - currentFrame.offset().top + window.parent.$('body').find("#id_meliscore_header").height() ;
+                        if(topPosition > 0) {
+                            $(".melis-cms-dnd-box").css("top", topPosition );
+                            $(".melis-cms-dnd-box").height($(window.parent).height() - window.parent.$('body').find("#id_meliscore_header").height() - 5);
+                        }
+                    }
                 } else {
                     dndHeight = $(window.parent).height() - currentFrame.offset().top - 5;
                     $(".melis-cms-dnd-box").css("top", 0);
                     $(".melis-cms-dnd-box").height(dndHeight);
                 }
-
-            });
+            }
+        });
 
             // For IE scroll giving different value
             if (window.parent) {

@@ -79,7 +79,7 @@ $(function(){
 		var parentTr = btn.parents("tr");
 		var s301Id = parentTr.attr("id");
 		
-		var oldUrl = $("#tableToolSite301 tr#"+s301Id+" td:nth-child(2)").text();
+		var oldUrl = $("#tableToolSite301 tr#"+s301Id+" td:nth-child(4)").text();
 		if(oldUrl !== ''){
 			window.open(oldUrl,"_blank");
 		}else{
