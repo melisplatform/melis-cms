@@ -364,7 +364,7 @@ var melisDragnDrop = (function($, window) {
             var dndHeight = $(window.parent).height() - currentFrame.offset().top - 5;
             var stickyHead = window.parent.$("#"+parent.activeTabId).find(".bg-white.innerAll");
             var widgetHeight = window.parent.$("#"+parent.activeTabId).find(".widget-head.nav");
-
+            $(".melis-cms-dnd-box").css("height", "100vh" ); // default height
         // Chrome, Firefox etc browser
         $(window.parent).scroll(function() {
             if( (stickyHead.offset().top + stickyHead.height() + 30) >= currentFrame.offset().top ) {
