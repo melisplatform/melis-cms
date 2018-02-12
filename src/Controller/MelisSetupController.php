@@ -26,52 +26,52 @@ class MelisSetupController extends AbstractActionController
 
         $data = $this->getTool()->sanitizeRecursive($this->params()->fromRoute());
 
-        try {
-            $container = new Container('melis_modules_configuration_status');
+   //      try {
+   //          $container = new Container('melis_modules_configuration_status');
            
-			$request = $this->getRequest();
-			$uri     = $request->getUri();
-			$scheme  = $uri->getScheme();
-			$siteDomain = $uri->getHost();
+			// $request = $this->getRequest();
+			// $uri     = $request->getUri();
+			// $scheme  = $uri->getScheme();
+			// $siteDomain = $uri->getHost();
     
-            $cmsSiteSrv = $this->getServiceLocator()->get('MelisCmsSiteService');
-			$environmentName = getenv('MELIS_PLATFORM');
-            $container = new \Zend\Session\Container('melisinstaller');
-            $container = $container->getArrayCopy();
+   //          $cmsSiteSrv = $this->getServiceLocator()->get('MelisCmsSiteService');
+			// $environmentName = getenv('MELIS_PLATFORM');
+   //          $container = new \Zend\Session\Container('melisinstaller');
+   //          $container = $container->getArrayCopy();
 
-            $selectedSite = isset($container['site_module']['site']) ? $container['site_module']['site'] : null;
+   //          $selectedSite = isset($container['site_module']['site']) ? $container['site_module']['site'] : null;
 
-            $environments = isset($container['environments']['new']) ? $container['environments']['new'] : null;
-            $siteId = 1;
+   //          $environments = isset($container['environments']['new']) ? $container['environments']['new'] : null;
+   //          $siteId = 1;
 
-            if ($selectedSite) {
-                if ($selectedSite == 'NewSite') {
+   //          if ($selectedSite) {
+   //              if ($selectedSite == 'NewSite') {
 
-                    $dataSite = array(
-                        'site_name' => isset($container['site_module']['website_name']) ? $container['site_module']['website_name'] : null
-                    );
+   //                  $dataSite = array(
+   //                      'site_name' => isset($container['site_module']['website_name']) ? $container['site_module']['website_name'] : null
+   //                  );
 
-                    $dataDomain = array(
-                        'sdom_env' => $environmentName,
-                        'sdom_scheme' => $scheme,
-                        'sdom_domain' => $siteDomain
-                    );
+   //                  $dataDomain = array(
+   //                      'sdom_env' => $environmentName,
+   //                      'sdom_scheme' => $scheme,
+   //                      'sdom_domain' => $siteDomain
+   //                  );
 
-                    $dataSiteLang = $container['site_module']['language'];
+   //                  $dataSiteLang = $container['site_module']['language'];
 
-                    $genSiteModule = true;
+   //                  $genSiteModule = true;
 
-                    $siteModule = getenv('MELIS_MODULE');
+   //                  $siteModule = getenv('MELIS_MODULE');
 
-                    $saveSiteResult = $cmsSiteSrv->saveSite($dataSite, $dataDomain, array(), $dataSiteLang, null, $genSiteModule, $siteModule);
+   //                  $saveSiteResult = $cmsSiteSrv->saveSite($dataSite, $dataDomain, array(), $dataSiteLang, null, $genSiteModule, $siteModule);
 
-                    if ($saveSiteResult['success']) {
-                        $siteId = $saveSiteResult['site_id'];
-                    }
-                }
-            }
+   //                  if ($saveSiteResult['success']) {
+   //                      $siteId = $saveSiteResult['site_id'];
+   //                  }
+   //              }
+   //          }
 
-            $this->saveCmsSiteDomain($scheme, $siteDomain);
+   //          $this->saveCmsSiteDomain($scheme, $siteDomain);
 
         }
         catch(\Exception $e) {
