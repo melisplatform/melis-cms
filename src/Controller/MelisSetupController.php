@@ -35,8 +35,10 @@ class MelisSetupController extends AbstractActionController
 			$siteDomain = $uri->getHost();
     
             $cmsSiteSrv = $this->getServiceLocator()->get('MelisCmsSiteService');
-
+			$environmentName = getenv('MELIS_PLATFORM');
             $container = new \Zend\Session\Container('melisinstaller');
+            $container = $container->getArrayCopy();
+
             $selectedSite = isset($container['site_module']['site']) ? $container['site_module']['site'] : null;
 
             $environments = isset($container['environments']['new']) ? $container['environments']['new'] : null;
@@ -46,7 +48,7 @@ class MelisSetupController extends AbstractActionController
                 if ($selectedSite == 'NewSite') {
 
                     $dataSite = array(
-                        'site_name' => $selectedSite['cms_data']['web_form']['website_name']
+                        'site_name' => isset($container['site_module']['website_name']) ? $container['site_module']['website_name'] : null
                     );
 
                     $dataDomain = array(
@@ -55,7 +57,7 @@ class MelisSetupController extends AbstractActionController
                         'sdom_domain' => $siteDomain
                     );
 
-                    $dataSiteLang = $selectedSite['cms_data']['web_lang'];
+                    $dataSiteLang = $container['site_module']['language'];
 
                     $genSiteModule = true;
 
