@@ -73,10 +73,10 @@ class MelisSetupController extends AbstractActionController
 
    //          $this->saveCmsSiteDomain($scheme, $siteDomain);
 
-        }
-        catch(\Exception $e) {
-            $errors = $e->getMessage();
-        }
+       // }
+        // catch(\Exception $e) {
+        //     $errors = $e->getMessage();
+        // }
 
 
         $response = array(
