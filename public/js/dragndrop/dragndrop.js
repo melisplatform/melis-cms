@@ -1,11 +1,5 @@
 
 var melisDragnDrop = (function($, window) {
-
-    // cache DOM
-    /*    var currentFrame,
-     dndHeight,
-     stickyHead;*/
-
     var scrollBool = true;
     var centerWindow;
     var scrollH = window.parent.$("body")[0].scrollHeight;
@@ -39,7 +33,6 @@ var melisDragnDrop = (function($, window) {
 
     $(".melis-dragdropzone").sortable({
         connectWith: ".melis-float-plugins",
-        // connectWith: ".melis-draggable, .melis-dragdropzone, .melis-float-plugins",
         connectToSortable: ".melis-float-plugins",
         handle: ".m-move-handle",
         cursor: "move",
@@ -51,18 +44,19 @@ var melisDragnDrop = (function($, window) {
 
         start: function(event, ui) {
             $(".melis-dragdropzone").sortable("refresh");
+
             // hide tinyMCE panel
             $(".mce-tinymce.mce-panel.mce-floatpanel").hide();
+            // highlight dragdropzone
             $(".melis-dragdropzone").addClass("highlight");
             $(".ui-sortable-helper").css("z-index", "9999999");
 
-            // item percentage width
+            // get item percentage width
             var placeholderWidth = ( 100 * parseFloat($(ui.helper[0]).css("width")) / parseFloat($(ui.helper[0]).parent().css('width')) ) + '%';
             $(ui.placeholder[0]).css("width", placeholderWidth);
 
-
+            // detect if browser is in desktop
             if( $(window).width() >= 768) {
-
                 $(window).mousemove(function (e) {
                     var top;
                     var frameTop = window.parent.$("#" + parent.activeTabId).find(".melis-iframe").offset().top + 10;
@@ -370,7 +364,7 @@ var melisDragnDrop = (function($, window) {
             var dndHeight = $(window.parent).height() - currentFrame.offset().top - 5;
             var stickyHead = window.parent.$("#"+parent.activeTabId).find(".bg-white.innerAll");
             var widgetHeight = window.parent.$("#"+parent.activeTabId).find(".widget-head.nav");
-
+            $(".melis-cms-dnd-box").css("height", "100vh" ); // default height
         // Chrome, Firefox etc browser
         $(window.parent).scroll(function() {
             if( (stickyHead.offset().top + stickyHead.height() + 30) >= currentFrame.offset().top ) {
@@ -381,6 +375,7 @@ var melisDragnDrop = (function($, window) {
                 if( $(window).width() <= 767){
                     var mobileHeader =(mobileHeader !== 'undefined') ? window.parent.$('body').find("#id_meliscore_header") : '';
                     if( $(mobileHeader).length ) {
+                        $(".melis-cms-dnd-box").css("height", "100vh" );
                         var topPosition = window.parent.$('body').find("#id_meliscore_header").offset().top - currentFrame.offset().top + window.parent.$('body').find("#id_meliscore_header").height() ;
                         if(topPosition > 0) {
                             $(".melis-cms-dnd-box").css("top", topPosition );
@@ -408,9 +403,6 @@ var melisDragnDrop = (function($, window) {
             }
 
             $(".melis-cms-dnd-box").height(dndHeight);
-        /*} else {
-            console.log('nope', $(currentFrame).length);
-        }*/
     }
     if( $(currentFrame).length ) {
         pluginScrollPos();

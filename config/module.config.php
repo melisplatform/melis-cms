@@ -134,6 +134,7 @@ return array(
             'MelisCms\Controller\FrontPluginsModal' => 'MelisCms\Controller\FrontPluginsModalController',
             'MelisCms\Controller\PageDuplication' => 'MelisCms\Controller\PageDuplicationController',
             'MelisCms\Controller\PageLanguages' => 'MelisCms\Controller\PageLanguagesController',
+            'MelisCms\Controller\MelisSetup' => 'MelisCms\Controller\MelisSetupController',
         ),
     ),
     'form_elements' => array(
