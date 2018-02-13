@@ -127,17 +127,7 @@ class PageEditionController extends AbstractActionController
             'id'      => $uniqueId
         ));
     }
-
     
-    public function testAction()
-    {
-        $container = new Container('meliscms');
-        
-        print_r($container['content-pages']);
-        
-        die();
-    }
-
     /**
      * Saves datas edited in a page and posted to this function
      * Save is made in SESSION.
