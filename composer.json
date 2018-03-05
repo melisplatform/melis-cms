@@ -33,10 +33,9 @@
     "ext-openssl": "*",
     "ext-json": "*",
     "ext-pdo_mysql": "*",
-    "ext-mcrypt": "*",
-    "melisplatform/melis-core": "~2.2.7",
-    "melisplatform/melis-engine": "~2.2.1",
-    "melisplatform/melis-front": "~2.2.1",
+    "melisplatform/melis-core": "^2.3.0",
+    "melisplatform/melis-engine": "^2.3.0",
+    "melisplatform/melis-front": "^2.3.0",
     "justinrainbow/json-schema": "5.2.1"
   },
   "require-dev": {

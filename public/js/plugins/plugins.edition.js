@@ -727,25 +727,6 @@ var melisPluginEdition = (function($, window) {
         }
     }
 
-    // Wrap in Float Box and re init
-    /*function addPluginFloatBox() {
-        var pluginContainerId = getPluginContainerId();
-        var melisIdPage = window.parent.$("#"+parent.activeTabId).find(".melis-iframe").data("iframe-id");
-        var dropzone = $(this).closest(".melis-dragdropzone").data("dragdropzone-id");
-        // generate container
-        $($(this).prev()).wrap('<div id="'+ pluginContainerId +'" class="melis-float-plugins"></div>');
-        $(this).remove();
-        $("#"+pluginContainerId).find(".melis-ui-outlined .melis-plugin-tools-box").attr("data-plugin-container", pluginContainerId);
-
-        $("#"+pluginContainerId).children(".melis-ui-outlined").map(function() {
-            $(this).find(".melis-plugin-tools-box").data("plugin-container", pluginContainerId);
-        });
-
-        // save session
-        sendDragnDropList(dropzone, melisIdPage);
-
-    }*/
-
     // get plugin container id
     function getPluginContainerId() {
         var pluginId = "";
@@ -757,41 +738,6 @@ var melisPluginEdition = (function($, window) {
             error: function(data) { console.log("Error", data); }
         });
         return pluginId;
-    }
-
-    function changeWidth() {
-        var el = $(this).parent();
-        var parentWidth = el.parent().width();
-        var elWidth = el.width();
-        // convert px to percent
-        elWidth = (100 * elWidth / parentWidth);
-        elWidth = elWidth.toFixed(2);
-        var resizeBox = '<div class="ui-resize-input" title="Edit plugin width"><input id="pluginWidthResize" type="text" value="' + elWidth + '"/>% <div>';
-        el.append(resizeBox);
-
-        // get input value when press enter
-        $('#pluginWidthResize').keypress(function (event) {
-            var keycode = (event.keyCode ? event.keyCode : event.which);
-            if (keycode == '13') {
-                var inputVal = $(this).val();
-                if ($.isNumeric(inputVal) && inputVal >= 1 && inputVal <= 100) {
-                    var parent = $(this).parent().closest(".melis-ui-outlined");
-                    parent.css('width', inputVal + '%');
-                    // remove width indicator
-                    $(this).closest(".ui-resize-input").remove();
-                    var toolBox = $(parent).find(".melis-plugin-tools-box");
-
-                    getPluginData(toolBox, inputVal);
-                } else {
-                    $(this).val(parentWidth.css('width'));
-                }
-
-                if ($.isNumeric(inputVal) && inputVal >= 50) {
-                    $(".btn-pulse").remove();
-                }
-            }
-            event.stopPropagation();
-        });
     }
 
     // on load iframe remove child plugin class responsive
@@ -827,31 +773,6 @@ var melisPluginEdition = (function($, window) {
             $(this).css("width", "");
         });
     });
-
-
-
-    /*$(".melis-float-plugins").sortable({
-        connectWith: ".melis-dragdropzone, .melis-float-plugins",
-        connectToSortable: ".melis-dragdropzone",
-        handle: "false",
-        forcePlaceholderSize: false,
-        cursor: "move",
-        cursorAt: { top: 0, left: 0 },
-        zIndex: 999999,
-        placeholder: "ui-state-highlight",
-        tolerance: "pointer",
-        receive: function( event, ui ) {
-            var parentID = $(ui.item[0]).closest(".melis-float-plugins").attr("id");
-            $(ui.item[0]).find(".melis-plugin-tools-box").data("plugin-container", parentID);
-        },
-        stop: function( event, ui ) {
-            calcFrameHeight();
-        },
-        over: function( event, ui ) {
-            var sizeW = $(ui.item[0]).width();
-            $(".melis-float-plugins .ui-state-highlight").width(sizeW).height(40);
-        },
-    }).disableSelection();*/
 
     // init resize
     initResizable(); // disable for now

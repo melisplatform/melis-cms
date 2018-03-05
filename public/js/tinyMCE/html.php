@@ -6,7 +6,7 @@
         'inline' => true,
         'templates' => 'miniTemplates',
         'menubar' => false,
-        'forced_root_block' => 'p',
+        'forced_root_block' => '',
         'cleanup' => false,
         'verify_html' => false,
         'plugins' => array(

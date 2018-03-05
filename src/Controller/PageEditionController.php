@@ -30,6 +30,14 @@ class PageEditionController extends AbstractActionController
 		$idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
     	$melisKey = $this->params()->fromRoute('melisKey', '');
     	
+    	/**
+         * Clearing the session data of the page in every open in page edition
+         */
+        $container = new Container('meliscms');
+        if (!empty($container['content-pages']))
+            if (!empty($container['content-pages'][$idPage]))
+                $container['content-pages'][$idPage] = array();
+    	
     	$melisPage = $this->getServiceLocator()->get('MelisEnginePage');
     	$datasPage = $melisPage->getDatasPage($idPage, 'saved');
     	if($datasPage)
@@ -119,8 +127,7 @@ class PageEditionController extends AbstractActionController
             'id'      => $uniqueId
         ));
     }
-
-
+    
     /**
      * Saves datas edited in a page and posted to this function
      * Save is made in SESSION.

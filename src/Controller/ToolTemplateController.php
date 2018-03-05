@@ -632,15 +632,9 @@ class ToolTemplateController extends AbstractActionController
         
         // make sure that the request is an AJAX call
         if($this->getRequest()->isPost()) {
-            $optionFilter = array();
-            
-            if(!empty($this->getRequest()->getPost('tpl_site_id'))){
-                $optionFilter['tpl_site_id'] = $this->getRequest()->getPost('tpl_site_id');
-            }
-            
-            
-            // get the tool columns
-            $columns = $melisTool->getColumns();
+
+            $siteId = $this->getRequest()->getPost('tpl_site_id');
+            $siteId = !empty($siteId)? $siteId : null;
             
             $colId = array_keys($melisTool->getColumns());
             
@@ -657,28 +651,14 @@ class ToolTemplateController extends AbstractActionController
             
             $search = $this->getRequest()->getPost('search');
             $search = $search['value'];
-            
-            $dataCount = $templatesModel->getTotalData();
-            
-            $dataQuery = array(
-                'where' => array(
-                    'key' => 'tpl_id',
-                    'value' => $search,
-                ),
-                'order' => array(
-                    'key' => $selCol,
-                    'dir' => $sortOrder,
-                ),
-                'start' => $start,
-                'limit' => $length,
-                'columns' => $melisTool->getSearchableColumns(),
-                'date_filter' => array(),
-            );
-            
-            $getData = $templatesModel->getPagedData($dataQuery, null, $optionFilter);
 
+            $dataCount = $templatesModel->getTotalData();
+
+            $getData = $templatesModel->getData($search, $siteId, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length);
             $tableData = $getData->toArray();
-            
+
+
+
             for($ctr = 0; $ctr < count($tableData); $ctr++)
             {
                 // apply text limits
@@ -688,17 +668,13 @@ class ToolTemplateController extends AbstractActionController
                 }
                 
                 $tableData[$ctr]['DT_RowId'] = $tableData[$ctr]['tpl_id'];
-                // instead of showing the Site ID, replace it with Site name
-                $siteData = $tableSite->getEntryById($tableData[$ctr]['tpl_site_id']);
-                $siteText = $siteData->current();
-                $tableData[$ctr]['tpl_site_id'] = !empty($siteText->site_name) ? $siteText->site_name : '';
                 
                 // display controller and action in Controller Column
                 $tableData[$ctr]['tpl_zf2_controller'] = !empty($tableData[$ctr]['tpl_zf2_action']) ? $tableData[$ctr]['tpl_zf2_controller'] . '/' . $tableData[$ctr]['tpl_zf2_action'] : $tableData[$ctr]['tpl_zf2_controller'];
 
             }
         }
-        
+
         return new JsonModel(array(
             'draw' => (int) $draw,
             'recordsTotal' => $dataCount,
@@ -993,6 +969,16 @@ class ToolTemplateController extends AbstractActionController
     
         $searched = $this->getRequest()->getQuery('filter');
         $columns  = $melisTool->getSearchableColumns();
+
+
+        //remove the sitename from the where clause to avoid error since it doesn't exist in the template table
+        for($i = 0; $i < sizeof($columns); $i++)
+        {
+            if($columns[$i] == 'site_name'){
+                unset($columns[$i]);
+            }
+        }
+
         $data = $templatesModel->getDataForExport($searched, $columns);
     
         return $melisTool->exportDataToCsv($data->toArray());

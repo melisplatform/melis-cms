@@ -22,7 +22,7 @@ class MelisCmsPlatformIdListener extends MelisCoreGeneralListener implements Lis
         
         $callBackHandler = $sharedEvents->attach(
         	'MelisCore',
-        	'meliscore_platform_new_end', 
+        	'meliscore_platform_save_end', 
         	function($e){
         		
         		$sm = $e->getTarget()->getServiceLocator();
@@ -33,7 +33,7 @@ class MelisCmsPlatformIdListener extends MelisCoreGeneralListener implements Lis
         		$success = (int) $params['success'];
         		$id      = (int) $params['id'];
         		
-        		if($success == 1) {
+        		if($success == 1 && $params['typeCode'] == 'CORE_PLATFORM_ADD') {
         		    
         		    $data = $platformIdTable->getLastPlatformRange()->current();
         		    
