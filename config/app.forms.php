@@ -55,6 +55,7 @@ return array(
 											'SITE' => 'tr_meliscms_page_tab_properties_form_type_Site',
 											'FOLDER' => 'tr_meliscms_page_tab_properties_form_type_Folder',
 											'PAGE' => 'tr_meliscms_page_tab_properties_form_type_Page',
+											'NEWSLETTER' => 'tr_meliscms_page_tab_properties_form_type_Newsletter',
 										),
 									),
 									'attributes' => array(
@@ -227,7 +228,7 @@ return array(
 									array(
 										'name'    => 'InArray',
 										'options' => array(
-											'haystack' => array('SITE', 'FOLDER', 'PAGE'),
+											'haystack' => array('SITE', 'FOLDER', 'PAGE', 'NEWSLETTER'),
 										    'messages' => array(
 										        \Zend\Validator\InArray::NOT_IN_ARRAY => 'tr_meliscms_page_form_page_type_invalid',
 										    ),

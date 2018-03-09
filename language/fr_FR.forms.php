@@ -15,6 +15,7 @@
 		'tr_meliscms_page_tab_properties_form_type_Site' => 'Site',
 		'tr_meliscms_page_tab_properties_form_type_Folder' => 'Dossier',
 		'tr_meliscms_page_tab_properties_form_type_Page' => 'Page',
+		'tr_meliscms_page_tab_properties_form_type_Newsletter' => 'Newsletter',
 		'tr_meliscms_page_tab_properties_form_Status' => 'Statut',
 		'tr_meliscms_page_tab_properties_form_status_Online' => 'En ligne',
 		'tr_meliscms_page_tab_properties_form_status_Offline' => 'Hors ligne',
