@@ -9,7 +9,7 @@
 
 return array(
     'router' => array(
-        'SiteSample' => array(
+        'routes' => array(
         	'SiteSample-home' => array(
 				'type'    => 'regex',
 				'options' => array(
