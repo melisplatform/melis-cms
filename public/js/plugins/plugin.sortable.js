@@ -37,9 +37,6 @@ var melisPluginSortable = (function($, window) {
 
 	$("body").on("click", ".m-options-handle", function() {
 		window.fromdragdropzone = $(this).closest(".melis-plugin-tools-box").data("melis-fromdragdropzone");
-		// Need a callback to load showModalSlider
-		setTimeout(function(){ checkedModalSlider(); }, 2000);
-
 	});
 
 	var modalUl;
@@ -53,45 +50,69 @@ var melisPluginSortable = (function($, window) {
 	var maxPosNext;
 
 	function checkedModalSlider() {
-		modalUl = window.parent.$("body #id_meliscms_plugin_modal .melis-whead-box .nav.nav-tabs");
-	    var modalNavContainer = 0;
-	    modalContainerWidth = window.parent.$("#id_meliscms_plugin_modal").outerWidth();
+		// check jquery available
+		if(jQuery) {
+			// nav ul
+			modalUl = window.parent.$("body #id_meliscms_plugin_modal .melis-whead-box .nav.nav-tabs");
 
-	    var minSize = 150;
-	    var maxSize = 225;
-	    var modalTabs = window.parent.$("body #id_meliscms_plugin_modal .melis-whead-box .nav.nav-tabs li");
-	    var tabLength = modalTabs.length;
-	    var tabSize = tabLength * maxSize;
-	    maxPosNext = tabSize / tabLength;
+		    // modal width
+		    modalContainerWidth = window.parent.$("#id_meliscms_plugin_modal").outerWidth();
 
-	    window.parent.$("body #id_meliscms_plugin_modal .melis-whead-box .nav.nav-tabs li").each(function() {
-	        modalNavContainer += $(this).outerWidth();
-	        var el = $(this).outerWidth();
-	        maxLiWidth = Math.max(maxLiWidth, el);
-	    });
-	    if(modalNavContainer > modalContainerWidth) {
-	    	modalTabs.width(minSize);
-			window.parent. $("body #id_meliscms_plugin_modal .melis-whead-box .nav.nav-tabs").width(tabSize);
-			window.parent.$("body #id_meliscms_plugin_modal .melis-whead-box").width(modalContainerWidth - 50);
-			window.parent.$("body .widget-melis-tabprev").addClass("active");
-			window.parent.$("body .widget-melis-tabnext").addClass("active");
+		    // set default value
+		    var modalNavContainer = 0;
+		    var minSize = 150;
+		    var maxSize = 225;
 
-	    } else {
-			window.parent.$("body .widget-melis-tabprev, .widget-melis-tabnext").removeClass("active");
-			window.parent.$("body #id_meliscms_plugin_modal .melis-whead-box").width(modalContainerWidth);
-	    }
+		    // Nav li items
+		    var modalTabs = window.parent.$("body #id_meliscms_plugin_modal .melis-whead-box .nav.nav-tabs li");
+		    // get nav length
+		    var tabLength = modalTabs.length;
+		    // set li width
+		    var tabSize = tabLength * maxSize;
+
+		    maxPosNext = tabSize / tabLength;
+
+		    // get total li width
+		    window.parent.$("body #id_meliscms_plugin_modal .melis-whead-box .nav.nav-tabs li").each(function() {
+		        modalNavContainer += $(this).outerWidth();
+		    });
+
+
+		    // check if nav li width > ul container
+		    if(modalNavContainer > modalContainerWidth) {
+		    	// set nav tab width
+		    	modalTabs.width(minSize);
+
+		    	// set nav tab ul container width
+				window.parent. $("body #id_meliscms_plugin_modal .melis-whead-box .nav.nav-tabs").width(tabSize);
+
+				// set nav container width "overflow hidden"
+				window.parent.$("body #id_meliscms_plugin_modal .melis-whead-box").width(modalContainerWidth - 50);
+
+				// show tab slider navigation
+				window.parent.$("body .widget-melis-tabprev").addClass("active");
+				window.parent.$("body .widget-melis-tabnext").addClass("active");
+
+		    } else {
+		    	// hide tab slider nav
+				window.parent.$("body .widget-melis-tabprev, .widget-melis-tabnext").removeClass("active");
+				// set nav container width
+				window.parent.$("body #id_meliscms_plugin_modal .melis-whead-box").width(modalContainerWidth);
+		    }
+		}
+
 
 	}
 
 	function modalSlideNext() {
     	if(modalUl) {
+    		// Left Position of parent ul
  	    	var posLeft = Math.abs(modalUl.position().left);
 	    	if(posLeft >= 25 && posLeft <= maxPosNext + 50) {
 	    		modalUl.finish().animate({
 		    		'left': '-=150',
 		    	}, 300);
-	    	}
-    	}
+	    	}    	}
 	}
 
 	function modalSlidePrev() {
@@ -120,4 +141,5 @@ var melisPluginSortable = (function($, window) {
     return {
     	checkedModalSlider 			: 		checkedModalSlider
     }
+    
  })(jQuery, window);

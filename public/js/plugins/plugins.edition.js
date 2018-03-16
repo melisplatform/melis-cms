@@ -570,8 +570,14 @@ var melisPluginEdition = (function($, window) {
                 window.parent.$('body').css('overflow', 'hidden');
                 setTimeout(function() {
                     window.parent.$('html, body').scrollTop(optionHandleT);
+
                 }, 300);
+
             }
+            
+            setTimeout(function() {
+                    melisPluginSortable.checkedModalSlider();
+            }, 300);
         });
     }
 
