@@ -407,7 +407,7 @@
 	    'tr_meliscms_tool_style_id tooltip' => 'Identifiant du style',
 	    'tr_meliscms_tool_style_name' => 'Nom',
 	    'tr_meliscms_tool_style_name_properties' => 'Nom du style',
-	    'tr_meliscms_tool_style_name tooltip' => 'Nom du style',
+	    'tr_meliscms_tool_style_name tooltip' => 'Le nom de la feuille de style',
 	    'tr_meliscms_tool_style_page_id' => 'Page ID',
 	    'tr_meliscms_tool_style_page_id tooltip' => ' Tooltip Page ID',
 	    'tr_meliscms_tool_style_page_status' => 'Statut',

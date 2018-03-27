@@ -29,12 +29,12 @@ class TemplateSelectFactory extends MelisSelectFactory
 		$valueoptions = array();
 		
 		$valueoptions[-1] = $translator->translate('tr_meliscms_page_tab_properties_form_Template_None');
-		
+
 		$max = $templates->count();
 		for ($i = 0; $i < $max; $i++)
 		{
 			$tpl = $templates->current();
-			$valueoptions[$tpl->tpl_id] = $tpl->tpl_name . ' (' . $tpl->tpl_id . ')';
+			$valueoptions[$tpl->tpl_id] = $tpl->tpl_zf2_website_folder . ' - ' . $tpl->tpl_name . ' (' . $tpl->tpl_id . ')';
 			$templates->next();
 		}
 
