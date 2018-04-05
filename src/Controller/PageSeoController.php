@@ -129,11 +129,16 @@ class PageSeoController extends AbstractActionController
 		$request = $this->getRequest();
 		if ($request->isPost())
 		{
-			// Get values posted and set them in form
-			$postValues = get_object_vars($request->getPost());
-			$seoForm->setData($postValues);
+            // Get values posted and set them in form
+            $postValues = get_object_vars($request->getPost());
 
-			// Validate the form 
+            if (!empty($postValues['pseo_url'])) {
+                $postValues['pseo_url'] =  $this->cleanURL($postValues['pseo_url']);
+            }
+
+            $seoForm->setData($postValues);
+
+            // Validate the form
 			if ($seoForm->isValid())
 			{
 				// Get datas validated
@@ -285,5 +290,15 @@ class PageSeoController extends AbstractActionController
 		return new JsonModel($result);
 	}
 
+    /**
+     * Rids the URL from special characters
+     * @param string $url
+     * @return mixed
+     */
+    private function cleanURL(string $url = '')
+    {
+        $url = str_replace(' ', '-', $url); 				// Replaces all spaces with hyphens
 
+        return preg_replace('/[^A-Za-z0-9\-]/', '-', $url);	// Replaces special characters with hyphens
+    }
 }
