@@ -32,7 +32,7 @@ var melisDragnDrop = (function($, window) {
     });
 
     $(".melis-dragdropzone").sortable({
-        connectWith: ".melis-float-plugins",
+        connectWith: ".melis-float-plugins, .melis-dragdropzone",
         connectToSortable: ".melis-float-plugins",
         handle: ".m-move-handle",
         cursor: "move",
