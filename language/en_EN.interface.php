@@ -180,7 +180,8 @@
 	    'tr_meliscms_menu_dupe' => 'Duplicate tree',
 	    'tr_meliscms_menu_dupe_fail' => 'Failed to duplicate page tree',
 	    'tr_meliscms_menu_dupe_success' => 'Page tree has been duplicated successfully',
-	    'tr_meliscms_menu_dupe_destination_fail' => 'The destination page doesn&#39;t exist',
+        'tr_meliscms_menu_dupe_page_relation_fail' => 'conflict in duplicating new page language of',
+        'tr_meliscms_menu_dupe_destination_fail' => 'The destination page doesn&#39;t exist',
 	    'tr_meliscms_menu_dupe_source_fail' => 'The source page doesn&#39;t exist',
 	    'tr_meliscms_tree_sites_duplication_source' => 'Source page ID',
 	    'tr_meliscms_tree_sites_duplication_source tooltip' => 'Identifier of the page tree to be duplicated',
@@ -385,8 +386,11 @@
         'tr_meliscms_duplicate_error' => 'Unable to duplicate page',
         'tr_melis_cms_duplicate_success' => 'Page "%s" successfully duplicated',
         'tr_melis_cms_duplicate_text_identifier' => '[Duplicated]',
-	    
-	    // plugins edition
+        'tr_meliscms_tree_sites_duplication_page_relation' => 'Relation avec une page initiale',
+        'tr_meliscms_tree_sites_duplication_page_relation tooltip' => 'Permer de créer une page en relation avec une page initiale',
+
+
+        // plugins edition
 	    'tr_meliscms_plugins_modal_cancel' => 'Cancel',
 	    'tr_meliscms_plugins_modal_apply' => 'Apply',
 	    
@@ -398,10 +402,10 @@
 	    'tr_meliscore_tool_styles_new' => 'New style',
 	    'tr_meliscore_tool_styles_edit' => 'Edit style',
 	    'tr_meliscms_tool_style_id' => 'ID',
-	    'tr_meliscms_tool_style_id tooltip' => 'Style identifier',
+	    'tr_meliscms_tool_style_id tooltip' => 'Style identifie',
 	    'tr_meliscms_tool_style_name' => 'Name',
 	    'tr_meliscms_tool_style_name_properties' => 'Style name',
-	    'tr_meliscms_tool_style_name tooltip' => 'The name of the stylesheet',
+	    'tr_meliscms_tool_style_name tooltip' => 'ID tooltip',
 	    'tr_meliscms_tool_style_page_id' => 'Page ID',
 	    'tr_meliscms_tool_style_page_id tooltip' => ' Tooltip Page ID',
 	    'tr_meliscms_tool_style_page_status' => 'Status',

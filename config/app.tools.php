@@ -2391,6 +2391,19 @@ return array(
                                 ),
                                 array(
                                     'spec' => array(
+                                        'name' => 'pageRelation',
+                                        'type' => 'checkbox',
+                                        'options' => array(
+                                            'label' => 'tr_meliscms_tree_sites_duplication_page_relation',
+                                            'tooltip' => 'tr_meliscms_tree_sites_duplication_page_relation tooltip',
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'pageRelation',
+                                        ),
+                                    ),
+                                ),
+                                array(
+                                    'spec' => array(
                                         'name' => 'destinationPageId',
                                         'type' => 'MelisText',
                                         'options' => array(
@@ -2405,6 +2418,7 @@ return array(
                                         ),
                                     ),
                                 ),
+
                             ),
                             'input_filter' => array(
                                 'sourcePageId' => array(

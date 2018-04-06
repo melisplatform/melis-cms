@@ -186,7 +186,8 @@
 	    'tr_meliscms_menu_dupe_fail' => 'Echec de la duplication de l&#39;arborescence',
 	    'tr_meliscms_menu_dupe_success' => 'L&#39;arborescence a été dupliquée avec succès',
 	    'tr_meliscms_menu_dupe_destination_fail' => 'La page de destination n&#39;existe pas',
-	    'tr_meliscms_menu_dupe_source_fail' => 'La page d&#39;origine n&#39;existe pas',
+        'tr_meliscms_menu_dupe_page_relation_fail' => 'conflit dans la duplication de la nouvelle langue de page de',
+        'tr_meliscms_menu_dupe_source_fail' => 'La page d&#39;origine n&#39;existe pas',
 	    'tr_meliscms_tree_sites_duplication_source' => 'ID page d&#39;origine',
 	    'tr_meliscms_tree_sites_duplication_source tooltip' => 'Identifiant de la page de l&#39;arborescence à dupliquer',
 	    'tr_meliscms_tree_sites_duplication_destination' => 'ID page de destination',
@@ -391,8 +392,10 @@
         'tr_meliscms_duplicate_error' => 'Impossible de dupliquer la page',
         'tr_melis_cms_duplicate_success' => 'Page "%s" dupliquée avec succès',
         'tr_melis_cms_duplicate_text_identifier' => '[Dupliquée]',
-	    
-	    // plugins edition
+        'tr_meliscms_tree_sites_duplication_page_relation' => 'Relation avec une page initiale',
+        'tr_meliscms_tree_sites_duplication_page_relation tooltip' => 'Permer de créer une page en relation avec une page initiale',
+
+        // plugins edition
 	    'tr_meliscms_plugins_modal_cancel' => 'Annuler',
 	    'tr_meliscms_plugins_modal_apply' => 'Appliquer',
 	    
@@ -407,7 +410,7 @@
 	    'tr_meliscms_tool_style_id tooltip' => 'Identifiant du style',
 	    'tr_meliscms_tool_style_name' => 'Nom',
 	    'tr_meliscms_tool_style_name_properties' => 'Nom du style',
-	    'tr_meliscms_tool_style_name tooltip' => 'Le nom de la feuille de style',
+	    'tr_meliscms_tool_style_name tooltip' => 'Nom du style',
 	    'tr_meliscms_tool_style_page_id' => 'Page ID',
 	    'tr_meliscms_tool_style_page_id tooltip' => ' Tooltip Page ID',
 	    'tr_meliscms_tool_style_page_status' => 'Statut',
