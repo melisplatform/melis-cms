@@ -8,12 +8,22 @@ $(document).ready(function() {
         modalUrl = 'melis/MelisCms/Page/renderPageModal';
         
         meliscmsSiteSelectorInputDom = $(this).parents(".input-group").find("input");
-        
+
+		// remove last modal prevent from appending infinitely
+        $("body").on('hide.bs.modal', "#id_meliscms_page_tree_id_selector_container", function () {
+            $("#id_meliscms_page_tree_id_selector_container").remove();
+            if($("body").find(".modal-backdrop").length == 2) {
+                $("body").find(".modal-backdrop").last().remove();
+            }
+        });
+
         melisHelper.createModal(zoneId, melisKey, false, {}, modalUrl, function(){
         	// Removing Content menu of Fancytree
     		$.contextMenu("destroy", ".fancytree-title");
         });
 	});
+
+
 	
 	addEvent("#selectPageId", function(){
         
