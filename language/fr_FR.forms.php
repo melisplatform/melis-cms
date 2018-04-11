@@ -37,7 +37,7 @@
 		'tr_meliscms_page_tab_properties_form_Creation date tooltip' => 'Date à laquelle la page a été créée',
 		'tr_meliscms_page_tab_properties_form_submittext_Save' => 'Sauvegarder',
 // 	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomie',
-	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomie * <i class="fa fa-info-circle fa-lg" data-toggle="tooltip" data-placement="left" title="" data-original-title="Saisissez les termes pour classer votre page. Séparez chaque terme par une virgule"></i>',
+	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomie  <i class="fa fa-info-circle fa-lg" data-toggle="tooltip" data-placement="left" title="" data-original-title="Saisissez les termes pour classer votre page. Séparez chaque terme par une virgule"></i>',
 	    'tr_meliscms_page_tab_properties_form_taxonomy_placeholder' => 'Séparer les mots clefs avec une virgule',
 	    'tr_meliscms_page_tab_properties_form_taxonomy_placeholder tooltip' => 'Saisissez les termes pour classer votre page. Séparez chaque terme par une virgule',
 		'tr_meliscms_tool_style_name_properties tooltip' => 'Sélectionnez un style à ajouter à votre page parmi les styles créés depuis l&#39;outil &#34;Styles&#34;', 	
