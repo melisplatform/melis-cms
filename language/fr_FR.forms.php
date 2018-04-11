@@ -51,9 +51,9 @@
 		'tr_meliscms_page_tab_seo_form_Url' => 'URL',
 		'tr_meliscms_page_tab_seo_form_Url tooltip' => 'URL de la page',
 		'tr_meliscms_page_tab_seo_form_Url Redirect' => 'URL redirection',
-		'tr_meliscms_page_tab_seo_form_Url Redirect tooltip' => 'URL de redirection de la page si celle-ci est publiée. Pour une page interne saisir son ID ou son URL, pour une page externe saisir l&#39;URL complète avec le http://',
+		'tr_meliscms_page_tab_seo_form_Url Redirect tooltip' => 'URL de redirection de la page si celle-ci est publiée. Pour une page interne saisir son URL, pour une page externe saisir l&#39;URL complète avec le http://',
 		'tr_meliscms_page_tab_seo_form_Url 301' => 'URL 301',
-		'tr_meliscms_page_tab_seo_form_Url 301 tooltip' => 'URL de redirection de la page si celle-ci est dépubliée. Pour une page interne saisir son ID ou son URL, pour une page externe saisir l&#39;URL complète avec le http://',
+		'tr_meliscms_page_tab_seo_form_Url 301 tooltip' => 'URL de redirection de la page si celle-ci est dépubliée. Pour une page interne saisir son URL, pour une page externe saisir l&#39;URL complète avec le http://',
 			
 			
 	    // page prompts
