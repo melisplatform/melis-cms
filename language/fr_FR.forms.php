@@ -37,7 +37,7 @@
 		'tr_meliscms_page_tab_properties_form_Creation date tooltip' => 'Date à laquelle la page a été créée',
 		'tr_meliscms_page_tab_properties_form_submittext_Save' => 'Sauvegarder',
 // 	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomie',
-	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomie * <i class="fa fa-info-circle fa-lg" data-toggle="tooltip" data-placement="left" title="" data-original-title="Saisissez les termes pour classer votre page. Séparez chaque terme par une virgule"></i>',
+	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomie  <i class="fa fa-info-circle fa-lg" data-toggle="tooltip" data-placement="left" title="" data-original-title="Saisissez les termes pour classer votre page. Séparez chaque terme par une virgule"></i>',
 	    'tr_meliscms_page_tab_properties_form_taxonomy_placeholder' => 'Séparer les mots clefs avec une virgule',
 	    'tr_meliscms_page_tab_properties_form_taxonomy_placeholder tooltip' => 'Saisissez les termes pour classer votre page. Séparez chaque terme par une virgule',
 		'tr_meliscms_tool_style_name_properties tooltip' => 'Sélectionnez un style à ajouter à votre page parmi les styles créés depuis l&#39;outil &#34;Styles&#34;', 	
@@ -51,9 +51,9 @@
 		'tr_meliscms_page_tab_seo_form_Url' => 'URL',
 		'tr_meliscms_page_tab_seo_form_Url tooltip' => 'URL de la page',
 		'tr_meliscms_page_tab_seo_form_Url Redirect' => 'URL redirection',
-		'tr_meliscms_page_tab_seo_form_Url Redirect tooltip' => 'URL de redirection de la page si celle-ci est publiée. Pour une page interne saisir son ID ou son URL, pour une page externe saisir l&#39;URL complète avec le http://',
+		'tr_meliscms_page_tab_seo_form_Url Redirect tooltip' => 'URL de redirection de la page si celle-ci est publiée. Pour une page interne saisir son URL, pour une page externe saisir l&#39;URL complète avec le http://',
 		'tr_meliscms_page_tab_seo_form_Url 301' => 'URL 301',
-		'tr_meliscms_page_tab_seo_form_Url 301 tooltip' => 'URL de redirection de la page si celle-ci est dépubliée. Pour une page interne saisir son ID ou son URL, pour une page externe saisir l&#39;URL complète avec le http://',
+		'tr_meliscms_page_tab_seo_form_Url 301 tooltip' => 'URL de redirection de la page si celle-ci est dépubliée. Pour une page interne saisir son URL, pour une page externe saisir l&#39;URL complète avec le http://',
 			
 			
 	    // page prompts
