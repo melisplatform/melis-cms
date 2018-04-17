@@ -75,12 +75,14 @@ var melisPluginSortable = (function($, window) {
 			window.parent.$("body #id_meliscms_plugin_modal .melis-whead-box").width(modalContainerWidth - 50);
 			window.parent.$("body .widget-melis-tabprev").addClass("active");
 			window.parent.$("body .widget-melis-tabnext").addClass("active");
-
 	    } else {
-			window.parent.$("body .widget-melis-tabprev, .widget-melis-tabnext").removeClass("active");
-			window.parent.$("body #id_meliscms_plugin_modal .melis-whead-box").width(modalContainerWidth);
+            window.parent.$("body .widget-melis-tabprev, .widget-melis-tabnext").removeClass("active");
+	    	if(modalNavContainer == 0) {
+                window.parent.$("body #id_meliscms_plugin_modal .melis-whead-box").css({"width": "auto"});
+            } else {
+                window.parent.$("body #id_meliscms_plugin_modal .melis-whead-box").width(modalContainerWidth);
+			}
 	    }
-
 	}
 
 	function modalSlideNext() {
