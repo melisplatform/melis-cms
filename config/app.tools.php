@@ -55,6 +55,13 @@ return array(
                                 'sortable' => true,
 
                             ),
+                            
+                            'tpl_status' => array(
+                                'text' => 'tr_meliscms_tool_templates_tpl_status',
+                                'css' => array('width' => '5%', 'padding-right' => '0'),
+                                'sortable' => true,
+
+                            ),
 
                             'site_name' => array(
                                 'text' => 'tr_meliscms_tool_templates_tpl_site_id',
