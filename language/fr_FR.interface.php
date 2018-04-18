@@ -106,10 +106,9 @@
 	    'tr_meliscms_tool_templates_text_info' => 'Gérez ici les templates associés à chaque site et déclarez les fichiers physiques qui les représentent.',
 	    
 	    'tr_meliscms_tool_templates_tpl_id' => 'ID',
+	    'tr_meliscms_tool_templates_tpl_status' => 'Status',
 	    'tr_meliscms_tool_templates_tpl_site_id' => 'Site',
-
 	    'tr_meliscms_tool_templates_tpl_site_id tooltip' => 'Choix du site associé au template',
-
 	    'tr_meliscms_tool_templates_tpl_site site' => 'Site',
 	    'tr_meliscms_tool_templates_tpl_site_text' => 'Gérez ici les sites de la plateforme ainsi que leurs domaines associés, page d\'accueil et page 404',
 	    'tr_meliscms_tool_templates_tpl_name' => 'Nom',
@@ -122,7 +121,7 @@
 	    'tr_meliscms_tool_templates_tpl_creation_date' => 'Date de création',
 	    'tr_meliscms_tool_templates_tpl_last_user_id' => 'Id User',
 	    'tr_meliscms_tool_templates_tpl_label_choose' => 'Choisir',
-	     
+	
 	    'tr_tool_templates_modal_tab_header' => 'Gestion des templates',
 	    'tr_tool_templates_modal_tab_text_add' => 'Templates',
 	    'tr_tool_templates_modal_tab_text_edit' => 'Editer un template',
