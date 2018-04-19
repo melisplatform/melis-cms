@@ -179,6 +179,22 @@ return array(
     					            ),
     					        ),
 					       ),
+                            array(
+                                'spec' => array(
+                                    'name' => 'page_search_type',
+//                                    'type' => 'Zend\Form\Element\Select',
+                                    'type' => 'MelisCmsStyleSelect',
+                                    'options' => array(
+                                        'label' => 'tr_meliscms_page_tab_properties_search_type',
+                                        'tooltip' => 'tr_meliscms_page_tab_properties_search_type tooltip',
+                                        'value_options' => array(
+                                            'tr_meliscms_page_tab_properties_search_type_option1' => 'tr_meliscms_page_tab_properties_search_type_option1',
+                                            'tr_meliscms_page_tab_properties_search_type_option2' => 'tr_meliscms_page_tab_properties_search_type_option2',
+                                            'tr_meliscms_page_tab_properties_search_type_option3' => 'tr_meliscms_page_tab_properties_search_type_option3',
+                                        ),
+                                    ),
+                                ),
+                            ),
 						),
 						'input_filter' => array(      
 							'page_id' => array(

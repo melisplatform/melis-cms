@@ -207,7 +207,13 @@
 	    'tr_meliscms_tool_style_page_id_too_long' => 'Page ID is too long',
 	    'tr_meliscms_tool_style_page_is_empty' => 'The input is required and can&#39;t be empty',
 	    'tr_meliscms_tree_sites_duplication_use_root' => 'Root',
-	    
-	    
+
+	    'tr_meliscms_page_tab_properties_search_type'         => 'Search options',
+	    'tr_meliscms_page_tab_properties_search_type tooltip' => 'Select search option for indexing',
+	    'tr_meliscms_page_tab_properties_search_type_option1' => 'Yes, with subpages',
+	    'tr_meliscms_page_tab_properties_search_type_option2' => 'Yes, without subpages',
+	    'tr_meliscms_page_tab_properties_search_type_option3' => 'No',
+
+
 	);
 ?>
