@@ -71,7 +71,6 @@ return array(
 			'conf' => array(
 				'id' => 'id_melis_cms',
 				'name' => 'tr_meliscms_meliscms',
-// 			    'rightsDisplay' => 'none',
 			),
 			'ressources' => array(
 				'js' => array(
