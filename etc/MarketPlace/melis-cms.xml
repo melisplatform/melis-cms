@@ -1,0 +1,79 @@
+<melis-cms>
+	<package_info>
+		<mp_title>Melis Cms</mp_title>
+		<mp_subtitle>The module that brings you page's edition and plugins to create and administrate your website.</mp_subtitle>
+		<mp_description>
+			MelisCms is the website manager of Melis Platform.<br />
+			It will bring everything needed to create and manage a website:<br />
+			- a treeview of pages to have a easy view on all pages, combined with a quick page search tool<br />
+			- a fully wysiwyg templating system, where the page is displayed just as what people see online<br />
+			- a plugin system to create pages from scratch and make it available to non technical persons<br />
+			- a SEO management system to deal with URLs<br />
+			- a language tool to associate same pages in different languages versions<br />
+			- a tool to declare a website, its domain, its homepage, its 404<br />
+			- a tool to deal with 301 links and any redirection, ideal when migrating a website<br />
+			- a tool to declare templates and stylesheets<br />
+			- a tool to create new languages for the front-office<br />
+			- a tool that enable page Ids management per platform, so that Ids are different from one environment to another and production deployment easier
+		</mp_description>
+		<mp_maintainers>melisplatform</mp_maintainers>
+		<mp_group>Melis Cms</mp_group>
+	</package_info>
+	<package_images>
+		<img_1>
+			<mpi_image_title>MelisCms's page edition </mpi_image_title>
+			<mpi_image_file>melis-cms_1.JPG</mpi_image_file>
+			<mpi_image_main>1</mpi_image_main>
+		</img_1>
+		<img_2>
+			<mpi_image_title>MelisCms's page properties</mpi_image_title>
+			<mpi_image_file>melis-cms_2.JPG</mpi_image_file>
+			<mpi_image_main>0</mpi_image_main>
+		</img_2>
+		<img_3>
+			<mpi_image_title>MelisCms's page SEO</mpi_image_title>
+			<mpi_image_file>melis-cms_3.JPG</mpi_image_file>
+			<mpi_image_main>0</mpi_image_main>
+		</img_3>
+		<img_4>
+			<mpi_image_title>MelisCms's page language association</mpi_image_title>
+			<mpi_image_file>melis-cms_4.JPG</mpi_image_file>
+			<mpi_image_main>0</mpi_image_main>
+		</img_4>
+		<img_5>
+			<mpi_image_title>MelisCms's plugin toolbar</mpi_image_title>
+			<mpi_image_file>melis-cms_5.JPG</mpi_image_file>
+			<mpi_image_main>0</mpi_image_main>
+		</img_5>
+		<img_6>
+			<mpi_image_title>MelisCms's plugin drag'n'drop</mpi_image_title>
+			<mpi_image_file>melis-cms_6.JPG</mpi_image_file>
+			<mpi_image_main>0</mpi_image_main>
+		</img_6>
+		<img_7>
+			<mpi_image_title>MelisCms's wysiwyg edition</mpi_image_title>
+			<mpi_image_file>melis-cms_7.JPG</mpi_image_file>
+			<mpi_image_main>0</mpi_image_main>
+		</img_7>
+		<img_8>
+			<mpi_image_title>MelisCms's mobile edition and visualization</mpi_image_title>
+			<mpi_image_file>melis-cms_8.JPG</mpi_image_file>
+			<mpi_image_main>0</mpi_image_main>
+		</img_8>
+		<img_9>
+			<mpi_image_title>MelisCms's media library</mpi_image_title>
+			<mpi_image_file>melis-cms_8.JPG</mpi_image_file>
+			<mpi_image_main>0</mpi_image_main>
+		</img_9>
+		<img_10>
+			<mpi_image_title>MelisCms's template manager tool</mpi_image_title>
+			<mpi_image_file>melis-cms_10.JPG</mpi_image_file>
+			<mpi_image_main>0</mpi_image_main>
+		</img_10>
+		<img_11>
+			<mpi_image_title>MelisCms's site tool edition</mpi_image_title>
+			<mpi_image_file>melis-cms_11.JPG</mpi_image_file>
+			<mpi_image_main>0</mpi_image_main>
+		</img_11>
+	</package_images>
+</melis-cms>
