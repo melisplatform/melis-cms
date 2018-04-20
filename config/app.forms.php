@@ -135,6 +135,21 @@ return array(
 									),
 								),
 							),
+                            array(
+                                'spec' => array(
+                                    'name' => 'style_id',
+                                    'type' => 'MelisCmsStyleSelect',
+                                    'options' => array(
+                                        'label' => 'tr_meliscms_tool_style_name_properties',
+                                        'tooltip' => 'tr_meliscms_tool_style_name_properties tooltip',
+                                        'empty_option' => 'tr_meliscms_form_common_Choose',
+                                        'disable_inarray_validator' => true,
+                                    ),
+                                    'attributes' => array(
+                                        'id' => 'id_page_style_id',
+                                    ),
+                                ),
+                            ),
 							array(
 								'spec' => array(
 									'name' => 'page_creation_date',
@@ -164,21 +179,6 @@ return array(
     					            ),
     					        ),
     					    ),
-    					    array(
-    					        'spec' => array(
-    					            'name' => 'style_id',
-    					            'type' => 'MelisCmsStyleSelect',
-    					            'options' => array(
-    					                'label' => 'tr_meliscms_tool_style_name_properties',
-    					                'tooltip' => 'tr_meliscms_tool_style_name_properties tooltip',
-    					                'empty_option' => 'tr_meliscms_form_common_Choose',
-    					                'disable_inarray_validator' => true,
-    					            ),
-    					            'attributes' => array(
-    					                'id' => 'id_page_style_id',
-    					            ),
-    					        ),
-					       ),
                             array(
                                 'spec' => array(
                                     'name' => 'page_search_type',
