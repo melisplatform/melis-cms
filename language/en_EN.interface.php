@@ -298,7 +298,7 @@
 	    'tr_meliscms_tool_platform_pids_tpl_id_current tooltip' => 'The next template created on the selected platform will have this identifier',
 	    'tr_meliscms_tool_platform_pids_tpl_id_end' => 'Template ID end',
 	    'tr_meliscms_tool_platform_pids_tpl_id_end tooltip' => 'The pages identifiers end at this identifier for the selected platform',
-	    'tr_meliscms_tool_platform_ids_btn_add' => 'Add a range of ID\'s',
+	    'tr_meliscms_tool_platform_ids_btn_add' => 'Add a range of IDs',
 	    'tr_meliscms_tool_platform_ids_btn_edit' => 'Update a range of ID\'s',
 	    'tr_meliscms_tool_platform_pids_name_empty' => 'Choose platform',
 	    'tr_meliscms_tool_platform_ids_table' => 'Table',
