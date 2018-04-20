@@ -812,14 +812,21 @@ var melisCmsFormHelper = (function($, window) {
         if(!closeByButtonOnly) closeByButtonOnly = true;
         var closeByButtonOnly = ( closeByButtonOnly !== true ) ?  'overlay-hideonclick' : '';
         var errorTexts = '';
+
         $.each(errors, function(idx, errorData) {
             if(errorData['success'] === false) {
+                errorTexts += '<div class="row">';
                 errorTexts += '<h3>'+ (errorData['name']) +'</h3>';
                 errorTexts +='<h4>'+ (errorData['message']) +'</h4>';
                 highlightMultiErrors(errorData['success'], errorData['errors']);
+
                 $.each( errorData['errors'], function( key, error ) {
                     if(key !== 'label'){
-                        errorTexts += '<p class="modal-error-cont"><b>'+ (( error['label'] == undefined ) ? ((error['label']== undefined) ? key : errors['label'] ) : error['label'] )+ ': </b>  ';
+                        errorTexts += '<div class="col-xs-12 col-sm-5">';
+                        errorTexts += '  <b>'+ (( error['label'] == undefined ) ? ((error['label']== undefined) ? key : errors['label'] ) : error['label'] ) +'</b>';
+                        errorTexts += '</div>';
+                        errorTexts += '<div class="col-xs-12 col-sm-7">';
+                        errorTexts += ' <div class="modal-error-container">';
                         // catch error level of object
                         try {
                             $.each( error, function( key, value ) {
@@ -830,22 +837,29 @@ var melisCmsFormHelper = (function($, window) {
                                     }else{
                                         $errMsg = value;
                                     }
-                                    errorTexts += '<span><i class="fa fa-circle"></i>'+ $errMsg + '</span>';
+                                    if($errMsg != '') {
+                                        errorTexts += '<span class="tets error-list"><i class="fa fa-circle"></i>'+ $errMsg + '</span>';
+                                    }
+
                                 }
                             });
                         } catch(e) {
                             if(key !== 'label' && key !== 'form') {
-                                errorTexts +=  '<span><i class="fa fa-circle"></i>'+ error + '</span>';
+                                errorTexts +=  '<span class="hoy error-list"><i class="fa fa-circle"></i>'+ error + '</span>';
                             }
                         }
                     }
+
+                    errorTexts += '</div></div>';
                 });
-                errorTexts += '</p><br/>';
             }
+            errorTexts += '  </div> <br/>';
         });
 
+        // errorTexts += '';
+
         var div = '<div class="melis-modaloverlay '+ closeByButtonOnly +'"></div>';
-        div += '<div class="melis-modal-cont KOnotif">  <div class="modal-content">'+ errorTexts +' <span class="btn btn-block btn-primary">' + translations.tr_meliscore_notification_modal_Close +'</span></div> </div>';
+        div += '<div class="melis-modal-cont KOnotif">  <div class="modal-content error">'+ errorTexts +' <span class="btn btn-block btn-primary">' + translations.tr_meliscore_notification_modal_Close +'</span></div> </div>';
         $body.append(div);
     }
 

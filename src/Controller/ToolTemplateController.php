@@ -657,7 +657,12 @@ class ToolTemplateController extends AbstractActionController
             $getData = $templatesModel->getData($search, $siteId, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length);
             $tableData = $getData->toArray();
 
-
+            // Get site modules & controllers
+            try {
+                $siteModules = $this->getSiteModules();
+            } catch (\Exception $e) {
+                // Place handling here
+            }
 
             for($ctr = 0; $ctr < count($tableData); $ctr++)
             {
@@ -666,12 +671,24 @@ class ToolTemplateController extends AbstractActionController
                 {
                     $tableData[$ctr][$vKey] = $melisTool->limitedText($vValue);
                 }
-                
+
                 $tableData[$ctr]['DT_RowId'] = $tableData[$ctr]['tpl_id'];
+
+                // Append Template status: Green Circle = Active || Red Circle = Inctive
+                try {
+                    $tpl = [
+                        'module'        => $tableData[$ctr]['tpl_zf2_website_folder'],
+                        'controller'    => $tableData[$ctr]['tpl_zf2_controller'],
+                        'action'        => $tableData[$ctr]['tpl_zf2_action']
+                    ];
+                    $tpl_status                     = $this->getTemplateStatus($siteModules, $tpl);
+                    $tableData[$ctr]['tpl_status']  = '<span class="text-'.($tpl_status? 'success' : 'danger').'"><i class="fa fa-fw fa-circle"></i></span>';
+                } catch (\Exception $e) {
+                    // Place handling here
+                }
                 
                 // display controller and action in Controller Column
                 $tableData[$ctr]['tpl_zf2_controller'] = !empty($tableData[$ctr]['tpl_zf2_action']) ? $tableData[$ctr]['tpl_zf2_controller'] . '/' . $tableData[$ctr]['tpl_zf2_action'] : $tableData[$ctr]['tpl_zf2_controller'];
-
             }
         }
 
@@ -681,8 +698,87 @@ class ToolTemplateController extends AbstractActionController
             'recordsFiltered' => $templatesModel->getTotalFiltered(),
             'data' => $tableData,
         ));
+    }
 
-    
+    /**
+     * Returns true: Module, & Controller, & Action exists
+     * otherwise, false
+     * @return bool
+     */
+    private function getTemplateStatus(array $modules, array $template) : bool
+    {
+        $status      = false;
+        $moduleNames = array_keys($modules);
+
+        // Check if template's Module exists
+        if (in_array($template['module'], $moduleNames)) {
+
+            // Check if template's Controller exists
+            $controller = $template['controller'] . 'Controller.php';
+            if (in_array($controller, $modules[$template['module']])) {
+                $controller = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/' . $template['module'] . '/src/' . $template['module'] . '/Controller/' . $controller;
+                $controller = file_get_contents($controller);
+
+                // Check if template's Action exists
+                $actionPattern = '/function.*'.$template['action'].'Action/';
+                if (preg_match($actionPattern, $controller)) {
+                    $status = true;
+                }
+            }
+        }
+
+        return $status;
+    }
+
+    /**
+     * Returns the list of Modules (MelisSites)
+     * @return array
+     */
+    protected function getSiteModules() : array
+    {
+        $modules    = [];
+        $modulePath = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites';
+
+        if (is_dir($modulePath)){
+            foreach (scandir($modulePath) as $module) {
+                // Skip directory pointers
+                if ($module == '.' || $module == '..') continue;
+
+                if (is_dir($modulePath . '/' . $module)) {
+                    $modules[$module] = $this->getControllers($modulePath . '/' . $module . '/src/' . $module . '/Controller');
+                }
+            }
+        }
+
+        return $modules;
+    }
+
+    /**
+     * Returns a module's controllers
+     * @return array
+     */
+    protected function getControllers(string $controllersPath) : array
+    {
+        $controllers = [];
+
+        // List all controller files inside the ..src/controller folder
+        if (is_dir($controllersPath)) {
+            foreach (scandir($controllersPath) as $controller) {
+                // Skip directory pointers
+                if ($controller == '.' || $controller == '..' || is_dir($controllersPath . '/' . $controller)) {
+                    continue;
+                }
+
+                // Check if file's extension is ".php"
+                $filePath   = $controllersPath . '/' . $controller;
+                $fileExt    = pathinfo($filePath)['extension'];
+                if ($fileExt == 'php' && is_file($filePath)) {
+                    $controllers[] = $controller;
+                }
+            }
+        }
+
+        return $controllers;
     }
 
     /**

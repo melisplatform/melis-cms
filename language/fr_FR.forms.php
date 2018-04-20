@@ -211,5 +211,12 @@
 	    'tr_meliscms_tool_style_page_id_too_long' => 'Page ID is too long',
 	    'tr_meliscms_tool_style_page_is_empty' => 'Le champ ne peut être vide',
 	    'tr_meliscms_tree_sites_duplication_use_root' => 'Racine',
-	);
+
+        'tr_meliscms_page_tab_properties_search_type'         => 'Options de recherche',
+        'tr_meliscms_page_tab_properties_search_type tooltip' => 'Select search option for indexing',
+        'tr_meliscms_page_tab_properties_search_type_option1' => 'Oui, avec les sous pages',
+        'tr_meliscms_page_tab_properties_search_type_option2' => 'Oui, sans les sous pages',
+        'tr_meliscms_page_tab_properties_search_type_option3' => 'Non',
+
+    );
 ?>
