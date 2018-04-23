@@ -106,7 +106,7 @@
 	    'tr_meliscms_tool_templates_text_info' => 'Gérez ici les templates associés à chaque site et déclarez les fichiers physiques qui les représentent.',
 	    
 	    'tr_meliscms_tool_templates_tpl_id' => 'ID',
-	    'tr_meliscms_tool_templates_tpl_status' => 'Status',
+	    'tr_meliscms_tool_templates_tpl_status' => 'Fichiers',
 	    'tr_meliscms_tool_templates_tpl_site_id' => 'Site',
 	    'tr_meliscms_tool_templates_tpl_site_id tooltip' => 'Choix du site associé au template',
 	    'tr_meliscms_tool_templates_tpl_site site' => 'Site',
@@ -412,6 +412,7 @@
 	    'tr_meliscms_tool_style_name tooltip' => 'Nom du style',
 	    'tr_meliscms_tool_style_page_id' => 'Page ID',
 	    'tr_meliscms_tool_style_page_id tooltip' => ' Tooltip Page ID',
+        'tr_meliscms_tool_style_files' => 'Fichiers',
 	    'tr_meliscms_tool_style_page_status' => 'Statut',
 	    'tr_meliscms_tool_style_page_status tooltip' => 'Active ou désactive le style',
 	    'tr_meliscms_tool_style_page_status_off' => 'Inactif',
