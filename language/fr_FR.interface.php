@@ -456,5 +456,8 @@
 	    'tr_meliscms_page_user_access_rights' => 'Droits d\'accès utilisateur',
 	    'tr_meliscms_page_user_access_rights_no_access' => 'Vos droits ne vous permettent pas d\'effectuer cette action, veuillez voir avec l\'administrateur',
 
+        // Drag and drop CMS
+        'tr_meliscms_drag_and_drop_modal_title' => 'Drag\'n\'Drop confirmation',
+        'tr_meliscms_drag_and_drop_modal_content' => 'Êtes-vous sur de vouloir ajouter ce plugin à cette page ?',
 	);
 ?>
