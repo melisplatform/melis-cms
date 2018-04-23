@@ -454,6 +454,10 @@
 	    // User Access rights
 	    'tr_meliscms_page_user_access_rights' => 'User access rights',
 	    'tr_meliscms_page_user_access_rights_no_access' => 'Your rights do not allow you to perform this action, please see with the administrator',
-	    
+
+        // Drag and drop CMS
+	    'tr_meliscms_drag_and_drop_modal_title' => 'Drag\'n\'Drop confirmation',
+	    'tr_meliscms_drag_and_drop_modal_content' => 'Are you sure you want to add this plugin to the page?',
+
 	);
 ?>
