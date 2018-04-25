@@ -33,14 +33,17 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
 		for ($i = 0; $i < $max; $i++)
 		{
 			$style = $styles->current();
-			
-		    $valueoptions[] = array(
-		        'label' => $style->style_name,
-		        'value' => $style->style_id,
-		        'attributes' => array(
-		            'data-link' => $style->style_path,
-		        )
-		    );
+
+            if(true === (bool) $style->status) {
+                $valueoptions[] = array(
+                    'label' => $style->style_name,
+                    'value' => $style->style_id,
+                    'attributes' => array(
+                        'data-link' => $style->style_path,
+                    )
+                );
+            }
+
 			
 			$styles->next();
 		}
