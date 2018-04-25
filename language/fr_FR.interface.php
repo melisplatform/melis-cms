@@ -183,7 +183,7 @@
 	    'tr_meliscms_menu_delete' => 'Supprimer',
 	    'tr_meliscms_menu_dupe' => 'Dupliquer l&#39;arborescence',
 	    'tr_meliscms_menu_dupe_fail' => 'Echec de la duplication de l&#39;arborescence',
-	    'tr_meliscms_menu_dupe_success' => 'L&#39;arborescence a été dupliquée avec succès',
+	    'tr_meliscms_menu_dupe_success' => 'L\'arborescence a été dupliquée avec succès',
 	    'tr_meliscms_menu_dupe_destination_fail' => 'La page de destination n&#39;existe pas',
         'tr_meliscms_menu_dupe_page_relation_fail' => 'conflit dans la duplication de la nouvelle langue de page de',
         'tr_meliscms_menu_dupe_source_fail' => 'La page d&#39;origine n&#39;existe pas',
