@@ -717,6 +717,7 @@ class TreeSitesController extends AbstractActionController
 
                         $success = 1;
                         $textMessage = $translator->translate('tr_meliscms_menu_dupe_success');
+                        $textMessage = 'tr_meliscms_menu_dupe_success';
                     }
                 }
                 else {
