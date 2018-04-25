@@ -34,7 +34,7 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
 		{
 			$style = $styles->current();
 
-            if(true === (bool) $style->status) {
+            if(true === (bool) $style->style_status) {
                 $valueoptions[] = array(
                     'label' => $style->style_name,
                     'value' => $style->style_id,
