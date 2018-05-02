@@ -108,15 +108,16 @@
 	        	},
 			    lazyLoad: function(event, data) {
 			      // get the page ID and pass it to lazyload
-			      var pageId = data.node.data.melisData.page_id;
-			      data.result = { 
+			     var pageId = data.node.data.melisData.page_id;
+			      data.result = {
 			    		  url: '/melis/MelisCms/TreeSites/get-tree-pages-by-page-id?nodeId='+pageId,
 			    		  data: {
 			    			  mode: 'children',
 			    			  parent: data.node.key
 			    		  },
-			    		  cache: false
+			    		  cache: false,
 			      }
+
 			    },
     			create: function(event, data) {
     				melisHelper.loadingZone($('#treeview-container'));
@@ -286,30 +287,32 @@
 
 	                },
 	                dragDrop: function(node, data) {
-	                    // This function MUST be defined to enable dropping of items on the tree.
-	                    // data.hitMode is 'before', 'after', or 'over'.
-	                    // We could for example move the source to the new target:
+                        node.setExpanded(true).always(function(){
+                        // This function MUST be defined to enable dropping of items on the tree.
+                        // data.hitMode is 'before', 'after', or 'over'.
+                        // We could for example move the source to the new target:
 
-	                  	// catch if its 'root_*' parent
-	                  	var isRootOldParentId = data.otherNode.getParent().key.toString();
-	                	var oldParentId = ( isRootOldParentId.includes('root') ) ? -1 : data.otherNode.getParent().key ;
+                        // catch if its 'root_*' parent
+                        var isRootOldParentId = data.otherNode.getParent().key.toString();
+                        var oldParentId = ( isRootOldParentId.includes('root') ) ? -1 : data.otherNode.getParent().key ;
 
-	                	// move the node to drag parent ------------------------------------------------
-	                    data.otherNode.moveTo(node, data.hitMode);
+                        // move the node to drag parent ------------------------------------------------
 
-	                    var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
+                        data.otherNode.moveTo(node, data.hitMode);
 
-						var draggedPage = data.otherNode.key
+                        var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
 
-						// catch if its 'root_*' parent
-						var isRootNewParentId = node.getParent().key.toString();
-						var newParentId  = ( isRootNewParentId.includes('root') ) ? -1 : node.getParent().key ;
+                        var draggedPage = data.otherNode.key
 
-						if(data.hitMode == 'over'){
-							newParentId  =  data.node.key ;
-						}
+                        // catch if its 'root_*' parent
+                        var isRootNewParentId = node.getParent().key.toString();
+                        var newParentId  = ( isRootNewParentId.includes('root') ) ? -1 : node.getParent().key ;
 
-						var newIndexPosition = data.otherNode.getIndex()+1;
+                        if(data.hitMode == 'over'){
+                            newParentId  =  data.node.key ;
+                        }
+
+                        var newIndexPosition = data.otherNode.getIndex()+1;
 
 	                	//send data to apply new position of the dragged node
 						var datastring = {
@@ -324,10 +327,11 @@
 	                	    data        : datastring,
 	                	    encode		: true
 	                	}).success(function(data){
-
 	                	}).error(function(xhr, textStatus, errorThrown){
 	                		alert( translations.tr_meliscore_error_message );
 	                	});
+                        });
+	                	// end
 	                }
 	              },
 	        });

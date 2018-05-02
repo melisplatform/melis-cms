@@ -720,6 +720,8 @@ class PageController extends AbstractActionController
                     $data_icon = 'fa fa-home';
                 if ($page->page_type == 'FOLDER')
                     $data_icon = 'fa fa-folder-open-o';
+                if ($page->page_type == 'NEWSLETTER')
+                    $data_icon = 'fa fa-newspaper-o';
             }
             $datas['item_icon'] = $data_icon;
             $datas['item_name'] = $pageName;
@@ -1033,6 +1035,8 @@ class PageController extends AbstractActionController
                     $data_icon = 'fa fa-home';
                 if ($page->page_type == 'FOLDER')
                     $data_icon = 'fa fa-folder-open-o';
+                if ($page->page_type == 'NEWSLETTER')
+                    $data_icon = 'fa fa-newspaper-o';
             }
             $datas['item_icon'] = $data_icon;
             $datas['item_name'] = $pageName;

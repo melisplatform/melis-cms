@@ -15,6 +15,7 @@
 		'tr_meliscms_page_tab_properties_form_type_Site' => 'Site',
 		'tr_meliscms_page_tab_properties_form_type_Folder' => 'Folder',
 		'tr_meliscms_page_tab_properties_form_type_Page' => 'Page',
+		'tr_meliscms_page_tab_properties_form_type_Newsletter' => 'Newsletter',
 		'tr_meliscms_page_tab_properties_form_Status' => 'Status',
 		'tr_meliscms_page_tab_properties_form_status_Online' => 'Online',
 		'tr_meliscms_page_tab_properties_form_status_Offline' => 'Offline',
@@ -36,7 +37,7 @@
 		'tr_meliscms_page_tab_properties_form_Creation date tooltip' => 'Date when the page has been created',
 		'tr_meliscms_page_tab_properties_form_submittext_Save' => 'Save',
 // 	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomy',
-	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomy * <i class="fa fa-info-circle fa-lg" data-toggle="tooltip" data-placement="left" title="" data-original-title="Type the terms to classify your page. Separate each term by a coma"></i>',
+	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomy  <i class="fa fa-info-circle fa-lg" data-toggle="tooltip" data-placement="left" title="" data-original-title="Type the terms to classify your page. Separate each term by a coma"></i>',
 	    'tr_meliscms_page_tab_properties_form_taxonomy_placeholder' => 'Separate options with a comma',
 	    'tr_meliscms_page_tab_properties_form_taxonomy_placeholder tooltip' => 'Type the terms to classify your page. Separate each term by a coma',
 	    'tr_meliscms_tool_style_name_properties tooltip' => 'Select a style to add to your page among the created styles from the &#34;Styles&#34; tool',
@@ -48,9 +49,9 @@
 		'tr_meliscms_page_tab_seo_form_Url' => 'URL',
 		'tr_meliscms_page_tab_seo_form_Url tooltip' => 'URL of the page',
 		'tr_meliscms_page_tab_seo_form_Url Redirect' => 'URL redirection',
-		'tr_meliscms_page_tab_seo_form_Url Redirect tooltip' => 'URL redirection of the page if the page is published. For an internal page enter its ID or its URL, for an external page enter its complete URL with the http://',
+		'tr_meliscms_page_tab_seo_form_Url Redirect tooltip' => 'URL redirection of the page if the page is published. For an internal page enter its URL, for an external page enter its complete URL with the http://',
 		'tr_meliscms_page_tab_seo_form_Url 301' => 'URL 301',
-		'tr_meliscms_page_tab_seo_form_Url 301 tooltip' => 'URL redirection of the page if the page is unpublished. For an internal page enter its ID or its URL, for an external page enter its complete URL with the http://',
+		'tr_meliscms_page_tab_seo_form_Url 301 tooltip' => 'URL redirection of the page if the page is unpublished. For an internal page enter its URL, for an external page enter its complete URL with the http://',
 			
 	    // page prompts
 	    'tr_meliscms_page_form_page_name_empty' => 'Please enter the page name',
@@ -206,7 +207,13 @@
 	    'tr_meliscms_tool_style_page_id_too_long' => 'Page ID is too long',
 	    'tr_meliscms_tool_style_page_is_empty' => 'The input is required and can&#39;t be empty',
 	    'tr_meliscms_tree_sites_duplication_use_root' => 'Root',
-	    
-	    
+
+	    'tr_meliscms_page_tab_properties_search_type'         => 'Search options',
+	    'tr_meliscms_page_tab_properties_search_type tooltip' => 'Select search option for indexing',
+	    'tr_meliscms_page_tab_properties_search_type_option1' => 'Yes, with subpages',
+	    'tr_meliscms_page_tab_properties_search_type_option2' => 'Yes, without subpages',
+	    'tr_meliscms_page_tab_properties_search_type_option3' => 'No',
+
+
 	);
 ?>

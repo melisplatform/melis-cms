@@ -71,7 +71,6 @@ return array(
 			'conf' => array(
 				'id' => 'id_melis_cms',
 				'name' => 'tr_meliscms_meliscms',
-// 			    'rightsDisplay' => 'none',
 			),
 			'ressources' => array(
 				'js' => array(
@@ -94,6 +93,22 @@ return array(
 		            '/MelisCms/css/fancytree.custom.css',
 		            '/MelisCms/css/styles.css',       
 				),
+                /**
+                 * the "build" configuration compiles all assets into one file to make
+                 * lesser requests
+                 */
+                'build' => [
+                    'disable_bundle' => false,
+                    // lists of assets that will be loaded in the layout
+                    'css' => [
+                        '/MelisCms/build/css/bundle.css',
+
+                    ],
+                    'js' => [
+                        '/MelisCms/build/js/bundle.js',
+                    ]
+                ]
+
 			),
 			'datas' => array(
 			),

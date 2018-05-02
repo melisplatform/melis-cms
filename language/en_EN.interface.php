@@ -104,7 +104,9 @@
 	    // tool Template Manager
 	    'tr_meliscms_tool_templates' => 'Template manager', 
 	    'tr_meliscms_tool_templates_text_info' => 'Manage here the templates associated to each site and declare the physical files representing them.', 
+	    
 	    'tr_meliscms_tool_templates_tpl_id' => 'ID',
+	    'tr_meliscms_tool_templates_tpl_status' => 'Files',
 	    'tr_meliscms_tool_templates_tpl_site_id' => 'Site',
 	    'tr_meliscms_tool_templates_tpl_site_id tooltip' => 'Site of the template',
 	    'tr_meliscms_tool_templates_tpl_site site' => 'Site',
@@ -180,7 +182,8 @@
 	    'tr_meliscms_menu_dupe' => 'Duplicate tree',
 	    'tr_meliscms_menu_dupe_fail' => 'Failed to duplicate page tree',
 	    'tr_meliscms_menu_dupe_success' => 'Page tree has been duplicated successfully',
-	    'tr_meliscms_menu_dupe_destination_fail' => 'The destination page doesn&#39;t exist',
+        'tr_meliscms_menu_dupe_page_relation_fail' => 'conflict in duplicating new page language of',
+        'tr_meliscms_menu_dupe_destination_fail' => 'The destination page doesn&#39;t exist',
 	    'tr_meliscms_menu_dupe_source_fail' => 'The source page doesn&#39;t exist',
 	    'tr_meliscms_tree_sites_duplication_source' => 'Source page ID',
 	    'tr_meliscms_tree_sites_duplication_source tooltip' => 'Identifier of the page tree to be duplicated',
@@ -297,7 +300,7 @@
 	    'tr_meliscms_tool_platform_pids_tpl_id_current tooltip' => 'The next template created on the selected platform will have this identifier',
 	    'tr_meliscms_tool_platform_pids_tpl_id_end' => 'Template ID end',
 	    'tr_meliscms_tool_platform_pids_tpl_id_end tooltip' => 'The pages identifiers end at this identifier for the selected platform',
-	    'tr_meliscms_tool_platform_ids_btn_add' => 'Add a range of ID\'s',
+	    'tr_meliscms_tool_platform_ids_btn_add' => 'Add a range of IDs',
 	    'tr_meliscms_tool_platform_ids_btn_edit' => 'Update a range of ID\'s',
 	    'tr_meliscms_tool_platform_pids_name_empty' => 'Choose platform',
 	    'tr_meliscms_tool_platform_ids_table' => 'Table',
@@ -385,8 +388,11 @@
         'tr_meliscms_duplicate_error' => 'Unable to duplicate page',
         'tr_melis_cms_duplicate_success' => 'Page "%s" successfully duplicated',
         'tr_melis_cms_duplicate_text_identifier' => '[Duplicated]',
-	    
-	    // plugins edition
+        'tr_meliscms_tree_sites_duplication_page_relation' => 'Relation avec une page initiale',
+        'tr_meliscms_tree_sites_duplication_page_relation tooltip' => 'Permer de créer une page en relation avec une page initiale',
+
+
+        // plugins edition
 	    'tr_meliscms_plugins_modal_cancel' => 'Cancel',
 	    'tr_meliscms_plugins_modal_apply' => 'Apply',
 	    
@@ -404,6 +410,7 @@
 	    'tr_meliscms_tool_style_name tooltip' => 'ID tooltip',
 	    'tr_meliscms_tool_style_page_id' => 'Page ID',
 	    'tr_meliscms_tool_style_page_id tooltip' => ' Tooltip Page ID',
+        'tr_meliscms_tool_style_files' => 'Files',
 	    'tr_meliscms_tool_style_page_status' => 'Status',
 	    'tr_meliscms_tool_style_page_status tooltip' => 'Activate or deactivate the style',
 	    'tr_meliscms_tool_style_page_status_off' => 'Inactive',
@@ -447,6 +454,10 @@
 	    // User Access rights
 	    'tr_meliscms_page_user_access_rights' => 'User access rights',
 	    'tr_meliscms_page_user_access_rights_no_access' => 'Your rights do not allow you to perform this action, please see with the administrator',
-	    
+
+        // Drag and drop CMS
+	    'tr_meliscms_drag_and_drop_modal_title' => 'Drag\'n\'Drop confirmation',
+	    'tr_meliscms_drag_and_drop_modal_content' => 'Are you sure you want to add this plugin to the page?',
+
 	);
 ?>

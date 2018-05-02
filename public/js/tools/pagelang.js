@@ -23,7 +23,7 @@ $(function(){
 					// Opening new Page language created
 					melisHelper.tabOpen( data.pageInfo.name, data.pageInfo.tabicon, data.pageInfo.id, data.pageInfo.meliskey, {idPage : data.pageInfo.pageid});
 					// reload and expand the treeview
-					refreshTreeview(data.pageInfo.pageid);
+                    melisCms.refreshTreeview(data.pageInfo.pageid);
 				}
 				
 				// Reload the parent page
