@@ -433,7 +433,6 @@ return array(
 									'name'    => 'StringLength',
 									'options' => array(
 										'encoding' => 'UTF-8',
-										'max'      => 65,
 									    'messages' => array(
 									        \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_pageseo_form_page_title_long',
 									    ),
@@ -453,7 +452,6 @@ return array(
 									'name'    => 'StringLength',
 									'options' => array(
 										'encoding' => 'UTF-8',
-										'max'      => 255,
 									    'messages' => array(
 									        \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_pageseo_form_page_desc_long',
 									    ),
