@@ -3,61 +3,57 @@
 return array(
 	'plugins' => array(
 		'meliscore' => array(
-			'datas' => array(
-			),
+			'datas' => [],
 			'interface' => array(
 				'meliscore_leftmenu' => array(
 					'interface' => array(
-						'meliscms_sitetree' =>  array(
-							'conf' => array(
-								'id' => 'id_meliscms_menu_sitetree',
-								'name' => 'tr_meliscms_menu_sitetree_Name',
-								'type' => '/meliscms/interface/meliscms_sitetree',
-							),
-						),
-        			    'meliscore_toolstree' =>  array(
-        			    	'interface' => array( 
-								'meliscms_tools_section' => array(
-									'conf' => array(
-											'id' => 'id_meliscms_tools_section',
-											'name' => 'tr_meliscms_meliscms',
-											'icon' => 'fa-newspaper-o',
-											'rights_checkbox_disable' => true,
-									),
-        			    			'interface' => array( 
-        			    			    'meliscms_tool_site' => array(
-        			    			        'conf' => array(
-        			    			            'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_site',
-        			    			        ),
-        			    			    ),
-		        			    		'meliscms_tool_site_301' => array(
-		        			    			'conf' => array(
-		        			    				'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_site_301',
-		        			    			),
-		        			    		),
-		        			    		'meliscms_tool_templates' => array(
-		        			    			'conf' => array(
-		        			    				'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_templates',
-		        			    			),
-		        			    		),
-        			    			    'meliscms_tool_styles' => array(
-        			    			        'conf' => array(
-        			    			            'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_styles',
-        			    			        ),
-        			    			    ),
-		        			    		'meliscms_tool_language' => array(
-		        			    			'conf' => array(
-		        			    				'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_language',
-		        			    			),
-		        			    		),
-        			    			    'meliscms_tool_platform_ids' => array(
-        			    			        'conf' => array(
-        			    			            'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_platform_ids',
-        			    			        ),
-        			    			    ),
-        			    			),
-								),
-        			    	)
+        			    'meliscms_toolstree_section' =>  array(
+                            'conf' => array(
+                                'id' => 'meliscms_toolstree_section',
+                                'melisKey' => 'meliscms_toolstree_section',
+                                'name' => 'tr_meliscms_meliscms',
+                                'icon' => '',
+                                'rights_checkbox_disable' => true,
+                            ),
+                            'interface' => array(
+                                'meliscms_sitetree' =>  array(
+                                    'conf' => array(
+                                        'id' => 'id_meliscms_menu_sitetree',
+                                        'name' => 'tr_meliscms_menu_sitetree_Name',
+                                        'type' => '/meliscms/interface/meliscms_sitetree',
+                                    ),
+                                ),
+                                'meliscms_tool_site' => array(
+                                    'conf' => array(
+                                        'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_site',
+                                    ),
+                                ),
+//                                'meliscms_tool_site_301' => array(
+//                                    'conf' => array(
+//                                        'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_site_301',
+//                                    ),
+//                                ),
+//                                'meliscms_tool_templates' => array(
+//                                    'conf' => array(
+//                                        'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_templates',
+//                                    ),
+//                                ),
+//                                'meliscms_tool_styles' => array(
+//                                    'conf' => array(
+//                                        'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_styles',
+//                                    ),
+//                                ),
+//                                'meliscms_tool_language' => array(
+//                                    'conf' => array(
+//                                        'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_language',
+//                                    ),
+//                                ),
+//                                'meliscms_tool_platform_ids' => array(
+//                                    'conf' => array(
+//                                        'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_platform_ids',
+//                                    ),
+//                                ),
+                            ),
         			    ),
 					),
 				),
@@ -133,7 +129,7 @@ return array(
 						'name' => 'tr_meliscms_toolstree',
 						'rightsDisplay' => 'referencesonly',
 					),
-			        'interface' => array(			            
+			        'interface' => array(
 			            'meliscms_tool_templates' => array(
 			                'conf' => array(
 			                    'id' => 'id_meliscms_tool_templates',
