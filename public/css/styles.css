@@ -587,7 +587,28 @@ body.modal-open {
 	margin-right: 6px;
 }
 
+.cms-page-indicators-plugin .innerAll{
+    padding: 25px 10px;
+    margin: 5px 0;
+}
+
+
 /* ===============================================================[ -= RESPONSIVE =- ]==================================================================== */
+
+@media (min-width: 1200px) and (max-width: 1600px) {
+    .cms-page-indicators-plugin p.lead {
+        font-size: 15px;
+    }
+}
+
+@media ( max-width: 768px ) {
+    .cms-page-indicators-plugin .innerAll {
+        margin: 0;
+    }
+    .dashboard-medium {
+        height: auto;
+    }
+}
 
 @media( min-width: 768px ){
 	

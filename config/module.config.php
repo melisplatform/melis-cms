@@ -119,7 +119,6 @@ return array(
         'invokables' => array(
             'MelisCms\Controller\Index' => 'MelisCms\Controller\IndexController',
             'MelisCms\Controller\TreeSites' => 'MelisCms\Controller\TreeSitesController',
-            'MelisCms\Controller\Dashboard' => 'MelisCms\Controller\DashboardController',
             'MelisCms\Controller\Page' => 'MelisCms\Controller\PageController',
             'MelisCms\Controller\PageProperties' => 'MelisCms\Controller\PagePropertiesController',
             'MelisCms\Controller\PageSeo' => 'MelisCms\Controller\PageSeoController',
@@ -136,6 +135,11 @@ return array(
             'MelisCms\Controller\PageLanguages' => 'MelisCms\Controller\PageLanguagesController',
             'MelisCms\Controller\MelisSetup' => 'MelisCms\Controller\MelisSetupController',
         ),
+    ),
+    'controller_plugins' => array(
+        'invokables' => array(
+            'MelisCmsPagesIndicatorsPlugin' => 'MelisCms\Controller\DashboardPlugins\MelisCmsPagesIndicatorsPlugin',
+        )
     ),
     'form_elements' => array(
         'factories' => array(
@@ -158,6 +162,9 @@ return array(
         'template_map' => array(
             'layout/layoutCms'           => __DIR__ . '/../view/layout/layoutCms.phtml',
             'melis-cms/index/index' => __DIR__ . '/../view/melis-cms/index/index.phtml',
+            
+            // Dashboard plugin templates
+            'melis-cms/dashboard/page-indicators' => __DIR__ . '/../view/melis-cms/dashboard-plugins/page-indicators.phtml',
         ),
         'template_path_stack' => array(
             __DIR__ . '/../view',
