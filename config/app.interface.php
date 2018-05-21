@@ -7,6 +7,13 @@ return array(
 			'interface' => array(
 				'meliscore_leftmenu' => array(
 					'interface' => array(
+                        'meliscms_sitetree' =>  array(
+                            'conf' => array(
+                                'id' => 'id_meliscms_menu_sitetree',
+                                'name' => 'tr_meliscms_menu_sitetree_Name',
+                                'type' => '/meliscms/interface/meliscms_sitetree',
+                            ),
+                        ),
         			    'meliscms_toolstree_section' =>  array(
                             'conf' => array(
                                 'id' => 'meliscms_toolstree_section',
@@ -23,13 +30,6 @@ return array(
                                 'jsdatas' => array()
                             ),
                             'interface' => array(
-//                                'meliscms_sitetree' =>  array(
-//                                    'conf' => array(
-//                                        'id' => 'id_meliscms_menu_sitetree',
-//                                        'name' => 'tr_meliscms_menu_sitetree_Name',
-//                                        'type' => '/meliscms/interface/meliscms_sitetree',
-//                                    ),
-//                                ),
                                 'meliscms_tool_site' => array(
                                     'conf' => array(
                                         'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_site',
