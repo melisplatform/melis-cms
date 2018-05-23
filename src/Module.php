@@ -176,7 +176,7 @@ class Module
             include __DIR__ . '/../config/diagnostic.config.php',
             include __DIR__ . '/../config/diagnostic.config.php',
             include __DIR__ . '/../config/app.microservice.php',
-            include __DIR__ . '/../config/dashboard-plugins/MelisCmsPagesIndicatorsPlugin.php',
+            include __DIR__ . '/../config/dashboard-plugins/MelisCmsPagesIndicatorsPlugin.config.php',
         );
 
         foreach ($configFiles as $file) {
