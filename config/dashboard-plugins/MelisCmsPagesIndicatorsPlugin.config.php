@@ -24,8 +24,6 @@
                                     'module' => 'MelisCms',
                                     'plugin' => 'MelisCmsPagesIndicatorsPlugin',
                                     'function' => 'pageIndicators',
-                                    'jscallback' => '',
-                                    'jsdatas' => array()
                                 ),
                             ),
                         ),
