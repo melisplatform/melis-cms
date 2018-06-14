@@ -602,6 +602,22 @@ body.modal-open {
 	height: auto;
 }
 
+.modal-content.error div.col-xs-12 {
+	margin-bottom: 10px;
+}
+.modal-error-container span {
+	padding-left: 6px;
+}
+
+.modal-error-container span .fa {
+	position: relative;
+	left: 0;
+	font-size: 6px;
+	color: #932E2A;
+	vertical-align: middle;
+	margin-right: 6px;
+}
+
 /* ===============================================================[ -= RESPONSIVE =- ]==================================================================== */
 
 @media( min-width: 768px ){

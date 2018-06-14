@@ -718,7 +718,7 @@ var melisCms = (function(){
     $body.on('switch-change', '.page-publishunpublish', publishUnpublish);
     
     // char counter in seo title
-    $body.on("keyup keydown change", "form[name='pageseo'] input[name='pseo_meta_title']", { limit: 60}, charCounter);
+    $body.on("keyup keydown change", "form[name='pageseo'] input[name='pseo_meta_title']", { limit: 70}, charCounter);
     
     // char counter in seo description
     $body.on("keyup keydown change", "form[name='pageseo'] textarea[name='pseo_meta_description']", { limit: 160}, charCounter);

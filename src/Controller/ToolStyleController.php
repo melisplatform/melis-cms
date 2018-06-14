@@ -308,6 +308,10 @@ class ToolStyleController extends AbstractActionController
 
             for($ctr = 0; $ctr < count($tableData); $ctr++)
             {
+                // Append style file status in the tables data
+                $fileStatus = $this->getFilesStatus($tableData[$ctr]['style_path']);
+                $tableData[$ctr]['style_files'] = '<span class="text-'.($fileStatus? 'success' : 'danger').'"><i class="fa fa-fw fa-circle"></i></span>';
+
                 // apply text limits
                 foreach($tableData[$ctr] as $vKey => $vValue)
                 {
@@ -334,6 +338,53 @@ class ToolStyleController extends AbstractActionController
         ));
 
     }
+
+    /**
+     * Returns true: style File exists in the specified path
+     * otherwise, false
+     * @param string $filepath
+     * @return bool
+     */
+    protected function getFilesStatus(string $filepath) : bool
+    {
+        $status     = false;
+        $path       = explode('/', $filepath);
+
+        if (empty($path[0])) {
+            // Internal Path
+            $site           = $path[1];
+            $acceptables    = ['css', 'CSS'];
+            $filename       = $path[count($path) - 1];
+
+            // check if style file has correct extension
+            $nameParts = explode('.', $filename);
+            if (!in_array($nameParts[count($nameParts) - 1], $acceptables)) {
+                return false;
+            }
+
+            // Getting the subfolder(s)
+            $subfolders     = '';
+            for ($i = 2; $i <= count($path) - 2; $i++) {
+                $subfolders .= $path[$i] . '/';
+            }
+
+            $fullPath = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/' . $site . '/public/' . $subfolders . $filename;
+            if (is_file($fullPath) && file_exists($fullPath)) {
+                return true;
+            }
+
+        } else {
+            // External Path
+            $header_response = get_headers($filepath, 1);
+            if (strpos($header_response[0], "200") !== false) {
+                // File exists
+                return true;
+            }
+        }
+
+        return $status;
+    }
+
     /** TOOL CRUD
      *  Below are the functions that will be used in
      *  Adding, updating, displaying and deleting an entry

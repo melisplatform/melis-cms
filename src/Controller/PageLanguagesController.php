@@ -207,114 +207,132 @@ class PageLanguagesController extends AbstractActionController
             {
                 
                 $data = $form->getData();
-                
+
                 /**
                  * Page tree data of the new Page Language
                  */
                 $pageTree = array(
                     'tree_father_page_id' => $data['pageLangPageId']
                 );
-                
-                $cmsLangTbl = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
-                $cmsLangData = $cmsLangTbl->getEntryByField('lang_cms_locale', $data['pageLangLocale'])->current();
-                
-                $cmsLangPrefix = !empty($cmsLangData)? ' ('.strtolower(substr($cmsLangData->lang_cms_locale, 0, 2)).')': '';
-                
-                /**
-                 * Retrieving the published data of the current page and 
-                 * use to create the new Page
-                 */
-                $pagePublishedTbl = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
-                $currentPage = $pagePublishedTbl->getEntryById($data['pageLangPageId'])->current();
-                $pagePublished = array();
-                if (!empty($currentPage))
+                $pageLangIds = array();
+
+                $cmsLangTbl      = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+                $pageLangTbl     = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+                $pageInitialId   = $pageLangTbl->getEntryByField('plang_page_id',$data['pageLangPageId'])->current();
+                $pageLangInitial = $pageLangTbl->getEntryByField('plang_page_id_initial',$pageInitialId->plang_page_id_initial)->toArray();
+
+                foreach($pageLangInitial as $pagelangid => $pagelangVal)
                 {
-                    $pagePublished = get_object_vars($currentPage);
-                    // Adding prefix of the language to page name
-                    $pagePublished['page_name'] .= $cmsLangPrefix;
-                    // Set new page language version to unpublish
-                    $pagePublished['page_status'] = 0;
+                    $pageLangIds[] = $pagelangVal['plang_lang_id'];
                 }
-                
-                /**
-                 * Retrieving the saved data of the current page and 
-                 * use to create the new Page
-                 */
-                $pageSavedTbl = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
-                $currentPage = $pageSavedTbl->getEntryById($data['pageLangPageId'])->current();
-                $pageSaved = array();
-                if (!empty($currentPage))
-                {
-                    $pageSaved = get_object_vars($currentPage);
-                    // Adding prefix of the language to page name
-                    $pageSaved['page_name'] .= $cmsLangPrefix;
-                    // Set new page language version to unpublish
-                    $pageSaved['page_status'] = 0;
-                }
-                
-                /**
-                 * Retrieving the seo data of the current page and
-                 * use to create the new Page
-                 */
-                $pageSeoTbl = $this->getServiceLocator()->get('MelisEngineTablePageSeo');
-                $currentPage = $pageSeoTbl->getEntryById($data['pageLangPageId'])->current();
-                $pageSeo = array();
-                if (!empty($currentPage))
-                {
-                    $pageSeo = get_object_vars($currentPage);
-                }
-                
-                /**
-                 * Page lang data of the new Page Language
-                 * using the current page as parent page id
-                 */
-                $pageLang = array(
-                    'plang_lang_id' => $cmsLangData->lang_cms_id,
-                    'plang_page_id_initial' => $data['pageLangPageId'],
-                );
-                
-                /**
-                 * Retrieving the style data of the current page and
-                 * use to create the new Page
-                 */
-                $pageStyleTbl = $this->getServiceLocator()->get('MelisEngineTablePageStyle');
-                $currentPage = $pageStyleTbl->getEntryByField('pstyle_page_id', $data['pageLangPageId'])->current();
-                $pageStyle = array();
-                if (!empty($currentPage))
-                {
-                    $pageStyle = get_object_vars($currentPage);
-                    unset($pageStyle['pstyle_id']);
-                }
-                
-                // unsetting date edit
-                unset($pagePublished['page_edit_date']);
-                unset($pageSaved['page_edit_date']);
-                
-                /**
-                 * Saving the Page using the MelisCmsPageService Service
-                 */
-                $pageSrv = $this->getServiceLocator()->get('MelisCmsPageService');
-                $pageId = $pageSrv->savePage($pageTree, $pagePublished, $pageSaved, $pageSeo, $pageLang, $pageStyle);
-                
-                if (!is_null($pageId))
-                {
+
+                $cmsLangData     = $cmsLangTbl->getEntryByField('lang_cms_locale', $data['pageLangLocale'])->current();
+                $checkPageLangId = in_array($cmsLangData->lang_cms_id, $pageLangIds);
+
+
+                if(empty($checkPageLangId)){
+                    $cmsLangPrefix = !empty($cmsLangData)? ' ('.strtolower(substr($cmsLangData->lang_cms_locale, 0, 2)).')': '';
+
                     /**
-                     * Retrieving the new created page for response of the request call
+                     * Retrieving the published data of the current page and
+                     * use to create the new Page
                      */
-                    $pageSrv = $this->getServiceLocator()->get('MelisEnginePage');
-                    $pageData = $pageSrv->getDatasPage($pageId, 'saved')->getMelisPageTree();
-                    
-                    $pageInfo = array(
-                        'tabicon' => 'fa-file-o',
-                        'name' => $pageData->page_name,
-                        'id' => $pageData->tree_page_id.'_id_meliscms_page',
-                        'meliskey' => 'meliscms_page',
-                        'pageid' => $pageData->tree_page_id
+                    $pagePublishedTbl = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
+                    $currentPage = $pagePublishedTbl->getEntryById($data['pageLangPageId'])->current();
+                    $pagePublished = array();
+                    if (!empty($currentPage))
+                    {
+                        $pagePublished = get_object_vars($currentPage);
+                        // Adding prefix of the language to page name
+                        $pagePublished['page_name'] .= $cmsLangPrefix;
+                        // Set new page language version to unpublish
+                        $pagePublished['page_status'] = 0;
+                    }
+
+                    /**
+                     * Retrieving the saved data of the current page and
+                     * use to create the new Page
+                     */
+                    $pageSavedTbl = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+                    $currentPage = $pageSavedTbl->getEntryById($data['pageLangPageId'])->current();
+                    $pageSaved = array();
+                    if (!empty($currentPage))
+                    {
+                        $pageSaved = get_object_vars($currentPage);
+                        // Adding prefix of the language to page name
+                        $pageSaved['page_name'] .= $cmsLangPrefix;
+                        // Set new page language version to unpublish
+                        $pageSaved['page_status'] = 0;
+                    }
+
+                    /**
+                     * Retrieving the seo data of the current page and
+                     * use to create the new Page
+                     */
+                    $pageSeoTbl = $this->getServiceLocator()->get('MelisEngineTablePageSeo');
+                    $currentPage = $pageSeoTbl->getEntryById($data['pageLangPageId'])->current();
+                    $pageSeo = array();
+                    if (!empty($currentPage))
+                    {
+                        $pageSeo = get_object_vars($currentPage);
+                    }
+
+                    /**
+                     * Page lang data of the new Page Language
+                     * using the current page as parent page id
+                     */
+
+                    $pageLang = array(
+                        'plang_lang_id' => $cmsLangData->lang_cms_id,
+                        'plang_page_id_initial' => $pageInitialId->plang_page_id_initial,
                     );
-                    
-                    $textMessage = 'tr_meliscms_page_lang_create_success';
-                    $status = 1;
+
+                    /**
+                     * Retrieving the style data of the current page and
+                     * use to create the new Page
+                     */
+                    $pageStyleTbl = $this->getServiceLocator()->get('MelisEngineTablePageStyle');
+                    $currentPage = $pageStyleTbl->getEntryByField('pstyle_page_id', $data['pageLangPageId'])->current();
+                    $pageStyle = array();
+                    if (!empty($currentPage))
+                    {
+                        $pageStyle = get_object_vars($currentPage);
+                        unset($pageStyle['pstyle_id']);
+                    }
+
+                    // unsetting date edit
+                    unset($pagePublished['page_edit_date']);
+                    unset($pageSaved['page_edit_date']);
+
+                    /**
+                     * Saving the Page using the MelisCmsPageService Service
+                     */
+                    $pageSrv = $this->getServiceLocator()->get('MelisCmsPageService');
+                    $pageId = $pageSrv->savePage($pageTree, $pagePublished, $pageSaved, $pageSeo, $pageLang, $pageStyle);
+
+                    if (!is_null($pageId))
+                    {
+                        /**
+                         * Retrieving the new created page for response of the request call
+                         */
+                        $pageSrv = $this->getServiceLocator()->get('MelisEnginePage');
+                        $pageData = $pageSrv->getDatasPage($pageId, 'saved')->getMelisPageTree();
+
+                        $pageInfo = array(
+                            'tabicon' => 'fa-file-o',
+                            'name' => $pageData->page_name,
+                            'id' => $pageData->tree_page_id.'_id_meliscms_page',
+                            'meliskey' => 'meliscms_page',
+                            'pageid' => $pageData->tree_page_id
+                        );
+
+                        $textMessage = 'tr_meliscms_page_lang_create_success';
+                        $status = 1;
+                    }
+                }else{
+                    $textMessage = 'tr_meliscms_page_lang_create_failed';
                 }
+
             }
             else
             {

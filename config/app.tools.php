@@ -55,6 +55,13 @@ return array(
                                 'sortable' => true,
 
                             ),
+                            
+                            'tpl_status' => array(
+                                'text' => 'tr_meliscms_tool_templates_tpl_status',
+                                'css' => array('width' => '5%', 'padding-right' => '0'),
+                                'sortable' => true,
+
+                            ),
 
                             'site_name' => array(
                                 'text' => 'tr_meliscms_tool_templates_tpl_site_id',
@@ -664,6 +671,11 @@ return array(
                                 'sortable' => true,
 
                             ),
+                            'style_files' => array(
+                                'text' => 'tr_meliscms_tool_style_files',
+                                'css' => array('width' => '5%', 'padding-right' => '0'),
+//                                'sortable' => true,
+                            ),
                             'style_status' => array(
                                 'text' => 'tr_meliscms_tool_style_page_status',
                                 'css' => array('width' => '5%', 'padding-right' => '0'),
@@ -672,7 +684,7 @@ return array(
                             ),
                             'style_name' => array(
                                 'text' => 'tr_meliscms_tool_style_name',
-                                'css' => array('width' => '20%', 'padding-right' => '0'),
+                                'css' => array('width' => '15%', 'padding-right' => '0'),
                                 'sortable' => true,
 
                             ),
@@ -2391,6 +2403,19 @@ return array(
                                 ),
                                 array(
                                     'spec' => array(
+                                        'name' => 'pageRelation',
+                                        'type' => 'checkbox',
+                                        'options' => array(
+                                            'label' => 'tr_meliscms_tree_sites_duplication_page_relation',
+                                            'tooltip' => 'tr_meliscms_tree_sites_duplication_page_relation tooltip',
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'pageRelation',
+                                        ),
+                                    ),
+                                ),
+                                array(
+                                    'spec' => array(
                                         'name' => 'destinationPageId',
                                         'type' => 'MelisText',
                                         'options' => array(
@@ -2405,6 +2430,7 @@ return array(
                                         ),
                                     ),
                                 ),
+
                             ),
                             'input_filter' => array(
                                 'sourcePageId' => array(
