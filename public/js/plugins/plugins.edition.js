@@ -817,11 +817,9 @@ var melisCmsFormHelper = (function($, window) {
     function melisMultiKoNotification(errors, closeByButtonOnly) {
         if(!closeByButtonOnly) closeByButtonOnly = true;
         var closeByButtonOnly = ( closeByButtonOnly !== true ) ?  'overlay-hideonclick' : '';
-        var errorTexts = '';
-
+        var errorTexts = '<div class="row">';
         $.each(errors, function(idx, errorData) {
             if(errorData['success'] === false) {
-                errorTexts += '<div class="row">';
                 errorTexts += '<h3>'+ (errorData['name']) +'</h3>';
                 errorTexts +='<h4>'+ (errorData['message']) +'</h4>';
                 highlightMultiErrors(errorData['success'], errorData['errors']);
@@ -846,7 +844,6 @@ var melisCmsFormHelper = (function($, window) {
                                     if($errMsg != '') {
                                         errorTexts += '<span class="tets error-list"><i class="fa fa-circle"></i>'+ $errMsg + '</span>';
                                     }
-
                                 }
                             });
                         } catch(e) {
@@ -855,14 +852,11 @@ var melisCmsFormHelper = (function($, window) {
                             }
                         }
                     }
-
                     errorTexts += '</div></div>';
                 });
             }
-            errorTexts += '  </div> <br/>';
         });
-
-        // errorTexts += '';
+        errorTexts += '</div>';
 
         var div = '<div class="melis-modaloverlay '+ closeByButtonOnly +'"></div>';
         div += '<div class="melis-modal-cont KOnotif">  <div class="modal-content error">'+ errorTexts +' <span class="btn btn-block btn-primary">' + translations.tr_meliscore_notification_modal_Close +'</span></div> </div>';
