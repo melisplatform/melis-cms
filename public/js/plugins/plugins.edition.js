@@ -842,7 +842,7 @@ var melisCmsFormHelper = (function($, window) {
                                         $errMsg = value;
                                     }
                                     if($errMsg != '') {
-                                        errorTexts += '<span class="tets error-list"><i class="fa fa-circle"></i>'+ $errMsg + '</span>';
+                                        errorTexts += '<span class="tets error-list"><i class="fa fa-circle"></i>'+ $errMsg + '</span><br/>';
                                     }
                                 }
                             });
@@ -857,7 +857,6 @@ var melisCmsFormHelper = (function($, window) {
             }
         });
         errorTexts += '</div>';
-
         var div = '<div class="melis-modaloverlay '+ closeByButtonOnly +'"></div>';
         div += '<div class="melis-modal-cont KOnotif">  <div class="modal-content error">'+ errorTexts +' <span class="btn btn-block btn-primary">' + translations.tr_meliscore_notification_modal_Close +'</span></div> </div>';
         $body.append(div);
