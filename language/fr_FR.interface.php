@@ -256,7 +256,7 @@
 	    // Dashboard Plugins
 	    'tr_PluginSection_meliscms' => 'Melis Cms',
 	    'tr_meliscms_dashboard_pages_indicators' => 'Indicateurs',
-	    'tr_meliscms_dashboard_pages_indicators_description' => 'This plugin display number sites and pages created and also the the number of pushblished and unpublished',
+	    'tr_meliscms_dashboard_pages_indicators_description' => 'Ce plugin affiche le nombre de sites, de pages créées ainsi que le nombre de pages publiées et non publiées.',
 	    'tr_meliscms_dashboard_pages_indicators_site' => 'Site',
 	    'tr_meliscms_dashboard_pages_indicators_pages' => 'Page',
 	    'tr_meliscms_dashboard_pages_indicators_published' => 'Publiée',
