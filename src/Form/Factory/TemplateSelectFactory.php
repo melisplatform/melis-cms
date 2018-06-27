@@ -30,11 +30,20 @@ class TemplateSelectFactory extends MelisSelectFactory
 		
 		$valueoptions[-1] = $translator->translate('tr_meliscms_page_tab_properties_form_Template_None');
 
+		// Get sites
+        $sites = $serviceManager->get('MelisEngineTableSite')->fetchAll()->toArray();
+        $siteNames = [];
+        if (!empty($sites)) {
+            foreach ($sites as $site) {
+                $siteNames[$site['site_id']] = $site['site_name'];
+            }
+        }
+
 		$max = $templates->count();
 		for ($i = 0; $i < $max; $i++)
 		{
 			$tpl = $templates->current();
-			$valueoptions[$tpl->tpl_id] = $tpl->tpl_zf2_website_folder . ' - ' . $tpl->tpl_name . ' (' . $tpl->tpl_id . ')';
+			$valueoptions[$tpl->tpl_id] = $siteNames[$tpl->tpl_site_id] . ' - ' . $tpl->tpl_name . ' (' . $tpl->tpl_id . ')';
 			$templates->next();
 		}
 
