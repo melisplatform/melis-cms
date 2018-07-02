@@ -815,7 +815,7 @@ var melisCmsFormHelper = (function($, window) {
      * KO NOTIFICATION for Multiple Form
      */
     function melisMultiKoNotification(errors, closeByButtonOnly) {
-        if(!closeByButtonOnly) closeByButtonOnly = true;
+        if (!closeByButtonOnly) closeByButtonOnly = true;
         var closeByButtonOnly = ( closeByButtonOnly !== true ) ?  'overlay-hideonclick' : '';
         var errorTexts = '<div class="row">';
         $.each(errors, function(idx, errorData) {
