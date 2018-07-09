@@ -272,7 +272,7 @@ class SiteController extends AbstractActionController
         $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
         $xmlRights = $melisCoreAuth->getAuthRights();
     
-        $isAccessible = $melisCoreRights->isAccessible($xmlRights, MelisCoreRightsService::MELISCORE_PREFIX_TOOLS, $key);
+        $isAccessible = $melisCoreRights->isAccessible($xmlRights, MelisCoreRightsService::MELIS_PLATFORM_TOOLS_PREFIX, $key);
     
         return $isAccessible;
     }
