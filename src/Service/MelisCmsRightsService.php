@@ -48,15 +48,18 @@ class MelisCmsRightsService implements MelisCoreRightsServiceInterface, ServiceL
             // $itemId contains the pageId which is asked to be retrieved
             // Let's get the tree of pageId to this page and then look
             // if the page is allowed or parent allowed
-            $melisEngineTree = $this->serviceLocator->get('MelisEngineTree');
+            /**
+             * @var \MelisEngine\Service\MelisTreeService $melisEngineTree
+             */
+            $melisEngineTree = $this->getServiceLocator()->get('MelisEngineTree');
             $breadcrumb = $melisEngineTree->getPageBreadcrumb($itemId, 0, true);
 
-            if (empty($rightsObj->$sectionId))
+            if (empty($rightsObj->$sectionId)) {
                 return false;
-
-            if (isset($rightsObj->$sectionId->id)) {
-                foreach ($rightsObj->$sectionId->id as $pageId) {
-                    if (empty($breadcrumb)) {
+            }
+            if ($breadcrumb) {
+                if (isset($rightsObj->$sectionId->id)) {
+                    foreach ($rightsObj->$sectionId->id as $pageId) {
                         foreach ($breadcrumb as $parentPage) {
                             if ($pageId == -1 || $pageId == $parentPage->tree_page_id) {
                                 return true;
