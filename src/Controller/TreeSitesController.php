@@ -445,30 +445,34 @@ class TreeSitesController extends AbstractActionController
 
 		return $rootPages;
 	}
-    
+
     /**
      * Determines if drag/drop is allowed in the treeview
      * If you can see the whole tree, then true
      * If you have access to only part of the tree, then false
-     * 
+     *
      * @return boolean
      */
     private function isAllowedDragDrop()
     {
-    	$melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
-    	 
-    	// Get the rights of the user
-    	$xmlRights = $melisCoreAuth->getAuthRights();
-    	$rightsObj = simplexml_load_string($xmlRights);
-    	 
-    	$sectionId = MelisCmsRightsService::MELISCMS_PREFIX_PAGES;
-    	foreach ($rightsObj->$sectionId->id as $rightsPageId)
-    	{
-    		if ($rightsPageId == -1)
-    			return true;
-    	}
-    	
-    	return false;
+        $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
+
+        // Get the rights of the user
+        $xmlRights = $melisCoreAuth->getAuthRights();
+        $rightsObj = simplexml_load_string($xmlRights);
+
+        $sectionId = MelisCmsRightsService::MELISCMS_PREFIX_PAGES;
+
+        if (isset($rightsObj->$sectionId)) {
+            foreach ($rightsObj->$sectionId->id as $rightsPageId)
+            {
+                if ($rightsPageId == -1)
+                    return true;
+            }
+        }
+
+
+        return false;
     }
 
     /**
@@ -598,7 +602,7 @@ class TreeSitesController extends AbstractActionController
         $view->sourcePageId = $sourcePageId;
         return $view;
     }
-
+    
     public function duplicateTreePageAction()
     {
 
@@ -613,7 +617,7 @@ class TreeSitesController extends AbstractActionController
         $translator = $this->serviceLocator->get('translator');
         $textMessage = $translator->translate('tr_meliscms_menu_dupe_fail');
         $textTitle = $translator->translate('tr_meliscms_menu_dupe');
-
+        
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         $melisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
 
@@ -660,13 +664,19 @@ class TreeSitesController extends AbstractActionController
                 $childPages = $pageTree->getAllPages($duplicateStartingFrom);
                 $page       = (array)$pageService->getDatasPage($duplicateStartingFrom)->getMelisPageTree();
 
+                $pages = $page;
+                $tmpData[] = $page;
+
+                foreach ($childPages as $idx => $childPage) {
+                    $pages[$idx] = $childPage;
+                }
 
                 if(!empty($pageDestId) && !empty($sourcePage)){
 
                     $pages = $page;
+
                     foreach ($childPages as $idx => $childPage) {
                         $pages[$idx] = $childPage;
-
                     }
                     $tmpData[0] = $pages;
 
@@ -674,7 +684,6 @@ class TreeSitesController extends AbstractActionController
 
                         $pageIdInitial    = $this->getPageIdInitial($duplicateStartingFrom);
                         $idsSameInitial   = $this->checkPageRelation($pages['children'] ?? array(), null, $pageIdInitial);
-                        //$pageChildrenSameInitialId = $this->removeElementValue($pages['children'],$idsSameInitial);
 
                         //parent data
                         $parentData =  array(
@@ -693,8 +702,8 @@ class TreeSitesController extends AbstractActionController
                                 $this->mapPage($destinationPage, $pageChildren, null, $langId , $pageRelation);
                                 $success = 1;
                                 $textMessage = $translator->translate('tr_meliscms_menu_dupe_success');
-                            }
-                            else{
+                            }else{
+
                                 $textMessage = $translator->translate('tr_meliscms_menu_dupe_fail');
                             }
 
@@ -717,7 +726,6 @@ class TreeSitesController extends AbstractActionController
 
                         $success = 1;
                         $textMessage = $translator->translate('tr_meliscms_menu_dupe_success');
-                        $textMessage = 'tr_meliscms_menu_dupe_success';
                     }
                 }
                 else {
@@ -743,7 +751,7 @@ class TreeSitesController extends AbstractActionController
                 $errors = $form->getMessages();
             }
         }
-
+        
         $response = array(
             'success' => $success,
             'textTitle' => $textTitle,
@@ -751,33 +759,31 @@ class TreeSitesController extends AbstractActionController
             'errors' => $errors,
             'chunk' => $data,
         );
-
+        
         $response = !empty($pageDupeResult['errors'])? $pageDupeResult : $response;
         $this->getEventManager()->trigger('meliscms_tree_duplicate_page_trees_end', $this, array_merge($response, array('typeCode' => $logTypeCode)));
         return new JsonModel($response);
     }
+
+
     public function mapPage($parentId, $pages, $bufferedParentId = null, $langId, $pageRelation =null)
     {
-
         $pageService = $this->getServiceLocator()->get('MelisCmsPageService');
 
         if(is_array($pages))
         {
             foreach($pages as $idx => $page) {
+                $newParentId = $pageService->duplicatePage($page['tree_page_id'], $parentId, $langId , $pageRelation);
+                $bufferedParentId = $parentId;
 
-                $newParentId = $parentId;
-                if(isset($page['tree_page_id'])){
-                    $newParentId = $pageService->duplicatePage($page['tree_page_id'], $parentId, $langId , $pageRelation);
-                    $bufferedParentId = $parentId;
-
-                }
                 if(isset($page['children'])) {
+
+
                     $this->mapPage($newParentId, $page['children'], null ,$langId , $pageRelation);
                 }
                 else {
                     $newParentId = $bufferedParentId;
                 }
-
             }
         }
 
@@ -814,50 +820,6 @@ class TreeSitesController extends AbstractActionController
         return $data;
 
     }
-
-    private function getPageIdInitial($pageId)
-    {
-        $tablePageLang = $this->getServiceLocator()->get('MelisEngineTablePageLang');
-        $cmsLang = $tablePageLang->getEntryByField('plang_page_id', $pageId)->current();
-
-        return $cmsLang->plang_page_id_initial;
-    }
-
-    private function removeElementValue($pageChldren,$data = [],$data2 = [])
-    {
-
-        foreach($pageChldren as $key => $val){
-
-
-            if(isset($val['tree_page_id']) == isset($data[0])){
-                unset($val['tree_page_id']);
-
-                $tmpData = array(
-                    'removed_child' => $data[0]
-                );
-
-                array_push($data2,$tmpData );
-
-                array_shift($data);
-
-            }else{
-                $tmpData = array(
-                    'allow_child' => $val['tree_page_id']
-                );
-                array_push($data2,$tmpData );
-            }
-
-            if(isset($val['children'])){
-
-                $data2 =  $this->removeElementValue($val['children'], $data, $data2);
-            }
-
-        }
-
-        return $data2;
-
-    }
-
     /**
      * @param $pages
      * @param array $data
@@ -873,20 +835,30 @@ class TreeSitesController extends AbstractActionController
 
             if($cmsLang->plang_page_id_initial == $parentPageIdInitial){
                 $data[] = $val['tree_page_id'];
-            }
-            if (isset($val['children'])) {
-                $data = $this->checkPageRelation($val['children'], $data, $parentPageIdInitial);
-            }
+                if (isset($val['children'])) {
+                    $data = $this->checkPageRelation($val['children'], $data, $parentPageIdInitial);
+                }
 
+            }
 
         }
 
         return $data;
 
     }
+    private function getPageIdInitial($pageId)
+    {
+        $tablePageLang = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+        $cmsLang = $tablePageLang->getEntryByField('plang_page_id', $pageId)->current();
 
+        return $cmsLang->plang_page_id_initial;
+    }
     public function savePageTreeRecursiveAction($page, $fatherPageId, $langId)
     {
+
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+
         $results = array();
         $data = array();
         $pageTreeTable = $this->getServiceLocator()->get('MelisEngineTablePageTree');
@@ -942,6 +914,35 @@ class TreeSitesController extends AbstractActionController
         return $results;
     }
 
+    public function recTestAction()
+    {
+        $cmsPageService = $this->getServiceLocator()->get('MelisCmsPageService');
+        $pageService = $this->getServiceLocator()->get('MelisEnginePage');
+
+        $pageTree = $this->getServiceLocator()->get('MelisEngineTree');
+
+        $destinationPage = 1139;
+        $duplicateStartingFrom = 1355;
+
+        $childPages = $pageTree->getAllPages($duplicateStartingFrom);
+        $curPageId = null;
+
+        $page    = (array) $pageService->getDatasPage($duplicateStartingFrom)->getMelisPageTree();
+
+
+        $pages = $page;
+        foreach($childPages as $idx => $childPage) {
+            $pages[$idx] = $childPage;
+        }
+
+
+        $destinationPage = $cmsPageService->duplicatePage($duplicateStartingFrom, $destinationPage);
+        $this->mapPage($destinationPage, $pages['children']);
+
+
+
+        die;
+    }
 
     
 }
