@@ -38,6 +38,8 @@
 		'tr_meliscms_page_actions_display_Desktop' => 'Desktop',
 	    'tr_meliscms_page_action_clear' => 'Erase draft',
         'tr_meliscms_page_action_duplicate' => 'Duplicate',
+
+	    'tr_melis_cms_page_analytics_tool_table' => 'Site analytics tool table',
 	    
 	    'tr_meliscms_delete_saved_page_title' => 'Erase saved version',
 	    'tr_meliscms_delete_saved_use_publish_version_confirmation_msg' => 'Are you sure you want to erase the saved version and go back to the published version?',
