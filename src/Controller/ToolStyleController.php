@@ -439,6 +439,7 @@ class ToolStyleController extends AbstractActionController
             if($form->isValid()) {
 
                 $data = $form->getData();
+                $data['style_status'] = ($data['style_status'] == 'on') ?? '';
 
                 $styleId = !empty($data['style_id'])? $data['style_id'] : null;
                 unset($data['style_id']);

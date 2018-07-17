@@ -470,7 +470,7 @@ return array(
                                 array(
                                     'spec' => array(
                                         'name' => 'style_status',
-                                        'type' => 'Checkbox',
+                                        'type' => 'Select',
                                         'disable_html_escape' => true,
                                         'options' => array(
                                             'label' => 'tr_meliscms_tool_style_page_status',
@@ -483,6 +483,7 @@ return array(
                                                 'label-off' => 'tr_meliscms_tool_style_page_status_off',
                                                 'label-on' => 'tr_meliscms_tool_style_page_status_on',
                                             ),
+                                            'disable_inarray_validator' => true
                                         ),
                                         'attributes' => array(
                                             'id' => 'id_style_page_id',
@@ -559,6 +560,14 @@ return array(
                                             )
                                         ),
                                     ),
+                                    'filters'  => array(
+                                        array('name' => 'StripTags'),
+                                        array('name' => 'StringTrim'),
+                                    ),
+                                ),
+                                'style_status' => array(
+                                    'name'     => 'style_status',
+                                    'required' => false,
                                     'filters'  => array(
                                         array('name' => 'StripTags'),
                                         array('name' => 'StringTrim'),
