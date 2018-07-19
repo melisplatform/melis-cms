@@ -390,8 +390,8 @@
         'tr_meliscms_duplicate_error' => 'Unable to duplicate page',
         'tr_melis_cms_duplicate_success' => 'Page "%s" successfully duplicated',
         'tr_melis_cms_duplicate_text_identifier' => '[Duplicated]',
-        'tr_meliscms_tree_sites_duplication_page_relation' => 'Relation avec une page initiale',
-        'tr_meliscms_tree_sites_duplication_page_relation tooltip' => 'Permer de créer une page en relation avec une page initiale',
+        'tr_meliscms_tree_sites_duplication_page_relation' => 'Relationship with an initial page',
+        'tr_meliscms_tree_sites_duplication_page_relation tooltip' => 'Allow to create a page in relation to an initial page',
 
 
         // plugins edition
