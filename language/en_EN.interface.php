@@ -341,7 +341,7 @@
 	    
 	    // Site Redirect Tool
 	    'tr_meliscms_tool_site_301' => 'Site redirect',
-	    'tr_meliscms_tool_site_301 info' => 'Declare here redirections towards specific pages for specific URL. <br>This fonctionality can be used for example in the case of a site migration in order to link old URL to the new ones.',
+	    'tr_meliscms_tool_site_301 info' => 'Declare here redirections towards specific pages for specific URL. <br>This functionality can be used for example in the case of a site migration in order to link old URL to the new ones.',
 	    
 	    // interface name
 	    'tr_meliscms_tool_site_301_header' => 'Header',
