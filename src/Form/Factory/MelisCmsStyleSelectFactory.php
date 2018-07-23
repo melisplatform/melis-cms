@@ -69,7 +69,7 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
                 }
             }
         }
-        
+
 		$valueoptions = array();
 
         if ($styles) {
@@ -78,13 +78,13 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
             {
                 $style = $styles->current();
                 if(true === (bool) $style->style_status) {
-                    $valueoptions[] = array(
+                    $valueoptions[] = [
                         'label' => $style->style_name,
                         'value' => $style->style_id,
-                        'attributes' => array(
+                        'attributes' => [
                             'data-link' => $style->style_path,
-                        )
-                    );
+                        ]
+                    ];
                 }
                 $styles->next();
             }
