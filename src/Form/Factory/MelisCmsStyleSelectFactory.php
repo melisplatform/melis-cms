@@ -18,6 +18,7 @@ use MelisCore\Form\Factory\MelisSelectFactory;
 class MelisCmsStyleSelectFactory extends MelisSelectFactory
 {
     const SITE = 'SITE';
+    const NEW_SITE = '';
 
     /**
      * @param ServiceLocatorInterface $formElementManager
@@ -51,26 +52,24 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
             $pageData = $pageSvc->getDatasPage($idPage, 'saved')->getMelisPageTree();
         }
 
-
-
-        if ($pageData->page_type == self::SITE) {
+        if ($pageData->page_type == self::SITE || $pageData->page_type == self::NEW_SITE) {
+            $idPage = $this->getCorrespondingSiteId($serviceManager, $idPage);
             $styles = $styleTable->getEntryByField('style_site_id', $idPage);
         } else {
             $parentId = $pageTree->getPageFather($idPage)->current();
             if (isset($parentId->tree_father_page_id)) {
-                $parentId = $parentId->tree_father_page_id;
+                $parentId = $this->getCorrespondingSiteId($serviceManager, $parentId->tree_father_page_id);
                 $styles = $styleTable->getEntryByField('style_site_id', $parentId);
             } else {
                 // try searching in the saved version
                 $parentId = $pageTree->getPageFather($idPage, 'saved')->current();
                 if (isset($parentId->tree_father_page_id)) {
-                    $parentId = $parentId->tree_father_page_id;
+                    $parentId = $this->getCorrespondingSiteId($serviceManager, $parentId->tree_father_page_id);
                     $styles = $styleTable->getEntryByField('style_site_id', $parentId);
                 }
             }
         }
-
-
+        
 		$valueoptions = array();
 
         if ($styles) {
@@ -91,8 +90,26 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
             }
         }
 
-
 		return $valueoptions; 
 	}
+
+    /**
+     * @param ServiceLocatorInterface $sl
+     * @param int                     $pageId
+     * @return int
+     */
+	private function getCorrespondingSiteId(ServiceLocatorInterface $sl, $pageId) : int
+    {
+        /**
+         * @var \MelisEngine\Model\Tables\MelisSiteTable $siteTable
+         */
+        $siteTable = $sl->get('MelisEngineTableSite');
+        $site = $siteTable->getEntryByField('site_main_page_id', (int) $pageId)->current();
+        if ($site) {
+            return $site->site_id;
+        }
+
+        return 0;
+    }
 
 }
