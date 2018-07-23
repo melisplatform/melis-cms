@@ -51,37 +51,46 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
             $pageData = $pageSvc->getDatasPage($idPage, 'saved')->getMelisPageTree();
         }
 
+
+
         if ($pageData->page_type == self::SITE) {
             $styles = $styleTable->getEntryByField('style_site_id', $idPage);
         } else {
-            $parentId = $pageTree->getPageFather($idPage)->current()->tree_father_page_id ?? null;
-            if ($parentId) {
+            $parentId = $pageTree->getPageFather($idPage)->current();
+            if (isset($parentId->tree_father_page_id)) {
+                $parentId = $parentId->tree_father_page_id;
                 $styles = $styleTable->getEntryByField('style_site_id', $parentId);
             } else {
                 // try searching in the saved version
-                $parentId = $pageTree->getPageFather($idPage, 'saved')->current()->tree_father_page_id ?? null;
-                if ($parentId) {
+                $parentId = $pageTree->getPageFather($idPage, 'saved')->current();
+                if (isset($parentId->tree_father_page_id)) {
+                    $parentId = $parentId->tree_father_page_id;
                     $styles = $styleTable->getEntryByField('style_site_id', $parentId);
                 }
             }
         }
 
+
 		$valueoptions = array();
-		$max = $styles->count();
-		for ($i = 0; $i < $max; $i++)
-		{
-			$style = $styles->current();
-            if(true === (bool) $style->style_status) {
-                $valueoptions[] = array(
-                    'label' => $style->style_name,
-                    'value' => $style->style_id,
-                    'attributes' => array(
-                        'data-link' => $style->style_path,
-                    )
-                );
+
+        if ($styles) {
+            $max = $styles->count();
+            for ($i = 0; $i < $max; $i++)
+            {
+                $style = $styles->current();
+                if(true === (bool) $style->style_status) {
+                    $valueoptions[] = array(
+                        'label' => $style->style_name,
+                        'value' => $style->style_id,
+                        'attributes' => array(
+                            'data-link' => $style->style_path,
+                        )
+                    );
+                }
+                $styles->next();
             }
-			$styles->next();
-		}
+        }
+
 
 		return $valueoptions; 
 	}
