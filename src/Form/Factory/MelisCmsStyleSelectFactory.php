@@ -48,7 +48,7 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
                     )
                 );
             }
-            
+
 			$styles->next();
 		}
 
