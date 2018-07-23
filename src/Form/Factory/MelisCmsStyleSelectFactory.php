@@ -53,6 +53,12 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
             $parentId = $pageTree->getPageFather($idPage)->current()->tree_father_page_id ?? null;
             if ($parentId) {
                 $styles = $styleTable->getEntryByField('style_site_id', $parentId);
+            } else {
+                // try searching in the saved version
+                $parentId = $pageTree->getPageFather($idPage, 'saved')->current()->tree_father_page_id ?? null;
+                if ($parentId) {
+                    $styles = $styleTable->getEntryByField('style_site_id', $parentId);
+                }
             }
         }
 
