@@ -255,6 +255,9 @@ class ToolStyleController extends AbstractActionController
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_styles');
 
         // Site Table
+        /**
+         * @var \MelisEngine\Model\Tables\MelisCmsStyleTable $tableStyle
+         */
         $tableStyle = $this->getServiceLocator()->get('MelisEngineTableStyle');
 
         $colId = array();

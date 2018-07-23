@@ -19,14 +19,19 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
 {
 	protected function loadValueOptions(ServiceLocatorInterface $formElementManager)
 	{
+        /**
+         * @var \Zend\ServiceManager\ServiceLocatorInterface $serviceManager
+         */
 		$serviceManager = $formElementManager->getServiceLocator();
 		$request = $serviceManager->get('Request');
-		$idPage = $request->getQuery('idPage', $request->getPost('idPage', ''));
-		
+		$idPage = (int) $request->getQuery('idPage', $request->getPost('idPage', ''));
+
+        /**
+         * @var \MelisEngine\Model\Tables\MelisCmsStyleTable $styleTable
+         */
 		$styleTable = $serviceManager->get('MelisEngineTableStyle');
-		$styles = $styleTable->fetchAll();
-		
-		$request = $serviceManager->get('Request');
+		$styles = $styleTable->getEntryByField('style_site_id', $idPage);
+
 		$valueoptions = array();
 		
 		$max = $styles->count();
@@ -43,8 +48,7 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
                     )
                 );
             }
-
-			
+            
 			$styles->next();
 		}
 
