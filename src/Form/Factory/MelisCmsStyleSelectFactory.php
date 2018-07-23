@@ -47,6 +47,10 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
         $pageSvc  = $serviceManager->get('MelisEnginePage');
 
         $pageData = $pageSvc->getDatasPage($idPage)->getMelisPageTree();
+        if (!$pageData) {
+            $pageData = $pageSvc->getDatasPage($idPage, 'saved')->getMelisPageTree();
+        }
+
         if ($pageData->page_type == self::SITE) {
             $styles = $styleTable->getEntryByField('style_site_id', $idPage);
         } else {
