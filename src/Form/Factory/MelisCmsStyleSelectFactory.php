@@ -17,6 +17,12 @@ use MelisCore\Form\Factory\MelisSelectFactory;
  */
 class MelisCmsStyleSelectFactory extends MelisSelectFactory
 {
+    const SITE = 'SITE';
+
+    /**
+     * @param ServiceLocatorInterface $formElementManager
+     * @return array
+     */
 	protected function loadValueOptions(ServiceLocatorInterface $formElementManager)
 	{
         /**
@@ -25,20 +31,34 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
 		$serviceManager = $formElementManager->getServiceLocator();
 		$request = $serviceManager->get('Request');
 		$idPage = (int) $request->getQuery('idPage', $request->getPost('idPage', ''));
+        $styles = [];
 
         /**
          * @var \MelisEngine\Model\Tables\MelisCmsStyleTable $styleTable
          */
-		$styleTable = $serviceManager->get('MelisEngineTableStyle');
-		$styles = $styleTable->getEntryByField('style_site_id', $idPage);
+        $styleTable = $serviceManager->get('MelisEngineTableStyle');
+        /**
+         * @var \MelisEngine\Service\MelisTreeService $pageTree
+         */
+        $pageTree = $serviceManager->get('MelisEngineTree');
+        /**
+         * @var \MelisEngine\Service\MelisPageService $pageSvc
+         */
+        $pageSvc  = $serviceManager->get('MelisEnginePage');
+
+        $pageData = $pageSvc->getDatasPage($idPage)->getMelisPageTree();
+        if ($pageData->page_type == self::SITE) {
+            $styles = $styleTable->getEntryByField('style_site_id', $idPage);
+        } else {
+            $parentId = $pageTree->getPageFather($idPage)->current()->tree_father_page_id;
+            $styles = $styleTable->getEntryByField('style_site_id', $parentId);
+        }
 
 		$valueoptions = array();
-		
 		$max = $styles->count();
 		for ($i = 0; $i < $max; $i++)
 		{
 			$style = $styles->current();
-
             if(true === (bool) $style->style_status) {
                 $valueoptions[] = array(
                     'label' => $style->style_name,
@@ -48,7 +68,6 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
                     )
                 );
             }
-
 			$styles->next();
 		}
 
