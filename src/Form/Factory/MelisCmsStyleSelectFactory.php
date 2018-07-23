@@ -50,8 +50,10 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
         if ($pageData->page_type == self::SITE) {
             $styles = $styleTable->getEntryByField('style_site_id', $idPage);
         } else {
-            $parentId = $pageTree->getPageFather($idPage)->current()->tree_father_page_id;
-            $styles = $styleTable->getEntryByField('style_site_id', $parentId);
+            $parentId = $pageTree->getPageFather($idPage)->current()->tree_father_page_id ?? null;
+            if ($parentId) {
+                $styles = $styleTable->getEntryByField('style_site_id', $parentId);
+            }
         }
 
 		$valueoptions = array();
