@@ -341,7 +341,7 @@
 	    
 	    // Site Redirect Tool
 	    'tr_meliscms_tool_site_301' => 'Site redirect',
-	    'tr_meliscms_tool_site_301 info' => 'Declare here redirections towards specific pages for specific URL. <br>This fonctionality can be used for example in the case of a site migration in order to link old URL to the new ones.',
+	    'tr_meliscms_tool_site_301 info' => 'Declare here redirections towards specific pages for specific URL. <br>This functionality can be used for example in the case of a site migration in order to link old URL to the new ones.',
 	    
 	    // interface name
 	    'tr_meliscms_tool_site_301_header' => 'Header',
@@ -390,8 +390,8 @@
         'tr_meliscms_duplicate_error' => 'Unable to duplicate page',
         'tr_melis_cms_duplicate_success' => 'Page "%s" successfully duplicated',
         'tr_melis_cms_duplicate_text_identifier' => '[Duplicated]',
-        'tr_meliscms_tree_sites_duplication_page_relation' => 'Relation avec une page initiale',
-        'tr_meliscms_tree_sites_duplication_page_relation tooltip' => 'Permer de créer une page en relation avec une page initiale',
+        'tr_meliscms_tree_sites_duplication_page_relation' => 'Relationship with an initial page',
+        'tr_meliscms_tree_sites_duplication_page_relation tooltip' => 'Allow to create a page in relation to an initial page',
 
 
         // plugins edition
