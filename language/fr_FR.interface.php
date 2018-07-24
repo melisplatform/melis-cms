@@ -38,6 +38,8 @@
 		'tr_meliscms_page_actions_display_Desktop' => 'Ordinateur',
 	    'tr_meliscms_page_action_clear' => 'Effacer brouillon',
         'tr_meliscms_page_action_duplicate' => 'Dupliquer',
+
+        'tr_melis_cms_page_analytics_tool_table' => 'Site analytics tool table',
 	    
 	    'tr_meliscms_delete_saved_page_title' => 'Effacer la version sauvegardée',
 	    'tr_meliscms_delete_saved_use_publish_version_confirmation_msg' => 'Etes-vous sûr de vouloir effacer la version sauvegardée et revenir à la version publiée?',
@@ -411,7 +413,7 @@
 	    'tr_meliscms_tool_style_id tooltip' => 'Identifiant du style',
 	    'tr_meliscms_tool_style_name' => 'Nom',
 	    'tr_meliscms_tool_style_name_properties' => 'Nom du style',
-	    'tr_meliscms_tool_style_name tooltip' => 'Nom du style',
+	    'tr_meliscms_tool_style_name tooltip' => 'Nom de la feuille de style',
 	    'tr_meliscms_tool_style_page_id' => 'Page ID',
 	    'tr_meliscms_tool_style_page_id tooltip' => ' Tooltip Page ID',
         'tr_meliscms_tool_style_files' => 'Fichiers',

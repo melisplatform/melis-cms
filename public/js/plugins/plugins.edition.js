@@ -809,13 +809,11 @@ var melisCmsFormHelper = (function($, window) {
      * KO NOTIFICATION for Multiple Form
      */
     function melisMultiKoNotification(errors, closeByButtonOnly) {
-        if(!closeByButtonOnly) closeByButtonOnly = true;
+        if (!closeByButtonOnly) closeByButtonOnly = true;
         var closeByButtonOnly = ( closeByButtonOnly !== true ) ?  'overlay-hideonclick' : '';
-        var errorTexts = '';
-
+        var errorTexts = '<div class="row">';
         $.each(errors, function(idx, errorData) {
             if(errorData['success'] === false) {
-                errorTexts += '<div class="row">';
                 errorTexts += '<h3>'+ (errorData['name']) +'</h3>';
                 errorTexts +='<h4>'+ (errorData['message']) +'</h4>';
                 highlightMultiErrors(errorData['success'], errorData['errors']);
@@ -838,9 +836,8 @@ var melisCmsFormHelper = (function($, window) {
                                         $errMsg = value;
                                     }
                                     if($errMsg != '') {
-                                        errorTexts += '<span class="tets error-list"><i class="fa fa-circle"></i>'+ $errMsg + '</span>';
+                                        errorTexts += '<span class="tets error-list"><i class="fa fa-circle"></i>'+ $errMsg + '</span><br/>';
                                     }
-
                                 }
                             });
                         } catch(e) {
@@ -849,15 +846,11 @@ var melisCmsFormHelper = (function($, window) {
                             }
                         }
                     }
-
                     errorTexts += '</div></div>';
                 });
             }
-            errorTexts += '  </div> <br/>';
         });
-
-        // errorTexts += '';
-
+        errorTexts += '</div>';
         var div = '<div class="melis-modaloverlay '+ closeByButtonOnly +'"></div>';
         div += '<div class="melis-modal-cont KOnotif">  <div class="modal-content error">'+ errorTexts +' <span class="btn btn-block btn-primary">' + translations.tr_meliscore_notification_modal_Close +'</span></div> </div>';
         $body.append(div);

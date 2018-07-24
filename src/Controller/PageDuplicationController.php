@@ -105,7 +105,8 @@ class PageDuplicationController extends AbstractActionController
                 'page_menu' => $pageTreeData->page_menu,
                 'page_tpl_id' => $pageTreeData->page_tpl_id,
                 'page_taxonomy' => $pageTreeData->page_taxonomy,
-                'fatherPageId'  => $pageId
+                'fatherPageId'  => $pageId,
+                'page_search_type' => $pageTreeData->page_search_type,
             );
 
 
