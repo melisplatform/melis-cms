@@ -1131,7 +1131,9 @@ return array(
                                         'type' => 'MelisText',
                                         'options' => array(
                                             'label' => 'tr_meliscms_tool_site_page_id',
-                                            'tooltip' => 'tr_meliscms_tool_site_page_id tooltip'
+                                            'tooltip' => 'tr_meliscms_tool_site_page_id tooltip',
+                                            'button' => 'fa fa-sitemap',
+                                            'button-id' => 'siteMainPageId',
                                         ),
                                         'attributes' => array(
                                             'id' => 'id_site_main_page_id',
@@ -1147,6 +1149,8 @@ return array(
                                         'options' => array(
                                             'label' => 'tr_meliscms_tool_site_404_page_id',
                                             'tooltip' => 'tr_meliscms_tool_site_404_page_id tooltip',
+                                            'button' => 'fa fa-sitemap',
+                                            'button-id' => 's404PageId',
                                         ),
                                         'attributes' => array(
                                             'id' => 'id_s404_page_id',
