@@ -331,6 +331,14 @@ $(document).ready(function() {
     		
 	    })
 	});
+
+	$("body").on("click", "#siteMainPageId", function(){
+        melisLinkTree.createInputTreeModal('#id_site_main_page_id');
+	});
+
+	$("body").on("click", "#s404PageId", function(){
+        melisLinkTree.createInputTreeModal('#id_s404_page_id');
+	});
 	
 	function newSiteConfirmation(siteId) {
 		// initialize of local variable calendar id
