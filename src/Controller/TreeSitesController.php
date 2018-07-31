@@ -204,13 +204,23 @@ class TreeSitesController extends AbstractActionController
 					$data_page_name = $page['page_name'];
 			}
 
-			$data_icon = '';
-			if ($data_page_type == 'PAGE')
-				$data_icon = 'fa fa-file-o';
-			if ($data_page_type == 'SITE')
-				$data_icon = 'fa fa-home';
-			if ($data_page_type == 'FOLDER')
-				$data_icon = 'fa fa-folder-open-o';
+			switch ($data_page_type) {
+				case 'PAGE': 
+					$data_icon = 'fa fa-file-o';
+					break;
+				case 'SITE': 
+					$data_icon = 'fa fa-home';
+					break;
+				case 'FOLDER': 
+					$data_icon = 'fa fa-folder-open-o';
+					break;
+				case 'NEWSLETTER': 
+					$data_icon = 'fa fa-newspaper-o';
+					break;
+				default: 
+					$data_icon = '';
+					break;
+			}
 
 			$newpage = array(
 				// These datas are common to all treeviews
