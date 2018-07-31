@@ -3,11 +3,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]  
 ### Added  
- 
+ * Added site column on Style manager tool
 
 ### Changed  
-* Page edition and plugin: updates of drag'n'drop zone  
-* composer.json and dependencies  
+* Fixed error 500 on pages that is not yet published
+* Fixed issue on creating a site with special characters and accents
+* 
 
 ### Removed  
 
