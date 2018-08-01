@@ -47,25 +47,27 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
          */
         $pageSvc  = $serviceManager->get('MelisEnginePage');
 
-        $pageData = $pageSvc->getDatasPage($idPage)->getMelisPageTree();
-        if (!$pageData) {
-            $pageData = $pageSvc->getDatasPage($idPage, 'saved')->getMelisPageTree();
-        }
-
-        if ($pageData->page_type == self::SITE || $pageData->page_type == self::NEW_SITE) {
-            $idPage = $this->getCorrespondingSiteId($serviceManager, $idPage);
-            $styles = $styleTable->getEntryByField('style_site_id', $idPage);
-        } else {
-            $parentId = $pageTree->getPageFather($idPage)->current();
-            if (isset($parentId->tree_father_page_id)) {
-                $parentId = $this->getCorrespondingSiteId($serviceManager, $parentId->tree_father_page_id);
-                $styles = $styleTable->getEntryByField('style_site_id', $parentId);
+        if ($idPage) {
+            $pageData = $pageSvc->getDatasPage($idPage)->getMelisPageTree();
+            if (!$pageData) {
+                $pageData = $pageSvc->getDatasPage($idPage, 'saved')->getMelisPageTree();
+            }
+    
+            if ($pageData->page_type == self::SITE || $pageData->page_type == self::NEW_SITE) {
+                $idPage = $this->getCorrespondingSiteId($serviceManager, $idPage);
+                $styles = $styleTable->getEntryByField('style_site_id', $idPage);
             } else {
-                // try searching in the saved version
-                $parentId = $pageTree->getPageFather($idPage, 'saved')->current();
+                $parentId = $pageTree->getPageFather($idPage)->current();
                 if (isset($parentId->tree_father_page_id)) {
                     $parentId = $this->getCorrespondingSiteId($serviceManager, $parentId->tree_father_page_id);
                     $styles = $styleTable->getEntryByField('style_site_id', $parentId);
+                } else {
+                    // try searching in the saved version
+                    $parentId = $pageTree->getPageFather($idPage, 'saved')->current();
+                    if (isset($parentId->tree_father_page_id)) {
+                        $parentId = $this->getCorrespondingSiteId($serviceManager, $parentId->tree_father_page_id);
+                        $styles = $styleTable->getEntryByField('style_site_id', $parentId);
+                    }
                 }
             }
         }
