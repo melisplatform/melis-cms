@@ -3,8 +3,7 @@
 return array(
     'plugins' => array(
         'meliscore' => array(
-            'datas' => array(
-            ),
+            'datas' => [],
             'interface' => array(
                 'meliscore_leftmenu' => array(
                     'interface' => array(
@@ -15,21 +14,21 @@ return array(
                                 'type' => '/meliscms/interface/meliscms_sitetree',
                             ),
                         ),
-                        'meliscore_toolstree' =>  array(
+                        'meliscms_toolstree_section' =>  array(
                             'interface' => array(
-                                'meliscms_tools_section' => array(
+                                'meliscms_site_tools' => array(
                                     'conf' => array(
-                                        'id' => 'id_meliscms_tools_section',
-                                        'name' => 'tr_meliscms_meliscms',
-                                        'icon' => 'fa-newspaper-o',
+                                        'id' => 'id_meliscms_menu_sitetree',
+                                        'name' => 'Site Tools',
                                         'rights_checkbox_disable' => true,
+                                        'melisKey' => 'meliscms_site_tools',
                                     ),
-                                    'interface' => array(
-                                        'meliscms_tool_site' => array(
+                                    'interface' => [
+                                        'meliscms_tool_site' => [
                                             'conf' => array(
                                                 'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_site',
                                             ),
-                                        ),
+                                        ],
                                         'meliscms_tool_site_301' => array(
                                             'conf' => array(
                                                 'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_site_301',
@@ -55,9 +54,9 @@ return array(
                                                 'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_platform_ids',
                                             ),
                                         ),
-                                    ),
+                                    ]
                                 ),
-                            )
+                            ),
                         ),
                     ),
                 ),
