@@ -627,7 +627,7 @@ class ToolStyleController extends AbstractActionController
         $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
         $xmlRights = $melisCoreAuth->getAuthRights();
 
-        $isAccessible = $melisCoreRights->isAccessible($xmlRights, MelisCoreRightsService::MELISCORE_PREFIX_TOOLS, $key);
+        $isAccessible = $melisCoreRights->canAccess($key);
 
         return $isAccessible;
     }
