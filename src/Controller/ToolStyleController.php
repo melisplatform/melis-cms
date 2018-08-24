@@ -255,6 +255,9 @@ class ToolStyleController extends AbstractActionController
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_styles');
 
         // Site Table
+        /**
+         * @var \MelisEngine\Model\Tables\MelisCmsStyleTable $tableStyle
+         */
         $tableStyle = $this->getServiceLocator()->get('MelisEngineTableStyle');
 
         $colId = array();
@@ -439,6 +442,7 @@ class ToolStyleController extends AbstractActionController
             if($form->isValid()) {
 
                 $data = $form->getData();
+                $data['style_status'] = ($data['style_status'] == 'on') ?? '';
 
                 $styleId = !empty($data['style_id'])? $data['style_id'] : null;
                 unset($data['style_id']);
@@ -623,7 +627,7 @@ class ToolStyleController extends AbstractActionController
         $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
         $xmlRights = $melisCoreAuth->getAuthRights();
 
-        $isAccessible = $melisCoreRights->isAccessible($xmlRights, MelisCoreRightsService::MELISCORE_PREFIX_TOOLS, $key);
+        $isAccessible = $melisCoreRights->canAccess($key);
 
         return $isAccessible;
     }

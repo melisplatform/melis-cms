@@ -470,7 +470,7 @@ return array(
                                 array(
                                     'spec' => array(
                                         'name' => 'style_status',
-                                        'type' => 'Checkbox',
+                                        'type' => 'Select',
                                         'disable_html_escape' => true,
                                         'options' => array(
                                             'label' => 'tr_meliscms_tool_style_page_status',
@@ -483,6 +483,7 @@ return array(
                                                 'label-off' => 'tr_meliscms_tool_style_page_status_off',
                                                 'label-on' => 'tr_meliscms_tool_style_page_status_on',
                                             ),
+                                            'disable_inarray_validator' => true
                                         ),
                                         'attributes' => array(
                                             'id' => 'id_style_page_id',
@@ -500,6 +501,22 @@ return array(
                                         'attributes' => array(
                                             'id' => 'id_style_id',
                                             'readonly' => 'readonly',
+                                        ),
+                                    ),
+                                ),
+                                array(
+                                    'spec' => array(
+                                        'name' => 'style_site_id',
+                                        'type' => 'MelisCmsPluginSiteSelect',
+                                        'options' => array(
+                                            'label' => 'tr_meliscms_tool_templates_tpl_site_id',
+                                            'tooltip' => 'tr_meliscms_tool_templates_tpl_site_id',
+                                            'empty_option' => 'tr_meliscms_form_common_Choose',
+                                            'disable_inarray_validator' => true,
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'style_site_id',
+                                            'required' => 'required',
                                         ),
                                     ),
                                 ),
@@ -559,6 +576,32 @@ return array(
                                             )
                                         ),
                                     ),
+                                    'filters'  => array(
+                                        array('name' => 'StripTags'),
+                                        array('name' => 'StringTrim'),
+                                    ),
+                                ),
+                                'style_site_id' => array(
+                                    'name'     => 'style_site_id',
+                                    'required' => true,
+                                    'validators' => [
+                                        array(
+                                            'name' => 'NotEmpty',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_template_form_tpl_site_id_error_empty',
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                    'filters'  => array(
+                                        array('name' => 'StripTags'),
+                                        array('name' => 'StringTrim'),
+                                    ),
+                                ),
+                                'style_status' => array(
+                                    'name'     => 'style_status',
+                                    'required' => false,
                                     'filters'  => array(
                                         array('name' => 'StripTags'),
                                         array('name' => 'StringTrim'),
@@ -671,6 +714,12 @@ return array(
                                 'sortable' => true,
 
                             ),
+                            'site_name' => array(
+                                'text' => 'tr_meliscms_tool_templates_tpl_site_id',
+                                'css' => array('width' => '20%', 'padding-right' => '0'),
+                                'sortable' => true,
+
+                            ),
                             'style_files' => array(
                                 'text' => 'tr_meliscms_tool_style_files',
                                 'css' => array('width' => '5%', 'padding-right' => '0'),
@@ -690,7 +739,7 @@ return array(
                             ),
                             'style_path' => array(
                                 'text' => 'tr_meliscms_tool_style_path',
-                                'css' => array('width' => '60%', 'padding-right' => '0'),
+                                'css' => array('width' => '40%', 'padding-right' => '0'),
                                 'sortable' => true,
 
                             ),
@@ -1082,7 +1131,9 @@ return array(
                                         'type' => 'MelisText',
                                         'options' => array(
                                             'label' => 'tr_meliscms_tool_site_page_id',
-                                            'tooltip' => 'tr_meliscms_tool_site_page_id tooltip'
+                                            'tooltip' => 'tr_meliscms_tool_site_page_id tooltip',
+                                            'button' => 'fa fa-sitemap',
+                                            'button-id' => 'siteMainPageId',
                                         ),
                                         'attributes' => array(
                                             'id' => 'id_site_main_page_id',
@@ -1098,6 +1149,8 @@ return array(
                                         'options' => array(
                                             'label' => 'tr_meliscms_tool_site_404_page_id',
                                             'tooltip' => 'tr_meliscms_tool_site_404_page_id tooltip',
+                                            'button' => 'fa fa-sitemap',
+                                            'button-id' => 's404PageId',
                                         ),
                                         'attributes' => array(
                                             'id' => 'id_s404_page_id',
