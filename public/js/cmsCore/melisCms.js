@@ -478,7 +478,7 @@ var melisCms = (function(){
 	
 		var charLength = $(this).val().length;
 		var prevLabel = $(this).prev('label');
-		var limit = event.data.limit;
+		//var limit = event.data.limit;
 		
 		if( prevLabel.find('span').length ){
 			
