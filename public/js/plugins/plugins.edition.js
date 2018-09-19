@@ -16,16 +16,19 @@ var melisPluginEdition = (function($, window) {
     $("body").on("click", ".m-trash-handle", removePlugins);
 
     // Checking parent body events handler to avoid multiple events of the button
-    var cerateEventHalder = true;
+    // var cerateEventHalder = true;
     $.each($body.data("events").click, function(i, val){
-        if (val.selector == "#pluginModalBtnApply") {
-            cerateEventHalder = false;
+        try {
+            if (val.selector == "#pluginModalBtnApply") {
+                $body.off("click", "#pluginModalBtnApply");
+            }
         }
+        catch(error) {}
     });
 
-    if (cerateEventHalder) {
+    // if (cerateEventHalder) {
         $body.on("click", "#pluginModalBtnApply", submitPluginForms); // $body because it is modal and it's located in parent
-    }
+    // }
 
     $("body").on("focus", ".melis-ui-outlined .melis-editable", function() {
         $(this).closest(".melis-ui-outlined").addClass("melis-focus");
@@ -831,7 +834,7 @@ var melisCmsFormHelper = (function($, window) {
 
         // remove red color for correctly inputted fields
         $body.find("#id_meliscms_plugin_modal .form-group label").css("color", "inherit");
-                
+
         $.each(errors, function(idx, errorData) {
             if(errorData['success'] === false) {
                 errorTexts += '<h3>'+ (errorData['name']) +'</h3>';
