@@ -15,7 +15,17 @@ var melisPluginEdition = (function($, window) {
 
     $("body").on("click", ".m-trash-handle", removePlugins);
 
-    $body.on("click", "#pluginModalBtnApply", submitPluginForms); // $body because it is modal and it's located in parent
+    // Checking parent body events handler to avoid multiple events of the button
+    var cerateEventHalder = true;
+    $.each($body.data("events").click, function(i, val){
+        if (val.selector == "#pluginModalBtnApply") {
+            cerateEventHalder = false;
+        }
+    });
+
+    if (cerateEventHalder) {
+        $body.on("click", "#pluginModalBtnApply", submitPluginForms); // $body because it is modal and it's located in parent
+    }
 
     $("body").on("focus", ".melis-ui-outlined .melis-editable", function() {
         $(this).closest(".melis-ui-outlined").addClass("melis-focus");
