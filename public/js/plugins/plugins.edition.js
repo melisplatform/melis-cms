@@ -828,10 +828,16 @@ var melisCmsFormHelper = (function($, window) {
         if (!closeByButtonOnly) closeByButtonOnly = true;
         var closeByButtonOnly = ( closeByButtonOnly !== true ) ?  'overlay-hideonclick' : '';
         var errorTexts = '<div class="row">';
+
+        // remove red color for correctly inputted fields
+        $body.find("#id_meliscms_plugin_modal .form-group label").css("color", "inherit");
+                
         $.each(errors, function(idx, errorData) {
             if(errorData['success'] === false) {
                 errorTexts += '<h3>'+ (errorData['name']) +'</h3>';
                 errorTexts +='<h4>'+ (errorData['message']) +'</h4>';
+
+                // Highlighting errors fields
                 highlightMultiErrors(errorData['success'], errorData['errors']);
 
                 $.each( errorData['errors'], function( key, error ) {
@@ -873,8 +879,6 @@ var melisCmsFormHelper = (function($, window) {
     }
 
     function highlightMultiErrors(success, errors){
-        // remove red color for correctly inputted fields
-    	$body.find("#id_meliscms_plugin_modal .form-group label").css("color", "inherit");
         // if all form fields are error color them red
         if(!success){
             $.each( errors, function( key, error ) {
