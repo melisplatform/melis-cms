@@ -349,19 +349,23 @@ hr{
 	/* margin: 0; */
 	/* border-bottom: 1px solid #e5e5e5; */
 }
+#id_meliscms_plugin_modal .nav-tabs>li>a {
+ 	border: 0;
+	border-radius: 0;
+}
 .page-content-container .widget.widget-tabs-double-2>.widget-head ul li a.glyphicons{
-	min-width: 90px;
+min-width: 90px;
 }
 .widget.widget-tabs-double-2>.widget-head ul li.active{
 
 }
 /*
 .widget.widget-tabs>.widget-head ul li.active a{
-	border-color: transparent;
-    border-radius: 0;
-    margin: 0;
-    box-shadow: none;
-	text-shadow: none;
+border-color: transparent;
+border-radius: 0;
+margin: 0;
+box-shadow: none;
+text-shadow: none;
 }
 */
 .nav-tabs>li>a:hover, 
@@ -477,7 +481,7 @@ div.content-heading h1{
     position: relative;
     padding: 9px 15px 0 38px;
     color: #932e2a;
-    border-bottom-color: #eee;
+    /*border-bottom-color: #eee;*/
 }
 
 .widget.widget-tabs-double>.widget-head ul li a.f-awesome .fa-sitemap,
@@ -542,8 +546,8 @@ transition: all 0.4s ease-in-out; */
   right: 0;
   height: 100%;
   width: 30px;
-  background-image: -webkit-linear-gradient(left, rgba(52, 73, 94, 0), #981a1f);
-  background-image: linear-gradient(left, rgba(52, 73, 94, 0), #34495e);
+  /*background-image: -webkit-linear-gradient(left, rgba(52, 73, 94, 0), #981a1f);*/
+  /*background-image: linear-gradient(left, rgba(52, 73, 94, 0), #34495e);*/
 }
 
 .widget.widget-tabs-double>.widget-head .melis-whead-box ul li a.f-awesome:hover {
