@@ -28,7 +28,7 @@
 		'tr_meliscms_page_tab_properties_form_Language2 tooltip' => 'Site language',
 		'tr_meliscms_page_tab_properties_form_Language tooltip' => 'Language of the pages',
 		'tr_meliscms_page_tab_properties_form_Template' => 'Template',
-		'tr_meliscms_page_tab_properties_form_Template tooltip' => 'Select the page template among the templates registered in the "Templates" tool or select "None" if the page will not be published',
+		'tr_meliscms_page_tab_properties_form_Template tooltip' => 'Select the page template among the templates registered in the \'\'Templates\'\' tool or select \'\'None\'\' if the page will not be published',
 		'tr_meliscms_page_tab_properties_form_Template_None' => 'None',
 		'tr_meliscms_page_tab_properties_form_Meta Title' => 'Meta title',
 		'tr_meliscms_page_tab_properties_form_Meta Keywords' => 'Meta keywords',
