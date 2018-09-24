@@ -2582,6 +2582,12 @@ return array(
                                     ],
                                 ]
                             ],
+                            'input_filter' => [
+                                'site_id' => [
+                                    'name' => 'site_id',
+                                    'required' => false,
+                                ],
+                            ],
                         ],
                     ],
                 ],
