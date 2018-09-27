@@ -2579,6 +2579,9 @@ return array(
                                             'form_type' => 'form-horizontal',
                                             'empty_option' => 'tr_meliscore_common_choose',
                                         ],
+                                        'attributes' => [
+                                            'id' => 'melis_core_gdpr_search_form_site_id',
+                                        ]
                                     ],
                                 ]
                             ],
