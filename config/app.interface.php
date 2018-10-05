@@ -16,6 +16,37 @@ return array(
                         ),
                         'meliscms_toolstree_section' =>  array(
                             'interface' => array(
+//                                'meliscms_sitetree' =>  array(
+//                                    'conf' => array(
+//                                        'id' => 'id_meliscms_menu_sitetree',
+//                                        'name' => 'tr_meliscms_menu_sitetree_Name',
+//                                        'melisKey' => 'meliscms_sitetree',
+//                                    ),
+//                                    'forward' => array(
+//                                        'module' => 'MelisCms',
+//                                        'controller' => 'TreeSites',
+//                                        'action' => 'get-tree-pages-by-page-id',
+//                                        'jscallback' => 'treeCallBack();',
+//                                        'jsdatas' => array()
+//                                    ),
+//                                    'interface' => [
+//                                        'meliscms_sitetree' =>  array(
+//                                            'conf' => array(
+//                                                'id' => 'id_meliscms_menu_sitetree',
+//                                                'name' => 'tr_meliscms_menu_sitetree_Name',
+//                                                'melisKey' => 'meliscms_sitetree',
+//                                                'rightsDisplay' => 'referencesonly',
+//                                            ),
+//                                            'forward' => array(
+//                                                'module' => 'MelisCms',
+//                                                'controller' => 'TreeSites',
+//                                                'action' => 'get-tree-pages-by-page-id',
+//                                                'jscallback' => 'treeCallBack();',
+//                                                'jsdatas' => array()
+//                                            ),
+//                                        ),
+//                                    ]
+//                                ),
                                 'meliscms_site_tools' => array(
                                     'conf' => array(
                                         'id' => 'id_meliscms_menu_sitetree',
@@ -24,6 +55,7 @@ return array(
                                         'melisKey' => 'meliscms_site_tools',
                                     ),
                                     'interface' => [
+
                                         'meliscms_tool_site' => [
                                             'conf' => array(
                                                 'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_site',

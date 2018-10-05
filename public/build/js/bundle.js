@@ -478,7 +478,7 @@ var melisCms = (function(){
 	
 		var charLength = $(this).val().length;
 		var prevLabel = $(this).prev('label');
-		var limit = event.data.limit;
+		//var limit = event.data.limit;
 		
 		if( prevLabel.find('span').length ){
 			
@@ -487,26 +487,34 @@ var melisCms = (function(){
 				prevLabel.find('span').remove();
 			}
 			else{
-				prevLabel.find('span').html('<i class="fa fa-text-width"></i>(' + charLength + ')');
-				
-				if( charLength > limit ){
-					prevLabel.addClass('limit');
-					prevLabel.find('span').addClass('limit');
-				}
-				else{
-					prevLabel.removeClass('limit');
-					prevLabel.find('span').removeClass('limit');
-				}	
+                /**
+				 * Removed so that meta title & meta description has no limit
+				 * cause it's data type on db is TEXT
+                 */
+				// prevLabel.find('span').html('<i class="fa fa-text-width"></i>(' + charLength + ')');
+				//
+				// if( charLength > limit ){
+				// 	prevLabel.addClass('limit');
+				// 	prevLabel.find('span').addClass('limit');
+				// }
+				// else{
+				// 	prevLabel.removeClass('limit');
+				// 	prevLabel.find('span').removeClass('limit');
+				// }
 			}
 		}
 		else{
 			if(charLength !== 0){
 				prevLabel.append("<span class='text-counter-indicator'><i class='fa fa-text-width'></i>(" + charLength + ")</span>");
-				
-				if( charLength > limit ){
-					prevLabel.addClass('limit');
-					prevLabel.find('span').addClass('limit');
-				}
+
+                /**
+                 * Removed so that meta title & meta description has no limit
+				 * cause it's data type on db is TEXT
+                 */
+				// if( charLength > limit ){
+				// 	prevLabel.addClass('limit');
+				// 	prevLabel.find('span').addClass('limit');
+				// }
 			}
 		}
 	}
@@ -718,10 +726,10 @@ var melisCms = (function(){
     $body.on('switch-change', '.page-publishunpublish', publishUnpublish);
     
     // char counter in seo title
-    $body.on("keyup keydown change", "form[name='pageseo'] input[name='pseo_meta_title']", { limit: 70}, charCounter);
+    $body.on("keyup keydown change", "form[name='pageseo'] input[name='pseo_meta_title']" , charCounter);
     
     // char counter in seo description
-    $body.on("keyup keydown change", "form[name='pageseo'] textarea[name='pseo_meta_description']", { limit: 160}, charCounter);
+    $body.on("keyup keydown change", "form[name='pageseo'] textarea[name='pseo_meta_description']", charCounter);
     
     // main tab click event (edition, properties etc..)
     $body.on("shown.bs.tab", '.page-content-container .widget-head.nav ul li a', cmsTabEvents);
@@ -766,7 +774,10 @@ var melisCms = (function(){
 	
     // On Load
     $(window).on('load', function () {
-    	
+
+        $("#site-tree-cont").prependTo("#meliscms_toolstree_section_tools")
+			.removeClass('hidden').show();
+
     	window.mainTree = function(completeEvent){
             var melisExtensions;
             if( melisCore.screenSize <= 767 ) {
