@@ -31,11 +31,11 @@ class SiteRedirectController extends AbstractActionController
     public function renderToolSiteRedirectAction()
     {
         $translator = $this->getServiceLocator()->get('translator');
-        
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $noAccessPrompt = '';
-        
-        if(!$this->hasAccess($this::TOOL_KEY)) {
+        // Checks wether the user has access to this tools or not
+        $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
+        if(!$melisCoreRights->canAccess($this::TOOL_KEY)) {
             $noAccessPrompt = $translator->translate('tr_tool_no_access');
         }
         
@@ -43,22 +43,6 @@ class SiteRedirectController extends AbstractActionController
         $view->melisKey = $melisKey;
         $view->noAccess  = $noAccessPrompt;
         return $view;
-    }
-    
-    /**
-     * Checks wether the user has access to this tools or not
-     * 
-     * @return boolean
-     */
-    private function hasAccess($key)
-    {
-        $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
-        $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
-        $xmlRights = $melisCoreAuth->getAuthRights();
-    
-        $isAccessible = $melisCoreRights->isAccessible($xmlRights, MelisCoreRightsService::MELISCORE_PREFIX_TOOLS, $key);
-    
-        return $isAccessible;
     }
     
     /**

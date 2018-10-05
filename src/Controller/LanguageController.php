@@ -32,8 +32,9 @@ class LanguageController extends AbstractActionController
         $translator = $this->getServiceLocator()->get('translator');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $noAccessPrompt = '';
-    
-        if(!$this->hasAccess(self::INTERFACE_KEY)) {
+        // Checks wether the user has access to this tools or not
+        $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
+        if(!$melisCoreRights->canAccess(self::INTERFACE_KEY)) {
             $noAccessPrompt = $translator->translate('tr_tool_no_access');
         }
     
@@ -525,20 +526,4 @@ class LanguageController extends AbstractActionController
     
         return new JsonModel($response);
     }
-
-   /**
-    * Checks wether the user has access to this tools or not
-    * @return boolean
-    */
-    private function hasAccess($key)
-    {
-        $melisCmsAuth = $this->getServiceLocator()->get('MelisCoreAuth');
-        $melisCmsRights = $this->getServiceLocator()->get('MelisCoreRights');
-        $xmlRights = $melisCmsAuth->getAuthRights();
-    
-        $isAccessible = $melisCmsRights->isAccessible($xmlRights, MelisCoreRightsService::MELISCORE_PREFIX_TOOLS, $key);
-    
-        return $isAccessible;
-    }
-
 }
