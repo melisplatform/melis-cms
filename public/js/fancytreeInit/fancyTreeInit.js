@@ -2,7 +2,10 @@
 	
     // On Load
     $(window).on('load', function () {
-    	
+
+        $("#site-tree-cont").prependTo("#meliscms_toolstree_section_tools")
+			.removeClass('hidden').show();
+
     	window.mainTree = function(completeEvent){
             var melisExtensions;
             if( melisCore.screenSize <= 767 ) {

@@ -2564,5 +2564,37 @@ return array(
                 ),
             ),
         ),
+        'meliscore' => [
+            'tools' => [
+                'melis_core_gdpr_tool' => [
+                    'forms' => [
+                        'melis_core_gdpr_search_form' => [
+                            'elements' => [
+                                [
+                                    'spec' => [
+                                        'name' => 'site_id',
+                                        'type' => 'MelisCoreSiteSelect',
+                                        'options' => [
+                                            'label' => 'tr_melis_core_gdpr_form_site',
+                                            'form_type' => 'form-horizontal',
+                                            'empty_option' => 'tr_meliscore_common_choose',
+                                        ],
+                                        'attributes' => [
+                                            'id' => 'melis_core_gdpr_search_form_site_id',
+                                        ]
+                                    ],
+                                ]
+                            ],
+                            'input_filter' => [
+                                'site_id' => [
+                                    'name' => 'site_id',
+                                    'required' => false,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
     ),
 );  

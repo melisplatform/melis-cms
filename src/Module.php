@@ -11,7 +11,6 @@ namespace MelisCms;
 
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
-use Zend\ModuleManager\ModuleManager;
 use Zend\Session\Container;
 use Zend\Session\SessionManager;
 use Zend\Stdlib\ArrayUtils;
@@ -177,6 +176,7 @@ class Module
             include __DIR__ . '/../config/diagnostic.config.php',
             include __DIR__ . '/../config/diagnostic.config.php',
             include __DIR__ . '/../config/app.microservice.php',
+            include __DIR__ . '/../config/dashboard-plugins/MelisCmsPagesIndicatorsPlugin.config.php',
         );
 
         foreach ($configFiles as $file) {

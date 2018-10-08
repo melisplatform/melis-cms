@@ -8,7 +8,7 @@
 
 <div class="tab-pane container-level-a" <?php echo $id.' '.$data_melisKey; ?>>
 	<?php 
-		if($this->noAccessPrompt){
+		if(empty($this->noAccessPrompt)){
 		    if(!empty($this->zoneconfig['interface'])) {
 		        foreach($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
 		            echo $this->$keyConfig;
