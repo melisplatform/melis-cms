@@ -6,7 +6,8 @@ $(document).ready(function() {
         zoneId = 'id_meliscms_page_tree_id_selector';
         melisKey = 'meliscms_page_tree_id_selector';
         modalUrl = 'melis/MelisCms/Page/renderPageModal';
-        
+
+        $('#melis-modals-container').find('#id_meliscms_page_tree_id_selector_container').remove();
         meliscmsSiteSelectorInputDom = $(this).parents(".input-group").find("input");
 
 		// remove last modal prevent from appending infinitely
@@ -34,8 +35,20 @@ $(document).ready(function() {
         	var pageId = tartGetId.split("_")[1];
         	
         	if(meliscmsSiteSelectorInputDom.length){
+        		
         		// Assigning id to page id input
             	meliscmsSiteSelectorInputDom.val(pageId);
+            	
+        		if(meliscmsSiteSelectorInputDom.data("callback")){
+        			callback = meliscmsSiteSelectorInputDom.data("callback");
+        			
+        			if(typeof window[callback] === "function"){
+        				window[callback](pageId, meliscmsSiteSelectorInputDom);
+        			}else{
+        				console.log("callback "+meliscmsSiteSelectorInputDom.data("callback")+" is not a function.")
+        			}
+        		}
+        		
             	// Close modal
             	$(this).closest(".modal").modal("hide");
             }else{
@@ -45,6 +58,30 @@ $(document).ready(function() {
         	melisHelper.melisKoNotification("tr_meliscms_menu_sitetree_Name", "tr_meliscms_page_tree_no_selected_page");
         }
     });
+	
+	window.generatePageLink = function(pageId, inputTarget){
+		var pageId = (typeof pageId !== "undifined") ? pageId : null;
+		
+		inputTarget.data("idPage", pageId);
+		
+		dataString = inputTarget.data();
+		
+		if(pageId){
+			$.ajax({
+		        type        : 'GET', 
+		        url         : '/melis/MelisCms/Page/getPageLink',
+		        data		: dataString,
+		        dataType    : 'json',
+		        encode		: true,
+		        success		: function(res) {
+		        	inputTarget.val(res.link); 
+		        }
+			});
+		}else{
+			console.log("PageId is null");
+		}
+	}
+	
 	
 	// Add Event to "Add New Site" button
 	addEvent("#id_meliscms_tool_site_header_add", function(e) {

@@ -170,8 +170,7 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
         $pluginSessionSettings = isset($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId]) ?
             $_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId] : '';
         $pluginSettings        = (array) json_decode($pluginSessionSettings);
-
-
+        
         if($plugin == 'melisTag') {
 
             $pattern = '/type\=\"([html|media|textarea]*\")/';
@@ -180,12 +179,12 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
                 if($type) {
                     // apply sizes
                     if($pluginSettings) {
-                        $replacement   = $type .' width_desktop="'.$pluginSettings['width_desktop'].
+                        /* $replacement   = $type .' width_desktop="'.$pluginSettings['width_desktop'].
                             '" width_tablet="'.$pluginSettings['width_tablet'].
                             '" width_mobile="'.$pluginSettings['width_mobile'].'"';
-                        $pluginContent = preg_replace($pattern, $replacement, $pluginContent);
-
-
+                        $pluginContent = preg_replace($pattern, $replacement, $pluginContent); */
+                        
+                        $pluginContent = $this->setPluginWidthXmlAttribute($pluginContent, $pluginSettings);
                     }
                 }
             }
@@ -195,23 +194,20 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
 
             if(preg_match('/'.$pattern.'/', $pluginContent, $matches)) {
                 $id = isset($matches[0]) ? $matches[0] : null;
-
-                $pluginDesktop = isset($pluginSettings['width_desktop']) ? $pluginSettings['width_desktop'] : 100;
-                $pluginTablet  = isset($pluginSettings['width_tablet'])  ? $pluginSettings['width_tablet']  : 100;
-                $pluginMobile  = isset($pluginSettings['width_mobile'])  ? $pluginSettings['width_mobile']  : 100;
-
+                
                 if($id) {
                     if($pluginSettings) {
-                        $replacement   = $id .' width_desktop="'.$pluginDesktop.
+                        /* $replacement   = $id .' width_desktop="'.$pluginDesktop.
                             '" width_tablet="'.$pluginTablet.
                             '" width_mobile="'.$pluginMobile.'"';
-                        $pluginContent = preg_replace('/'.$pattern.'/', $replacement, $pluginContent);
+                        $pluginContent = preg_replace('/'.$pattern.'/', $replacement, $pluginContent); */
+                        
+                        $pluginContent = $this->setPluginWidthXmlAttribute($pluginContent, $pluginSettings);
                     }
-
                 }
             }
-
         }
+        
 
         if(isset($_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId])) {
             $_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId] =
@@ -230,6 +226,50 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
 
         }
 
+    }
+    
+    /**
+     * This method will setup the width of the plugin xml config
+     * 
+     * @param String $pluginXml
+     * @param array $pluginSettings
+     * @return string
+     */
+    private function setPluginWidthXmlAttribute($pluginXml, $pluginSettings){
+        
+        try {
+            
+            $pluginDesktop = isset($pluginSettings['width_desktop']) ? $pluginSettings['width_desktop'] : 100;
+            $pluginTablet  = isset($pluginSettings['width_tablet'])  ? $pluginSettings['width_tablet']  : 100;
+            $pluginMobile  = isset($pluginSettings['width_mobile'])  ? $pluginSettings['width_mobile']  : 100;
+            
+            // Parsing xml string to Xml object
+            $xml = simplexml_load_string($pluginXml);
+            
+            // Adding/updating plugin xml attributes
+            if (isset($xml->attributes()->width_desktop))
+                $xml->attributes()->width_desktop = $pluginDesktop;
+            else
+                $xml->addAttribute('width_desktop', $pluginDesktop);
+                    
+            if (isset($xml->attributes()->width_tablet))
+                $xml->attributes()->width_tablet = $pluginTablet;
+            else
+                $xml->addAttribute('width_tablet', $pluginTablet);
+                            
+            if (isset($xml->attributes()->width_mobile))
+                $xml->attributes()->width_mobile = $pluginMobile;
+            else
+                $xml->addAttribute('width_mobile', $pluginMobile);
+                
+            // Geeting the Plugin xml
+            $customXML = new \SimpleXMLElement($xml->asXML());
+            $dom = dom_import_simplexml($customXML);
+            $pluginXml = $dom->ownerDocument->saveXML($dom->ownerDocument->documentElement);
+                                    
+        }catch (\Exception $e){}
+        
+        return $pluginXml;
     }
 
     /**

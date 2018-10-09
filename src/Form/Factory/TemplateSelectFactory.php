@@ -43,7 +43,10 @@ class TemplateSelectFactory extends MelisSelectFactory
 		for ($i = 0; $i < $max; $i++)
 		{
 			$tpl = $templates->current();
-			$valueoptions[$tpl->tpl_id] = $siteNames[$tpl->tpl_site_id] . ' - ' . $tpl->tpl_name . ' (' . $tpl->tpl_id . ')';
+			if(array_key_exists($tpl->tpl_site_id, $siteNames))
+			    $valueoptions[$tpl->tpl_id] = $siteNames[$tpl->tpl_site_id] . ' - ' . $tpl->tpl_name . ' (' . $tpl->tpl_id . ')';
+			else
+                $valueoptions[$tpl->tpl_id] = $tpl->tpl_name . ' (' . $tpl->tpl_id . ')';
 			$templates->next();
 		}
 
