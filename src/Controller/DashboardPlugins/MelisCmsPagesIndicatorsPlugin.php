@@ -1,5 +1,5 @@
 <?php
-  
+
 /**
  * Melis Technology (http://www.melistechnology.com)
  *
@@ -7,31 +7,27 @@
  *
  */
 
-namespace MelisCms\Controller;
+namespace MelisCms\Controller\DashboardPlugins;
 
-use Zend\Mvc\Controller\AbstractActionController;
+use MelisCore\Controller\DashboardPlugins\MelisCoreDashboardTemplatingPlugin;
 use Zend\View\Model\ViewModel;
 use Zend\Session\Container;
 
-/**
- * Dashboard controller for MelisCMS
- * 
- * Used to render dashboard components in MelisPlatform Back Office
- *
- */
-class DashboardController extends AbstractActionController
+
+class MelisCmsPagesIndicatorsPlugin extends MelisCoreDashboardTemplatingPlugin
 {
-    /**
-     * Dashboard Page indicators
-     */
-    public function renderDashboardPagesIndicatorsAction(){
+    public function __construct()
+    {
+        $this->pluginModule = 'meliscms';
+        parent::__construct();
+    }
     
-        $melisKey = $this->params()->fromRoute('melisKey', '');
-    
+    public function pageIndicators()
+    {
         // Get the current language
         $container = new Container('meliscore');
         $locale = $container['melis-lang-locale'];
-    
+        
         // Variable Initializations
         $numSite = 0;
         $numPages = 0;
@@ -39,29 +35,29 @@ class DashboardController extends AbstractActionController
         $numUnpublished = 0;
         // Pages ID handler that exist on Page Saved table
         $savePagesId = array();
-    
-        $pageSavedTable = $this->serviceLocator->get('MelisEngineTablePageSaved');
-        $melisEngineTablePagePublished = $this->serviceLocator->get('MelisEngineTablePagePublished');
-    
+        
+        $pageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+        $melisEngineTablePagePublished = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
+        
         $currentPagesSaved = $pageSavedTable->fetchAll();
         if (!empty($currentPagesSaved))
         {
             $pages = $currentPagesSaved->toArray();
-    
+            
             if (!empty($pages))
             {
                 for ($i = 0 ; $i < count($pages) ; $i++)
                 {
                     // Add Page Id to Pages saved array handler
                     array_push($savePagesId, $pages[$i]['page_id']);
-    
+                    
                     //Check Page Type
                     if ($pages[$i]['page_type'] == 'SITE')
                     {
                         //Increament Number of Site
                         $numSite++;
                     }
-    
+                    
                     if ($pages[$i]['page_type'] == 'PAGE')
                     {
                         // Increament Number of Pages
@@ -81,13 +77,13 @@ class DashboardController extends AbstractActionController
                 }
             }
         }
-    
+        
         // Checking Page Current Status
         $currentPages = $melisEngineTablePagePublished->fetchAll();
         if (!empty($currentPages))
         {
             $pages = $currentPages->toArray();
-    
+            
             if (!empty($pages))
             {
                 for ($i = 0 ; $i < count($pages) ; $i++)
@@ -103,7 +99,7 @@ class DashboardController extends AbstractActionController
                             $numSite++;
                         }
                     }
-    
+                    
                     if ($pages[$i]['page_type'] == 'PAGE')
                     {
                         // Check if Page ID is existing from Saved Array
@@ -113,7 +109,7 @@ class DashboardController extends AbstractActionController
                             // Increament Number of Pages
                             $numPages++;
                         }
-    
+                        
                         //Check Page Status
                         // 1 = Published
                         // 2 = Unblished
@@ -131,10 +127,10 @@ class DashboardController extends AbstractActionController
                 }
             }
         }
-    
-    
+        
+        
         $view = new ViewModel();
-        $view->melisKey = $melisKey;
+        $view->setTemplate('melis-cms/dashboard/page-indicators');
         // Assigning data array to view
         $view->data = array(
             'locale' => $locale,
@@ -144,21 +140,7 @@ class DashboardController extends AbstractActionController
             'numUnpublished' => $numUnpublished
         );
         $view->pages = $pages;
-    
+        
         return $view;
-    }
-
-    public function getDashboardDataAction()
-    {
-        $success = 0;
-        $data    = array();
-
-        if($data){
-            $melisCmsData = $this->getServiceLocator()->get('MelisCmsDashboard');
-
-            $data = $melisCmsData->getDashboardData();
-        }
-
-        return $data;
     }
 }

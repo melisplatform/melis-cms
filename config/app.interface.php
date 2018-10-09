@@ -1267,26 +1267,6 @@ return array(
                 ),
             )
         ),
-        'meliscore_dashboard' => array(
-            'interface' => array(
-                'meliscms_dashboard_pages_indicators' => array(
-                    'conf' => array(
-                        'id' => 'id_meliscms_dashboard_pages_indicators',
-                        'name' => 'tr_meliscms_dashboard_pages_indicators',
-                        'melisKey' => 'meliscms_dashboard_pages_indicators',
-                        'width' => 6,
-                        'height' => 'dashboard-medium',
-                    ),
-                    'forward' => array(
-                        'module' => 'MelisCms',
-                        'controller' => 'Dashboard',
-                        'action' => 'render-dashboard-pages-indicators',
-                        'jscallback' => '',
-                        'jsdatas' => array()
-                    ),
-                ),
-            ),
-        ),
         'meliscms_page_modal' => array(
             'conf' => array(
                 'id' => 'id_meliscms_page_modal',

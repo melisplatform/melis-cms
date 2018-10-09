@@ -37,8 +37,9 @@ class SiteController extends AbstractActionController
         $translator = $this->getServiceLocator()->get('translator');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $noAccessPrompt = '';
-        
-        if(!$this->hasAccess(self::TOOL_KEY)) {
+        // Checks wether the user has access to this tools or not
+        $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
+        if(!$melisCoreRights->canAccess(self::TOOL_KEY)) {
             $noAccessPrompt = $translator->translate('tr_tool_no_access');
         }
 
@@ -260,21 +261,6 @@ class SiteController extends AbstractActionController
         $view->sitePages = $sitePages;
         
         return $view;
-    }
-    
-    /**
-     * Checks whether the user has access to this tools or not
-     * @return boolean
-     */
-    private function hasAccess($key)
-    {
-        $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
-        $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
-        $xmlRights = $melisCoreAuth->getAuthRights();
-    
-        $isAccessible = $melisCoreRights->canAccess($key);
-    
-        return $isAccessible;
     }
     
     /**
