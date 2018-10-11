@@ -248,7 +248,6 @@ class ToolStyleController extends AbstractActionController
      */
     public function getStyleDataAction()
     {
-
         // declare the Tool service that we will be using to completely create our tool.
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
 
@@ -289,24 +288,11 @@ class ToolStyleController extends AbstractActionController
             $search = $this->getRequest()->getPost('search');
             $search = $search['value'];
 
-            $dataCount = $tableStyle->getTotalData();
+            $limit = $this->getRequest()->getPost('length');
 
-            $dataQuery = array(
-                'where' => array(
-                    'key' => 'style_id',
-                    'value' => $search,
-                ),
-                'order' => array(
-                    'key' => $selCol,
-                    'dir' => $sortOrder,
-                ),
-                'start' => $start,
-                'limit' => $length,
-                'columns' => $melisTool->getSearchableColumns(),
-                'date_filter' => array(),
-            );
+            $dataCount = $tableStyle->getStyleList($search = '', $melisTool->getSearchableColumns(), $selCol, $sortOrder);
 
-            $getData = $tableStyle->getPagedData($dataQuery, null, $optionFilter);
+            $getData = $tableStyle->getStyleList($search = '', $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $limit);
 
             $tableData = $getData->toArray();
 
@@ -336,8 +322,8 @@ class ToolStyleController extends AbstractActionController
 
         return new JsonModel(array(
             'draw' => (int) $draw,
-            'recordsTotal' => $dataCount,
-            'recordsFiltered' => $tableStyle->getTotalFiltered(),
+            'recordsTotal' => count($dataCount->toArray()),
+            'recordsFiltered' => count($tableData),
             'data' => $tableData,
         ));
 
@@ -379,10 +365,12 @@ class ToolStyleController extends AbstractActionController
 
         } else {
             // External Path
-            $header_response = get_headers($filepath, 1);
-            if (strpos($header_response[0], "200") !== false) {
-                // File exists
-                return true;
+            if (filter_var($filepath, FILTER_VALIDATE_URL)) {
+                $header_response = get_headers($filepath, 1);
+                if (strpos($header_response[0], "200") !== false) {
+                    // File exists
+                    return true;
+                }
             }
         }
 
