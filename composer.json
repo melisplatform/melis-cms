@@ -31,7 +31,7 @@
     "melis-module-category": "cms"	  
   },
   "require": {
-    "php": "^5.5 || ^7.0",
+    "php": "^7.0",
     "ext-openssl": "*",
     "ext-json": "*",
     "ext-pdo_mysql": "*",
