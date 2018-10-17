@@ -1,15 +1,8 @@
 # Changelog
-All notable changes to this project will be documented in this file.  
 
-## [Unreleased]  
-### Added  
-
-### Changed  
-
-### Removed  
-
-
-## [v2.5.0] - 2018-07-31
-* Fixed error 500 on pages that is not yet published
-* Fixed issue on creating a site with special characters and accents
-* Added site column on Style manager tool
+## v3.0.0 - 2018-07-31
+* Added dashboard plugins for CMS
+* Updated tools tree
+* Added GDPR for MelisCore's GDPR tool
+* Updated assets
+* fixed responsive issue on dashboard plugins
