@@ -151,7 +151,7 @@ text-shadow: none;
 /* Not editable zone */
 .melis-noteditable{
 	pading: 20px;
-	color: #932e2a;
+	color: #e61c23;
     font-size: 25px;	
 }
 
@@ -205,7 +205,7 @@ div.content-heading h1{
 .page-content-container .nav-tabs > li.active:focus > a,
 .page-content-container .nav-tabs > li.active:active,
 .page-content-container .nav-tabs > li.active {
-	background: #932E2A;
+	background: #e61c23;
 }
 .page-content-container .nav-tabs > li.active,
 .page-content-container .nav-tabs > li:hover {
@@ -216,7 +216,7 @@ div.content-heading h1{
 .page-content-container .nav-tabs > li.active:focus > a,
 .page-content-container .nav-tabs > li.active:active > a {
 	background: #fff;
-	border: 1px solid #932E2A;
+	border: 1px solid #e61c23;
 	border-bottom: none;
 }
 .page-content-container .nav-tabs > li.active {
@@ -230,13 +230,13 @@ div.content-heading h1{
 .widget.widget-tabs-double>.widget-head ul li.active a.f-awesome {
     position: relative;
     padding: 9px 15px 0 38px;
-    color: #932e2a;
+    color: #e61c23;
     /*border-bottom-color: #eee;*/
 }
 
 .widget.widget-tabs-double>.widget-head ul li a.f-awesome .fa-sitemap,
 .widget.widget-tabs-double>.widget-head ul li.active a.f-awesome .fa-sitemap {
-    color: #932e2a;
+    color: #e61c23;
     font-size: 12px;
     position: absolute;
     top: 11px;
@@ -245,7 +245,7 @@ div.content-heading h1{
 
 .widget.widget-tabs-double>.widget-head .melis-whead-box ul li a.f-awesome .fa,
 .widget.widget-tabs-double>.widget-head .melis-whead-box ul li.active a.f-awesome .fa {
-    color: #932e2a;
+    color: #e61c23;
     font-size: 12px;
     position: absolute;
     top: 11px;
@@ -253,7 +253,7 @@ div.content-heading h1{
 }
 
 .widget.widget-tabs>.widget-head ul li.active a.f-awesome i:before {
-    color: #932e2a;
+    color: #e61c23;
     font-size: 16px;
 }
 
@@ -301,7 +301,7 @@ transition: all 0.4s ease-in-out; */
 }
 
 .widget.widget-tabs-double>.widget-head .melis-whead-box ul li a.f-awesome:hover {
-	color: #932e2a;
+	color: #e61c23;
 }
 
 .widget.widget-tabs-double>.widget-head .melis-whead-box ul li a.f-awesome:hover:after {
@@ -310,14 +310,14 @@ transition: all 0.4s ease-in-out; */
 }
 
 .widget.widget-tabs-double>.widget-head .melis-whead-box ul li a.f-awesome:hover i:before {
-	color: #932e2a;
+	color: #e61c23;
 }
 .widget.widget-tabs-double>.widget-head .melis-whead-box ul li a.f-awesome i:before {
 	color: #fff;
 	font-size: 16px;
 }
 .widget.widget-tabs-double>.widget-head .melis-whead-box ul li.active a.f-awesome {
-	color: #932e2a;
+	color: #e61c23;
 }
 
 .widget.widget-tabs-double>.widget-head .melis-whead-box ul li.active a.f-awesome:after {
@@ -326,7 +326,7 @@ transition: all 0.4s ease-in-out; */
 }
 
 .widget.widget-tabs-double>.widget-head .melis-whead-box ul li.active a.f-awesome i:before {
-	color: #932e2a;
+	color: #e61c23;
 	font-size: 16px;
 }
 
@@ -364,7 +364,7 @@ transition: all 0.4s ease-in-out; */
 }
 .widget-melis-tabprev:hover .fa,
 .widget-melis-tabnext:hover .fa {
-	color: #932e2a;
+	color: #e61c23;
 }
 .widget-melis-tabprev.active {
 	display: inline-block;
@@ -420,7 +420,7 @@ transition: all 0.4s ease-in-out; */
 }
 
 .meliscms-search-box.sidebar-treeview-search .sbox-icon:hover {
-    background: #932e2a;
+    background: #e61c23;
 }
 .meliscms-search-box.sidebar-treeview-search .sbox-icon:hover i {
 	color: #fff;
@@ -438,7 +438,7 @@ display: block;
 .melis-search-overlay {
     position: absolute;
     top: 0;
-    background: #932e2a;
+    background: #e61c23;
     color: #fff;
     width: 100%;
     height: 34px;
@@ -509,7 +509,7 @@ body.modal-open {
 }
 
 .open-page-from-lan-tab[data-opentab]:hover{
-    color: #932e2a;
+    color: #e61c23;
 }
 
 .hr-fw {
@@ -525,7 +525,7 @@ body.modal-open {
 	letter-spacing: 0.4px;
 }
 #content .pagelang-head-title strong {
-	color: #932e2a;
+	color: #e61c23;
 }
 
 .language-list {
@@ -561,7 +561,7 @@ body.modal-open {
 	font-size: 13px;
 	font-style: normal;
 	letter-spacing: 1px;
-	color: #932e2a;
+	color: #e61c23;
 }
 
 .language-list .language {
@@ -577,7 +577,7 @@ body.modal-open {
 	font-weight: bold;
 }
 .open-page-from-lan-tab[data-opentab]:hover .site {
-	color: #932e2a;
+	color: #e61c23;
 }
 
 .dropdown-lang-box .select2 {
@@ -607,7 +607,7 @@ body.modal-open {
 	position: relative;
 	left: 0;
 	font-size: 6px;
-	color: #932E2A;
+	color: #e61c23;
 	vertical-align: middle;
 	margin-right: 6px;
 }
