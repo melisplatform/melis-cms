@@ -601,7 +601,7 @@ var melisPluginEdition = (function($, window) {
         var iframe = window.parent.$("#"+ parent.activeTabId).find('iframe');
 
         // check if melis-ui-outlined element is available in preview page
-        if($(".melis-dragdropzone .melis-ui-outlined").length) {
+        if($(".melis-dragdropzone .melis-ui-outlined").length ) {
             $(".melis-dragdropzone .melis-ui-outlined").resizable({
                 containment: ".melis-dragdropzone",
                 start: function(event, ui){

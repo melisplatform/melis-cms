@@ -398,6 +398,7 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 .melis-ui-outlined:hover .melis-plugin-tools-box {
   opacity: 1; 
   visibility: visible;
+    z-index: 999;
 }
 
 .melis-ui-outlined:hover .m-plugin-sub-tools div {
