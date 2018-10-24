@@ -794,7 +794,9 @@ var melisPluginEdition = (function($, window) {
     });
 
     // init resize
-    initResizable(); // disable for now
+    if (pluginResizable == 1) {
+        initResizable(); // disable for now
+    }
     moveResponsiveClass();
     pluginDetector();
 
