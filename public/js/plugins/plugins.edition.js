@@ -76,7 +76,7 @@ var melisPluginEdition = (function($, window) {
     function validateModal(melisIdPage, melisPluginModule, melisPluginName, melisPluginId, melisPluginTag, datastring, siteModule) {
        $.ajax({
             type: 'POST',
-            url: "/melis/MelisCms/FrontPlugins/validatePluginModal?validate",
+            url: "/melis/MelisCms/FrontPlugins/validatePluginModal?validate&melisSite="+siteModule,
             data: datastring,
             dataType: 'json',
             success: function(data) {
