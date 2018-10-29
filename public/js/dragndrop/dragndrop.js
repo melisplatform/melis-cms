@@ -337,7 +337,10 @@ var melisDragnDrop = (function($, window) {
                     // Processing the plugin resources and initialization
                     melisPluginEdition.processPluginResources(plugin.init, idPlugin);
                     // Init Resizable
-                    melisPluginEdition.initResizable(); // disable for now
+                    // Init Resizable
+                    if (plugins.datas.resizable == true) {
+                        melisPluginEdition.initResizable(); // disable for now
+                    }
                     // remove plugin
                     $(dropLocation).remove();
                     // send new plugin list

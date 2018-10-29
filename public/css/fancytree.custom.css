@@ -53,7 +53,7 @@
 #id-mod-menu-dynatree.fancytree-ext-filter-hide span.fancytree-node.fancytree-match span.fancytree-title mark,
 #id-mod-menu-dynatree.fancytree-ext-filter-dimm tr.fancytree-match span.fancytree-title mark, 
 #id-mod-menu-dynatree.fancytree-ext-filter-dimm span.fancytree-node.fancytree-match span.fancytree-title mark {
-    background-color: #932e2a;
+    background-color: #e61c23;
     color: #fff;
 }
 
@@ -134,7 +134,7 @@ span.fancytree-active span.fancytree-title,
 }
 
 .light-tree .fancytree-node.fancytree-active{
-    background: #932e2a;
+    background: #e61c23;
     border-radius: 22px;
     color: #fff;
 }
@@ -146,7 +146,7 @@ span.fancytree-active span.fancytree-title,
 }
 
 .light-tree span.fancytree-active .fancytree-title{
-    background: #932e2a;
+    background: #e61c23;
     border-radius: 22px;
     color: #fff;
 }
@@ -188,7 +188,7 @@ span.fancytree-active span.fancytree-title,
 }
 
 .light-tree.fancytree-ext-filter.fancytree-ext-filter-hide .fancytree-node.fancytree-active{
-    background: #932e2a;
+    background: #e61c23;
     border-radius: 22px;
     color: #fff;
 }
@@ -200,7 +200,7 @@ span.fancytree-active span.fancytree-title,
 }
 
 .light-tree.fancytree-ext-filter.fancytree-ext-filter-hide span.fancytree-active .fancytree-title{
-    background: #932e2a;
+    background: #e61c23;
     border-radius: 22px;
     color: #fff;
 }

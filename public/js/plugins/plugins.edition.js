@@ -76,7 +76,7 @@ var melisPluginEdition = (function($, window) {
     function validateModal(melisIdPage, melisPluginModule, melisPluginName, melisPluginId, melisPluginTag, datastring, siteModule) {
        $.ajax({
             type: 'POST',
-            url: "/melis/MelisCms/FrontPlugins/validatePluginModal?validate",
+            url: "/melis/MelisCms/FrontPlugins/validatePluginModal?validate&melisSite="+siteModule,
             data: datastring,
             dataType: 'json',
             success: function(data) {
@@ -601,7 +601,7 @@ var melisPluginEdition = (function($, window) {
         var iframe = window.parent.$("#"+ parent.activeTabId).find('iframe');
 
         // check if melis-ui-outlined element is available in preview page
-        if($(".melis-dragdropzone .melis-ui-outlined").length) {
+        if($(".melis-dragdropzone .melis-ui-outlined").length ) {
             $(".melis-dragdropzone .melis-ui-outlined").resizable({
                 containment: ".melis-dragdropzone",
                 start: function(event, ui){
@@ -794,7 +794,9 @@ var melisPluginEdition = (function($, window) {
     });
 
     // init resize
-    initResizable(); // disable for now
+    if (pluginResizable == 1) {
+        initResizable(); // disable for now
+    }
     moveResponsiveClass();
     pluginDetector();
 

@@ -102,6 +102,7 @@ return array(
             'conf' => array(
                 'id' => 'id_melis_cms',
                 'name' => 'tr_meliscms_meliscms',
+                'pluginResizable' => true
             ),
             'ressources' => array(
                 'js' => array(
