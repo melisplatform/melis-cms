@@ -37,7 +37,10 @@ class PageEditionController extends AbstractActionController
         if (!empty($container['content-pages']))
             if (!empty($container['content-pages'][$idPage]))
                 $container['content-pages'][$idPage] = array();
-    	
+
+        $melisCoreConf = $this->getServiceLocator()->get('MelisConfig');
+        $resizeConfig   = $melisCoreConf->getItem('meliscms/conf')['pluginResizable'] ?? null;
+
     	$melisPage = $this->getServiceLocator()->get('MelisEnginePage');
     	$datasPage = $melisPage->getDatasPage($idPage, 'saved');
     	if($datasPage)
@@ -51,7 +54,8 @@ class PageEditionController extends AbstractActionController
     	$view = new ViewModel();
     	$view->idPage = $idPage;
     	$view->melisKey = $melisKey;
-    	
+    	$view->resizablePlugin = $resizeConfig;
+
     	if (empty($datasPageTree->page_tpl_id) || $datasPageTree->page_tpl_id == -1)
     	    $view->noTemplate = true;
     	else
