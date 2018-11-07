@@ -327,7 +327,7 @@ var melisDragnDrop = (function($, window) {
                         datastring.push({name: "melisPluginDesktopWidth", value: uiPlaceHolderWidth.slice(0, -1)});
 
                         // pass it in savePluginUpdate
-                        melisPluginEdition.savePluginUpdate(datastring);
+                        melisPluginEdition.savePluginUpdate(datastring, siteModule);
                     }
 
                     // adding plugin in dropzone
