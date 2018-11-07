@@ -82,7 +82,7 @@ var melisPluginEdition = (function($, window) {
             success: function(data) {
 
                 if(data.success) {
-                    savePluginUpdate(datastring);
+                    savePluginUpdate(datastring, siteModule);
 
                     setTimeout(function() {
 
@@ -124,10 +124,10 @@ var melisPluginEdition = (function($, window) {
     $("div.melis-dragdropzone").last().css({"margin-bottom": "35px"});
 
     // Saving Plugin
-    function savePluginUpdate(data){
+    function savePluginUpdate(data, siteModule){
         $.ajax({
             type: "POST",
-            url: "/melis/MelisCms/PageEdition/savePageSessionPlugin?idPage=" + melisActivePageId,
+            url: "/melis/MelisCms/PageEdition/savePageSessionPlugin?idPage=" + melisActivePageId + "&melisSite="+siteModule,
             data: data,
             dataType: 'json'
         }).done(function(response) {
@@ -383,13 +383,14 @@ var melisPluginEdition = (function($, window) {
 
     // Send the list of plugin inside DragnDropzone
     function sendDragnDropList(dropzone, pageId) {
+
         var dragdropzoneModule = $('div[data-dragdropzone-id='+ dropzone +']').data("module");
 
         var dragdropzonePlugin = $('div[data-dragdropzone-id='+ dropzone +']').data("plugin");
         var dragdropzonePluginId = $('div[data-dragdropzone-id='+ dropzone +']').data("plugin-id");
         var dragdropzoneMelisTag = $('div[data-dragdropzone-id='+ dropzone +']').data("melis-tag");
+        var siteModule = $('div[data-dragdropzone-id='+ dropzone +']').data("site-module");
         var pluginListEl = $('div[data-dragdropzone-id='+ dropzone +']').children(".melis-ui-outlined");
-
         var dragzone = [];
         var pluginList = new Object();
 
@@ -422,10 +423,11 @@ var melisPluginEdition = (function($, window) {
             } else {
                 pluginList['melisDragDropZoneListPlugin'][key]['melisPluginContainer'] = " ";
             }
-
-
         });
-        savePluginUpdate(pluginList);
+
+        if (typeof siteModule !== "undefined"){
+            savePluginUpdate(pluginList, siteModule);
+        }
     }
 
     function checkFunctionExists(functionName, idPlugin) {
@@ -731,7 +733,7 @@ var melisPluginEdition = (function($, window) {
             pluginList['melisPluginDesktopWidth'] = desktopWidth;
 
             // pass is to savePageSession
-            savePluginUpdate(pluginList);
+            savePluginUpdate(pluginList, toolBox.data("site-module"));
 
             // get plugin ID and re init
             // check if owl re init
