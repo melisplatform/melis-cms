@@ -207,7 +207,9 @@ var melisPluginEdition = (function($, window) {
 
                         // re init resize
                         $(".melis-dragdropzone .melis-ui-outlined").resizable("destroy"); // disable for now
-                        initResizable();
+                        if (parent.pluginResizable == 1){
+                            initResizable();
+                        }
                     }
                 }, 300);
             },
@@ -796,7 +798,7 @@ var melisPluginEdition = (function($, window) {
     });
 
     // init resize
-    if (pluginResizable == 1) {
+    if (parent.pluginResizable == 1) {
         initResizable(); // disable for now
     }
     moveResponsiveClass();
