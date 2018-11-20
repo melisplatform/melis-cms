@@ -804,12 +804,12 @@ return array(
                             ),
                             'site_label' => array(
                                 'text' => 'tr_meliscms_tool_site_site_label',
-                                'css' => array('width' => '89%', 'padding-right' => '0'),
+                                'css' => array('width' => '30%', 'padding-right' => '0'),
                                 'sortable' => true,
                             ),
                             'site_name' => array(
                                 'text' => 'tr_meliscms_tool_site_new_site_name',
-                                'css' => array('width' => '89%', 'padding-right' => '0'),
+                                'css' => array('width' => '30%', 'padding-right' => '0'),
                                 'sortable' => true,
                             ),
                         ),
