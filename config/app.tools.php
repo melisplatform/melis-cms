@@ -63,7 +63,7 @@ return array(
 
                             ),
 
-                            'site_name' => array(
+                            'site_label' => array(
                                 'text' => 'tr_meliscms_tool_templates_tpl_site_id',
                                 'css' => array('width' => '20%', 'padding-right' => '0'),
                                 'sortable' => true,
