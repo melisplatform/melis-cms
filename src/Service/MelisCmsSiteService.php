@@ -73,7 +73,9 @@ class MelisCmsSiteService extends MelisCoreGeneralService
         
         // Site Name
         $siteName = $arrayParameters['site']['site_name'];
-        
+        # Site label
+        $siteLabel = $arrayParameters['site']['site_label'];
+
         $siteDomainId = null;
         $site404Id = null;
         
@@ -141,10 +143,10 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                         $savedSiteId = $siteTable->save($arrayParameters['site']);
                         
                         // Creating Site Homepage template
-                        $templateId = $this->createSitePageTemplate($tplId, $savedSiteId, $siteModuleName, $siteName.' Home', 'Index', 'index', $platformId);
+                        $templateId = $this->createSitePageTemplate($tplId, $savedSiteId, $siteModuleName, $siteLabel.' Home', 'Index', 'index', $platformId);
                         
                         // Creating Site homepage
-                        $this->createSitePage($siteName, -1, $siteLangId, 'SITE', $pageId, $tplId, $platformId);
+                        $this->createSitePage($siteLabel, -1, $siteLangId, 'SITE', $pageId, $tplId, $platformId);
                         
                         if (!is_null($siteModuleName))
                         {
@@ -158,14 +160,14 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                             $moduleConfig = str_replace('\'homePageId\'', $pageId, $moduleConfig);
                             file_put_contents($moduleConfigDir, $moduleConfig);
                         }
-                        
+
                         // Creating Site 40 page template
                         $nxtTplId = ++$tplId;
-                        $templateId = $this->createSitePageTemplate($nxtTplId, $savedSiteId, $siteModuleName, $siteName.' 404', 'Page404', 'index', $platformId);
+                        $templateId = $this->createSitePageTemplate($nxtTplId, $savedSiteId, $siteModuleName, $siteLabel.' 404', 'Page404', 'index', $platformId);
                         
                         // Creating Site 404 page
                         $page404Id = $pageId + 1;
-                        $this->createSitePage($siteName.'-404', $pageId, $siteLangId, 'PAGE', $page404Id, $nxtTplId, $platformId);
+                        $this->createSitePage($siteLabel.'-404', $pageId, $siteLangId, 'PAGE', $page404Id, $nxtTplId, $platformId);
                          
                         $site404['s404_page_id'] = $page404Id;
                     }

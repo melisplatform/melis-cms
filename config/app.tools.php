@@ -1014,7 +1014,7 @@ return array(
                                                 'encoding' => 'UTF-8',
                                                 'max'      => 100,
                                                 'messages' => array(
-                                                    \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_tool_site_site_label_error_empty',
+                                                    \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_tool_site_site_label_error_long',
                                                 ),
                                             ),
                                         ),
@@ -1022,7 +1022,7 @@ return array(
                                             'name' => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_tool_site_site_label_error_long',
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_tool_site_site_label_error_empty',
                                                 ),
                                             ),
                                         ),
