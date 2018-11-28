@@ -214,7 +214,8 @@ class SiteRedirectController extends AbstractActionController
         $sites[] = '<option value="">'. $translator->translate('tr_meliscms_tool_templates_tpl_label_choose') .'</option>';
        
        foreach($siteTable->fetchAll() as $site){
-           $sites[] = '<option value="'.$site->site_id.'">'. $site->site_name .'</option>';
+           $siteName = !empty($site->site_label) ? $site->site_label : $site->site_name;
+           $sites[] = '<option value="'.$site->site_id.'">'. $siteName .'</option>';
        }
        
        $view = new ViewModel();

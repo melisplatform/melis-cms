@@ -26,7 +26,7 @@ class MelisCmsPluginSiteModuleSelectFactory extends MelisSelectFactory
 		$valueoptions = array();
 		foreach ($siteTable->fetchAll() As $val)
 		{
-		    $valueoptions[$val->site_name] = $val->site_name;
+		    $valueoptions[$val->site_name] = $val->site_label;
 		}
 		
 		return $valueoptions; 
