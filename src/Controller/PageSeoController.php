@@ -298,7 +298,13 @@ class PageSeoController extends AbstractActionController
     private function cleanURL(string $url = '')
     {
         $url = str_replace(' ', '-', $url); 				// Replaces all spaces with hyphens
+        $url = preg_replace('/[^A-Za-z0-9\/\-]+/', '-', $url);	// Replaces special characters with hyphens
 
-        return preg_replace('/[^A-Za-z0-9\-]/', '-', $url);	// Replaces special characters with hyphens
+        // remove "/" prefix on generated URL
+        if (substr($url, 0, 1) == '/') {
+            return preg_replace('/\//', '', $url, 1);
+        }
+
+        return $url;
     }
 }
