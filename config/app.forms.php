@@ -55,7 +55,6 @@ return array(
 											'SITE' => 'tr_meliscms_page_tab_properties_form_type_Site',
 											'FOLDER' => 'tr_meliscms_page_tab_properties_form_type_Folder',
 											'PAGE' => 'tr_meliscms_page_tab_properties_form_type_Page',
-											'NEWSLETTER' => 'tr_meliscms_page_tab_properties_form_type_Newsletter',
 										),
 									),
 									'attributes' => array(
