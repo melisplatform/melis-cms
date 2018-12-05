@@ -1,11 +1,7 @@
-(function ($, window) {
-	
+(function ($, window, document) {
+
     // On Load
     $(window).on('load', function () {
-
-        $("#site-tree-cont").prependTo("#meliscms_toolstree_section_tools")
-			.removeClass('hidden').show();
-
     	window.mainTree = function(completeEvent){
             var melisExtensions;
             if( melisCore.screenSize <= 767 ) {
@@ -38,24 +34,24 @@
 	                  'dupe': { 'name': translations.tr_meliscms_menu_dupe, 'icon': 'copy' },
 	                },
 	                actions: function(node, action, options) {
-	                  if(action === 'new'){
+	                  	if(action === 'new'){
 	                	  var data = node.data;
 	                	  
 	                	  //close page creation tab and open new one (in case if its already open - updated parent ID)
 	                	  melisHelper.tabClose('0_id_meliscms_page');
 	                	  melisHelper.tabOpen( translations.tr_meliscms_page_creation, 'fa-file-text-o', '0_id_meliscms_page', 'meliscms_page_creation',  { idPage: 0, idFatherPage: data.melisData.page_id } );                	  
-	                  }
-	                  if(action === 'edit'){
+	                  	}
+	                  	if(action === 'edit'){
 	                	  var data = node.data;
 	              		  melisHelper.tabOpen( data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,  { idPage: data.melisData.page_id } ); 
-	                  }
+	                 	}
 						if(action === 'delete'){
 	
 							var data = node.data;
 							var zoneId = data.melisData.item_zoneid;
 							var idPage = data.melisData.page_id;	  
-	                		  var parentNode = ( node.getParent().key == 'root_1') ? -1 : node.getParent().key ;
-//							var parentNode = ( node.key == 'root_1') ? -1 : node.getParent().key ;	
+	                		var parentNode = ( node.getParent().key == 'root_1') ? -1 : node.getParent().key;
+							// var parentNode = ( node.key == 'root_1') ? -1 : node.getParent().key;	
 	                		
 							// check if page to be delete is open or not
 							var openedOrNot = $(".tabsbar a[data-id='"+zoneId+"']").parent("li");
@@ -96,10 +92,10 @@
 								});  
 						}
 						if(action === 'dupe'){
-		                	  var data = node.data;
-//		              		  melisHelper.tabOpen( data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,  { sourcePageId: data.melisData.page_id } ); 
+		                	var data = node.data;
+							// melisHelper.tabOpen( data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,  { sourcePageId: data.melisData.page_id } ); 
 		              		
-		              		  // initialation of local variable
+		              		// initialation of local variable
 		          			zoneId = 'id_meliscms_tools_tree_modal_form_handler';
 		          			melisKey = 'meliscms_tools_tree_modal_form_handler';
 		          			modalUrl = 'melis/MelisCms/TreeSites/renderTreeSitesModalContainer';
@@ -123,10 +119,10 @@
 
 			    },
     			create: function(event, data) {
-    				melisHelper.loadingZone($('#treeview-container'));
+    				melisHelper.loadingZone( $('#treeview-container') );
 				},
 				init: function(event, data, flag) {
-			        melisHelper.removeLoadingZone($('#treeview-container'));
+			        melisHelper.removeLoadingZone( $('#treeview-container') );
 			           // focus search box
 			           $("input[name=left_tree_search]").focus();
 
@@ -342,9 +338,6 @@
     	
     	// initialize the tree
     	mainTree();
-
-		
-	
     });
     
     // create page if treeview page is empty
