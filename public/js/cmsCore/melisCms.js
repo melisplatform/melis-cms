@@ -698,9 +698,6 @@ var melisCms = (function(){
 
 	}
 
-
-	
-	
 	
 	
 	

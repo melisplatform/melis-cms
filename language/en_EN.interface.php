@@ -318,7 +318,7 @@
 	    // Platform Error Messages
 	    'tr_meliscms_tool_platform_add_error' => 'Unable to add MelisCms platform ID\'s',
 	    'tr_meliscms_tool_platform_update_error' => 'Unable to update MelisCms Platform ID\'s',
-	    'tr_meliscms_tool_platform_conflict_error' => 'Page or template platform ID\'s range is conflicting one of the exisitng Platform ID\'s range. <br>Please Adjust your page or template ID\'s range in order to proceed.',
+	    'tr_meliscms_tool_platform_conflict_error' => 'Page or template platform ID\'s range is conflicting one of the existing Platform ID\'s range. <br>Please Adjust your page or template ID\'s range in order to proceed.',
 	    'tr_meliscms_tool_platform_invalid' => 'Invalid platform',
 	    
 	    // Delete Messages

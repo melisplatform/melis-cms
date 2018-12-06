@@ -213,7 +213,13 @@
 	    'tr_meliscms_page_tab_properties_search_type_option1' => 'Yes, with subpages',
 	    'tr_meliscms_page_tab_properties_search_type_option2' => 'Yes, without subpages',
 	    'tr_meliscms_page_tab_properties_search_type_option3' => 'No',
-
-
+        # Site label
+        'tr_meliscms_tool_site_site_label'             => 'Label',
+        'tr_meliscms_tool_site_site_label tooltip'     => 'Label of your site',
+        'tr_meliscms_tool_site_site_label_error_empty' => 'Please enter the site label',
+        'tr_meliscms_tool_site_site_label_error_long'  => 'Site name too long, maximum characters accepted is 100 characters',
+        # New site name
+        'tr_meliscms_tool_site_new_site_name' => 'Module name',
+        'tr_meliscms_tool_site_new_site_name tooltip' => 'Site module name',
 	);
 ?>

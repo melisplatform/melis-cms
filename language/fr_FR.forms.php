@@ -217,6 +217,13 @@
         'tr_meliscms_page_tab_properties_search_type_option1' => 'Oui, avec les sous pages',
         'tr_meliscms_page_tab_properties_search_type_option2' => 'Oui, sans les sous pages',
         'tr_meliscms_page_tab_properties_search_type_option3' => 'Non',
-
+        # Site label
+        'tr_meliscms_tool_site_site_label' => 'Étiquette',
+        'tr_meliscms_tool_site_site_label tooltip' => 'Label du site',
+        'tr_meliscms_tool_site_site_label_error_empty' => 'Veuillez saisir l\'étiquette du site',
+        'tr_meliscms_tool_site_site_label_error_long'  => 'Nom du étiquette trop long, nombre de caractères maximum 45',
+        # New site name
+        'tr_meliscms_tool_site_new_site_name' => 'Nom du module',
+        'tr_meliscms_tool_site_new_site_name tooltip' => 'Nom du module de site',
     );
 ?>
