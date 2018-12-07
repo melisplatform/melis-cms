@@ -802,13 +802,13 @@ return array(
                                 'sortable' => true,
 
                             ),
-                            /*'site_label' => array(
+                            'site_label' => array(
                                 'text' => 'tr_meliscms_tool_site_site_label',
                                 'css' => array('width' => '30%', 'padding-right' => '0'),
                                 'sortable' => true,
-                            ),*/
+                            ),
                             'site_name' => array(
-                                'text' => 'tr_meliscms_tool_site_col_site_name',
+                                'text' => 'tr_meliscms_tool_site_new_site_name',
                                 'css' => array('width' => '30%', 'padding-right' => '0'),
                                 'sortable' => true,
                             ),
@@ -816,6 +816,7 @@ return array(
                         'searchables' => array(
                             'melis_cms_site.site_id',
                             'melis_cms_site.site_name',
+                            'melis_cms_site.site_label',
 
                         ),
                         'actionButtons' => array(
@@ -894,7 +895,7 @@ return array(
                                         ),
                                     ),
                                 ),
-                             /*   array(
+                                array(
                                     'spec' => array(
                                         'name' => 'site_label',
                                         'type' => 'MelisText',
@@ -908,7 +909,7 @@ return array(
                                             'required' => 'required',
                                         ),
                                     ),
-                                ),*/
+                                ),
                                 array(
                                     'spec' => array(
                                         'name' => 'plang_lang_id',
@@ -1004,7 +1005,7 @@ return array(
                                         array('name' => 'StringTrim'),
                                     ),
                                 ),
-                               /* 'site_label' => array(
+                                'site_label' => array(
                                     'name'     => 'site_label',
                                     'required' => true,
                                     'validators' => array(
@@ -1031,7 +1032,7 @@ return array(
                                         array('name' => 'StripTags'),
                                         array('name' => 'StringTrim'),
                                     ),
-                                ),*/
+                                ),
                                 'plang_lang_id' => array(
                                     'name'     => 'plang_lang_id',
                                     'required' => true,
@@ -1165,12 +1166,12 @@ return array(
                                         'attributes' => array(
                                             'id' => 'id_site_name',
                                             'value' => '',
-                                           # 'readonly' => 'true',
+                                            'readonly' => 'true',
                                             'required' => 'required'
                                         ),
                                     ),
                                 ),
-                              /*  array(
+                                array(
                                     'spec' => array(
                                         'name' => 'site_label',
                                         'type' => 'MelisText',
@@ -1184,7 +1185,7 @@ return array(
                                             'required' => 'required',
                                         ),
                                     ),
-                                ),*/
+                                ),
                                 array(
                                     'spec' => array(
                                         'name' => 'site_main_page_id',
@@ -1318,7 +1319,7 @@ return array(
                                         array('name' => 'StringTrim'),
                                     ),
                                 ),
-/*                                'site_label' => array(
+                                'site_label' => array(
                                     'name'     => 'site_label',
                                     'required' => true,
                                     'validators' => array(
@@ -1345,7 +1346,7 @@ return array(
                                         array('name' => 'StripTags'),
                                         array('name' => 'StringTrim'),
                                     ),
-                                ),*/
+                                ),
                                 'site_main_page_id' => array(
                                     'name'     => 'site_main_page_id',
                                     'required' => false,
