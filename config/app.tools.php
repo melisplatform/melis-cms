@@ -1878,7 +1878,7 @@ return array(
                                 array(
                                      'spec' => array(
                                         'name' => 'pids_name_select',
-                                        'type' => 'MelisText',
+                                        'type' => 'MelisCmsPlatformIDsSelect',
                                         'options' => array(
                                             'label' => 'tr_meliscms_tool_platform_pids_name',
                                             'tooltip' => 'tr_meliscms_tool_platform_pids_name tooltip',
