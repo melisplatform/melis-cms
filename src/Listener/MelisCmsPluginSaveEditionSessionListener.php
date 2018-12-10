@@ -55,7 +55,18 @@ class MelisCmsPluginSaveEditionSessionListener implements ListenerAggregateInter
         		$plugin = isset($postValues['melisPluginName']) ? $postValues['melisPluginName'] : null;
         		$tag    = isset($postValues['melisPluginTag'])  ? $postValues['melisPluginTag']  : null;
         		$id     = isset($postValues['melisPluginId'])   ? $postValues['melisPluginId']   : null;
-        		
+
+                /**
+                 * check if plugin is came from the mini template
+                 * to get its original plugin name
+                 */
+                if (strpos($plugin, 'MiniTemplatePlugin') !== false) {
+                    //explode to get the original plugin name
+                    $tplPlugin = explode('_', $plugin);
+                    //set the original plugin name
+                    $plugin = $tplPlugin[0];
+                }
+
         		if (empty($plugin) || empty($idPage) || empty($id))
         		    return;
         		    
