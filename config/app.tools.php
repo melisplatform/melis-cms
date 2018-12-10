@@ -886,7 +886,7 @@ return array(
                                         'type' => 'MelisText',
                                         'options' => array(
                                             'label' => 'tr_meliscms_tool_site_site_name',
-                                            'tooltip' => 'tr_meliscms_tool_site_site_name  tooltip',
+                                            'tooltip' => 'tr_meliscms_tool_site_site_name tooltip',
                                         ),
                                         'attributes' => array(
                                             'id' => 'id_site_name',
