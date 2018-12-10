@@ -422,6 +422,20 @@ return array(
 								),
 							),
 						),
+                        array(
+                            'spec' => array(
+                                'name' => 'pseo_canonical',
+                                'type' => 'MelisText',
+                                'options' => array(
+                                    'label' => 'tr_meliscms_page_tab_seo_form_canonical',
+                                    'tooltip' => 'tr_meliscms_page_tab_seo_form_canonical tooltip',
+                                ),
+                                'attributes' => array(
+                                    'id' => 'pseo_canonical',
+                                    'value' => '',
+                                ),
+                            ),
+                        ),
 					),
 					'input_filter' => array( 
 				        'pseo_meta_title' => array(

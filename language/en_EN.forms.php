@@ -76,6 +76,8 @@
 	    'tr_meliscms_pageseo_form_page_title_long'  => 'Page title is too long, it should be less than 65 characters',
 		'tr_meliscms_pageseo_form_page_desc_long'  => 'Description is too long, it should be less than 255 characters',
 		'tr_meliscms_pageseo_form_page_url_too_long'  => 'URL is too long, it should be less than 255 characters',
+        'tr_meliscms_page_tab_seo_form_canonical'  => 'Canonical URL',
+        'tr_meliscms_page_tab_seo_form_canonical tooltip'  => 'Canonical URL',
 	    
 	    // for template tool forms
 	    'tr_meliscms_template_form_tpl_id' => 'ID',

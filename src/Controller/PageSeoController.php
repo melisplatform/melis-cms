@@ -136,6 +136,10 @@ class PageSeoController extends AbstractActionController
                 $postValues['pseo_url'] =  $this->cleanURL($postValues['pseo_url']);
             }
 
+            if (!empty($postValues['pseo_canonical'])) {
+                $postValues['pseo_canonical'] =  $this->cleanURL($postValues['pseo_canonical']);
+            }
+
             $seoForm->setData($postValues);
 
             // Validate the form
