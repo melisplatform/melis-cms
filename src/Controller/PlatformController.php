@@ -156,30 +156,31 @@ class PlatformController extends AbstractActionController
         $propertyForm = $factory->createForm($genericPlatformForm);
         
         $view = new ViewModel();
-        
+        $melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+        $availablePlatform = $melisEngineTablePlatformIds->getAvailablePlatforms()->toArray();
         // Check if Cms Platform Id is Set
         if (isset($pids_id)&&$pids_id!=''){
-            
+
             // Get Platform ID Details
-            $melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+
             $platformIdsData = $melisEngineTablePlatformIds->getEntryById($pids_id);
             $platformIdsData = $platformIdsData->current();
-            
+
             $platformTable = $this->getServiceLocator()->get('MelisCoreTablePlatform');
             $platformData = $platformTable->getEntryById($pids_id);
             $platformData = $platformData->current();
-            
+
             // Assign Platform name to Element Name of the Form from the App Tool
             $platformIdsData->pids_name_input = $platformData->plf_name;
-            
-            // Removing Select input 
+
+            // Removing Select input
             $propertyForm->remove('pids_name_select');
             // Binding datas to the Form
             $propertyForm->bind($platformIdsData);
-            
+
             // Set variable to View
             $view->pids_id = $pids_id;
-            $view->tabTitle = 'tr_meliscms_tool_platform_ids_btn_edit'; 
+            $view->tabTitle = 'tr_meliscms_tool_platform_ids_btn_edit';
         }else{
             // Removing Id input and Platform input
             $propertyForm->remove('pids_id');
@@ -187,8 +188,9 @@ class PlatformController extends AbstractActionController
             // Set variable to View
             $view->tabTitle = 'tr_meliscms_tool_platform_ids_btn_add';
         }
-        
+
         $view->setVariable('meliscms_tool_platform_generic_form', $propertyForm);
+        $view->setVariable('available_platform', $availablePlatform);
         $view->melisKey = $this->params()->fromRoute('melisKey', '');
         return $view;
     }
