@@ -223,5 +223,10 @@
         # New site name
         'tr_meliscms_tool_site_new_site_name' => 'Module name',
         'tr_meliscms_tool_site_new_site_name tooltip' => 'Site module name',
+        # Template form validation error
+        'tr_melis_cms_tool_template_name_invalid'       => 'Invalid template name',
+        'tr_melis_cms_tool_template_layout_invalid'     => 'Invalid template layout',
+        'tr_melis_cms_tool_template_controller_invalid' => 'Invalid template controller',
+        'tr_melis_cms_tool_template_action_invalid'     => 'Invalid template action',
 	);
 ?>
