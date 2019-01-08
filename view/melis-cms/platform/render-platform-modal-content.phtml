@@ -20,18 +20,29 @@
         					<div id="cmsPlatformAlert"></div>
                             <div class="row">
                             	<div class="col-md-12">
-                            		<p class="modal-text-info"><?= $this->translate('tr_meliscms_tool_platform_modal_info') ?> </p>
                                     <?php
-                                    	$form = $this->meliscms_tool_platform_generic_form;
-                                    	$form->prepare();
-                                    	echo $this->form()->openTag($form); 
-                                    	echo $this->melisFieldCollection($form);
-                                    	echo $this->form()->closeTag(); 
-                                    ?>
-                                 	<div align="right">
-                                 		<a data-dismiss="modal" class="btn btn-danger pull-left"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscms_common_close')?></a>
-                                 		<a class="btn btn-success btnSavePlatfomrRange" data-id="<?php echo $this->pids_id?>"><i class="fa fa-save"></i> <?php echo $this->translate('tr_meliscms_common_save'); ?></a>
-                                 	</div>
+                                        $availablePlatform = $this->available_platform;
+                                        if (!empty($availablePlatform)){?>
+                                            <p class="modal-text-info"><?= $this->translate('tr_meliscms_tool_platform_modal_info') ?> </p>
+                                            <?php
+                                                $form = $this->meliscms_tool_platform_generic_form;
+                                                $form->prepare();
+                                                echo $this->form()->openTag($form);
+                                                echo $this->melisFieldCollection($form);
+                                                echo $this->form()->closeTag();
+                                            ?>
+                                            <div align="right">
+                                                <a data-dismiss="modal" class="btn btn-danger pull-left"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscms_common_close')?></a>
+                                                <a class="btn btn-success btnSavePlatfomrRange" data-id="<?php echo $this->pids_id?>"><i class="fa fa-save"></i> <?php echo $this->translate('tr_meliscms_common_save'); ?></a>
+                                            </div>
+                                        <?php } else {?>
+                                             <div class="alert alert-info">
+                                                 All platforms has already been assigned with  page IDs.
+                                             </div>
+                                            <div align="right">
+                                                <a data-dismiss="modal" class="btn btn-danger pull-left"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscms_common_close')?></a>
+                                            </div>
+                                        <?php }?>
                             	</div>
                             </div>
                         </div>

@@ -338,6 +338,14 @@ return array(
                                                 ),
                                             ),
                                         ),
+                                        array(
+                                            'name' => 'regex', false,
+                                            'options' => array(
+                                                'pattern' => '/^[a-zA-Z0-9]+([_ -]?[a-zA-Z0-9])*$/',
+                                                'messages' => array(\Zend\Validator\Regex::NOT_MATCH => 'tr_melis_cms_tool_template_name_invalid'),
+                                                'encoding' => 'UTF-8',
+                                            ),
+                                        ),
                                     ),
                                     'filters'  => array(
                                         array('name' => 'StripTags'),
@@ -407,8 +415,16 @@ return array(
 //                                 ),
                                 'tpl_zf2_layout' => array(
                                     'name'     => 'tpl_zf2_layout',
-                                    'required' => false,
+                                    'required' => true,
                                     'validators' => array(
+                                        array(
+                                            'name' => 'regex', false,
+                                            'options' => array(
+                                                'pattern' => '/^[a-zA-Z0-9]+([_ -]?[a-zA-Z0-9])*$/',
+                                                'messages' => array(\Zend\Validator\Regex::NOT_MATCH => 'tr_melis_cms_tool_template_layout_invalid'),
+                                                'encoding' => 'UTF-8',
+                                            ),
+                                        ),
                                     ),
                                     'filters'  => array(
                                         array('name' => 'StripTags'),
@@ -417,8 +433,16 @@ return array(
                                 ),
                                 'tpl_zf2_controller' => array(
                                     'name'     => 'tpl_zf2_controller',
-                                    'required' => false,
+                                    'required' => true,
                                     'validators' => array(
+                                        array(
+                                            'name' => 'regex', false,
+                                            'options' => array(
+                                                'pattern' => '/^[a-zA-Z0-9]+([_ -]?[a-zA-Z0-9])*$/',
+                                                'messages' => array(\Zend\Validator\Regex::NOT_MATCH => 'tr_melis_cms_tool_template_controller_invalid'),
+                                                'encoding' => 'UTF-8',
+                                            ),
+                                        ),
                                     ),
                                     'filters'  => array(
                                         array('name' => 'StripTags'),
@@ -427,8 +451,16 @@ return array(
                                 ),
                                 'tpl_zf2_action' => array(
                                     'name'     => 'tpl_zf2_action',
-                                    'required' => false,
+                                    'required' => true,
                                     'validators' => array(
+                                        array(
+                                            'name' => 'regex', false,
+                                            'options' => array(
+                                                'pattern' => '/^[a-zA-Z0-9]+([_ -]?[a-zA-Z0-9])*$/',
+                                                'messages' => array(\Zend\Validator\Regex::NOT_MATCH => 'tr_melis_cms_tool_template_action_invalid'),
+                                                'encoding' => 'UTF-8',
+                                            ),
+                                        ),
                                     ),
                                     'filters'  => array(
                                         array('name' => 'StripTags'),
@@ -886,7 +918,7 @@ return array(
                                         'type' => 'MelisText',
                                         'options' => array(
                                             'label' => 'tr_meliscms_tool_site_site_name',
-                                            'tooltip' => 'tr_meliscms_tool_site_site_name  tooltip',
+                                            'tooltip' => 'tr_meliscms_tool_site_site_name tooltip',
                                         ),
                                         'attributes' => array(
                                             'id' => 'id_site_name',
@@ -1878,7 +1910,7 @@ return array(
                                 array(
                                      'spec' => array(
                                         'name' => 'pids_name_select',
-                                        'type' => 'MelisText',
+                                        'type' => 'MelisCmsPlatformIDsSelect',
                                         'options' => array(
                                             'label' => 'tr_meliscms_tool_platform_pids_name',
                                             'tooltip' => 'tr_meliscms_tool_platform_pids_name tooltip',

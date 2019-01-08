@@ -79,6 +79,8 @@
 	    'tr_meliscms_pageseo_form_page_title_long'  => 'Titre de page trop long, il doit être de moins de 65 caractères',
 		'tr_meliscms_pageseo_form_page_desc_long'  => 'Description trop longue, elle doit être de moins de 255 caractères',
 		'tr_meliscms_pageseo_form_page_url_too_long'  => 'URL trop longue, elle doit être de moins de 255 caractères',
+        'tr_meliscms_page_tab_seo_form_canonical'  => 'Canonical URL',
+        'tr_meliscms_page_tab_seo_form_canonical tooltip'  => 'Canonical URL',
 			 
 	    // for template tool forms
 	    'tr_meliscms_template_form_tpl_id' => 'ID',
@@ -91,7 +93,7 @@
 	    'tr_meliscms_template_form_tpl_zf2_website_folder' => 'Dossier',
 	    'tr_meliscms_template_form_tpl_zf2_layout' => 'Layout',
 	    'tr_meliscms_template_form_tpl_zf2_layout tooltip' => 'Nom du layout tel que défini dans la configuration ZF2 du module du site',
-	    'tr_meliscms_template_form_tpl_zf2_controller' => 'Controller',
+	    'tr_meliscms_template_form_tpl_zf2_controller' => 'Controlleur',
 	    'tr_meliscms_template_form_tpl_zf2_controller tooltip' => 'Nom du controller (sans &quot;Controller&quot; et sans extension php)',
 	    'tr_meliscms_template_form_tpl_zf2_action' => 'Action',
 	    'tr_meliscms_template_form_tpl_zf2_action tooltip' => 'Methode du controller (sans &quot;Action&quot;)',
@@ -225,5 +227,10 @@
         # New site name
         'tr_meliscms_tool_site_new_site_name' => 'Nom du module',
         'tr_meliscms_tool_site_new_site_name tooltip' => 'Nom du module de site',
+        # Template form validation error
+        'tr_melis_cms_tool_template_name_invalid'       => 'Nom du template invalide',
+        'tr_melis_cms_tool_template_layout_invalid'     => 'Layout du template invalide',
+        'tr_melis_cms_tool_template_controller_invalid' => 'Controlleur du template invalide',
+        'tr_melis_cms_tool_template_action_invalid'     => 'Action du template invalide',
     );
 ?>
