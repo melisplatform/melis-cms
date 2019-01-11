@@ -139,8 +139,8 @@
         
         'tr_meliscms_tool_site_id' => 'ID',
         'tr_meliscms_tool_site_id tooltip' => 'Identifiant du site',
-        'tr_meliscms_tool_site_site_name' => 'Nom',
-        'tr_meliscms_tool_site_site_name tooltip' => 'Nom du site',
+        'tr_meliscms_tool_site_site_name' => 'Nom du module associé',
+        'tr_meliscms_tool_site_site_name tooltip' => 'Le nom du module tel que défini dans le code (ou le nom du dossier dans MelisSites/)',
         'tr_meliscms_tool_site_page_id' => 'ID page d&#39;accueil',
         'tr_meliscms_tool_site_page_id tooltip' => 'Identifiant de la page d&#39;accueil',
         'tr_meliscms_tool_site_site_id' => 'ID du domaine',
@@ -171,7 +171,7 @@
 	    'tr_meliscms_tool_site_melissites_directory_not_exist' => 'Le dossier de destination n\'existe pas, veuillez créer le dossier /module/MelisSites',
 	    'tr_meliscms_tool_site_site_created_title' => 'a été créé avec succès',
 	    'tr_meliscms_tool_site_site_created_message' => 'Votre nouveau site a été créé avec <b>Site module</b>, <b>Pages</b> et <b>Templates</b> générés.',
-	    'tr_meliscms_tool_site_site_name' => 'Nom du site',
+	   # 'tr_meliscms_tool_site_site_name' => 'Nom du site',
 	    'tr_meliscms_tool_site_site_module' => 'Module du site',
 	    'tr_meliscms_tool_site_site_layout' => 'layout du site',
 	    'tr_meliscms_tool_site_homepage' => 'Page d\'accueil',
@@ -220,8 +220,8 @@
         'tr_meliscms_page_tab_properties_search_type_option2' => 'Oui, sans les sous pages',
         'tr_meliscms_page_tab_properties_search_type_option3' => 'Non',
         # Site label
-        'tr_meliscms_tool_site_site_label' => 'Étiquette',
-        'tr_meliscms_tool_site_site_label tooltip' => 'Label du site',
+        'tr_meliscms_tool_site_site_label' => 'Nom du site',
+        'tr_meliscms_tool_site_site_label tooltip' => 'Le nom du site affiché dans la plateforme',
         'tr_meliscms_tool_site_site_label_error_empty' => 'Veuillez saisir l\'étiquette du site',
         'tr_meliscms_tool_site_site_label_error_long'  => 'Nom du étiquette trop long, nombre de caractères maximum 45',
         # New site name

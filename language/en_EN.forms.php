@@ -137,7 +137,7 @@
 	    'tr_meliscms_tool_site_id' => 'Site ID',
 	    'tr_meliscms_tool_site_id tooltip' => 'Identifier of the site',
 	    'tr_meliscms_tool_site_site_name' => 'Name',
-	    'tr_meliscms_tool_site_site_name tooltip' => 'Name of the site',
+	    'tr_meliscms_tool_site_site_name tooltip' => 'The module name as defined in the code (or folder name in MelisSites/)',
 	    'tr_meliscms_tool_site_page_id' => 'Home page ID',
 	    'tr_meliscms_tool_site_page_id tooltip' => 'Identifier of the home page',
 	    'tr_meliscms_tool_site_site_id' => 'Domain site ID',
@@ -166,7 +166,7 @@
 	    'tr_meliscms_tool_site_melissites_directory_not_exist' => 'Target directory not exist, please create the /module/MelisSites directory',
 	    'tr_meliscms_tool_site_site_created_title' => 'has been created successfully',
 	    'tr_meliscms_tool_site_site_created_message' => 'Your new site has been created with <b>Site module</b>, <b>Pages</b> and <b>Templates</b> generated.',
-	    'tr_meliscms_tool_site_site_name' => 'Site name',
+	    'tr_meliscms_tool_site_site_name' => 'Module name associated',
 	    'tr_meliscms_tool_site_site_module' => 'Site module',
 	    'tr_meliscms_tool_site_site_layout' => 'Site layout',
 	    'tr_meliscms_tool_site_homepage' => 'Homepage',
@@ -216,8 +216,8 @@
 	    'tr_meliscms_page_tab_properties_search_type_option2' => 'Yes, without subpages',
 	    'tr_meliscms_page_tab_properties_search_type_option3' => 'No',
         # Site label
-        'tr_meliscms_tool_site_site_label'             => 'Label',
-        'tr_meliscms_tool_site_site_label tooltip'     => 'Label of your site',
+        'tr_meliscms_tool_site_site_label'             => 'Name of the site',
+        'tr_meliscms_tool_site_site_label tooltip'     => 'The name of the site displayed in the platform',
         'tr_meliscms_tool_site_site_label_error_empty' => 'Please enter the site label',
         'tr_meliscms_tool_site_site_label_error_long'  => 'Site name too long, maximum characters accepted is 100 characters',
         # New site name
