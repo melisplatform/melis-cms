@@ -330,6 +330,24 @@ $(document).ready(function() {
 			alert( translations.tr_meliscore_error_message );
 		});
 	});
+
+    // Add Event to "Delete Button"
+    addEvent(".btnMinifyAssets", function(e) {
+        var siteId = $(this).parents("tr").attr("id");
+		$.ajax({
+			type        : 'POST',
+			url         : '/minify-assets',
+			data		: {siteId : siteId},
+			dataType    : 'json',
+			encode		: true,
+			beforeSend  : function(){
+
+			},
+			success		: function(data){
+				melisHelper.melisKoNotification(data.title, '', data.errors);
+			}
+		});
+    });
 	
 	$("body").on("change", "#siteEditionForm #id_sdom_env", function(e){ 
 		var siteId = $("#siteEditionForm #id_site_id").val();

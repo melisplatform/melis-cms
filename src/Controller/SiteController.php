@@ -262,6 +262,15 @@ class SiteController extends AbstractActionController
         
         return $view;
     }
+
+    /**
+     * Renders to the edit button in the table
+     * @return \Zend\View\Model\ViewModel
+     */
+    public function renderToolSiteContentActionMinifyAssetsAction()
+    {
+        return new ViewModel();
+    }
     
     /**
      * Returns all the data from the site table, site domain and site 404
