@@ -93,7 +93,7 @@
 	    'tr_meliscms_template_form_tpl_zf2_website_folder' => 'Dossier',
 	    'tr_meliscms_template_form_tpl_zf2_layout' => 'Layout',
 	    'tr_meliscms_template_form_tpl_zf2_layout tooltip' => 'Nom du layout tel que défini dans la configuration ZF2 du module du site',
-	    'tr_meliscms_template_form_tpl_zf2_controller' => 'Controlleur',
+	    'tr_meliscms_template_form_tpl_zf2_controller' => 'Controller',
 	    'tr_meliscms_template_form_tpl_zf2_controller tooltip' => 'Nom du controller (sans &quot;Controller&quot; et sans extension php)',
 	    'tr_meliscms_template_form_tpl_zf2_action' => 'Action',
 	    'tr_meliscms_template_form_tpl_zf2_action tooltip' => 'Methode du controller (sans &quot;Action&quot;)',
