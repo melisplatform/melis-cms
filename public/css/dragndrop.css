@@ -329,6 +329,7 @@ body {
     font-size: 14px;
     line-height: 25px;
     transition: all 0.4s ease-in-out;
+    /* added by: Junry @ 02082019*/
     width: inherit;
 }
 .melis-ui-outlined.ui-sortable-helper,
