@@ -1,4 +1,3 @@
-
 var melisDragnDrop = (function($, window) {
     var scrollBool = true;
     var centerWindow;
@@ -176,8 +175,6 @@ var melisDragnDrop = (function($, window) {
         change: function( event, ui ) {
             setPluginWidth(ui);
         },
-
-
     });
 
     // set plugin container width by placeholder
@@ -208,7 +205,6 @@ var melisDragnDrop = (function($, window) {
         placeholderWidth = $(ui.placeholder[0]);
 
     }
-
 
     // Tooltip
     $(".melis-cms-plugin-snippets").tooltip({
