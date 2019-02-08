@@ -2033,12 +2033,16 @@ $(function(){
 				});
 		});
 	});
-	
-	window.initPlatformIdTbl = function(){
-		$('.noPlatformIdDeleteBtn').each(function(){
-			$('#'+$(this).attr('id')+' .btnCmsPlatformIdsDelete').remove();
-		});
-	}
+
+    window.initPlatformIdTbl = function () {
+        var parent = "#platformToolTable";
+
+        // CMS platform IDs list init to remove delete buttons
+        $(parent).find('.noPlatformIdDeleteBtn').each(function () {
+            var rowId = '#' + $(this).attr('id');
+            $(parent).find(rowId).find('.btnCmsPlatformIdsDelete').remove();
+        });
+    }
 });
 
 
