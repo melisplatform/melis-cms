@@ -200,7 +200,7 @@ class ToolTemplateController extends AbstractActionController
         
         $view->melisKey = $melisKey;
         
-        $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration();
+        $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration('#tableToolTemplateManager',false,false,array('order' => '[[ 0, "desc" ]]'));
         
         return $view;
     }

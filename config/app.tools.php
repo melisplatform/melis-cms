@@ -1176,7 +1176,7 @@ return array(
                                 array(
                                     'spec' => array(
                                         'name' => 'site_id',
-                                        'type' => 'MelisText',
+                                        'type' => 'hidden',
                                         'options' => array(
                                             'label' => 'tr_meliscms_tool_site_id',
                                             'tooltip' => 'tr_meliscms_tool_site_id tooltip',
@@ -1184,6 +1184,7 @@ return array(
                                         'attributes' => array(
                                             'id' => 'id_site_id',
                                             'value' => '',
+
                                         ),
                                     ),
                                 ),
