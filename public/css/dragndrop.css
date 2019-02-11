@@ -713,6 +713,14 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
     font-weight: bold;
 }
 
+.plugins-override-padding{
+    padding-top: 10px;
+}
+
+.plugins-name-override-margin{
+    margin-top: 0;
+}
+
 @-webkit-keyframes spinning-cog {
     0% { -webkit-transform: rotate(0deg) }
     20% { -webkit-transform: rotate(-45deg) }
