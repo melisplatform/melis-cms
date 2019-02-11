@@ -182,6 +182,7 @@ Creating other config is possible. Add the config in a file then declare the fil
 	'media' => 'MelisCms/public/js/tinyMCE/media.php',  
 ),  
 ```  
+* mini templates will automatically turned into plugins if places in their folder.
 
 ### Javascript helpers provided with MelisCms    
 
