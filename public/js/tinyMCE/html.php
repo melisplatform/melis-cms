@@ -11,9 +11,10 @@
        'cleanup' => false,
        'verify_html' => false,
        'plugins' => array(
-           'advlist autolink lists link paste image charmap preview anchor textcolor colorpicker emoticons help hr nonbreaking',
+          //[contextmenu, textcolor, colorpicker] this plugin is already built in the core editor as of TinyMCE v. 5
+           'advlist autolink lists link paste image charmap preview anchor emoticons help hr nonbreaking',
            'searchreplace visualblocks code fullscreen',
-           'insertdatetime media table contextmenu  template'
+           'insertdatetime media table template'
        ),
        'image_advtab' => true,
        'toolbar' => 'insertfile undo redo paste | formatselect | forecolor | bold italic strikethrough underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media template | code',
