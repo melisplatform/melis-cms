@@ -54,6 +54,13 @@ var melisDragnDrop = (function($, window) {
             var placeholderWidth = ( 100 * parseFloat($(ui.helper[0]).css("width")) / parseFloat($(ui.helper[0]).parent().css('width')) ) + '%';
             $(ui.placeholder[0]).css("width", placeholderWidth);
 
+            // change its css to fit for theme design
+            $(ui.helper[0]).css({
+                "height" : "auto",
+                "padding-left" : "10px",
+                "padding-right" : "10px"
+            });
+
             // detect if browser is in desktop
             if( $(window).width() >= 768) {
                 $(window).mousemove(function (e) {
@@ -74,7 +81,6 @@ var melisDragnDrop = (function($, window) {
                         if ($(".melis-cms-dnd-box").hasClass("show")) {
                             $(".melis-cms-dnd-box").removeClass("show");
                         }
-
 
                         if (e.clientY >= ($(window.parent).scrollTop() + $(window.parent).height() - frameTop)) {
                             // detect IE8 and above, and edge
