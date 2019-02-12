@@ -18,3 +18,4 @@
         'toolbar' => 'insertfile undo redo link image media | code',
         'init_instance_callback' => 'tinyMceCleaner',
 	); 
+    

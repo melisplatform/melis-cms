@@ -41,3 +41,4 @@
      'toolbar' => 'insertfile undo redo | formatselect | forecolor backcolor | bold italic strikethrough underline hr nonbreaking | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media template | charmap emoticons code print help',
      'init_instance_callback' => 'tinyMceCleaner',
  ); */
+ 
