@@ -1083,7 +1083,7 @@ return array(
                                 ),
                                 'sdom_env' => array(
                                     'name'     => 'sdom_env',
-                                    'required' => false,
+                                    'required' => true,
                                     'validators' => array(
                                         array(
                                             'name'    => 'StringLength',
@@ -1418,7 +1418,7 @@ return array(
                                 ),
                                 'sdom_env' => array(
                                     'name'     => 'sdom_env',
-                                    'required' => false,
+                                    'required' => true,
                                     'validators' => array(
                                         array(
                                             'name'    => 'StringLength',
