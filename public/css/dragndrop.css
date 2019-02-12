@@ -554,7 +554,7 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
     border: 4px solid #e61c23;
 }
 
-div[data-module-name="MelisMiniTemplate"].melis-cms-plugin-snippets {
+.melis-dragdropzone > div[data-module-name="MelisMiniTemplate"].melis-cms-plugin-snippets {
     background: #e61c23;
 }
 
