@@ -15,7 +15,20 @@ var melisPluginEdition = (function($, window) {
 
     $("body").on("click", ".m-trash-handle", removePlugins);
 
-    $body.on("click", "#pluginModalBtnApply", submitPluginForms); // $body because it is modal and it's located in parent
+    // Checking parent body events handler to avoid multiple events of the button
+    // var cerateEventHalder = true;
+    $.each($body.data("events").click, function(i, val){
+        try {
+            if (val.selector == "#pluginModalBtnApply") {
+                $body.off("click", "#pluginModalBtnApply");
+            }
+        }
+        catch(error) {}
+    });
+
+    // if (cerateEventHalder) {
+        $body.on("click", "#pluginModalBtnApply", submitPluginForms); // $body because it is modal and it's located in parent
+    // }
 
     $("body").on("focus", ".melis-ui-outlined .melis-editable", function() {
         $(this).closest(".melis-ui-outlined").addClass("melis-focus");
@@ -63,13 +76,13 @@ var melisPluginEdition = (function($, window) {
     function validateModal(melisIdPage, melisPluginModule, melisPluginName, melisPluginId, melisPluginTag, datastring, siteModule) {
        $.ajax({
             type: 'POST',
-            url: "/melis/MelisCms/FrontPlugins/validatePluginModal?validate",
+            url: "/melis/MelisCms/FrontPlugins/validatePluginModal?validate&melisSite="+siteModule,
             data: datastring,
             dataType: 'json',
             success: function(data) {
 
                 if(data.success) {
-                    savePluginUpdate(datastring);
+                    savePluginUpdate(datastring, siteModule);
 
                     setTimeout(function() {
 
@@ -111,10 +124,10 @@ var melisPluginEdition = (function($, window) {
     $("div.melis-dragdropzone").last().css({"margin-bottom": "35px"});
 
     // Saving Plugin
-    function savePluginUpdate(data){
+    function savePluginUpdate(data, siteModule){
         $.ajax({
             type: "POST",
-            url: "/melis/MelisCms/PageEdition/savePageSessionPlugin?idPage=" + melisActivePageId,
+            url: "/melis/MelisCms/PageEdition/savePageSessionPlugin?idPage=" + melisActivePageId + "&melisSite="+siteModule,
             data: data,
             dataType: 'json'
         }).done(function(response) {
@@ -193,8 +206,10 @@ var melisPluginEdition = (function($, window) {
                         disableLinks('a');
 
                         // re init resize
-                        // $(".melis-dragdropzone .melis-ui-outlined").resizable("destroy"); // disable for now
-                        // initResizable();
+                        $(".melis-dragdropzone .melis-ui-outlined").resizable("destroy"); // disable for now
+                        if (parent.pluginResizable == 1){
+                            initResizable();
+                        }
                     }
                 }, 300);
             },
@@ -223,7 +238,6 @@ var melisPluginEdition = (function($, window) {
             // check resources css / js
             if(pluginVal.ressources) {
                 $.each(pluginVal.ressources, function(i, value) {
-
                     // check if css / js
                     if(i == "css") {
                         elType = "css";
@@ -371,13 +385,14 @@ var melisPluginEdition = (function($, window) {
 
     // Send the list of plugin inside DragnDropzone
     function sendDragnDropList(dropzone, pageId) {
+
         var dragdropzoneModule = $('div[data-dragdropzone-id='+ dropzone +']').data("module");
 
         var dragdropzonePlugin = $('div[data-dragdropzone-id='+ dropzone +']').data("plugin");
         var dragdropzonePluginId = $('div[data-dragdropzone-id='+ dropzone +']').data("plugin-id");
         var dragdropzoneMelisTag = $('div[data-dragdropzone-id='+ dropzone +']').data("melis-tag");
-        var pluginListEl = $('div[data-dragdropzone-id='+ dropzone +']').find(".melis-ui-outlined");
-
+        var siteModule = $('div[data-dragdropzone-id='+ dropzone +']').data("site-module");
+        var pluginListEl = $('div[data-dragdropzone-id='+ dropzone +']').children(".melis-ui-outlined");
         var dragzone = [];
         var pluginList = new Object();
 
@@ -410,10 +425,11 @@ var melisPluginEdition = (function($, window) {
             } else {
                 pluginList['melisDragDropZoneListPlugin'][key]['melisPluginContainer'] = " ";
             }
-
-
         });
-        savePluginUpdate(pluginList);
+
+        if (typeof siteModule !== "undefined"){
+            savePluginUpdate(pluginList, siteModule);
+        }
     }
 
     function checkFunctionExists(functionName, idPlugin) {
@@ -552,7 +568,7 @@ var melisPluginEdition = (function($, window) {
         // initialation of local variable
         zoneId = 'id_meliscms_plugin_modal_interface';
         melisKey = 'meliscms_plugin_modal_interface';
-        modalUrl = '/melis/MelisCms/FrontPlugins/renderPluginModal';
+        modalUrl = '/melis/MelisCms/FrontPlugins/renderPluginModal?melisSite='+siteModule;
 
         var modalParams = {
             pluginFrontConfig : pluginFrontConfig,
@@ -571,8 +587,14 @@ var melisPluginEdition = (function($, window) {
                 window.parent.$('body').css('overflow', 'hidden');
                 setTimeout(function() {
                     window.parent.$('html, body').scrollTop(optionHandleT);
+
                 }, 300);
+
             }
+            
+            setTimeout(function() {
+                    melisPluginSortable.checkedModalSlider();
+            }, 300);
         });
     }
 
@@ -582,62 +604,45 @@ var melisPluginEdition = (function($, window) {
         var percentTotalWidth;
         var iframe = window.parent.$("#"+ parent.activeTabId).find('iframe');
 
-        $(".melis-dragdropzone .melis-ui-outlined").resizable({
-            containment: ".melis-dragdropzone",
-            start: function(event, ui){
-                var widthIndicator =  '<div class="ui-resize-indicator"></div>';
-                parentWidth = ui.originalElement.parent().outerWidth();
-                // width indicator
-                $(ui.originalElement).append(widthIndicator);
+        // check if melis-ui-outlined element is available in preview page
+        if($(".melis-dragdropzone .melis-ui-outlined").length ) {
+            $(".melis-dragdropzone .melis-ui-outlined").resizable({
+                containment: ".melis-dragdropzone",
+                start: function(event, ui){
+                    var widthIndicator =  '<div class="ui-resize-indicator"></div>';
+                    parentWidth = ui.originalElement.parent().outerWidth();
+                    // width indicator
+                    $(ui.originalElement).append(widthIndicator);
 
-                if($(ui.originalElement).find(".ui-resize-input")) {
-                    $(ui.originalElement).find(".ui-resize-input").remove();
-                }
-            },
-            resize: function(event, ui) {
-                totalWidth = ui.size.width;
-                ui.originalElement.css('height', 'auto');
-                // convert px to percent
-                percentTotalWidth = (100 * totalWidth / parentWidth);
-                percentTotalWidth = percentTotalWidth.toFixed(2);
-                ui.originalElement.css('width', percentTotalWidth + '%');
-                $(ui.originalElement).find(".ui-resize-indicator").text(percentTotalWidth + " %");
-            },
-            stop: function(event, ui) {
-                // get all data attributes
-                var toolBox = $(ui.originalElement).children(".melis-plugin-tools-box");
-
-                getPluginData(toolBox, percentTotalWidth);
-                // get the function
-                var owlCheck = $(ui.originalElement).find(".owl-carousel");
-                if( $(owlCheck).length ) {
-                    $(owlCheck).trigger('refresh.owl.carousel');
-                }
-
-                // remove indicator
-                $(ui.originalElement).find(".ui-resize-indicator").remove();
-                // check if below 50% and if melis-float-plugin available
-                if(percentTotalWidth <= 50 && $(ui.element[0]).parent('.melis-float-plugins').length <= 0) {
-                    if($(ui.element[0]).next('.btn-pulse').length <= 0) {
-                        // create button get the current height of left plugin
-                        var btnAddPluginBox = '<button class="btn-pulse" title="Add Plugin Box"><i class="fa fa-plus"></i></button>';
-                        var elHeight = $(ui.element[0]).height(),
-                            btnPosTop = elHeight / 2;
-                        // add button
-                        $(btnAddPluginBox).insertAfter($(ui.element[0]));
-                        if($(ui.element[0]).next('.btn-pulse').length >= 1) {
-                            var elPos = $(this).position();
-                            $(this).next('.btn-pulse').css('top', btnPosTop + elPos.top);
-                        }
-                        $("body").on("click", ".btn-pulse", addPluginFloatBox);
+                    if($(ui.originalElement).find(".ui-resize-input")) {
+                        $(ui.originalElement).find(".ui-resize-input").remove();
                     }
-                } else {
-                    if($(ui.element[0]).next('.btn-pulse').length) {
-                        $(ui.element[0]).next().remove();
+                },
+                resize: function(event, ui) {
+                    totalWidth = ui.size.width;
+                    ui.originalElement.css('height', 'auto');
+                    // convert px to percent
+                    percentTotalWidth = (100 * totalWidth / parentWidth);
+                    percentTotalWidth = percentTotalWidth.toFixed(2);
+                    ui.originalElement.css('width', percentTotalWidth + '%');
+                    $(ui.originalElement).find(".ui-resize-indicator").text(percentTotalWidth + " %");
+                },
+                stop: function(event, ui) {
+                    // get all data attributes
+                    var toolBox = $(ui.originalElement).children(".melis-plugin-tools-box");
+
+                    getPluginData(toolBox, percentTotalWidth);
+                    // get the function
+                    var owlCheck = $(ui.originalElement).find(".owl-carousel");
+                    if( $(owlCheck).length ) {
+                        $(owlCheck).trigger('refresh.owl.carousel');
                     }
+
+                    // remove indicator
+                    $(ui.originalElement).find(".ui-resize-indicator").remove();
                 }
-            }
-        });
+            });
+        }
     }
 
     function getPluginData(el, percentTotalWidth) {
@@ -685,7 +690,10 @@ var melisPluginEdition = (function($, window) {
                 // update DOM data attribute
                 $(toolBox).attr("data-plugin-width-mobile", mobileWidth);
                 currentClass = "plugin-width-xs-";
-                newClass = "plugin-width-xs-"+Math.round(percentTotalWidth);
+
+                var strPercentTotalWidth = percentTotalWidth;
+                 // newClass = "plugin-width-xs-"+Math.floor(percentTotalWidth); // removed when css is ready
+                newClass = "plugin-width-xs-"+strPercentTotalWidth.replace(".", "-"); // removed when css is ready
                 $.each(classes, function(key, value) {
                     if( value.indexOf(currentClass) != -1 ) {
                         parentOutlined.removeClass(value).addClass(newClass);
@@ -697,7 +705,9 @@ var melisPluginEdition = (function($, window) {
                 tabletWidth = percentTotalWidth;
                 $(toolBox).attr("data-plugin-width-tablet", tabletWidth);
                 currentClass = "plugin-width-md-";
-                newClass = "plugin-width-md-"+Math.round(percentTotalWidth);
+                var strPercentTotalWidth = percentTotalWidth;
+                // newClass = "plugin-width-md-"+Math.floor(percentTotalWidth); // removed when css is ready
+                newClass = "plugin-width-lg-"+strPercentTotalWidth.replace(".", "-"); // removed when css is ready
                 $.each(classes, function(key, value) {
                     if( value.indexOf(currentClass) != -1 ) {
                         parentOutlined.removeClass(value).addClass(newClass);
@@ -709,7 +719,9 @@ var melisPluginEdition = (function($, window) {
                 desktopWidth = percentTotalWidth;
                 $(toolBox).attr("data-plugin-width-desktop", desktopWidth);
                 currentClass = "plugin-width-lg-";
-                newClass = "plugin-width-lg-"+Math.round(percentTotalWidth);
+                var strPercentTotalWidth = percentTotalWidth;
+                // newClass = "plugin-width-lg-"+Math.floor(percentTotalWidth); // removed when css is ready
+                newClass = "plugin-width-lg-" + strPercentTotalWidth.replace(".", "-"); // removed when css is ready
                 $.each(classes, function(key, value) {
                     if( value.indexOf(currentClass) != -1 ) {
                         parentOutlined.removeClass(value).addClass(newClass);
@@ -723,8 +735,9 @@ var melisPluginEdition = (function($, window) {
             pluginList['melisPluginDesktopWidth'] = desktopWidth;
 
             // pass is to savePageSession
-            savePluginUpdate(pluginList);
+            savePluginUpdate(pluginList, toolBox.data("site-module"));
 
+            // get plugin ID and re init
             // check if owl re init
             var owlCheck = $(parentOutlined).find(".owl-carousel");
             if( $(owlCheck).length ) {
@@ -735,25 +748,6 @@ var melisPluginEdition = (function($, window) {
 
             }
         }
-    }
-
-    // Wrap in Float Box and re init
-    function addPluginFloatBox() {
-        var pluginContainerId = getPluginContainerId();
-        var melisIdPage = window.parent.$("#"+parent.activeTabId).find(".melis-iframe").data("iframe-id");
-        var dropzone = $(this).closest(".melis-dragdropzone").data("dragdropzone-id");
-        // generate container
-        $($(this).prev()).wrap('<div id="'+ pluginContainerId +'" class="melis-float-plugins"></div>');
-        $(this).remove();
-        $("#"+pluginContainerId).find(".melis-ui-outlined .melis-plugin-tools-box").attr("data-plugin-container", pluginContainerId);
-
-        $("#"+pluginContainerId).children(".melis-ui-outlined").map(function() {
-            $(this).find(".melis-plugin-tools-box").data("plugin-container", pluginContainerId);
-        });
-
-        // save session
-        sendDragnDropList(dropzone, melisIdPage);
-
     }
 
     // get plugin container id
@@ -767,41 +761,6 @@ var melisPluginEdition = (function($, window) {
             error: function(data) { console.log("Error", data); }
         });
         return pluginId;
-    }
-
-    function changeWidth() {
-        var el = $(this).parent();
-        var parentWidth = el.parent().width();
-        var elWidth = el.width();
-        // convert px to percent
-        elWidth = (100 * elWidth / parentWidth);
-        elWidth = elWidth.toFixed(2);
-        var resizeBox = '<div class="ui-resize-input" title="Edit plugin width"><input id="pluginWidthResize" type="text" value="' + elWidth + '"/>% <div>';
-        el.append(resizeBox);
-
-        // get input value when press enter
-        $('#pluginWidthResize').keypress(function (event) {
-            var keycode = (event.keyCode ? event.keyCode : event.which);
-            if (keycode == '13') {
-                var inputVal = $(this).val();
-                if ($.isNumeric(inputVal) && inputVal >= 1 && inputVal <= 100) {
-                    var parent = $(this).parent().closest(".melis-ui-outlined");
-                    parent.css('width', inputVal + '%');
-                    // remove width indicator
-                    $(this).closest(".ui-resize-input").remove();
-                    var toolBox = $(parent).find(".melis-plugin-tools-box");
-
-                    getPluginData(toolBox, inputVal);
-                } else {
-                    $(this).val(parentWidth.css('width'));
-                }
-
-                if ($.isNumeric(inputVal) && inputVal >= 50) {
-                    $(".btn-pulse").remove();
-                }
-            }
-            event.stopPropagation();
-        });
     }
 
     // on load iframe remove child plugin class responsive
@@ -838,36 +797,16 @@ var melisPluginEdition = (function($, window) {
         });
     });
 
-
-
-    $(".melis-float-plugins").sortable({
-        connectWith: ".melis-dragdropzone, .melis-float-plugins",
-        connectToSortable: ".melis-dragdropzone",
-        handle: "false",
-        forcePlaceholderSize: false,
-        cursor: "move",
-        cursorAt: { top: 0, left: 0 },
-        zIndex: 999999,
-        placeholder: "ui-state-highlight",
-        tolerance: "pointer",
-        receive: function( event, ui ) {
-            var parentID = $(ui.item[0]).closest(".melis-float-plugins").attr("id");
-            $(ui.item[0]).find(".melis-plugin-tools-box").data("plugin-container", parentID);
-        },
-        stop: function( event, ui ) {
-            calcFrameHeight();
-        },
-        over: function( event, ui ) {
-            var sizeW = $(ui.item[0]).width();
-            $(".melis-float-plugins .ui-state-highlight").width(sizeW).height(40);
-        },
-    }).disableSelection();
-
     // init resize
-    // initResizable(); // disable for now
-    // moveResponsiveClass();
+    if (parent.pluginResizable == 1) {
+        initResizable(); // disable for now
+    }
+    moveResponsiveClass();
     pluginDetector();
 
+    $(window).load(function() {
+        calcFrameHeight();
+    });
     return {
         submitPluginForms       :       submitPluginForms,
         pluginRenderer          :       pluginRenderer,
@@ -882,9 +821,9 @@ var melisPluginEdition = (function($, window) {
         disableLinks            :       disableLinks,
         processPluginResources  :       processPluginResources,
         pluginDetector          :       pluginDetector,
-        /*initResizable           :       initResizable,
+        initResizable           :       initResizable,
         moveResponsiveClass     :       moveResponsiveClass,
-        pluginContainerChecker  :       pluginContainerChecker,*/ // disable for now
+        pluginContainerChecker  :       pluginContainerChecker, // disable for now
     }
 
 })(jQuery, window);
@@ -895,17 +834,28 @@ var melisCmsFormHelper = (function($, window) {
      * KO NOTIFICATION for Multiple Form
      */
     function melisMultiKoNotification(errors, closeByButtonOnly) {
-        if(!closeByButtonOnly) closeByButtonOnly = true;
+        if (!closeByButtonOnly) closeByButtonOnly = true;
         var closeByButtonOnly = ( closeByButtonOnly !== true ) ?  'overlay-hideonclick' : '';
-        var errorTexts = '';
+        var errorTexts = '<div class="row">';
+
+        // remove red color for correctly inputted fields
+        $body.find("#id_meliscms_plugin_modal .form-group label").css("color", "inherit");
+
         $.each(errors, function(idx, errorData) {
             if(errorData['success'] === false) {
                 errorTexts += '<h3>'+ (errorData['name']) +'</h3>';
                 errorTexts +='<h4>'+ (errorData['message']) +'</h4>';
+
+                // Highlighting errors fields
                 highlightMultiErrors(errorData['success'], errorData['errors']);
+
                 $.each( errorData['errors'], function( key, error ) {
                     if(key !== 'label'){
-                        errorTexts += '<p class="modal-error-cont"><b>'+ (( error['label'] == undefined ) ? ((error['label']== undefined) ? key : errors['label'] ) : error['label'] )+ ': </b>  ';
+                        errorTexts += '<div class="col-xs-12 col-sm-5">';
+                        errorTexts += '  <b>'+ (( error['label'] == undefined ) ? ((error['label']== undefined) ? key : errors['label'] ) : error['label'] ) +'</b>';
+                        errorTexts += '</div>';
+                        errorTexts += '<div class="col-xs-12 col-sm-7">';
+                        errorTexts += ' <div class="modal-error-container">';
                         // catch error level of object
                         try {
                             $.each( error, function( key, value ) {
@@ -916,28 +866,28 @@ var melisCmsFormHelper = (function($, window) {
                                     }else{
                                         $errMsg = value;
                                     }
-                                    errorTexts += '<span><i class="fa fa-circle"></i>'+ $errMsg + '</span>';
+                                    if($errMsg != '') {
+                                        errorTexts += '<span class="tets error-list"><i class="fa fa-circle"></i>'+ $errMsg + '</span><br/>';
+                                    }
                                 }
                             });
                         } catch(e) {
                             if(key !== 'label' && key !== 'form') {
-                                errorTexts +=  '<span><i class="fa fa-circle"></i>'+ error + '</span>';
+                                errorTexts +=  '<span class="hoy error-list"><i class="fa fa-circle"></i>'+ error + '</span>';
                             }
                         }
                     }
+                    errorTexts += '</div></div>';
                 });
-                errorTexts += '</p><br/>';
             }
         });
-
+        errorTexts += '</div>';
         var div = '<div class="melis-modaloverlay '+ closeByButtonOnly +'"></div>';
-        div += '<div class="melis-modal-cont KOnotif">  <div class="modal-content">'+ errorTexts +' <span class="btn btn-block btn-primary">' + translations.tr_meliscore_notification_modal_Close +'</span></div> </div>';
+        div += '<div class="melis-modal-cont KOnotif">  <div class="modal-content error">'+ errorTexts +' <span class="btn btn-block btn-primary">' + translations.tr_meliscore_notification_modal_Close +'</span></div> </div>';
         $body.append(div);
     }
 
     function highlightMultiErrors(success, errors){
-        // remove red color for correctly inputted fields
-    	$body.find("#id_meliscms_plugin_modal .form-group label").css("color", "inherit");
         // if all form fields are error color them red
         if(!success){
             $.each( errors, function( key, error ) {

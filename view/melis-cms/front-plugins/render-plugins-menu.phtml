@@ -2,21 +2,42 @@
 function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
 {
     $conf = $pluginConf['melis'];
-    
     if (!empty($conf['thumbnail']))
         $thumbnail = $conf['thumbnail'];
         else
             $thumbnail = '/MelisFront/plugins/images/default.jpg';
             
-            if (!empty($conf['name']))
+            if (!empty($conf['name'])) {
                 $name = $conf['name'];
-                else
-                    $name = $pluginName;
-                    ?>
-            <div class="melis-cms-plugin-snippets" data-module-name="<?= $moduleName; ?>" data-plugin-name="<?= $pluginName; ?>" data-plugin-site-module="<?= $siteModule ?>" title="<?php if (!empty($conf['description'])){ echo $conf['description']; } ?>">
-                <img src="<?= $thumbnail; ?>" alt="">
-                <span class="melis-cms-plugin-title"><?= $name; ?></span>
-            </div> 
+            }
+            else {
+                $name = $pluginName;
+            }
+            ?>
+            <?php
+                if(isset($conf['subcategory']['id'])) {
+                    $pluginid = $conf['subcategory']['id'];
+                    /**
+                     * check if plugin is came from the mini template
+                     * to remove the thumbnail
+                     */
+                    if (strpos($pluginid, 'miniTemplatePlugins') !== false) { ?>
+                        <div class="melis-cms-plugin-snippets plugins-override-padding" data-module-name="<?= $moduleName; ?>" data-plugin-name="<?= $pluginName; ?>" data-plugin-site-module="<?= $siteModule ?>" title="<?php if (!empty($conf['description'])){ echo $conf['description']; } ?>">
+                            <span class="melis-cms-plugin-title plugins-name-override-margin"><?= $name; ?></span>
+                        </div>
+                    <?php } else { ?>
+                        <div class="melis-cms-plugin-snippets" data-module-name="<?= $moduleName; ?>" data-plugin-name="<?= $pluginName; ?>" data-plugin-site-module="<?= $siteModule ?>" title="<?php if (!empty($conf['description'])){ echo $conf['description']; } ?>">
+                            <img src="<?= $thumbnail; ?>" alt="">
+                            <span class="melis-cms-plugin-title"><?= $name; ?></span>
+                        </div>
+                    <?php }
+                }else{ ?>
+                    <div class="melis-cms-plugin-snippets" data-module-name="<?= $moduleName; ?>" data-plugin-name="<?= $pluginName; ?>" data-plugin-site-module="<?= $siteModule ?>" title="<?php if (!empty($conf['description'])){ echo $conf['description']; } ?>">
+                        <img src="<?= $thumbnail; ?>" alt="">
+                        <span class="melis-cms-plugin-title"><?= $name; ?></span>
+                    </div>
+               <?php }
+            ?>
     	<?php       
     }
 ?>
@@ -89,7 +110,7 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
 <link rel="stylesheet" href="/MelisCms/css/jquery-ui.css">
 <link rel="stylesheet" href="/MelisCms/css/plugin-mini-menu.css">
 <link rel="stylesheet" href="/MelisCms/css/dragndrop.css">
-
 <script type="text/javascript" src="/MelisCms/js/dragndrop/jquery-ui.js"></script>
+<script type="text/javascript" src="/MelisCms/js/dragndrop/jquery.ui.touch-punch.min.js"></script>
 <script type="text/javascript" src="/MelisCms/js/plugins/plugin.sortable.js"></script>
 <script type="text/javascript" src="/MelisCms/js/dragndrop/dragndrop.js"></script>

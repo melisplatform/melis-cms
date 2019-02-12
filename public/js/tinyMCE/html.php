@@ -11,10 +11,9 @@
        'cleanup' => false,
        'verify_html' => false,
        'plugins' => array(
-          //[contextmenu, textcolor, colorpicker] this plugin is already built in the core editor as of TinyMCE v. 5
-           'advlist autolink lists link paste image charmap preview anchor emoticons help hr nonbreaking',
+           'advlist autolink lists link paste image charmap preview anchor textcolor colorpicker emoticons help hr nonbreaking',
            'searchreplace visualblocks code fullscreen',
-           'insertdatetime media table template'
+           'insertdatetime media table contextmenu  template'
        ),
        'image_advtab' => true,
        'toolbar' => 'insertfile undo redo paste | formatselect | forecolor | bold italic strikethrough underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media template | code',
@@ -41,4 +40,3 @@
      'toolbar' => 'insertfile undo redo | formatselect | forecolor backcolor | bold italic strikethrough underline hr nonbreaking | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media template | charmap emoticons code print help',
      'init_instance_callback' => 'tinyMceCleaner',
  ); */
- 

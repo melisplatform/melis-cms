@@ -31,11 +31,11 @@ class SiteRedirectController extends AbstractActionController
     public function renderToolSiteRedirectAction()
     {
         $translator = $this->getServiceLocator()->get('translator');
-        
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $noAccessPrompt = '';
-        
-        if(!$this->hasAccess($this::TOOL_KEY)) {
+        // Checks wether the user has access to this tools or not
+        $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
+        if(!$melisCoreRights->canAccess($this::TOOL_KEY)) {
             $noAccessPrompt = $translator->translate('tr_tool_no_access');
         }
         
@@ -43,22 +43,6 @@ class SiteRedirectController extends AbstractActionController
         $view->melisKey = $melisKey;
         $view->noAccess  = $noAccessPrompt;
         return $view;
-    }
-    
-    /**
-     * Checks wether the user has access to this tools or not
-     * 
-     * @return boolean
-     */
-    private function hasAccess($key)
-    {
-        $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
-        $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
-        $xmlRights = $melisCoreAuth->getAuthRights();
-    
-        $isAccessible = $melisCoreRights->isAccessible($xmlRights, MelisCoreRightsService::MELISCORE_PREFIX_TOOLS, $key);
-    
-        return $isAccessible;
     }
     
     /**
@@ -137,63 +121,44 @@ class SiteRedirectController extends AbstractActionController
         
         if($this->getRequest()->isPost())
         {
-            
+
             $optionFilter = array();
-            
+
             if(!empty($this->getRequest()->getPost('s301_site_id'))){
                 $optionFilter['s301_site_id'] = $this->getRequest()->getPost('s301_site_id');
             }
-            
+
+            $siteId = $this->getRequest()->getPost('s301_site_id');
+            $siteId = !empty($siteId)? $siteId : null;
+
             $colId = array_keys($melisTool->getColumns());
-        
+
             $sortOrder = $this->getRequest()->getPost('order');
             $sortOrder = $sortOrder[0]['dir'];
-        
+
             $selCol = $this->getRequest()->getPost('order');
             $selCol = $colId[$selCol[0]['column']];
-        
+
             $draw = $this->getRequest()->getPost('draw');
-        
+
             $start = $this->getRequest()->getPost('start');
             $length =  $this->getRequest()->getPost('length');
-        
+
             $search = $this->getRequest()->getPost('search');
             $search = $search['value'];
-        
+
             $dataCount = $site301Table->getTotalData();
-        
-            $dataQuery = array(
-                'where' => array(
-                    'key' => 's301_id',
-                    'value' => $search,
-                ),
-                'order' => array(
-                    'key' => $selCol,
-                    'dir' => $sortOrder,
-                ),
-                'start' => $start,
-                'limit' => $length,
-                'columns' => $melisTool->getSearchableColumns(),
-                'date_filter' => array()
-            );
-            
-            $getData = $site301Table->getPagedData($dataQuery, null, $optionFilter);
-        
+
+            $getData = $site301Table->getData($search, $siteId, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length);
+
             $tableData = $getData->toArray();
-            
+
             foreach ($tableData As $key => $val)
             {
-                
-                if(array_key_exists('s301_site_id', $val)){
-                    
-                    $site = $siteTable->getEntryById($val['s301_site_id'])->current();
-                    $tableData[$key]['s301_site_id'] = !empty($site->site_name)? $site->site_name : '';
-                }
-                
                 $tableData[$key]['DT_RowId'] = $val['s301_id'];
             }
         }
-        
+
         return new JsonModel(array(
             'draw' => (int) $draw,
             'recordsTotal' => $dataCount,
@@ -249,7 +214,8 @@ class SiteRedirectController extends AbstractActionController
         $sites[] = '<option value="">'. $translator->translate('tr_meliscms_tool_templates_tpl_label_choose') .'</option>';
        
        foreach($siteTable->fetchAll() as $site){
-           $sites[] = '<option value="'.$site->site_id.'">'. $site->site_name .'</option>';
+           $siteName = !empty($site->site_label) ? $site->site_label : $site->site_name;
+           $sites[] = '<option value="'.$site->site_id.'">'. $siteName .'</option>';
        }
        
        $view = new ViewModel();

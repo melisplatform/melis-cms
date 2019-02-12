@@ -134,6 +134,21 @@ return array(
 									),
 								),
 							),
+                            array(
+                                'spec' => array(
+                                    'name' => 'style_id',
+                                    'type' => 'MelisCmsStyleSelect',
+                                    'options' => array(
+                                        'label' => 'tr_meliscms_tool_style_name_properties',
+                                        'tooltip' => 'tr_meliscms_tool_style_name_properties tooltip',
+                                        'empty_option' => 'tr_meliscms_form_common_Choose',
+                                        'disable_inarray_validator' => true,
+                                    ),
+                                    'attributes' => array(
+                                        'id' => 'id_page_style_id',
+                                    ),
+                                ),
+                            ),
 							array(
 								'spec' => array(
 									'name' => 'page_creation_date',
@@ -163,21 +178,22 @@ return array(
     					            ),
     					        ),
     					    ),
-    					    array(
-    					        'spec' => array(
-    					            'name' => 'style_id',
-    					            'type' => 'MelisCmsStyleSelect',
-    					            'options' => array(
-    					                'label' => 'tr_meliscms_tool_style_name_properties',
-    					                'tooltip' => 'tr_meliscms_tool_style_name_properties tooltip',
-    					                'empty_option' => 'tr_meliscms_form_common_Choose',
-    					                'disable_inarray_validator' => true,
-    					            ),
-    					            'attributes' => array(
-    					                'id' => 'id_page_style_id',
-    					            ),
-    					        ),
-					       ),
+                            array(
+                                'spec' => array(
+                                    'name' => 'page_search_type',
+//                                    'type' => 'Zend\Form\Element\Select',
+                                    'type' => 'MelisCmsStyleSelect',
+                                    'options' => array(
+                                        'label' => 'tr_meliscms_page_tab_properties_search_type',
+                                        'tooltip' => 'tr_meliscms_page_tab_properties_search_type tooltip',
+                                        'value_options' => array(
+                                            'tr_meliscms_page_tab_properties_search_type_option1' => 'tr_meliscms_page_tab_properties_search_type_option1',
+                                            'tr_meliscms_page_tab_properties_search_type_option2' => 'tr_meliscms_page_tab_properties_search_type_option2',
+                                            'tr_meliscms_page_tab_properties_search_type_option3' => 'tr_meliscms_page_tab_properties_search_type_option3',
+                                        ),
+                                    ),
+                                ),
+                            ),
 						),
 						'input_filter' => array(      
 							'page_id' => array(
@@ -227,7 +243,7 @@ return array(
 									array(
 										'name'    => 'InArray',
 										'options' => array(
-											'haystack' => array('SITE', 'FOLDER', 'PAGE'),
+											'haystack' => array('SITE', 'FOLDER', 'PAGE', 'NEWSLETTER'),
 										    'messages' => array(
 										        \Zend\Validator\InArray::NOT_IN_ARRAY => 'tr_meliscms_page_form_page_type_invalid',
 										    ),
@@ -406,6 +422,20 @@ return array(
 								),
 							),
 						),
+                        array(
+                            'spec' => array(
+                                'name' => 'pseo_canonical',
+                                'type' => 'MelisText',
+                                'options' => array(
+                                    'label' => 'tr_meliscms_page_tab_seo_form_canonical',
+                                    'tooltip' => 'tr_meliscms_page_tab_seo_form_canonical tooltip',
+                                ),
+                                'attributes' => array(
+                                    'id' => 'pseo_canonical',
+                                    'value' => '',
+                                ),
+                            ),
+                        ),
 					),
 					'input_filter' => array( 
 				        'pseo_meta_title' => array(
@@ -416,7 +446,6 @@ return array(
 									'name'    => 'StringLength',
 									'options' => array(
 										'encoding' => 'UTF-8',
-										'max'      => 65,
 									    'messages' => array(
 									        \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_pageseo_form_page_title_long',
 									    ),
@@ -436,7 +465,6 @@ return array(
 									'name'    => 'StringLength',
 									'options' => array(
 										'encoding' => 'UTF-8',
-										'max'      => 255,
 									    'messages' => array(
 									        \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_pageseo_form_page_desc_long',
 									    ),

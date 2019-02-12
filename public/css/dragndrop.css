@@ -5,24 +5,24 @@ body {
     position: fixed;
     top: 0;
     right: -4px;
-    width: 224px;
+    width: 200px;
     height: 100%;
     font-family: 'Lato', sans-serif;
     font-weight: normal;
     font-style: normal;
     font-size: 14px;
     line-height: 25px;	
-    border-bottom: 4px solid #932e2a;
-    border-left: 4px solid #932e2a;
+    border-bottom: 4px solid #e61c23;
+    border-left: 4px solid #e61c23;
     background: #373737;
-    transform: translate3d(224px, 0, 0);
-    -webkit-transform: translate3d(224px, 0, 0);
-    -moz-transform: translate3d(224px, 0, 0);
-    -ms-transform: translate3d(224px, 0, 0);
+    transform: translate3d(200px, 0, 0);
+    -webkit-transform: translate3d(200px, 0, 0);
+    -moz-transform: translate3d(200px, 0, 0);
+    -ms-transform: translate3d(200px, 0, 0);
     transition: transform 0.4s, height 0.4s;
     -webkit-transition: transform 0.4s, height 0.4s;
     -moz-transition: transform 0.4s, height 0.4s;
-    z-index: 999999999; 
+    z-index: 9999999; 
 }
 .melis-cms-dnd-box.show {
     transform: translate3d(0, 0, 0);
@@ -36,7 +36,7 @@ body {
     top: 50px;
     left: -44px;
     padding: 8px 10px 5px;
-    background-color: #932e2a;
+    background-color: #e61c23;
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
     color: #fff;
@@ -53,7 +53,7 @@ body {
     top: 50px;
     left: -44px;
     padding: 8px 10px 5px;
-    background-color: #932e2a;
+    background-color: #e61c23;
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
     color: #fff;
@@ -93,7 +93,7 @@ body {
 }
 .melis-cms-plugin-snippets:hover {
     opacity: 1;
-    background: #932e2a;
+    background: #e61c23;
 }
 .melis-cms-plugin-snippets:hover img,
 .melis-cms-category-plugins:hover img {
@@ -123,7 +123,7 @@ body {
     margin-top: 10px;
     color: #fff;
     letter-spacing: 0.4px;
-
+    font-size: 10px;
     transition: color 0.4s;
     -webkit-transition: color 0.4s;
     -moz-transition: color 0.4s;
@@ -145,7 +145,7 @@ body {
     font-weight: normal;
     letter-spacing: 1px;
     color: #fff;
-    font-size: 14px;
+    font-size: 10px;
     letter-spacing: 1px;
     border-radius: 2px;
     border-bottom: 1px solid #2c2c2c;
@@ -165,8 +165,8 @@ body {
 
 .melis-cms-ps-box .melis-cms-filter-btn.active,
 .melis-cms-category-btn.active {
-    background: #932e2a;
-    border-color: #932e2a;
+    background: #e61c23;
+    border-color: #e61c23;
 }
 
 .melis-cms-ps-box .melis-cms-filter-btn.active .fa,
@@ -243,7 +243,7 @@ body {
 }
 
 .melis-cms-dnd-title {
-    background: #932e2a;
+    background: #e61c23;
     color: #fff;
     line-height: 47px;
     text-transform: uppercase;
@@ -252,11 +252,12 @@ body {
     padding: 0 15px;
     letter-spacing: 4px;
     text-align: center;
+    font-size: 12px;
 }
 
 .melis-cms-category-btn {
     padding: 4px 15px 4px 30px;
-    font-size: 12px;
+    font-size: 10px;
 }
 .melis-cms-category-btn:hover {
     border-color: #373737;
@@ -294,7 +295,7 @@ body {
  
 ::-webkit-scrollbar-thumb {
     min-height: 48px;
-    background: #932E2A;
+    background: #e61c23;
     background-clip: padding-box;
     border: 3px solid #fff;
     border-radius: 5px;
@@ -328,6 +329,8 @@ body {
     font-size: 14px;
     line-height: 25px;
     transition: all 0.4s ease-in-out;
+    /* added by: Junry @ 02082019*/
+    width: inherit;
 }
 .melis-ui-outlined.ui-sortable-helper,
 .melis-ui-outlined.ui-resizable-resizing {
@@ -382,11 +385,11 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 }
 
 .melis-ui-outlined:hover {
-    /*outline: 1px solid #932E2A; */
-    box-shadow: 0 0 0 1px #932e2a;
-    -webkit-box-shadow: 0 0 0 1px #932e2a;
-    -moz-box-shadow: 0 0 0 1px #932e2a;
-    -ms-box-shadow: 0 0 0 1px #932e2a;
+    /*outline: 1px solid #e61c23; */
+    box-shadow: 0 0 0 1px #e61c23;
+    -webkit-box-shadow: 0 0 0 1px #e61c23;
+    -moz-box-shadow: 0 0 0 1px #e61c23;
+    -ms-box-shadow: 0 0 0 1px #e61c23;
   z-index: 9999996 !important;
 }
 
@@ -397,6 +400,7 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 .melis-ui-outlined:hover .melis-plugin-tools-box {
   opacity: 1; 
   visibility: visible;
+    z-index: 999;
 }
 
 .melis-ui-outlined:hover .m-plugin-sub-tools div {
@@ -418,7 +422,7 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 .melis-plugin-tools-box {
     position: absolute;
     top: -40px;
-    background: #932E2A;
+    background: #e61c23;
     padding: 4px 12px;
     width: auto;
     height: 40px;
@@ -441,7 +445,7 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
     text-transform: uppercase;
     font-weight: 900;
     letter-spacing: 0.4px;
-    color: #b9504b;
+    color: #ffa4a7;
     font-size: 10px;
 }
 
@@ -456,7 +460,7 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 .m-plugin-sub-tools {
     display: inline-block;
     margin-left: 15px;
-    background: #932e2a;
+    background: #e61c23;
 }
 
 .m-plugin-sub-tools div {
@@ -531,7 +535,7 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
     width: 40px;
     height: 40px;
     line-height: 40px;
-    background: #932e2a;
+    background: #e61c23;
     box-shadow: 0 0 2px rgba(0,0,0,0.6);
     color: #fff;
     text-align: center;
@@ -547,7 +551,11 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 
 .ui-sortable-helper {
     background: #fff;
-    border: 4px solid #932e2a;
+    border: 4px solid #e61c23;
+}
+
+div[data-module-name="MelisMiniTemplate"].melis-cms-plugin-snippets:hover {
+    background: #e61c23;
 }
 
 .ui-sortable-helper:after {
@@ -573,7 +581,7 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 .ui-sortable-placeholder.ui-state-highlight {
   padding: 0;
   margin: 0 0 20px;
-  background: #932e2a;
+  background: #e61c23;
   transition: all 0.4s ease-in-out;
   height: 40px;
   /*background: rgba(255, 255, 255, 0.4);*/
@@ -592,7 +600,7 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
   z-index: 999999999;
   width: 100%;
   height: 100%;
-  background: #932e2a;
+  background: #e61c23;
   text-align: center;
   opacity: 1;
   visibility: visible;
@@ -613,7 +621,7 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
     min-height: 47px;
     height: 100%;
     width: 100%;
-    background: #932E2A;
+    background: #e61c23;
 }
 #content .overlay-loader{
     /* top: -47px; */
@@ -636,14 +644,14 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 .btn-pulse {
     position: absolute;
     right: 20%;
-    color: #932e2a;
+    color: #e61c23;
     background: #fff;
     border: none;
     border-radius: 100%;
     width: 50px;
     height: 50px;
     line-height: 46px;
-    border: 2px solid #932e2a;
+    border: 2px solid #e61c23;
     box-shadow: 0 0 0 0 rgb(147, 46, 42);
     -webkit-transition: all 0.3s ease-in-out;
     -moz-transition: all 0.3s ease-in-out;
@@ -656,7 +664,7 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 }
 .btn-pulse:hover {
     color: #fff;
-    background: #932e2a;
+    background: #e61c23;
     -webkit-animation: none;
     -moz-animation: none;
     -ms-animation: none;animation: none;
@@ -692,7 +700,7 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
     font-weight: bold;
     letter-spacing: 1px;
     text-align: center;
-    background: #932e2a;
+    background: #e61c23;
     border-bottom-left-radius: 2px;
     z-index: 1;
 }
@@ -707,6 +715,14 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
     width: 25px;
     font-size: 10px;
     font-weight: bold;
+}
+
+.plugins-override-padding{
+    padding-top: 10px;
+}
+
+.plugins-name-override-margin{
+    margin-top: 0;
 }
 
 @-webkit-keyframes spinning-cog {
@@ -765,3 +781,31 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 @-moz-keyframes pulse-sm {to {box-shadow: 0 0 0 15px rgba(147, 46, 42, 0);}}
 @-ms-keyframes pulse-sm {to {box-shadow: 0 0 0 15px rgba(147, 46, 42, 0);}}
 @keyframes pulse-sm {to {box-shadow: 0 0 0 15px rgba(147, 46, 42, 0);}}
+
+
+
+/* Media Queries */
+@media screen and (min-width: 768px) {
+    .melis-cms-dnd-box {
+        width: 224px;
+        transform: translate3d(224px, 0, 0);
+        -webkit-transform: translate3d(224px, 0, 0);
+        -moz-transform: translate3d(224px, 0, 0);
+        -ms-transform: translate3d(224px, 0, 0);
+    }
+    .melis-cms-ps-box .melis-cms-filter-btn,
+    .melis-cms-category-btn {
+        font-size: 14px;
+    }
+
+    .melis-cms-plugin-title {
+        font-size: 14px;
+    }
+    .melis-cms-dnd-title {
+        font-size: 14px;
+    }
+
+    .melis-cms-category-btn {
+        font-size: 12px;
+    }
+}

@@ -5,16 +5,15 @@
 		'language' => 'en',
 		'inline' => true,
 		'menubar' => false,
-		'forced_root_block'  => 'p',
+		'forced_root_block'  => '',
 		'cleanup'  => false,
 		'verify_html'  => false,
 		'plugins' => array(
-			//[contextmenu, textcolor, colorpicker] this plugin is already built in the core editor as of TinyMCE v. 5
-		    'advlist autolink lists link image charmap print preview anchor',
+		    'advlist autolink lists link image charmap print preview anchor textcolor colorpicker',
 		    'searchreplace visualblocks code fullscreen',
-		    'insertdatetime media table paste autoresize'
+		    'insertdatetime media table contextmenu paste autoresize'
 	    ),
 	    'autoresize_on_init' => false,
-	    'toolbar' => 'undo redo link unlink | code',
+	    'toolbar' => 'undo redo link unlink | forecolor backcolor | code',
 	    'init_instance_callback'  => 'tinyMceCleaner',
 	); 

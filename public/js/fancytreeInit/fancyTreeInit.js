@@ -1,8 +1,7 @@
-(function ($, window) {
-	
+(function ($, window, document) {
+
     // On Load
     $(window).on('load', function () {
-    	
     	window.mainTree = function(completeEvent){
             var melisExtensions;
             if( melisCore.screenSize <= 767 ) {
@@ -35,24 +34,24 @@
 	                  'dupe': { 'name': translations.tr_meliscms_menu_dupe, 'icon': 'copy' },
 	                },
 	                actions: function(node, action, options) {
-	                  if(action === 'new'){
+	                  	if(action === 'new'){
 	                	  var data = node.data;
 	                	  
 	                	  //close page creation tab and open new one (in case if its already open - updated parent ID)
 	                	  melisHelper.tabClose('0_id_meliscms_page');
 	                	  melisHelper.tabOpen( translations.tr_meliscms_page_creation, 'fa-file-text-o', '0_id_meliscms_page', 'meliscms_page_creation',  { idPage: 0, idFatherPage: data.melisData.page_id } );                	  
-	                  }
-	                  if(action === 'edit'){
+	                  	}
+	                  	if(action === 'edit'){
 	                	  var data = node.data;
 	              		  melisHelper.tabOpen( data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,  { idPage: data.melisData.page_id } ); 
-	                  }
+	                 	}
 						if(action === 'delete'){
 	
 							var data = node.data;
 							var zoneId = data.melisData.item_zoneid;
 							var idPage = data.melisData.page_id;	  
-	                		  var parentNode = ( node.getParent().key == 'root_1') ? -1 : node.getParent().key ;
-//							var parentNode = ( node.key == 'root_1') ? -1 : node.getParent().key ;	
+	                		var parentNode = ( node.getParent().key == 'root_1') ? -1 : node.getParent().key;
+							// var parentNode = ( node.key == 'root_1') ? -1 : node.getParent().key;	
 	                		
 							// check if page to be delete is open or not
 							var openedOrNot = $(".tabsbar a[data-id='"+zoneId+"']").parent("li");
@@ -93,10 +92,10 @@
 								});  
 						}
 						if(action === 'dupe'){
-		                	  var data = node.data;
-//		              		  melisHelper.tabOpen( data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,  { sourcePageId: data.melisData.page_id } ); 
+		                	var data = node.data;
+							// melisHelper.tabOpen( data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,  { sourcePageId: data.melisData.page_id } ); 
 		              		
-		              		  // initialation of local variable
+		              		// initialation of local variable
 		          			zoneId = 'id_meliscms_tools_tree_modal_form_handler';
 		          			melisKey = 'meliscms_tools_tree_modal_form_handler';
 		          			modalUrl = 'melis/MelisCms/TreeSites/renderTreeSitesModalContainer';
@@ -108,21 +107,22 @@
 	        	},
 			    lazyLoad: function(event, data) {
 			      // get the page ID and pass it to lazyload
-			      var pageId = data.node.data.melisData.page_id;
-			      data.result = { 
+			     var pageId = data.node.data.melisData.page_id;
+			      data.result = {
 			    		  url: '/melis/MelisCms/TreeSites/get-tree-pages-by-page-id?nodeId='+pageId,
 			    		  data: {
 			    			  mode: 'children',
 			    			  parent: data.node.key
 			    		  },
-			    		  cache: false
+			    		  cache: false,
 			      }
+
 			    },
     			create: function(event, data) {
-    				melisHelper.loadingZone($('#treeview-container'));
+    				melisHelper.loadingZone( $('#treeview-container') );
 				},
 				init: function(event, data, flag) {
-			        melisHelper.removeLoadingZone($('#treeview-container'));
+			        melisHelper.removeLoadingZone( $('#treeview-container') );
 			           // focus search box
 			           $("input[name=left_tree_search]").focus();
 
@@ -286,30 +286,32 @@
 
 	                },
 	                dragDrop: function(node, data) {
-	                    // This function MUST be defined to enable dropping of items on the tree.
-	                    // data.hitMode is 'before', 'after', or 'over'.
-	                    // We could for example move the source to the new target:
+                        node.setExpanded(true).always(function(){
+                        // This function MUST be defined to enable dropping of items on the tree.
+                        // data.hitMode is 'before', 'after', or 'over'.
+                        // We could for example move the source to the new target:
 
-	                  	// catch if its 'root_*' parent
-	                  	var isRootOldParentId = data.otherNode.getParent().key.toString();
-	                	var oldParentId = ( isRootOldParentId.includes('root') ) ? -1 : data.otherNode.getParent().key ;
+                        // catch if its 'root_*' parent
+                        var isRootOldParentId = data.otherNode.getParent().key.toString();
+                        var oldParentId = ( isRootOldParentId.includes('root') ) ? -1 : data.otherNode.getParent().key ;
 
-	                	// move the node to drag parent ------------------------------------------------
-	                    data.otherNode.moveTo(node, data.hitMode);
+                        // move the node to drag parent ------------------------------------------------
 
-	                    var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
+                        data.otherNode.moveTo(node, data.hitMode);
 
-						var draggedPage = data.otherNode.key
+                        var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
 
-						// catch if its 'root_*' parent
-						var isRootNewParentId = node.getParent().key.toString();
-						var newParentId  = ( isRootNewParentId.includes('root') ) ? -1 : node.getParent().key ;
+                        var draggedPage = data.otherNode.key
 
-						if(data.hitMode == 'over'){
-							newParentId  =  data.node.key ;
-						}
+                        // catch if its 'root_*' parent
+                        var isRootNewParentId = node.getParent().key.toString();
+                        var newParentId  = ( isRootNewParentId.includes('root') ) ? -1 : node.getParent().key ;
 
-						var newIndexPosition = data.otherNode.getIndex()+1;
+                        if(data.hitMode == 'over'){
+                            newParentId  =  data.node.key ;
+                        }
+
+                        var newIndexPosition = data.otherNode.getIndex()+1;
 
 	                	//send data to apply new position of the dragged node
 						var datastring = {
@@ -324,10 +326,11 @@
 	                	    data        : datastring,
 	                	    encode		: true
 	                	}).success(function(data){
-
 	                	}).error(function(xhr, textStatus, errorThrown){
 	                		alert( translations.tr_meliscore_error_message );
 	                	});
+                        });
+	                	// end
 	                }
 	              },
 	        });
@@ -335,9 +338,6 @@
     	
     	// initialize the tree
     	mainTree();
-
-		
-	
     });
     
     // create page if treeview page is empty

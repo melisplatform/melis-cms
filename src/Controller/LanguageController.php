@@ -32,8 +32,9 @@ class LanguageController extends AbstractActionController
         $translator = $this->getServiceLocator()->get('translator');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $noAccessPrompt = '';
-    
-        if(!$this->hasAccess(self::INTERFACE_KEY)) {
+        // Checks wether the user has access to this tools or not
+        $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
+        if(!$melisCoreRights->canAccess(self::INTERFACE_KEY)) {
             $noAccessPrompt = $translator->translate('tr_tool_no_access');
         }
     
@@ -219,9 +220,11 @@ class LanguageController extends AbstractActionController
     
     public function getLanguagesAction()
     {
+
+
         $langTable = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
         $translator = $this->getServiceLocator()->get('translator');
-    
+
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
     
@@ -249,7 +252,7 @@ class LanguageController extends AbstractActionController
             $search = $search['value'];
     
             $dataCount = $langTable->getTotalData();
-    
+
             $getData = $langTable->getPagedData(array(
                 'where' => array(
                     'key' => 'lang_cms_id',
@@ -264,7 +267,7 @@ class LanguageController extends AbstractActionController
                 'columns' => $melisTool->getSearchableColumns(),
                 'date_filter' => array()
             ));
-    
+
             $tableData = $getData->toArray();
             for($ctr = 0; $ctr < count($tableData); $ctr++)
             {
@@ -359,8 +362,7 @@ class LanguageController extends AbstractActionController
         $this->getEventManager()->trigger('meliscms_language_new_start', $this, $response);
         $langTable = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
         $translator = $this->getServiceLocator()->get('translator');
-    
-    
+
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
         $id = null;
@@ -378,41 +380,38 @@ class LanguageController extends AbstractActionController
             $form->setData($postValues);
     
             if($form->isValid()) {
-    
                 $data = $form->getData();
                 $isExistData = $langTable->getEntryByField('lang_cms_locale', $data['lang_cms_locale']);
                 $isExistData = $isExistData->current();
-                if(empty($isExistData)) 
-                {
+                if (empty($isExistData)) {
                     $id = $langTable->save($data);
                     $textMessage = 'tr_meliscms_tool_language_add_success';
                     $success = 1;
-                }
-                else 
-                {
+                } else {
                     $errors = array(
                         'lang_cms_locale' => array(
                             'locale_exists' => $translator->translate('tr_meliscms_tool_language_add_exists')
                         ),
                     );
                 }
-    
             }
             else {
                 $errors = $form->getMessages();
             }
-    
-            $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
-            $appConfigForm = $melisMelisCoreConfig->getItem('meliscms/tools/meliscms_language_tool/forms/meliscms_tool_language_generic_form');
-            $appConfigForm = $appConfigForm['elements'];
-    
-            foreach ($errors as $keyError => $valueError)
-            {
-                foreach ($appConfigForm as $keyForm => $valueForm)
+
+            if ($errors) {
+                $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+                $appConfigForm = $melisMelisCoreConfig->getItem('meliscms/tools/meliscms_language_tool/forms/meliscms_tool_language_generic_form');
+                $appConfigForm = $appConfigForm['elements'];
+        
+                foreach ($errors as $keyError => $valueError)
                 {
-                    if ($valueForm['spec']['name'] == $keyError &&
-                        !empty($valueForm['spec']['options']['label']))
-                        $errors[$keyError]['label'] = $valueForm['spec']['options']['label'];
+                    foreach ($appConfigForm as $keyForm => $valueForm)
+                    {
+                        if ($valueForm['spec']['name'] == $keyError &&
+                            !empty($valueForm['spec']['options']['label']))
+                            $errors[$keyError]['label'] = $valueForm['spec']['options']['label'];
+                    }
                 }
             }
         }
@@ -427,7 +426,6 @@ class LanguageController extends AbstractActionController
         $this->getEventManager()->trigger('meliscms_language_new_end', $this, array_merge($response, array('typeCode' => 'CMS_LANGUAGE_ADD', 'itemId' => $id)));
          
         return new JsonModel($response);
-    
     }
     
     public function editLanguageAction(){
@@ -528,20 +526,4 @@ class LanguageController extends AbstractActionController
     
         return new JsonModel($response);
     }
-
-   /**
-    * Checks wether the user has access to this tools or not
-    * @return boolean
-    */
-    private function hasAccess($key)
-    {
-        $melisCmsAuth = $this->getServiceLocator()->get('MelisCoreAuth');
-        $melisCmsRights = $this->getServiceLocator()->get('MelisCoreRights');
-        $xmlRights = $melisCmsAuth->getAuthRights();
-    
-        $isAccessible = $melisCmsRights->isAccessible($xmlRights, MelisCoreRightsService::MELISCORE_PREFIX_TOOLS, $key);
-    
-        return $isAccessible;
-    }
-
 }

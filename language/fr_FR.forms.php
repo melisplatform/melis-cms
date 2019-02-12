@@ -15,6 +15,7 @@
 		'tr_meliscms_page_tab_properties_form_type_Site' => 'Site',
 		'tr_meliscms_page_tab_properties_form_type_Folder' => 'Dossier',
 		'tr_meliscms_page_tab_properties_form_type_Page' => 'Page',
+		'tr_meliscms_page_tab_properties_form_type_Newsletter' => 'Newsletter',
 		'tr_meliscms_page_tab_properties_form_Status' => 'Statut',
 		'tr_meliscms_page_tab_properties_form_status_Online' => 'En ligne',
 		'tr_meliscms_page_tab_properties_form_status_Offline' => 'Hors ligne',
@@ -36,7 +37,7 @@
 		'tr_meliscms_page_tab_properties_form_Creation date tooltip' => 'Date à laquelle la page a été créée',
 		'tr_meliscms_page_tab_properties_form_submittext_Save' => 'Sauvegarder',
 // 	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomie',
-	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomie * <i class="fa fa-info-circle fa-lg" data-toggle="tooltip" data-placement="left" title="" data-original-title="Saisissez les termes pour classer votre page. Séparez chaque terme par une virgule"></i>',
+	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomie  <i class="fa fa-info-circle fa-lg" data-toggle="tooltip" data-placement="left" title="" data-original-title="Saisissez les termes pour classer votre page. Séparez chaque terme par une virgule"></i>',
 	    'tr_meliscms_page_tab_properties_form_taxonomy_placeholder' => 'Séparer les mots clefs avec une virgule',
 	    'tr_meliscms_page_tab_properties_form_taxonomy_placeholder tooltip' => 'Saisissez les termes pour classer votre page. Séparez chaque terme par une virgule',
 		'tr_meliscms_tool_style_name_properties tooltip' => 'Sélectionnez un style à ajouter à votre page parmi les styles créés depuis l&#39;outil &#34;Styles&#34;', 	
@@ -50,9 +51,9 @@
 		'tr_meliscms_page_tab_seo_form_Url' => 'URL',
 		'tr_meliscms_page_tab_seo_form_Url tooltip' => 'URL de la page',
 		'tr_meliscms_page_tab_seo_form_Url Redirect' => 'URL redirection',
-		'tr_meliscms_page_tab_seo_form_Url Redirect tooltip' => 'URL de redirection de la page si celle-ci est publiée. Pour une page interne saisir son ID ou son URL, pour une page externe saisir l&#39;URL complète avec le http://',
+		'tr_meliscms_page_tab_seo_form_Url Redirect tooltip' => 'URL de redirection de la page si celle-ci est publiée. Pour une page interne saisir son URL, pour une page externe saisir l&#39;URL complète avec le http://',
 		'tr_meliscms_page_tab_seo_form_Url 301' => 'URL 301',
-		'tr_meliscms_page_tab_seo_form_Url 301 tooltip' => 'URL de redirection de la page si celle-ci est dépubliée. Pour une page interne saisir son ID ou son URL, pour une page externe saisir l&#39;URL complète avec le http://',
+		'tr_meliscms_page_tab_seo_form_Url 301 tooltip' => 'URL de redirection de la page si celle-ci est dépubliée. Pour une page interne saisir son URL, pour une page externe saisir l&#39;URL complète avec le http://',
 			
 			
 	    // page prompts
@@ -78,6 +79,8 @@
 	    'tr_meliscms_pageseo_form_page_title_long'  => 'Titre de page trop long, il doit être de moins de 65 caractères',
 		'tr_meliscms_pageseo_form_page_desc_long'  => 'Description trop longue, elle doit être de moins de 255 caractères',
 		'tr_meliscms_pageseo_form_page_url_too_long'  => 'URL trop longue, elle doit être de moins de 255 caractères',
+        'tr_meliscms_page_tab_seo_form_canonical'  => 'Canonical URL',
+        'tr_meliscms_page_tab_seo_form_canonical tooltip'  => 'Canonical URL',
 			 
 	    // for template tool forms
 	    'tr_meliscms_template_form_tpl_id' => 'ID',
@@ -136,8 +139,8 @@
         
         'tr_meliscms_tool_site_id' => 'ID',
         'tr_meliscms_tool_site_id tooltip' => 'Identifiant du site',
-        'tr_meliscms_tool_site_site_name' => 'Nom',
-        'tr_meliscms_tool_site_site_name tooltip' => 'Nom du site',
+        'tr_meliscms_tool_site_site_name' => 'Nom du module associé',
+        'tr_meliscms_tool_site_site_name tooltip' => 'Le nom du module tel que défini dans le code (ou le nom du dossier dans MelisSites/)',
         'tr_meliscms_tool_site_page_id' => 'ID page d&#39;accueil',
         'tr_meliscms_tool_site_page_id tooltip' => 'Identifiant de la page d&#39;accueil',
         'tr_meliscms_tool_site_site_id' => 'ID du domaine',
@@ -168,7 +171,7 @@
 	    'tr_meliscms_tool_site_melissites_directory_not_exist' => 'Le dossier de destination n\'existe pas, veuillez créer le dossier /module/MelisSites',
 	    'tr_meliscms_tool_site_site_created_title' => 'a été créé avec succès',
 	    'tr_meliscms_tool_site_site_created_message' => 'Votre nouveau site a été créé avec <b>Site module</b>, <b>Pages</b> et <b>Templates</b> générés.',
-	    'tr_meliscms_tool_site_site_name' => 'Nom du site',
+	   # 'tr_meliscms_tool_site_site_name' => 'Nom du site',
 	    'tr_meliscms_tool_site_site_module' => 'Module du site',
 	    'tr_meliscms_tool_site_site_layout' => 'layout du site',
 	    'tr_meliscms_tool_site_homepage' => 'Page d\'accueil',
@@ -210,5 +213,24 @@
 	    'tr_meliscms_tool_style_page_id_too_long' => 'Page ID is too long',
 	    'tr_meliscms_tool_style_page_is_empty' => 'Le champ ne peut être vide',
 	    'tr_meliscms_tree_sites_duplication_use_root' => 'Racine',
-	);
+
+        'tr_meliscms_page_tab_properties_search_type'         => 'Options de recherche',
+        'tr_meliscms_page_tab_properties_search_type tooltip' => 'Select search option for indexing',
+        'tr_meliscms_page_tab_properties_search_type_option1' => 'Oui, avec les sous pages',
+        'tr_meliscms_page_tab_properties_search_type_option2' => 'Oui, sans les sous pages',
+        'tr_meliscms_page_tab_properties_search_type_option3' => 'Non',
+        # Site label
+        'tr_meliscms_tool_site_site_label' => 'Nom du site',
+        'tr_meliscms_tool_site_site_label tooltip' => 'Le nom du site affiché dans la plateforme',
+        'tr_meliscms_tool_site_site_label_error_empty' => 'Veuillez saisir l\'étiquette du site',
+        'tr_meliscms_tool_site_site_label_error_long'  => 'Nom du étiquette trop long, nombre de caractères maximum 45',
+        # New site name
+        'tr_meliscms_tool_site_new_site_name' => 'Nom du module',
+        'tr_meliscms_tool_site_new_site_name tooltip' => 'Nom du module de site',
+        # Template form validation error
+        'tr_melis_cms_tool_template_name_invalid'       => 'Nom du template invalide',
+        'tr_melis_cms_tool_template_layout_invalid'     => 'Layout du template invalide',
+        'tr_melis_cms_tool_template_controller_invalid' => 'Controlleur du template invalide',
+        'tr_melis_cms_tool_template_action_invalid'     => 'Action du template invalide',
+    );
 ?>

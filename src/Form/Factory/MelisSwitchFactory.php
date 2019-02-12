@@ -14,7 +14,7 @@ use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\ServiceManager\FactoryInterface;
 
 /**
- * Melis commerce date field
+ * Melis Cms Switch plugin factory
  */
 
 class MelisSwitchFactory extends Text implements FactoryInterface

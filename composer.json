@@ -5,9 +5,19 @@
   "license": "OSL-3.0",
   "homepage": "https://github.com/melisplatform/melis-cms",
   "support": {
+	"email": "contact@melistechnology.com",
     "source": "https://github.com/melisplatform/melis-cms",
-    "issues": "https://github.com/melisplatform/melis-cms/issues"
+    "issues": "https://github.com/melisplatform/melis-cms/issues",
+	"docs": "https://www.melistechnology.com/melistechnology/resources/download-documentation/id/17#documentation"
   },
+  "authors": [
+	{
+		"name": "Melis Technology",
+		"email": "contact@melistechnology.com",
+		"homepage": "https://www.melistechnology.com",
+		"role": "Developer"
+	}
+  ],
   "keywords": [
     "cms",
     "melis",
@@ -15,10 +25,20 @@
     "module"
   ],
   "extra": {
-    "module-name": "MelisCms"
+    "module-name": "MelisCms",
+    "dbdeploy": true,
+    "melis-site": false,
+    "melis-module-category": "cms"	  
   },
   "require": {
-    "php": "^5.5 || ^7.0"
+    "php": "^7.0",
+    "ext-openssl": "*",
+    "ext-json": "*",
+    "ext-pdo_mysql": "*",
+    "melisplatform/melis-core": "^2.3",
+    "melisplatform/melis-engine": "^2.3",
+    "melisplatform/melis-front": "^2.3",
+    "justinrainbow/json-schema": "5.2.1"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.8"

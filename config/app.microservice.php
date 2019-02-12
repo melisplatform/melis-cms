@@ -35,6 +35,26 @@ return array(
 									),
 								),
 							),
+                            array(
+                                'spec' => array(
+                                    'name' => 'type',
+                                    'type' => 'Select',
+                                    'options' => array(
+                                        'label' => 'type',
+                                        'options' => array(
+                                            'saved',
+                                            'published'
+                                        ),
+                                    ),
+                                    'attributes' => array(
+                                        'id' => 'type',
+                                        'value' => '',
+                                        'class' => '',
+                                        'placeholder' => 'saved',
+                                        'data-type' => 'string'
+                                    ),
+                                ),
+                            ),
 						),
 						'input_filter' => array(
 							'siteId' => array(

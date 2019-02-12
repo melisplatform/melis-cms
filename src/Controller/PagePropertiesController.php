@@ -44,7 +44,17 @@ class PagePropertiesController extends AbstractActionController
 		    'meliscms_page_properties',
 		    $idPage . '_'
 		);
-		
+
+		/** Overriding the Page properties form by calling listener */
+        $modifiedForm =  $this->getEventManager()->trigger(
+            'modify_page_properties_form_config',
+            $this,
+            ['appConfigForm' => $appConfigForm]
+        )->last();
+        if (!empty($modifiedForm)) {
+            $appConfigForm = $modifiedForm;
+        }
+
 		if (!empty($idPage))
 		{
 			// Lang not changeable after creation, config array defines the form in "new" state
@@ -124,6 +134,16 @@ class PagePropertiesController extends AbstractActionController
 		    'meliscms_page_properties',
 		    $idPage . '_'
 		);
+        /** Overriding the Page properties form by calling listener */
+        $modifiedForm =  $this->getEventManager()->trigger(
+            'modify_page_properties_form_config',
+            $this,
+            ['appConfigForm' => $appConfigForm]
+        )->last();
+
+        if (!empty($modifiedForm)) {
+            $appConfigForm = $modifiedForm;
+        }
 			
 		if ($isNew == false)
 		{
@@ -260,7 +280,7 @@ class PagePropertiesController extends AbstractActionController
         					return new JsonModel(array(
         							'success' => 0,
         							'datas' => array(),
-        							'errors' => array(array('platform_current_page_id_max' => $translator->translate('tr_meliscms_page_save_error_Current page id has reached end of platform band')))
+        							'errors' => array(array($translator->translate('tr_meliscms_page_save_error_platform_id_max') => $translator->translate('tr_meliscms_page_save_error_Current page id has reached end of platform band')))
         					));
         				}
         				 
@@ -280,7 +300,7 @@ class PagePropertiesController extends AbstractActionController
         					return new JsonModel(array(
         							'success' => 0,
         							'datas' => array(),
-        							'errors' => array(array('platform_current_page_id_used' => $translator->translate('tr_meliscms_page_save_error_Current page id defined in platform is already used')))
+        							'errors' => array(array($translator->translate('tr_meliscms_page_save_error_platform_id_used') => $translator->translate('tr_meliscms_page_save_error_Current page id defined in platform is already used')))
         					));
         				}
         				 

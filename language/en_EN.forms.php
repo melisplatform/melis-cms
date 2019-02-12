@@ -15,6 +15,7 @@
 		'tr_meliscms_page_tab_properties_form_type_Site' => 'Site',
 		'tr_meliscms_page_tab_properties_form_type_Folder' => 'Folder',
 		'tr_meliscms_page_tab_properties_form_type_Page' => 'Page',
+		'tr_meliscms_page_tab_properties_form_type_Newsletter' => 'Newsletter',
 		'tr_meliscms_page_tab_properties_form_Status' => 'Status',
 		'tr_meliscms_page_tab_properties_form_status_Online' => 'Online',
 		'tr_meliscms_page_tab_properties_form_status_Offline' => 'Offline',
@@ -27,7 +28,7 @@
 		'tr_meliscms_page_tab_properties_form_Language2 tooltip' => 'Site language',
 		'tr_meliscms_page_tab_properties_form_Language tooltip' => 'Language of the pages',
 		'tr_meliscms_page_tab_properties_form_Template' => 'Template',
-		'tr_meliscms_page_tab_properties_form_Template tooltip' => 'Select the page template among the templates registered in the "Templates" tool or select "None" if the page will not be published',
+		'tr_meliscms_page_tab_properties_form_Template tooltip' => 'Select the page template among the templates registered in the \'\'Templates\'\' tool or select \'\'None\'\' if the page will not be published',
 		'tr_meliscms_page_tab_properties_form_Template_None' => 'None',
 		'tr_meliscms_page_tab_properties_form_Meta Title' => 'Meta title',
 		'tr_meliscms_page_tab_properties_form_Meta Keywords' => 'Meta keywords',
@@ -36,7 +37,7 @@
 		'tr_meliscms_page_tab_properties_form_Creation date tooltip' => 'Date when the page has been created',
 		'tr_meliscms_page_tab_properties_form_submittext_Save' => 'Save',
 // 	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomy',
-	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomy * <i class="fa fa-info-circle fa-lg" data-toggle="tooltip" data-placement="left" title="" data-original-title="Type the terms to classify your page. Separate each term by a coma"></i>',
+	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomy  <i class="fa fa-info-circle fa-lg" data-toggle="tooltip" data-placement="left" title="" data-original-title="Type the terms to classify your page. Separate each term by a coma"></i>',
 	    'tr_meliscms_page_tab_properties_form_taxonomy_placeholder' => 'Separate options with a comma',
 	    'tr_meliscms_page_tab_properties_form_taxonomy_placeholder tooltip' => 'Type the terms to classify your page. Separate each term by a coma',
 	    'tr_meliscms_tool_style_name_properties tooltip' => 'Select a style to add to your page among the created styles from the &#34;Styles&#34; tool',
@@ -48,9 +49,9 @@
 		'tr_meliscms_page_tab_seo_form_Url' => 'URL',
 		'tr_meliscms_page_tab_seo_form_Url tooltip' => 'URL of the page',
 		'tr_meliscms_page_tab_seo_form_Url Redirect' => 'URL redirection',
-		'tr_meliscms_page_tab_seo_form_Url Redirect tooltip' => 'URL redirection of the page if the page is published. For an internal page enter its ID or its URL, for an external page enter its complete URL with the http://',
+		'tr_meliscms_page_tab_seo_form_Url Redirect tooltip' => 'URL redirection of the page if the page is published. For an internal page enter its URL, for an external page enter its complete URL with the http://',
 		'tr_meliscms_page_tab_seo_form_Url 301' => 'URL 301',
-		'tr_meliscms_page_tab_seo_form_Url 301 tooltip' => 'URL redirection of the page if the page is unpublished. For an internal page enter its ID or its URL, for an external page enter its complete URL with the http://',
+		'tr_meliscms_page_tab_seo_form_Url 301 tooltip' => 'URL redirection of the page if the page is unpublished. For an internal page enter its URL, for an external page enter its complete URL with the http://',
 			
 	    // page prompts
 	    'tr_meliscms_page_form_page_name_empty' => 'Please enter the page name',
@@ -75,6 +76,8 @@
 	    'tr_meliscms_pageseo_form_page_title_long'  => 'Page title is too long, it should be less than 65 characters',
 		'tr_meliscms_pageseo_form_page_desc_long'  => 'Description is too long, it should be less than 255 characters',
 		'tr_meliscms_pageseo_form_page_url_too_long'  => 'URL is too long, it should be less than 255 characters',
+        'tr_meliscms_page_tab_seo_form_canonical'  => 'Canonical URL',
+        'tr_meliscms_page_tab_seo_form_canonical tooltip'  => 'Canonical URL',
 	    
 	    // for template tool forms
 	    'tr_meliscms_template_form_tpl_id' => 'ID',
@@ -134,7 +137,7 @@
 	    'tr_meliscms_tool_site_id' => 'Site ID',
 	    'tr_meliscms_tool_site_id tooltip' => 'Identifier of the site',
 	    'tr_meliscms_tool_site_site_name' => 'Name',
-	    'tr_meliscms_tool_site_site_name tooltip' => 'Name of the site',
+	    'tr_meliscms_tool_site_site_name tooltip' => 'The module name as defined in the code (or folder name in MelisSites/)',
 	    'tr_meliscms_tool_site_page_id' => 'Home page ID',
 	    'tr_meliscms_tool_site_page_id tooltip' => 'Identifier of the home page',
 	    'tr_meliscms_tool_site_site_id' => 'Domain site ID',
@@ -163,7 +166,7 @@
 	    'tr_meliscms_tool_site_melissites_directory_not_exist' => 'Target directory not exist, please create the /module/MelisSites directory',
 	    'tr_meliscms_tool_site_site_created_title' => 'has been created successfully',
 	    'tr_meliscms_tool_site_site_created_message' => 'Your new site has been created with <b>Site module</b>, <b>Pages</b> and <b>Templates</b> generated.',
-	    'tr_meliscms_tool_site_site_name' => 'Site name',
+	    'tr_meliscms_tool_site_site_name' => 'Module name associated',
 	    'tr_meliscms_tool_site_site_module' => 'Site module',
 	    'tr_meliscms_tool_site_site_layout' => 'Site layout',
 	    'tr_meliscms_tool_site_homepage' => 'Homepage',
@@ -206,7 +209,24 @@
 	    'tr_meliscms_tool_style_page_id_too_long' => 'Page ID is too long',
 	    'tr_meliscms_tool_style_page_is_empty' => 'The input is required and can&#39;t be empty',
 	    'tr_meliscms_tree_sites_duplication_use_root' => 'Root',
-	    
-	    
+
+	    'tr_meliscms_page_tab_properties_search_type'         => 'Search options',
+	    'tr_meliscms_page_tab_properties_search_type tooltip' => 'Select search option for indexing',
+	    'tr_meliscms_page_tab_properties_search_type_option1' => 'Yes, with subpages',
+	    'tr_meliscms_page_tab_properties_search_type_option2' => 'Yes, without subpages',
+	    'tr_meliscms_page_tab_properties_search_type_option3' => 'No',
+        # Site label
+        'tr_meliscms_tool_site_site_label'             => 'Name of the site',
+        'tr_meliscms_tool_site_site_label tooltip'     => 'The name of the site displayed in the platform',
+        'tr_meliscms_tool_site_site_label_error_empty' => 'Please enter the site label',
+        'tr_meliscms_tool_site_site_label_error_long'  => 'Site name too long, maximum characters accepted is 100 characters',
+        # New site name
+        'tr_meliscms_tool_site_new_site_name' => 'Module name',
+        'tr_meliscms_tool_site_new_site_name tooltip' => 'Site module name',
+        # Template form validation error
+        'tr_melis_cms_tool_template_name_invalid'       => 'Invalid template name',
+        'tr_melis_cms_tool_template_layout_invalid'     => 'Invalid template layout',
+        'tr_melis_cms_tool_template_controller_invalid' => 'Invalid template controller',
+        'tr_melis_cms_tool_template_action_invalid'     => 'Invalid template action',
 	);
 ?>

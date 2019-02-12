@@ -11,7 +11,6 @@ namespace MelisCms;
 
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
-use Zend\ModuleManager\ModuleManager;
 use Zend\Session\Container;
 use Zend\Session\SessionManager;
 use Zend\Stdlib\ArrayUtils;
@@ -27,7 +26,6 @@ use MelisCms\Listener\MelisCmsSiteDomainDeleteListener;
 use MelisCms\Listener\MelisCmsPlatformIdListener;
 use MelisCms\Listener\MelisCmsNewSiteDomainListener;
 use MelisCms\Listener\MelisCmsDeleteSiteDomainListener;
-use MelisCms\Listener\MelisCmsInstallerLastProcessListener;
 use MelisCms\Listener\MelisCmsToolUserNewUserListener;
 use MelisCms\Listener\MelisCmsDeletePlatformListener;
 use MelisCms\Listener\MelisCmsPageDefaultUrlsListener;
@@ -35,6 +33,11 @@ use MelisCms\Listener\MelisCmsPageGetterListener;
 use MelisCms\Listener\MelisCmsPageEditionSavePluginSessionListener;
 use MelisCms\Listener\MelisCmsAddPluginContainerListener;
 
+/**
+ * Class Module
+ * @package MelisCms
+ * @require melis-core|melis-engine|melis-front
+ */
 class Module
 {
     public function onBootstrap(MvcEvent $e)
@@ -81,12 +84,10 @@ class Module
                     $eventManager->attach(new MelisCmsPlatformIdListener());
                     $eventManager->attach(new MelisCmsNewSiteDomainListener());
                     $eventManager->attach(new MelisCmsDeleteSiteDomainListener());
-                    $eventManager->attach(new MelisCmsInstallerLastProcessListener());
                     $eventManager->attach(new MelisCmsToolUserNewUserListener());
                     $eventManager->attach(new MelisCmsDeletePlatformListener());
                     $eventManager->attach(new MelisCmsPageDefaultUrlsListener());
-                    //$eventManager->attach(new MelisCmsPageEditionSavePluginSessionListener());
-                    //$eventManager->attach(new MelisCmsAddPluginContainerListener());
+                    $eventManager->attach(new MelisCmsPageEditionSavePluginSessionListener());
 
                     // Saving Plugin Tag values, Melis Side
                     $eventManager->attach($sm->get('MelisCms\Listener\MelisCmsPluginSaveEditionSessionListener'));
@@ -132,6 +133,7 @@ class Module
             $translationType = array(
                 'interface',
                 'forms',
+                'install',
             );
             
         $translationList = array();
@@ -174,6 +176,7 @@ class Module
             include __DIR__ . '/../config/diagnostic.config.php',
             include __DIR__ . '/../config/diagnostic.config.php',
             include __DIR__ . '/../config/app.microservice.php',
+            include __DIR__ . '/../config/dashboard-plugins/MelisCmsPagesIndicatorsPlugin.config.php',
         );
 
         foreach ($configFiles as $file) {

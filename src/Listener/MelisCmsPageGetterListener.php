@@ -32,54 +32,50 @@ class MelisCmsPageGetterListener implements ListenerAggregateInterface
                 
                 // Service manager
                 $sm = $e->getApplication()->getServiceManager();
+                $request = $sm->get('Request');
 
-                // execute only if the request is coming from a non-cli command
-                if (php_sapi_name() !== 'cli') {
-                    $request = $sm->get('Request');
+                $container = new Container('meliscms');
 
-                    $container = new Container('meliscms');
-
-                    // Checking if the request is from Publish action on Page Edtion
-                    if ($request->getQuery('idPage') && $params['action'] == 'publishPage')
-                    {
-                        $pageId = $request->getQuery('idPage');
-                        /**
-                         * This will initialize a Page Cache flag to excute the caching procedure
-                         * using the page id as identity of the flag
-                         */
-                        $container['page-cache-getter-temp'] = array();
-                        $container['page-cache-getter-temp'][$pageId] = 1;
-
-                    }
+                // Checking if the request is from Publish action on Page Edtion
+                if ($request->getQuery('idPage') && $params['action'] == 'publishPage')
+                {
+                    $pageId = $request->getQuery('idPage');
                     /**
-                     * Checking the request is from retrieving the site from preview
-                     * that has a query data of "melisSite" and Caching session flag from Publish action
+                     * This will initialize a Page Cache flag to excute the caching procedure
+                     * using the page id as identity of the flag
                      */
-                    elseif ($request->getQuery('melisSite') && !empty($container['page-cache-getter-temp']))
+                    $container['page-cache-getter-temp'] = array();
+                    $container['page-cache-getter-temp'][$pageId] = 1;
+
+                }
+                /**
+                 * Checking the request is from retrieving the site from preview
+                 * that has a query data of "melisSite" and Caching session flag from Publish action
+                 */
+                elseif ($request->getQuery('melisSite') && !empty($container['page-cache-getter-temp']))
+                {
+                    $pageId = $params['idpage'];
+
+                    if (!empty($container['page-cache-getter-temp'][$pageId]))
                     {
-                        $pageId = $params['idpage'];
+                        // Page cache config
+                        $cacheKey = 'cms_page_getter_'.$pageId;
+                        $cacheConfig = 'meliscms_page';
 
-                        if (!empty($container['page-cache-getter-temp'][$pageId]))
+                        // Retrieving page cache
+                        $melisEngineCacheSystem = $sm->get('MelisEngineCacheSystem');
+                        $results = $melisEngineCacheSystem->getCacheByKey($cacheKey, $cacheConfig, true);
+                        if (!empty($results))
                         {
-                            // Page cache config
-                            $cacheKey = 'cms_page_getter_'.$pageId;
-                            $cacheConfig = 'meliscms_page';
-
-                            // Retrieving page cache
-                            $melisEngineCacheSystem = $sm->get('MelisEngineCacheSystem');
-                            $results = $melisEngineCacheSystem->getCacheByKey($cacheKey, $cacheConfig, true);
-                            if (!empty($results))
-                            {
-                                // Deleting page cached
-                                $melisEngineCacheSystem->deleteCacheByPrefix($cacheKey, $cacheConfig);
-                            }
-                            // Unseting Publish flag from session
-                            unset($container['page-cache-getter-temp'][$pageId]);
+                            // Deleting page cached
+                            $melisEngineCacheSystem->deleteCacheByPrefix($cacheKey, $cacheConfig);
                         }
+                        // Unseting Publish flag from session
+                        unset($container['page-cache-getter-temp'][$pageId]);
                     }
                 }
-
             }
+
         );
         $this->listeners[] = $callBackHandler;
     }

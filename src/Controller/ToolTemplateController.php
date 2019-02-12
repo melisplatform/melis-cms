@@ -39,8 +39,9 @@ class ToolTemplateController extends AbstractActionController
         $translator = $this->getServiceLocator()->get('translator');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $noAccessPrompt = '';
-        
-        if(!$this->hasAccess($this::TOOL_KEY)) {
+        // Checks wether the user has access to this tools or not
+        $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
+        if(!$melisCoreRights->canAccess($this::TOOL_KEY)) {
             $noAccessPrompt = $translator->translate('tr_tool_no_access');
         }
         
@@ -132,7 +133,8 @@ class ToolTemplateController extends AbstractActionController
         $sites[] = '<option value="">'. $translator->translate('tr_meliscms_tool_templates_tpl_label_choose') .'</option>';
        
        foreach($siteTable->fetchAll() as $site){
-           $sites[] = '<option value="'.$site->site_id.'">'. $site->site_name .'</option>';
+           $siteName = !empty($site->site_label) ? $site->site_label : $site->site_name;
+           $sites[] = '<option value="'.$site->site_id.'">'. $siteName .'</option>';
        }
        
        $view = new ViewModel();
@@ -198,7 +200,7 @@ class ToolTemplateController extends AbstractActionController
         
         $view->melisKey = $melisKey;
         
-        $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration();
+        $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration('#tableToolTemplateManager',false,false,array('order' => '[[ 0, "desc" ]]'));
         
         return $view;
     }
@@ -632,15 +634,9 @@ class ToolTemplateController extends AbstractActionController
         
         // make sure that the request is an AJAX call
         if($this->getRequest()->isPost()) {
-            $optionFilter = array();
-            
-            if(!empty($this->getRequest()->getPost('tpl_site_id'))){
-                $optionFilter['tpl_site_id'] = $this->getRequest()->getPost('tpl_site_id');
-            }
-            
-            
-            // get the tool columns
-            $columns = $melisTool->getColumns();
+
+            $siteId = $this->getRequest()->getPost('tpl_site_id');
+            $siteId = !empty($siteId)? $siteId : null;
             
             $colId = array_keys($melisTool->getColumns());
             
@@ -657,28 +653,19 @@ class ToolTemplateController extends AbstractActionController
             
             $search = $this->getRequest()->getPost('search');
             $search = $search['value'];
-            
-            $dataCount = $templatesModel->getTotalData();
-            
-            $dataQuery = array(
-                'where' => array(
-                    'key' => 'tpl_id',
-                    'value' => $search,
-                ),
-                'order' => array(
-                    'key' => $selCol,
-                    'dir' => $sortOrder,
-                ),
-                'start' => $start,
-                'limit' => $length,
-                'columns' => $melisTool->getSearchableColumns(),
-                'date_filter' => array(),
-            );
-            
-            $getData = $templatesModel->getPagedData($dataQuery, null, $optionFilter);
 
+            $dataCount = $templatesModel->getTotalData();
+
+            $getData = $templatesModel->getData($search, $siteId, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length);
             $tableData = $getData->toArray();
-            
+
+            // Get site modules & controllers
+            try {
+                $siteModules = $this->getSiteModules();
+            } catch (\Exception $e) {
+                // Place handling here
+            }
+
             for($ctr = 0; $ctr < count($tableData); $ctr++)
             {
                 // apply text limits
@@ -686,27 +673,114 @@ class ToolTemplateController extends AbstractActionController
                 {
                     $tableData[$ctr][$vKey] = $melisTool->limitedText($vValue);
                 }
-                
+
                 $tableData[$ctr]['DT_RowId'] = $tableData[$ctr]['tpl_id'];
-                // instead of showing the Site ID, replace it with Site name
-                $siteData = $tableSite->getEntryById($tableData[$ctr]['tpl_site_id']);
-                $siteText = $siteData->current();
-                $tableData[$ctr]['tpl_site_id'] = !empty($siteText->site_name) ? $siteText->site_name : '';
+
+                // Append Template status: Green Circle = Active || Red Circle = Inctive
+                try {
+                    $tpl = [
+                        'module'        => $tableData[$ctr]['tpl_zf2_website_folder'],
+                        'controller'    => $tableData[$ctr]['tpl_zf2_controller'],
+                        'action'        => $tableData[$ctr]['tpl_zf2_action']
+                    ];
+                    $tpl_status                     = $this->getTemplateStatus($siteModules, $tpl);
+                    $tableData[$ctr]['tpl_status']  = '<span class="text-'.($tpl_status? 'success' : 'danger').'"><i class="fa fa-fw fa-circle"></i></span>';
+                } catch (\Exception $e) {
+                    // Place handling here
+                }
                 
                 // display controller and action in Controller Column
                 $tableData[$ctr]['tpl_zf2_controller'] = !empty($tableData[$ctr]['tpl_zf2_action']) ? $tableData[$ctr]['tpl_zf2_controller'] . '/' . $tableData[$ctr]['tpl_zf2_action'] : $tableData[$ctr]['tpl_zf2_controller'];
-
             }
         }
-        
+
         return new JsonModel(array(
             'draw' => (int) $draw,
             'recordsTotal' => $dataCount,
             'recordsFiltered' => $templatesModel->getTotalFiltered(),
             'data' => $tableData,
         ));
+    }
 
-    
+    /**
+     * Returns true: Module, & Controller, & Action exists
+     * otherwise, false
+     * @return bool
+     */
+    private function getTemplateStatus(array $modules, array $template) : bool
+    {
+        $status      = false;
+        $moduleNames = array_keys($modules);
+
+        // Check if template's Module exists
+        if (in_array($template['module'], $moduleNames)) {
+
+            // Check if template's Controller exists
+            $controller = $template['controller'] . 'Controller.php';
+            if (in_array($controller, $modules[$template['module']])) {
+                $controller = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/' . $template['module'] . '/src/' . $template['module'] . '/Controller/' . $controller;
+                $controller = file_get_contents($controller);
+
+                // Check if template's Action exists
+                $actionPattern = '/function.*'.$template['action'].'Action/';
+                if (preg_match($actionPattern, $controller)) {
+                    $status = true;
+                }
+            }
+        }
+
+        return $status;
+    }
+
+    /**
+     * Returns the list of Modules (MelisSites)
+     * @return array
+     */
+    protected function getSiteModules() : array
+    {
+        $modules    = [];
+        $modulePath = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites';
+
+        if (is_dir($modulePath)){
+            foreach (scandir($modulePath) as $module) {
+                // Skip directory pointers
+                if ($module == '.' || $module == '..') continue;
+
+                if (is_dir($modulePath . '/' . $module)) {
+                    $modules[$module] = $this->getControllers($modulePath . '/' . $module . '/src/' . $module . '/Controller');
+                }
+            }
+        }
+
+        return $modules;
+    }
+
+    /**
+     * Returns a module's controllers
+     * @return array
+     */
+    protected function getControllers(string $controllersPath) : array
+    {
+        $controllers = [];
+
+        // List all controller files inside the ..src/controller folder
+        if (is_dir($controllersPath)) {
+            foreach (scandir($controllersPath) as $controller) {
+                // Skip directory pointers
+                if ($controller == '.' || $controller == '..' || is_dir($controllersPath . '/' . $controller)) {
+                    continue;
+                }
+
+                // Check if file's extension is ".php"
+                $filePath   = $controllersPath . '/' . $controller;
+                $fileExt    = pathinfo($filePath)['extension'];
+                if ($fileExt == 'php' && is_file($filePath)) {
+                    $controllers[] = $controller;
+                }
+            }
+        }
+
+        return $controllers;
     }
 
     /**
@@ -993,26 +1067,18 @@ class ToolTemplateController extends AbstractActionController
     
         $searched = $this->getRequest()->getQuery('filter');
         $columns  = $melisTool->getSearchableColumns();
+
+
+        //remove the sitename from the where clause to avoid error since it doesn't exist in the template table
+        for($i = 0; $i < sizeof($columns); $i++)
+        {
+            if($columns[$i] == 'site_name'){
+                unset($columns[$i]);
+            }
+        }
+
         $data = $templatesModel->getDataForExport($searched, $columns);
     
         return $melisTool->exportDataToCsv($data->toArray());
     }
-    
-    
-    /**
-     * Checks wether the user has access to this tools or not
-     * @return boolean
-     */
-    private function hasAccess($key)
-    {
-        $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
-        $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
-        $xmlRights = $melisCoreAuth->getAuthRights();
-        
-        $isAccessible = $melisCoreRights->isAccessible($xmlRights, MelisCoreRightsService::MELISCORE_PREFIX_TOOLS, $key);
-        
-        return $isAccessible;
-    }
-
-
 }
