@@ -745,7 +745,7 @@ return array(
                                 'sortable' => true,
 
                             ),
-                            'site_name' => array(
+                            'site_label' => array(
                                 'text' => 'tr_meliscms_tool_templates_tpl_site_id',
                                 'css' => array('width' => '20%', 'padding-right' => '0'),
                                 'sortable' => true,
@@ -2327,7 +2327,7 @@ return array(
                                 'css' => array('width' => '1%'),
                                 'sortable' => true,
                             ),
-                            'site_name' => array(
+                            'site_label' => array(
                                 'text' => 'tr_meliscms_tool_site_301_s301_site',
                                 'css' => array('width' => '30%'),
                                 'sortable' => true,
