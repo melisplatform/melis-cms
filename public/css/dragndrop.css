@@ -329,6 +329,8 @@ body {
     font-size: 14px;
     line-height: 25px;
     transition: all 0.4s ease-in-out;
+    /* added by: Junry @ 02082019*/
+    width: inherit;
 }
 .melis-ui-outlined.ui-sortable-helper,
 .melis-ui-outlined.ui-resizable-resizing {
@@ -552,6 +554,10 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
     border: 4px solid #e61c23;
 }
 
+.melis-dragdropzone > div[data-module-name="MelisMiniTemplate"].melis-cms-plugin-snippets {
+    background: #e61c23;
+}
+
 .ui-sortable-helper:after {
     /*content: "\f1e6";*/
     font-family: FontAwesome;
@@ -709,6 +715,14 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
     width: 25px;
     font-size: 10px;
     font-weight: bold;
+}
+
+.plugins-override-padding{
+    padding-top: 10px;
+}
+
+.plugins-name-override-margin{
+    margin-top: 0;
 }
 
 @-webkit-keyframes spinning-cog {

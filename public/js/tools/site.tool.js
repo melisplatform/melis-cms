@@ -369,11 +369,11 @@ $(document).ready(function() {
 	    })
 	});
 
-	$("body").on("click", "#siteMainPageId", function(){
+	$("body").on("click", "#siteMainPageId span", function(){
         melisLinkTree.createInputTreeModal('#id_site_main_page_id');
 	});
 
-	$("body").on("click", "#s404PageId", function(){
+	$("body").on("click", "#s404PageId span", function(){
         melisLinkTree.createInputTreeModal('#id_s404_page_id');
 	});
 	
