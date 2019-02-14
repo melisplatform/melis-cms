@@ -333,8 +333,9 @@ $(document).ready(function() {
 
     // Add Event to "Minify Button"
     addEvent(".btnMinifyAssets", function(e) {
-        var siteId = $(this).parents("tr").attr("id");
-        var _this = $(this);
+    	var _this 	= $(this),
+        	siteId 	= _this.parents("tr").attr("id");
+        
 		$.ajax({
 			type        : 'POST',
 			url         : '/minify-assets',
@@ -345,10 +346,11 @@ $(document).ready(function() {
                 _this.attr('disabled', true);
 			},
 			success		: function(data){
+				console.log('data: ', data);
 				var errorTexts = '<h3>'+ melisHelper.melisTranslator(data.title) +'</h3>';
 				$.each( data.errors, function( key, error ) {
 					$.each( error, function( key, value ) {
-                        errorTexts += '<p class="modal-error-cont"><b>'+ key + ': </b>  ';
+                        errorTexts += '<p class="modal-error-cont"><strong>'+ key + ': </strong>  ';
 						if(value instanceof Object){
 							$.each(value, function(key, val){
                                 errorTexts += '<span><i class="fa fa-circle"></i>'+ '<label>'+ key + ': </label>  ' + val + '</span>';
