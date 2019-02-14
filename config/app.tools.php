@@ -63,7 +63,7 @@ return array(
 
                             ),
 
-                            'site_name' => array(
+                            'site_label' => array(
                                 'text' => 'tr_meliscms_tool_templates_tpl_site_id',
                                 'css' => array('width' => '20%', 'padding-right' => '0'),
                                 'sortable' => true,
@@ -745,7 +745,7 @@ return array(
                                 'sortable' => true,
 
                             ),
-                            'site_name' => array(
+                            'site_label' => array(
                                 'text' => 'tr_meliscms_tool_templates_tpl_site_id',
                                 'css' => array('width' => '20%', 'padding-right' => '0'),
                                 'sortable' => true,
@@ -1176,7 +1176,7 @@ return array(
                                 array(
                                     'spec' => array(
                                         'name' => 'site_id',
-                                        'type' => 'MelisText',
+                                        'type' => 'hidden',
                                         'options' => array(
                                             'label' => 'tr_meliscms_tool_site_id',
                                             'tooltip' => 'tr_meliscms_tool_site_id tooltip',
@@ -1184,6 +1184,7 @@ return array(
                                         'attributes' => array(
                                             'id' => 'id_site_id',
                                             'value' => '',
+
                                         ),
                                     ),
                                 ),
@@ -2326,7 +2327,7 @@ return array(
                                 'css' => array('width' => '1%'),
                                 'sortable' => true,
                             ),
-                            'site_name' => array(
+                            'site_label' => array(
                                 'text' => 'tr_meliscms_tool_site_301_s301_site',
                                 'css' => array('width' => '30%'),
                                 'sortable' => true,

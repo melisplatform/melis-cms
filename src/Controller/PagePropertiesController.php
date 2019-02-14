@@ -134,6 +134,16 @@ class PagePropertiesController extends AbstractActionController
 		    'meliscms_page_properties',
 		    $idPage . '_'
 		);
+        /** Overriding the Page properties form by calling listener */
+        $modifiedForm =  $this->getEventManager()->trigger(
+            'modify_page_properties_form_config',
+            $this,
+            ['appConfigForm' => $appConfigForm]
+        )->last();
+
+        if (!empty($modifiedForm)) {
+            $appConfigForm = $modifiedForm;
+        }
 			
 		if ($isNew == false)
 		{

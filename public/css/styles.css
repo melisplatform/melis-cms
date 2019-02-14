@@ -672,7 +672,22 @@ body.modal-open {
 		margin-left: 10px;
 	}
 }
+/*styling site default page id and 404 page id input site tree view btn to have a click effect*/
 
+#siteMainPageId > span:hover {
+	background-color: #e5e5e5;
+}
+#s404PageId > span:hover {
+	background-color: #e5e5e5;
+}
+#siteMainPageId > span:active {
+	background-color: #ccc;
+	border-color: #ccc;
+}
+#s404PageId > span:active {
+	background-color: #ccc;
+	border-color: #ccc;
+}
 
 
 
