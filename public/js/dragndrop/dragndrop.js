@@ -55,11 +55,11 @@ var melisDragnDrop = (function($, window) {
             $(ui.placeholder[0]).css("width", placeholderWidth);
 
             // change its css to fit for theme design
-            $(ui.helper[0]).attr("data-module-name", "MelisMiniTemplate").css({
-                "height" : "auto",
-                "padding-left" : "10px",
-                "padding-right" : "10px"
-            });
+            // $(ui.helper[0]).attr("data-module-name", "MelisMiniTemplate").css({
+            //     "height" : "auto",
+            //     "padding-left" : "10px",
+            //     "padding-right" : "10px"
+            // });
 
             // detect if browser is in desktop
             if( $(window).width() >= 768) {
