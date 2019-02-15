@@ -1,0 +1,29 @@
+<?php
+$id = '';
+if (!empty($this->zoneconfig['conf']['id']))
+    $id = ' id="' .$this->zoneconfig['conf']['id'] . '"';
+$data_melisKey = $this->melisKey;
+
+
+?>
+<div<?= $id; ?> data-melisKey='<?= $data_melisKey; ?>' class="page-content-container iframe-container">
+    <div class="widget widget-tabs widget-tabs-double-2 widget-tabs-responsive">
+        <div class="widget-head nav">
+            <ul class="tabs-label nav-tabs">
+                <?php foreach($this->zoneconfig['interface'] AS $configKey => $configVal) { ?>
+                    <li role="presentation">
+                        <a class="glyphicons <?= $configVal['conf']['icon'] ?> cs-fa" data-toggle="tab" href="#<?=$configVal['conf']['id']?>" aria-expanded="true">
+                            <i></i>
+                            <span><?=$this->translate($configVal['conf']['name']); ?></span>
+                        </a>
+                    </li>
+                <?php } ?>
+            </ul>
+        </div>
+    </div>
+    <div class="widget-body tab-content">
+        <?php foreach($this->zoneconfig['interface'] AS $configKey => $configVal) {?>
+            <?php echo $this->$configKey ?>
+        <?php } ?>
+    </div>
+</div>

@@ -36,6 +36,36 @@ class SitesController extends AbstractActionController
         $view->melisKey = $melisKey;
         return $view;
     }
+
+    /**
+     * @return ViewModel();
+     */
+    public function renderToolSitesEditAction() {
+
+        $melisKey = $this->getMelisKey();
+        $view = new ViewModel();
+        $view->melisKey = $melisKey;
+        return $view;
+    }
+
+    /**
+     * @return ViewModel();
+     */
+    public function renderToolSitesEditHeaderAction() {
+
+        $melisKey = $this->getMelisKey();
+        $view = new ViewModel();
+        $view->melisKey = $melisKey;
+        return $view;
+    }
+
+    public function renderToolSitesTabsAction() {
+
+        $melisKey = $this->getMelisKey();
+        $view = new ViewModel();
+        $view->melisKey = $melisKey;
+        return $view;
+    }
     
     /**
      * Renders to the header section of the tool

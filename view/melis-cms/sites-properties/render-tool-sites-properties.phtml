@@ -1,0 +1,15 @@
+<?php
+
+$id = '';
+if (!empty($this->zoneconfig['conf']['id']) && !$this->prefixId)
+    $id = 'id="' . $this->zoneconfig['conf']['id'] . '"';
+else
+    $id = 'id="' . $this->idPage . '_' . $this->zoneconfig['conf']['id'] . '"';
+
+$data_melisKey = $this->melisKey;
+
+?>
+<div data-melisKey='<?= $data_melisKey; ?>'<?= $id; ?> class="tab-pane widget-body-regular meliscms_center_tabs">
+    <span>test1</span>
+</div>
+

@@ -9,6 +9,15 @@ $(document).ready(function() {
         });
     });
 
+    /**
+     * This will open a new tab when editing a site
+     */
+    $body.on("click", ".btnEditSites", function(){
+        melisHelper.tabOpen("Test", 'fa-user', 'id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site', null, null, function(){
+
+        });
+    });
+
     window.createSitesModalCallback = function () {
         var   $slideGroup = $('.slide-group');
         var   current = 0;

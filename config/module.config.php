@@ -135,6 +135,7 @@ return array(
             'MelisCms\Controller\PageLanguages' => 'MelisCms\Controller\PageLanguagesController',
             'MelisCms\Controller\MelisSetup' => 'MelisCms\Controller\MelisSetupController',
             'MelisCms\Controller\Sites' => 'MelisCms\Controller\SitesController',
+            'MelisCms\Controller\SitesProperties' => 'MelisCms\Controller\SitesPropertiesController',
         ),
     ),
     'controller_plugins' => array(

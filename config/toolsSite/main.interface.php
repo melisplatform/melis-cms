@@ -210,7 +210,55 @@ return array(
                                         ),
                                     ),
                                 ), // end modals
-                            )
+                            ),
+                        ),
+                        //start site edit interface
+                        'meliscms_tool_sites_edit_site' => array(
+                            'conf' => array(
+                                'id' => 'id_meliscms_tool_sites_edit_site',
+                                'melisKey' => 'meliscms_tool_sites_edit_site',
+                                'name' => 'Edit Site',
+                            ),
+                            'forward' => array(
+                                'module' => 'MelisCms',
+                                'controller' => 'Sites',
+                                'action' => 'render-tool-sites-edit',
+                                'jscallback' => '',
+                                'jsdatas' => array()
+                            ),
+                            'interface' => array(
+                                'meliscms_tool_sites_edit_site_header' => array(
+                                    'conf' => array(
+                                        'id' => 'id_meliscms_tool_sites_edit_site_header',
+                                        'name' => 'Header',
+                                        'melisKey' => 'meliscms_tool_sites_edit_site_header',
+                                    ),
+                                    'forward' => array(
+                                        'module' => 'MelisCms',
+                                        'controller' => 'Sites',
+                                        'action' => 'render-tool-sites-edit-header',
+                                        'jscallback' => '',
+                                        'jsdatas' => array()
+                                    ),
+                                    'interface' => array(),
+                                ), // end header
+                                'meliscms_tool_sites_edit_site_tabs' => array(
+                                    'conf' => array(
+                                        'id' => 'id_meliscms_tool_sites_edit_site_tabs',
+                                        'melisKey' => 'meliscms_tool_sites_edit_site_tabs',
+                                    ),
+                                    'forward' => array(
+                                        'module' => 'MelisCms',
+                                        'controller' => 'Sites',
+                                        'action' => 'render-tool-sites-tabs',
+                                        'jscallback' => '',
+                                        'jsdatas' => array()
+                                    ),
+                                    'interface' =>  array(
+
+                                    ),
+                                ),
+                            ),
                         ),
                     ),
                 ),
