@@ -57,6 +57,33 @@ class SitesController extends AbstractActionController
         $view = new ViewModel();
         return $view;
     }
+
+    /**
+     * Renders to the refresh button in the table filter bar
+     * @return \Zend\View\Model\ViewModel
+     */
+    public function renderToolSitesContentFilterRefreshAction()
+    {
+        return new ViewModel();
+    }
+
+    /**
+     * Renders to the Search input in the table filter bar
+     * @return \Zend\View\Model\ViewModel
+     */
+    public function renderToolSitesContentFilterSearchAction()
+    {
+        return new ViewModel();
+    }
+
+    /**
+     * Renders to the limit selection in the table filter bar
+     * @return \Zend\View\Model\ViewModel
+     */
+    public function renderToolSitesContentFilterLimitAction()
+    {
+        return new ViewModel();
+    }
     
     /**
      * Renders to the center content of the tool
@@ -64,10 +91,19 @@ class SitesController extends AbstractActionController
      */
     public function renderToolSitesContentAction()
     {
+        $translator = $this->getServiceLocator()->get('translator');
         $melisKey = $this->getMelisKey();
+        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
+
+        $columns = $melisTool->getColumns();
+        // pre-add Action Columns
+        $columns['actions'] = array('text' => $translator->translate('tr_meliscms_action'));
 
         $view = new ViewModel();
         $view->melisKey = $melisKey;
+        $view->tableColumns = $columns;
+        $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration();
         return $view;
     }
     
@@ -167,8 +203,63 @@ class SitesController extends AbstractActionController
      */
     public function getSiteDataAction()
     {
-        return new JsonModel(array());
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $translator = $this->getServiceLocator()->get('translator');
 
+        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
+
+        $colId = array();
+        $dataCount = 0;
+        $draw = 0;
+        $tableData = array();
+
+        if($this->getRequest()->isPost())
+        {
+            $colId = array_keys($melisTool->getColumns());
+
+            $sortOrder = $this->getRequest()->getPost('order');
+            $sortOrder = $sortOrder[0]['dir'];
+
+            $selCol = $this->getRequest()->getPost('order');
+            $selCol = $colId[$selCol[0]['column']];
+
+            $draw = $this->getRequest()->getPost('draw');
+
+            $start =   (int) $this->getRequest()->getPost('start');
+            $length =  (int) $this->getRequest()->getPost('length');
+
+            $search = $this->getRequest()->getPost('search');
+            $search = $search['value'];
+
+            $dataCount = $siteTable->getTotalData();
+
+            $getData = $siteTable->getSitesData($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length);
+            $dataFilter = $siteTable->getSitesData($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder, null, null);
+
+            $tableData = $getData->toArray();
+            for($ctr = 0; $ctr < count($tableData); $ctr++)
+            {
+                // apply text limits
+                foreach($tableData[$ctr] as $vKey => $vValue)
+                {
+                    $tableData[$ctr][$vKey] = $melisTool->limitedText($melisTool->escapeHtml($vValue));
+                }
+
+                // manually modify value of the desired row
+                // no specific row to be modified
+
+                // add DataTable RowID, this will be added in the <tr> tags in each rows
+                $tableData[$ctr]['DT_RowId'] = $tableData[$ctr]['site_id'];
+            }
+        }
+
+        return new JsonModel(array(
+            'draw' => (int) $draw,
+            'recordsTotal' => $dataCount,
+            'recordsFiltered' =>  $dataFilter->count(),
+            'data' => $tableData,
+        ));
     }
 
     /**
