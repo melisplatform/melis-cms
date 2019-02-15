@@ -2750,4 +2750,34 @@ $(document).ready(function() {
             melisCoreTool.done("#btn-new-meliscms-tool-sites");
         });
     });
+
+    window.createSitesModalCallback = function () {
+        var   $slideGroup = $('.slide-group');
+        var   current = 0;
+        var   $slide = $('.slide');
+        var   slidesTotal = $slide.length;
+
+        var updateIndex = function(currentSlide) {
+            current = currentSlide;
+
+            transition(current);
+        };
+
+        var transition = function(slidePosition) {
+            var slidePositionNew = (slidePosition ) * 500;
+            $slideGroup.animate({
+                'left': '-' + slidePositionNew + 'px'
+            });
+        };
+
+        $("#btn-prev-create-meliscms-tool-sites").on("click", function () {
+            var index = current - 1;
+            current > 0 ? updateIndex(index) : updateIndex(current);
+        });
+        $("#btn-next-create-meliscms-tool-sites").on("click", function () {
+            var index = current + 1;
+            current < (slidesTotal - 1) ? updateIndex(index) : updateIndex(current);
+        });
+
+    }
 });

@@ -1,0 +1,21 @@
+/* slider
+----------------------*/
+.slide-wrap {
+    margin: 5% auto 0;
+    width: auto;
+}
+.slide-mask {
+    position: relative;
+    overflow: hidden;
+    height: 100px;
+}
+.slide-group {
+    position: absolute;
+    top: 0px;
+    left: 0;
+}
+.slide {
+    display:inline-block;
+    height: 100px;
+    width:500px;
+}

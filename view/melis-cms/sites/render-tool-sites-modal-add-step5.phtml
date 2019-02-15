@@ -1,0 +1,9 @@
+<?php
+$id = '';
+if (!empty($this->zoneconfig['conf']['id']))
+    $id = ' id="' .$this->zoneconfig['conf']['id'] . '"';
+?>
+
+<div class="container" <?= $id; ?> data-melisKey="<?= $this->melisKey; ?>">
+    <h1>STEP 5</h1>
+</div>

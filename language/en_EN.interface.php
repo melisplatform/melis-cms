@@ -151,7 +151,10 @@
 	    'tr_meliscms_tool_site_add' => 'Add new site',
 	    'tr_meliscms_tool_site_delete_success' => 'Site has been deleted successfully',
 	    'tr_meliscms_tool_site_delete_failed' => 'Unable to delete site, please try again later',
-	    
+	    'tr_meliscms_tool_sites_cancel' => 'Cancel',
+	    'tr_meliscms_tool_sites_prev' => 'Previous',
+	    'tr_meliscms_tool_sites_next' => 'Next',
+
 	    'tr_meliscms_tool_site_delete_env_success' => 'Site environment has been deleted successully',
 	    'tr_meliscms_tool_site_delete_env_failed' => 'Unable to delete site envinroment, please try again later',
 	    

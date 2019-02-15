@@ -144,12 +144,51 @@ class SitesController extends AbstractActionController
     public function renderToolSitesModalAddAction()
     {
         // declare the Tool service that we will be using to completely create our tool.
-        $zoneId = $this->params()->fromRoute('id', $this->params()->fromQuery('id'), null);
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->setTerminal(false);
         $view->melisKey  = $melisKey;
-        $view->zoneId  = $zoneId;
+        return $view;
+    }
+
+    public function renderToolSitesModalAddStep1Action()
+    {
+        $melisKey = $this->getMelisKey();
+        $view = new ViewModel();
+        $view->setTerminal(false);
+        $view->melisKey  = $melisKey;
+        return $view;
+    }
+    public function renderToolSitesModalAddStep2Action()
+    {
+        $melisKey = $this->getMelisKey();
+        $view = new ViewModel();
+        $view->setTerminal(false);
+        $view->melisKey  = $melisKey;
+        return $view;
+    }
+    public function renderToolSitesModalAddStep3Action()
+    {
+        $melisKey = $this->getMelisKey();
+        $view = new ViewModel();
+        $view->setTerminal(false);
+        $view->melisKey  = $melisKey;
+        return $view;
+    }
+    public function renderToolSitesModalAddStep4Action()
+    {
+        $melisKey = $this->getMelisKey();
+        $view = new ViewModel();
+        $view->setTerminal(false);
+        $view->melisKey  = $melisKey;
+        return $view;
+    }
+    public function renderToolSitesModalAddStep5Action()
+    {
+        $melisKey = $this->getMelisKey();
+        $view = new ViewModel();
+        $view->setTerminal(false);
+        $view->melisKey  = $melisKey;
         return $view;
     }
     
