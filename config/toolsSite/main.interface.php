@@ -24,6 +24,15 @@ return array(
             ),
         ),
         'meliscms' => array(
+            'ressources' => array(
+                'js' => array(
+                    '/MelisCms/js/tools/sites/sites.tool.js',
+                ),
+                'css' => array(
+
+                ),
+
+            ),
             'interface' => array(
                 'meliscms_toolstree' => array(
                     'interface' => array(
