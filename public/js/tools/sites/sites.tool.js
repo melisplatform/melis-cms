@@ -13,7 +13,9 @@ $(document).ready(function() {
      * This will open a new tab when editing a site
      */
     $body.on("click", ".btnEditSites", function(){
-        melisHelper.tabOpen("Test", 'fa-user', 'id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site', null, null, function(){
+        var tableId = $(this).closest('tr').attr('id');
+        var name = $(this).closest('tr').find("td:nth-child(2)").text();
+        melisHelper.tabOpen(name, 'fa-user', tableId+'_id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site',  { siteId : tableId }, null, function(){
 
         });
     });

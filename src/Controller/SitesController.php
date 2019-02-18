@@ -41,10 +41,12 @@ class SitesController extends AbstractActionController
      * @return ViewModel();
      */
     public function renderToolSitesEditAction() {
-
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
+        $view->siteId = $siteId;
+
         return $view;
     }
 

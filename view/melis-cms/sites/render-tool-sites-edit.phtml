@@ -1,18 +1,25 @@
 <?php
+$data_melisKey = $this->melisKey;
+$id = '';
+if (!empty($this->zoneconfig['conf']['id']))
+    $id = ' id="' . $this->siteId . '_' . $this->zoneconfig['conf']['id'] . '"';
 
-	$id = '';
-	if (!empty($this->zoneconfig['conf']['id']) && !$this->prefixId)
-		$id = 'id="' . $this->zoneconfig['conf']['id'] . '"';
-	else
-		$id = 'id="' . $this->idPage . '_' . $this->zoneconfig['conf']['id'] . '"';
-	
-        $data_melisKey = $this->melisKey;
-	
 ?>
-<div data-melisKey='<?= $data_melisKey; ?>'<?= $id; ?> role="tabpanel" class="tab-pane container-level-a">
-    <?php echo $this->meliscms_tool_sites_edit_site_header; ?>
-    <div class="spacing-x2 innerAll">
-        <?php echo $this->meliscms_tool_sites_edit_site_tabs; ?>
-    </div>
-</div>
 
+<div<?= $id; ?>  class="tab-pane container-level-a" data-melisKey='<?= $data_melisKey; ?>'>
+    <?php
+    if(empty($this->noAccess))
+    {
+        if(!empty($this->zoneconfig['interface'])) {
+            foreach($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
+                echo $this->$keyConfig;
+            }
+        }
+    }
+    else
+    {
+        echo '<h4>'.$this->noAccess.'</h4>';
+    }
+
+    ?>
+</div>
