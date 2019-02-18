@@ -52,14 +52,18 @@ var melisDragnDrop = (function($, window) {
 
             // get item percentage width
             var placeholderWidth = ( 100 * parseFloat($(ui.helper[0]).css("width")) / parseFloat($(ui.helper[0]).parent().css('width')) ) + '%';
-            $(ui.placeholder[0]).css("width", placeholderWidth);
+                $(ui.placeholder[0]).css("width", placeholderWidth);
 
-            // change its css to fit for theme design
-            $(ui.helper[0]).attr("data-module-name", "MelisMiniTemplate").css({
-                "height" : "auto",
-                "padding-left" : "10px",
-                "padding-right" : "10px"
-            });
+            // change its css to fit for theme design specific for the melismenitemplate
+            var ddn = $(ui.helper[0]).attr("data-module-name");
+
+                if ( ddn == "MelisMiniTemplate" ) {
+                    $(ui.helper[0]).css({
+                        "height" : "auto",
+                        "padding-left" : "10px",
+                        "padding-right" : "10px"
+                    });
+                }
 
             // detect if browser is in desktop
             if( $(window).width() >= 768) {
