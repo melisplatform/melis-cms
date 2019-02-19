@@ -346,24 +346,18 @@ $(document).ready(function() {
                 _this.attr('disabled', true);
 			},
 			success		: function(data){
-				console.log('data: ', data);
-				var errorTexts = '<h3>'+ melisHelper.melisTranslator(data.title) +'</h3>';
-				$.each( data.errors, function( key, error ) {
-					$.each( error, function( key, value ) {
-                        errorTexts += '<p class="modal-error-cont"><strong>'+ key + ': </strong>  ';
-						if(value instanceof Object){
-							$.each(value, function(key, val){
-                                errorTexts += '<span><i class="fa fa-circle"></i>'+ '<label>'+ key + ': </label>  ' + val + '</span>';
-							})
-						}else{
-                            errorTexts += '<span><i class="fa fa-circle"></i>'+ value + '</span>';
-						}
-					});
+				if(data.success) {
+                    melisHelper.melisOkNotification(data.title, 'tr_front_minify_assets_compiled_successfully');
+                }else{
+					var errorTexts = '<h3>'+ melisHelper.melisTranslator(data.title) +'</h3>';
+					errorTexts += '<p><strong>Error: </strong>  ';
+					errorTexts += '<span>'+ data.message + '</span>';
 					errorTexts += '</p>';
-				});
-				var div = "<div class='melis-modaloverlay overlay-hideonclick'></div>";
-				div += "<div class='melis-modal-cont KOnotif'>  <div class='modal-content'>"+ errorTexts +" <span class='btn btn-block btn-primary'>"+ translations.tr_meliscore_notification_modal_Close +"</span></div> </div>";
-				$body.append(div);
+
+                    var div = "<div class='melis-modaloverlay overlay-hideonclick'></div>";
+                    div += "<div class='melis-modal-cont KOnotif'>  <div class='modal-content'>"+ errorTexts +" <span class='btn btn-block btn-primary'>"+ translations.tr_meliscore_notification_modal_Close +"</span></div> </div>";
+                    $body.append(div);
+				}
 
                 _this.attr('disabled', false);
 			}
