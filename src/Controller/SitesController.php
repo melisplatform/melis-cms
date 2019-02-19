@@ -49,23 +49,25 @@ class SitesController extends AbstractActionController
 
         return $view;
     }
-
     /**
      * @return ViewModel();
      */
     public function renderToolSitesEditHeaderAction() {
-
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
+        $view->siteId = $siteId;
         return $view;
     }
 
     public function renderToolSitesTabsAction() {
 
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
+        $view->siteId = $siteId;
         return $view;
     }
     

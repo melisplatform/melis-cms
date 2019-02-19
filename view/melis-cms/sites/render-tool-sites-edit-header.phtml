@@ -1,13 +1,11 @@
 <?php
 
-	$id = '';
-	if (!empty($this->zoneconfig['conf']['id']) && !$this->prefixId)
-		$id = 'id="' . $this->zoneconfig['conf']['id'] . '"';
-	else
-		$id = 'id="' . $this->idPage . '_' . $this->zoneconfig['conf']['id'] . '"';
-	
-        $data_melisKey = $this->melisKey;
-	
+$id = '';
+if (!empty($this->zoneconfig['conf']['id']))
+    $id = ' id="' . $this->siteId . '_' . $this->zoneconfig['conf']['id'] . '"';
+
+$data_melisKey = $this->melisKey;
+
 ?>
 <div class="me-heading bg-white border-bottom" <?= $id; ?> data-melisKey='<?= $data_melisKey; ?>'>
     <div class="row">
@@ -17,8 +15,8 @@
         </div>
         <div class="me-hr col-xs-12 col-sm-4 col-md-3">
             <?php
-            if(!empty($this->zoneconfig['interface'])) {
-                foreach($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
+            if (!empty($this->zoneconfig['interface'])) {
+                foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
                     echo $this->$keyConfig;
                 }
             }

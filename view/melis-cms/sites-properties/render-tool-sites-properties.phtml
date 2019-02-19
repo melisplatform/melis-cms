@@ -1,10 +1,8 @@
 <?php
 
 $id = '';
-if (!empty($this->zoneconfig['conf']['id']) && !$this->prefixId)
-    $id = 'id="' . $this->zoneconfig['conf']['id'] . '"';
-else
-    $id = 'id="' . $this->idPage . '_' . $this->zoneconfig['conf']['id'] . '"';
+if (!empty($this->zoneconfig['conf']['id']))
+    $id = ' id="' . $this->siteId . '_' . $this->zoneconfig['conf']['id'] . '"';
 
 $data_melisKey = $this->melisKey;
 
