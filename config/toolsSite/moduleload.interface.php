@@ -9,9 +9,9 @@ return array(
                             'interface' => array(
                                 'meliscms_tool_sites_edit_site_tabs' => array(
                                     'interface' => array(
-                                        'meliscms_tool_sites_edit_site_tabs_properties' => array(
+                                        'meliscms_tool_sites_edit_site_tabs_module_load' => array(
                                             'conf' => array(
-                                                'type' => 'melistoolsitesproperties/interface/meliscms_tool_sites_properties'
+                                                'type' => 'melistoolsitesmoduleload/interface/meliscms_tool_sites_module_load'
                                             )
                                         ),
                                     ),
@@ -22,7 +22,7 @@ return array(
                 ),
             ),
         ),
-        'melistoolsitesproperties' => array(
+        'melistoolsitesmoduleload' => array(
             'conf' => array(
                 'id' => '',
                 'name' => 'Properties',
@@ -54,17 +54,17 @@ return array(
 
             ),
             'interface' => array(
-                'meliscms_tool_sites_properties' => array(
+                'meliscms_tool_sites_module_load' => array(
                     'conf' => array(
-                        'id' => 'id_meliscms_tool_sites_properties',
-                        'melisKey' => 'meliscms_tool_sites_properties',
-                        'name' => 'Properties',
-                        'icon' => 'cogwheel',
+                        'id' => 'id_meliscms_tool_sites_module_load',
+                        'melisKey' => 'meliscms_tool_sites_module_load',
+                        'name' => 'Module Loading',
+                        'icon' => 'list',
                     ),
                     'forward' => array(
                         'module' => 'MelisCms',
                         'controller' => 'Sites',
-                        'action' => 'render-tool-sites-properties',
+                        'action' => 'render-tool-sites-module-load',
                         'jscallback' => '',
                         'jsdatas' => array()
                     ),

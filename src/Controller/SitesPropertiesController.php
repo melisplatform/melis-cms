@@ -18,12 +18,6 @@ use Zend\View\Model\ViewModel;
 class SitesPropertiesController extends AbstractActionController
 {
 
-    public function renderToolSitesPropertiesAction() {
-        $melisKey = $this->getMelisKey();
-        $view = new ViewModel();
-        $view->melisKey = $melisKey;
-        return $view;
-    }
 
     private function getMelisKey()
     {

@@ -179,6 +179,11 @@ class Module
             include __DIR__ . '/../config/toolsSite/main.interface.php',
             include __DIR__ . '/../config/toolsSite/app.tools.php',
             include __DIR__ . '/../config/toolsSite/properties.interface.php',
+            include __DIR__ . '/../config/toolsSite/moduleload.interface.php',
+            include __DIR__ . '/../config/toolsSite/domains.interface.php',
+            include __DIR__ . '/../config/toolsSite/languages.interface.php',
+            include __DIR__ . '/../config/toolsSite/siteconfig.interface.php',
+            include __DIR__ . '/../config/toolsSite/sitetranslations.interface.php',
             include __DIR__ . '/../config/dashboard-plugins/MelisCmsPagesIndicatorsPlugin.config.php',
         );
 

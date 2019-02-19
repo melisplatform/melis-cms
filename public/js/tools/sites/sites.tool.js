@@ -15,7 +15,7 @@ $(document).ready(function() {
     $body.on("click", ".btnEditSites", function(){
         var tableId = $(this).closest('tr').attr('id');
         var name = $(this).closest('tr').find("td:nth-child(2)").text();
-        melisHelper.tabOpen(name, 'fa-user', tableId+'_id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site',  { siteId : tableId }, null, function(){
+        melisHelper.tabOpen(name, 'fa-globe', tableId+'_id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site',  { siteId : tableId }, null, function(){
 
         });
     });
