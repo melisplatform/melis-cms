@@ -795,14 +795,14 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
     }
     .melis-cms-ps-box .melis-cms-filter-btn,
     .melis-cms-category-btn {
-        font-size: 14px;
+        font-size: 12px;
     }
 
     .melis-cms-plugin-title {
-        font-size: 14px;
+        font-size: 12px;
     }
     .melis-cms-dnd-title {
-        font-size: 14px;
+        font-size: 12px;
     }
 
     .melis-cms-category-btn {
