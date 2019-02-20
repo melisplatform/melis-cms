@@ -1,4 +1,5 @@
 $(document).ready(function() {
+
     $body = $("body");
     var modalUrl = "/melis/MelisCms/Sites/renderToolSitesModalContainer";
 
@@ -49,4 +50,5 @@ $(document).ready(function() {
         });
 
     }
+
 });

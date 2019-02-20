@@ -30,7 +30,7 @@ return array(
             ),
             'ressources' => array(
                 'js' => array(
-
+                    '/MelisCms/js/tools/sites/sitesModuleLoad.tool.js',
                 ),
                 'css' => array(
 
@@ -69,7 +69,19 @@ return array(
                         'jsdatas' => array()
                     ),
                     'interface' => array(
-
+                        'meliscms_tool_sites_module_load_content' => array(
+                            'conf' => array(
+                                'id' => 'id_meliscms_tool_sites_module_load_content',
+                                'melisKey' => 'meliscms_tool_sites_module_load_content',
+                            ),
+                            'forward' => array(
+                                'module' => 'MelisCms',
+                                'controller' => 'Sites',
+                                'action' => 'render-tool-sites-module-load-content',
+                                'jscallback' => 'setOnOff();',
+                                'jsdatas' => array()
+                            ),
+                        ),
                     ),
                 ),
             ),

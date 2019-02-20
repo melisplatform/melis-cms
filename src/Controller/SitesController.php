@@ -91,6 +91,22 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
+    public function renderToolSitesModuleLoadContentAction() {
+
+        $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
+        $modulesSvc = $this->getServiceLocator()->get('ModulesService');
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $modulesInfo = $modulesSvc->getModulesAndVersions();
+        $modules = $siteModuleLoadSvc->getModules($siteId);
+        $melisKey = $this->getMelisKey();
+        $view = new ViewModel();
+        $view->modulesInfo = $modulesInfo;
+        $view->modules = $modules;
+        $view->melisKey = $melisKey;
+        $view->siteId = $siteId;
+        return $view;
+    }
+
     public function renderToolSitesDomainsAction() {
 
         $siteId = (int) $this->params()->fromQuery('siteId', '');
