@@ -137,6 +137,7 @@ return array(
             'MelisCms\Controller\MelisSetup' => 'MelisCms\Controller\MelisSetupController',
             'MelisCms\Controller\Sites' => 'MelisCms\Controller\SitesController',
             'MelisCms\Controller\SitesProperties' => 'MelisCms\Controller\SitesPropertiesController',
+            'MelisCms\Controller\SitesModuleLoader' => 'MelisCms\Controller\SitesModuleLoaderController',
         ),
     ),
     'controller_plugins' => array(

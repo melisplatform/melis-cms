@@ -63,11 +63,11 @@ $status = '';
                                         <h4><?= isset($this->modulesInfo[$moduleName]['version']) ? $this->modulesInfo[$moduleName]['version'] : 'v1.0'; ?> </h4>
                                     </div>
                                     <div class="col-md-6 col-sm-6 col-xs-6 ">
-                                        <div data-module-name="<?= $moduleName; ?>" class="make-switch <?= $this->siteId ?>_module_switch module-switch" data-on-label="<?= $this->translate('tr_meliscore_common_active'); ?>" data-off-label="<?= $this->translate('tr_meliscore_common_inactive'); ?>" data-text-label="<?= $this->translate('tr_meliscore_tool_user_col_status'); ?>">
+                                        <div data-siteModule-name="<?= $moduleName; ?>" class="make-switch <?= $this->siteId ?>_module_switch module-switch" data-on-label="<?= $this->translate('tr_meliscore_common_active'); ?>" data-off-label="<?= $this->translate('tr_meliscore_common_inactive'); ?>" data-text-label="<?= $this->translate('tr_meliscore_tool_user_col_status'); ?>">
                                             <?php
                                             $status = $moduleStatus > 0 ? 'checked' : '';
                                             ?>
-                                            <input name="<?= $moduleName; ?>" data-module-name="<?= $moduleName; ?>" type="checkbox" <?= $status; ?>/>
+                                            <input name="<?= $moduleName; ?>" data-siteModule-name="<?= $moduleName; ?>" type="checkbox" <?= $status; ?>/>
                                         </div>
                                     </div>
                                 </div>
