@@ -31,7 +31,7 @@
                 'interface' => [
                     'MelisCmsPagesIndicatorsPlugin' => array(
                         'conf' => [
-                            'name' => 'MelisCmsPagesIndicatorsPlugin',
+                            'name' => 'tr_meliscms_dashboard_pages_indicators',
                             'melisKey' => 'MelisCmsPagesIndicatorsPlugin'
                         ],
                         'datas' => [
