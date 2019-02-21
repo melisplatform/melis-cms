@@ -963,3 +963,9 @@ body.modal-open {
     height: 100px;
     width:500px;
 }
+.ms-cont {
+    width: 280px;
+}
+.ms-cont h4 {
+    padding: 15px 0;
+}

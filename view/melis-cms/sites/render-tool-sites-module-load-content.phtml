@@ -13,7 +13,7 @@ $status = '';
         <div class="switch-all-container">
             <div class="row">
                 <div class="col-md-12">
-                    <div id="select-deselect-all-module" class="make-switch " data-on-label="<?= $this->translate('tr_meliscore_common_active'); ?>" data-off-label="<?= $this->translate('tr_meliscore_common_inactive'); ?>" data-text-label="<?= $this->translate('tr_meliscore_tool_user_col_status'); ?>">
+                    <div id="site-select-deselect-all-module" class="<?= $this->siteId ?>_main_switch make-switch " data-on-label="<?= $this->translate('tr_meliscore_common_active'); ?>" data-off-label="<?= $this->translate('tr_meliscore_common_inactive'); ?>" data-text-label="<?= $this->translate('tr_meliscore_tool_user_col_status'); ?>">
                         <input type="checkbox" <?= $status; ?> checked/>
                     </div>
                 </div>
@@ -32,11 +32,11 @@ $status = '';
                 </div>
                 <div class="pull-right">
                     <div class="clearfix ms-cont">
-                        <div class="row clearfix">
+                        <div class="row ">
                             <div class="col-md-6 col-sm-6 col-xs-6"><!--  module-version-display -->
                                 <h4>Version </h4>
                             </div>
-                            <div>
+                            <div class="col-md-6 col-sm-6 col-xs-6">
                                 <div class="icon-cont clearfix">
                                     <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="left" title="<?=$this->translate('tr_meliscore_module_management_notification_tip'); ?>"></i>
                                 </div>
@@ -63,7 +63,7 @@ $status = '';
                                         <h4><?= isset($this->modulesInfo[$moduleName]['version']) ? $this->modulesInfo[$moduleName]['version'] : 'v1.0'; ?> </h4>
                                     </div>
                                     <div class="col-md-6 col-sm-6 col-xs-6 ">
-                                        <div data-module-name="<?= $moduleName; ?>" class="make-switch module-switch" data-on-label="<?= $this->translate('tr_meliscore_common_active'); ?>" data-off-label="<?= $this->translate('tr_meliscore_common_inactive'); ?>" data-text-label="<?= $this->translate('tr_meliscore_tool_user_col_status'); ?>">
+                                        <div data-module-name="<?= $moduleName; ?>" class="make-switch <?= $this->siteId ?>_module_switch module-switch" data-on-label="<?= $this->translate('tr_meliscore_common_active'); ?>" data-off-label="<?= $this->translate('tr_meliscore_common_inactive'); ?>" data-text-label="<?= $this->translate('tr_meliscore_tool_user_col_status'); ?>">
                                             <?php
                                             $status = $moduleStatus > 0 ? 'checked' : '';
                                             ?>
