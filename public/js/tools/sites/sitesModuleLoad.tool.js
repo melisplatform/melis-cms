@@ -5,7 +5,7 @@ $(document).ready(function() {
 
     function switchButtonWithoutEvent(moduleName, status)
     {
-        $('div[data-module-name="'+moduleName+'"]').find("div.switch-animate").removeClass("switch-on switch-off").addClass("switch-"+status);
+        $('div[data-siteModule-name="'+moduleName+'"]').find("div.switch-animate").removeClass("switch-on switch-off").addClass("switch-"+status);
     }
 
     /**
@@ -26,7 +26,7 @@ $(document).ready(function() {
     });
 
     $("body").on('switch-change', 'div[data-siteModule-name]', function (e, data) {
-
+        var currentTabId = activeTabId.split("_")[0];
         var moduleName = $(this).attr("data-siteModule-name");
         var value 	   = data.value;
         var isInactive = false;
@@ -36,7 +36,7 @@ $(document).ready(function() {
 
 
             $("h4#meliscore-tool-module-content-title").html(translations.tr_meliscore_module_management_checking_dependencies);
-            $('div[data-siteModule-name]').bootstrapSwitch('setActive', false);
+            $('.'+currentTabId+'_module_switch').bootstrapSwitch('setActive', false);
 
 
             $.ajax({
@@ -69,10 +69,12 @@ $(document).ready(function() {
                                 // this will just trigger an animate switch
                                 switchButtonWithoutEvent(v, "off");
                             });
+                            $('div[data-siteModule-name='+moduleName+']').find("div.switch-animate").removeClass("switch-on switch-off").addClass("switch-off");
                         }
                     );
                 }
-                $('div[data-siteModule-name]').bootstrapSwitch('setActive', true);
+                $('div[data-siteModule-name='+moduleName+']').find("div.switch-animate").removeClass("switch-on switch-off").addClass("switch-on");
+                $('.'+currentTabId+'_module_switch').bootstrapSwitch('setActive', true);
                 $("h4#meliscore-tool-module-content-title").html(translations.tr_meliscore_module_management_modules);
             });
 
@@ -81,7 +83,7 @@ $(document).ready(function() {
 
         if(value === isActive) {
             $("h4#meliscore-tool-module-content-title").html(translations.tr_meliscore_module_management_checking_dependencies);
-            $('div[data-siteModule-name]').bootstrapSwitch('setActive', false);
+            $('.'+currentTabId+'_module_switch').bootstrapSwitch('setActive', false);
 
             $.ajax({
                 type        : 'POST',
@@ -99,7 +101,7 @@ $(document).ready(function() {
                     });
 
                 }
-                $('div[data-siteModule-name]').bootstrapSwitch('setActive', true);
+                $('.'+currentTabId+'_module_switch').bootstrapSwitch('setActive', true);
                 $("h4#meliscore-tool-module-content-title").html(translations.tr_meliscore_module_management_modules);
             });
         }
