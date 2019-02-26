@@ -310,7 +310,7 @@
 	    'tr_meliscms_tool_platform_ids_table' => 'Table',
 	    'tr_meliscms_tool_platform_ids_modal_content' => 'Add and update modal',
 	    'tr_meliscms_tool_platform_modal_info' => 'Declare here the range of identifiers of a specific platform',
-        'tr_meliscms_tool_platform_modal_info_assigned_page_ids' => 'Declare here the range of identifiers of a specific platform',
+        'tr_meliscms_tool_platform_modal_info_assigned_page_ids' => 'All platforms have already been assigned with page IDs.',
 	    
 	    //Platform Success messages
 	    'tr_meliscms_tool_platform_add_success' => 'New platform IDs added successfully',

@@ -12,48 +12,45 @@ $data_melisKey = 'data-melisKey="' . $this->melisKey . '"';
                 <div class="widget-head">
                     <ul class="nav nav-tabs">
                         <li class="active">
-                            <a href="#<?php echo $id ?>" class="glyphicons <?php echo ($this->pids_id) ? 'pencil' : 'plus' ?>"
-                              data-toggle="tab" aria-expanded="true"><i></i> <?php echo $this->translate($this->tabTitle) ?></a>
+                            <a href="#<?= $id ?>" class="glyphicons <?= ($this->pids_id) ? 'pencil' : 'plus' ?>"
+                              data-toggle="tab" aria-expanded="true"><i></i> <?= $this->translate($this->tabTitle) ?></a>
                         </li>
                     </ul>
                 </div>
                 <div class="widget-body innerAll inner-2x">
                     <div class="tab-content">
-                        <div class="tab-pane active" <?php echo $id ?>>
+                        <div class="tab-pane active" <?= $id ?>>
                             <div id="cmsPlatformAlert"></div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <?php
-                                    $availablePlatform = $this->available_platform;
-                                    if (!empty($availablePlatform)) {
-                                        ?>
+                                    <?php if (!empty($this->available_platform) || !empty($this->pids_id)): ?>
                                         <p class="modal-text-info"><?= $this->translate('tr_meliscms_tool_platform_modal_info') ?> </p>
                                         <?php
-                                        $form = $this->meliscms_tool_platform_generic_form;
-                                        $form->prepare();
-                                        echo $this->form()->openTag($form);
-                                        echo $this->melisFieldCollection($form);
-                                        echo $this->form()->closeTag();
+                                            $form = $this->meliscms_tool_platform_generic_form;
+                                            $form->prepare();
+                                            echo $this->form()->openTag($form);
+                                            echo $this->melisFieldCollection($form);
+                                            echo $this->form()->closeTag();
                                         ?>
                                         <div align="right">
                                             <a data-dismiss="modal" class="btn btn-danger pull-left"><i
-                                                        class="fa fa-times"></i> <?php echo $this->translate('tr_meliscms_common_close') ?>
+                                                        class="fa fa-times"></i> <?= $this->translate('tr_meliscms_common_close') ?>
                                             </a>
                                             <a class="btn btn-success btnSavePlatfomrRange"
-                                               data-id="<?php echo $this->pids_id ?>"><i
-                                                        class="fa fa-save"></i> <?php echo $this->translate('tr_meliscms_common_save'); ?>
+                                               data-id="<?= $this->pids_id ?>"><i
+                                                        class="fa fa-save"></i> <?= $this->translate('tr_meliscms_common_save'); ?>
                                             </a>
                                         </div>
-                                    <?php } else { ?>
+                                    <?php else: ?>
                                         <div class="alert alert-info">
                                             <?= $this->translate('tr_meliscms_tool_platform_modal_info_assigned_page_ids'); ?>
                                         </div>
                                         <div align="right">
-                                            <a data-dismiss="modal" class="btn btn-danger pull-left"><i
-                                                        class="fa fa-times"></i> <?php echo $this->translate('tr_meliscms_common_close') ?>
+                                            <a data-dismiss="modal" class="btn btn-danger pull-left">
+                                                <i class="fa fa-times"></i> <?= $this->translate('tr_meliscms_common_close') ?>
                                             </a>
                                         </div>
-                                    <?php } ?>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
