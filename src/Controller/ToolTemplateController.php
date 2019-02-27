@@ -10,9 +10,8 @@
 namespace MelisCms\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
-use MelisCore\Service\MelisCoreRightsService;
+use Zend\View\Model\ViewModel;
 
 /**
  * 
@@ -1049,29 +1048,40 @@ class ToolTemplateController extends AbstractActionController
         
         return new JsonModel($data);
     }
-    
+
+    /**
+     * Exports templates from the Template manager tool
+     *
+     * @return mixed
+     */
     public function exportToCsvAction()
     {
+        /** @var \MelisEngine\Model\Tables\MelisTemplateTable $templatesModel */
         $templatesModel = $this->getServiceLocator()->get('MelisEngineTableTemplate');
-        $translator = $this->getServiceLocator()->get('translator');
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_templates');
-    
-    
-        $searched = $this->getRequest()->getQuery('filter');
-        $columns  = $melisTool->getSearchableColumns();
 
+        $queryParams = $this->getRequest()->getQuery();
+        $searched = empty($queryParams->filter) ? '' : $queryParams->filter;
+        $siteId = empty($queryParams->site) ? null : (int)$queryParams->site;
+        $site = [
+            'columnName' => 'tpl_site_id',
+            'id' => $siteId
+        ];
+        $columns = $melisTool->getSearchableColumns();
 
-        //remove the sitename from the where clause to avoid error since it doesn't exist in the template table
-        for($i = 0; $i < sizeof($columns); $i++)
-        {
-            if($columns[$i] == 'site_name'){
+        /**
+         * Removing 'site_name' to prevent being added in the where clause (non-existent table column).
+         * Removing 'tpl_site_id' to avoid redundant conditions
+         */
+        for ($i = 0; $i < sizeof($columns); $i++) {
+            if ($columns[$i] === 'site_name' || $columns[$i] === 'tpl_site_id') {
                 unset($columns[$i]);
             }
         }
 
-        $data = $templatesModel->getDataForExport($searched, $columns);
-    
+        $data = $templatesModel->getDataForExport($searched, $columns, $site);
+
         return $melisTool->exportDataToCsv($data->toArray());
     }
 }
