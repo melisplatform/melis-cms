@@ -466,6 +466,10 @@ class SiteController extends AbstractActionController
                         }
                         
                         $siteId = $saveSiteResult['site_id'];
+                        // to solve the error on loading css and js
+                        // regenerate the melis.modules.path cause the newly created path is not
+                        // included in the file
+                        $this->regenerateModulesPath();
                         $status = 1;
                     }
                     else 
@@ -539,7 +543,7 @@ class SiteController extends AbstractActionController
             'errors' => $errors,
             'test' => $errors,
         );
-        
+
         $this->getEventManager()->trigger('meliscms_site_save_end', $this, array_merge($response, array('typeCode' => $logTypeCode, 'itemId' => $siteId)));
         
         if ($siteId)
@@ -725,6 +729,15 @@ class SiteController extends AbstractActionController
         }
     }
 
+    private function regenerateModulesPath()
+    {
+       $file = $_SERVER['DOCUMENT_ROOT'] . "../../config/melis.modules.path.php";
+       if (file_exists($file)) {
+           chmod($file, 0777);
+           unlink($file);
+           return true;
+       }
+    }
 
     
 }
