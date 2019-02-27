@@ -731,9 +731,8 @@ class SiteController extends AbstractActionController
 
     private function regenerateModulesPath()
     {
-       $file = $_SERVER['DOCUMENT_ROOT'] . "../../config/melis.modules.path.php";
+       $file = $_SERVER['DOCUMENT_ROOT'] . "/../config/melis.modules.path.php";
        if (file_exists($file)) {
-           chmod($file, 0777);
            unlink($file);
            return true;
        }
