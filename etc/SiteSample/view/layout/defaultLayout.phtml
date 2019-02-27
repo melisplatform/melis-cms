@@ -21,5 +21,10 @@
 			renderMode = <?= $this->renderMode; ?>
 			-->
 		</div>
+        <?php
+        /* Placed js at the end of the document so the pages load faster */
+        // jquery
+         echo $this->inlineScript()->appendFile($this->basePath('/SiteSample/js/vendor/jquery-2.2.4.min.js'));
+        ?>
 	</body>
 </html>
