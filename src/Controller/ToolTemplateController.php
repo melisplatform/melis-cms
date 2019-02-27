@@ -699,6 +699,7 @@ class ToolTemplateController extends AbstractActionController
                 // display controller and action in Controller Column
                 $tableData[$ctr]['tpl_zf2_controller'] = !empty($tableData[$ctr]['tpl_zf2_action']) ? $tableData[$ctr]['tpl_zf2_controller'] . '/' . $tableData[$ctr]['tpl_zf2_action'] : $tableData[$ctr]['tpl_zf2_controller'];
             }
+
         }
 
         return new JsonModel(array(
@@ -722,38 +723,44 @@ class ToolTemplateController extends AbstractActionController
         $moduleName = $template['module'];
         $controller = $template['controller'];
         $action     = $template['action'];
+        $vendorSiteModules = [
+            'MelisDemoCms'
+        ];
 
-        /*
-         * Checking directly the namespace if it's available
-         */
-        $controllerClassName = "\\{$moduleName}\\Controller\\{$controller}Controller";
-
-        if (class_exists($controllerClassName)) {
-            $tmpClass = new $controllerClassName;
-            if(method_exists($tmpClass,$action . "Action")){
-                $status = true;
+        if (in_array($moduleName,$vendorSiteModules)) {
+            /*
+             * Checking directly the namespace if it's available
+             * only in vendor site module
+             */
+            $controllerClassName = "\\{$moduleName}\\Controller\\{$controller}Controller";
+            if (class_exists($controllerClassName)) {
+                $tmpClass = new $controllerClassName;
+                if(method_exists($tmpClass,$action . "Action")){
+                    $status = true;
+                } else {
+                    $message = "Controller action [$action] not found in Controller [$controller]";
+                }
             } else {
-                $message = "Controller action [$action] not found in Controller [$controller]";
+                $message = "Controller [$controller] not found";
             }
         } else {
-             $message = "Controller [$controller] not found";
+            // This for melissites site module
+            // Check if template's Module exists
+            if (in_array($template['module'], $moduleNames)) {
+                // Check if template's Controller exists
+                $controller = $template['controller'] . 'Controller.php';
+                if (in_array($controller, $modules[$template['module']])) {
+                    $controller = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/' . $template['module'] . '/src/' . $template['module'] . '/Controller/' . $controller;
+                    $controller = file_get_contents($controller);
+                    // Check if template's Action exists
+                    $actionPattern = '/function.*'.$template['action'].'Action/';
+                    if (preg_match($actionPattern, $controller)) {
+                        $status = true;
+                    }
+                }
+            }
         }
-//        // Check if template's Module exists
-//        if (in_array($template['module'], $moduleNames)) {
-//
-//            // Check if template's Controller exists
-//            $controller = $template['controller'] . 'Controller.php';
-//            if (in_array($controller, $modules[$template['module']])) {
-//                $controller = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/' . $template['module'] . '/src/' . $template['module'] . '/Controller/' . $controller;
-//                $controller = file_get_contents($controller);
-//
-//                // Check if template's Action exists
-//                $actionPattern = '/function.*'.$template['action'].'Action/';
-//                if (preg_match($actionPattern, $controller)) {
-//                    $status = true;
-//                }
-//            }
-//        }
+
         $response = [
             'status' => $status,
             'message' => $message
