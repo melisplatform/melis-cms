@@ -395,7 +395,7 @@
         'tr_melis_cms_duplicate_text_identifier' => '[Duplicated]',
         'tr_meliscms_tree_sites_duplication_page_relation' => 'Relationship with an initial page',
         'tr_meliscms_tree_sites_duplication_page_relation tooltip' => 'Allow to create a page in relation to an initial page',
-
+        'tr_meliscms_tree_sites_duplication_root tooltip' => 'Check this box to place the pages at the root.',
 
         // plugins edition
 	    'tr_meliscms_plugins_modal_cancel' => 'Cancel',

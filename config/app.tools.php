@@ -2603,7 +2603,20 @@ return array(
                                         ),
                                     ),
                                 ),
-
+                                array(
+                                    'spec' => array(
+                                        'name' => 'use_root',
+                                        'type' => 'checkbox',
+                                        'options' => array(
+                                            'label' => 'tr_meliscms_tree_sites_duplication_use_root',
+                                            'tooltip' => 'tr_meliscms_tree_sites_duplication_root tooltip',
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'use_root',
+                                            'class' => 'use_root_orig_checkbox'
+                                        ),
+                                    ),
+                                ),
                             ),
                             'input_filter' => array(
                                 'sourcePageId' => array(

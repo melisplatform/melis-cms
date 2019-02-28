@@ -398,6 +398,7 @@
         'tr_melis_cms_duplicate_text_identifier' => '[Dupliquée]',
         'tr_meliscms_tree_sites_duplication_page_relation' => 'Relation avec une page initiale',
         'tr_meliscms_tree_sites_duplication_page_relation tooltip' => 'Permer de créer une page en relation avec une page initiale',
+        'tr_meliscms_tree_sites_duplication_root tooltip' => 'Cochez cette case pour placer les pages à la racine.',
 
         // plugins edition
 	    'tr_meliscms_plugins_modal_cancel' => 'Annuler',
