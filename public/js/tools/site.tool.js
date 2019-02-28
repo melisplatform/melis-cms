@@ -330,6 +330,39 @@ $(document).ready(function() {
 			alert( translations.tr_meliscore_error_message );
 		});
 	});
+
+    // Add Event to "Minify Button"
+    addEvent(".btnMinifyAssets", function(e) {
+    	var _this 	= $(this),
+        	siteId 	= _this.parents("tr").attr("id");
+        
+		$.ajax({
+			type        : 'POST',
+			url         : '/minify-assets',
+			data		: {siteId : siteId},
+			dataType    : 'json',
+			encode		: true,
+			beforeSend  : function(){
+                _this.attr('disabled', true);
+			},
+			success		: function(data){
+				if(data.success) {
+                    melisHelper.melisOkNotification(data.title, 'tr_front_minify_assets_compiled_successfully');
+                }else{
+					var errorTexts = '<h3>'+ melisHelper.melisTranslator(data.title) +'</h3>';
+					errorTexts += '<p><strong>Error: </strong>  ';
+					errorTexts += '<span>'+ data.message + '</span>';
+					errorTexts += '</p>';
+
+                    var div = "<div class='melis-modaloverlay overlay-hideonclick'></div>";
+                    div += "<div class='melis-modal-cont KOnotif'>  <div class='modal-content'>"+ errorTexts +" <span class='btn btn-block btn-primary'>"+ translations.tr_meliscore_notification_modal_Close +"</span></div> </div>";
+                    $body.append(div);
+				}
+
+                _this.attr('disabled', false);
+			}
+		});
+    });
 	
 	$("body").on("change", "#siteEditionForm #id_sdom_env", function(e){ 
 		var siteId = $("#siteEditionForm #id_site_id").val();
