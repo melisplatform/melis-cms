@@ -659,13 +659,6 @@ class ToolTemplateController extends AbstractActionController
             $getData = $templatesModel->getData($search, $siteId, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length);
             $tableData = $getData->toArray();
 
-            // Get site modules & controllers
-            try {
-                $siteModules = $this->getSiteModules();
-            } catch (\Exception $e) {
-                // Place handling here
-            }
-
             for($ctr = 0; $ctr < count($tableData); $ctr++)
             {
                 // apply text limits
@@ -683,15 +676,8 @@ class ToolTemplateController extends AbstractActionController
                         'controller'    => $tableData[$ctr]['tpl_zf2_controller'],
                         'action'        => $tableData[$ctr]['tpl_zf2_action']
                     ];
-                    $tpl_status = $this->getTemplateStatus($siteModules, $tpl);
-
-                    if ($tpl_status['status']) {
-                        $tableData[$ctr]['tpl_status']  = '<span class="text-success"><i class="fa fa-fw fa-circle"></i></span>';
-                    } else {
-                        $message = $tpl_status['message'];
-                        $tableData[$ctr]['tpl_status'] = '<span class="text-danger" style="cursor:pointer;" title="' . $message . '"><i class="fa fa-fw fa-circle"></i></span>';
-                    }
-
+                    $tpl_status                     = $this->getTemplateStatus($tpl);
+                    $tableData[$ctr]['tpl_status']  = '<span class="text-'.($tpl_status? 'success' : 'danger').'"><i class="fa fa-fw fa-circle"></i></span>';
                 } catch (\Exception $e) {
                     // Place handling here
                 }
@@ -711,54 +697,55 @@ class ToolTemplateController extends AbstractActionController
 
     /**
      * Returns true: Module, & Controller, & Action exists
-     * otherwise, false with message
-     * @return array
+     * otherwise, false
+     * @return bool
      */
-    private function getTemplateStatus(array $modules, array $template) : array
+    private function getTemplateStatus(array $template) : bool
     {
         $status      = false;
-        $moduleNames = array_keys($modules);
-        $message     = null;
-        $moduleName = $template['module'];
-        $controller = $template['controller'];
-        $action     = $template['action'];
 
-        /*
-         * Checking directly the namespace if it's available
-         */
-        $controllerClassName = "\\{$moduleName}\\Controller\\{$controller}Controller";
+        $moduleSrv = $this->getServiceLocator()->get('ModulesService');
+        $modulePath = $moduleSrv->getModulePath($template['module']);
 
-        if (class_exists($controllerClassName)) {
-            $tmpClass = new $controllerClassName;
-            if(method_exists($tmpClass,$action . "Action")){
-                $status = true;
-            } else {
-                $message = "Controller action [$action] not found in Controller [$controller]";
+        if (!empty($modulePath)){
+
+            $viewPath = $modulePath.'/view/'.$this->moduleNameToViewName($template['module']);
+            $ctrlPath = $modulePath.'/src/Controller';
+
+            if (strpos($modulePath, '/module/') != false){
+                $ctrlPath = $modulePath.'/'.$template['module'].'/src/Controller';
             }
-        } else {
-             $message = "Controller [$controller] not found";
+
+            $ctrlFile = $ctrlPath.'/'.$template['controller'].'Controller.php';
+
+            if (file_exists($ctrlFile)){
+
+                $ctrlFileContent = file_get_contents($ctrlFile);
+
+                // Check if template's Action exists
+                $actionPattern = '/function.*'.$template['action'].'Action/';
+                if (preg_match($actionPattern, $ctrlFileContent)) {
+
+                    $viewFile = $viewPath.'/'.$this->moduleNameToViewName($template['controller']).'/'.$this->moduleNameToViewName($template['action']).'.phtml';
+
+                    if (file_exists($viewFile)){
+                        $status = true;
+                    }
+                }
+            }
         }
-//        // Check if template's Module exists
-//        if (in_array($template['module'], $moduleNames)) {
-//
-//            // Check if template's Controller exists
-//            $controller = $template['controller'] . 'Controller.php';
-//            if (in_array($controller, $modules[$template['module']])) {
-//                $controller = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/' . $template['module'] . '/src/' . $template['module'] . '/Controller/' . $controller;
-//                $controller = file_get_contents($controller);
-//
-//                // Check if template's Action exists
-//                $actionPattern = '/function.*'.$template['action'].'Action/';
-//                if (preg_match($actionPattern, $controller)) {
-//                    $status = true;
-//                }
-//            }
-//        }
-        $response = [
-            'status' => $status,
-            'message' => $message
-        ];
-        return $response;
+
+        return $status;
+    }
+
+    /**
+     * This method converting a Module name to a valid view name  directory
+     * @param $string - Module name
+     * @return string
+     */
+    private function moduleNameToViewName($string)
+    {
+        return strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $string));
     }
 
     /**

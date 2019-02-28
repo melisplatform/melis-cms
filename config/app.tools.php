@@ -852,6 +852,11 @@ return array(
 
                         ),
                         'actionButtons' => array(
+                            'minify' => array(
+                                'module' => 'MelisCms',
+                                'controller' => 'Site',
+                                'action' => 'render-tool-site-content-action-minify-assets',
+                            ),
                             'edit' => array(
                                 'module' => 'MelisCms',
                                 'controller' => 'Site',
