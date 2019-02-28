@@ -717,6 +717,7 @@ class ToolTemplateController extends AbstractActionController
      */
     private function getTemplateStatus(array $modules, array $template) : array
     {
+        $moduleSvc = $this->getServiceLocator()->get('MelisAssetManagerModulesService');
         $status      = false;
         $moduleNames = array_keys($modules);
         $message     = null;
@@ -727,7 +728,10 @@ class ToolTemplateController extends AbstractActionController
             'MelisDemoCms'
         ];
 
-        if (in_array($moduleName,$vendorSiteModules)) {
+        $modulePath = $moduleSvc->getModulePath($moduleName);
+        // check if it is from vendor modules
+        $tmp = strpos($modulePath,'vendor');
+        if (in_array($moduleName,$vendorSiteModules) && !empty($tmp)) {
             /*
              * Checking directly the namespace if it's available
              * only in vendor site module
