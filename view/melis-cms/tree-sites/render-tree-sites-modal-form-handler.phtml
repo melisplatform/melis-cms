@@ -27,6 +27,11 @@ $data_melisKey = $this->melisKey;
                                     echo $this->form()->openTag($this->form);
                                     echo $this->melisFieldCollection($this->form);
                                     echo $this->form()->closeTag(); ?>
+                                    <script type="text/javascript">
+                                        $(function() {
+                                            melisCore.loadCustomCheckboxElement();
+                                        });
+                                    </script>
                                     <br>
                                     <div align="right">
                                         <button data-dismiss="modal" class="btn btn-danger pull-left">

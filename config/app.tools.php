@@ -2589,6 +2589,7 @@ return array(
                                         ),
                                         'attributes' => array(
                                             'id' => 'pageRelation',
+                                            'class' => 'melis-check-box',
                                         ),
                                     ),
                                 ),
@@ -2618,7 +2619,7 @@ return array(
                                         ),
                                         'attributes' => array(
                                             'id' => 'use_root',
-                                            'class' => 'use_root_orig_checkbox'
+                                            'class' => 'use_root_orig_checkbox melis-check-box'
                                         ),
                                     ),
                                 ),
