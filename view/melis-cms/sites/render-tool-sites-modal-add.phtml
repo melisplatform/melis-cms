@@ -14,29 +14,23 @@ if (!empty($this->zoneconfig['conf']['id']))
                         <li class="active"><a href="#<?php echo $this->zoneconfig['conf']['id'] ?>" class="glyphicons <?php echo ($this->id) ? 'pencil' : 'plus'?>" data-toggle="tab" aria-expanded="true"><i></i> <?php echo $this->title ?></a></li>
                     </ul>
                 </div>
-
                 <div class="widget-body innerAll inner-2x">
-                    <div class="tab-content">
-                        <div class="tab-pane active" id="<?php echo $id ?>">
-                            <div class="slide-wrap">
-                                <div class="slide-mask">
-                                    <ul class="slide-group">
-                                        <?php
-                                            if (!empty($this->zoneconfig['interface'])) {
-                                                foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
-                                                    echo  '<li class="slide">' . $this->$keyConfig . '</li>';
-                                                }
-                                            }
-                                        ?>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div align="right">
-                                <button type="button" data-dismiss="modal" class="btn btn-danger pull-left"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
-                                <button type="button" class="btn btn-success" id="btn-prev-create-meliscms-tool-sites"><?php echo $this->translate('tr_meliscms_tool_sites_prev') ?></button>
-                                <button type="button" class="btn btn-success" id="btn-next-create-meliscms-tool-sites"><?php echo $this->translate('tr_meliscms_tool_sites_next') ?></button>
-                            </div>
-                        </div>
+                    <div class="owl-carousel owl-theme owl-loaded sites-steps-owl">
+                        <?php
+                            if (!empty($this->zoneconfig['interface'])) {
+                                $step = 1;
+                                foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
+                                    echo  '<div data-step="step_'.$step.'" class="item">' . $this->$keyConfig . '</div>';
+                                    $step++;
+                                }
+                            }
+                        ?>
+                    </div>
+                    <div align="right">
+                        <button type="button" data-dismiss="modal" class="btn btn-danger pull-left"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
+                        <button type="button" class="btn btn-success" id="btn-prev-step"><?php echo $this->translate('tr_meliscms_tool_sites_prev') ?></button>
+                        <button type="button" class="btn btn-success" id="btn-next-step"><?php echo $this->translate('tr_meliscms_tool_sites_next') ?></button>
+                        <button type="button" class="btn btn-success" id="btn-finish-step"><?php echo $this->translate('Finish') ?></button>
                     </div>
                 </div>
             </div>

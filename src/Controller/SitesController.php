@@ -188,24 +188,62 @@ class SitesController extends AbstractActionController
     public function renderToolSitesModalAddStep1Action()
     {
         $melisKey = $this->getMelisKey();
+
+        // declare the Tool service that we will be using to completely create our tool.
+        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+
+        // tell the Tool what configuration in the app.tools.php that will be used.
+        $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
+        //prepare the user profile form
+        $form = $melisTool->getForm('meliscms_tool_sites_modal_add_step1_form');
+
         $view = new ViewModel();
-        $view->setTerminal(false);
-        $view->melisKey  = $melisKey;
+        $view->setVariable('step1_form', $form);
+        $view->melisKey = $melisKey;
+
         return $view;
     }
     public function renderToolSitesModalAddStep2Action()
     {
         $melisKey = $this->getMelisKey();
+
+        //get the lang list
+        $langService = $this->getServiceLocator()->get('MelisEngineLang');
+        $langList = $langService->getAvailableLanguages();
+
+        // declare the Tool service that we will be using to completely create our tool.
+        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+
+        // tell the Tool what configuration in the app.tools.php that will be used.
+        $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
+        //prepare the step2 forms
+        $formMultiLingual = $melisTool->getForm('meliscms_tool_sites_modal_add_step2_form_multi_language');
+        $formSingleLanguage = $melisTool->getForm('meliscms_tool_sites_modal_add_step2_form_single_language');
+
         $view = new ViewModel();
-        $view->setTerminal(false);
-        $view->melisKey  = $melisKey;
+        $view->setVariable('step2_form_multi_language', $formMultiLingual);
+        $view->setVariable('step2_form_single_language', $formSingleLanguage);
+        $view->melisKey = $melisKey;
+        $view->langList = $langList;
+
         return $view;
     }
     public function renderToolSitesModalAddStep3Action()
     {
         $melisKey = $this->getMelisKey();
+
+        // declare the Tool service that we will be using to completely create our tool.
+        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+
+        // tell the Tool what configuration in the app.tools.php that will be used.
+        $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
+        //prepare the step2 forms
+        $formMultiDomain = $melisTool->getForm('meliscms_tool_sites_modal_add_step3_form_multi_domain');
+        $formSingleDomain = $melisTool->getForm('meliscms_tool_sites_modal_add_step3_form_single_domain');
+
         $view = new ViewModel();
-        $view->setTerminal(false);
+        $view->setVariable('step3_form_multi_domain', $formMultiDomain);
+        $view->setVariable('step3_form_single_domain', $formSingleDomain);
         $view->melisKey  = $melisKey;
         return $view;
     }

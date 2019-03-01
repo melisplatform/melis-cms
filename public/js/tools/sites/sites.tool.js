@@ -20,33 +20,111 @@ $(document).ready(function() {
         });
     });
 
-    window.createSitesModalCallback = function () {
-        var   $slideGroup = $('.slide-group');
-        var   current = 0;
-        var   $slide = $('.slide');
-        var   slidesTotal = $slide.length;
 
-        var updateIndex = function(currentSlide) {
-            current = currentSlide;
-
-            transition(current);
-        };
-
-        var transition = function(slidePosition) {
-            var slidePositionNew = (slidePosition ) * 500;
-            $slideGroup.animate({
-                'left': '-' + slidePositionNew + 'px'
-            });
-        };
-
-        $("#btn-prev-create-meliscms-tool-sites").on("click", function () {
-            var index = current - 1;
-            current > 0 ? updateIndex(index) : updateIndex(current);
+    var owlStep = null;
+    /**
+     * Initialize owl carousel for step by step
+     * process of creating site
+     * @type {null}
+     */
+    window.initializeStep = function () {
+        owlStep = $('.sites-steps-owl').owlCarousel({
+            items: 1,
+            touchDrag: false,
+            mouseDrag: false,
+            dotsSpeed: 500,
+            navSpeed: 500,
+            dots: false,
+            pagination: false,
+            loop: false,
+            rewindNav: false,
+            autoHeight: true,
+            afterMove: function (elem) {
+                var current = this.currentItem;
+                //hide the prev button when we are on the first step
+                if(current === 0){
+                    $("#btn-prev-step").hide();
+                }else{
+                    $("#btn-prev-step").show();
+                }
+            },
+            beforeMove: function(elem){
+                var current = this.currentItem;
+                var step = elem.find(".item").eq(current).attr("data-step");
+                checkStep(step);
+            }
         });
-        $("#btn-next-create-meliscms-tool-sites").on("click", function () {
-            var index = current + 1;
-            current < (slidesTotal - 1) ? updateIndex(index) : updateIndex(current);
-        });
+    };
 
+    $body.on("click", "#btn-next-step", function(e){
+        if(owlStep !== null) {
+            owlStep.trigger('owl.next');
+        }
+    });
+
+    $body.on("click", "#btn-prev-step", function(e){
+        if(owlStep !== null)
+            owlStep.trigger('owl.prev');
+    });
+
+    /**
+     * check step
+     * @param step
+     */
+    function checkStep(step)
+    {
+        //check if multi language
+        var isMultiLang = $('#is_multi_language').bootstrapSwitch('status');
+        //process step
+        switch(step){
+            case "step_1":
+                break;
+            case "step_2":
+                if(isMultiLang){
+                    $(".step2-forms .sites_step2-multi-language").show();
+                    $(".step2-forms .sites_step2-single-language").hide();
+                }else{
+                    $(".step2-forms .sites_step2-single-language").show();
+                    $(".step2-forms .sites_step2-multi-language").hide();
+                }
+                break;
+            case "step_3":
+                if(isMultiLang){
+                    var multiLangForm = $("#step2form-multi_language");
+                    var multiLangFormData = multiLangForm.serializeArray();
+                    var multiDomainsContainer = $(".sites_step3-multi-domain #multi-domains_container");
+                    var div = $("<div/>",{
+                        class: "form-group"
+                    });
+                    multiDomainsContainer.empty();
+                    $.each(multiLangFormData, function(){
+                        if(this.name == "site_selected_languages"){
+                            var langData = this.value.split("_");
+                            var label = $("<label/>").text(langData[1]);
+                            div.append(label);
+                            var input = $("<input/>",{
+                                class: "form-control"
+                            }).attr("data-langId", langData[0]);
+                            div.append(input);
+                            multiDomainsContainer.append(div);
+                        }else if(this.name == "sites_url_setting"){
+
+                        }
+                    });
+                }else{
+
+                }
+                break;
+            case "step_4":
+                $("#btn-next-step").show();
+                $("#btn-finish-step").hide();
+                break;
+            case "step_5":
+                $("#btn-finish-step").show();
+                $("#btn-next-step").hide();
+                break;
+            default:
+                break;
+        }
     }
 });
