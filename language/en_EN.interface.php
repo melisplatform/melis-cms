@@ -466,5 +466,15 @@
 	    'tr_meliscms_drag_and_drop_modal_title' => 'Drag\'n\'Drop confirmation',
 	    'tr_meliscms_drag_and_drop_modal_content' => 'Are you sure you want to add this plugin to the page?',
 
+        //New site tools
+        'tr_melis_cms_sites_tool_add_step1_text' => 'This tool will help you create the right configuration for your site by asking you some questions. This will ensure the right generations of files in your modules and optimum compatibility with the Melis Platform ecosystem.',
+        'tr_melis_cms_sites_tool_add_step1_is_multi_lang' => 'Will this site be multilingual?',
+        'tr_melis_cms_sites_tool_add_step2_select_languages' => 'Please choose the languages you want to use for this site:',
+        'tr_melis_cms_sites_tool_add_step2_select_language' => 'Please choose the language you want to use for this site:',
+        'tr_melis_cms_sites_tool_add_step2_reflect_urls' => 'How do you want to reflect the language in the site’s URLs?',
+        'tr_melis_cms_sites_tool_add_step2_url_local_after_domain' => 'I want the locale shown after my domain (ex: www.mysite.com/en/myurl)',
+        'tr_melis_cms_sites_tool_add_step2_url_different_domains' => 'I want to have different domains or subdomains for them (ex: en.mysite.com and fr.mysite.com) and the tool will actually create multiple sites for you',
+        'tr_melis_cms_sites_tool_add_step2_url_do_nothing' => 'I want nothing, my page url will be solely built on the page’s name',
+
 	);
 ?>

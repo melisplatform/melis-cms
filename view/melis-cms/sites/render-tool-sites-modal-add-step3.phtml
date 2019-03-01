@@ -5,5 +5,24 @@ if (!empty($this->zoneconfig['conf']['id']))
 ?>
 
 <div class="container" <?= $id; ?> data-melisKey="<?= $this->melisKey; ?>">
-    <h1>STEP 3</h1>
+    <div class="step3-forms">
+        <div class="sites_step3-single-domain">
+
+        </div>
+        <div class="sites_step3-multi-domain">
+            <?php
+            $form = $this->step3_form_multi_domain;
+            $form->prepare();
+            echo $this->form()->openTag($form);
+            ?>
+            <label for="">What will be the domain of this sites?</label>
+            <div id="multi-domains_container" class="tool-sites_container_fixed_width">
+                <!-- This is where the dynamic input fields loaded-->
+            </div>
+            <?php
+            echo $this->melisFieldCollection($form);
+            echo $this->form()->closeTag();
+            ?>
+        </div>
+    </div>
 </div>

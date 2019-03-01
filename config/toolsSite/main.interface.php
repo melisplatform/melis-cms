@@ -120,7 +120,7 @@ return array(
                                                 'module' => 'MelisCms',
                                                 'controller' => 'Sites',
                                                 'action' => 'render-tool-sites-modal-add',
-                                                'jscallback' => 'createSitesModalCallback();',
+                                                'jscallback' => 'initializeStep();',
                                                 'jsdatas' => array()
                                             ),
                                             'interface' => array (

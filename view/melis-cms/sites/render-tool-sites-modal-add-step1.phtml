@@ -4,6 +4,18 @@ if (!empty($this->zoneconfig['conf']['id']))
     $id = ' id="' . $this->zoneconfig['conf']['id'] . '"';
 ?>
 
-<div class="container" <?= $id; ?> data-melisKey="<?= $this->melisKey; ?>">
-    <h1>STEP 1</h1>
+<div <?= $id; ?> data-melisKey="<?= $this->melisKey; ?>">
+    <div>
+        <span><?= $this->translate('tr_melis_cms_sites_tool_add_step1_text'); ?></span>
+    </div>
+    <br />
+    <div class="step1-form">
+        <?php
+        $form = $this->step1_form;
+        $form->prepare();
+        echo $this->form()->openTag($form);
+        echo $this->melisFieldCollection($form);
+        echo $this->form()->closeTag();
+        ?>
+    </div>
 </div>
