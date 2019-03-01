@@ -7,6 +7,20 @@ $data_melisKey = $this->melisKey;
 
 ?>
 <div data-melisKey='<?= $data_melisKey; ?>'<?= $id; ?> class="tab-pane widget-body-regular meliscms_center_tabs">
-    <h1>DOMAINS TAB</h1>
+    <?php
+    if(empty($this->noAccess))
+    {
+        if(!empty($this->zoneconfig['interface'])) {
+            foreach($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
+                echo $this->$keyConfig;
+            }
+        }
+    }
+    else
+    {
+        echo '<h4>'.$this->noAccess.'</h4>';
+    }
+
+    ?>
 </div>
 

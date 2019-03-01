@@ -69,6 +69,20 @@ return array(
                         'jsdatas' => array()
                     ),
                     'interface' => array(
+                        'meliscms_tool_sites_domains_content' => array(
+                            'conf' => array(
+                                'id' => 'id_meliscms_tool_sites_domains_content',
+                                'melisKey' => 'meliscms_tool_sites_domains_content',
+                                'rightsDisplay' => 'true',
+                            ),
+                            'forward' => array(
+                                'module' => 'MelisCms',
+                                'controller' => 'Sites',
+                                'action' => 'render-tool-sites-domains-content',
+                                'jscallback' => 'setOnOff();',
+                                'jsdatas' => array()
+                            ),
+                        ),
 
                     ),
                 ),

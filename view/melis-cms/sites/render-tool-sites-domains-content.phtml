@@ -1,0 +1,12 @@
+<?php
+$id = '';
+if (!empty($this->zoneconfig['conf']['id']))
+    $id = ' id="' . $this->siteId . '_' . $this->zoneconfig['conf']['id'] . '"';
+
+$data_melisKey = $this->melisKey;
+
+?>
+<div data-melisKey='<?= $data_melisKey; ?>'<?= $id; ?> class="tab-pane widget-body-regular meliscms_center_tabs">
+    <h1>DOMAINS TAB Content</h1>
+</div>
+

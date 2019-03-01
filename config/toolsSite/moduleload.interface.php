@@ -26,7 +26,7 @@ return array(
             'conf' => array(
                 'id' => '',
                 'name' => 'Properties',
-                'rightsDisplay' => 'none',
+                'rightsDisplay' => 'referenceonly',
             ),
             'ressources' => array(
                 'js' => array(
@@ -73,6 +73,7 @@ return array(
                             'conf' => array(
                                 'id' => 'id_meliscms_tool_sites_module_load_content',
                                 'melisKey' => 'meliscms_tool_sites_module_load_content',
+                                'rightsDisplay' => 'true',
                             ),
                             'forward' => array(
                                 'module' => 'MelisCms',

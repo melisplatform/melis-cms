@@ -130,6 +130,19 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
+    public function renderToolSitesDomainsContentAction() {
+
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $melisKey = $this->getMelisKey();
+        $siteDomainsSvc = $this->getServiceLocator()->get("MelisCmsSitesDomainsService");
+        $siteEnvs = $siteDomainsSvc->getEnvironments();
+        $view = new ViewModel();
+        $view->siteEnvs = $siteEnvs;
+        $view->melisKey = $melisKey;
+        $view->siteId = $siteId;
+        return $view;
+    }
+
     public function renderToolSitesLanguagesAction() {
 
         $siteId = (int) $this->params()->fromQuery('siteId', '');
@@ -439,15 +452,16 @@ class SitesController extends AbstractActionController
         $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $request = $this->getRequest();
-        $modules = $request->getPost()->toArray();
+        $data = $request->getPost()->toArray();
 
         $moduleList = array();
-
-        foreach ($modules as $module => $val){
-            $module = str_replace("moduleLoad",'',$module);
-            array_push($moduleList,$module);
+        //Collecting requests from the moduleLoad Form
+        foreach ($data as $datum => $val){
+            if (preg_match('/\bmoduleLoad\b/', $datum)) {
+                $datum = str_replace("moduleLoad",'',$datum);
+                array_push($moduleList,$datum);
+            }
         }
-
         $siteModuleLoadSvc->saveModuleLoad($siteId,$moduleList);
 
         $response = array(
