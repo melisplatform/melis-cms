@@ -1,6 +1,6 @@
 $(document).ready(function() {
 
-    $body = $("body");
+    var $body = $("body");
     var modalUrl = "/melis/MelisCms/Sites/renderToolSitesModalContainer";
 
     $body.on('click', "#btn-new-meliscms-tool-sites", function () {
@@ -20,6 +20,8 @@ $(document).ready(function() {
 
         });
     });
+
+
 
     window.createSitesModalCallback = function () {
         var   $slideGroup = $('.slide-group');

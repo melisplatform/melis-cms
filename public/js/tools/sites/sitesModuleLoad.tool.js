@@ -2,10 +2,56 @@ $(document).ready(function() {
 
     $body = $("body");
 
+    /**
+     * Get all input values into one array on clicking save button except for the site translation inputs
+     */
+    $body.on("click","#btn-save-meliscms-tool-sites", function () {
+        var currentTabId = activeTabId.split("_")[0];
+        var dataString = $("#"+currentTabId+"_id_meliscms_tool_sites_edit_site form").serializeArray();
+        // serialize the new array and send it to server
+        console.log(dataString);
+        dataString = $.param(dataString);
+
+        $.ajax({
+            type        : 'POST',
+            url         : '/melis/MelisCms/Sites/saveSite?siteId='+currentTabId,
+            data        : dataString,
+            dataType    : 'json',
+            encode		: true
+        }).success(function(data){
+            if(data.success === 1){
+
+                // call melisOkNotification
+                melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
+
+                // update flash messenger values
+                melisCore.flashMessenger();
+
+            }
+            else
+            {
+                // error modal
+                melisHelper.melisKoNotification( data.textTitle, data.textMessage, data.errors, '#000' );
+            }
+
+            // update flash messenger values
+            melisCore.flashMessenger();
+
+        }).error(function(xhr, textStatus, errorThrown){
+            alert( translations.tr_meliscore_error_message );
+        });
+
+    });
 
     function switchButtonWithoutEvent(moduleName, status)
     {
-        $('div[data-siteModule-name="'+moduleName+'"]').find("div.switch-animate").removeClass("switch-on switch-off").addClass("switch-"+status);
+        var currentTabId = activeTabId.split("_")[0];
+        $('div[data-siteModule-name="'+moduleName+'"].'+currentTabId+'_module_switch').find("div.switch-animate").removeClass("switch-on switch-off").addClass("switch-"+status);
+        if(status === 'on'){
+            $('div[data-siteModule-name='+moduleName+'].'+currentTabId+'_module_switch>div>input').attr("checked",true);
+        }else{
+            $('div[data-siteModule-name='+moduleName+'].'+currentTabId+'_module_switch>div>input').removeAttr("checked");
+        }
     }
 
     /**
@@ -21,8 +67,11 @@ $(document).ready(function() {
         }else{
             val = "on";
         }
-
-        $('.'+currentTabId+'_module_switch').find('div.switch-animate').removeClass("switch-on switch-off").addClass("switch-"+val);
+        
+        $("."+currentTabId+"_module_switch").each(function (index, el) {
+            var moduleName = $(el).attr('data-siteModule-name');
+            switchButtonWithoutEvent(moduleName,val);
+        });
     });
 
     $("body").on('switch-change', 'div[data-siteModule-name]', function (e, data) {

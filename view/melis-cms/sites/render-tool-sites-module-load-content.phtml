@@ -46,39 +46,41 @@ $status = '';
                 </div>
                 <div class="clearfix"></div>
             </div>
-            <div class="module-sortable">
-                <?php
-                if (!empty($this->modules))
-                {
-                    foreach($this->modules as $moduleName => $moduleStatus)
+            <form>
+                <div class="module-sortable">
+                    <?php
+                    if (!empty($this->modules))
                     {
-                        ?>
-                        <div class="module-cont clearfix">
-                            <div class="pull-left">
-                                <h4><?= $moduleName; ?></h4>
-                            </div>
-                            <div class="pull-right">
-                                <div class="row">
-                                    <div class="col-md-6 col-sm-6 col-xs-6 ">
-                                        <h4><?= isset($this->modulesInfo[$moduleName]['version']) ? $this->modulesInfo[$moduleName]['version'] : 'v1.0'; ?> </h4>
-                                    </div>
-                                    <div class="col-md-6 col-sm-6 col-xs-6 ">
-                                        <div data-siteModule-name="<?= $moduleName; ?>" class="make-switch <?= $this->siteId ?>_module_switch module-switch" data-on-label="<?= $this->translate('tr_meliscore_common_active'); ?>" data-off-label="<?= $this->translate('tr_meliscore_common_inactive'); ?>" data-text-label="<?= $this->translate('tr_meliscore_tool_user_col_status'); ?>">
-                                            <?php
-                                            $status = $moduleStatus > 0 ? 'checked' : '';
-                                            ?>
-                                            <input name="<?= $moduleName; ?>" data-siteModule-name="<?= $moduleName; ?>" type="checkbox" <?= $status; ?>/>
+                        foreach($this->modules as $moduleName => $moduleStatus)
+                        {
+                            ?>
+                            <div class="module-cont clearfix">
+                                <div class="pull-left">
+                                    <h4><?= $moduleName; ?></h4>
+                                </div>
+                                <div class="pull-right">
+                                    <div class="row">
+                                        <div class="col-md-6 col-sm-6 col-xs-6 ">
+                                            <h4><?= isset($this->modulesInfo[$moduleName]['version']) ? $this->modulesInfo[$moduleName]['version'] : 'v1.0'; ?> </h4>
+                                        </div>
+                                        <div class="col-md-6 col-sm-6 col-xs-6 ">
+                                            <div data-siteModule-name="<?= $moduleName; ?>" class="make-switch <?= $this->siteId ?>_module_switch module-switch" data-on-label="<?= $this->translate('tr_meliscore_common_active'); ?>" data-off-label="<?= $this->translate('tr_meliscore_common_inactive'); ?>" data-text-label="<?= $this->translate('tr_meliscore_tool_user_col_status'); ?>">
+                                                <?php
+                                                $status = $moduleStatus > 0 ? 'checked' : '';
+                                                ?>
+                                                <input name="moduleLoad<?= $moduleName; ?>" data-siteModule-name="<?= $moduleName; ?>" type="checkbox" <?= $status; ?>/>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                <div class="clearfix"></div>
                             </div>
-                            <div class="clearfix"></div>
-                        </div>
-                        <?php
+                            <?php
+                        }
                     }
-                }
-                ?>
-            </div>
+                    ?>
+                </div>
+            </form>
         </div>
     </div>
 </div>
