@@ -240,7 +240,22 @@ return array(
                                         'jscallback' => '',
                                         'jsdatas' => array()
                                     ),
-                                    'interface' => array(),
+                                    'interface' => array(
+                                        'meliscms_tool_sites_edit_site_header_save' => array(
+                                            'conf' => array(
+                                                'id' => 'id_meliscms_tool_sites_edit_site_header_save',
+                                                'name' => 'tr_meliscms_tool_sites_edit_site_header_save',
+                                                'melisKey' => 'meliscms_tool_sites_edit_site_header_save',
+                                            ),
+                                            'forward' => array(
+                                                'module' => 'MelisCms',
+                                                'controller' => 'Sites',
+                                                'action' => 'render-tool-sites-edit-site-header-save',
+                                                'jscallback' => '',
+                                                'jsdatas' => array()
+                                            ),
+                                        ),
+                                    ),
                                 ), // end header
                                 'meliscms_tool_sites_edit_site_tabs' => array(
                                     'conf' => array(
