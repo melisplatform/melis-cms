@@ -2,7 +2,8 @@
 var melisCms = (function(){
 	
 	// CACHE SELECTORS
-	var $body = $("body");
+	var $body 	  = $("body"),
+		$document = $("document");
 	
 	// ---=[ BUG FIX ] =---  TINYMCE POPUP MODAL FOCUS 
 	var windowOffset
@@ -27,8 +28,8 @@ var melisCms = (function(){
 	window.scrollOffsetTinyMCE = function(){
 		return windowOffset;
 	}
-	
-	$("body").on("click", ".mce-btn", function(){
+
+	$body.on("click", ".mce-btn", function(){
 		
 		var mcePopUp = $("#mce-modal-block").length;
 		
@@ -631,7 +632,7 @@ var melisCms = (function(){
         	alert( translations.tr_meliscore_error_message );
         });
     }
-	
+
 	// WINDOW SCROLL FUNCTIONALITIES ========================================================================================================
 	if( melisCore.screenSize >= 768){
 		jQuery(window).scroll(function(){
@@ -731,9 +732,9 @@ var melisCms = (function(){
     // main tab click event (edition, properties etc..)
     $body.on("shown.bs.tab", '.page-content-container .widget-head.nav ul li a', cmsTabEvents);
     
-    //  refresh page tab (historic, versionining etc)
+    // refresh page tab (historic, versionining etc)
     $body.on("shown.bs.tab", '.melis-refreshPageTable', refreshPageTable );
-    
+
 
     
     
@@ -767,6 +768,7 @@ var melisCms = (function(){
 	};
 
 })();
+
 (function ($, window, document) {
 
     // On Load
@@ -1213,12 +1215,13 @@ $(document).ready(function() {
 	$("body").on("click", "#btnTemplateUpdate", function() {
 		toolTemplate.updateTemplate();
 	});
+
 	$("body").on("click", ".btnMelisTemplatesExport", function() {
 		var searched = $("input[type='search'][aria-controls='tableToolTemplateManager']").val();
+		var siteId = $("#templatesSiteSelect").val();
 		if(!melisCoreTool.isTableEmpty("tableToolTemplateManager")) {
-			melisCoreTool.exportData('/melis/MelisCms/ToolTemplate/exportToCsv?filter='+searched);
+			melisCoreTool.exportData('/melis/MelisCms/ToolTemplate/exportToCsv?filter='+searched+'&site='+siteId);
 		}
-		
 	});
 	
 	$("body").on("change", "#templatesSiteSelect", function(){
@@ -1702,6 +1705,39 @@ $(document).ready(function() {
 			alert( translations.tr_meliscore_error_message );
 		});
 	});
+
+    // Add Event to "Minify Button"
+    addEvent(".btnMinifyAssets", function(e) {
+    	var _this 	= $(this),
+        	siteId 	= _this.parents("tr").attr("id");
+        
+		$.ajax({
+			type        : 'POST',
+			url         : '/minify-assets',
+			data		: {siteId : siteId},
+			dataType    : 'json',
+			encode		: true,
+			beforeSend  : function(){
+                _this.attr('disabled', true);
+			},
+			success		: function(data){
+				if(data.success) {
+                    melisHelper.melisOkNotification(data.title, 'tr_front_minify_assets_compiled_successfully');
+                }else{
+					var errorTexts = '<h3>'+ melisHelper.melisTranslator(data.title) +'</h3>';
+					errorTexts += '<p><strong>Error: </strong>  ';
+					errorTexts += '<span>'+ data.message + '</span>';
+					errorTexts += '</p>';
+
+                    var div = "<div class='melis-modaloverlay overlay-hideonclick'></div>";
+                    div += "<div class='melis-modal-cont KOnotif'>  <div class='modal-content'>"+ errorTexts +" <span class='btn btn-block btn-primary'>"+ translations.tr_meliscore_notification_modal_Close +"</span></div> </div>";
+                    $body.append(div);
+				}
+
+                _this.attr('disabled', false);
+			}
+		});
+    });
 	
 	$("body").on("change", "#siteEditionForm #id_sdom_env", function(e){ 
 		var siteId = $("#siteEditionForm #id_site_id").val();

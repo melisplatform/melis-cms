@@ -24,12 +24,13 @@ $(document).ready(function() {
 	$("body").on("click", "#btnTemplateUpdate", function() {
 		toolTemplate.updateTemplate();
 	});
+
 	$("body").on("click", ".btnMelisTemplatesExport", function() {
 		var searched = $("input[type='search'][aria-controls='tableToolTemplateManager']").val();
+		var siteId = $("#templatesSiteSelect").val();
 		if(!melisCoreTool.isTableEmpty("tableToolTemplateManager")) {
-			melisCoreTool.exportData('/melis/MelisCms/ToolTemplate/exportToCsv?filter='+searched);
+			melisCoreTool.exportData('/melis/MelisCms/ToolTemplate/exportToCsv?filter='+searched+'&site='+siteId);
 		}
-		
 	});
 	
 	$("body").on("change", "#templatesSiteSelect", function(){

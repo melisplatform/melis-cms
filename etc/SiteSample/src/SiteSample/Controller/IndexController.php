@@ -14,7 +14,7 @@ use Zend\View\Model\ViewModel;
 
 class IndexController extends MelisSiteActionController
 {
-    public function indexsiteAction()
+    public function indexAction()
     {
     	$view = new ViewModel();
     	

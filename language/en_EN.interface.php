@@ -310,6 +310,7 @@
 	    'tr_meliscms_tool_platform_ids_table' => 'Table',
 	    'tr_meliscms_tool_platform_ids_modal_content' => 'Add and update modal',
 	    'tr_meliscms_tool_platform_modal_info' => 'Declare here the range of identifiers of a specific platform',
+        'tr_meliscms_tool_platform_modal_info_assigned_page_ids' => 'All platforms have already been assigned with page IDs.',
 	    
 	    //Platform Success messages
 	    'tr_meliscms_tool_platform_add_success' => 'New platform IDs added successfully',
@@ -394,7 +395,7 @@
         'tr_melis_cms_duplicate_text_identifier' => '[Duplicated]',
         'tr_meliscms_tree_sites_duplication_page_relation' => 'Relationship with an initial page',
         'tr_meliscms_tree_sites_duplication_page_relation tooltip' => 'Allow to create a page in relation to an initial page',
-
+        'tr_meliscms_tree_sites_duplication_root tooltip' => 'Check this box to place the pages at the root.',
 
         // plugins edition
 	    'tr_meliscms_plugins_modal_cancel' => 'Cancel',

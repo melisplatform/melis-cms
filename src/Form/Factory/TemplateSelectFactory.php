@@ -35,7 +35,8 @@ class TemplateSelectFactory extends MelisSelectFactory
         $siteNames = [];
         if (!empty($sites)) {
             foreach ($sites as $site) {
-                $siteNames[$site['site_id']] = $site['site_name'];
+                $siteLabel = $site['site_label'] ?? $site['site_name'];
+                $siteNames[$site['site_id']] = $siteLabel;
             }
         }
 

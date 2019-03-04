@@ -52,7 +52,7 @@ var melisDragnDrop = (function($, window) {
 
             // get item percentage width
             var placeholderWidth = ( 100 * parseFloat($(ui.helper[0]).css("width")) / parseFloat($(ui.helper[0]).parent().css('width')) ) + '%';
-            $(ui.placeholder[0]).css("width", placeholderWidth);
+                $(ui.placeholder[0]).css("width", placeholderWidth);
 
             // change its css to fit for theme design specific for the melismenitemplate
             var ddn = $(ui.helper[0]).attr("data-module-name");
@@ -399,7 +399,7 @@ var melisDragnDrop = (function($, window) {
             $(".melis-cms-dnd-box").css("height", "100vh" ); // default height
         // Chrome, Firefox etc browser
         $(window.parent).scroll(function() {
-            if( (stickyHead.offset().top + stickyHead.height() + 30) >= currentFrame.offset().top ) {
+            if( (stickyHead.offset().top + sticky.height() + 30) >= currentFrame.offset().top ) {
                 $(".melis-cms-dnd-box").css("top", stickyHead.offset().top - currentFrame.offset().top + stickyHead.height() + 30);
                 dndHeight = $(window.parent).height() - stickyHead.height() - widgetHeight.height() - 15;
                 $(".melis-cms-dnd-box").height(dndHeight);
