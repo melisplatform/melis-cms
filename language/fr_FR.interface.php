@@ -312,7 +312,8 @@
 	    'tr_meliscms_tool_platform_ids_table' => 'Tableau',
 	    'tr_meliscms_tool_platform_ids_modal_content' => 'Add and update modal',
 	    'tr_meliscms_tool_platform_modal_info' => 'Déclarez ici la plage d\'identifiants d\'une plateforme spécifique',
-	    
+        'tr_meliscms_tool_platform_modal_info_assigned_page_ids' => 'Toutes les plateformes ont déjà des plages d\'identifiants assigné.',
+
 	    //Platform Success messages
 	    'tr_meliscms_tool_platform_add_success' => 'Nouvelle plage d\'IDs de la plateforme ajoutée avec succès',
 	    'tr_meliscms_tool_platform_update_success' => 'Plage d\'IDs de la plateforme mise à jour avec succès',
@@ -397,6 +398,7 @@
         'tr_melis_cms_duplicate_text_identifier' => '[Dupliquée]',
         'tr_meliscms_tree_sites_duplication_page_relation' => 'Relation avec une page initiale',
         'tr_meliscms_tree_sites_duplication_page_relation tooltip' => 'Permer de créer une page en relation avec une page initiale',
+        'tr_meliscms_tree_sites_duplication_root tooltip' => 'Cochez cette case pour placer les pages à la racine.',
 
         // plugins edition
 	    'tr_meliscms_plugins_modal_cancel' => 'Annuler',

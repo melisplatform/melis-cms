@@ -852,6 +852,11 @@ return array(
 
                         ),
                         'actionButtons' => array(
+                            'minify' => array(
+                                'module' => 'MelisCms',
+                                'controller' => 'Site',
+                                'action' => 'render-tool-site-content-action-minify-assets',
+                            ),
                             'edit' => array(
                                 'module' => 'MelisCms',
                                 'controller' => 'Site',
@@ -2584,6 +2589,7 @@ return array(
                                         ),
                                         'attributes' => array(
                                             'id' => 'pageRelation',
+                                            'class' => 'melis-check-box',
                                         ),
                                     ),
                                 ),
@@ -2603,7 +2609,20 @@ return array(
                                         ),
                                     ),
                                 ),
-
+                                array(
+                                    'spec' => array(
+                                        'name' => 'use_root',
+                                        'type' => 'checkbox',
+                                        'options' => array(
+                                            'label' => 'tr_meliscms_tree_sites_duplication_use_root',
+                                            'tooltip' => 'tr_meliscms_tree_sites_duplication_root tooltip',
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'use_root',
+                                            'class' => 'use_root_orig_checkbox melis-check-box'
+                                        ),
+                                    ),
+                                ),
                             ),
                             'input_filter' => array(
                                 'sourcePageId' => array(
