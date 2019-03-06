@@ -135,11 +135,20 @@ class SitesController extends AbstractActionController
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $siteDomainsSvc = $this->getServiceLocator()->get("MelisCmsSitesDomainsService");
+        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
+
+        $domainsForm = $melisTool->getForm("meliscms_tool_sites_domain_form");
         $siteEnvs = $siteDomainsSvc->getEnvironments();
+        $siteDomains = $siteDomainsSvc->getDomainsBySiteId($siteId);
+
+
         $view = new ViewModel();
         $view->siteEnvs = $siteEnvs;
         $view->melisKey = $melisKey;
         $view->siteId = $siteId;
+        $view->domainsForm = $domainsForm;
+        $view->siteDomains = $siteDomains;
         return $view;
     }
 
@@ -484,28 +493,71 @@ class SitesController extends AbstractActionController
 
         $status  = 1;
         $errors  = array();
-        $textMessage = '';
+        $textMessage = 'tr_melis_cms_site_save_ko';
         $logTypeCode = '';
-
+        $translator = $this->getServiceLocator()->get('translator');
         $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
+        $siteDomainsSvc = $this->getServiceLocator()->get("MelisCmsSitesDomainsService");
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $request = $this->getRequest();
         $data = $request->getPost()->toArray();
+        $success = 0;
+        $ctr = 0;
 
         $moduleList = array();
-        //Collecting requests from the moduleLoad Form
+        $domainData = array();
+
         foreach ($data as $datum => $val){
+            //collecting data for module load
             if (preg_match('/\bmoduleLoad\b/', $datum)) {
                 $datum = str_replace("moduleLoad",'',$datum);
                 array_push($moduleList,$datum);
             }
+
+            //collecting data for site domains
+            if (strstr($datum,'sdom')) {
+                $key = substr($datum, (strpos($datum, '_') ?: -1) + 1);
+                if(!empty($domainData[$ctr]))
+                    if(array_key_exists($key, $domainData[$ctr]))
+                        $ctr++;
+                $domainData[$ctr][$key] = $val;
+            }
         }
+
+        //saving module load
         $siteModuleLoadSvc->saveModuleLoad($siteId,$moduleList);
+
+        //saving site domains
+        foreach($domainData as $domainDatum){
+            $form = $this->getTool()->getForm('meliscms_tool_sites_domain_form');
+            $form->setData($domainDatum);
+
+            if($form->isValid()) {
+                $success = $siteDomainsSvc->saveSiteDomain($domainDatum);
+                if($success){
+                    $textMessage = $translator->translate("tr_melis_cms_site_save_ok");
+                    $status = 1;
+                }else{
+                    $response = array(
+                        'success' => $success,
+                        'textTitle' => $translator->translate('tr_meliscms_tool_site'),
+                        'textMessage' => $translator->translate('tr_melis_cms_site_save_ko'),
+                        'errors' => $errors,
+                    );
+                    return new JsonModel($response);
+                }
+            }else{
+                $textMessage = 'tr_melis_cms_site_save_ko';
+                $errors = $form->getMessages();
+                $status = 0;
+            }
+
+        }
 
         $response = array(
             'success' => $status,
-            'textTitle' => 'tr_meliscms_tool_site',
-            'textMessage' => $textMessage,
+            'textTitle' => $translator->translate('tr_meliscms_tool_site'),
+            'textMessage' => $translator->translate($textMessage),
             'errors' => $errors,
         );
 
@@ -548,7 +600,7 @@ class SitesController extends AbstractActionController
     private function getTool()
     {
         $toolSvc = $this->getServiceLocator()->get('MelisCoreTool');
-        $toolSvc->setMelisToolKey('MelisCmsUserAccount', 'melis_cms_user_account');
+        $toolSvc->setMelisToolKey('meliscms', 'meliscms_tool_sites');
         return $toolSvc;
     }
 

@@ -191,6 +191,7 @@ return array(
                                 //fields filter
                             ),
                         ),
+
                     ),
 
                 ), // end Melis CMS Site Tool

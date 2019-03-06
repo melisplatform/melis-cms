@@ -1,8 +1,27 @@
 .tool-sites_container_fixed_width{
     max-width: 500px;
 }
+.tab-header-title-container {
+    width: 100%;
+    text-align: right;
+    margin-top: -15px;
+    margin-bottom: 20px;
+}
+
 /**STEP FORM**/
 .sites_step2-multi-language, .sites_step2-single-language,
 #btn-prev-step, #btn-finish-step{
     display: none;
+}
+
+/** SITE V2 DOMAIN TAB **/
+
+ul.meliscms-site-domains-list > li,
+ul.meliscms-site-domains-list > li:hover {
+    border: 0 solid #e61c23 !important;
+}
+.page-content-container .nav-tabs.meliscms-site-domains-list li.active > a,
+.page-content-container .nav-tabs.meliscms-site-domains-list > li.active:focus > a,
+.page-content-container .nav-tabs.meliscms-site-domains-list > li.active:active > a {
+    border: 0 solid #e61c23 !important;
 }

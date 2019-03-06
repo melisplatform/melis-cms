@@ -7,6 +7,74 @@ $data_melisKey = $this->melisKey;
 
 ?>
 <div data-melisKey='<?= $data_melisKey; ?>'<?= $id; ?> class="tab-pane widget-body-regular meliscms_center_tabs">
-    <h1>DOMAINS TAB Content</h1>
+    <div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none">
+        <div class="widget-body innerAll inner-2x">
+            <div class="tab-header-title-container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h3 class="pull-left"><?= $this->translate('tr_melis_cms_sites_domains'); ?></h3>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane active">
+                <div class="row">
+                    <div class="col-xs-12 col-md-2">
+                        <div class="product-text-tab-container">
+                            <ul class="nav-tabs product-text-tab meliscms-site-domains-list">
+                                <?php foreach($this->siteEnvs as $idx => $siteEnv) :?>
+                                    <li class="">
+                                        <a class="clearfix" data-toggle="tab" id="news_cms_lang_<?= $siteEnv['plf_id'] ?>" href="#<?= $siteEnv['plf_name']; ?>-log-type-details-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $siteEnv['plf_id'] ?>">
+                                            <span><?= $siteEnv['plf_name'] ?></span>
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-5">
+                        <div class="tab-content">
+                            <?php foreach ($this->siteEnvs as $idx => $siteEnv) : ?>
+                                <div id="<?= $siteEnv['plf_name']; ?>-log-type-details-<?= $this->siteId; ?>" class="tab-pane product-text-tab-content">
+                                    <div class="bg-white">
+                                        <h4 class=""><i class="fa fa-map-marker"></i>  <?= $siteEnv['plf_name']; ?></h4>
+                                    </div>
+                                    <div id="cms_domain_<?= $siteEnv['plf_id']; ?>">
+                                        <?php
+                                        $form = clone $this->domainsForm;
+
+                                        if(isset($this->siteDomains) && !empty($this->siteDomains)){
+                                            foreach ($this->siteDomains as $siteDomain){
+                                                if($siteDomain["sdom_env"] == $siteEnv['plf_name']){
+                                                    foreach($form->getElements() as $element => $attributes)  {
+                                                        $el =  $form->get((string) $element);
+                                                        if(isset($siteDomain[$el->getName()])){
+                                                            $el->setValue($siteDomain[$el->getName()]);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        foreach($form->getElements() as $element => $attributes)  {
+                                            $el =  $form->get((string) $element);
+                                            if($el->getName() == "sdom_env")
+                                                $el->setValue($siteEnv['plf_name']);
+                                            if($el->getName() == "sdom_site_id")
+                                                $el->setValue($this->siteId);
+                                            $el->setName($siteEnv['plf_name']."_".$el->getName());
+                                        }
+
+                                        echo $this->form()->openTag($form);
+                                        echo $this->melisFieldCollection($form);
+                                        echo $this->form()->closeTag();
+                                        ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 

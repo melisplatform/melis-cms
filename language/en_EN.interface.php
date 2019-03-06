@@ -475,6 +475,9 @@
         'tr_melis_cms_sites_tool_add_step2_url_local_after_domain' => 'I want the locale shown after my domain (ex: www.mysite.com/en/myurl)',
         'tr_melis_cms_sites_tool_add_step2_url_different_domains' => 'I want to have different domains or subdomains for them (ex: en.mysite.com and fr.mysite.com) and the tool will actually create multiple sites for you',
         'tr_melis_cms_sites_tool_add_step2_url_do_nothing' => 'I want nothing, my page url will be solely built on the page’s name',
+        'tr_melis_cms_sites_module_loading' => 'Module Loading',
+        'tr_melis_cms_sites_domains' => 'Domains',
+
 
 	);
 ?>

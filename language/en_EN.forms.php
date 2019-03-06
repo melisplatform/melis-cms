@@ -228,5 +228,14 @@
         'tr_melis_cms_tool_template_layout_invalid'     => 'Invalid template layout',
         'tr_melis_cms_tool_template_controller_invalid' => 'Invalid template controller',
         'tr_melis_cms_tool_template_action_invalid'     => 'Invalid template action',
+
+
+        //New site tools
+        'tr_melis_cms_site_save_ko' => "Unable to save the site.",
+        'tr_melis_cms_site_save_ok' => "Site has been saved successfully.",
+        'tr_melis_cms_sites_domain_scheme' => "Scheme",
+        'tr_melis_cms_sites_domain_scheme tooltip' => "http or https protocol",
+        'tr_melis_cms_sites_domain' => "Domain",
+        'tr_melis_cms_sites_domain tooltip' => "Domain on which the site is accessible (ex: www.mysite.com)",
 	);
 ?>
