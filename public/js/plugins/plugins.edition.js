@@ -791,11 +791,11 @@ var melisPluginEdition = (function($, window) {
     }
 
     // remove inline width when changing viewport
-    window.parent.$("#"+ parent.activeTabId).find('iframe').on("resize", function() {
-        $(this).contents().find(".melis-dragdropzone .melis-ui-outlined").each(function() {
-            $(this).css("width", "");
-        });
-    });
+    // window.parent.$("#"+ parent.activeTabId).find('iframe').on("resize", function() {
+    //     $(this).contents().find(".melis-dragdropzone .melis-ui-outlined").each(function() {
+    //         $(this).css("width", "");
+    //     });
+    // });
 
     // init resize
     if (parent.pluginResizable == 1) {
