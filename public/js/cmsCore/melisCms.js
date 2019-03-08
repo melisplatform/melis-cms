@@ -6,7 +6,8 @@ var melisCms = (function(){
 		$document = $("document");
 	
 	// ---=[ BUG FIX ] =---  TINYMCE POPUP MODAL FOCUS 
-	var windowOffset
+	var windowOffset;
+
 	window.scrollToViewTinyMCE = function(dialogHeight, iframeHeight){
 		
 		// window scroll offest
@@ -24,19 +25,17 @@ var melisCms = (function(){
 			console.log("offset = "+ windowOffset); */
 			return windowOffset;
 		}
-	} 
+	}
+
 	window.scrollOffsetTinyMCE = function(){
 		return windowOffset;
 	}
 
-	$body.on("click", ".mce-btn", function(){
-		
+	$body.on("click", ".tox-tbtn", function(){
 		var mcePopUp = $("#mce-modal-block").length;
 		
-		if(mcePopUp){
-			
-			
-			if($("iframe.melis-iframe").length){
+		if( mcePopUp ) {
+			if( $("iframe.melis-iframe").length ) {
 				// iframe offset top
 				$("iframe.melis-iframe").position().top;
 				
@@ -60,7 +59,8 @@ var melisCms = (function(){
 				console.log("has popup = "+ dialogTop); */
 				$(".mce-floatpanel.mce-window").css("top", dialogTop);
 				$("html, body").animate({scrollTop: dialogTop }, 300);
-			}else{
+			}
+			else {
 				$("#mce-modal-block").css('z-index',1049);
 				$(".mce-floatpanel.mce-window").css('z-index', 1050);
 			}
@@ -87,7 +87,7 @@ var melisCms = (function(){
 	} 
 	
 	// NEW PAGE
-	function newPage(){
+	function newPage() {
    	  	//close page creation tab and open new one (in case if its already open - updated parent ID)
 		var pageID = $(this).data('pagenumber');
    	  	melisHelper.tabClose('0_id_meliscms_page');
@@ -96,7 +96,7 @@ var melisCms = (function(){
 	}
 	
 		// SAVE PAGE
-	function savePage(idPage){
+	function savePage(idPage) {
 		
 		var pageNumber = (typeof idPage === 'string') ? idPage :  $(this).data("pagenumber"); 
 		var fatherPageId = $(this).data("fatherpageid"); 
@@ -146,7 +146,7 @@ var melisCms = (function(){
 		    		melisHelper.tabClose(pageCreationId);
 		    		
 		    		//remove first char on the zoneID and replace with newly create id
-		    		var newPageZoneId = data.datas.idPage + pageCreationId.substring(1, pageCreationId.length) 
+		    		var newPageZoneId = data.datas.idPage + pageCreationId.substring(1, pageCreationId.length);
 		    	
 		    		//open newly opened page
 			        melisHelper.tabOpen( data.datas.item_name, data.datas.item_icon, newPageZoneId, data.datas.item_melisKey,  { idPage: data.datas.idPage } );	
@@ -174,7 +174,7 @@ var melisCms = (function(){
 	}
 	
 	// PUBLISH PAGE 
-	function publishPage(idPage){
+	function publishPage(idPage) {
 		var pageNumber = (typeof idPage === 'string') ? idPage :  $(this).data("pagenumber"); 
 		
 		// convert the serialized form values into an array
@@ -369,15 +369,13 @@ var melisCms = (function(){
 	}
 	
 	// Deactivating page edition action buttons
-    function disableCmsButtons(id)
-    {
+    function disableCmsButtons(id) {
         $("div.make-switch label on, off").parent().css("z-index", -1).parents("div.make-switch").css("opacity", 0.5);
         $("#"+id+"_id_meliscms_page_action_tabs").addClass('relative').prepend("<li class='btn-disabled'></li>");
     }
     
     // Activating page edition action buttons
-    function enableCmsbuttons(id)
-    {
+    function enableCmsbuttons(id) {
         $("#"+id+"_action_tabs").removeClass('relative');
         $("#"+id+"_action_tabs li.btn-disabled").remove();
         
@@ -531,7 +529,6 @@ var melisCms = (function(){
 		$("#"+ activeTabId + " .melis-iframe").css("height", iHeight);
 	}
 	
-	
 	// REFRESH PAGE TAB (historic, versionining etc)
     function refreshPageTable(){
     	var zoneParent = $(this).parents(".melis-page-table-cont");
@@ -541,8 +538,7 @@ var melisCms = (function(){
     	melisHelper.zoneReload(zoneId, melisKey, { idPage: pageId }); 
     }
     
-    function disableCmsButtons(id)
-    {
+    function disableCmsButtons(id) {
         $("#" + activeTabId + " .page-publishunpublish").append("<div class='overlay-switch' style='width: 100%;height: 100%;" +
             "position: absolute;top: 0;" +
             "left: 0;z-index: 99999999;" +
@@ -550,15 +546,14 @@ var melisCms = (function(){
         $("#"+id+"_id_meliscms_page_action_tabs").addClass('relative').prepend("<li class='btn-disabled'></li>");
     }
     
-    function enableCmsbuttons(id)
-    {
+    function enableCmsbuttons(id) {
         $("#"+id+"_action_tabs").removeClass('relative');
         $("#"+id+"_action_tabs li.btn-disabled").remove();
         $("#" + activeTabId + " .overlay-switch").remove();
     }
 	
     // IFRAME HEIGHT CONTROLS (for onload, displaySettings & sidebar collapse)
-    function iframeLoad(){
+    function iframeLoad() {
     	var height = $("#"+ activeTabId + " .melis-iframe").contents().height();
     	$("#"+ activeTabId + " .melis-iframe").css("height", height);
     	$("#"+ activeTabId + " .melis-iframe").css("min-height", "700px");  

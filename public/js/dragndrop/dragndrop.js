@@ -399,7 +399,7 @@ var melisDragnDrop = (function($, window) {
             $(".melis-cms-dnd-box").css("height", "100vh" ); // default height
         // Chrome, Firefox etc browser
         $(window.parent).scroll(function() {
-            if( (stickyHead.offset().top + sticky.height() + 30) >= currentFrame.offset().top ) {
+            if( (stickyHead.offset().top + stickyHead.height() + 30) >= currentFrame.offset().top ) {
                 $(".melis-cms-dnd-box").css("top", stickyHead.offset().top - currentFrame.offset().top + stickyHead.height() + 30);
                 dndHeight = $(window.parent).height() - stickyHead.height() - widgetHeight.height() - 15;
                 $(".melis-cms-dnd-box").height(dndHeight);

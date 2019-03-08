@@ -24,19 +24,16 @@ var melisCms = (function(){
 			console.log("offset = "+ windowOffset); */
 			return windowOffset;
 		}
-	} 
+	}
 	window.scrollOffsetTinyMCE = function(){
 		return windowOffset;
 	}
 
-	$body.on("click", ".mce-btn", function(){
-		
+	$body.on("click", ".tox-tbtn", function(){
 		var mcePopUp = $("#mce-modal-block").length;
 		
-		if(mcePopUp){
-			
-			
-			if($("iframe.melis-iframe").length){
+		if( mcePopUp ) {
+			if( $("iframe.melis-iframe").length ) {
 				// iframe offset top
 				$("iframe.melis-iframe").position().top;
 				
@@ -60,7 +57,8 @@ var melisCms = (function(){
 				console.log("has popup = "+ dialogTop); */
 				$(".mce-floatpanel.mce-window").css("top", dialogTop);
 				$("html, body").animate({scrollTop: dialogTop }, 300);
-			}else{
+			}
+			else {
 				$("#mce-modal-block").css('z-index',1049);
 				$(".mce-floatpanel.mce-window").css('z-index', 1050);
 			}
@@ -146,7 +144,7 @@ var melisCms = (function(){
 		    		melisHelper.tabClose(pageCreationId);
 		    		
 		    		//remove first char on the zoneID and replace with newly create id
-		    		var newPageZoneId = data.datas.idPage + pageCreationId.substring(1, pageCreationId.length) 
+		    		var newPageZoneId = data.datas.idPage + pageCreationId.substring(1, pageCreationId.length);
 		    	
 		    		//open newly opened page
 			        melisHelper.tabOpen( data.datas.item_name, data.datas.item_icon, newPageZoneId, data.datas.item_melisKey,  { idPage: data.datas.idPage } );	
@@ -2199,6 +2197,7 @@ window.initRedirectTemplateList = function(data, tblSettings){
     var dataUrl;
 
     // Binding Events =================================================================================================================
+    console.log("insert: ", $("button[aria-label='Insert/edit link']").length );
 
     $body.on("click", "div[aria-label='Insert/edit link']", checkBtn);
     $body.on("click", "div.mce-menu-item", checkBtn);
@@ -2322,11 +2321,11 @@ window.initRedirectTemplateList = function(data, tblSettings){
     }
     
     function showUrl() {
-//      var inputBox = $('.melis-iframe').contents().find('#mce-link-tree').prev().val(dataUrl);
-//  	 var inputBox = $('#mce-link-tree').parent().find('input').val(dataUrl);
+        //var inputBox = $('.melis-iframe').contents().find('#mce-link-tree').prev().val(dataUrl);
+        //var inputBox = $('#mce-link-tree').parent().find('input').val(dataUrl);
     	var inputBox = $('.melis-iframe').contents().find('#mce-link-tree').parent().find('input').val(dataUrl);
-    	$(".mce-floatpanel.mce-window").find('#mce-link-tree').parent().find('input').val(dataUrl);
-  }
+    	    $(".mce-floatpanel.mce-window").find('#mce-link-tree').parent().find('input').val(dataUrl);
+    }
 
     function checkBtn() {
         var urlBox = $('body').find('.mce-has-open').prev().text();
@@ -2336,10 +2335,12 @@ window.initRedirectTemplateList = function(data, tblSettings){
         var urlLabel = $('body').find('.mce-widget.mce-label');
         
         urlLabel.each( function() {
-            if($(this).text() === "Url") {
+            var $this = $(this);
+
+            if( $this.text() === "Url" ) {
                 var moxie = $body.find('.mce-btn.mce-open');
                 var moxieWidth = moxie.width() + 1;
-                var urlInputBox = $(this).next();
+                var urlInputBox = $this.next();
                 var urlInput = urlInputBox.children('.mce-textbox');
                 var cInput;
 
@@ -2363,12 +2364,7 @@ window.initRedirectTemplateList = function(data, tblSettings){
         box.append('<div id="mce-link-tree" class="mce-btn mce-open" style="position: absolute; right: 0; width: 32px; height: 28px;"><button><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; top: 2px; font-size: 16px;"></i></button></div>');
     }
 
-    function addTreeBtn() {
-
-    }
-
     function createTreeModal() {
-
         // initialation of local variable
         zoneId = 'id_meliscms_find_page_tree';
         melisKey = 'meliscms_find_page_tree';
@@ -2411,7 +2407,6 @@ window.initRedirectTemplateList = function(data, tblSettings){
     }
 
     function findPageMainTree() {
-
         $("#find-page-dynatree").fancytree({
             extensions: ["filter"],
             keyboard: true,
@@ -2468,6 +2463,7 @@ window.initRedirectTemplateList = function(data, tblSettings){
 
     }
 
+
     return {
         createTreeModal         :       createTreeModal,
         createInputTreeModal	: 		createInputTreeModal,
@@ -2477,6 +2473,7 @@ window.initRedirectTemplateList = function(data, tblSettings){
     }
 
 })(jQuery, window);
+
 $(function() {
 
     $("body").on("click", "a.melis-pageduplicate", function() {

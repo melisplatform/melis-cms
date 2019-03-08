@@ -5,7 +5,6 @@
     var dataUrl;
 
     // Binding Events =================================================================================================================
-
     $body.on("click", "div[aria-label='Insert/edit link']", checkBtn);
     $body.on("click", "div.mce-menu-item", checkBtn);
 
@@ -128,11 +127,11 @@
     }
     
     function showUrl() {
-//      var inputBox = $('.melis-iframe').contents().find('#mce-link-tree').prev().val(dataUrl);
-//  	 var inputBox = $('#mce-link-tree').parent().find('input').val(dataUrl);
+        //var inputBox = $('.melis-iframe').contents().find('#mce-link-tree').prev().val(dataUrl);
+        //var inputBox = $('#mce-link-tree').parent().find('input').val(dataUrl);
     	var inputBox = $('.melis-iframe').contents().find('#mce-link-tree').parent().find('input').val(dataUrl);
-    	$(".mce-floatpanel.mce-window").find('#mce-link-tree').parent().find('input').val(dataUrl);
-  }
+    	    $(".mce-floatpanel.mce-window").find('#mce-link-tree').parent().find('input').val(dataUrl);
+    }
 
     function checkBtn() {
         var urlBox = $('body').find('.mce-has-open').prev().text();
@@ -142,10 +141,12 @@
         var urlLabel = $('body').find('.mce-widget.mce-label');
         
         urlLabel.each( function() {
-            if($(this).text() === "Url") {
+            var $this = $(this);
+
+            if( $this.text() === "Url" ) {
                 var moxie = $body.find('.mce-btn.mce-open');
                 var moxieWidth = moxie.width() + 1;
-                var urlInputBox = $(this).next();
+                var urlInputBox = $this.next();
                 var urlInput = urlInputBox.children('.mce-textbox');
                 var cInput;
 
@@ -169,12 +170,7 @@
         box.append('<div id="mce-link-tree" class="mce-btn mce-open" style="position: absolute; right: 0; width: 32px; height: 28px;"><button><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; top: 2px; font-size: 16px;"></i></button></div>');
     }
 
-    function addTreeBtn() {
-
-    }
-
     function createTreeModal() {
-
         // initialation of local variable
         zoneId = 'id_meliscms_find_page_tree';
         melisKey = 'meliscms_find_page_tree';
@@ -217,7 +213,6 @@
     }
 
     function findPageMainTree() {
-
         $("#find-page-dynatree").fancytree({
             extensions: ["filter"],
             keyboard: true,
@@ -273,6 +268,7 @@
         
 
     }
+
 
     return {
         createTreeModal         :       createTreeModal,
