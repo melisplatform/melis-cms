@@ -733,7 +733,7 @@ var melisPluginEdition = (function($, window) {
             pluginList['melisPluginMobileWidth'] = mobileWidth;
             pluginList['melisPluginTabletWidth'] = tabletWidth;
             pluginList['melisPluginDesktopWidth'] = desktopWidth;
-
+            pluginList['resize'] = true;
             // pass is to savePageSession
             savePluginUpdate(pluginList, toolBox.data("site-module"));
 
