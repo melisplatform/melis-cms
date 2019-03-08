@@ -109,6 +109,12 @@ class SitesController extends AbstractActionController
         $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
         $modulesSvc = $this->getServiceLocator()->get('ModulesService');
         $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $melisCoreAuth = $this->serviceLocator->get('MelisCoreAuth');
+
+        $userAuthDatas = $melisCoreAuth->getStorage()->read();
+
+        $isAdmin = isset($userAuthDatas->usr_admin) || $userAuthDatas->usr_admin != "" ? $userAuthDatas->usr_admin : 0;
+
         $modulesInfo = $modulesSvc->getModulesAndVersions();
         $modules = $siteModuleLoadSvc->getModules($siteId);
         $melisKey = $this->getMelisKey();
@@ -116,6 +122,7 @@ class SitesController extends AbstractActionController
         $view->modulesInfo = $modulesInfo;
         $view->modules = $modules;
         $view->melisKey = $melisKey;
+        $view->isAdmin = $isAdmin;
         $view->siteId = $siteId;
         return $view;
     }
@@ -501,17 +508,25 @@ class SitesController extends AbstractActionController
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $request = $this->getRequest();
         $data = $request->getPost()->toArray();
+        $melisCoreAuth = $this->serviceLocator->get('MelisCoreAuth');
+        $userAuthDatas = $melisCoreAuth->getStorage()->read();
+        $isAdmin = isset($userAuthDatas->usr_admin) || $userAuthDatas->usr_admin != "" ? $userAuthDatas->usr_admin : 0;
+
         $success = 0;
         $ctr = 0;
 
         $moduleList = array();
         $domainData = array();
 
+
         foreach ($data as $datum => $val){
-            //collecting data for module load
-            if (preg_match('/\bmoduleLoad\b/', $datum)) {
-                $datum = str_replace("moduleLoad",'',$datum);
-                array_push($moduleList,$datum);
+
+            //collecting data for site module load
+            if($isAdmin) {
+                if (strstr($datum,'moduleLoad')) {
+                    $datum = str_replace("moduleLoad", '', $datum);
+                    array_push($moduleList, $datum);
+                }
             }
 
             //collecting data for site domains
@@ -522,6 +537,7 @@ class SitesController extends AbstractActionController
                         $ctr++;
                 $domainData[$ctr][$key] = $val;
             }
+
         }
 
         //saving module load
@@ -578,6 +594,7 @@ class SitesController extends AbstractActionController
         $textMessage = '';
         $eventDatas = array();
         $this->getEventManager()->trigger('meliscms_site_delete_start', $this, $eventDatas);
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
          
 
         $response = array(
@@ -585,7 +602,7 @@ class SitesController extends AbstractActionController
             'textTitle' => 'tr_meliscms_tool_site',
             'textMessage' => $textMessage
         );
-        $this->getEventManager()->trigger('meliscms_site_delete_end', $this, array_merge($response, array('typeCode' => 'CMS_SITE_DELETE', 'itemId' => $siteID)));
+        $this->getEventManager()->trigger('meliscms_site_delete_end', $this, array_merge($response, array('typeCode' => 'CMS_SITE_DELETE', 'itemId' => $siteId)));
         
         return new JsonModel($response);
     }

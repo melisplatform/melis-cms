@@ -27,17 +27,24 @@ $status = '';
                 </div>
             </div>
         </div>
+        <?php if(!$this->isAdmin) {?>
+        <div class="row" id="not-admin-notice">
+            <div class="col-md-12">
+                <h5 class="pull-left" style="color:#e61c23;"><strong><?= $this->translate('tr_melis_cms_sites_module_load_no_access'); ?></strong></h5>
+            </div>
+        </div>
+        <?php } ?>
         <!-- modules -->
         <div class="module-settings">
             <div class="ms-heading">
                 <div class="pull-left">
                     <h4 id="meliscore-tool-module-content-title"><?= $this->translate('tr_meliscore_module_management_modules'); ?></h4>
                 </div>
-                <div class="pull-right">
+                <div class="pull-right" style="width: 15%;">
                     <div class="clearfix ms-cont">
                         <div class="row ">
                             <div class="col-md-6 col-sm-6 col-xs-6"><!--  module-version-display -->
-                                <h4>Version </h4>
+                                <h4 id="header-version">Version </h4>
                             </div>
                             <div class="col-md-6 col-sm-6 col-xs-6">
                                 <div class="icon-cont clearfix">

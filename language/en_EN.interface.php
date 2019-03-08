@@ -476,6 +476,8 @@
         'tr_melis_cms_sites_tool_add_step2_url_different_domains' => 'I want to have different domains or subdomains for them (ex: en.mysite.com and fr.mysite.com) and the tool will actually create multiple sites for you',
         'tr_melis_cms_sites_tool_add_step2_url_do_nothing' => 'I want nothing, my page url will be solely built on the page’s name',
         'tr_melis_cms_sites_module_loading' => 'Module Loading',
+        'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice' => '<i class="fa fa-warning"></i> Below are the lists of module(s) that is required by <strong>%s</strong>, are you sure you want to activate <strong>%s</strong>? ',
+        'tr_melis_cms_sites_module_load_no_access' => 'You need to have and admin level of rights to modify this section.',
         'tr_melis_cms_sites_domains' => 'Domains',
 
 

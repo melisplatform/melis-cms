@@ -9,7 +9,6 @@ $(document).ready(function() {
         var currentTabId = activeTabId.split("_")[0];
         var dataString = $("#"+currentTabId+"_id_meliscms_tool_sites_edit_site form").serializeArray();
         // serialize the new array and send it to server
-        console.log(dataString);
         dataString = $.param(dataString);
 
         $.ajax({
@@ -87,7 +86,6 @@ $(document).ready(function() {
             $("h4#meliscore-tool-module-content-title").html(translations.tr_meliscore_module_management_checking_dependencies);
             $('.'+currentTabId+'_module_switch').bootstrapSwitch('setActive', false);
 
-
             $.ajax({
                 type        : 'POST',
                 url         : '/melis/MelisCms/SitesModuleLoader/getDependents',
@@ -118,15 +116,18 @@ $(document).ready(function() {
                                 // this will just trigger an animate switch
                                 switchButtonWithoutEvent(v, "off");
                             });
-                            $('div[data-siteModule-name='+moduleName+']').find("div.switch-animate").removeClass("switch-on switch-off").addClass("switch-off");
+                        },
+                        function() {
+                            switchButtonWithoutEvent(moduleName, "on");
                         }
                     );
+                }else{
+                    switchButtonWithoutEvent(moduleName, "off");
+                    // $('div[data-siteModule-name='+moduleName+']').find("div.switch-animate").removeClass("switch-on switch-off").addClass("switch-off");
                 }
-                $('div[data-siteModule-name='+moduleName+']').find("div.switch-animate").removeClass("switch-on switch-off").addClass("switch-on");
                 $('.'+currentTabId+'_module_switch').bootstrapSwitch('setActive', true);
                 $("h4#meliscore-tool-module-content-title").html(translations.tr_meliscore_module_management_modules);
             });
-
         }
 
 
@@ -136,19 +137,44 @@ $(document).ready(function() {
 
             $.ajax({
                 type        : 'POST',
-                url         : '/melis/MelisCms/SitesModuleLoader/getRequiredDependencies',
+                url         : '/melis/MelisCms/SitesModuleLoader/getRequiredDependencies?siteId='+currentTabId,
                 data		: {module : moduleName},
                 dataType    : 'json',
                 encode		: true,
             }).success(function(data){
-                if(data.success) {
-                    $.each(data.modules, function(i, v) {
-                        // this will trigger a switch-change event
-                        // $('div[data-siteModule-name="'+v+'"]').bootstrapSwitch('setState', false, false);
-                        // this will just trigger an animate switch
-                        switchButtonWithoutEvent(v, "on");
-                    });
+                var modules    = "<br/><br/><div class='container'><div class='row'><div class='col-lg-12'><ul>%s</ul></div></div></div>";
+                var moduleList = '';
 
+                $.each(data.modules, function(i, v) {
+                    moduleList += "<li>"+v+"</li>";
+
+                });
+
+                modules = modules.replace("%s", moduleList);
+                if(data.success) {
+                    melisCoreTool.confirm(
+                        translations.tr_meliscore_common_yes,
+                        translations.tr_meliscore_tool_emails_mngt_generic_from_header_cancel,
+                        translations.tr_meliscore_general_proceed,
+                        data.message+modules,
+                        function() {
+                            $.each(data.modules, function(i, v) {
+                                // this will trigger a switch-change event
+                                // $('div[data-siteModule-name="'+v+'"]').bootstrapSwitch('setState', false, false);
+                                // this will just trigger an animate switch
+                                switchButtonWithoutEvent(v, "on");
+                            });
+                            switchButtonWithoutEvent(moduleName, "on");
+                        },
+                        function() {
+                            switchButtonWithoutEvent(moduleName, "off");
+                        }
+                    );
+
+
+                }else{
+                    switchButtonWithoutEvent(moduleName, "on");
+                    // $('div[data-siteModule-name='+moduleName+']').find("div.switch-animate").removeClass("switch-on switch-off").addClass("switch-off");
                 }
                 $('.'+currentTabId+'_module_switch').bootstrapSwitch('setActive', true);
                 $("h4#meliscore-tool-module-content-title").html(translations.tr_meliscore_module_management_modules);
@@ -156,5 +182,12 @@ $(document).ready(function() {
         }
 
     });
+
+    window.moduleLoadJsCallback = function () {
+        setOnOff();
+        if($("#not-admin-notice").length > 0){
+            $(".has-switch").bootstrapSwitch('setActive', false);
+        }
+    };
 
 });

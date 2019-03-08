@@ -58,15 +58,25 @@ class SitesModuleLoaderController extends AbstractActionController
     {
         $success = 0;
         $modules = array();
+        $requiredModules = array();
         $request = $this->getRequest();
         $tool    = $this->getServiceLocator()->get('MelisCoreTool');
+        $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $message = 'tr_meliscore_module_management_no_dependencies';
 
         if($request->isPost()) {
             $module = $tool->sanitize($request->getPost('module'));
-
             if($module) {
                 $modules = $this->getModuleSvc()->getDependencies($module);
-                if($modules) {
+                $existingModules = $siteModuleLoadSvc->getModules($siteId);
+                foreach ($modules as $moduleName){
+                    if(isset($existingModules[$moduleName])){
+                        array_push($requiredModules,$moduleName);
+                    }
+                }
+                if($requiredModules) {
+                    $message = $tool->getTranslation('tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice', array($module, $module));
                     $success = 1;
                 }
             }
@@ -74,7 +84,8 @@ class SitesModuleLoaderController extends AbstractActionController
 
         $response = array(
             'success' => $success,
-            'modules' => $modules,
+            'modules' => $requiredModules,
+            'message' => $tool->getTranslation($message)
         );
 
         return new JsonModel($response);

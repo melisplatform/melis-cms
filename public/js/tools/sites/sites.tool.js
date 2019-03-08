@@ -57,7 +57,7 @@ $(document).ready(function() {
     };
 
     $body.on("click", "#btn-next-step", function(e){
-        if(owlStep !== null) {
+        if(owlStep != null) {
             owlStep.trigger('owl.next');
         }
     });

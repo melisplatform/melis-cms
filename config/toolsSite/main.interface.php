@@ -27,9 +27,11 @@ return array(
             'ressources' => array(
                 'js' => array(
                     '/MelisCms/js/tools/sites/sites.tool.js',
+                    '/MelisCms/js/owl.carousel.js',
                 ),
                 'css' => array(
                     '/MelisCms/css/tools/sites/sites.tool.css',
+                    '/MelisCms/css/owl/owl.carousel.css',
                 ),
 
             ),
@@ -218,6 +220,7 @@ return array(
                                 'id' => 'id_meliscms_tool_sites_edit_site',
                                 'melisKey' => 'meliscms_tool_sites_edit_site',
                                 'name' => 'Edit Site',
+                                'follow_regular_rendering' => false,
                             ),
                             'forward' => array(
                                 'module' => 'MelisCms',
