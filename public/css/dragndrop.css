@@ -320,7 +320,7 @@ body {
 .melis-ui-outlined {
     position: relative;
     z-index: 1;
-    min-width: 150px;
+    /*min-width: 150px;*/
     transition-property: outline-color, transform;
     transition-duration: 0.4s, 0.4s;
     font-family: 'Lato', sans-serif;

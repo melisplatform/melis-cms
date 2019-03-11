@@ -309,15 +309,15 @@ var melisDragnDrop = (function($, window) {
                         // check if dragndrop mobile, tablet, desktop
                         // check if resize in mobile
                         if(currentFrame.width() <= 480) {
-                            $(pluginId).addClass(" plugin-width-md-100-00 plugin-width-lg-100-00 plugin-width-xs-" + strPlaceholderWidth.replace(".", "-") ); //uiPlaceHolderWidth
+                            $(pluginId).addClass(" plugin-width-md-100-00 plugin-width-lg-100-00 plugin-width-xs-100-00"); //uiPlaceHolderWidth
                         }
                         // check if resize in tablet
                         if(currentFrame.width() > 490 && currentFrame.width() <= 980) {
-                            $(pluginId).addClass(" plugin-width-xs-100-00 plugin-width-lg-100-00 plugin-width-md-" + strPlaceholderWidth.replace(".", "-") ); //uiPlaceHolderWidth
+                            $(pluginId).addClass(" plugin-width-xs-100-00 plugin-width-lg-100-00 plugin-width-md-100-00"); //uiPlaceHolderWidth
                         }
                         // check if resize in desktop
                         if(currentFrame.width() >= 981) {
-                            $(pluginId).addClass(" plugin-width-xs-100-00 plugin-width-md-100-00 plugin-width-lg-" + strPlaceholderWidth.replace(".", "-") ); //uiPlaceHolderWidth
+                            $(pluginId).addClass(" plugin-width-xs-100-00 plugin-width-md-100-00 plugin-width-lg-100-00"); //uiPlaceHolderWidth
                         }
 
                     }, 100);
