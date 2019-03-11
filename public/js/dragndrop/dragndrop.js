@@ -330,7 +330,7 @@ var melisDragnDrop = (function($, window) {
                         datastring.push({name: "melisPluginTag", value: melisPluginTag});
                         datastring.push({name: "melisPluginMobileWidth", value: 100 });
                         datastring.push({name: "melisPluginTabletWidth", value: 100 });
-                        datastring.push({name: "melisPluginDesktopWidth", value: uiPlaceHolderWidth.slice(0, -1)});
+                        datastring.push({name: "melisPluginDesktopWidth", value: 100});
 
                         // pass it in savePluginUpdate
                         melisPluginEdition.savePluginUpdate(datastring, siteModule);
