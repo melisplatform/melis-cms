@@ -9,11 +9,11 @@
 
 namespace MelisCms\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\View\Model\JsonModel;
 use MelisCms\Service\MelisCmsRightsService;
-use Zend\Http\Request;
+use Zend\Form\Factory;
+use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\JsonModel;
+use Zend\View\Model\ViewModel;
 
 /**
  * This class renders Melis CMS TreeView
@@ -595,7 +595,7 @@ class TreeSitesController extends AbstractActionController
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         $melisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
         $appConfigForm = $melisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_tree_sites_tool/forms/meliscms_tree_sites_duplicate_tree_form','meliscms_tree_sites_duplicate_tree_form');
-        $factory = new \Zend\Form\Factory();
+        $factory = new Factory();
         $formElements = $this->serviceLocator->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $form = $factory->createForm($appConfigForm);
@@ -612,67 +612,66 @@ class TreeSitesController extends AbstractActionController
         $view->sourcePageId = $sourcePageId;
         return $view;
     }
-    
+
+    /**
+     * @return JsonModel
+     */
     public function duplicateTreePageAction()
     {
-
         ini_set('memory_limit', '-1');
         set_time_limit(0);
 
-        $response = array();
-        $pageDupeResult = array();
+        $pageDupeResult = [];
         $success = 0;
-        $errors  = array();
-        $data = array();
+        $errors = [];
+        $data = [];
         $translator = $this->serviceLocator->get('translator');
         $textMessage = $translator->translate('tr_meliscms_menu_dupe_fail');
         $textTitle = $translator->translate('tr_meliscms_menu_dupe');
-        
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
-        $melisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+        $logTypeCode = 'CMS_DUPLICATE_TREE_PAGE';
+        $duplicateStartingFrom = 0;
 
-        $appConfigForm = $melisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_tree_sites_tool/forms/meliscms_tree_sites_duplicate_tree_form','meliscms_tree_sites_duplicate_tree_form');
-        $factory = new \Zend\Form\Factory();
-        $formElements = $this->serviceLocator->get('FormElementManager');
-        $factory->setFormElementManager($formElements);
-        $form = $factory->createForm($appConfigForm);
+        if ($this->getRequest()->isPost()) {
+            $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+            $melisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+            $appConfigForm = $melisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_tree_sites_tool/forms/meliscms_tree_sites_duplicate_tree_form', 'meliscms_tree_sites_duplicate_tree_form');
+            $factory = new Factory();
+            $formElements = $this->serviceLocator->get('FormElementManager');
+            $factory->setFormElementManager($formElements);
+            /** @var \Zend\Form\Form $form */
+            $form = $factory->createForm($appConfigForm);
 
-        $postValues = get_object_vars($this->getRequest()->getPost());
-        $postValues['destinationPageId'] = ($postValues['use_root'])? -1 : $postValues['destinationPageId'];
-
-        if($this->getRequest()->isPost()){
-            $logTypeCode = 'CMS_DUPLICATE_TREE_PAGE';
+            $postValues = $this->getRequest()->getPost()->toArray();
+            $duplicateStartingFrom = empty($postValues['sourcePageId']) ? 0 : $postValues['sourcePageId'];
+            $postValues['destinationPageId'] = ($postValues['use_root']) ? -1 : $postValues['destinationPageId'];
 
             $postValues = $melisTool->sanitizePost($postValues);
-
             $form->setData($postValues);
 
             //validation
-            if($form->isValid()) {
-
+            if ($form->isValid()) {
                 $data = $form->getData();
                 $destinationPage = $data['destinationPageId'];
-                $duplicateStartingFrom = $data['sourcePageId'];
                 $langId = $data['lang_id'];
                 $pageRelation = $data['pageRelation'];
 
                 //to check if the destination pageId is existing or not
-                $pageTreeTable  = $this->getServiceLocator()->get('MelisEngineTablePageTree');
-                $pageDestId     = $pageTreeTable->getEntryById($data['destinationPageId'])->toArray();
-                $pageDestId      = ($data['destinationPageId'] == -1)? true : $pageDestId;
+                $pageTreeTable = $this->getServiceLocator()->get('MelisEngineTablePageTree');
+                $pageDestId = $pageTreeTable->getEntryById($data['destinationPageId'])->toArray();
+                $pageDestId = ($data['destinationPageId'] == -1) ? true : $pageDestId;
 
-                $sourcePage     = $pageTreeTable->getFullDatasPage($data['sourcePageId'])->toArray();
+                $sourcePage = $pageTreeTable->getFullDatasPage($data['sourcePageId'])->toArray();
                 $cmsPageService = $this->getServiceLocator()->get('MelisCmsPageService');
-                $pageService    = $this->getServiceLocator()->get('MelisEnginePage');
-                $pageTree       = $this->getServiceLocator()->get('MelisEngineTree');
-                $langLocale     = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+                $pageService = $this->getServiceLocator()->get('MelisEnginePage');
+                $pageTree = $this->getServiceLocator()->get('MelisEngineTree');
+                $langLocale = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
 
                 //Language Locale
-                $langLocale     = $langLocale->getEntryById($langId)->current();
-                $langLocale     = $langLocale->lang_cms_locale;
+                $langLocale = $langLocale->getEntryById($langId)->current();
+                $langLocale = $langLocale->lang_cms_locale;
 
                 $childPages = $pageTree->getAllPages($duplicateStartingFrom);
-                $page       = (array)$pageService->getDatasPage($duplicateStartingFrom)->getMelisPageTree();
+                $page = (array)$pageService->getDatasPage($duplicateStartingFrom)->getMelisPageTree();
 
                 $pages = $page;
                 $tmpData[] = $page;
@@ -681,8 +680,7 @@ class TreeSitesController extends AbstractActionController
                     $pages[$idx] = $childPage;
                 }
 
-                if(!empty($pageDestId) && !empty($sourcePage)){
-
+                if (!empty($pageDestId) && !empty($sourcePage)) {
                     $pages = $page;
 
                     foreach ($childPages as $idx => $childPage) {
@@ -690,88 +688,84 @@ class TreeSitesController extends AbstractActionController
                     }
                     $tmpData[0] = $pages;
 
-                    if($pageRelation){
-
-                        $pageIdInitial    = $this->getPageIdInitial($duplicateStartingFrom);
-                        $idsSameInitial   = $this->checkPageRelation($pages['children'] ?? array(), null, $pageIdInitial);
-
-                        //parent data
-                        $parentData =  array(
-                            'pageId' => $duplicateStartingFrom,
-                            'langId' => $sourcePage[0]['lang_cms_id'],
-                        );
+                    if ($pageRelation) {
+                        $pageIdInitial = $this->getPageIdInitial($duplicateStartingFrom);
+                        $idsSameInitial = $this->checkPageRelation($pages['children'] ?? [], null, $pageIdInitial);
 
                         //Return language that has a conflict in duplicating new page language version
-                        $parentDataLang   = $this->checkPageLanguageVersion($tmpData,null,$langId);
-                        $pageChildren     = $pages['children'] ?? array();
-                        if(empty($parentDataLang)){
-
-                            if(empty($idsSameInitial))
-                            {
+                        $parentDataLang = $this->checkPageLanguageVersion($tmpData, null, $langId);
+                        $pageChildren = $pages['children'] ?? [];
+                        if (empty($parentDataLang)) {
+                            if (empty($idsSameInitial)) {
                                 $destinationPage = $cmsPageService->duplicatePage($duplicateStartingFrom, $destinationPage, $langId, $pageRelation);
-                                $this->mapPage($destinationPage, $pageChildren, null, $langId , $pageRelation);
+                                $this->mapPage($destinationPage, $pageChildren, null, $langId, $pageRelation);
                                 $success = 1;
                                 $textMessage = $translator->translate('tr_meliscms_menu_dupe_success');
-                            }else{
-
+                            } else {
                                 $textMessage = $translator->translate('tr_meliscms_menu_dupe_fail');
                             }
 
 
-                        }else{
+                        } else {
                             //Return errors
-                            foreach($parentDataLang as $key => $val){
-                                $errors[] = array(
-                                    'errorMessage' =>  $translator->translate('tr_meliscms_menu_dupe_page_relation_fail') . ' '. $langLocale,
-                                    'label'        => 'Page '. $val['pageId']
-                                );
+                            foreach ($parentDataLang as $key => $val) {
+                                $errors[] = [
+                                    'errorMessage' => $translator->translate('tr_meliscms_menu_dupe_page_relation_fail') . ' ' . $langLocale,
+                                    'label' => 'Page ' . $val['pageId']
+                                ];
                             }
                         }
-
-                    }else{
-
+                    } else {
                         $destinationPage = $cmsPageService->duplicatePage($duplicateStartingFrom, $destinationPage, $langId);
-                        $pageChildren    = isset($pages['children']) ? $pages['children'] : null;
+                        $pageChildren = isset($pages['children']) ? $pages['children'] : null;
                         $this->mapPage($destinationPage, $pageChildren, null, $langId);
 
                         $success = 1;
                         $textMessage = $translator->translate('tr_meliscms_menu_dupe_success');
                     }
-                }
-                else {
+                } else {
                     // destination page not existing
                     if (empty($pageDestId)) {
-                        $errors = array(
-                            'destinationPageId' => array(
+                        $errors = [
+                            'destinationPageId' => [
                                 'errorMessage' => $translator->translate('tr_meliscms_menu_dupe_destination_fail'),
                                 'label' => $translator->translate('tr_meliscms_menu_dupe'),
-                            ),
-                        );
+                            ],
+                        ];
                         // source page not existing
                     } else {
-                        $errors = array(
-                            'sourcePageId' => array(
+                        $errors = [
+                            'sourcePageId' => [
                                 'errorMessage' => $translator->translate('tr_meliscms_menu_dupe_source_fail'),
                                 'label' => $translator->translate('tr_meliscms_menu_dupe'),
-                            ),
-                        );
+                            ],
+                        ];
                     }
                 }
-            }else{
+            } else {
                 $errors = $form->getMessages();
             }
         }
-        
-        $response = array(
+
+        $response = [
             'success' => $success,
             'textTitle' => $textTitle,
             'textMessage' => $textMessage,
             'errors' => $errors,
             'chunk' => $data,
+        ];
+
+        $response = empty($pageDupeResult['errors']) ? $response : $pageDupeResult;
+        /** Log action */
+        $this->getEventManager()->trigger(
+            'meliscms_tree_duplicate_page_trees_end',
+            $this,
+            array_merge(
+                $response,
+                ['typeCode' => $logTypeCode, 'itemId' => $duplicateStartingFrom]
+            )
         );
-        
-        $response = !empty($pageDupeResult['errors'])? $pageDupeResult : $response;
-        $this->getEventManager()->trigger('meliscms_tree_duplicate_page_trees_end', $this, array_merge($response, array('typeCode' => $logTypeCode)));
+
         return new JsonModel($response);
     }
 
