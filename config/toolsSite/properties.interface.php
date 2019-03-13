@@ -69,7 +69,20 @@ return array(
                         'jsdatas' => array()
                     ),
                     'interface' => array(
-
+                        'meliscms_tool_sites_properties_content' => array(
+                            'conf' => array(
+                                'id' => 'id_meliscms_tool_sites_properties_content',
+                                'melisKey' => 'meliscms_tool_sites_properties_content',
+                                'rightsDisplay' => 'true',
+                            ),
+                            'forward' => array(
+                                'module' => 'MelisCms',
+                                'controller' => 'Sites',
+                                'action' => 'render-tool-sites-properties-content',
+                                'jscallback' => '',
+                                'jsdatas' => array()
+                            ),
+                        ),
                     ),
                 ),
             ),

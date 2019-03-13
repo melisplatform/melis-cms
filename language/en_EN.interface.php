@@ -475,10 +475,30 @@
         'tr_melis_cms_sites_tool_add_step2_url_local_after_domain' => 'I want the locale shown after my domain (ex: www.mysite.com/en/myurl)',
         'tr_melis_cms_sites_tool_add_step2_url_different_domains' => 'I want to have different domains or subdomains for them (ex: en.mysite.com and fr.mysite.com) and the tool will actually create multiple sites for you',
         'tr_melis_cms_sites_tool_add_step2_url_do_nothing' => 'I want nothing, my page url will be solely built on the page’s name',
+
+        #MODULE LOAD TAB
         'tr_melis_cms_sites_module_loading' => 'Module Loading',
         'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice' => '<i class="fa fa-warning"></i> Below are the lists of module(s) that is required by <strong>%s</strong>, are you sure you want to activate <strong>%s</strong>? ',
         'tr_melis_cms_sites_module_load_no_access' => 'You need to have and admin level of rights to modify this section.',
+
+        #DOMAINS TAB
         'tr_melis_cms_sites_domains' => 'Domains',
+
+        #PROPERTIES TAB
+        'tr_melis_cms_sites_properties' => 'Properties',
+        'tr_melis_cms_sites_site_id' => 'Site ID',
+        'tr_melis_cms_sites_site_id tooltip' => 'Identifier of the site currently editing',
+        'tr_melis_cms_sites_site_label' => 'Site Name',
+        'tr_melis_cms_sites_site_label tooltip' => 'The name of the site displayed in the platform',
+        'tr_melis_cms_sites_site_name' => 'Site Module',
+        'tr_melis_cms_sites_site_name tooltip' => 'The module name as defined in the code (or folder name in MelisSites/)',
+        'tr_melis_cms_sites_s404_page_id' => '404 Page ID',
+        'tr_melis_cms_sites_s404_page_id tooltip' => 'Identifier of the 404 page',
+        'tr_melis_cms_sites_site_main_page_id' => 'Main Home Page ID',
+        'tr_melis_cms_sites_site_main_page_id tooltip' => 'Identifier of the home page',
+        'tr_melis_cms_sites_homepages' => 'Homepages',
+        'tr_melis_cms_sites_shome_page_id' => 'Home Page ID',
+        'tr_melis_cms_sites_shome_page_id tooltip' => 'Identifier of the home page per language',
 
 
 	);

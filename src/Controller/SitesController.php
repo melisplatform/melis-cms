@@ -94,6 +94,47 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
+    public function renderToolSitesPropertiesContentAction() {
+
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $melisKey = $this->getMelisKey();
+        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $cmsLangSvc = $this->getServiceLocator()->get('MelisEngineLang');
+        $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
+
+        $cmsLangs = $cmsLangSvc->getAvailableLanguages();
+        $propertiesForm = $melisTool->getForm("meliscms_tool_sites_properties_form");
+        $homepageForm = $melisTool->getForm("meliscms_tool_sites_properties_homepage_form");
+
+        $sitePropSvc = $this->getServiceLocator()->get("MelisCmsSitesPropertiesService");
+        $siteProp = $sitePropSvc->getSitePropAnd404BySiteId($siteId);
+        $siteLangHomepages = $sitePropSvc->getLangHomepages($siteId);
+
+        //setting data for the properties form
+        $propertiesForm->setData((array)$siteProp);
+
+        //Filter the cms language that are only used by the current site
+        $tempCmsLangs = $cmsLangs;
+        $cmsLangs = array();
+        foreach($tempCmsLangs as $tempCmsLang){
+            foreach ($siteLangHomepages as $siteLangHomepage){
+                if($tempCmsLang['lang_cms_id'] === $siteLangHomepage['shome_lang_id']){
+                    array_push($cmsLangs,$tempCmsLang);
+                }
+            }
+        }
+        array_reverse($cmsLangs);
+
+        $view = new ViewModel();
+        $view->melisKey = $melisKey;
+        $view->siteId = $siteId;
+        $view->propertiesForm = $propertiesForm;
+        $view->homepageForm = $homepageForm;
+        $view->siteLangHomepages = $siteLangHomepages;
+        $view->cmsLangs = $cmsLangs;
+        return $view;
+    }
+
     public function renderToolSitesModuleLoadAction() {
 
         $siteId = (int) $this->params()->fromQuery('siteId', '');
@@ -514,9 +555,12 @@ class SitesController extends AbstractActionController
 
         $success = 0;
         $ctr = 0;
+        $ctr1 = 0;
 
         $moduleList = array();
         $domainData = array();
+        $siteProp = array();
+        $siteHomeData = array();
 
 
         foreach ($data as $datum => $val){
@@ -530,7 +574,7 @@ class SitesController extends AbstractActionController
             }
 
             //collecting data for site domains
-            if (strstr($datum,'sdom')) {
+            if (strstr($datum,'sdom_')) {
                 $key = substr($datum, (strpos($datum, '_') ?: -1) + 1);
                 if(!empty($domainData[$ctr]))
                     if(array_key_exists($key, $domainData[$ctr]))
@@ -538,10 +582,27 @@ class SitesController extends AbstractActionController
                 $domainData[$ctr][$key] = $val;
             }
 
+            //collecting data for site properties
+            if (strstr($datum,'siteprop_')) {
+                $datum = str_replace("siteprop_", '', $datum);
+                array_push($siteProp, $datum);
+            }
+
+            //collecting data for site language homepages
+            if (strstr($datum,'sitehome_')) {
+                $key = substr($datum, (strpos($datum, '_') ?: -1) + 1);
+                if(!empty($siteHomeData[$ctr1]))
+                    if(array_key_exists($key, $siteHomeData[$ctr1]))
+                        $ctr1++;
+                $siteHomeData[$ctr1][$key] = $val;
+            }
+
         }
 
         //saving module load
-        $siteModuleLoadSvc->saveModuleLoad($siteId,$moduleList);
+        if($isAdmin) {
+            $siteModuleLoadSvc->saveModuleLoad($siteId, $moduleList);
+        }
 
         //saving site domains
         foreach($domainData as $domainDatum){
@@ -554,13 +615,8 @@ class SitesController extends AbstractActionController
                     $textMessage = $translator->translate("tr_melis_cms_site_save_ok");
                     $status = 1;
                 }else{
-                    $response = array(
-                        'success' => $success,
-                        'textTitle' => $translator->translate('tr_meliscms_tool_site'),
-                        'textMessage' => $translator->translate('tr_melis_cms_site_save_ko'),
-                        'errors' => $errors,
-                    );
-                    return new JsonModel($response);
+                    $textMessage = $translator->translate('tr_melis_cms_site_save_ko');
+                    $success  = 0;
                 }
             }else{
                 $textMessage = 'tr_melis_cms_site_save_ko';
