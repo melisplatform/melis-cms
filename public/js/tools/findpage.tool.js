@@ -3,10 +3,15 @@
     // cache DOM
     var $body = $('body');
     var dataUrl;
+    var $tmce = tinymce.dom.DomQuery;
+    var $melisIframe = $body.find(".melis-iframe"),
+        $insertEditLink = $melisIframe.contents().find(".insert-edit-link");
 
     // Binding Events =================================================================================================================
-    $body.on("click", "div[aria-label='Insert/edit link']", checkBtn);
-    $body.on("click", "div.mce-menu-item", checkBtn);
+    //$body.on("click", "div[aria-label='Insert/edit link']", checkBtn);
+    //$insertEditLink.on("click", checkBtn);
+    //$editLink.on("click", checkBtn);
+    //$body.on("click", "div.mce-menu-item", checkBtn);
 
     // CreateTreeModal
     $body.on("click", "#mce-link-tree", createTreeModal);
@@ -130,17 +135,35 @@
         //var inputBox = $('.melis-iframe').contents().find('#mce-link-tree').prev().val(dataUrl);
         //var inputBox = $('#mce-link-tree').parent().find('input').val(dataUrl);
     	var inputBox = $('.melis-iframe').contents().find('#mce-link-tree').parent().find('input').val(dataUrl);
-    	    $(".mce-floatpanel.mce-window").find('#mce-link-tree').parent().find('input').val(dataUrl);
+                       $(".mce-floatpanel.mce-window").find('#mce-link-tree').parent().find('input').val(dataUrl);
     }
 
     function checkBtn() {
-        var urlBox = $('body').find('.mce-has-open').prev().text();
+        console.log("checkBtn from insert-edit-link");
 
-        var check = $body.find('.mce-has-open')[0];
+        var $melisIframe    = $body.find(".melis-iframe"),
+            $dialog         = $melisIframe.contents().find(".tox-dialog"),
+            $conHStacks     = $dialog.find(".tox-form__controls-h-stack"),
+            $urlBtn         = $conHStacks.find(".tox-browse-url"),
+            $urlInputWrap   = $conHStacks.find(".tox-control-wrap"),
+            $urlInput       = $urlInputWrap.find(".tox-textfield"),
+            urlBtnWidth     = $urlBtn.width() + 1,
+            cUrlInput;
 
-        var urlLabel = $('body').find('.mce-widget.mce-label');
-        
-        urlLabel.each( function() {
+            if ( $urlBtn.length ) {
+                cUrlInput = $urlInput.width() - urlBtnWidth;
+                $urlBtn.css("left", 0);
+                $urlInput.css("width", cUrlInput);
+                addTreeBtnMoxie();
+            }
+            else {
+                cUrlInput = $urlInput.width() - 32;
+                $urlInput.css("width", cUrlInput);
+                addTreeBtnMoxie();
+                //$conHStacks.append('<div id="mce-link-tree" class="mce-btn mce-open" style="position: absolute; right: 0; width: 32px; height: 28px;"><button><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; top: 2px; font-size: 16px;"></i></button></div>');
+            }
+
+        /*urlLabel.each( function() {
             var $this = $(this);
 
             if( $this.text() === "Url" ) {
@@ -160,14 +183,20 @@
                     urlInput.css({'width': cInput});
                     urlInputBox.append('<div id="mce-link-tree" class="mce-btn mce-open" style="position: absolute; right: 0; width: 32px; height: 28px;"><button><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; top: 2px; font-size: 16px;"></i></button></div>');
                 }
-                
             }
-        });
+        });*/
     }
 
     function addTreeBtnMoxie() {
-        var box = $body.find('.mce-has-open');
-        box.append('<div id="mce-link-tree" class="mce-btn mce-open" style="position: absolute; right: 0; width: 32px; height: 28px;"><button><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; top: 2px; font-size: 16px;"></i></button></div>');
+        console.log("addTreeBtnMoxie");
+
+        var $melisIframe    = $body.find(".melis-iframe"),
+            $dialog         = $melisIframe.contents().find(".tox-dialog"),
+            $conHStacks     = $dialog.find(".tox-form__controls-h-stack");
+
+            if ( $conHStacks.length ) {
+                $conHStacks.append('<div id="mce-link-tree" class="mce-btn mce-open" style="position: absolute; right: 0; width: 32px; height: 28px;"><button><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; top: 2px; font-size: 16px;"></i></button></div>');
+            }
     }
 
     function createTreeModal() {
@@ -269,13 +298,12 @@
 
     }
 
-
     return {
         createTreeModal         :       createTreeModal,
         createInputTreeModal	: 		createInputTreeModal,
         findPageMainTree        :       findPageMainTree,
         checkBtn                :       checkBtn,
-        showUrl                 :       showUrl,
+        showUrl                 :       showUrl
     }
 
 })(jQuery, window);
