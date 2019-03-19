@@ -1,0 +1,59 @@
+<?php
+$id = '';
+if (!empty($this->zoneconfig['conf']['id'])) {
+    $id = ' id="' . $this->siteId . '_' . $this->zoneconfig['conf']['id'] . '"';
+}
+
+$data_melisKey = $this->melisKey;
+?>
+<div <?= $id; ?> data-melisKey="<?= $data_melisKey; ?>">
+    <div class="spacing-x2 innerAll">
+        <div class="switch-all-container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="pull-left">Choose the languages affected to this site</h3>
+                </div>
+            </div>
+        </div>
+        <?php
+            $form = clone $this->form;
+            $form->prepare();
+
+            echo $this->form()->openTag($form);
+        ?>
+        <!--LANGUAGES LISTING-->
+        <?php foreach ($this->languages as $language) { ?>
+            <label class="checkbox-inline">
+                <?php
+                    $checked = '';
+
+                    if (in_array($language['lang_cms_id'], $this->selectedLanguages)) {
+                        $checked = 'checked';
+                    }
+                ?>
+                <input type="checkbox" name="slang_lang_id[]" value="<?= $language['lang_cms_id'] ?>" <?= $checked ?>> <?= $language['lang_cms_name'] ?>
+            </label>
+        <?php } ?>
+        <!--LANGUAGES LISTING END-->
+        <br>
+        <br>
+        <h3>How do you want to reflect the language in the site's URLs?</h3>
+        <div class="row">
+            <div class="col-md-12">
+                <label class="radio-inline">
+                    <input type="radio" class="radio" name="site_opt_lang_url" value="2"> I want the locale shown after my domain (ex: www.mysite.com/en/myurl)
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <label class="radio-inline">
+                    <input type="radio" class="radio" name="site_opt_lang_url" value="1"> I want nothing, my page url will be solely built on the page's name
+                </label>
+            </div>
+        </div>
+        <?php
+            echo $this->form()->closeTag();
+        ?>
+    </div>
+</div>

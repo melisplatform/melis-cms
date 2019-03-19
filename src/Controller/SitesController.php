@@ -160,12 +160,41 @@ class SitesController extends AbstractActionController
     }
 
     public function renderToolSitesLanguagesAction() {
-
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
+
+        $view = new ViewModel();
+
+        $view->melisKey = $melisKey;
+        $view->siteId = $siteId;
+
+        return $view;
+    }
+
+    public function renderToolSitesLanguagesContentAction() {
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $melisKey = $this->getMelisKey();
+        $melisEngineLangSvc = $this->getServiceLocator()->get('MelisEngineLang');
+        $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+        $selectedLanguages = [];
+
+        $languages = $melisEngineLangSvc->getAvailableLanguages();
+        $form = $this->getTool()->getForm('meliscms_tool_sites_languages_form');
+
+        $siteLanguages = $siteLangsTable->getEntryByField('slang_site_id', $siteId)->toArray();
+
+        foreach ($siteLanguages as $language) {
+            array_push($selectedLanguages, $language['slang_lang_id']);
+        }
+
         $view = new ViewModel();
         $view->melisKey = $melisKey;
         $view->siteId = $siteId;
+        $view->form = $form;
+        $view->languages = $languages;
+        $view->siteLanguages = $siteLanguages;
+        $view->selectedLanguages = $selectedLanguages;
+
         return $view;
     }
 
@@ -511,13 +540,14 @@ class SitesController extends AbstractActionController
         $melisCoreAuth = $this->serviceLocator->get('MelisCoreAuth');
         $userAuthDatas = $melisCoreAuth->getStorage()->read();
         $isAdmin = isset($userAuthDatas->usr_admin) || $userAuthDatas->usr_admin != "" ? $userAuthDatas->usr_admin : 0;
+        $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
 
         $success = 0;
         $ctr = 0;
 
         $moduleList = array();
         $domainData = array();
-
 
         foreach ($data as $datum => $val){
 
@@ -569,6 +599,25 @@ class SitesController extends AbstractActionController
             }
 
         }
+
+        // saving languages
+        foreach ($data['slang_lang_id'] as $lang) {
+            $siteLangs = $siteLangsTable->getEntryByField('slang_site_id', $siteId)->toArray();
+
+            foreach ($siteLangs as $siteLang) {
+                if ($siteLang['slang_lang_id'] !== $lang) {
+                    $siteLangsTable->save([
+                        'slang_site_id' => $siteId,
+                        'slang_lang_id' => $lang
+                    ]);
+                }
+            }
+        }
+
+        // update site to add site option language url
+        $siteTable->save([
+            'site_opt_lang_url' => $data['site_opt_lang_url']
+        ]);
 
         $response = array(
             'success' => $status,
