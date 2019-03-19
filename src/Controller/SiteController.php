@@ -462,7 +462,7 @@ class SiteController extends AbstractActionController
                         }
                         else 
                         {
-                            $textMessage = 'tr_meliscms_tool_site_edit_success';
+                            $textMessage = 'tr_meliscmsmelisSiteHelper _tool_site_edit_success';
                         }
                         
                         $siteId = $saveSiteResult['site_id'];

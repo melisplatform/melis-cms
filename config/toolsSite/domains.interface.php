@@ -79,7 +79,7 @@ return array(
                                 'module' => 'MelisCms',
                                 'controller' => 'Sites',
                                 'action' => 'render-tool-sites-domains-content',
-                                'jscallback' => 'setOnOff();',
+                                'jscallback' => '',
                                 'jsdatas' => array()
                             ),
                         ),

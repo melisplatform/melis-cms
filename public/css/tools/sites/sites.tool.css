@@ -1,5 +1,6 @@
 .tool-sites_container_fixed_width{
-    max-width: 500px;
+    max-width: 540px;
+    margin-bottom:10px;
 }
 .tab-header-title-container {
     width: 100%;
@@ -15,6 +16,14 @@ div[data-meliskey="meliscms_tool_sites_edit_site_tabs"] .widget-head.nav {
 .sites_step2-multi-language, .sites_step2-single-language,
 #btn-prev-step, #btn-finish-step{
     display: none;
+}
+
+.step5-message{
+    margin-top: 30px !important;
+}
+
+.fieldErrorColor{
+    color: #FF0000;
 }
 
 /** Site V2 MODULE LOAD TAB **/
@@ -39,3 +48,16 @@ ul.meliscms-site-domains-list > li:hover {
 .page-content-container .nav-tabs.meliscms-site-domains-list > li.active:active > a {
     border: 0 solid #e61c23 !important;
 }
+
+/** SITE V2 PROPERTIES **/
+/** SITE V2 DOMAIN TAB **/
+ul.meliscms-site-language-homepage-list > li,
+ul.meliscms-site-language-homepage-list > li:hover {
+    border: 0 solid #e61c23 !important;
+}
+.page-content-container .nav-tabs.meliscms-site-language-homepage-list li.active > a,
+.page-content-container .nav-tabs.meliscms-site-language-homepage-list > li.active:focus > a,
+.page-content-container .nav-tabs.meliscms-site-language-homepage-list > li.active:active > a {
+    border: 0 solid #e61c23 !important;
+}
+

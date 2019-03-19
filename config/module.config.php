@@ -112,6 +112,7 @@ return array(
             'MelisCmsSiteService' => 'MelisCms\Service\Factory\MelisCmsSiteServiceFactory',
             'MelisCmsSiteModuleLoadService' => 'MelisCms\Service\Factory\MelisCmsSitesModuleLoadServiceFactory',
             'MelisCmsSitesDomainsService' => 'MelisCms\Service\Factory\MelisCmsSitesDomainsServiceFactory',
+            'MelisCmsSitesPropertiesService' => 'MelisCms\Service\Factory\MelisCmsSitesPropertiesServiceFactory',
             'MelisCmsPageGetterService' => 'MelisCms\Service\Factory\MelisCmsPageGetterServiceFactory',
             'MelisCms\Listener\MelisCmsPluginSaveEditionSessionListener' => 'MelisCms\Listener\Factory\MelisCmsPluginSaveEditionSessionListenerFactory',
             'MelisCmsPageService' => 'MelisCms\Service\Factory\MelisCmsPageServiceFactory',

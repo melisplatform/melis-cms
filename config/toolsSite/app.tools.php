@@ -81,7 +81,7 @@ return array(
                         'meliscms_tool_sites_modal_add_step1_form' => array(
                             'attributes' => array(
                                 'name' => 'toolsitesadd_step1form',
-                                'id' => 'site-translation-form',
+                                'id' => 'step1form-is_multi_lingual',
                                 'method' => 'POST',
                                 'action' => '',
                             ),
@@ -92,7 +92,6 @@ return array(
                                         'name' => 'is_multi_language',
                                         'type' => 'Select',
                                         'options' => array(
-                                            'tooltip' => '',
                                             'label' => 'tr_melis_cms_sites_tool_add_step1_is_multi_lang',
                                             'checked_value' => 1,
                                             'unchecked_value' => 0,
@@ -109,9 +108,6 @@ return array(
                                     ),
                                 ),
                             ),
-                            'input_filter' => array(
-
-                            ),
                         ),
                         /**
                          * STEP 2 FORMS
@@ -125,10 +121,26 @@ return array(
                             ),
                             'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
                             'elements' => array(
-                                //add other field here for step2
-                            ),
-                            'input_filter' => array(
-                                //fields filter
+                                array(
+                                    'spec' => array(
+                                        'type' => 'Zend\Form\Element\Radio',
+                                        'name' => 'sites_url_setting',
+                                        'options' => array(
+                                            'label' => 'tr_melis_cms_sites_tool_add_step2_reflect_urls',
+                                            'label_options' => array(
+                                                'disable_html_escape' => true,
+                                            ),
+                                            'value_options' => array(
+                                                '1' => 'tr_melis_cms_sites_tool_add_step2_url_local_after_domain',
+                                                '2' => 'tr_melis_cms_sites_tool_add_step2_url_different_domains',
+                                                '3' => 'tr_melis_cms_sites_tool_add_step2_url_do_nothing',
+                                            ),
+                                        ),
+                                        'attributes' => array(
+                                            'required' => 'required',
+                                        ),
+                                    )
+                                )
                             ),
                         ),
                         'meliscms_tool_sites_modal_add_step2_form_single_language' => array(
@@ -141,9 +153,6 @@ return array(
                             'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
                             'elements' => array(
                                 //add other field here for step2
-                            ),
-                            'input_filter' => array(
-                                //fields filter
                             ),
                         ),
                         /**
@@ -160,26 +169,22 @@ return array(
                             'elements' => array(
                                 array(
                                     'spec' => array(
-                                        'name' => 'single_domain_name',
+                                        'name' => 'sdom_domain',
                                         'type' => 'MelisText',
                                         'options' => array(
-                                            'tooltip' => '',
-                                            'label' => 'tr_melis_cms_sites_tool_add_step1_is_multi_lang',
+                                            'label' => 'tr_melis_cms_sites_tool_add_step3_single_domain_name',
                                         ),
                                         'attributes' => array(
-                                            'id' => 'single_domain_name',
+                                            'id' => 'sdom_domain',
                                         ),
                                     ),
                                 ),
                             ),
-                            'input_filter' => array(
-                                //fields filter
-                            ),
                         ),
                         'meliscms_tool_sites_modal_add_step3_form_multi_domain' => array(
                             'attributes' => array(
-                                'name' => 'toolsitesadd_step3form-single_domain',
-                                'id' => 'step3form-single_domain',
+                                'name' => 'toolsitesadd_step3form-multi_domain',
+                                'id' => 'step3form-multi_domain',
                                 'method' => 'POST',
                                 'action' => '',
                             ),
@@ -187,8 +192,66 @@ return array(
                             'elements' => array(
                                 //add other field here for step3 multi domain
                             ),
-                            'input_filter' => array(
-                                //fields filter
+                        ),
+                        /**
+                         * STEP 4 FORMS
+                         */
+                        'meliscms_tool_sites_modal_add_step4_form_module' => array(
+                            'attributes' => array(
+                                'name' => 'toolsitesadd_step4form_module',
+                                'id' => 'step4form_module',
+                                'method' => 'POST',
+                                'action' => '',
+                            ),
+                            'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                            'elements' => array(
+                                array(
+                                    'spec' => array(
+                                        'name' => 'siteSelectModuleName',
+                                        'type' => 'MelisCmsPluginSiteModuleSelect',
+                                        'options' => array(
+                                            'label' => 'tr_melis_cms_sites_tool_add_step4_select_module',
+                                            'empty_option' => 'tr_melis_cms_sites_tool_add_step4_select_module_placeholder',
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'siteSelectModuleName',
+                                            'class' => 'form-control',
+                                        ),
+                                    ),
+                                ),
+                                array(
+                                    'spec' => array(
+                                        'name' => 'siteCreateModuleName',
+                                        'type' => 'MelisText',
+                                        'options' => array(
+                                            'label' => 'tr_melis_cms_sites_tool_add_step4_create_module',
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'siteCreateModuleName',
+                                            'class' => 'form-control',
+                                            'value' => getenv('MELIS_MODULE'),
+                                        ),
+                                    ),
+                                ),
+                                array(
+                                    'spec' => array(
+                                        'type' => 'Zend\Form\Element\Radio',
+                                        'name' => 'create_sites_file',
+                                        'options' => array(
+                                            'label' => 'tr_melis_cms_sites_tool_add_step4_create_file_for_website',
+                                            'label_options' => array(
+                                                'disable_html_escape' => true,
+                                            ),
+                                            'value_options' => array(
+                                                'yes' => 'tr_meliscms_common_yes',
+                                                'no' => 'tr_meliscms_common_no',
+                                            ),
+                                        ),
+                                        'attributes' => array(
+                                            'required' => 'required',
+                                        ),
+                                    )
+                                )
                             ),
                         ),
 
