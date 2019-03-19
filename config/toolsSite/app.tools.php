@@ -254,6 +254,7 @@ return array(
                                 )
                             ),
                         ),
+
                     ),
 
                 ), // end Melis CMS Site Tool

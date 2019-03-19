@@ -1,0 +1,101 @@
+<?php
+$id = '';
+if (!empty($this->zoneconfig['conf']['id']))
+    $id = ' id="' . $this->siteId . '_' . $this->zoneconfig['conf']['id'] . '"';
+
+$data_melisKey = $this->melisKey;
+
+?>
+<div data-melisKey='<?= $data_melisKey; ?>'<?= $id; ?> class="tab-pane widget-body-regular meliscms_center_tabs">
+    <div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none">
+        <div class="widget-body innerAll inner-2x">
+            <div class="tab-header-title-container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h3 class="pull-left"><?= $this->translate('tr_melis_cms_sites_properties'); ?></h3>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane active">
+                <div class="row">
+                    <div class="col-md-4 col-lg-4 col-sm-12">
+                        <?php
+                        $form = $this->propertiesForm;
+                        $form->prepare();
+                        foreach($form->getElements() as $element => $attributes)  {
+                            $el =  $form->get((string) $element);
+                            if($el->getName() == "site_id")
+                                $el->setValue($this->siteId);
+                            if($el->getName() == "site_id_disp")
+                                $el->setValue($this->siteId);
+                            $el->setName("siteprop_".$el->getName());
+                        }
+                        echo $this->form()->openTag($form);
+                        echo $this->melisFieldCollection($form);
+                        echo $this->form()->closeTag();
+                        ?>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="tab-header-title-container" style="margin-top:15px;">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3 class="pull-left"><?= $this->translate('tr_melis_cms_sites_homepages'); ?></h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-md-2">
+                        <div class="product-text-tab-container" >
+                            <ul class="nav-tabs product-text-tab meliscms-site-language-homepage-list">
+                                <?php foreach($this->cmsLangs as $idx => $cmsLang) :?>
+                                    <li class="">
+                                        <a class="clearfix" data-toggle="tab" id="news_cms_lang_<?= $cmsLang['lang_cms_id'] ?>" href="#<?= $cmsLang['lang_cms_locale']; ?>-log-type-details-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $cmsLang['lang_cms_id'] ?>">
+                                            <span><?= $cmsLang['lang_cms_name'] ?></span>
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-3">
+                        <div class="tab-content">
+                            <?php foreach ($this->cmsLangs as $idx => $cmsLang) : ?>
+                                <div id="<?= $cmsLang['lang_cms_locale']; ?>-log-type-details-<?= $this->siteId; ?>" class="tab-pane product-text-tab-content">
+                                    <div class="bg-white">
+                                        <h4 class=""><i class="fa fa-map-marker"></i>  <?= $cmsLang['lang_cms_name']; ?></h4>
+                                    </div>
+                                    <div id="cms_domain_<?= $cmsLang['lang_cms_id']; ?>">
+                                        <?php
+                                        $form = clone $this->homepageForm;
+
+                                        foreach($form->getElements() as $element => $attributes)  {
+                                            $el =  $form->get((string) $element);
+                                            foreach ($this->siteLangHomepages as $siteLangHomepage){
+                                                if($siteLangHomepage['shome_lang_id'] == $cmsLang['lang_cms_id']){
+                                                    $el->setValue($siteLangHomepage[$el->getName()]);
+                                                }
+                                            }
+                                            if($el->getName() == "shome_lang_id")
+                                                $el->setValue($cmsLang['lang_cms_id']);
+                                            $el->setName("sitehome_".$idx."_".$el->getName());
+
+                                        }
+                                        echo $this->form()->openTag($form);
+                                        echo $this->melisFieldCollection($form);
+                                        echo $this->form()->closeTag();
+                                        ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

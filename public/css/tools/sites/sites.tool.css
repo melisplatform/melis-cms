@@ -2,6 +2,16 @@
     max-width: 540px;
     margin-bottom:10px;
 }
+.tab-header-title-container {
+    width: 100%;
+    text-align: right;
+    margin-top: -15px;
+    margin-bottom: 20px;
+}
+div[data-meliskey="meliscms_tool_sites_edit_site_tabs"] .widget-head.nav {
+    z-index: 1;
+}
+
 /**STEP FORM**/
 .sites_step2-multi-language, .sites_step2-single-language,
 #btn-prev-step, #btn-finish-step{
@@ -15,3 +25,39 @@
 .fieldErrorColor{
     color: #FF0000;
 }
+
+/** Site V2 MODULE LOAD TAB **/
+#site-select-deselect-all-module.has-switch {
+    right: 22px;
+}
+div[data-meliskey="meliscms_tool_sites_module_load_content"] .switch-all-noti {
+    z-index: 0;
+    top: -45px;
+}
+div[data-meliskey="meliscms_tool_sites_module_load_content"] #header-version {
+    padding: 15px 0px;
+}
+
+/** SITE V2 DOMAIN TAB **/
+ul.meliscms-site-domains-list > li,
+ul.meliscms-site-domains-list > li:hover {
+    border: 0 solid #e61c23 !important;
+}
+.page-content-container .nav-tabs.meliscms-site-domains-list li.active > a,
+.page-content-container .nav-tabs.meliscms-site-domains-list > li.active:focus > a,
+.page-content-container .nav-tabs.meliscms-site-domains-list > li.active:active > a {
+    border: 0 solid #e61c23 !important;
+}
+
+/** SITE V2 PROPERTIES **/
+/** SITE V2 DOMAIN TAB **/
+ul.meliscms-site-language-homepage-list > li,
+ul.meliscms-site-language-homepage-list > li:hover {
+    border: 0 solid #e61c23 !important;
+}
+.page-content-container .nav-tabs.meliscms-site-language-homepage-list li.active > a,
+.page-content-container .nav-tabs.meliscms-site-language-homepage-list > li.active:focus > a,
+.page-content-container .nav-tabs.meliscms-site-language-homepage-list > li.active:active > a {
+    border: 0 solid #e61c23 !important;
+}
+

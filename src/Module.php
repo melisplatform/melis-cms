@@ -178,6 +178,8 @@ class Module
             include __DIR__ . '/../config/app.microservice.php',
             include __DIR__ . '/../config/toolsSite/main.interface.php',
             include __DIR__ . '/../config/toolsSite/app.tools.php',
+            include __DIR__ . '/../config/toolsSite/domains.tools.php',
+            include __DIR__ . '/../config/toolsSite/properties.tools.php',
             include __DIR__ . '/../config/toolsSite/properties.interface.php',
             include __DIR__ . '/../config/toolsSite/moduleload.interface.php',
             include __DIR__ . '/../config/toolsSite/domains.interface.php',

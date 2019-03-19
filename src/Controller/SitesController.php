@@ -32,9 +32,8 @@ class SitesController extends AbstractActionController
      * Main container of the tool, this holds all the components of the tools
      * @return ViewModel();
      */
-    public function renderToolSitesAction()
-    {
-
+    public function renderToolSitesAction() {
+        
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -44,9 +43,8 @@ class SitesController extends AbstractActionController
     /**
      * @return ViewModel();
      */
-    public function renderToolSitesEditAction()
-    {
-        $siteId = (int)$this->params()->fromQuery('siteId', '');
+    public function renderToolSitesEditAction() {
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -58,9 +56,8 @@ class SitesController extends AbstractActionController
     /**
      * @return ViewModel();
      */
-    public function renderToolSitesEditHeaderAction()
-    {
-        $siteId = (int)$this->params()->fromQuery('siteId', '');
+    public function renderToolSitesEditHeaderAction() {
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -71,9 +68,8 @@ class SitesController extends AbstractActionController
     /**
      * @return ViewModel();
      */
-    public function renderToolSitesEditSiteHeaderSaveAction()
-    {
-        $siteId = (int)$this->params()->fromQuery('siteId', '');
+    public function renderToolSitesEditSiteHeaderSaveAction() {
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -81,10 +77,9 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesTabsAction()
-    {
+    public function renderToolSitesTabsAction() {
 
-        $siteId = (int)$this->params()->fromQuery('siteId', '');
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -92,10 +87,9 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesPropertiesAction()
-    {
+    public function renderToolSitesPropertiesAction() {
 
-        $siteId = (int)$this->params()->fromQuery('siteId', '');
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -103,10 +97,50 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesModuleLoadAction()
-    {
+    public function renderToolSitesPropertiesContentAction() {
 
-        $siteId = (int)$this->params()->fromQuery('siteId', '');
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $melisKey = $this->getMelisKey();
+        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $cmsLangSvc = $this->getServiceLocator()->get('MelisEngineLang');
+        $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
+
+        $cmsLangs = $cmsLangSvc->getAvailableLanguages();
+        $propertiesForm = $melisTool->getForm("meliscms_tool_sites_properties_form");
+        $homepageForm = $melisTool->getForm("meliscms_tool_sites_properties_homepage_form");
+
+        $sitePropSvc = $this->getServiceLocator()->get("MelisCmsSitesPropertiesService");
+        $siteProp = $sitePropSvc->getSitePropAnd404BySiteId($siteId);
+        $siteLangHomepages = $sitePropSvc->getLangHomepages($siteId);
+
+        //setting data for the properties form
+        $propertiesForm->setData((array)$siteProp);
+
+        //Filter the cms language that are only used by the current site
+        $tempCmsLangs = $cmsLangs;
+        $cmsLangs = array();
+        foreach($tempCmsLangs as $tempCmsLang){
+            foreach ($siteLangHomepages as $siteLangHomepage){
+                if($tempCmsLang['lang_cms_id'] === $siteLangHomepage['shome_lang_id']){
+                    array_push($cmsLangs,$tempCmsLang);
+                }
+            }
+        }
+        array_reverse($cmsLangs);
+
+        $view = new ViewModel();
+        $view->melisKey = $melisKey;
+        $view->siteId = $siteId;
+        $view->propertiesForm = $propertiesForm;
+        $view->homepageForm = $homepageForm;
+        $view->siteLangHomepages = $siteLangHomepages;
+        $view->cmsLangs = $cmsLangs;
+        return $view;
+    }
+
+    public function renderToolSitesModuleLoadAction() {
+
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -114,12 +148,17 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesModuleLoadContentAction()
-    {
+    public function renderToolSitesModuleLoadContentAction() {
 
         $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
         $modulesSvc = $this->getServiceLocator()->get('ModulesService');
-        $siteId = (int)$this->params()->fromQuery('siteId', '');
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $melisCoreAuth = $this->serviceLocator->get('MelisCoreAuth');
+
+        $userAuthDatas = $melisCoreAuth->getStorage()->read();
+
+        $isAdmin = isset($userAuthDatas->usr_admin) || $userAuthDatas->usr_admin != "" ? $userAuthDatas->usr_admin : 0;
+
         $modulesInfo = $modulesSvc->getModulesAndVersions();
         $modules = $siteModuleLoadSvc->getModules($siteId);
         $melisKey = $this->getMelisKey();
@@ -127,14 +166,14 @@ class SitesController extends AbstractActionController
         $view->modulesInfo = $modulesInfo;
         $view->modules = $modules;
         $view->melisKey = $melisKey;
+        $view->isAdmin = $isAdmin;
         $view->siteId = $siteId;
         return $view;
     }
 
-    public function renderToolSitesDomainsAction()
-    {
+    public function renderToolSitesDomainsAction() {
 
-        $siteId = (int)$this->params()->fromQuery('siteId', '');
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -142,24 +181,31 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesDomainsContentAction()
-    {
+    public function renderToolSitesDomainsContentAction() {
 
-        $siteId = (int)$this->params()->fromQuery('siteId', '');
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $siteDomainsSvc = $this->getServiceLocator()->get("MelisCmsSitesDomainsService");
+        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
+
+        $domainsForm = $melisTool->getForm("meliscms_tool_sites_domain_form");
         $siteEnvs = $siteDomainsSvc->getEnvironments();
+        $siteDomains = $siteDomainsSvc->getDomainsBySiteId($siteId);
+
+
         $view = new ViewModel();
         $view->siteEnvs = $siteEnvs;
         $view->melisKey = $melisKey;
         $view->siteId = $siteId;
+        $view->domainsForm = $domainsForm;
+        $view->siteDomains = $siteDomains;
         return $view;
     }
 
-    public function renderToolSitesLanguagesAction()
-    {
+    public function renderToolSitesLanguagesAction() {
 
-        $siteId = (int)$this->params()->fromQuery('siteId', '');
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -167,10 +213,9 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesSiteConfigAction()
-    {
+    public function renderToolSitesSiteConfigAction() {
 
-        $siteId = (int)$this->params()->fromQuery('siteId', '');
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -178,30 +223,27 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesSiteTranslationsAction()
-    {
+    public function renderToolSitesSiteTranslationsAction() {
 
-        $siteId = (int)$this->params()->fromQuery('siteId', '');
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
         $view->siteId = $siteId;
         return $view;
     }
-
     /**
      * Renders to the header section of the tool
      * @return \Zend\View\Model\ViewModel
      */
-    public function renderToolSitesHeaderAction()
-    {
+    public function renderToolSitesHeaderAction() {
 
         $melisKey = $this->getMelisKey();
 
-        $view = new ViewModel();
-        $view->melisKey = $melisKey;
+        $view              = new ViewModel();
+        $view->melisKey    = $melisKey;
         $view->headerTitle = $this->getTool()->getTranslation('tr_meliscms_tool_sites_header_title');
-        $view->subTitle = $this->getTool()->getTranslation('tr_meliscms_tool_sites_header_sub_title');
+        $view->subTitle    = $this->getTool()->getTranslation('tr_meliscms_tool_sites_header_sub_title');
         return $view;
     }
 
@@ -237,7 +279,7 @@ class SitesController extends AbstractActionController
     {
         return new ViewModel();
     }
-
+    
     /**
      * Renders to the center content of the tool
      * @return \Zend\View\Model\ViewModel
@@ -259,7 +301,7 @@ class SitesController extends AbstractActionController
         $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration();
         return $view;
     }
-
+    
     /**
      * This is the container of the modal
      * @return \Zend\View\Model\ViewModel
@@ -277,7 +319,7 @@ class SitesController extends AbstractActionController
 
         return $view;
     }
-
+    
     /**
      * Renders to the empty modal display, this will be displayed if the user doesn't have access to the modal tabs
      * @return \Zend\View\Model\ViewModel
@@ -288,7 +330,7 @@ class SitesController extends AbstractActionController
         $tool = $config->getItem('/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_sites/interface/meliscms_tool_sites_modals');
         return new ViewModel();
     }
-
+    
 
     /**
      * Displays the add form in the modal
@@ -300,7 +342,7 @@ class SitesController extends AbstractActionController
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->setTerminal(false);
-        $view->melisKey = $melisKey;
+        $view->melisKey  = $melisKey;
         return $view;
     }
 
@@ -313,7 +355,7 @@ class SitesController extends AbstractActionController
 
         // tell the Tool what configuration in the app.tools.php that will be used.
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
-        //prepare the step1 form
+        //prepare the user profile form
         $form = $melisTool->getForm('meliscms_tool_sites_modal_add_step1_form');
 
         $view = new ViewModel();
@@ -322,7 +364,6 @@ class SitesController extends AbstractActionController
 
         return $view;
     }
-
     public function renderToolSitesModalAddStep2Action()
     {
         $melisKey = $this->getMelisKey();
@@ -348,7 +389,6 @@ class SitesController extends AbstractActionController
 
         return $view;
     }
-
     public function renderToolSitesModalAddStep3Action()
     {
         $melisKey = $this->getMelisKey();
@@ -358,17 +398,16 @@ class SitesController extends AbstractActionController
 
         // tell the Tool what configuration in the app.tools.php that will be used.
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
-        //prepare the step3 forms
+        //prepare the step2 forms
         $formMultiDomain = $melisTool->getForm('meliscms_tool_sites_modal_add_step3_form_multi_domain');
         $formSingleDomain = $melisTool->getForm('meliscms_tool_sites_modal_add_step3_form_single_domain');
 
         $view = new ViewModel();
         $view->setVariable('step3_form_multi_domain', $formMultiDomain);
         $view->setVariable('step3_form_single_domain', $formSingleDomain);
-        $view->melisKey = $melisKey;
+        $view->melisKey  = $melisKey;
         return $view;
     }
-
     public function renderToolSitesModalAddStep4Action()
     {
         $melisKey = $this->getMelisKey();
@@ -386,7 +425,6 @@ class SitesController extends AbstractActionController
         $view->melisKey = $melisKey;
         return $view;
     }
-
     public function renderToolSitesModalAddStep5Action()
     {
         $melisKey = $this->getMelisKey();
@@ -395,23 +433,23 @@ class SitesController extends AbstractActionController
         $view->melisKey = $melisKey;
         return $view;
     }
-
+    
 
     public function renderToolSitesModalEditAction()
     {
         // declare the Tool service that we will be using to completely create our tool.
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
-
+    
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
-
+    
         $view = new ViewModel();
-
+    
         $view->setVariable('meliscms_site_tool_edition_form', $melisTool->getForm('meliscms_site_tool_edition_form'));
-
+    
         return $view;
     }
-
+    
     /**
      * Renders to the edit button in the table
      * @return \Zend\View\Model\ViewModel
@@ -420,7 +458,7 @@ class SitesController extends AbstractActionController
     {
         return new ViewModel();
     }
-
+    
     /**
      * Renders to the delete button in the table
      * @return \Zend\View\Model\ViewModel
@@ -429,7 +467,7 @@ class SitesController extends AbstractActionController
     {
         return new ViewModel();
     }
-
+    
     public function renderToolSitesNewSiteConfirmationModalAction()
     {
         $melisKey = $this->params()->fromRoute('melisKey', '');
@@ -439,7 +477,7 @@ class SitesController extends AbstractActionController
 
         return $view;
     }
-
+    
     /**
      * Returns all the data from the site table, site domain and site 404
      */
@@ -456,7 +494,8 @@ class SitesController extends AbstractActionController
         $draw = 0;
         $tableData = array();
 
-        if ($this->getRequest()->isPost()) {
+        if($this->getRequest()->isPost())
+        {
             $colId = array_keys($melisTool->getColumns());
 
             $sortOrder = $this->getRequest()->getPost('order');
@@ -494,9 +533,9 @@ class SitesController extends AbstractActionController
         }
 
         return new JsonModel(array(
-            'draw' => (int)$draw,
+            'draw' => (int) $draw,
             'recordsTotal' => $dataCount,
-            'recordsFiltered' => $dataFilter->count(),
+            'recordsFiltered' =>  $dataFilter->count(),
             'data' => $tableData,
         ));
     }
@@ -734,28 +773,95 @@ class SitesController extends AbstractActionController
 
         $status  = 1;
         $errors  = array();
-        $textMessage = '';
+        $textMessage = 'tr_melis_cms_site_save_ko';
         $logTypeCode = '';
-
+        $translator = $this->getServiceLocator()->get('translator');
         $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
+        $siteDomainsSvc = $this->getServiceLocator()->get("MelisCmsSitesDomainsService");
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $request = $this->getRequest();
         $data = $request->getPost()->toArray();
+        $melisCoreAuth = $this->serviceLocator->get('MelisCoreAuth');
+        $userAuthDatas = $melisCoreAuth->getStorage()->read();
+        $isAdmin = isset($userAuthDatas->usr_admin) || $userAuthDatas->usr_admin != "" ? $userAuthDatas->usr_admin : 0;
+
+        $success = 0;
+        $ctr = 0;
+        $ctr1 = 0;
 
         $moduleList = array();
-        //Collecting requests from the moduleLoad Form
+        $domainData = array();
+        $siteProp = array();
+        $siteHomeData = array();
+
+
         foreach ($data as $datum => $val){
-            if (preg_match('/\bmoduleLoad\b/', $datum)) {
-                $datum = str_replace("moduleLoad",'',$datum);
-                array_push($moduleList,$datum);
+
+            //collecting data for site module load
+            if($isAdmin) {
+                if (strstr($datum,'moduleLoad')) {
+                    $datum = str_replace("moduleLoad", '', $datum);
+                    array_push($moduleList, $datum);
+                }
             }
+
+            //collecting data for site domains
+            if (strstr($datum,'sdom_')) {
+                $key = substr($datum, (strpos($datum, '_') ?: -1) + 1);
+                if(!empty($domainData[$ctr]))
+                    if(array_key_exists($key, $domainData[$ctr]))
+                        $ctr++;
+                $domainData[$ctr][$key] = $val;
+            }
+
+            //collecting data for site properties
+            if (strstr($datum,'siteprop_')) {
+                $datum = str_replace("siteprop_", '', $datum);
+                array_push($siteProp, $datum);
+            }
+
+            //collecting data for site language homepages
+            if (strstr($datum,'sitehome_')) {
+                $key = substr($datum, (strpos($datum, '_') ?: -1) + 1);
+                if(!empty($siteHomeData[$ctr1]))
+                    if(array_key_exists($key, $siteHomeData[$ctr1]))
+                        $ctr1++;
+                $siteHomeData[$ctr1][$key] = $val;
+            }
+
         }
-        $siteModuleLoadSvc->saveModuleLoad($siteId,$moduleList);
+
+        //saving module load
+        if($isAdmin) {
+            $siteModuleLoadSvc->saveModuleLoad($siteId, $moduleList);
+        }
+
+        //saving site domains
+        foreach($domainData as $domainDatum){
+            $form = $this->getTool()->getForm('meliscms_tool_sites_domain_form');
+            $form->setData($domainDatum);
+
+            if($form->isValid()) {
+                $success = $siteDomainsSvc->saveSiteDomain($domainDatum);
+                if($success){
+                    $textMessage = $translator->translate("tr_melis_cms_site_save_ok");
+                    $status = 1;
+                }else{
+                    $textMessage = $translator->translate('tr_melis_cms_site_save_ko');
+                    $success  = 0;
+                }
+            }else{
+                $textMessage = 'tr_melis_cms_site_save_ko';
+                $errors = $form->getMessages();
+                $status = 0;
+            }
+
+        }
 
         $response = array(
             'success' => $status,
-            'textTitle' => 'tr_meliscms_tool_site',
-            'textMessage' => $textMessage,
+            'textTitle' => $translator->translate('tr_meliscms_tool_site'),
+            'textMessage' => $translator->translate($textMessage),
             'errors' => $errors,
         );
 
@@ -776,14 +882,15 @@ class SitesController extends AbstractActionController
         $textMessage = '';
         $eventDatas = array();
         $this->getEventManager()->trigger('meliscms_site_delete_start', $this, $eventDatas);
-         
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
+
 
         $response = array(
             'success' => $status ,
             'textTitle' => 'tr_meliscms_tool_site',
             'textMessage' => $textMessage
         );
-        $this->getEventManager()->trigger('meliscms_site_delete_end', $this, array_merge($response, array('typeCode' => 'CMS_SITE_DELETE', 'itemId' => $siteID)));
+        $this->getEventManager()->trigger('meliscms_site_delete_end', $this, array_merge($response, array('typeCode' => 'CMS_SITE_DELETE', 'itemId' => $siteId)));
         
         return new JsonModel($response);
     }
@@ -798,7 +905,7 @@ class SitesController extends AbstractActionController
     private function getTool()
     {
         $toolSvc = $this->getServiceLocator()->get('MelisCoreTool');
-        $toolSvc->setMelisToolKey('MelisCmsUserAccount', 'melis_cms_user_account');
+        $toolSvc->setMelisToolKey('meliscms', 'meliscms_tool_sites');
         return $toolSvc;
     }
 
