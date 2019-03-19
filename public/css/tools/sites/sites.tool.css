@@ -1,8 +1,17 @@
 .tool-sites_container_fixed_width{
-    max-width: 500px;
+    max-width: 540px;
+    margin-bottom:10px;
 }
 /**STEP FORM**/
 .sites_step2-multi-language, .sites_step2-single-language,
 #btn-prev-step, #btn-finish-step{
     display: none;
+}
+
+.step5-message{
+    margin-top: 30px !important;
+}
+
+.fieldErrorColor{
+    color: #FF0000;
 }

@@ -24,13 +24,17 @@ class SitesController extends AbstractActionController
     const TOOL_INDEX = 'meliscms';
     const TOOL_KEY = 'meliscms_tool_sites';
 
+    const SITE_TABLE_PREFIX = 'site_';
+    const DOMAIN_TABLE_PREFIX = 'sdom_';
+    const SITE404_TABLE_PREFIX = 's404_';
 
     /**
      * Main container of the tool, this holds all the components of the tools
      * @return ViewModel();
      */
-    public function renderToolSitesAction() {
-        
+    public function renderToolSitesAction()
+    {
+
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -40,8 +44,9 @@ class SitesController extends AbstractActionController
     /**
      * @return ViewModel();
      */
-    public function renderToolSitesEditAction() {
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
+    public function renderToolSitesEditAction()
+    {
+        $siteId = (int)$this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -53,8 +58,9 @@ class SitesController extends AbstractActionController
     /**
      * @return ViewModel();
      */
-    public function renderToolSitesEditHeaderAction() {
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
+    public function renderToolSitesEditHeaderAction()
+    {
+        $siteId = (int)$this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -65,8 +71,9 @@ class SitesController extends AbstractActionController
     /**
      * @return ViewModel();
      */
-    public function renderToolSitesEditSiteHeaderSaveAction() {
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
+    public function renderToolSitesEditSiteHeaderSaveAction()
+    {
+        $siteId = (int)$this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -74,9 +81,10 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesTabsAction() {
+    public function renderToolSitesTabsAction()
+    {
 
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $siteId = (int)$this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -84,9 +92,10 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesPropertiesAction() {
+    public function renderToolSitesPropertiesAction()
+    {
 
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $siteId = (int)$this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -94,9 +103,10 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesModuleLoadAction() {
+    public function renderToolSitesModuleLoadAction()
+    {
 
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $siteId = (int)$this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -104,11 +114,12 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesModuleLoadContentAction() {
+    public function renderToolSitesModuleLoadContentAction()
+    {
 
         $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
         $modulesSvc = $this->getServiceLocator()->get('ModulesService');
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $siteId = (int)$this->params()->fromQuery('siteId', '');
         $modulesInfo = $modulesSvc->getModulesAndVersions();
         $modules = $siteModuleLoadSvc->getModules($siteId);
         $melisKey = $this->getMelisKey();
@@ -120,9 +131,10 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesDomainsAction() {
+    public function renderToolSitesDomainsAction()
+    {
 
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $siteId = (int)$this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -130,9 +142,10 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesDomainsContentAction() {
+    public function renderToolSitesDomainsContentAction()
+    {
 
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $siteId = (int)$this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $siteDomainsSvc = $this->getServiceLocator()->get("MelisCmsSitesDomainsService");
         $siteEnvs = $siteDomainsSvc->getEnvironments();
@@ -143,9 +156,10 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesLanguagesAction() {
+    public function renderToolSitesLanguagesAction()
+    {
 
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $siteId = (int)$this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -153,9 +167,10 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesSiteConfigAction() {
+    public function renderToolSitesSiteConfigAction()
+    {
 
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $siteId = (int)$this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -163,27 +178,30 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesSiteTranslationsAction() {
+    public function renderToolSitesSiteTranslationsAction()
+    {
 
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $siteId = (int)$this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->melisKey = $melisKey;
         $view->siteId = $siteId;
         return $view;
     }
+
     /**
      * Renders to the header section of the tool
      * @return \Zend\View\Model\ViewModel
      */
-    public function renderToolSitesHeaderAction() {
+    public function renderToolSitesHeaderAction()
+    {
 
         $melisKey = $this->getMelisKey();
 
-        $view              = new ViewModel();
-        $view->melisKey    = $melisKey;
+        $view = new ViewModel();
+        $view->melisKey = $melisKey;
         $view->headerTitle = $this->getTool()->getTranslation('tr_meliscms_tool_sites_header_title');
-        $view->subTitle    = $this->getTool()->getTranslation('tr_meliscms_tool_sites_header_sub_title');
+        $view->subTitle = $this->getTool()->getTranslation('tr_meliscms_tool_sites_header_sub_title');
         return $view;
     }
 
@@ -219,7 +237,7 @@ class SitesController extends AbstractActionController
     {
         return new ViewModel();
     }
-    
+
     /**
      * Renders to the center content of the tool
      * @return \Zend\View\Model\ViewModel
@@ -241,7 +259,7 @@ class SitesController extends AbstractActionController
         $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration();
         return $view;
     }
-    
+
     /**
      * This is the container of the modal
      * @return \Zend\View\Model\ViewModel
@@ -259,7 +277,7 @@ class SitesController extends AbstractActionController
 
         return $view;
     }
-    
+
     /**
      * Renders to the empty modal display, this will be displayed if the user doesn't have access to the modal tabs
      * @return \Zend\View\Model\ViewModel
@@ -270,7 +288,7 @@ class SitesController extends AbstractActionController
         $tool = $config->getItem('/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_sites/interface/meliscms_tool_sites_modals');
         return new ViewModel();
     }
-    
+
 
     /**
      * Displays the add form in the modal
@@ -282,7 +300,7 @@ class SitesController extends AbstractActionController
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->setTerminal(false);
-        $view->melisKey  = $melisKey;
+        $view->melisKey = $melisKey;
         return $view;
     }
 
@@ -295,7 +313,7 @@ class SitesController extends AbstractActionController
 
         // tell the Tool what configuration in the app.tools.php that will be used.
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
-        //prepare the user profile form
+        //prepare the step1 form
         $form = $melisTool->getForm('meliscms_tool_sites_modal_add_step1_form');
 
         $view = new ViewModel();
@@ -304,6 +322,7 @@ class SitesController extends AbstractActionController
 
         return $view;
     }
+
     public function renderToolSitesModalAddStep2Action()
     {
         $melisKey = $this->getMelisKey();
@@ -329,6 +348,7 @@ class SitesController extends AbstractActionController
 
         return $view;
     }
+
     public function renderToolSitesModalAddStep3Action()
     {
         $melisKey = $this->getMelisKey();
@@ -338,49 +358,60 @@ class SitesController extends AbstractActionController
 
         // tell the Tool what configuration in the app.tools.php that will be used.
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
-        //prepare the step2 forms
+        //prepare the step3 forms
         $formMultiDomain = $melisTool->getForm('meliscms_tool_sites_modal_add_step3_form_multi_domain');
         $formSingleDomain = $melisTool->getForm('meliscms_tool_sites_modal_add_step3_form_single_domain');
 
         $view = new ViewModel();
         $view->setVariable('step3_form_multi_domain', $formMultiDomain);
         $view->setVariable('step3_form_single_domain', $formSingleDomain);
-        $view->melisKey  = $melisKey;
+        $view->melisKey = $melisKey;
         return $view;
     }
+
     public function renderToolSitesModalAddStep4Action()
     {
         $melisKey = $this->getMelisKey();
+
+        // declare the Tool service that we will be using to completely create our tool.
+        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+
+        // tell the Tool what configuration in the app.tools.php that will be used.
+        $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
+        //prepare the step4 forms
+        $moduleForm = $melisTool->getForm('meliscms_tool_sites_modal_add_step4_form_module');
+
         $view = new ViewModel();
-        $view->setTerminal(false);
-        $view->melisKey  = $melisKey;
+        $view->setVariable('step4_form_module', $moduleForm);
+        $view->melisKey = $melisKey;
         return $view;
     }
+
     public function renderToolSitesModalAddStep5Action()
     {
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->setTerminal(false);
-        $view->melisKey  = $melisKey;
+        $view->melisKey = $melisKey;
         return $view;
     }
-    
+
 
     public function renderToolSitesModalEditAction()
     {
         // declare the Tool service that we will be using to completely create our tool.
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
-    
+
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
-    
+
         $view = new ViewModel();
-    
+
         $view->setVariable('meliscms_site_tool_edition_form', $melisTool->getForm('meliscms_site_tool_edition_form'));
-    
+
         return $view;
     }
-    
+
     /**
      * Renders to the edit button in the table
      * @return \Zend\View\Model\ViewModel
@@ -389,7 +420,7 @@ class SitesController extends AbstractActionController
     {
         return new ViewModel();
     }
-    
+
     /**
      * Renders to the delete button in the table
      * @return \Zend\View\Model\ViewModel
@@ -398,7 +429,7 @@ class SitesController extends AbstractActionController
     {
         return new ViewModel();
     }
-    
+
     public function renderToolSitesNewSiteConfirmationModalAction()
     {
         $melisKey = $this->params()->fromRoute('melisKey', '');
@@ -408,7 +439,7 @@ class SitesController extends AbstractActionController
 
         return $view;
     }
-    
+
     /**
      * Returns all the data from the site table, site domain and site 404
      */
@@ -425,8 +456,7 @@ class SitesController extends AbstractActionController
         $draw = 0;
         $tableData = array();
 
-        if($this->getRequest()->isPost())
-        {
+        if ($this->getRequest()->isPost()) {
             $colId = array_keys($melisTool->getColumns());
 
             $sortOrder = $this->getRequest()->getPost('order');
@@ -437,8 +467,8 @@ class SitesController extends AbstractActionController
 
             $draw = $this->getRequest()->getPost('draw');
 
-            $start =   (int) $this->getRequest()->getPost('start');
-            $length =  (int) $this->getRequest()->getPost('length');
+            $start = (int)$this->getRequest()->getPost('start');
+            $length = (int)$this->getRequest()->getPost('length');
 
             $search = $this->getRequest()->getPost('search');
             $search = $search['value'];
@@ -449,11 +479,9 @@ class SitesController extends AbstractActionController
             $dataFilter = $siteTable->getSitesData($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder, null, null);
 
             $tableData = $getData->toArray();
-            for($ctr = 0; $ctr < count($tableData); $ctr++)
-            {
+            for ($ctr = 0; $ctr < count($tableData); $ctr++) {
                 // apply text limits
-                foreach($tableData[$ctr] as $vKey => $vValue)
-                {
+                foreach ($tableData[$ctr] as $vKey => $vValue) {
                     $tableData[$ctr][$vKey] = $melisTool->limitedText($melisTool->escapeHtml($vValue));
                 }
 
@@ -466,11 +494,233 @@ class SitesController extends AbstractActionController
         }
 
         return new JsonModel(array(
-            'draw' => (int) $draw,
+            'draw' => (int)$draw,
             'recordsTotal' => $dataCount,
-            'recordsFiltered' =>  $dataFilter->count(),
+            'recordsFiltered' => $dataFilter->count(),
             'data' => $tableData,
         ));
+    }
+
+    /**
+     * @return JsonModel
+     */
+    public function createNewSiteAction()
+    {
+        $status = false;
+        $siteId = null;
+        $siteName = '';
+        $textMessage = '';
+        $siteTablePrefix = self::SITE_TABLE_PREFIX;
+        $domainTablePrefix = self::DOMAIN_TABLE_PREFIX;
+
+        if ($this->getRequest()->isPost()) {
+            $sitesData = $this->getRequest()->getPost('data');
+            if(!empty($sitesData)) {
+                $createNewFile = false;
+                $isNewSIte = false;
+                $siteData = array();
+                $siteLanguages = array();
+                $site404Data = array();
+                $domainData = array();
+                $domainDataTemp = array();
+
+                /**
+                 * This will look for every specific data for each table(site, domains, etc..)
+                 *
+                 * The Domain is specific case cause there's a chance that the user will
+                 * select multi domain for every site(depend on language) and even though
+                 * the user select single domain, we will still need to prepare the data as
+                 * equal to multi domain
+                 */
+                foreach ($sitesData as $key => $value) {
+                    if (!empty($value['data']) && is_array($value['data'])) {
+                        foreach ($value['data'] as $k => $val) {
+                            if (!empty($val) && is_array($val)) {
+                                if (!empty($val['name'])) {
+                                    /**
+                                     * add site data
+                                     */
+                                    if (strpos($val['name'], $siteTablePrefix) !== false) {
+                                        $siteData[$val['name']] = $val['value'];
+                                    }
+
+                                    /**
+                                     * add the domain data
+                                     */
+                                    if ($key == 'domains') {
+                                        /**
+                                         * if it is came from the domain form, we will put
+                                         * it inside the main domain data container
+                                         */
+                                        if (strpos($val['name'], $domainTablePrefix) !== false) {
+                                            $domainData[$k][$val['name']] = $val['value'];
+                                        }
+                                    } else {
+                                        /**
+                                         * we will put the domain data to temporary
+                                         * container to add to main container later
+                                         */
+                                        if (strpos($val['name'], $domainTablePrefix) !== false) {
+                                            $domainDataTemp[$val['name']] = $val['value'];
+                                        }
+                                    }
+                                } else {
+                                    /**
+                                     * This will add the data that the key
+                                     * is equal to the field name
+                                     */
+                                    foreach ($val as $field => $fieldValue) {
+                                        /**
+                                         * add site data
+                                         */
+                                        if (strpos($field, $siteTablePrefix) !== false) {
+                                            $siteData[$field] = $fieldValue;
+                                        }
+
+                                        /**
+                                         * add domain data
+                                         */
+                                        if (strpos($field, $domainTablePrefix) !== false) {
+                                            $domainData[$k][$field] = $fieldValue;
+                                        }
+                                    }
+                                }
+                            } else {
+                                /**
+                                 * add the site data
+                                 */
+                                if (strpos($k, $siteTablePrefix) !== false) {
+                                    $siteData[$k] = $val;
+                                }
+
+                                /**
+                                 * Add the other domain data to temporary container
+                                 * since it came from other form, were just gonna
+                                 * add this to main domain container later
+                                 */
+                                if (strpos($k, $domainTablePrefix) !== false) {
+                                    $domainDataTemp[$k] = $val;
+                                }
+                            }
+                        }
+                    } else {
+                        foreach ($value as $fieldKey => $fieldValue) {
+                            /**
+                             * add the site data
+                             */
+                            if (strpos($fieldKey, $siteTablePrefix) !== false) {
+                                $siteData[$fieldKey] = $fieldValue;
+                            }
+
+                            /**
+                             * Add the other domain data to temporary container
+                             * since it came from other form, were just gonna
+                             * add this to main domain container later
+                             */
+                            if (strpos($fieldKey, $domainTablePrefix) !== false) {
+                                $domainDataTemp[$fieldKey] = $fieldValue;
+                            }
+                        }
+                    }
+
+                    /**
+                     * Check if it is a new site and if were are
+                     * gonna create a file for this site
+                     */
+                    if ($key == 'module') {
+                        $createNewFile = ($value['createFile'] === 'true');
+                        $isNewSIte = ($value['newSite'] === 'true');
+                    }
+
+                    /**
+                     * get the site languages
+                     */
+                    if ($key == 'languages') {
+                        $siteLanguages = $value;
+                    }
+                }
+
+                /**
+                 * Fill the other fields with the default one
+                 * if the fields are still empty
+                 */
+                //check if $domainData is empty
+                if (empty($domainData) && !empty($domainDataTemp)) {
+                    foreach ($siteLanguages as $locale => $langId) {
+                        foreach ($domainDataTemp as $dom => $val) {
+                            $domainData[$locale] = array($dom => $val);
+                        }
+                    }
+                }
+                //we need to loop the domain to fill all fields
+                foreach ($domainData as $domKey => $domVal) {
+                    //add the temporary domain data to the main container
+                    foreach ($domainDataTemp as $tempKey => $tempVal) {
+                        if (empty($domainData[$domKey][$tempKey])) {
+                            $domainData[$domKey][$tempKey] = $tempVal;
+                        }
+                    }
+                    /**
+                     * add some default data to domain
+                     * if the fields does not exist
+                     * or empty
+                     */
+                    $domainData[$domKey]['sdom_env'] = (!empty($domainData[$domKey]['sdom_env'])) ? $domainData[$domKey]['sdom_env'] : getenv('MELIS_PLATFORM');
+                    $domainData[$domKey]['sdom_scheme'] = (!empty($domainData[$domKey]['sdom_scheme'])) ? $domainData[$domKey]['sdom_scheme'] : 'http';
+                }
+                //field the site data
+                if (!empty($siteData)) {
+                    $siteName = (!empty($siteData['site_name'])) ? $siteData['site_name'] : '';
+                    $siteData['site_label'] = (!empty($siteData['site_label'])) ? $siteData['site_label'] : $siteName;
+                }
+
+                /**
+                 * Before proceeding to save the site
+                 * check if it is a new site and
+                 * the site is not yet created
+                 */
+                $isValidName = true;
+                if ($isNewSIte) {
+                    $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+                    $siteDBData = $siteTable->getEntryByField('site_name', $siteName)->current();
+                    if (!empty($siteDBData)) {
+                        $isValidName = false;
+                    }
+                }
+
+                if ($isValidName) {
+                    $cmsSiteSrv = $this->getServiceLocator()->get('MelisCmsSiteService');
+                    $saveSiteResult = $cmsSiteSrv->saveSite($siteData, $domainData, $siteLanguages, $site404Data, $siteName, $createNewFile, $isNewSIte);
+
+                    if ($saveSiteResult['success'])
+                    {
+                        $siteId = $saveSiteResult['site_id'];
+                        $textMessage = 'tr_melis_cms_sites_tool_add_create_site_success';
+                        $status = true;
+                    }
+                    else
+                    {
+                        $textMessage = $saveSiteResult['message'];
+                        $status = false;
+                    }
+                }else{
+                    $status = false;
+                    $textMessage = 'tr_melis_cms_sites_tool_add_create_site_already_exist';
+                }
+            }
+        }
+
+        $response = array(
+            'success' => $status,
+            'textTitle' => 'tr_meliscms_tool_site',
+            'textMessage' => $textMessage,
+            'siteId' => $siteId,
+            'siteName' => $siteName,
+        );
+
+        $this->getEventManager()->trigger('meliscms_site_save_end', $this, array_merge($response, array('typeCode' => 'CMS_SITE_ADD', 'itemId' => $siteId)));
+
+       return new JsonModel($response);
     }
 
     /**
