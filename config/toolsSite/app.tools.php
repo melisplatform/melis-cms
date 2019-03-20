@@ -130,6 +130,9 @@ return array(
                                             'label_options' => array(
                                                 'disable_html_escape' => true,
                                             ),
+                                            'label_attributes' => array(
+                                                'class' => 'err_sites_url_setting',
+                                            ),
                                             'value_options' => array(
                                                 '1' => 'tr_melis_cms_sites_tool_add_step2_url_local_after_domain',
                                                 '2' => 'tr_melis_cms_sites_tool_add_step2_url_different_domains',
@@ -173,9 +176,13 @@ return array(
                                         'type' => 'MelisText',
                                         'options' => array(
                                             'label' => 'tr_melis_cms_sites_tool_add_step3_single_domain_name',
+                                            'label_attributes' => array(
+                                                'class' => 'err_sdom_domain',
+                                            )
                                         ),
                                         'attributes' => array(
                                             'id' => 'sdom_domain',
+                                            'required' => 'required',
                                         ),
                                     ),
                                 ),
@@ -225,11 +232,15 @@ return array(
                                         'type' => 'MelisText',
                                         'options' => array(
                                             'label' => 'tr_melis_cms_sites_tool_add_step4_create_module',
+                                            'label_attributes' => array(
+                                                'class' => 'err_siteCreateModuleName',
+                                            )
                                         ),
                                         'attributes' => array(
                                             'id' => 'siteCreateModuleName',
                                             'class' => 'form-control',
                                             'value' => getenv('MELIS_MODULE'),
+                                            'required' => 'required',
                                         ),
                                     ),
                                 ),
@@ -248,7 +259,7 @@ return array(
                                             ),
                                         ),
                                         'attributes' => array(
-                                            'required' => 'required',
+                                            'id' => 'create_sites_file',
                                         ),
                                     )
                                 )

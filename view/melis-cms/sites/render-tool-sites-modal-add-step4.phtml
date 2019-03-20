@@ -12,7 +12,23 @@ if (!empty($this->zoneconfig['conf']['id']))
                 $form = $this->step4_form_module;
                 $form->prepare();
                 echo $this->form()->openTag($form);
-                echo $this->melisFieldCollection($form);
+                foreach ($form->getElements() As $key => $val)
+                {
+                    $newId = '';
+                    $hide = '';
+                    if($key == "create_sites_file"){
+                        $newId = "createSiteFiles";
+                        $hide = 'hidden';
+                        $val->setValue('yes');
+                    }
+                    echo '<div class="form-group '.$hide.'" id="'.$newId.'">';
+                    if ($val->getLabel())
+                    {
+                        echo $this->formLabel($val);
+                    }
+                    echo $this->formElement($val);
+                    echo '</div>';
+                }
                 echo $this->form()->closeTag();
                 ?>
             </div>

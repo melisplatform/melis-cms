@@ -102,7 +102,6 @@ class MelisCmsSiteService extends MelisCoreGeneralService
         $site404Table = $this->getServiceLocator()->get('MelisEngineTableSite404');
         $siteHomeTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
         $sitelangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
-        $translator = $this->getServiceLocator()->get('translator');
 
         // Site Name
         $siteName = $arrayParameters['siteData']['site_name'];
@@ -318,11 +317,11 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                                  */
                                 $con->commit();
                             } else {
-                                $results['message'] = 'Please provide the site language(s)';
+                                $results['message'] = 'tr_melis_cms_sites_tool_add_create_site_no_site_language';
                                 $hasError = true;
                             }
                         } else {
-                            $results['message'] = 'tr_melis_cms_sites_tool_add_unable_to_create_site';
+                            $results['message'] = 'tr_melis_cms_sites_tool_add_create_site_unknown_error';
                             $hasError = true;
                         }
                     }catch (\Exception $ex){
@@ -331,7 +330,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                          * the db insertion
                          */
                         $con->rollback();
-                        $results['message'] = 'tr_melis_cms_sites_tool_add_unable_to_create_site';
+                        $results['message'] = 'tr_melis_cms_sites_tool_add_create_site_unknown_error';
                         $hasError = true;
                     }
                 }

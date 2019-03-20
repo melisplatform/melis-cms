@@ -545,12 +545,15 @@ class SitesController extends AbstractActionController
      */
     public function createNewSiteAction()
     {
+        $errors = array();
         $status = false;
         $siteId = null;
         $siteName = '';
         $textMessage = '';
         $siteTablePrefix = self::SITE_TABLE_PREFIX;
         $domainTablePrefix = self::DOMAIN_TABLE_PREFIX;
+
+        $translator = $this->getServiceLocator()->get('translator');
 
         if ($this->getRequest()->isPost()) {
             $sitesData = $this->getRequest()->getPost('data');
@@ -739,12 +742,22 @@ class SitesController extends AbstractActionController
                     }
                     else
                     {
-                        $textMessage = $saveSiteResult['message'];
+                        $textMessage = 'tr_melis_cms_sites_tool_add_unable_to_create_site';
+                        $errors = array(
+                            'Error' => array(
+                                'siteAlreadyExists' => $translator->translate($saveSiteResult['message'])
+                            ),
+                        );
                         $status = false;
                     }
                 }else{
+                    $textMessage = 'tr_melis_cms_sites_tool_add_unable_to_create_site';
+                    $errors = array(
+                        'Error' => array(
+                            'siteAlreadyExists' => $translator->translate('tr_meliscms_tool_site_name_exists')
+                        ),
+                    );
                     $status = false;
-                    $textMessage = 'tr_melis_cms_sites_tool_add_create_site_already_exist';
                 }
             }
         }
@@ -755,6 +768,7 @@ class SitesController extends AbstractActionController
             'textMessage' => $textMessage,
             'siteId' => $siteId,
             'siteName' => $siteName,
+            'errors' => $errors
         );
 
         $this->getEventManager()->trigger('meliscms_site_save_end', $this, array_merge($response, array('typeCode' => 'CMS_SITE_ADD', 'itemId' => $siteId)));

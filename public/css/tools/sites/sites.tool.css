@@ -8,6 +8,15 @@
     margin-top: -15px;
     margin-bottom: 20px;
 }
+
+#modal-site-creation .sites-steps-owl sup{
+    margin-left: 3px;
+}
+
+#modal-site-creation #siteAddAlert{
+    padding: 7px;
+}
+
 div[data-meliskey="meliscms_tool_sites_edit_site_tabs"] .widget-head.nav {
     z-index: 1;
 }

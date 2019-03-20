@@ -6,7 +6,7 @@ if (!empty($this->zoneconfig['conf']['id']))
 ?>
 
 <div class="modal-content" <?= $id; ?> data-melisKey="<?= $this->melisKey; ?>">
-    <div class="modal-body padding-none">
+    <div class="modal-body padding-none" id="modal-site-creation">
         <div class="wizard">
             <div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none">
                 <div class="widget-head">
@@ -15,6 +15,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                     </ul>
                 </div>
                 <div class="widget-body innerAll inner-2x">
+                    <div id="siteAddAlert" class="alert alert-danger hidden"><strong></strong> <?= $this->translate('tr_melis_cms_sites_tool_add_create_site_required_field'); ?></div>
                     <div class="owl-carousel owl-theme owl-loaded sites-steps-owl">
                         <?php
                             if (!empty($this->zoneconfig['interface'])) {
