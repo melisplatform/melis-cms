@@ -6,9 +6,7 @@ $(document).ready(function() {
     $body.on("click", ".btnEditSites", function(){
         var tableId = $(this).closest('tr').attr('id');
         var name = $(this).closest('tr').find("td:nth-child(2)").text();
-        melisHelper.tabOpen(name, 'fa-globe', tableId+'_id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site',  { siteId : tableId }, null, function(){
-
-        });
+        openSiteEditTab(name, tableId);
     });
 
 
@@ -328,7 +326,7 @@ $(document).ready(function() {
                 /**
                  * prepare lang info
                  */
-                lang = langInfo[1];
+                lang = langInfo[2];
 
                 langData[langInfo[1]] = langInfo[0];
             }else{
