@@ -220,6 +220,7 @@ class SitesController extends AbstractActionController
         $melisKey = $this->getMelisKey();
         $melisEngineLangSvc = $this->getServiceLocator()->get('MelisEngineLang');
         $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
         $selectedLanguages = [];
 
         $languages = $melisEngineLangSvc->getAvailableLanguages();
@@ -231,6 +232,8 @@ class SitesController extends AbstractActionController
             array_push($selectedLanguages, $language['slang_lang_id']);
         }
 
+        $siteOptLangUrl = $siteTable->getEntryById($siteId)->toArray()[0]['site_opt_lang_url'];
+
         $view = new ViewModel();
         $view->melisKey = $melisKey;
         $view->siteId = $siteId;
@@ -238,6 +241,7 @@ class SitesController extends AbstractActionController
         $view->languages = $languages;
         $view->siteLanguages = $siteLanguages;
         $view->selectedLanguages = $selectedLanguages;
+        $view->siteOptionLangUrl = $siteOptLangUrl;
 
         return $view;
     }
@@ -889,6 +893,12 @@ class SitesController extends AbstractActionController
         }
 
         // saving languages
+        // get all active languages of site
+        $activeSiteLangs = $siteLangsTable->getSiteLangs(null, $siteId, null, true)->toArray();
+
+        print_r($activeSiteLangs);
+        exit;
+
         foreach ($data['slang_lang_id'] as $lang) {
             $siteLangs = $siteLangsTable->getEntryByField('slang_site_id', $siteId)->toArray();
 

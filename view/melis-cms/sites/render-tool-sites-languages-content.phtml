@@ -38,20 +38,32 @@ $data_melisKey = $this->melisKey;
         <br>
         <br>
         <h3>How do you want to reflect the language in the site's URLs?</h3>
+        <!-- SITE OPTION LANGUAGE URL -->
+        <?php
+            $option1 = '';
+            $option2 = '';
+
+            if ($this->siteOptLangUrl === 1) {
+                $option1 = 'checked';
+            } else {
+                $option2 = 'checked';
+            }
+        ?>
         <div class="row">
             <div class="col-md-12">
                 <label class="radio-inline">
-                    <input type="radio" class="radio" name="site_opt_lang_url" value="2"> I want the locale shown after my domain (ex: www.mysite.com/en/myurl)
+                    <input type="radio" class="radio" name="site_opt_lang_url" value="2" <?= $option2 ?>> I want the locale shown after my domain (ex: www.mysite.com/en/myurl)
                 </label>
             </div>
         </div>
         <div class="row">
             <div class="col-md-12">
                 <label class="radio-inline">
-                    <input type="radio" class="radio" name="site_opt_lang_url" value="1"> I want nothing, my page url will be solely built on the page's name
+                    <input type="radio" class="radio" name="site_opt_lang_url" value="1" <?= $option1 ?>> I want nothing, my page url will be solely built on the page's name
                 </label>
             </div>
         </div>
+        <!-- SITE OPTION LANGUAGE URL END -->
         <?php
             echo $this->form()->closeTag();
         ?>
