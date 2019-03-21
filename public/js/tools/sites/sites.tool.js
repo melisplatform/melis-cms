@@ -341,6 +341,9 @@ $(document).ready(function() {
             createFile = false;
             $("#siteCreateModuleName").removeAttr("required").prop("disabled", true);
             $("#step4form_module").find("input[name=create_sites_file]").prop("disabled", true);
+
+            removeFormError("#step4form_module");
+            $("#siteAddAlert").addClass("hidden");
         }else{
             $("#siteCreateModuleName").attr("required", "required").prop("disabled", false);
             $("#step4form_module").find("input[name=create_sites_file]").prop("disabled", false);
@@ -349,7 +352,11 @@ $(document).ready(function() {
     });
 
     $body.on("input", "#step4form_module #siteCreateModuleName", function() {
-        $("#step4form_module").find("#createSiteFiles").removeClass("hidden");
+        if($(this).val() != "") {
+            $("#step4form_module").find("#createSiteFiles").removeClass("hidden");
+        }else{
+            $("#step4form_module").find("#createSiteFiles").addClass("hidden");
+        }
         updateSliderHeight();
     });
 
