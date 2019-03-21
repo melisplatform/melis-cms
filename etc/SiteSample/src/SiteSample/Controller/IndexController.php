@@ -9,10 +9,9 @@
 
 namespace SiteSample\Controller;
 
-use MelisFront\Controller\MelisSiteActionController;
 use Zend\View\Model\ViewModel;
 
-class IndexController extends MelisSiteActionController
+class IndexController extends BaseController
 {
     public function indexsiteAction()
     {

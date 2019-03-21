@@ -24,6 +24,9 @@ class SitesController extends AbstractActionController
     const TOOL_INDEX = 'meliscms';
     const TOOL_KEY = 'meliscms_tool_sites';
 
+    const SITE_TABLE_PREFIX = 'site_';
+    const DOMAIN_TABLE_PREFIX = 'sdom_';
+    const SITE404_TABLE_PREFIX = 's404_';
 
     /**
      * Main container of the tool, this holds all the components of the tools
@@ -408,9 +411,18 @@ class SitesController extends AbstractActionController
     public function renderToolSitesModalAddStep4Action()
     {
         $melisKey = $this->getMelisKey();
+
+        // declare the Tool service that we will be using to completely create our tool.
+        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+
+        // tell the Tool what configuration in the app.tools.php that will be used.
+        $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
+        //prepare the step4 forms
+        $moduleForm = $melisTool->getForm('meliscms_tool_sites_modal_add_step4_form_module');
+
         $view = new ViewModel();
-        $view->setTerminal(false);
-        $view->melisKey  = $melisKey;
+        $view->setVariable('step4_form_module', $moduleForm);
+        $view->melisKey = $melisKey;
         return $view;
     }
     public function renderToolSitesModalAddStep5Action()
@@ -418,7 +430,7 @@ class SitesController extends AbstractActionController
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->setTerminal(false);
-        $view->melisKey  = $melisKey;
+        $view->melisKey = $melisKey;
         return $view;
     }
     
@@ -494,8 +506,8 @@ class SitesController extends AbstractActionController
 
             $draw = $this->getRequest()->getPost('draw');
 
-            $start =   (int) $this->getRequest()->getPost('start');
-            $length =  (int) $this->getRequest()->getPost('length');
+            $start = (int)$this->getRequest()->getPost('start');
+            $length = (int)$this->getRequest()->getPost('length');
 
             $search = $this->getRequest()->getPost('search');
             $search = $search['value'];
@@ -506,11 +518,9 @@ class SitesController extends AbstractActionController
             $dataFilter = $siteTable->getSitesData($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder, null, null);
 
             $tableData = $getData->toArray();
-            for($ctr = 0; $ctr < count($tableData); $ctr++)
-            {
+            for ($ctr = 0; $ctr < count($tableData); $ctr++) {
                 // apply text limits
-                foreach($tableData[$ctr] as $vKey => $vValue)
-                {
+                foreach ($tableData[$ctr] as $vKey => $vValue) {
                     $tableData[$ctr][$vKey] = $melisTool->limitedText($melisTool->escapeHtml($vValue));
                 }
 
@@ -528,6 +538,242 @@ class SitesController extends AbstractActionController
             'recordsFiltered' =>  $dataFilter->count(),
             'data' => $tableData,
         ));
+    }
+
+    /**
+     * @return JsonModel
+     */
+    public function createNewSiteAction()
+    {
+        $errors = array();
+        $status = false;
+        $siteId = null;
+        $siteName = '';
+        $textMessage = '';
+        $siteTablePrefix = self::SITE_TABLE_PREFIX;
+        $domainTablePrefix = self::DOMAIN_TABLE_PREFIX;
+
+        $translator = $this->getServiceLocator()->get('translator');
+
+        if ($this->getRequest()->isPost()) {
+            $sitesData = $this->getRequest()->getPost('data');
+            if(!empty($sitesData)) {
+                $createNewFile = false;
+                $isNewSIte = false;
+                $siteData = array();
+                $siteLanguages = array();
+                $site404Data = array();
+                $domainData = array();
+                $domainDataTemp = array();
+
+                /**
+                 * This will look for every specific data for each table(site, domains, etc..)
+                 *
+                 * The Domain is specific case cause there's a chance that the user will
+                 * select multi domain for every site(depend on language) and even though
+                 * the user select single domain, we will still need to prepare the data as
+                 * equal to multi domain
+                 */
+                foreach ($sitesData as $key => $value) {
+                    if (!empty($value['data']) && is_array($value['data'])) {
+                        foreach ($value['data'] as $k => $val) {
+                            if (!empty($val) && is_array($val)) {
+                                if (!empty($val['name'])) {
+                                    /**
+                                     * add site data
+                                     */
+                                    if (strpos($val['name'], $siteTablePrefix) !== false) {
+                                        $siteData[$val['name']] = $val['value'];
+                                    }
+
+                                    /**
+                                     * add the domain data
+                                     */
+                                    if ($key == 'domains') {
+                                        /**
+                                         * if it is came from the domain form, we will put
+                                         * it inside the main domain data container
+                                         */
+                                        if (strpos($val['name'], $domainTablePrefix) !== false) {
+                                            $domainData[$k][$val['name']] = $val['value'];
+                                        }
+                                    } else {
+                                        /**
+                                         * we will put the domain data to temporary
+                                         * container to add to main container later
+                                         */
+                                        if (strpos($val['name'], $domainTablePrefix) !== false) {
+                                            $domainDataTemp[$val['name']] = $val['value'];
+                                        }
+                                    }
+                                } else {
+                                    /**
+                                     * This will add the data that the key
+                                     * is equal to the field name
+                                     */
+                                    foreach ($val as $field => $fieldValue) {
+                                        /**
+                                         * add site data
+                                         */
+                                        if (strpos($field, $siteTablePrefix) !== false) {
+                                            $siteData[$field] = $fieldValue;
+                                        }
+
+                                        /**
+                                         * add domain data
+                                         */
+                                        if (strpos($field, $domainTablePrefix) !== false) {
+                                            $domainData[$k][$field] = $fieldValue;
+                                        }
+                                    }
+                                }
+                            } else {
+                                /**
+                                 * add the site data
+                                 */
+                                if (strpos($k, $siteTablePrefix) !== false) {
+                                    $siteData[$k] = $val;
+                                }
+
+                                /**
+                                 * Add the other domain data to temporary container
+                                 * since it came from other form, were just gonna
+                                 * add this to main domain container later
+                                 */
+                                if (strpos($k, $domainTablePrefix) !== false) {
+                                    $domainDataTemp[$k] = $val;
+                                }
+                            }
+                        }
+                    } else {
+                        foreach ($value as $fieldKey => $fieldValue) {
+                            /**
+                             * add the site data
+                             */
+                            if (strpos($fieldKey, $siteTablePrefix) !== false) {
+                                $siteData[$fieldKey] = $fieldValue;
+                            }
+
+                            /**
+                             * Add the other domain data to temporary container
+                             * since it came from other form, were just gonna
+                             * add this to main domain container later
+                             */
+                            if (strpos($fieldKey, $domainTablePrefix) !== false) {
+                                $domainDataTemp[$fieldKey] = $fieldValue;
+                            }
+                        }
+                    }
+
+                    /**
+                     * Check if it is a new site and if were are
+                     * gonna create a file for this site
+                     */
+                    if ($key == 'module') {
+                        $createNewFile = ($value['createFile'] === 'true');
+                        $isNewSIte = ($value['newSite'] === 'true');
+                    }
+
+                    /**
+                     * get the site languages
+                     */
+                    if ($key == 'languages') {
+                        $siteLanguages = $value;
+                    }
+                }
+
+                /**
+                 * Fill the other fields with the default one
+                 * if the fields are still empty
+                 */
+                //check if $domainData is empty
+                if (empty($domainData) && !empty($domainDataTemp)) {
+                    foreach ($siteLanguages as $locale => $langId) {
+                        foreach ($domainDataTemp as $dom => $val) {
+                            $domainData[$locale] = array($dom => $val);
+                        }
+                    }
+                }
+                //we need to loop the domain to fill all fields
+                foreach ($domainData as $domKey => $domVal) {
+                    //add the temporary domain data to the main container
+                    foreach ($domainDataTemp as $tempKey => $tempVal) {
+                        if (empty($domainData[$domKey][$tempKey])) {
+                            $domainData[$domKey][$tempKey] = $tempVal;
+                        }
+                    }
+                    /**
+                     * add some default data to domain
+                     * if the fields does not exist
+                     * or empty
+                     */
+                    $domainData[$domKey]['sdom_env'] = (!empty($domainData[$domKey]['sdom_env'])) ? $domainData[$domKey]['sdom_env'] : getenv('MELIS_PLATFORM');
+                    $domainData[$domKey]['sdom_scheme'] = (!empty($domainData[$domKey]['sdom_scheme'])) ? $domainData[$domKey]['sdom_scheme'] : 'http';
+                }
+                //field the site data
+                if (!empty($siteData)) {
+                    $siteName = (!empty($siteData['site_name'])) ? $siteData['site_name'] : '';
+                    $siteData['site_label'] = (!empty($siteData['site_label'])) ? $siteData['site_label'] : $siteName;
+                }
+
+                /**
+                 * Before proceeding to save the site
+                 * check if it is a new site and
+                 * the site is not yet created
+                 */
+                $isValidName = true;
+                if ($isNewSIte) {
+                    $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+                    $siteDBData = $siteTable->getEntryByField('site_name', $siteName)->current();
+                    if (!empty($siteDBData)) {
+                        $isValidName = false;
+                    }
+                }
+
+                if ($isValidName) {
+                    $cmsSiteSrv = $this->getServiceLocator()->get('MelisCmsSiteService');
+                    $saveSiteResult = $cmsSiteSrv->saveSite($siteData, $domainData, $siteLanguages, $site404Data, $siteName, $createNewFile, $isNewSIte);
+
+                    if ($saveSiteResult['success'])
+                    {
+                        $siteId = $saveSiteResult['site_id'];
+                        $textMessage = 'tr_melis_cms_sites_tool_add_create_site_success';
+                        $status = true;
+                    }
+                    else
+                    {
+                        $textMessage = 'tr_melis_cms_sites_tool_add_unable_to_create_site';
+                        $errors = array(
+                            'Error' => array(
+                                'siteAlreadyExists' => $translator->translate($saveSiteResult['message'])
+                            ),
+                        );
+                        $status = false;
+                    }
+                }else{
+                    $textMessage = 'tr_melis_cms_sites_tool_add_unable_to_create_site';
+                    $errors = array(
+                        'Error' => array(
+                            'siteAlreadyExists' => $translator->translate('tr_meliscms_tool_site_name_exists')
+                        ),
+                    );
+                    $status = false;
+                }
+            }
+        }
+
+        $response = array(
+            'success' => $status,
+            'textTitle' => 'tr_meliscms_tool_site',
+            'textMessage' => $textMessage,
+            'siteId' => $siteId,
+            'siteName' => $siteName,
+            'errors' => $errors
+        );
+
+        $this->getEventManager()->trigger('meliscms_site_save_end', $this, array_merge($response, array('typeCode' => 'CMS_SITE_ADD', 'itemId' => $siteId)));
+
+       return new JsonModel($response);
     }
 
     /**
@@ -676,7 +922,7 @@ class SitesController extends AbstractActionController
         $eventDatas = array();
         $this->getEventManager()->trigger('meliscms_site_delete_start', $this, $eventDatas);
         $siteId = (int) $this->params()->fromQuery('siteId', '');
-         
+
 
         $response = array(
             'success' => $status ,

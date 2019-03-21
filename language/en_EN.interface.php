@@ -467,6 +467,9 @@
 	    'tr_meliscms_drag_and_drop_modal_content' => 'Are you sure you want to add this plugin to the page?',
 
         //New site tools
+        'tr_melis_cms_sites_tool_add' => 'Add site',
+        'tr_melis_cms_sites_tool_create' => 'Create site',
+        
         'tr_melis_cms_sites_tool_add_step1_text' => 'This tool will help you create the right configuration for your site by asking you some questions. This will ensure the right generations of files in your modules and optimum compatibility with the Melis Platform ecosystem.',
         'tr_melis_cms_sites_tool_add_step1_is_multi_lang' => 'Will this site be multilingual?',
         'tr_melis_cms_sites_tool_add_step2_select_languages' => 'Please choose the languages you want to use for this site:',
@@ -475,7 +478,23 @@
         'tr_melis_cms_sites_tool_add_step2_url_local_after_domain' => 'I want the locale shown after my domain (ex: www.mysite.com/en/myurl)',
         'tr_melis_cms_sites_tool_add_step2_url_different_domains' => 'I want to have different domains or subdomains for them (ex: en.mysite.com and fr.mysite.com) and the tool will actually create multiple sites for you',
         'tr_melis_cms_sites_tool_add_step2_url_do_nothing' => 'I want nothing, my page url will be solely built on the page’s name',
+        'tr_melis_cms_sites_tool_add_step3_single_domain_name' => 'What will be the domain of this site?',
+        'tr_melis_cms_sites_tool_add_step3_multi_domain_name' => 'What will be the domain of this sites?',
+        'tr_melis_cms_sites_tool_add_step4_select_module' => 'Please choose the module name attached to the site in the list:',
+        'tr_melis_cms_sites_tool_add_step4_select_module_placeholder' => 'Choose a module',
+        'tr_melis_cms_sites_tool_add_step4_create_module' => 'Or create a new module and provide the name:',
+        'tr_melis_cms_sites_tool_add_step4_create_file_for_website' => 'Create the folders & files for the new website?',
+        'tr_melis_cms_sites_tool_add_step5_new_site_is_created' => 'A new site will be created with following parameters:',
+        'tr_melis_cms_sites_tool_add_step5_new_site_using_existing_module' => 'The site will use the existing module <b>“%s”</b>.The module folders and files will not be created.',
+        'tr_melis_cms_sites_tool_add_step5_new_site_using_new_module' => 'The <b>“%s”</b> module will be properly created with those parameters, allowing you to start the development of the site the best way possible.​',
 
+        'tr_melis_cms_sites_tool_add_unable_to_create_site' => 'Unable to create site.',
+        'tr_melis_cms_sites_tool_add_site_language_already_created' => '%s version of %s site is already created.',
+        'tr_melis_cms_sites_tool_add_create_site_success' => 'Site created successfully',
+        'tr_melis_cms_sites_tool_add_create_site_already_exist' => 'Unable to create site, Site name already used.',
+        'tr_melis_cms_sites_tool_add_create_site_unknown_error' => 'Something went wrong while creating the site, Please try again.',
+        'tr_melis_cms_sites_tool_add_create_site_no_site_language' => 'Please provide the site language(s).',
+        'tr_melis_cms_sites_tool_add_create_site_required_field' => 'Please fill out all the required fields.',
         #MODULE LOAD TAB
         'tr_melis_cms_sites_module_loading' => 'Module Loading',
         'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice' => '<i class="fa fa-warning"></i> Below are the lists of module(s) that is required by <strong>%s</strong>, are you sure you want to activate <strong>%s</strong>? ',

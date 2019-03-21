@@ -3,6 +3,7 @@
 namespace MelisCms\Service;
 
 use MelisCore\Service\MelisCoreGeneralService;
+use ZendTest\XmlRpc\Server\TestAsset\Exception;
 
 class MelisCmsSiteService extends MelisCoreGeneralService
 {
@@ -49,8 +50,37 @@ class MelisCmsSiteService extends MelisCoreGeneralService
         return $arrayParameters['results'];
         
     }
-    
-    public function saveSite($site, $siteDomain, $site404, $siteLangId = null, $siteId = null, $genSiteModule = false, $siteModule = null)
+
+    /**
+     * Function to create multi lingual site
+     *
+     * @param $siteData
+     * @param $domainData
+     *          Example Format: array(
+     *                                  'en_EN' => array(
+     *                                       'sdom_domain' => 'english.com',
+     *                                       'sdom_env'    => 'development',
+     *                                       etc.....
+     *                                  ),
+     *                                  'fr_FR' => array(
+     *                                       'sdom_domain' => 'french.com',
+     *                                       'sdom_env'    => 'development',
+     *                                       etc.....
+     *                                  ),
+     *                              )
+     * @param $siteLanguages
+     *          Example Format: array(
+     *                                  'en_EN' => 1,
+     *                                  'fr_FR' => 2,
+     *                              )
+     *
+     * @param $site404
+     * @param null $siteModuleName
+     * @param bool $createModule
+     * @param bool $isNewSite
+     * @return mixed
+     */
+    public function saveSite($siteData, $domainData, $siteLanguages, $site404, $siteModuleName = null, $createModule = false, $isNewSite = false)
 	{
 	    $results = array(
 	        'site_id' => null,
@@ -70,152 +100,270 @@ class MelisCmsSiteService extends MelisCoreGeneralService
         $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
         $siteDomainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
         $site404Table = $this->getServiceLocator()->get('MelisEngineTableSite404');
-        
+        $siteHomeTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
+        $sitelangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+
         // Site Name
-        $siteName = $arrayParameters['site']['site_name'];
-        # Site label
-        $siteLabel = $arrayParameters['site']['site_label'];
+        $siteName = $arrayParameters['siteData']['site_name'];
+        // Site label
+        $siteLabel = $arrayParameters['siteData']['site_label'];
+        //MelisSites Directory
+        $melisSite = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites';
 
         $siteDomainId = null;
         $site404Id = null;
-        
         $hasError = false;
-        if (!is_null($arrayParameters['siteId']))
+        $savedSiteId = null;
+
+        $curPlatform = !empty(getenv('MELIS_PLATFORM'))  ? getenv('MELIS_PLATFORM') : 'development';
+        $corePlatformTable = $this->getServiceLocator()->get('MelisCoreTablePlatform');
+        $corePlatformData = $corePlatformTable->getEntryByField('plf_name', $curPlatform)->current();
+
+        if($corePlatformData)
         {
-            // Saving Site
-            $savedSiteId = $siteTable->save($arrayParameters['site'], $arrayParameters['siteId']);
-            
-            // Retreiving the Site domain
-            $domainData = $siteDomainTable->getDataBySiteIdAndEnv($arrayParameters['siteId'], $siteDomain['sdom_env'])->current();
-            
-            if (!empty($domainData))
+            $platformId = $corePlatformData->plf_id;
+            $cmsPlatformTable = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+            $cmsPlatformData = $cmsPlatformTable->getEntryById($platformId)->current();
+            /**
+             * Check if there is platform
+             */
+            if ($cmsPlatformData)
             {
-                // If exist, the action would be updating the existing data
-                $siteDomainId = $domainData->sdom_id;
-            }
-            
-            // Retreiving the Site 404 page
-            $s404Data = $site404Table->getEntryByField('s404_site_id', $arrayParameters['siteId'])->current();
-            
-            if (!empty($s404Data))
-            {
-                // If exist, the action would be updating the existing data
-                $site404Id = $s404Data->s404_id;
-            }
-        }
-        else 
-        {
-            
-            $curPlatform = !empty(getenv('MELIS_PLATFORM'))  ? getenv('MELIS_PLATFORM') : 'development';
-            $corePlatformTable = $this->getServiceLocator()->get('MelisCoreTablePlatform');
-            $corePlatformData = $corePlatformTable->getEntryByField('plf_name', $curPlatform)->current();
-             
-            if($corePlatformData)
-            {
-                $platformId = $corePlatformData->plf_id;
-                $cmsPlatformTable = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
-                $cmsPlatformData = $cmsPlatformTable->getEntryById($platformId)->current();
-                
-                if ($cmsPlatformData)
+                $mainPageId = (int) $cmsPlatformData->pids_page_id_current;
+
+                $tempRes = array(
+                    'success' => true
+                );
+
+                $siteModuleName = $arrayParameters['siteModuleName'];
+
+                if ($arrayParameters['createModule'] && !empty($siteModuleName))
                 {
-                    $tempRes = array(
-                        'success' => true
-                    );
-                    
-                    $siteModuleName = null;
-                    
-                    if ($arrayParameters['genSiteModule'])
-                    {
-                        $siteModuleName = $this->generateModuleNameCase($arrayParameters['siteModule']);
-                        
-                        $tempRes = $this->createSiteModule($siteModuleName);
-                    }
-                    
-                    if ($tempRes['success'])
-                    {
-                        $pageId = (int) $cmsPlatformData->pids_page_id_current;
-                        $tplId = (int) $cmsPlatformData->pids_tpl_id_current;
-                         
-                        // Assigning the next page id from Platform Id's to Site main page id
-                        $arrayParameters['site']['site_main_page_id'] = $pageId;
-                        
-                        // Saving Site
-                        $savedSiteId = $siteTable->save($arrayParameters['site']);
-                        
-                        // Creating Site Homepage template
-                        $templateId = $this->createSitePageTemplate($tplId, $savedSiteId, $siteModuleName, $siteLabel.' Home', 'Index', 'index', $platformId);
-                        
-                        // Creating Site homepage
-                        $this->createSitePage($siteLabel, -1, $siteLangId, 'SITE', $pageId, $tplId, $platformId);
-                        
-                        if (!is_null($siteModuleName))
-                        {
+                    $moduleName = $this->generateModuleNameCase($siteModuleName);
+                    $tempRes = $this->createSiteModule($moduleName);
+                    if($tempRes['success']) {
+                        if (!is_null($siteModuleName)) {
                             // Getting the DemoSite config
-                            $melisSite = $_SERVER['DOCUMENT_ROOT'].'/../module/MelisSites';
                             $outputFileName = 'module.config.php';
-                            $moduleConfigDir = $melisSite.'/'.$siteModuleName.'/config/'.$outputFileName;
-                            
-                            // Replacing the Site homepage id to site module sonfig
+                            $moduleConfigDir = $melisSite . '/' . $siteModuleName . '/config/' . $outputFileName;
+
+                            // Replacing the Site homepage id to site module config
                             $moduleConfig = file_get_contents($moduleConfigDir);
-                            $moduleConfig = str_replace('\'homePageId\'', $pageId, $moduleConfig);
+                            $moduleConfig = str_replace('\'homePageId\'', $mainPageId, $moduleConfig);
                             file_put_contents($moduleConfigDir, $moduleConfig);
                         }
-
-                        // Creating Site 40 page template
-                        $nxtTplId = ++$tplId;
-                        $templateId = $this->createSitePageTemplate($nxtTplId, $savedSiteId, $siteModuleName, $siteLabel.' 404', 'Page404', 'index', $platformId);
-                        
-                        // Creating Site 404 page
-                        $page404Id = $pageId + 1;
-                        $this->createSitePage($siteLabel.'-404', $pageId, $siteLangId, 'PAGE', $page404Id, $nxtTplId, $platformId);
-                         
-                        $site404['s404_page_id'] = $page404Id;
                     }
-                    else
-                    {
-                        // Error occured in creating the Site on MelisSites Directory
-                        $results['message'] = $tempRes['message'];
+                }
+
+                if ($tempRes['success'])
+                {
+                    /**
+                     * Prepare the transaction so that
+                     * we can rollback the db insertion if
+                     * there are some error occurred
+                     */
+                    $db = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');//get db adapter
+                    $con = $db->getDriver()->getConnection();//get db driver connection
+                    $con->beginTransaction();//begin transaction
+                    try {
+                        // Assigning the next page id from Platform Id's
+                        $arrayParameters['siteData']['site_main_page_id'] = $mainPageId;
+
+                        //save the site
+                        $savedSiteId = $siteTable->save($arrayParameters['siteData']);
+
+                        /**
+                         * Make sure that the site id is not empty
+                         */
+                        if (!empty($savedSiteId)) {
+                            if (!empty($arrayParameters['siteLanguages'])) {
+                                $siteLang = '';
+                                if(!empty($arrayParameters['siteLanguages']['sites_url_setting'])) {
+                                    $siteUrlSetting = $arrayParameters['siteLanguages']['sites_url_setting'];
+                                    unset($arrayParameters['siteLanguages']['sites_url_setting']);
+                                }
+                                /**
+                                 * Loop through each language
+                                 * to make a site per language
+                                 */
+                                foreach ($arrayParameters['siteLanguages'] as $langLabel => $langId) {
+                                    $langName = explode('_', $langLabel);
+                                    /**
+                                     * get the current page id and template id
+                                     * from the platform ids
+                                     */
+                                    $cmsCurPlatformData = $cmsPlatformTable->getEntryById($platformId)->current();
+                                    $pageId = (int)$cmsCurPlatformData->pids_page_id_current;
+                                    $tplId = (int)$cmsCurPlatformData->pids_tpl_id_current;
+
+                                    /**
+                                     * Create home page and template
+                                     */
+                                    //Creating Site Homepage page and template
+                                    $this->createSitePageTemplate($tplId, $savedSiteId, $siteModuleName, $langName[1] . ': Home', 'Index', 'index', $platformId);
+                                    $this->createSitePage($langName[1] . ':' . $siteLabel . ' - Home', -1, $langId, 'SITE', $pageId, $tplId, $platformId);
+                                    /**
+                                     * This will save the homepage id
+                                     * to the SiteName.config.php file
+                                     */
+                                    $tab = '';
+                                    if ($siteLang != '') {
+                                        $tab = "\t\t\t\t";
+                                    }
+                                    //make an array of language
+                                    $siteLang .= $tab . '\'' . $langLabel . '\'' . ' => array(' . "\n\t\t\t\t\t" .
+                                        '\'' . 'homePageId' . '\'' . ' => ' . $pageId . "\n\t\t\t\t" .
+                                        '),' . "\n";
+
+
+                                    /**
+                                     * Create 404 template and page
+                                     */
+                                    $nxtTplId = ++$tplId;
+                                    $this->createSitePageTemplate($nxtTplId, $savedSiteId, $siteModuleName, $langName[1] . ': 404', 'Page404', 'index', $platformId);
+                                    $page404Id = $pageId + 1;
+                                    $this->createSitePage($langName[1] . ':' . $siteLabel . ' - 404', $pageId, $langId, 'PAGE', $page404Id, $nxtTplId, $platformId);
+
+                                    /**
+                                     * save the site home page language id
+                                     */
+                                    $siteHomeData = array(
+                                        'shome_site_id' => $savedSiteId,
+                                        'shome_lang_id' => $langId,
+                                        'shome_page_id' => $pageId
+                                    );
+                                    $siteHomeTable->save($siteHomeData);
+                                    /**
+                                     * Save the site lang id
+                                     */
+                                    $siteLangsData = array(
+                                        'slang_site_id' =>   $savedSiteId,
+                                        'slang_lang_id' => $langId,
+                                    );
+                                    $sitelangsTable->save($siteLangsData);
+
+                                    /**
+                                     * save 404 data
+                                     */
+                                    $arrayParameters['site404']['s404_page_id'] = $page404Id;
+                                    $arrayParameters['site404']['s404_site_id'] = $savedSiteId;
+                                    $site404Table->save($arrayParameters['site404']);
+
+                                    /**
+                                     * Process the insertion of domain by each language
+                                     *
+                                     * Get the domain data by language
+                                     */
+                                    $siteDomain = array();
+                                    foreach ($arrayParameters['domainData'] as $langKey => $domain) {
+                                        if ($langKey == $langLabel) {
+                                            $siteDomain = $domain;
+                                        }
+                                    }
+                                    //insert the domain
+                                    if (!empty($siteDomain)) {
+                                        $siteDomain['sdom_site_id'] = $savedSiteId;
+                                        $siteDomainTable->save($siteDomain);
+                                    }
+                                }
+
+                                /**
+                                 * Modify the SiteName.config.php
+                                 * to add every language in the site
+                                 * config
+                                 */
+                                $siteConfigName = $siteModuleName . '.config.php';
+                                $siteConfigDir = $melisSite . '/' . $siteModuleName . '/config/' . $siteConfigName;
+
+                                /**
+                                 * Make an array for the site config per language
+                                 */
+                                $siteLangArray = 'array(' . "\n\t\t\t\t" .
+                                                 $siteLang .
+                                                "\t\t\t" . '),' . "\n";
+                                $siteLangConfig = '\'' . $savedSiteId . '\' => '.$siteLangArray;
+                                /**
+                                 * Check if it is a new site(new site module) so that we can determine
+                                 * whether we are going to create a site config per language
+                                 * or we're just going to update the site config
+                                 */
+                                if($isNewSite) {
+                                    /**
+                                     * Check if site has a file created
+                                     */
+                                    if($arrayParameters['createModule']) {
+                                        /**
+                                         * Update the site config to add
+                                         * the config per language
+                                         */
+                                        $moduleConfig = file_get_contents($siteConfigDir);
+                                        $moduleConfig = preg_replace('/(\'siteLangConfig\'\s*,)/im', $siteLangConfig, $moduleConfig);
+                                        file_put_contents($siteConfigDir, $moduleConfig);
+                                    }
+                                }else{
+                                    /**
+                                     * Update the SiteName.config.php
+                                     * to include the new site language config
+                                     *
+                                     * This will include the new site lang config above the
+                                     * allSites config array
+                                     */
+                                    $moduleConfig = preg_replace('/(\'allSites(?![\s\S]*\'allSites[\s\S]*$))/im', "$siteLangConfig\t\t\t$1", file_get_contents($siteConfigDir));
+                                    file_put_contents($siteConfigDir, $moduleConfig);
+                                }
+                                /**
+                                 * If there is no error during the process,
+                                 * start inserting all the site data to the db
+                                 */
+                                $con->commit();
+                            } else {
+                                $results['message'] = 'tr_melis_cms_sites_tool_add_create_site_no_site_language';
+                                $hasError = true;
+                            }
+                        } else {
+                            $results['message'] = 'tr_melis_cms_sites_tool_add_create_site_unknown_error';
+                            $hasError = true;
+                        }
+                    }catch (\Exception $ex){
+                        /**
+                         * if there are error, rollback
+                         * the db insertion
+                         */
+                        $con->rollback();
+                        $results['message'] = 'tr_melis_cms_sites_tool_add_create_site_unknown_error';
                         $hasError = true;
                     }
                 }
-                else 
-    	        {
-    	            // if there is no Platform Id available
-    	            $results['message'] = 'tr_meliscms_tool_site_no_platform_ids';
-    	            $hasError = true;
-    	        }
-    	    }
-    	    else 
-    	    {
-    	        // If there is no Platform available on the database
-    	        $results['message'] = 'tr_meliscore_error_message';
-    	        $hasError = true;
-    	    }
+                else
+                {
+                    // Error occured in creating the Site on MelisSites Directory
+                    $results['message'] = $tempRes['message'];
+                    $hasError = true;
+                }
+            }
+            else
+            {
+                // if there is no Platform Id available
+                $results['message'] = 'tr_meliscms_tool_site_no_platform_ids';
+                $hasError = true;
+            }
+        }
+        else
+        {
+            // If there is no Platform available on the database
+            $results['message'] = 'tr_meliscore_error_message';
+            $hasError = true;
         }
         
         
         // Checking if error occured
         if (!$hasError)
         {
-            // Saving Site domain
-            $siteDomain['sdom_site_id'] = $savedSiteId;
-            $siteDomainTable->save($siteDomain, $siteDomainId);
-            
-            // Saving Site 404 page
-            if (!empty($site404['s404_page_id']))
-            {
-                $site404['s404_site_id'] = $savedSiteId;
-                $site404Table->save($site404, $site404Id);
-            }
-            elseif (!is_null($site404Id)) 
-            {
-                $site404Table->deleteById($site404Id);
-            }
-            
             $results = array(
                 'site_id' => $savedSiteId,
                 'success' => true,
-                'message' => 'tr_meliscms_tool_site_save_success',
+                'message' => 'tr_melis_cms_sites_tool_add_create_site_success',
+                'siteName' => $siteLabel,
             );
         }
         
@@ -228,6 +376,185 @@ class MelisCmsSiteService extends MelisCoreGeneralService
 	     
 	    return $arrayParameters['results'];
 	}
+
+//    public function saveSite($site, $siteDomain, $site404, $siteLangId = null, $siteId = null, $genSiteModule = false, $siteModule = null)
+//    {
+//        $results = array(
+//            'site_id' => null,
+//            'success' => false,
+//            'message' => null,
+//        );
+//
+//        // Event parameters prepare
+//        $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
+//
+//        // Sending service start event
+//        $arrayParameters = $this->sendEvent('meliscmssite_service_save_site_start', $arrayParameters);
+//
+//        // Service implementation start
+//
+//        // Table services
+//        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+//        $siteDomainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
+//        $site404Table = $this->getServiceLocator()->get('MelisEngineTableSite404');
+//
+//        // Site Name
+//        $siteName = $arrayParameters['site']['site_name'];
+//        # Site label
+//        $siteLabel = $arrayParameters['site']['site_label'];
+//
+//        $siteDomainId = null;
+//        $site404Id = null;
+//
+//        $hasError = false;
+//        if (!is_null($arrayParameters['siteId']))
+//        {
+//            // Saving Site
+//            $savedSiteId = $siteTable->save($arrayParameters['site'], $arrayParameters['siteId']);
+//
+//            // Retreiving the Site domain
+//            $domainData = $siteDomainTable->getDataBySiteIdAndEnv($arrayParameters['siteId'], $siteDomain['sdom_env'])->current();
+//
+//            if (!empty($domainData))
+//            {
+//                // If exist, the action would be updating the existing data
+//                $siteDomainId = $domainData->sdom_id;
+//            }
+//
+//            // Retreiving the Site 404 page
+//            $s404Data = $site404Table->getEntryByField('s404_site_id', $arrayParameters['siteId'])->current();
+//
+//            if (!empty($s404Data))
+//            {
+//                // If exist, the action would be updating the existing data
+//                $site404Id = $s404Data->s404_id;
+//            }
+//        }
+//        else
+//        {
+//
+//            $curPlatform = !empty(getenv('MELIS_PLATFORM'))  ? getenv('MELIS_PLATFORM') : 'development';
+//            $corePlatformTable = $this->getServiceLocator()->get('MelisCoreTablePlatform');
+//            $corePlatformData = $corePlatformTable->getEntryByField('plf_name', $curPlatform)->current();
+//
+//            if($corePlatformData)
+//            {
+//                $platformId = $corePlatformData->plf_id;
+//                $cmsPlatformTable = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+//                $cmsPlatformData = $cmsPlatformTable->getEntryById($platformId)->current();
+//
+//                if ($cmsPlatformData)
+//                {
+//                    $tempRes = array(
+//                        'success' => true
+//                    );
+//
+//                    $siteModuleName = null;
+//
+//                    if ($arrayParameters['genSiteModule'])
+//                    {
+//                        $siteModuleName = $this->generateModuleNameCase($arrayParameters['siteModule']);
+//
+//                        $tempRes = $this->createSiteModule($siteModuleName);
+//                    }
+//
+//                    if ($tempRes['success'])
+//                    {
+//                        $pageId = (int) $cmsPlatformData->pids_page_id_current;
+//                        $tplId = (int) $cmsPlatformData->pids_tpl_id_current;
+//
+//                        // Assigning the next page id from Platform Id's to Site main page id
+//                        $arrayParameters['site']['site_main_page_id'] = $pageId;
+//
+//                        // Saving Site
+//                        $savedSiteId = $siteTable->save($arrayParameters['site']);
+//
+//                        // Creating Site Homepage template
+//                        $templateId = $this->createSitePageTemplate($tplId, $savedSiteId, $siteModuleName, $siteLabel.' Home', 'Index', 'index', $platformId);
+//
+//                        // Creating Site homepage
+//                        $this->createSitePage($siteLabel, -1, $siteLangId, 'SITE', $pageId, $tplId, $platformId);
+//
+//                        if (!is_null($siteModuleName))
+//                        {
+//                            // Getting the DemoSite config
+//                            $melisSite = $_SERVER['DOCUMENT_ROOT'].'/../module/MelisSites';
+//                            $outputFileName = 'module.config.php';
+//                            $moduleConfigDir = $melisSite.'/'.$siteModuleName.'/config/'.$outputFileName;
+//
+//                            // Replacing the Site homepage id to site module sonfig
+//                            $moduleConfig = file_get_contents($moduleConfigDir);
+//                            $moduleConfig = str_replace('\'homePageId\'', $pageId, $moduleConfig);
+//                            file_put_contents($moduleConfigDir, $moduleConfig);
+//                        }
+//
+//                        // Creating Site 40 page template
+//                        $nxtTplId = ++$tplId;
+//                        $templateId = $this->createSitePageTemplate($nxtTplId, $savedSiteId, $siteModuleName, $siteLabel.' 404', 'Page404', 'index', $platformId);
+//
+//                        // Creating Site 404 page
+//                        $page404Id = $pageId + 1;
+//                        $this->createSitePage($siteLabel.'-404', $pageId, $siteLangId, 'PAGE', $page404Id, $nxtTplId, $platformId);
+//
+//                        $site404['s404_page_id'] = $page404Id;
+//                    }
+//                    else
+//                    {
+//                        // Error occured in creating the Site on MelisSites Directory
+//                        $results['message'] = $tempRes['message'];
+//                        $hasError = true;
+//                    }
+//                }
+//                else
+//                {
+//                    // if there is no Platform Id available
+//                    $results['message'] = 'tr_meliscms_tool_site_no_platform_ids';
+//                    $hasError = true;
+//                }
+//            }
+//            else
+//            {
+//                // If there is no Platform available on the database
+//                $results['message'] = 'tr_meliscore_error_message';
+//                $hasError = true;
+//            }
+//        }
+//
+//
+//        // Checking if error occured
+//        if (!$hasError)
+//        {
+//            // Saving Site domain
+//            $siteDomain['sdom_site_id'] = $savedSiteId;
+//            $siteDomainTable->save($siteDomain, $siteDomainId);
+//
+//            // Saving Site 404 page
+//            if (!empty($site404['s404_page_id']))
+//            {
+//                $site404['s404_site_id'] = $savedSiteId;
+//                $site404Table->save($site404, $site404Id);
+//            }
+//            elseif (!is_null($site404Id))
+//            {
+//                $site404Table->deleteById($site404Id);
+//            }
+//
+//            $results = array(
+//                'site_id' => $savedSiteId,
+//                'success' => true,
+//                'message' => 'tr_meliscms_tool_site_save_success',
+//            );
+//        }
+//
+//        // Service implementation end
+//
+//        // Adding results to parameters for events treatment if needed
+//        $arrayParameters['results'] = $results;
+//        // Sending service end event
+//        $arrayParameters = $this->sendEvent('meliscmssite_service_save_site_end', $arrayParameters);
+//
+//        return $arrayParameters['results'];
+//    }
 	
 	/**
 	 * This method creating Site page

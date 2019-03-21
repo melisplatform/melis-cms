@@ -1,27 +1,41 @@
 $(document).ready(function() {
     $body = $("body");
-    var modalUrl = "/melis/MelisCms/Sites/renderToolSitesModalContainer";
-
-    $body.on('click', "#btn-new-meliscms-tool-sites", function () {
-        melisCoreTool.pending("#btn-new-meliscms-tool-sites");
-        melisHelper.createModal('id_meliscms_tool_sites_modal_container','meliscms_tool_sites_modal_add_content',true,[],modalUrl,function () {
-            melisCoreTool.done("#btn-new-meliscms-tool-sites");
-        });
-    });
-
     /**
      * This will open a new tab when editing a site
      */
     $body.on("click", ".btnEditSites", function(){
         var tableId = $(this).closest('tr').attr('id');
         var name = $(this).closest('tr').find("td:nth-child(2)").text();
-        melisHelper.tabOpen(name, 'fa-globe', tableId+'_id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site',  { siteId : tableId }, null, function(){
-
-        });
+        openSiteEditTab(name, tableId);
     });
 
 
+    /**
+     * ======================================================================================
+     * =============================== START CREATE SITES ===================================
+     * ======================================================================================
+     */
+    var formData = {};
+    var selectedLanguages = '';
+    var domainType = '';
+    var createFile = true;
+    var newSite = true;
     var owlStep = null;
+    var currentStepForm = '';
+    var siteName = '';
+    var selectedDomainValue = [];
+
+
+    var modalUrl = "/melis/MelisCms/Sites/renderToolSitesModalContainer";
+
+    $body.on('click', "#btn-new-meliscms-tool-sites", function () {
+        melisCoreTool.pending("#btn-new-meliscms-tool-sites");
+        melisHelper.createModal('id_meliscms_tool_sites_modal_container','meliscms_tool_sites_modal_add_content',true,[],modalUrl,function () {
+            melisCoreTool.done("#btn-new-meliscms-tool-sites");
+            currentStepForm = '';
+        });
+    });
+
     /**
      * Initialize owl carousel for step by step
      * process of creating site
@@ -43,9 +57,9 @@ $(document).ready(function() {
                 var current = this.currentItem;
                 //hide the prev button when we are on the first step
                 if(current === 0){
-                    $("#btn-prev-step").hide();
+                    hideElement("#btn-prev-step");
                 }else{
-                    $("#btn-prev-step").show();
+                    showElement("#btn-prev-step");
                 }
             },
             beforeMove: function(elem){
@@ -57,18 +71,39 @@ $(document).ready(function() {
     };
 
     $body.on("click", "#btn-next-step", function(e){
-        if(owlStep != null) {
-            owlStep.trigger('owl.next');
+        if(owlStep !== null) {
+            /**
+             * check if form is not empty before
+             * proceeding to the next slide
+             */
+            if(currentStepForm != "" && currentStepForm != "skip") {
+                var form = getSerializedForm(currentStepForm);
+                if (isFormEmpty(form, currentStepForm)) {
+                    $("#siteAddAlert").removeClass("hidden");
+                } else {
+                    $("#siteAddAlert").addClass("hidden");
+                    removeFormError(currentStepForm);
+                    owlStep.trigger('owl.next');
+                }
+            }else{
+                $("#siteAddAlert").addClass("hidden");
+                removeFormError(currentStepForm);
+                owlStep.trigger('owl.next');
+            }
         }
     });
 
     $body.on("click", "#btn-prev-step", function(e){
-        if(owlStep !== null)
+        if(owlStep !== null) {
+            $("#siteAddAlert").addClass("hidden");
+            removeFormError(currentStepForm);
             owlStep.trigger('owl.prev');
+        }
     });
 
     /**
-     * check step
+     * This will process each step
+     * BEFORE proceeding to next slide
      * @param step
      */
     function checkStep(step)
@@ -78,53 +113,450 @@ $(document).ready(function() {
         //process step
         switch(step){
             case "step_1":
+                //skip step 1 form
+                currentStepForm = 'skip';
                 break;
             case "step_2":
+                //include the from in step1
+                var step1Obj = {};
+                step1Obj.isMultiLang = isMultiLang ? true : false;
+                step1Obj.data = getSerializedForm("#step2form-is_multi_lingual");
+                formData.multiLang = step1Obj;
+                /**
+                 * determine what should we display
+                 * depending if multi language or not
+                 */
                 if(isMultiLang){
-                    $(".step2-forms .sites_step2-multi-language").show();
-                    $(".step2-forms .sites_step2-single-language").hide();
+                    showElement(".step2-forms .sites_step2-multi-language");
+                    hideElement(".step2-forms .sites_step2-single-language");
+
+                    currentStepForm = "#step2form-multi_language";
                 }else{
-                    $(".step2-forms .sites_step2-single-language").show();
-                    $(".step2-forms .sites_step2-multi-language").hide();
+                    showElement(".step2-forms .sites_step2-single-language");
+                    hideElement(".step2-forms .sites_step2-multi-language");
+
+                    currentStepForm = "#step2form-single_language";
                 }
                 break;
             case "step_3":
+                //clear selected languages
+                var lang = '';
+                selectedLanguages = '';
+                /**
+                 * On this step, we are in step 3
+                 * but we are still processing the data from
+                 * the step 2 so that we can determine what
+                 * we are displaying on step 3
+                 */
+
+                var langData = {};
+                var domainData = {};
+                /**
+                 * check if site is multi lingual
+                 */
                 if(isMultiLang){
-                    var multiLangForm = $("#step2form-multi_language");
-                    var multiLangFormData = multiLangForm.serializeArray();
+                    /**
+                     * Load the multi lingual form
+                     */
+                    var multiLangFormData = getSerializedForm("#step2form-multi_language");
+                    //include the step2 data into the object
+                    langData = processSiteLanguage(multiLangFormData, lang);
+
                     var multiDomainsContainer = $(".sites_step3-multi-domain #multi-domains_container");
                     var div = $("<div/>",{
                         class: "form-group"
                     });
+
                     multiDomainsContainer.empty();
                     $.each(multiLangFormData, function(){
-                        if(this.name == "site_selected_languages"){
-                            var langData = this.value.split("_");
-                            var label = $("<label/>").text(langData[1]);
+                        if(this.name == "site_selected_lang"){
+                            var langData = this.value.split("-");
+                            /**
+                             * prepare lang info
+                             */
+                            if(lang == ""){
+                                lang = langData[2];
+                            }else {
+                                lang = lang + " / " + langData[2];
+                            }
+                            /**
+                             * This will create a text input for language
+                             * depending the selected language
+                             * of the user
+                             */
+                            var label = $("<label/>").html(langData[2]+"<sup>*</sup>").addClass("err_site-domain-"+this.value);
                             div.append(label);
+                            var domainName = "site-domain-"+this.value;
                             var input = $("<input/>",{
-                                class: "form-control"
+                                type: "text",
+                                class: "form-control",
+                                name: domainName,
+                                value: applyDomainValue(domainName),
+                                required: "required"
                             }).attr("data-langId", langData[0]);
                             div.append(input);
                             multiDomainsContainer.append(div);
                         }else if(this.name == "sites_url_setting"){
+                            /**
+                             * get the value of the site url setting to
+                             * determine whether it is multi domain
+                             * or not
+                             */
+                            if(this.value == 2){
+                                //this will load the multi domain form
+                                showElement(".sites_step3-multi-domain");
+                                hideElement(".sites_step3-single-domain");
+                                domainData.isMultiDomain = true;
 
+                                currentStepForm = "#step3form-multi_domain";
+                            }else{
+                                //load the single domain form
+                                showElement(".sites_step3-single-domain");
+                                hideElement(".sites_step3-multi-domain");
+                                domainData.isMultiDomain= false;
+
+                                currentStepForm = "#step3form-single_domain";
+                            }
                         }
                     });
                 }else{
+                    currentStepForm = "#step3form-single_domain";
+                    /**
+                     * Load the single domain if the site is not
+                     * multi lingual
+                     */
+                    showElement(".sites_step3-single-domain");
+                    hideElement(".sites_step3-multi-domain");
 
+                    domainData.isMultiDomain = false;
+                    //add step  2 data
+                    var singLangFormData = getSerializedForm("#step2form-single_language");
+                    langData = processSiteLanguage(singLangFormData, lang);
+                    lang = langData.langDetails;
                 }
+                formData.languages = langData.data;
+                formData.domains = domainData;
+
+                selectedLanguages = '- Languages: ' + lang;
                 break;
             case "step_4":
-                $("#btn-next-step").show();
-                $("#btn-finish-step").hide();
+                currentStepForm = "#step4form_module";
+                /**
+                 * Process the domain form
+                 * to get the data
+                 * @type {string}
+                 */
+                var domain = '';
+                var domainFormData = {};
+                if(formData.domains.isMultiDomain){
+                    domainFormData = getSerializedForm("#step3form-multi_domain");
+                    domain = 'Multiple';
+                }else{
+                    domainFormData = getSerializedForm("#step3form-single_domain");
+                    domain = 'Single';
+                }
+
+                domainType = '- Domains: ' + domain;
+                formData.domains.data = processSiteDomain(domainFormData);
+
+                /**
+                 * Hide the finish button when
+                 * your are on step4 ang below
+                 */
+                showElement("#btn-next-step");
+                hideElement("#btn-finish-step");
                 break;
             case "step_5":
-                $("#btn-finish-step").show();
-                $("#btn-next-step").hide();
+                //get the data of step4
+                var step4Obj = {};
+                step4Obj.data = processSiteModule();
+                step4Obj.newSite = newSite;
+                step4Obj.createFile = createFile;
+                formData.module = step4Obj;
+
+                /**
+                 * Hide the next button and
+                 * show the finish button
+                 * when you are on the last
+                 * step
+                 */
+                showElement("#btn-finish-step");
+                hideElement("#btn-next-step");
+
+                /**
+                 * prepare to display the user selected
+                 * options on site creation
+                 */
+                var text = translations.tr_melis_cms_sites_tool_add_step5_new_site_using_existing_module;
+                if(newSite){
+                    text = translations.tr_melis_cms_sites_tool_add_step5_new_site_using_new_module;
+                }
+                $(".site_creation_info").empty().append(selectedLanguages, "<br />",domainType,
+                                                        "<br/><p class='step5-message'>"+text.replace(/%s/g, siteName)+"</p>");
                 break;
             default:
                 break;
         }
     }
+
+    /**
+     * This will send a request to
+     * create a new site
+     */
+    $body.on("click", "#btn-finish-step", function(e){
+        $.ajax({
+            url: "/melis/MelisCms/Sites/createNewSite",
+            method: "POST",
+            data: {"data" : formData},
+            dataType: "JSON",
+            beforeSend: function(){
+                melisCoreTool.pending("#btn-finish-step");
+            },
+            success: function(data){
+                if(data.success){
+                    $('#id_meliscms_tool_sites_modal_container_container').modal('hide');
+                    openSiteEditTab(data.siteName, data.siteId);
+                }else{
+                    melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
+                }
+                melisCore.flashMessenger();
+                melisCoreTool.done("#btn-finish-step");
+            },
+            error: function(){
+                console.log(translations.tr_melis_cms_sites_tool_add_create_site_unknown_error);
+            }
+        });
+        e.preventDefault();
+    });
+
+    /**
+     * This will determine whether the user will create
+     * a new site or not
+     */
+    $body.on("change", "#siteSelectModuleName", function(){
+        if($(this).val() != ""){
+            newSite = false;
+            createFile = false;
+            $("#siteCreateModuleName").removeAttr("required").prop("disabled", true);
+            $("#step4form_module").find("input[name=create_sites_file]").prop("disabled", true);
+        }else{
+            $("#siteCreateModuleName").attr("required", "required").prop("disabled", false);
+            $("#step4form_module").find("input[name=create_sites_file]").prop("disabled", false);
+            newSite = true;
+        }
+    });
+
+    $body.on("input", "#step4form_module #siteCreateModuleName", function() {
+        $("#step4form_module").find("#createSiteFiles").removeClass("hidden");
+        updateSliderHeight();
+    });
+
+    /**
+     * Process site lang data(Single language)
+     * @param form
+     * @param lang
+     */
+    function processSiteLanguage(form, lang){
+        var langData = {};
+        var data = {};
+        $.each(form, function(i, v){
+            if(this.name == "site_selected_lang") {
+                var langInfo = this.value.split("-");
+                /**
+                 * prepare lang info
+                 */
+                lang = langInfo[2];
+
+                langData[langInfo[1]] = langInfo[0];
+            }else{
+                langData[v.name] = v.value;
+            }
+
+            data.data = langData;
+            data.langDetails = lang;
+        });
+        return data;
+    }
+
+    /**
+     * Process site domain data
+     * @param form
+     */
+    function processSiteDomain(form){
+        var domainData = {};
+        //clear domain values
+        selectedDomainValue = [];
+        $.each(form, function(i, v){
+            selectedDomainValue.push(v);
+            if (v.name.indexOf("site-domain") >= 0){
+                var dom = v.name.split("-");
+                var langName = dom[3];
+                domainData[langName] = {"sdom_domain" : v.value};
+            }else{
+                domainData[v.name] = v.value;
+            }
+        });
+        return domainData;
+    }
+
+    /**
+     * Process the site module data
+     * @returns {*|jQuery}
+     */
+    function processSiteModule(){
+        var form = getSerializedForm("#step4form_module");
+        $.each(form, function(i, v){
+            if(v.name == "create_sites_file"){
+                //we decide only to create a file if it is a new site
+                if(newSite) {
+                    if (v.value == "yes") {
+                        createFile = true;
+                    } else {
+                        createFile = false;
+                    }
+                }
+                delete form[i];
+            }else if(v.name == "siteSelectModuleName"){
+                delete form[i];
+                if(!newSite){
+                    form.push({'site_name':v.value});
+                    siteName = v.value;
+                }
+            }else if(v.name == "siteCreateModuleName"){
+                delete form[i];
+                if(newSite) {
+                    form.push({'site_name': v.value});
+                    siteName = v.value;
+                }
+            }
+        });
+        return form;
+    }
+
+    /**
+     * Apply the selected domain
+     * @param domainName
+     * @returns {string}
+     */
+    function applyDomainValue(domainName){
+        var value = "";
+        $.each(selectedDomainValue, function(i, v){
+            if(v.name == domainName){
+                value = v.value;
+                return value;
+            }
+        });
+        return value;
+    }
+
+    /**
+     * Check if form is empty
+     * @param form
+     * @param currentStepForm
+     * @returns {boolean}
+     */
+    function isFormEmpty(form, currentStepForm){
+        var fromInputNames = [];
+        $.each(form, function(i, v){
+           if(v.value != ""){
+               fromInputNames.push(v.name)
+           }
+        });
+        return showFormError(currentStepForm, fromInputNames);
+    }
+
+    /**
+     * Show error on form
+     * @param form
+     * @param fieldNames
+     * @returns {boolean}
+     */
+    function showFormError(form, fieldNames){
+        var errCtr = 0;
+        var curForm = $(form+" input");
+        curForm.each(function(){
+            if($(this).prop('required')){
+                var inputName = $(this).attr("name");
+                var errlabel = $(this).closest("form").find("label.err_" + inputName).not(":has(input)");
+                if (jQuery.inArray(inputName, fieldNames) === -1) {
+                    errlabel.addClass("fieldErrorColor");
+                    errCtr++;
+                } else {
+                    errlabel.removeClass("fieldErrorColor");
+                }
+            }
+        });
+
+        if(errCtr > 0)
+            return true;
+
+        return false;
+    }
+
+    /**
+     * Remove errors from form
+     * @param form
+     */
+    function removeFormError(form){
+        var curForm = $(form+" input");
+        curForm.each(function(){
+            var inputName = $(this).attr("name");
+            var errlabel = $(this).closest("form").find("label.err_"+inputName).not(":has(input)");
+            errlabel.removeClass("fieldErrorColor");
+        });
+    }
+
+    /**
+     * Function to update the slider
+     * height
+     */
+    function updateSliderHeight(){
+        setInterval(function () {
+            $(".sites-steps-owl").each(function () {
+                $(this).data('owlCarousel').autoHeight();
+            });
+        });
+    }
+
+    /**
+     * Open site edition tab
+     * @param name
+     * @param siteId
+     */
+    function openSiteEditTab(name, siteId){
+        melisHelper.tabOpen(name, 'fa-globe', siteId+'_id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site',  { siteId : siteId }, null, function(){
+
+        });
+    }
+
+    /**
+     *
+     * @param form
+     * @returns {*|jQuery}
+     */
+    function getSerializedForm(form){
+        return $(form).serializeArray();
+    }
+
+    /**
+     *
+     * @param elem
+     */
+    function showElement(elem){
+        $(elem).show();
+    }
+
+    /**
+     *
+     * @param elem
+     */
+    function hideElement(elem){
+        $(elem).hide();
+    }
+
+    /**
+     * ================================================================================
+     * ============================== END SITE CREATION ===============================
+     * ================================================================================
+     */
 });

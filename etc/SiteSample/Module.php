@@ -42,6 +42,7 @@ class Module
     	$config = array();
     	$configFiles = array(
     			include __DIR__ . '/config/module.config.php',
+    			include __DIR__ . '/config/melis.plugins.config.php',
     			include __DIR__ . '/config/SiteSample.config.php',
     	);
     	
