@@ -1,0 +1,20 @@
+<?php
+$id = '';
+if (!empty($this->zoneconfig['conf']['id'])) {
+    $id = ' id="' . $this->siteId . '_' . $this->zoneconfig['conf']['id'] . '"';
+}
+
+$data_melisKey = $this->melisKey;
+?>
+<div <?= $id; ?> data-melisKey="<?= $data_melisKey; ?>">
+    <div class="spacing-x2 innerAll">
+        <div class="switch-all-container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="pull-left">Site Config</h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
