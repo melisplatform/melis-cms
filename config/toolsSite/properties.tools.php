@@ -206,6 +206,20 @@ return array(
                             'elements' => array(
                                 array(
                                     'spec' => array(
+                                        'name' => 'shome_id',
+                                        'type' => 'hidden',
+                                        'options' => array(
+                                            'label' => 'tr_melis_cms_sites_shome_id',
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'shome_id',
+                                            'value' => '',
+                                            'placeholder' => 'tr_melis_cms_sites_shome_id',
+                                        ),
+                                    ),
+                                ),
+                                array(
+                                    'spec' => array(
                                         'name' => 'shome_lang_id',
                                         'type' => 'hidden',
                                         'options' => array(
@@ -215,6 +229,20 @@ return array(
                                             'id' => 'shome_lang_id',
                                             'value' => '',
                                             'placeholder' => 'tr_melis_cms_sites_shome_lang_id',
+                                        ),
+                                    ),
+                                ),
+                                array(
+                                    'spec' => array(
+                                        'name' => 'shome_site_id',
+                                        'type' => 'hidden',
+                                        'options' => array(
+                                            'label' => 'tr_melis_cms_sites_shome_site_id',
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'shome_site_id',
+                                            'value' => '',
+                                            'placeholder' => 'tr_melis_cms_sites_sshome_site_id',
                                         ),
                                     ),
                                 ),
@@ -235,6 +263,44 @@ return array(
                                 ),
                             ),
                             'input_filter' => array(
+                                'shome_id' => array(
+                                    'name' => 'shome_id',
+                                    'required' => false,
+                                    'validators' => array(
+                                        array(
+                                            'name' => 'IsInt',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'invalid id',
+                                                    \Zend\I18n\Validator\IsInt::INVALID => 'invalid id',
+                                                )
+                                            )
+                                        ),
+                                    ),
+                                    'filters' => array(
+                                        array('name' => 'StripTags'),
+                                        array('name' => 'StringTrim'),
+                                    ),
+                                ),
+                                'shome_site_id' => array(
+                                    'name' => 'shome_site_id',
+                                    'required' => false,
+                                    'validators' => array(
+                                        array(
+                                            'name' => 'IsInt',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'invalid id',
+                                                    \Zend\I18n\Validator\IsInt::INVALID => 'invalid id',
+                                                )
+                                            )
+                                        ),
+                                    ),
+                                    'filters' => array(
+                                        array('name' => 'StripTags'),
+                                        array('name' => 'StringTrim'),
+                                    ),
+                                ),
                                 'shome_lang_id' => array(
                                     'name' => 'shome_lang_id',
                                     'required' => false,

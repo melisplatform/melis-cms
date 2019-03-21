@@ -2912,8 +2912,9 @@ $(document).ready(function() {
             }
             else
             {
+                melisCoreTool.highlightErrors(data.success, data.errors, currentTabId+"_id_meliscms_tool_sites_edit_site");
                 // error modal
-                melisHelper.melisKoNotification( data.textTitle, data.textMessage, data.errors, '#000' );
+                melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors );
             }
 
             // update flash messenger values

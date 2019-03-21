@@ -40,6 +40,8 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
             'MelisModuleConfig',
             'MelisComposerDeploy',
             'MelisDbDeploy',
+            'MelisSmallBusiness',
+            'MelisMarketPlace',
             $siteModuleName,
             '.', '..','.gitignore',
         );

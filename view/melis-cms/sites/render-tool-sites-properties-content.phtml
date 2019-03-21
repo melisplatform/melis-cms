@@ -81,8 +81,8 @@ $data_melisKey = $this->melisKey;
                                             }
                                             if($el->getName() == "shome_lang_id")
                                                 $el->setValue($cmsLang['lang_cms_id']);
-                                            $el->setName("sitehome_".$idx."_".$el->getName());
-
+                                            $el->setName($cmsLang['lang_cms_id']."_".$el->getName());
+                                            $el->setAttribute('id', $el->getName());
                                         }
                                         echo $this->form()->openTag($form);
                                         echo $this->melisFieldCollection($form);
