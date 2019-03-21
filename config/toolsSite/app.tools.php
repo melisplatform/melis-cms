@@ -54,6 +54,11 @@ return array(
                                 'css' => array('width' => '30%', 'padding-right' => '0'),
                                 'sortable' => true,
                             ),
+                            'site_langs' => array(
+                                'text' => 'Site language(s)',
+                                'css' => array('width' => '30%', 'padding-right' => '0'),
+                                'sortable' => false,
+                            ),
                         ),
                         'searchables' => array(
                             'melis_cms_site.site_id',

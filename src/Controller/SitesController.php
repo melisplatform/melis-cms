@@ -728,6 +728,18 @@ class SitesController extends AbstractActionController
                     if (!empty($siteDBData)) {
                         $isValidName = false;
                     }
+
+                    /**
+                     * Make the value of site_name empty
+                     * on siteData since the user choice
+                     * not to create a file, therefore
+                     * this site has not module
+                     */
+                    if(!$createNewFile){
+                        if(!empty($siteData['site_name'])){
+                            $siteData['site_name'] = '';
+                        }
+                    }
                 }
 
                 if ($isValidName) {
