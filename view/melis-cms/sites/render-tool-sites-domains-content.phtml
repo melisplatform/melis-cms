@@ -61,6 +61,7 @@ $data_melisKey = $this->melisKey;
                                             if($el->getName() == "sdom_site_id")
                                                 $el->setValue($this->siteId);
                                             $el->setName($siteEnv['plf_name']."_".$el->getName());
+                                            $el->setAttribute('id', $el->getName());
                                         }
 
                                         echo $this->form()->openTag($form);

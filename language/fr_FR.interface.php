@@ -484,8 +484,15 @@
         'tr_melis_cms_sites_tool_add_step4_create_module' => 'Or create a new module and provide the name:',
         'tr_melis_cms_sites_tool_add_step4_create_file_for_website' => 'Create the folders & files for the new website?',
         'tr_melis_cms_sites_tool_add_step5_new_site_is_created' => 'A new site will be created with following parameters:',
-        'tr_melis_cms_sites_tool_add_step5_new_site_using_existing_module' => 'The site will use the existing module “%s”.The module folders and files will not be created.',
+        'tr_melis_cms_sites_tool_add_step5_new_site_using_existing_module' => 'The site will use the existing module <b>“%s”</b>.The module folders and files will not be created.',
+        'tr_melis_cms_sites_tool_add_step5_new_site_using_new_module' => 'The <b>“%s”</b> module will be properly created with those parameters, allowing you to start the development of the site the best way possible.​',
 
         'tr_melis_cms_sites_tool_add_unable_to_create_site' => 'Unable to create site.',
+        'tr_melis_cms_sites_tool_add_site_language_already_created' => '%s version of %s site is already created.',
+        'tr_melis_cms_sites_tool_add_create_site_success' => 'Site created successfully',
+        'tr_melis_cms_sites_tool_add_create_site_already_exist' => 'Unable to create site, Site name already used.',
+        'tr_melis_cms_sites_tool_add_create_site_unknown_error' => 'Something went wrong while creating the site, Please try again.',
+        'tr_melis_cms_sites_tool_add_create_site_no_site_language' => 'Please provide the site language(s).',
+        'tr_melis_cms_sites_tool_add_create_site_required_field' => 'Please fill out all the required fields.',
 	);
 ?>

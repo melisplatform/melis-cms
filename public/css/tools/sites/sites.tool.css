@@ -1,5 +1,5 @@
 .tool-sites_container_fixed_width{
-    max-width: 540px;
+    /*max-width: 540px;*/
     margin-bottom:10px;
 }
 .tab-header-title-container {
@@ -8,6 +8,15 @@
     margin-top: -15px;
     margin-bottom: 20px;
 }
+
+#modal-site-creation .sites-steps-owl sup{
+    margin-left: 3px;
+}
+
+#modal-site-creation #siteAddAlert{
+    padding: 7px;
+}
+
 div[data-meliskey="meliscms_tool_sites_edit_site_tabs"] .widget-head.nav {
     z-index: 1;
 }
@@ -24,6 +33,15 @@ div[data-meliskey="meliscms_tool_sites_edit_site_tabs"] .widget-head.nav {
 
 .fieldErrorColor{
     color: #FF0000;
+}
+
+.widget.widget-tabs>.widget-head ul.create-site-step{
+    padding: 10px;
+}
+
+.sites-steps-owl input[type="radio"],
+.sites-steps-owl input[type="checkbox"]{
+    margin-right: 4px;
 }
 
 /** Site V2 MODULE LOAD TAB **/

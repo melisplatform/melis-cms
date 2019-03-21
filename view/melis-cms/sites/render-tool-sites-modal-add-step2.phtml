@@ -13,7 +13,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                 $form->prepare();
                 echo $this->form()->openTag($form);
                 ?>
-                <label><?= $this->translate('tr_melis_cms_sites_tool_add_step2_select_language'); ?></label>
+                <label class="err_site_selected_lang"><?= $this->translate('tr_melis_cms_sites_tool_add_step2_select_language'); ?><sup>*</sup></label>
                 <div class="row">
                     <?php
                     foreach($this->langList as $key => $val) {
@@ -21,7 +21,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                         ?>
                         <div class="col-md-3">
                             <div class="form-group">
-                                <input type="radio" value="<?= $id.'-'.$val['lang_cms_name'] ?>" name="site_selected_lang" id="<?= $id ?>"/>
+                                <input type="radio" value="<?= $id.'-'.$val['lang_cms_name'] ?>" name="site_selected_lang" id="<?= $id ?>" required="required"/>
                                 <label for="<?= $id ?>"><?= $val['lang_cms_name']; ?></label>
                             </div>
                         </div>
@@ -38,7 +38,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                 $form->prepare();
                 echo $this->form()->openTag($form);
                 ?>
-                <label><?= $this->translate('tr_melis_cms_sites_tool_add_step2_select_languages'); ?></label>
+                <label class="err_site_selected_lang"><?= $this->translate('tr_melis_cms_sites_tool_add_step2_select_languages'); ?> <sup>*</sup></label>
                 <div class="row">
                     <?php
                     foreach($this->langList as $key => $val) {
@@ -47,20 +47,25 @@ if (!empty($this->zoneconfig['conf']['id']))
                         ?>
                         <div class="col-md-3">
                             <div class="form-group">
-                                <input type="checkbox" value="<?= $id.'-'.$val['lang_cms_name'] ?>" name="site_selected_lang" id="<?= $id ?>" <?= $selected ?>/> <label for="<?= $id ?>" id=""><?= $val['lang_cms_name']; ?></label>
+                                <input type="checkbox" value="<?= $id.'-'.$val['lang_cms_name'] ?>" name="site_selected_lang" id="<?= $id ?>" <?= $selected ?> required="required" /> <label for="<?= $id ?>" id=""><?= $val['lang_cms_name']; ?></label>
                             </div>
                         </div>
                     <?php } ?>
                 </div>
                 <?php
-//                echo $this->melisFieldCollection($form);
                 foreach ($form->getElements() As $key => $val)
                 {
                     echo '<div class="form-group">';
                     if ($val->getLabel())
                     {
-                        echo $this->formLabel($val);
-//                        echo '<span class="err_'.$key.' hidden fieldErrorColor"></span>';
+                        $required = '';
+                        if(!empty($val->getAttribute('required'))){
+                            $required = '<sup>*</sup>';
+                        }
+                        echo $this->formLabel()->openTag($val);
+                        echo $val->getLabel();
+                        echo $required;
+                        echo $this->formLabel()->closeTag();
                     }
                     echo $this->formElement($val);
                     echo '</div>';

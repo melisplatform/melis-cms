@@ -589,12 +589,15 @@ class SitesController extends AbstractActionController
      */
     public function createNewSiteAction()
     {
+        $errors = array();
         $status = false;
         $siteId = null;
         $siteName = '';
         $textMessage = '';
         $siteTablePrefix = self::SITE_TABLE_PREFIX;
         $domainTablePrefix = self::DOMAIN_TABLE_PREFIX;
+
+        $translator = $this->getServiceLocator()->get('translator');
 
         if ($this->getRequest()->isPost()) {
             $sitesData = $this->getRequest()->getPost('data');
@@ -769,6 +772,18 @@ class SitesController extends AbstractActionController
                     if (!empty($siteDBData)) {
                         $isValidName = false;
                     }
+
+                    /**
+                     * Make the value of site_name empty
+                     * on siteData since the user choice
+                     * not to create a file, therefore
+                     * this site has not module
+                     */
+                    if(!$createNewFile){
+                        if(!empty($siteData['site_name'])){
+                            $siteData['site_name'] = '';
+                        }
+                    }
                 }
 
                 if ($isValidName) {
@@ -783,12 +798,22 @@ class SitesController extends AbstractActionController
                     }
                     else
                     {
-                        $textMessage = $saveSiteResult['message'];
+                        $textMessage = 'tr_melis_cms_sites_tool_add_unable_to_create_site';
+                        $errors = array(
+                            'Error' => array(
+                                'siteAlreadyExists' => $translator->translate($saveSiteResult['message'])
+                            ),
+                        );
                         $status = false;
                     }
                 }else{
+                    $textMessage = 'tr_melis_cms_sites_tool_add_unable_to_create_site';
+                    $errors = array(
+                        'Error' => array(
+                            'siteAlreadyExists' => $translator->translate('tr_meliscms_tool_site_name_exists')
+                        ),
+                    );
                     $status = false;
-                    $textMessage = 'tr_melis_cms_sites_tool_add_create_site_already_exist';
                 }
             }
         }
@@ -799,6 +824,7 @@ class SitesController extends AbstractActionController
             'textMessage' => $textMessage,
             'siteId' => $siteId,
             'siteName' => $siteName,
+            'errors' => $errors
         );
 
         $this->getEventManager()->trigger('meliscms_site_save_end', $this, array_merge($response, array('typeCode' => 'CMS_SITE_ADD', 'itemId' => $siteId)));
@@ -822,6 +848,7 @@ class SitesController extends AbstractActionController
         $translator = $this->getServiceLocator()->get('translator');
         $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
         $siteDomainsSvc = $this->getServiceLocator()->get("MelisCmsSitesDomainsService");
+        $sitePropSvc = $this->getServiceLocator()->get("MelisCmsSitesPropertiesService");
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $request = $this->getRequest();
         $data = $request->getPost()->toArray();
@@ -839,6 +866,8 @@ class SitesController extends AbstractActionController
         $domainData = array();
         $siteProp = array();
         $siteHomeData = array();
+
+        $shomeErrors = array();
 
         foreach ($data as $datum => $val){
 
@@ -866,7 +895,7 @@ class SitesController extends AbstractActionController
             }
 
             //collecting data for site language homepages
-            if (strstr($datum,'sitehome_')) {
+            if (strstr($datum,'shome_')) {
                 $key = substr($datum, (strpos($datum, '_') ?: -1) + 1);
                 if(!empty($siteHomeData[$ctr1]))
                     if(array_key_exists($key, $siteHomeData[$ctr1]))
@@ -887,20 +916,31 @@ class SitesController extends AbstractActionController
             $form->setData($domainDatum);
 
             if($form->isValid()) {
-                $success = $siteDomainsSvc->saveSiteDomain($domainDatum);
-                if($success){
-                    $textMessage = $translator->translate("tr_melis_cms_site_save_ok");
-                    $status = 1;
-                }else{
-                    $textMessage = $translator->translate('tr_melis_cms_site_save_ko');
-                    $success  = 0;
-                }
+                $siteDomainsSvc->saveSiteDomain($domainDatum);
             }else{
-                $textMessage = 'tr_melis_cms_site_save_ko';
-                $errors = $form->getMessages();
+                $currErr = array();
+                foreach ($form->getMessages() as $key => $err){
+                    $currErr[$domainDatum["sdom_env"]."_".$key] = $err;
+                }
+                $errors = array_merge($errors,$currErr);
                 $status = 0;
             }
+        }
 
+        //saving site language homepage
+        foreach($siteHomeData as $siteHomeDatum){
+            $form = $this->getTool()->getForm('meliscms_tool_sites_properties_homepage_form');
+            $form->setData($siteHomeDatum);
+            if($form->isValid()) {
+                $sitePropSvc->saveSiteLangHome($siteHomeDatum);
+            }else{
+                $currErr = array();
+                foreach ($form->getMessages() as $key => $err){
+                    $currErr[$siteHomeDatum["shome_lang_id"]."_".$key] = $err;
+                }
+                $errors = array_merge($errors,$currErr);
+                $status = 0;
+            }
         }
 
         // saving languages
@@ -948,6 +988,17 @@ class SitesController extends AbstractActionController
 
         // update site to add site option language url
         $siteTable->save(['site_opt_lang_url' => $data['site_opt_lang_url']], $siteId);
+
+//        //saving site properties
+//        $form = $this->getTool()->getForm('meliscms_tool_sites_properties_form');
+//        $form->setData($siteProp);
+//        if($form->isValid()) {
+//            $sitePropSvc->saveSiteLangHome($siteProp);
+//        }else{
+//            $errors = array_merge($errors,$form->getMessages());
+//            $status = 0;
+//        }
+
 
         $response = array(
             'success' => $status,
