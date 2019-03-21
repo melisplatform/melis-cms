@@ -256,6 +256,17 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
+    public function renderToolSitesSiteConfigContentAction() {
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $melisKey = $this->getMelisKey();
+
+        $view = new ViewModel();
+        $view->melisKey = $melisKey;
+        $view->siteId = $siteId;
+
+        return $view;
+    }
+
     public function renderToolSitesSiteTranslationsAction() {
 
         $siteId = (int) $this->params()->fromQuery('siteId', '');
@@ -893,29 +904,50 @@ class SitesController extends AbstractActionController
         }
 
         // saving languages
-        // get all active languages of site
+        $siteLangs = $siteLangsTable->getSiteLangs(null, $siteId, null, null)->toArray();
         $activeSiteLangs = $siteLangsTable->getSiteLangs(null, $siteId, null, true)->toArray();
+        $selectedSiteLangs = $data['slang_lang_id'] ?? [];
+        $noChangesOnSiteLangs = false;
 
-        print_r($activeSiteLangs);
-        exit;
-
-        foreach ($data['slang_lang_id'] as $lang) {
-            $siteLangs = $siteLangsTable->getEntryByField('slang_site_id', $siteId)->toArray();
-
-            foreach ($siteLangs as $siteLang) {
-                if ($siteLang['slang_lang_id'] !== $lang) {
-                    $siteLangsTable->save([
-                        'slang_site_id' => $siteId,
-                        'slang_lang_id' => $lang
-                    ]);
+        // check if active languages and selected languages are the same
+        if (count($activeSiteLangs) === count($selectedSiteLangs)) {
+            foreach ($activeSiteLangs as $activeSiteLang) {
+                if (in_array($activeSiteLang['slang_lang_id'], $selectedSiteLangs)) {
+                    $noChangesOnSiteLangs = true;
                 }
             }
         }
 
+        // catch if there are changes on the selected languages over the active languages
+        if (!$noChangesOnSiteLangs) {
+            // disable all active languages of site
+            $siteLangsTable->update(['status' => 0], 'slang_site_id', $siteId);
+
+            // because all of the active languages are disabled. All we have to do
+            // is to save if it's a new language or to active(update) the language back
+            foreach ($selectedSiteLangs as $selectedSiteLang) {
+                $slangId = 0;
+
+                foreach ($siteLangs as $siteLang) {
+                    if ($selectedSiteLang == $siteLang['slang_lang_id']) {
+                        $slangId = $siteLang['slang_id'];
+                        break;
+                    }
+                }
+
+                $siteLangsTable->save(
+                    [
+                        'slang_site_id' => $siteId,
+                        'slang_lang_id' => $selectedSiteLang,
+                        'status' => 1
+                    ],
+                    $slangId
+                );
+            }
+        }
+
         // update site to add site option language url
-        $siteTable->save([
-            'site_opt_lang_url' => $data['site_opt_lang_url']
-        ]);
+        $siteTable->save(['site_opt_lang_url' => $data['site_opt_lang_url']], $siteId);
 
         $response = array(
             'success' => $status,

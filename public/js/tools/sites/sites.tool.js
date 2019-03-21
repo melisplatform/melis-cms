@@ -444,4 +444,33 @@ $(document).ready(function() {
      * ============================== END SITE CREATION ===============================
      * ================================================================================
      */
+
+    /**
+     * ================================================================================
+     * ============================== START LANGUAGES TAB =============================
+     * ================================================================================
+     */
+    $body.on('change', ".sites-tool-lang-tab-checkbox", function () {
+        let input = $(this).closest('label').siblings('.to-delete-languages-data');
+
+        if ($(this).data('active') === 'active' && !this.checked) {
+            input.val('false');
+
+            melisCoreTool.confirm(
+                translations.tr_meliscore_common_yes,
+                translations.tr_meliscore_common_no,
+                'Site Languague',
+                'Do you want to delete all data from other tabs of this language? ',
+                function() {
+                    input.val('true');
+                }
+            );
+        }
+    });
+
+    /**
+     * ================================================================================
+     * ============================== END LANGUAGES TAB ===============================
+     * ================================================================================
+     */
 });
