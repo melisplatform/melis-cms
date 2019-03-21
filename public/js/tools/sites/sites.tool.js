@@ -53,6 +53,7 @@ $(document).ready(function() {
             loop: false,
             rewindNav: false,
             autoHeight: true,
+            responsive: false,
             afterMove: function (elem) {
                 var current = this.currentItem;
                 //hide the prev button when we are on the first step
@@ -66,6 +67,7 @@ $(document).ready(function() {
                 var current = this.currentItem;
                 var step = elem.find(".item").eq(current).attr("data-step");
                 checkStep(step);
+                updateActiveStep(step);
             }
         });
     };
@@ -527,6 +529,24 @@ $(document).ready(function() {
         melisHelper.tabOpen(name, 'fa-globe', siteId+'_id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site',  { siteId : siteId }, null, function(){
 
         });
+    }
+
+    function updateActiveStep(step){
+        var currStep = step.split("_");
+        var ul = $("ul.create-site-step");
+        ul.find("span.step-current").text(currStep[1]);
+
+        //remove all active tab
+        ul.each(function(){
+           $(this).find("li").removeClass("active");
+        });
+
+        //set active tab
+        ul.each(function(){
+            $(this).find("li."+step).addClass("active");
+        });
+
+        ul.find("span.step-name").text(ul.find("li.active").attr("data-stepName"));
     }
 
     /**
