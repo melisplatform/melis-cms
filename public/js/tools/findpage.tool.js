@@ -1,34 +1,35 @@
  var melisLinkTree = (function($, window){
     
     // cache DOM
-    var $body = $('body');
-    var dataUrl;
-    var $tmce = tinymce.dom.DomQuery;
-    var $melisIframe = $body.find(".melis-iframe"),
-        $insertEditLink = $melisIframe.contents().find(".insert-edit-link");
+    var dataUrl,
+        $body           = $('body'),
+        $t              = tinymce.dom.DomQuery,
+        $taux           = $t(".tox-tinymce-aux"),
+        $mceLinkTree    = $t("#mce-link-tree");
 
     // Binding Events =================================================================================================================
-    //$body.on("click", "div[aria-label='Insert/edit link']", checkBtn);
     //$insertEditLink.on("click", checkBtn);
     //$editLink.on("click", checkBtn);
-    //$body.on("click", "div.mce-menu-item", checkBtn);
+
+    // tox menu
+    //$body.on("contextmenu", ".tox-collection__item--active", checkBtn);
 
     // CreateTreeModal
     $body.on("click", "#mce-link-tree", createTreeModal);
-    
+
     // Filter Search
-    $(document).on("keyup", "input[name=tree_search]", function(event){
+    $(document).on("keyup", "input[name=tree_search]", function(event) {
     	var keycode = (event.keyCode ? event.keyCode : event.which);
     	if(keycode == '13'){
     		startTreeSearch();
     	}   
     }).focus();
     
-    $body.on("click", "#searchTreeView", function(e){
+    $body.on("click", "#searchTreeView", function(e) {
     	startTreeSearch();
 	});
     
-    $body.on("click", "#resetTreeView", function(e){
+    $body.on("click", "#resetTreeView", function(e) {
     	melisHelper.loadingZone($('.page-evolution-content'));
     	$("input[name=tree_search]").val('');
     	var tree = $("#find-page-dynatree").fancytree("getTree");
@@ -41,7 +42,7 @@
 		}, 2000);
 	});
         
-    $body.on("click", "#generateTreePageLink", function(){
+    $body.on("click", "#generateTreePageLink", function() {
         melisCoreTool.pending('#generateTreePageLink');
         var id = $('#find-page-dynatree .fancytree-active').parent('li'). attr('id').split("_")[1];
         $.ajax({
@@ -61,7 +62,7 @@
 
     });
     
-    $body.on("click", "#generateTreePageId", function(){
+    $body.on("click", "#generateTreePageId", function() {
     	melisCoreTool.pending('#generateTreePageLink');
     	var id = $('#find-page-dynatree .fancytree-active').parent('li'). attr('id').split("_")[1];
     	var inputId = $('#generateTreePageId').data('inputid');
@@ -71,7 +72,7 @@
     	
     	melisCoreTool.done('#generateTreePageLink');
     });
-    
+
     function startTreeSearch() {
     	var match = $("input[name=tree_search]").val();
 		var tree = $("#find-page-dynatree").fancytree("getTree");
@@ -116,7 +117,6 @@
         					node.makeVisible();
         					break;
             			}
-
                     }
         			filterFunc.call(tree, match, opts);					
     			}).done(function(){
@@ -124,80 +124,44 @@
                     searchContainer.removeClass("searching");
     			});					
             }
-	    	
-		
 	     }).error(function(){
 	    	 console.log('failed');
 	     });
     }
     
     function showUrl() {
-        //var inputBox = $('.melis-iframe').contents().find('#mce-link-tree').prev().val(dataUrl);
-        //var inputBox = $('#mce-link-tree').parent().find('input').val(dataUrl);
     	var inputBox = $('.melis-iframe').contents().find('#mce-link-tree').parent().find('input').val(dataUrl);
                        $(".mce-floatpanel.mce-window").find('#mce-link-tree').parent().find('input').val(dataUrl);
     }
 
     function checkBtn() {
-        console.log("checkBtn from insert-edit-link");
-
-        var $melisIframe    = $body.find(".melis-iframe"),
-            $dialog         = $melisIframe.contents().find(".tox-dialog"),
+        var $aux            = $t(".tox-tinymce-aux"),
+            $dialog         = $aux.find(".tox-dialog"),
             $conHStacks     = $dialog.find(".tox-form__controls-h-stack"),
-            $urlBtn         = $conHStacks.find(".tox-browse-url"),
-            $urlInputWrap   = $conHStacks.find(".tox-control-wrap"),
-            $urlInput       = $urlInputWrap.find(".tox-textfield"),
-            urlBtnWidth     = $urlBtn.width() + 1,
-            cUrlInput;
+            $inputUrl       = $conHStacks.find(".tox-control-wrap input"),
+            $urlBtn         = $conHStacks.find("#mce-link-tree");
 
-            if ( $urlBtn.length ) {
-                cUrlInput = $urlInput.width() - urlBtnWidth;
-                $urlBtn.css("left", 0);
-                $urlInput.css("width", cUrlInput);
-                addTreeBtnMoxie();
-            }
-            else {
-                cUrlInput = $urlInput.width() - 32;
-                $urlInput.css("width", cUrlInput);
-                addTreeBtnMoxie();
-                //$conHStacks.append('<div id="mce-link-tree" class="mce-btn mce-open" style="position: absolute; right: 0; width: 32px; height: 28px;"><button><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; top: 2px; font-size: 16px;"></i></button></div>');
-            }
-
-        /*urlLabel.each( function() {
-            var $this = $(this);
-
-            if( $this.text() === "Url" ) {
-                var moxie = $body.find('.mce-btn.mce-open');
-                var moxieWidth = moxie.width() + 1;
-                var urlInputBox = $this.next();
-                var urlInput = urlInputBox.children('.mce-textbox');
-                var cInput;
-
-                if(moxie.length){
-                    cInput = urlInput.width() - moxieWidth;
-                    moxie.css({'left':'0'});
-                    urlInput.css({'width': cInput})
-                    addTreeBtnMoxie();
-                }else{
-                    cInput = urlInput.width() - 32;
-                    urlInput.css({'width': cInput});
-                    urlInputBox.append('<div id="mce-link-tree" class="mce-btn mce-open" style="position: absolute; right: 0; width: 32px; height: 28px;"><button><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; top: 2px; font-size: 16px;"></i></button></div>');
+            if ( !$urlBtn.length ) {
+                if ( $conHStacks.length ) {
+                    $conHStacks.append('<button title="Site tree view" id="mce-link-tree" class="mce-btn mce-open" style="width: 34px; height: 34px;"><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; font-size: 16px; display: block; text-align: center;"></i></button>');
                 }
             }
-        });*/
     }
 
-    function addTreeBtnMoxie() {
-        console.log("addTreeBtnMoxie");
+    /*function addTreeBtnMoxie() {
+        console.log("addTreeBtnMovie");
 
-        var $melisIframe    = $body.find(".melis-iframe"),
-            $dialog         = $melisIframe.contents().find(".tox-dialog"),
+        var //$melisIframe    = $body.find(".melis-iframe"),
+            //$melisIframe    = $(window).parent,
+            //$dialog         = $(".melis-iframe").contents().find(".tox-dialog"),
+            $aux            = $t(".tox-tinymce-aux"),
+            $dialog         = $aux.find(".tox-dialog"),
             $conHStacks     = $dialog.find(".tox-form__controls-h-stack");
 
             if ( $conHStacks.length ) {
-                $conHStacks.append('<div id="mce-link-tree" class="mce-btn mce-open" style="position: absolute; right: 0; width: 32px; height: 28px;"><button><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; top: 2px; font-size: 16px;"></i></button></div>');
+                $conHStacks.append('<button title="Site tree view" id="mce-link-tree" class="mce-btn mce-open" style="width: 34px; height: 34px;"><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; font-size: 16px; display: block; text-align: center;"></i></button>');
             }
-    }
+    }*/
 
     function createTreeModal() {
         // initialation of local variable
@@ -237,8 +201,7 @@
 
     function selectedNodes() {
         var title = $(this).closest('li').attr('id');
-        $('#statusLine').append(title);
-        console.log(title);
+            $('#statusLine').append(title);
     }
 
     function findPageMainTree() {
