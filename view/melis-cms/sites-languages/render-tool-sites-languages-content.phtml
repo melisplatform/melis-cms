@@ -23,13 +23,13 @@ $data_melisKey = $this->melisKey;
         ?>
         <!--LANGUAGES LISTING-->
         <input type="text" class="to-delete-languages-data" name="to_delete_languages_data" value="false" hidden="hidden">
-        <?php foreach ($this->languages as $language) { ?>
+        <?php foreach ($this->availableLangs as $language) { ?>
             <label class="checkbox-inline">
                 <?php
                     $checked = '';
                     $active = '';
 
-                    if (in_array($language['lang_cms_id'], $this->selectedLanguages)) {
+                    if (in_array($language['lang_cms_id'], $this->activeLangs)) {
                         $checked = 'checked';
                         $active = 'active';
                     }
