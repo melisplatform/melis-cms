@@ -87,39 +87,6 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesModuleLoadAction() {
-
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
-        $melisKey = $this->getMelisKey();
-        $view = new ViewModel();
-        $view->melisKey = $melisKey;
-        $view->siteId = $siteId;
-        return $view;
-    }
-
-    public function renderToolSitesModuleLoadContentAction() {
-
-        $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
-        $modulesSvc = $this->getServiceLocator()->get('ModulesService');
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
-        $melisCoreAuth = $this->serviceLocator->get('MelisCoreAuth');
-
-        $userAuthDatas = $melisCoreAuth->getStorage()->read();
-
-        $isAdmin = isset($userAuthDatas->usr_admin) || $userAuthDatas->usr_admin != "" ? $userAuthDatas->usr_admin : 0;
-
-        $modulesInfo = $modulesSvc->getModulesAndVersions();
-        $modules = $siteModuleLoadSvc->getModules($siteId);
-        $melisKey = $this->getMelisKey();
-        $view = new ViewModel();
-        $view->modulesInfo = $modulesInfo;
-        $view->modules = $modules;
-        $view->melisKey = $melisKey;
-        $view->isAdmin = $isAdmin;
-        $view->siteId = $siteId;
-        return $view;
-    }
-
     public function renderToolSitesDomainsAction() {
 
         $siteId = (int) $this->params()->fromQuery('siteId', '');
@@ -149,48 +116,6 @@ class SitesController extends AbstractActionController
         $view->siteId = $siteId;
         $view->domainsForm = $domainsForm;
         $view->siteDomains = $siteDomains;
-        return $view;
-    }
-
-    public function renderToolSitesLanguagesAction() {
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
-        $melisKey = $this->getMelisKey();
-
-        $view = new ViewModel();
-
-        $view->melisKey = $melisKey;
-        $view->siteId = $siteId;
-
-        return $view;
-    }
-
-    public function renderToolSitesLanguagesContentAction() {
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
-        $melisKey = $this->getMelisKey();
-        $melisEngineLangSvc = $this->getServiceLocator()->get('MelisEngineLang');
-        $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
-        $selectedLanguages = [];
-
-        $form = $this->getTool()->getForm('meliscms_tool_sites_languages_form');
-        $languages = $melisEngineLangSvc->getAvailableLanguages();
-        $activeSiteLangs = $siteLangsTable->getSiteLangs(null, $siteId, null, true)->toArray();
-
-        foreach ($activeSiteLangs as $language) {
-            array_push($selectedLanguages, $language['slang_lang_id']);
-        }
-
-        $siteOptLangUrl = $siteTable->getEntryById($siteId)->toArray()[0]['site_opt_lang_url'];
-
-        $view = new ViewModel();
-        $view->melisKey = $melisKey;
-        $view->siteId = $siteId;
-        $view->form = $form;
-        $view->languages = $languages;
-        $view->siteLanguages = $activeSiteLangs;
-        $view->selectedLanguages = $selectedLanguages;
-        $view->siteOptionLangUrl = $siteOptLangUrl;
-
         return $view;
     }
 

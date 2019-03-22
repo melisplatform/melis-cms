@@ -16,9 +16,6 @@ use MelisCore\Service\MelisCoreRightsService;
 use Zend\Config\Reader\Json;
 use phpDocumentor\Reflection\Types\Boolean;
 
-/**
- * Site Tool Plugin
- */
 class SitesModuleLoaderController extends AbstractActionController
 {
     /**
@@ -90,6 +87,45 @@ class SitesModuleLoaderController extends AbstractActionController
 
         return new JsonModel($response);
 
+    }
+
+    public function renderToolSitesModuleLoadAction() {
+
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $melisKey = $this->getMelisKey();
+
+        $view = new ViewModel();
+
+        $view->melisKey = $melisKey;
+        $view->siteId = $siteId;
+
+        return $view;
+    }
+
+    public function renderToolSitesModuleLoadContentAction() {
+
+        $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
+        $modulesSvc = $this->getServiceLocator()->get('ModulesService');
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $melisCoreAuth = $this->serviceLocator->get('MelisCoreAuth');
+
+        $userAuthDatas = $melisCoreAuth->getStorage()->read();
+
+        $isAdmin = isset($userAuthDatas->usr_admin) || $userAuthDatas->usr_admin != "" ? $userAuthDatas->usr_admin : 0;
+
+        $modulesInfo = $modulesSvc->getModulesAndVersions();
+        $modules = $siteModuleLoadSvc->getModules($siteId);
+        $melisKey = $this->getMelisKey();
+
+        $view = new ViewModel();
+
+        $view->modulesInfo = $modulesInfo;
+        $view->modules = $modules;
+        $view->melisKey = $melisKey;
+        $view->isAdmin = $isAdmin;
+        $view->siteId = $siteId;
+
+        return $view;
     }
 
     /**
