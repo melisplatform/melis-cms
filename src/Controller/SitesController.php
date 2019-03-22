@@ -87,38 +87,6 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesDomainsAction() {
-
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
-        $melisKey = $this->getMelisKey();
-        $view = new ViewModel();
-        $view->melisKey = $melisKey;
-        $view->siteId = $siteId;
-        return $view;
-    }
-
-    public function renderToolSitesDomainsContentAction() {
-
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
-        $melisKey = $this->getMelisKey();
-        $siteDomainsSvc = $this->getServiceLocator()->get("MelisCmsSitesDomainsService");
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
-        $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
-
-        $domainsForm = $melisTool->getForm("meliscms_tool_sites_domain_form");
-        $siteEnvs = $siteDomainsSvc->getEnvironments();
-        $siteDomains = $siteDomainsSvc->getDomainsBySiteId($siteId);
-
-
-        $view = new ViewModel();
-        $view->siteEnvs = $siteEnvs;
-        $view->melisKey = $melisKey;
-        $view->siteId = $siteId;
-        $view->domainsForm = $domainsForm;
-        $view->siteDomains = $siteDomains;
-        return $view;
-    }
-
     public function renderToolSitesSiteConfigAction() {
 
         $siteId = (int) $this->params()->fromQuery('siteId', '');
