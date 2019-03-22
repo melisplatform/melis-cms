@@ -106,9 +106,11 @@ class SitesController extends AbstractActionController
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
 
         $cmsLangs = $cmsLangSvc->getAvailableLanguages();
+        // GET FORMS
         $propertiesForm = $melisTool->getForm("meliscms_tool_sites_properties_form");
         $homepageForm = $melisTool->getForm("meliscms_tool_sites_properties_homepage_form");
 
+        // SITE PROPERTIES
         $sitePropSvc = $this->getServiceLocator()->get("MelisCmsSitesPropertiesService");
         $siteProp = $sitePropSvc->getSitePropAnd404BySiteId($siteId);
         $siteLangHomepages = $sitePropSvc->getLangHomepages($siteId);
