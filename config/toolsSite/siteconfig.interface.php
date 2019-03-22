@@ -63,7 +63,7 @@ return array(
                     ),
                     'forward' => array(
                         'module' => 'MelisCms',
-                        'controller' => 'Sites',
+                        'controller' => 'SitesConfig',
                         'action' => 'render-tool-sites-site-config',
                         'jscallback' => '',
                         'jsdatas' => array()
@@ -77,7 +77,7 @@ return array(
                             ),
                             'forward' => array(
                                 'module' => 'MelisCms',
-                                'controller' => 'Sites',
+                                'controller' => 'SitesConfig',
                                 'action' => 'render-tool-sites-site-config-content',
                             ),
                             'interface' => array(
