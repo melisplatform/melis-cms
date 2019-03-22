@@ -592,8 +592,8 @@ $(document).ready(function() {
      * ============================== START LANGUAGES TAB =============================
      * ================================================================================
      */
-    $body.on('change', ".sites-tool-lang-tab-checkbox", function () {
-        let input = $(this).closest('label').siblings('.to-delete-languages-data');
+    $body.on('change', '.sites-tool-lang-tab-checkbox', function () {
+        var input = $(this).closest('label').siblings('.to-delete-languages-data');
 
         if ($(this).data('active') === 'active' && !this.checked) {
             input.val('false');
@@ -609,7 +609,6 @@ $(document).ready(function() {
             );
         }
     });
-
     /**
      * ================================================================================
      * ============================== END LANGUAGES TAB ===============================
