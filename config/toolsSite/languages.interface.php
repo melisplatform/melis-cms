@@ -54,7 +54,7 @@ return array(
                     ),
                     'forward' => array(
                         'module' => 'MelisCms',
-                        'controller' => 'Sites',
+                        'controller' => 'SitesLanguages',
                         'action' => 'render-tool-sites-languages',
                         'jscallback' => '',
                         'jsdatas' => array()
@@ -68,7 +68,7 @@ return array(
                             ),
                             'forward' => array(
                                 'module' => 'MelisCms',
-                                'controller' => 'Sites',
+                                'controller' => 'SitesLanguages',
                                 'action' => 'render-tool-sites-languages-content',
                             ),
                             'interface' => array(
