@@ -743,7 +743,12 @@ class TreeSitesController extends AbstractActionController
                     }
                 }
             } else {
-                $errors = $form->getMessages();
+                $formErrors = $form->getMessages();
+
+                foreach ($formErrors as $fieldName => $fieldErrors) {
+                    $errors[$fieldName] = $fieldErrors;
+                    $errors[$fieldName]['label'] = $form->get($fieldName)->getLabel();
+                }
             }
         }
 
