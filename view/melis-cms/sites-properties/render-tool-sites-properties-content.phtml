@@ -1,10 +1,10 @@
 <?php
 $id = '';
-if (!empty($this->zoneconfig['conf']['id']))
+if (!empty($this->zoneconfig['conf']['id'])) {
     $id = ' id="' . $this->siteId . '_' . $this->zoneconfig['conf']['id'] . '"';
+}
 
 $data_melisKey = $this->melisKey;
-
 ?>
 <div data-melisKey='<?= $data_melisKey; ?>'<?= $id; ?> class="tab-pane widget-body-regular meliscms_center_tabs">
     <div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none">
@@ -51,10 +51,10 @@ $data_melisKey = $this->melisKey;
                     <div class="col-xs-12 col-md-2">
                         <div class="product-text-tab-container" >
                             <ul class="nav-tabs product-text-tab meliscms-site-language-homepage-list">
-                                <?php foreach($this->cmsLangs as $idx => $cmsLang) :?>
+                                <?php foreach($this->activeSiteLangs as $lang) :?>
                                     <li class="">
-                                        <a class="clearfix" data-toggle="tab" id="news_cms_lang_<?= $cmsLang['lang_cms_id'] ?>" href="#<?= $cmsLang['lang_cms_locale']; ?>-log-type-details-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $cmsLang['lang_cms_id'] ?>">
-                                            <span><?= $cmsLang['lang_cms_name'] ?></span>
+                                        <a class="clearfix" data-toggle="tab" id="news_cms_lang_<?= $lang['slang_lang_id'] ?>" href="#<?= $lang['lang_cms_locale']; ?>-log-type-details-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $lang['slang_lang_id'] ?>">
+                                            <span><?= $lang['lang_cms_name'] ?></span>
                                         </a>
                                     </li>
                                 <?php endforeach; ?>
@@ -63,27 +63,36 @@ $data_melisKey = $this->melisKey;
                     </div>
                     <div class="col-xs-12 col-md-3">
                         <div class="tab-content">
-                            <?php foreach ($this->cmsLangs as $idx => $cmsLang) : ?>
-                                <div id="<?= $cmsLang['lang_cms_locale']; ?>-log-type-details-<?= $this->siteId; ?>" class="tab-pane product-text-tab-content">
+                            <?php foreach ($this->activeSiteLangs as $lang) : ?>
+                                <div id="<?= $lang['lang_cms_locale']; ?>-log-type-details-<?= $this->siteId; ?>" class="tab-pane product-text-tab-content">
                                     <div class="bg-white">
-                                        <h4 class=""><i class="fa fa-map-marker"></i>  <?= $cmsLang['lang_cms_name']; ?></h4>
+                                        <h4 class=""><i class="fa fa-map-marker"></i>  <?= $lang['lang_cms_name']; ?></h4>
                                     </div>
-                                    <div id="cms_domain_<?= $cmsLang['lang_cms_id']; ?>">
+                                    <div id="cms_domain_<?= $lang['slang_lang_id']; ?>">
                                         <?php
                                         $form = clone $this->homepageForm;
 
-                                        foreach($form->getElements() as $element => $attributes)  {
+                                        foreach ($form->getElements() as $element => $attributes)  {
                                             $el =  $form->get((string) $element);
-                                            foreach ($this->siteLangHomepages as $siteLangHomepage){
-                                                if($siteLangHomepage['shome_lang_id'] == $cmsLang['lang_cms_id']){
+
+                                            foreach ($this->siteLangHomepages as $siteLangHomepage) {
+                                                if ($siteLangHomepage['shome_lang_id'] == $lang['slang_lang_id']) {
                                                     $el->setValue($siteLangHomepage[$el->getName()]);
                                                 }
                                             }
-                                            if($el->getName() == "shome_lang_id")
-                                                $el->setValue($cmsLang['lang_cms_id']);
-                                            $el->setName($cmsLang['lang_cms_id']."_".$el->getName());
+
+                                            if ($el->getName() == 'shome_site_id') {
+                                                $el->setValue($this->siteId);
+                                            }
+
+                                            if ($el->getName() == 'shome_lang_id') {
+                                                $el->setValue($lang['slang_lang_id']);
+                                            }
+
+                                            $el->setName($lang['slang_lang_id']."_".$el->getName());
                                             $el->setAttribute('id', $el->getName());
                                         }
+
                                         echo $this->form()->openTag($form);
                                         echo $this->melisFieldCollection($form);
                                         echo $this->form()->closeTag();

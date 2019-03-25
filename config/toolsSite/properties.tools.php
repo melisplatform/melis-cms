@@ -322,7 +322,7 @@ return array(
                                 ),
                                 'shome_page_id' => array(
                                     'name' => 'shome_page_id',
-                                    'required' => false,
+                                    'required' => true,
                                     'validators' => array(
                                         array(
                                             'name' => 'IsInt',
