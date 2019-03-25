@@ -46,9 +46,6 @@ class SitesPropertiesController extends AbstractActionController
         $siteProp = $sitePropSvc->getSitePropAnd404BySiteId($siteId);
         $siteLangHomepages = $sitePropSvc->getLangHomepages($siteId);
 
-        print_r($siteLangHomepages);
-        exit;
-
         // SET DATA TO FORM
         $propertiesForm->setData((array)$siteProp);
 

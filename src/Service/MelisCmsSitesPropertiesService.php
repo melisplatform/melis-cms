@@ -65,8 +65,6 @@ class MelisCmsSitesPropertiesService extends MelisCoreGeneralService
             $langHompages = $langHompageTable->getEntryByField('shome_site_id', $siteId)->toArray();
         }
 
-        print_r($langHompages);
-        exit;
         // Service implementation end
 
         // Adding results to parameters for events treatment if needed
