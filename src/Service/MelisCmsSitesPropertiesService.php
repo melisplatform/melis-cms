@@ -59,12 +59,14 @@ class MelisCmsSitesPropertiesService extends MelisCoreGeneralService
         $arrayParameters = $this->sendEvent('meliscmssite_service_get_site_property_start', $arrayParameters);
 
         // Service implementation start
-        $siteProp = array();
         $langHompageTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
-        if(is_numeric($siteId)) {
-            $langHompages = $langHompageTable->getEntryByField("shome_site_id",$siteId)->toArray();
 
+        if (is_numeric($siteId)) {
+            $langHompages = $langHompageTable->getEntryByField('shome_site_id', $siteId)->toArray();
         }
+
+        print_r($langHompages);
+        exit;
         // Service implementation end
 
         // Adding results to parameters for events treatment if needed
@@ -83,29 +85,31 @@ class MelisCmsSitesPropertiesService extends MelisCoreGeneralService
      */
     public function saveSiteLangHome($data)
     {
-
         // Event parameters prepare
         $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
 
         // Sending service start event
-        $arrayParameters = $this->sendEvent('meliscmssite_service_save_site_domain_start', $arrayParameters);
-
+        $arrayParameters = $this->sendEvent('meliscmssite_service_save_site_home_pages_start', $arrayParameters);
 
         // Service implementation start
         $siteLangHomeTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
-        $siteLangHomeId = (isset($data["shome_id"]) || $data["shome_id"] > 0) ? $data["shome_id"] : null;
+        $siteLangHomeId = (isset($arrayParameters['data']['shome_id']) || $arrayParameters['data']['shome_id'] > 0) ? $arrayParameters['data']['shome_id'] : null;
 
-        $siteLangHomeData = $siteLangHomeTable->save($data, $siteLangHomeId);
-
+        $siteLangHomeData = $siteLangHomeTable->save(
+            [
+                'shome_site_id' => $arrayParameters['data']['shome_site_id'],
+                'shome_lang_id' => $arrayParameters['data']['shome_lang_id'],
+                'shome_page_id' => $arrayParameters['data']['shome_page_id']
+            ],
+            $siteLangHomeId
+        );
         // Service implementation end
 
         // Adding results to parameters for events treatment if needed
         $arrayParameters['results'] = $siteLangHomeData;
         // Sending service end event
-        $arrayParameters = $this->sendEvent('meliscmssite_service_save_site_domain_end', $arrayParameters);
+        $arrayParameters = $this->sendEvent('meliscmssite_service_save_site_home_pages_end', $arrayParameters);
 
         return $arrayParameters['results'];
     }
-
-
 }

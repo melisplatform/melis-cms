@@ -223,6 +223,15 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
+    public function renderToolSitesSiteTranslationsAction() {
+
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $melisKey = $this->getMelisKey();
+        $view = new ViewModel();
+        $view->melisKey = $melisKey;
+        $view->siteId = $siteId;
+        return $view;
+    }
     /**
      * Renders to the header section of the tool
      * @return \Zend\View\Model\ViewModel
@@ -873,21 +882,8 @@ class SitesController extends AbstractActionController
             }
         }
 
-        //saving site language homepage
-        foreach($siteHomeData as $siteHomeDatum){
-            $form = $this->getTool()->getForm('meliscms_tool_sites_properties_homepage_form');
-            $form->setData($siteHomeDatum);
-            if($form->isValid()) {
-                $sitePropSvc->saveSiteLangHome($siteHomeDatum);
-            }else{
-                $currErr = array();
-                foreach ($form->getMessages() as $key => $err){
-                    $currErr[$siteHomeDatum["shome_lang_id"]."_".$key] = $err;
-                }
-                $errors = array_merge($errors,$currErr);
-                $status = 0;
-            }
-        }
+        $this->saveSiteHomePages($siteHomeData, $errors, $status);
+        $this->saveSiteLanguagesTab($siteId, $data);
 
 //        //saving site properties
 //        $form = $this->getTool()->getForm('meliscms_tool_sites_properties_form');
@@ -936,6 +932,80 @@ class SitesController extends AbstractActionController
         
         return new JsonModel($response);
     }
+
+    private function saveSiteHomePages($siteHomeData, &$errors, &$status) {
+        $sitePropSvc = $this->getServiceLocator()->get("MelisCmsSitesPropertiesService");
+
+        foreach($siteHomeData as $siteHomeDatum) {
+            $form = $this->getTool()->getForm('meliscms_tool_sites_properties_homepage_form');
+            $form->setData($siteHomeDatum);
+
+            if ($form->isValid()) {
+                $sitePropSvc->saveSiteLangHome($siteHomeDatum);
+            } else {
+                $currErr = [];
+
+                foreach ($form->getMessages() as $key => $err) {
+                    $currErr[$siteHomeDatum["shome_lang_id"]."_".$key] = $err;
+                }
+
+                $errors = array_merge($errors, $currErr);
+                $status = 0;
+            }
+        }
+    }
+
+    private function saveSiteLanguagesTab($siteId, $data) {
+        $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+
+        // Saving languages
+        $siteLangs = $siteLangsTable->getSiteLangs(null, $siteId, null, null)->toArray();
+        $activeSiteLangs = $siteLangsTable->getSiteLangs(null, $siteId, null, true)->toArray();
+        $selectedSiteLangs = $data['slang_lang_id'] ?? [];
+        $noChangesOnSiteLangs = false;
+
+        // Check if active languages and selected languages are the same
+        if (count($activeSiteLangs) === count($selectedSiteLangs)) {
+            foreach ($activeSiteLangs as $activeSiteLang) {
+                if (in_array($activeSiteLang['slang_lang_id'], $selectedSiteLangs)) {
+                    $noChangesOnSiteLangs = true;
+                }
+            }
+        }
+
+        // Catch if there are changes on the selected languages over the active languages
+        if (!$noChangesOnSiteLangs) {
+            // Disable all active languages of site
+            $siteLangsTable->update(['status' => 0], 'slang_site_id', $siteId);
+
+            // Because all of the active languages are disabled. All we have to do
+            // is to save if it's a new language or to active(update) the language back
+            foreach ($selectedSiteLangs as $selectedSiteLang) {
+                $slangId = 0;
+
+                foreach ($siteLangs as $siteLang) {
+                    if ($selectedSiteLang == $siteLang['slang_lang_id']) {
+                        $slangId = $siteLang['slang_id'];
+                        break;
+                    }
+                }
+
+                $siteLangsTable->save(
+                    [
+                        'slang_site_id' => $siteId,
+                        'slang_lang_id' => $selectedSiteLang,
+                        'status' => 1
+                    ],
+                    $slangId
+                );
+            }
+        }
+
+        // Update site to add site option language url
+        $siteTable->save(['site_opt_lang_url' => $data['site_opt_lang_url']], $siteId);
+    }
+
     private function getMelisKey()
     {
         $melisKey = $this->params()->fromRoute('melisKey', $this->params()->fromQuery('melisKey'), null);

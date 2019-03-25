@@ -29,25 +29,16 @@ return array(
                 'rightsDisplay' => 'none',
             ),
             'ressources' => array(
-                'js' => array(
-
-                ),
-                'css' => array(
-
-                ),
+                'js' => [],
+                'css' => [],
                 /**
                  * the "build" configuration compiles all assets into one file to make
                  * lesser requests
                  */
                 'build' => [
                     // lists of assets that will be loaded in the layout
-                    'css' => [
-
-
-                    ],
-                    'js' => [
-
-                    ]
+                    'css' => [],
+                    'js' => []
                 ]
             ),
             'datas' => array(
@@ -63,13 +54,27 @@ return array(
                     ),
                     'forward' => array(
                         'module' => 'MelisCms',
-                        'controller' => 'Sites',
+                        'controller' => 'SitesLanguages',
                         'action' => 'render-tool-sites-languages',
                         'jscallback' => '',
                         'jsdatas' => array()
                     ),
                     'interface' => array(
+                        'meliscms_tool_sites_languages_content' => array(
+                            'conf' => array(
+                                'id' => 'id_meliscms_tool_sites_languages_content',
+                                'melisKey' => 'meliscms_tool_sites_languages_content',
+                                'name' => 'languages_content',
+                            ),
+                            'forward' => array(
+                                'module' => 'MelisCms',
+                                'controller' => 'SitesLanguages',
+                                'action' => 'render-tool-sites-languages-content',
+                            ),
+                            'interface' => array(
 
+                            ),
+                        ),
                     ),
                 ),
             ),
