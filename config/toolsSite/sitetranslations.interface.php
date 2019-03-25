@@ -63,13 +63,29 @@ return array(
                     ),
                     'forward' => array(
                         'module' => 'MelisCms',
-                        'controller' => 'Sites',
+                        'controller' => 'SitesTranslation',
                         'action' => 'render-tool-sites-site-translations',
                         'jscallback' => '',
                         'jsdatas' => array()
                     ),
                     'interface' => array(
 
+                    ),
+                ),
+
+                'meliscms_tool_sites_site_translations_modal_edit' => array(
+                    'conf' => array(
+                        'id' => 'id_meliscms_tool_sites_site_translations_modal_edit',
+                        'melisKey' => 'meliscms_tool_sites_site_translations_modal_edit',
+                        'name' => 'tr_melis_site_translation_edit_translation',
+                        'icon' => 'fa fa-pencil',
+                    ),
+                    'forward' => array(
+                        'module' => 'MelisCms',
+                        'controller' => 'SitesTranslation',
+                        'action' => 'render-tool-sites-site-translation-modal-edit',
+                        'jscallback' => '',
+                        'jsdatas' => array()
                     ),
                 ),
             ),

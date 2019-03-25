@@ -223,15 +223,6 @@ class SitesController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesSiteTranslationsAction() {
-
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
-        $melisKey = $this->getMelisKey();
-        $view = new ViewModel();
-        $view->melisKey = $melisKey;
-        $view->siteId = $siteId;
-        return $view;
-    }
     /**
      * Renders to the header section of the tool
      * @return \Zend\View\Model\ViewModel
