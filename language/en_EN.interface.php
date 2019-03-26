@@ -550,6 +550,7 @@
         'tr_melis_site_translation_select_language_site' => 'Select Site',
         'tr_melis_site_translation_empty_site' => 'Please select a site',
         'tr_melis_site_translation_select_site_tooltip' => 'Specify what site does this translation belongs to',
+        'tr_melis_site_translation_language' => 'Language',
 
 	);
 ?>

@@ -30,25 +30,11 @@ return array(
             ),
             'ressources' => array(
                 'js' => array(
-
+                    '/MelisCms/js/tools/sites/site-translation.js',
                 ),
                 'css' => array(
 
                 ),
-                /**
-                 * the "build" configuration compiles all assets into one file to make
-                 * lesser requests
-                 */
-                'build' => [
-                    // lists of assets that will be loaded in the layout
-                    'css' => [
-
-
-                    ],
-                    'js' => [
-
-                    ]
-                ]
             ),
             'datas' => array(
 

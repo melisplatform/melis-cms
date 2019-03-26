@@ -46,17 +46,17 @@ $data_melisKey = $this->melisKey;
                                                     <div id="site_translation_<?= $transLang['lang_cms_locale']; ?>">
                                                         <?php
                                                         $form = clone $this->sitestranslation_form;
-
-                                                        foreach($form->getElements() as $name => $input)  {
+                                                        $form->setAttribute('id', $transLang['lang_cms_id'].'_sites-translation-form');
+                                                        foreach($form->getElements() as $name => $input) {
                                                             foreach ($this->transData as $siteTransData) {
                                                                 if ($siteTransData['mstt_lang_id'] == $transLang['lang_cms_id']) {
-                                                                    if(isset($siteTransData[$name])) {
+                                                                    if (isset($siteTransData[$name])) {
                                                                         $input->setValue($siteTransData[$name]);
                                                                     }
                                                                 }
                                                             }
 
-                                                            $input->setName($transLang['lang_cms_id']."_".$name);
+                                                            $input->setName($transLang['lang_cms_id'] . "-" . $name);
                                                             $input->setAttribute('id', $name);
                                                         }
                                                         echo $this->form()->openTag($form);

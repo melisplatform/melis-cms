@@ -75,29 +75,6 @@ class SitesTranslationController extends AbstractActionController
     }
 
     /**
-     * Function to render site translation add modal
-     *
-     * @return ViewModel
-     */
-    /*public function renderMelisSiteTranslationModalAddSiteTranslationAction()
-    {
-        $melisKey = $this->params()->fromRoute('melisKey', '');
-
-        // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
-
-        // tell the Tool what configuration in the app.tools.php that will be used.
-        $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
-        //prepare the user profile form
-        $form = $melisTool->getForm('melissitetranslation_form');
-
-        $view = new ViewModel();
-        $view->setVariable('melissitetranslation_form', $form);
-        $view->melisKey = $melisKey;
-        return $view;
-    }*/
-
-    /**
      * Function to render site translation edit modal
      *
      * @return ViewModel
@@ -106,7 +83,6 @@ class SitesTranslationController extends AbstractActionController
     {
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $translationKey = $this->params()->fromQuery('translationKey', null);
-        $langid = $this->params()->fromQuery('langId', null);
         $siteId = $this->params()->fromQuery('siteId', 0);
 
         // declare the Tool service that we will be using to completely create our tool.
@@ -152,7 +128,7 @@ class SitesTranslationController extends AbstractActionController
         $view = new ViewModel();
         $view->melisKey = $melisKey;
         $view->tableColumns = $columns;
-        $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration();
+        $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration('#'.$siteId.'_tableMelisSiteTranslation');
         $view->siteId = $siteId;
 
         return $view;
@@ -194,49 +170,105 @@ class SitesTranslationController extends AbstractActionController
      */
     public function saveTranslationAction()
     {
-
         $success = false;
         $errors = array();
+        $langError = array();
 
         $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
-        $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered('meliscms/tools/site_translation_tool/forms/sitestranslation_form','sitestranslation_form');
 
         $factory = new \Zend\Form\Factory();
         $formElements = $this->getServiceLocator()->get('FormElementManager');
         $factory->setFormElementManager($formElements);
-        $propertyForm = $factory->createForm($appConfigForm);
+
+        $siteTranslationData = array();
 
         //get the request
         $request = $this->getRequest();
         //check if request is post
         if($request->isPost())
         {
-            //get and sanitize the data
-            $postValues = $melisTool->sanitizeRecursive(get_object_vars($request->getPost()), array('mstt_text'), false, true);
-//            print_r($postValues);exit;
-            //we need to merge the data from mst_data and mstt_data array to validate the form
-            $tempFormValidationData = array_merge($postValues['mst_data'], $postValues['mstt_data']);
-            //assign the data to the form
-            $propertyForm->setData($tempFormValidationData);
-            //check if form is valid(if all the form field are match with the value that we pass from routes)
-            if($propertyForm->isValid()) {
+            $data = $request->getPost();
+            foreach($data as $key => $val) {
+                $fieldName = explode('-', $key);
+                if(!empty($fieldName[1])){
+                    if(!isset($siteTranslationData[$fieldName[0]])){
+                        /**
+                         * Prepare the data of the translation
+                         * by each language
+                         */
+                        $siteTranslationData[$fieldName[0]] = array();
+                        $siteTranslationData[$fieldName[0]]['mst_data'] = array();
+                        $siteTranslationData[$fieldName[0]]['mstt_data'] = array();
+                        /**
+                         * get the mst and mstt id to determine
+                         * whether we are going to update the translation
+                         * or we just need to update
+                         */
+                        $siteTranslationData[$fieldName[0]]['mst_id'] = $data[$fieldName[0].'-mst_id'];
+                        $siteTranslationData[$fieldName[0]]['mstt_id'] = $data[$fieldName[0].'-mstt_id'];
+                    }
+
+                    /**
+                     * Prepare the mst and mstt data
+                     */
+                    if (strpos($fieldName[1], 'mst_') !== false) {
+                        $siteTranslationData[$fieldName[0]]['mst_data'][$fieldName[1]] = $val;
+                    }
+
+                    if (strpos($fieldName[1], 'mstt_') !== false) {
+                        $siteTranslationData[$fieldName[0]]['mstt_data'][$fieldName[1]] = $val;
+                    }
+                }
+            }
+            /**
+             * validate translation form
+             */
+            foreach($siteTranslationData as $key => $transData){
+                /**
+                 * unset the mst and mstt id
+                 * set the mstt_mst_id if not empty
+                 */
+                if(isset($transData['mst_id'])){
+                    $mstId = $transData['mst_id'];
+                    if(!empty($mstId)){
+                        $siteTranslationData[$key]['mstt_data']['mstt_mst_id'] = $mstId;
+                    }
+                    unset($siteTranslationData[$key]['mst_data']['mst_id']);
+                    unset($siteTranslationData[$key]['mstt_data']['mstt_id']);
+                }
+                $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered('meliscms/tools/site_translation_tool/forms/sitestranslation_form','sitestranslation_form');
+                $propertyForm = $factory->createForm($appConfigForm);
+                //we need to merge the data from mst_data and mstt_data array to validate the form
+                $tempFormValidationData = array_merge($transData['mst_data'], $transData['mstt_data']);
+                //assign the data to the form
+                $propertyForm->setData($tempFormValidationData);
+                //check if form is valid(if all the form field are match with the value that we pass from routes)
+                if(!$propertyForm->isValid()) {
+                    $appConfigForm = $appConfigForm['elements'];
+                    $formErrors = $propertyForm->getMessages();
+                    $errors = array_merge($errors, $this->processErrors($formErrors, $appConfigForm, $key));
+                    array_push($langError, $key);
+                }
+            }
+
+            if(empty($errors)){
+                /**
+                 * if form is valid, save the data
+                 */
+                //get and sanitize the data
+                $postValues = $melisTool->sanitizeRecursive($siteTranslationData, array('mstt_text'), false, true);
                 $melisSiteTranslationService = $this->getServiceLocator()->get('MelisSiteTranslationService');
                 $res = $melisSiteTranslationService->saveTranslation($postValues);
-                if ($res) {
-                    $success = true;
-                }
-            }else{
-                $appConfigForm = $appConfigForm['elements'];
-                $formErrors = $propertyForm->getMessages();
-                $errors = $this->processErrors($formErrors, $appConfigForm);
+                $success = $res['success'];
             }
         }
 
         //prepare the data to return
         $response = array(
             'success'  =>  $success,
-            'errors' => $errors
+            'errors' => $errors,
+            'langErrorIds' => $langError,
         );
         return new JsonModel($response);
     }
@@ -270,7 +302,7 @@ class SitesTranslationController extends AbstractActionController
             $search = $this->getRequest()->getPost('search');
             $search = $search['value'];
             //get site
-            $site = $this->getRequest()->getPost('site_translation_site_name');
+            $selectedLang = $this->getRequest()->getPost('site_translation_language_name');
             //get start(where to start to get package)
             $start = $this->getRequest()->getPost('start');
             //get length(how many package will be displayed)
@@ -282,29 +314,45 @@ class SitesTranslationController extends AbstractActionController
             $langIdBO = $container['melis-lang-id'];
             $langId = null;
             //get the language information
+
             /**
-             * since there are possibility that the back office language and front language are not the same
-             * we need to get the language information from back office and compare it from the cms language
-             * using the language locale of both to get the exact language id
-             * to make sure that we retrieve the exact translation
+             * check if the user filter the list by language
              */
-            $langCoreTbl = $this->getServiceLocator()->get('MelisCoreTableLang');
-            $langDetails = $langCoreTbl->getEntryById($langIdBO)->toArray();
-            if($langDetails){
-                $langCmsTbl = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
-                foreach($langDetails as $langBO){
-                    $localeBO = $langBO['lang_locale'];
-                    $langCmsDetails = $langCmsTbl->getEntryByField('lang_cms_locale', $localeBO)->toArray();
-                    foreach($langCmsDetails as $langCms){
-                        $langId = $langCms['lang_cms_id'];
+            if(empty($selectedLang)) {
+                /**
+                 * since there are possibility that the back office language and front language are not the same
+                 * we need to get the language information from back office and compare it from the cms language
+                 * using the language locale of both to get the exact language id
+                 * to make sure that we retrieve the exact translation
+                 */
+                $langCoreTbl = $this->getServiceLocator()->get('MelisCoreTableLang');
+                $langDetails = $langCoreTbl->getEntryById($langIdBO)->toArray();
+                if ($langDetails) {
+                    $langCmsTbl = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+                    foreach ($langDetails as $langBO) {
+                        $localeBO = $langBO['lang_locale'];
+                        $langCmsDetails = $langCmsTbl->getEntryByField('lang_cms_locale', $localeBO)->toArray();
+                        foreach ($langCmsDetails as $langCms) {
+                            $langId = $langCms['lang_cms_id'];
+                        }
                     }
                 }
+            }else{
+                /**
+                 * assign the selected user lang as default
+                 * language of the list
+                 */
+                $langId = $selectedLang;
             }
             //prepare the data to paginate
             $dataArr = $melisSiteTranslationService->getSiteTranslation(null, null ,$siteId);
 
             $a = [];
 
+            /**
+             * This will select only the translation
+             * depending on the lang id given
+             */
             $tempAr = [];
             $tempAr2 = [];
             $temp = [];
@@ -382,13 +430,6 @@ class SitesTranslationController extends AbstractActionController
                             }
                         }
                     }
-                }else{//check if we need to filter by site
-                    if(!empty($site)){
-                        $hasFilter = true;
-                        if($data[$i]['module'] == $site){
-                            array_push($a, $data[$i]);
-                        }
-                    }
                 }
             }
 
@@ -414,66 +455,29 @@ class SitesTranslationController extends AbstractActionController
             'data' => $data,
         ));
     }
-
+    
     /**
-     * Function to get translation by key and lang id
-     *
-     * @return JsonModel
-     */
-    public function getSiteTranslationByKeyAndLangIdAction()
-    {
-        $langid = $this->params()->fromQuery('langId', null);
-        $siteid = $this->params()->fromQuery('siteId', null);
-        $translationKey = $this->params()->fromQuery('translationKey', null);
-        $melisSiteTranslationService = $this->getServiceLocator()->get('MelisSiteTranslationService');
-        $data = $melisSiteTranslationService->getSiteTranslation($translationKey, $langid, $siteid, true);
-        return new JsonModel(array(
-            'data' => $data,
-        ));
-    }
-
-    /**
-     * Function list all sites from the page to used as filter by site
+     * Function to add site translation
+     * filter by site language
      *
      * @return ViewModel
      */
-    public function renderToolSitesSiteTranslationFiltersSitesAction()
+    public function renderToolSitesSiteTranslationFiltersLanguagesAction()
     {
-        /**
-         * get the page site published
-         */
-        $pagePublished = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
-        $published = $pagePublished->getEntryByField('page_type', 'SITE')->toArray();
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
 
-        /**
-         * get the page site saved
-         */
-        $pageSaved = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
-        $saved = $pageSaved->getEntryByField('page_type', 'SITE')->toArray();
-
-        $data = array_merge($published, $saved);
-        /**
-         * get the folder name(module name) from template
-         */
-        $template = $this->getServiceLocator()->get('MelisEngineTableTemplate');
         $translator = $this->getServiceLocator()->get('translator');
-        $sites = array();
-        $sites[] = '<option value="">'. $translator->translate('tr_melis_site_translation_choose') .'</option>';
-        $modules = array();
-        for($i = 0; $i < sizeof($data); $i++){
-            $tpl = $template->getEntryById($data[$i]['page_tpl_id']);
-            foreach($tpl as $d){
-                array_push($modules, array('site' => $data[$i]['page_name'], 'module' => $d->tpl_zf2_website_folder));
-            }
-        }
+        $sitelangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+        $siteLangs = $sitelangsTable->getSiteLanguagesBySiteId($siteId)->toArray();
 
-        $modules = array_values(array_unique($modules, SORT_REGULAR));
-        foreach($modules as $site){
-            $sites[] = '<option value="'.$site['module'].'">'. $site['site'].'</option>';
+        $langs = array();
+        $langs[] = '<option value="">'. $translator->translate('tr_melis_site_translation_choose') .'</option>';
+        foreach($siteLangs as $lang){
+            $langs[] = '<option value="'.$lang['lang_cms_id'].'">'. $lang['lang_cms_name'].'</option>';
         }
 
         $view = new ViewModel();
-        $view->sites = $sites;
+        $view->languages = $langs;
         return $view;
     }
 
@@ -482,24 +486,29 @@ class SitesTranslationController extends AbstractActionController
      *
      * @param array $errors
      * @param Form $appConfigForm
+     * @param int $langId
      * @return array $errors
      */
-    private function processErrors($errors, $appConfigForm)
+    private function processErrors($errors, $appConfigForm, $langId)
     {
+        $modifiedError = array();
         //loop through each errors
         foreach ($errors as $keyError => $valueError)
         {
+            $fieldName = $langId.'-'.$keyError;
+            $modifiedError = array($fieldName => $valueError);
             //look in the form for every failed field to specify the errors
             foreach ($appConfigForm as $keyForm => $valueForm)
             {
                 if(isset($valueForm['spec'])) {
                     //check if field name is equal with the error key to highlight the field
                     if ($valueForm['spec']['name'] == $keyError &&
-                        !empty($valueForm['spec']['options']['label']))
-                        $errors[$keyError]['label'] = $valueForm['spec']['options']['label'];
+                        !empty($valueForm['spec']['options']['label'])) {
+                        $modifiedError[$fieldName]['label'] = $valueForm['spec']['options']['label'];
+                    }
                 }
             }
         }
-        return $errors;
+        return $modifiedError;
     }
 }
