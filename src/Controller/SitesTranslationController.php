@@ -491,6 +491,17 @@ class SitesTranslationController extends AbstractActionController
      */
     private function processErrors($errors, $appConfigForm, $langId)
     {
+        /**
+         * get the lang info so that we can give the
+         * exact error message per language
+         */
+        $langCmsTbl = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+        $langData = $langCmsTbl->getEntryById($langId)->toArray();
+        $langName = '';
+        if(!empty($langData[0])){
+            $langName = $langData[0]['lang_cms_name'];
+        }
+
         $modifiedError = array();
         //loop through each errors
         foreach ($errors as $keyError => $valueError)
@@ -504,7 +515,7 @@ class SitesTranslationController extends AbstractActionController
                     //check if field name is equal with the error key to highlight the field
                     if ($valueForm['spec']['name'] == $keyError &&
                         !empty($valueForm['spec']['options']['label'])) {
-                        $modifiedError[$fieldName]['label'] = $valueForm['spec']['options']['label'];
+                        $modifiedError[$fieldName]['label'] = $valueForm['spec']['options']['label'] .'('.$langName.')';
                     }
                 }
             }
