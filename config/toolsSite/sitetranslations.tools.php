@@ -13,7 +13,7 @@ return array(
                         // table ID
                         'target' => '#tableMelisSiteTranslation',
                         'ajaxUrl' => '/melis/MelisCms/SitesTranslation/getTranslation',
-                        'dataFunction' => 'initSiteTranslationSiteList',
+                        'dataFunction' => 'initAdditionalTransParam',
                         'ajaxCallback' => 'initSiteTranslationTable()',
                         'filters' => array(
                             'left' => array(
@@ -22,10 +22,10 @@ return array(
                                     'controller' => 'SitesTranslation',
                                     'action' => 'render-tool-sites-site-translation-content-filters-limit'
                                 ),
-                                'mt-tr-sites' => array(
+                                'mt-tr-languages' => array(
                                     'module' => 'MelisCms',
                                     'controller' => 'SitesTranslation',
-                                    'action' => 'render-tool-sites-site-translation-filters-sites'
+                                    'action' => 'render-tool-sites-site-translation-filters-languages'
                                 )
                             ),
                             'center' => array(
@@ -86,6 +86,24 @@ return array(
                             ),
                             'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
                             'elements' => array(
+                                array(
+                                    'spec' => array(
+                                        'name' => 'mst_id',
+                                        'type' => 'hidden',
+                                        'attributes' => array(
+                                            'id' => 'mst_id',
+                                        ),
+                                    ),
+                                ),
+                                array(
+                                    'spec' => array(
+                                        'name' => 'mstt_id',
+                                        'type' => 'hidden',
+                                        'attributes' => array(
+                                            'id' => 'mstt_id',
+                                        ),
+                                    ),
+                                ),
                                 array(
                                     'spec' => array(
                                         'name' => 'mst_site_id',

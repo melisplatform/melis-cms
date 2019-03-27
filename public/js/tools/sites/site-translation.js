@@ -2,19 +2,29 @@ $(document).ready(function(){
     var body = $("body");
     var mst_id = 0;
     var mstt_id = 0;
+    var transZoneKey = "meliscms_tool_sites_site_translations";
 
-    /*body.on("click", ".btnAddSiteTranslation", function() {
-        var zoneId = "id_melis_site_translation_tool_modal_add_site_translation";
-        var melisKey = "melis_site_translation_tool_modal_add_site_translation";
-        var modalUrl = "/melis/MelisSiteTranslation/MelisSiteTranslation/renderMelisSiteTranslationModal";
-        melisHelper.createModal(zoneId, melisKey, true, {},  modalUrl);
-    });*/
-
-    body.on("change", "#siteTranslationSiteName", function(){
+    /**
+     * This will trigger the language filter
+     */
+    body.on("change", "#siteTranslationLanguageName", function(){
         var tableId = $(this).parents().eq(6).find('table').attr('id');
         $("#"+tableId).DataTable().ajax.reload();
     });
 
+    /**
+     * This will refresh the table
+     */
+    body.on("click", ".mt-tr-refresh", function(){
+        var siteId = activeTabId.split("_")[0];
+        melisHelper.zoneReload(siteId+'_id_meliscms_tool_sites_site_translations', transZoneKey, {siteId:siteId}, function(){
+            $("#"+siteId+'_id_meliscms_tool_sites_site_translations').addClass("active");
+        });
+    });
+
+    /**
+     * This will edit the translation
+     */
     body.on("click", ".btnEditSiteTranslation", function(){
         var zoneId = "id_meliscms_tool_sites_site_translations_modal_edit";
         var melisKey = "meliscms_tool_sites_site_translations_modal_edit";
@@ -30,7 +40,11 @@ $(document).ready(function(){
         melisHelper.createModal(zoneId, melisKey, true, {translationKey:key, langId:langId, siteId:siteId},  modalUrl);
     });
 
+    /**
+     * This will delete the translation
+     */
     body.on("click", "#btnDeleteSiteTranslation", function(e){
+        var siteId = activeTabId.split("_")[0];
         var t_id = $(this).closest("tr").attr('data-mst-id');
         var tt_id = $(this).closest("tr").attr('data-mstt-id');
         var obj = {};
@@ -46,13 +60,15 @@ $(document).ready(function(){
                 function() {
                     $.ajax({
                         type: 'POST',
-                        url: '/melis/MelisSiteTranslation/MelisSiteTranslation/deleteTranslation',
+                        url: '/melis/MelisCms/SitesTranslation/deleteTranslation',
                         data: $.param(obj)
                     }).done(function (data) {
                         //process the returned data
                         if (data.success) {//success
                             melisHelper.melisOkNotification(translations.tr_meliscore_common_success, translations.tr_melis_site_translation_delete_success);
-                            melisHelper.zoneReload('id_melis_site_translation_tool_content', 'melis_site_translation_tool_content');
+                            melisHelper.zoneReload(siteId+'_id_meliscms_tool_sites_site_translations', transZoneKey, {siteId:siteId}, function(){
+                                $("#"+siteId+'_id_meliscms_tool_sites_site_translations').addClass("active");
+                            });
                         }
                     });
                 });
@@ -60,19 +76,18 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
+    /**
+     * This will save the translation
+     */
     body.on("click", ".btnSaveSiteTranslation", function(e){
+        var siteId = activeTabId.split("_")[0];
         // var form = $("#site-translation-form");
-        var form = $("form[name='sitestranslationform']");
-        // var obj = {};
-        // obj.mstt_data = {mstt_lang_id:form.find("#mstt_lang_id").val(), mstt_text:form.find("#mstt_text").val()};
-        // obj.mst_data = {mst_site_id:form.find("#mst_site_id").val(), mst_key:form.find("#mst_key").val()};
-        // obj.mstt_id = mstt_id
-        // obj.mst_id = mst_id;
+        var form = $("form[name='sitestranslationform']").serializeArray();
 
         $.ajax({
             type        : 'POST',
             url         : '/melis/MelisCms/SitesTranslation/saveTranslation',
-            data		   : form.serializeArray()
+            data		   : $.param(form)
         }).done(function(data) {
             //process the returned data
             if(data.success){//success
@@ -82,73 +97,45 @@ $(document).ready(function(){
                     melisHelper.melisOkNotification(translations.tr_meliscore_common_success, translations.tr_melis_site_translation_update_success);
                 }
                 //remove highlighted label
-                melisCoreTool.highlightErrors(1, null, "site-translation-form");
+                // melisCoreTool.highlightErrors(1, null, "site-translation-form");
                 $("#modal-site-translation").modal("hide");
-                melisHelper.zoneReload('id_melis_site_translation_tool_content','melis_site_translation_tool_content', function(){
+                melisHelper.zoneReload(siteId+'_id_meliscms_tool_sites_site_translations', transZoneKey,{siteId:siteId}, function(){
                     mst_id = 0;
                     mstt_id = 0;
+                    $("#"+siteId+'_id_meliscms_tool_sites_site_translations').addClass("active");
                 });
             }else{//failed
                 //show errors
-                melisHelper.melisKoNotification(translations.tr_melis_site_translation_name, translations.tr_melis_site_translation_save_failed, data.errors);
+                melisHelper.melisKoNotification(translations.tr_melis_site_translations, translations.tr_melis_site_translation_save_failed, data.errors);
                 //highlight errors
-                melisCoreTool.highlightErrors(0, data.errors, "site-translation-form");
+                $.each(data.langErrorIds, function(i, langId){
+                    melisCoreTool.highlightErrors(0, data.errors, langId+"_site-translation-form");
+                });
             }
         });
         e.preventDefault();
     });
-
-    body.on("change", "#site-translation-form #mstt_lang_id, #site-translation-form #mstt_site_id", function(){
-        var form = $("#site-translation-form");
-        var key = $("#site-translation-form #mst_key").val();
-        var langId = 0;
-        var siteId = 0;
-
-        if($(this).attr("name") == "mstt_lang_id"){
-            langId = $(this).val();
-            siteId = $("#site-translation-form #mstt_site_id").val();
-        }else{
-            siteId = $(this).val();
-            langId = $("#site-translation-form #mstt_lang_id").val();
-        }
-
-        var obj = {};
-        obj.translationKey = key;
-        obj.langId = langId;
-        obj.siteId = siteId;
-        $.ajax({
-            type        : 'GET',
-            url         : '/melis/MelisSiteTranslation/MelisSiteTranslation/getSiteTranslationByKeyAndLangId',
-            data		   : $.param(obj)
-        }).done(function(res){
-            var data = res.data;
-            if(data.length > 0) {
-                for (var i = 0; i < data.length; i++) {
-                    tinyMCE.activeEditor.setContent(data[i].mstt_text);
-                    form.find("#mstt_lang_id").val(data[i].mstt_lang_id);
-                    form.find("#mst_key").val(data[i].mst_key).attr('readonly', true);
-                    mstt_id = data[i].mstt_id;
-                    mst_id = data[i].mst_id;
-                }
-            }else{
-                tinyMCE.activeEditor.setContent('');
-                form.find("#mstt_lang_id").val(langId);
-                mstt_id = 0;
-                mst_id = 0;
-            }
-        });
-    });
 });
 
-function initSiteTranslationTable(data, tblSetting){
+/**
+ * Remove the delete button if the
+ * translation is came from the file
+ * @param data
+ * @param tblSetting
+ */
+window.initSiteTranslationTable = function(data, tblSetting){
     //hide delete button if data-mst-id is 0
-    $("#tableMelisSiteTranslation tbody tr[data-mst-id='0']").find("#btnDeleteSiteTranslation").remove();
-}
+    $("#"+activeTabId.split("_")[0]+"_tableMelisSiteTranslation tbody tr[data-mst-id='0']").find("#btnDeleteSiteTranslation").remove();
+};
 
-window.initSiteTranslationSiteList = function(data, tblSettings){
-    if($('#siteTranslationSiteName').length){
-        data.site_translation_site_name = $('#siteTranslationSiteName').val();
-        data.siteId = 16;
+/**
+ * This will prepare to add the additional
+ * data of the translation
+ * @param data
+ */
+window.initAdditionalTransParam = function(data){
+    if($('#siteTranslationLanguageName').length){
+        data.site_translation_language_name = $('#siteTranslationLanguageName').val();
     }
-
-}
+    data.siteId = activeTabId.split("_")[0];
+};
