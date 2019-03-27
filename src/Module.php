@@ -186,6 +186,7 @@ class Module
             include __DIR__ . '/../config/toolsSite/languages.interface.php',
             include __DIR__ . '/../config/toolsSite/languages.tools.php',
             include __DIR__ . '/../config/toolsSite/siteconfig.interface.php',
+            include __DIR__ . '/../config/toolsSite/siteconfig.tools.php',
             include __DIR__ . '/../config/toolsSite/sitetranslations.interface.php',
             include __DIR__ . '/../config/toolsSite/sitetranslations.tools.php',
             include __DIR__ . '/../config/dashboard-plugins/MelisCmsPagesIndicatorsPlugin.config.php',

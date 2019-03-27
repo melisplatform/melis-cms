@@ -15,6 +15,122 @@ $data_melisKey = $this->melisKey;
                 </div>
             </div>
         </div>
+        <br>
+        <br>
+        <br>
+        <div class="row">
+            <div class="col-xs-12 col-md-2">
+                <div class="product-text-tab-container" >
+                    <ul class="nav-tabs product-text-tab meliscms-site-language-homepage-list">
+                        <!-- GENERAL TAB START -->
+                        <li class="">
+                            <a class="clearfix" data-toggle="tab" href="#general-config-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="general">
+                                <span>General</span>
+                            </a>
+                        </li>
+                        <!-- GENERAL TAB END -->
+                        <?php foreach($this->activeSiteLangs as $lang) :?>
+                            <li class="">
+                                <a class="clearfix" data-toggle="tab" id="news_cms_lang_<?= $lang['slang_lang_id'] ?>" href="#<?= $lang['lang_cms_locale']; ?>-config-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $lang['slang_lang_id'] ?>">
+                                    <span><?= $lang['lang_cms_name'] ?></span>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-3">
+                <div class="tab-content">
+                    <!-- GENERAL TAB START -->
+                    <div id="general-config-<?= $this->siteId; ?>" class="tab-pane product-text-tab-content">
+                        <div class="bg-white">
+                            <h4 class=""><i class="fa fa-map-marker"></i>  General</h4>
+                        </div>
+                        <div id="cms_site_config_general">
+                            <?php
+                            $form = clone $this->configForm;
 
+                            foreach ($form->getElements() as $element => $attributes)  {
+                                $el =  $form->get((string) $element);
+
+                                $el->setName("gen_".$el->getName());
+                                $el->setAttribute('id', $el->getName());
+                            }
+
+                            echo $this->form()->openTag($form);
+                            echo $this->melisFieldCollection($form);
+                            ?>
+                            <!-- ADDITIONAL INPUTS START -->
+                            <?php if (!empty($this->config['site'][$this->siteName]['allSites'])) : ?>
+                                <?php foreach ($this->config['site'][$this->siteName]['allSites'] as $configKey => $config) : ?>
+                                    <div class="form-group ">
+                                        <label for="1_shome_page_id"><?= $configKey ?>
+                                            <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="Identifier of the home page per language"></i>
+                                        </label>
+                                        <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>" id="gen_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                            <!-- ADDITIONAL INPUTS END -->
+                            <?php
+                            echo $this->form()->closeTag();
+                            ?>
+                        </div>
+                    </div>
+                    <!-- GENERAL TAB END -->
+                    <?php foreach ($this->activeSiteLangs as $lang) : ?>
+                        <div id="<?= $lang['lang_cms_locale']; ?>-config-<?= $this->siteId; ?>" class="tab-pane product-text-tab-content">
+                            <div class="bg-white">
+                                <h4 class=""><i class="fa fa-map-marker"></i>  <?= $lang['lang_cms_name']; ?></h4>
+                            </div>
+                            <div id="cms_domain_<?= $lang['slang_lang_id']; ?>">
+                                <?php
+                                $form = clone $this->configForm;
+
+                                foreach ($form->getElements() as $element => $attributes)  {
+                                    $el =  $form->get((string) $element);
+//
+//                                    foreach ($this->siteLangHomepages as $siteLangHomepage) {
+//                                        if ($siteLangHomepage['shome_lang_id'] == $lang['slang_lang_id']) {
+//                                            $el->setValue($siteLangHomepage[$el->getName()]);
+//                                        }
+//                                    }
+//
+//                                    if ($el->getName() == 'shome_site_id') {
+//                                        $el->setValue($this->siteId);
+//                                    }
+//
+//                                    if ($el->getName() == 'shome_lang_id') {
+//                                        $el->setValue($lang['slang_lang_id']);
+//                                    }
+//
+                                    $el->setName($lang['slang_lang_id']."_".$el->getName());
+                                    $el->setAttribute('id', $el->getName());
+                                }
+
+                                echo $this->form()->openTag($form);
+                                echo $this->melisFieldCollection($form);
+                                ?>
+                                <!-- ADDITIONAL INPUTS START -->
+                                <?php if (!empty($this->config['site'][$this->siteName][$this->siteId][$lang['lang_cms_locale']])) : ?>
+                                    <?php foreach ($this->config['site'][$this->siteName][$this->siteId][$lang['lang_cms_locale']] as $configKey => $config) : ?>
+                                        <div class="form-group ">
+                                            <label for="1_shome_page_id"><?= $configKey ?>
+                                                <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="Identifier of the home page per language"></i>
+                                            </label>
+                                            <input type="text" class="form-control" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                                <!-- ADDITIONAL INPUTS END -->
+                                <?php
+                                echo $this->form()->closeTag();
+                                ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
