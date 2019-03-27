@@ -34,7 +34,6 @@ class SitesPropertiesController extends AbstractActionController
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
-        $cmsLangSvc = $this->getServiceLocator()->get('MelisEngineLang');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
 
         // GET FORMS
@@ -53,20 +52,6 @@ class SitesPropertiesController extends AbstractActionController
         $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
         $activeSiteLangs = $siteLangsTable->getSiteLangs(null, $siteId, null, true)->toArray();
 
-        $cmsLangs = $cmsLangSvc->getAvailableLanguages();
-        $tempCmsLangs = $cmsLangs;
-        $cmsLangs = array();
-
-        foreach($tempCmsLangs as $tempCmsLang){
-            foreach ($siteLangHomepages as $siteLangHomepage){
-                if($tempCmsLang['lang_cms_id'] === $siteLangHomepage['shome_lang_id']){
-                    array_push($cmsLangs,$tempCmsLang);
-                }
-            }
-        }
-
-        array_reverse($cmsLangs);
-
         $view = new ViewModel();
 
         $view->melisKey = $melisKey;
@@ -74,7 +59,6 @@ class SitesPropertiesController extends AbstractActionController
         $view->propertiesForm = $propertiesForm;
         $view->homepageForm = $homepageForm;
         $view->siteLangHomepages = $siteLangHomepages;
-        $view->cmsLangs = $cmsLangs;
         $view->activeSiteLangs = $activeSiteLangs;
 
         return $view;
