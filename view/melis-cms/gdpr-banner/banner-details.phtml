@@ -1,0 +1,47 @@
+<?php
+$id = '';
+if (!empty($this->zoneconfig['conf']['id'])) {
+    $id = $this->zoneconfig['conf']['id'];
+}
+$data_melisKey = $this->melisKey;
+?>
+<div class="mcms-gdpr-banner-details" id="<?= $id ?>" data-melisKey="<?= $this->melisKey; ?>">
+    <div class="row">
+        <div class="col-xs-12 col-md-2">
+            <div class="product-text-tab-container">
+                <ul class="nav-tabs product-text-tab">
+                    <?php foreach($this->languages as $idx => $lang) :?>
+                        <li class="">
+                            <a class="clearfix" data-toggle="tab" id="cms-gdpr-lang-<?= $lang['lang_cms_id']; ?>" href="#<?= $lang['lang_cms_name']; ?>-banner-details" aria-expanded="true" data-lang-id="<?= $lang['lang_cms_id'] ?>">
+                                <span><?= $lang['lang_cms_name'] ?></span>
+
+                                <span class="pull-right"><img src="/MelisCms/images/lang-flags/<?= $lang['lang_cms_locale']; ?>.png" class="imgDisplay pull-right"/></span>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-10">
+            <div class="tab-content">
+                <?php foreach ($this->languages as $idx => $lang) : ?>
+                    <div id="<?= $lang['lang_cms_name']; ?>-banner-details" class="tab-pane product-text-tab-content">
+                        <div class="bg-white">
+                            <h4 class=""><i class="fa fa-language" aria-hidden="true"></i> <?= $lang['lang_cms_name']; ?></h4>
+                        </div>
+                        <div id="cms-gdpr-<?= $lang['lang_cms_id']; ?>">
+                            <?php
+                            echo $this->form()->openTag($this->form);
+                            echo $this->melisFieldCollection($this->form);
+                            echo $this->form()->closeTag();
+                            ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        melisTinyMCE.createTinyMCE("tool", ".mcgdprbanner_content", {height: 300});
+    </script>
+</div>

@@ -134,6 +134,7 @@ return array(
             'MelisCms\Controller\PageDuplication' => 'MelisCms\Controller\PageDuplicationController',
             'MelisCms\Controller\PageLanguages' => 'MelisCms\Controller\PageLanguagesController',
             'MelisCms\Controller\MelisSetup' => 'MelisCms\Controller\MelisSetupController',
+            'MelisCms\Controller\GdprBanner' => 'MelisCms\Controller\GdprBannerController',
         ),
     ),
     'controller_plugins' => array(

@@ -751,15 +751,26 @@ body.modal-open {
 	border-color: #ccc;
 }
 
+/** GDPR Banner */
+.mcms-gdpr-banner-header {
+	margin-bottom: 8px;
+}
 
+.mcms-gdpr-banner-desc {
+	margin-bottom: 8px;
+}
 
+.mcms-gdpr-banner-header p {
+	display: inline-block;
+	margin: 4px 0;
+}
+.cms_gdpr_banner_site_filter_form label {
+	display: inline-block !important;
+	font-size: 1em;
+	margin: 0 10px 5px 0;
+}
 
-
-
-
-
-
-
-
-
-
+.cms_gdpr_banner_site_filter_form select {
+	display: inline-block !important;
+	font-size: 1em;
+}

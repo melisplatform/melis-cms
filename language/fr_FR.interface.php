@@ -469,4 +469,6 @@
 
         /** Banner */
         'tr_melis_cms_gdpr_banner_tabname' => 'Bannières',
+        'tr_melis_cms_gdpr_banner_content' => 'Banner content',
+        'tr_melis_cms_gdpr_banner_desc' => 'Customize the message notifying the users about cookies & data protection rights of the site.',
 	);
