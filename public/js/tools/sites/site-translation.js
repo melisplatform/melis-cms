@@ -32,7 +32,7 @@ $(document).ready(function(){
 
         var langId = $(this).closest("tr").attr('data-lang-id');
         var siteId = $(this).closest("tr").attr('data-site-id');
-        var key = $(this).closest("tr").find('td:first').text();
+        var key = $(this).closest("tr").find('td:nth-child(2)').text();
 
         mstt_id = $(this).closest("tr").attr('data-mstt-id');
         mst_id = $(this).closest("tr").attr('data-mst-id');

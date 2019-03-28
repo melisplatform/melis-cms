@@ -416,6 +416,12 @@ class SitesTranslationController extends AbstractActionController
 
                 //assign attribute data to table row
                 $data[$i]['DT_RowAttr'] = $attrArray;
+                //add translation indicator
+                $indicator = '<i class="fa fa-file fa-lg" aria-hidden="true" title="From file"></i>';
+                if($data[$i]['mst_id']){
+                    $indicator = '<i class="fa fa-database fa-lg" aria-hidden="true" title="From DB (Overrided)"></i>';
+                }
+                $data[$i]['mst_trans_indicator'] = $indicator;
 
                 //check if search is not empty(to filter by search)
                 if (!empty($search)) {
