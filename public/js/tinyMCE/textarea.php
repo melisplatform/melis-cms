@@ -5,7 +5,7 @@
 		'language' => 'en',
 		'inline' => true,
 		'menubar' => false,
-		'forced_root_block'  => '',
+		'forced_root_block'  => 'div',
 		'cleanup'  => false,
 		'verify_html'  => false,
 		'plugins' => array(
@@ -16,5 +16,6 @@
 	    ),
 	    'autoresize_on_init' => false,
 	    'toolbar' => 'undo redo link unlink | forecolor backcolor | code',
-	    'init_instance_callback'  => 'tinyMceCleaner',
+	    'setup' => 'melisTinyMCE.tinyMceActionEvent',
+	    'init_instance_callback'  => 'tinyMceCleaner'
 	); 

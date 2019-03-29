@@ -18,8 +18,8 @@
        ),
        'image_advtab' => true,
        'toolbar' => 'insertfile undo redo paste | formatselect | forecolor | bold italic strikethrough underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media template | code',
-       'setup' => 'melisTinyMCE.tinyMceInsertMelisTreeBtn'
-       //'init_instance_callback'
+       'setup' => 'melisTinyMCE.tinyMceActionEvent',
+       'init_instance_callback' => 'tinyMceCleaner'
    );
 
 # For Reference

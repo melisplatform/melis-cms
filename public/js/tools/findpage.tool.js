@@ -59,7 +59,6 @@
              console.log('failed');
          });
         melisCoreTool.done('#generateTreePageLink');
-
     });
     
     $body.on("click", "#generateTreePageId", function() {
@@ -195,8 +194,7 @@
     	}
     	
     	window.parent.melisHelper.createModal(zoneId, melisKey, false, {'pageTreeInputId' : id}, modalUrl, function() {
-    	});
-    	
+    	}); 	
     }
 
     function selectedNodes() {
@@ -257,8 +255,6 @@
                 mode: "hide"       // Grayout unmatched nodes (pass "hide" to remove unmatched node instead)
               },
         });
-        
-
     }
 
     return {
@@ -267,6 +263,6 @@
         findPageMainTree        :       findPageMainTree,
         checkBtn                :       checkBtn,
         showUrl                 :       showUrl
-    }
+    };
 
 })(jQuery, window);
