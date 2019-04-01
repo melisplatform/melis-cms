@@ -685,6 +685,7 @@ class SitesController extends AbstractActionController
         $domainData = array();
         $siteProp = array();
         $siteHomeData = array();
+        $siteConfigTabData = [];
 
         $shomeErrors = array();
 
@@ -723,6 +724,22 @@ class SitesController extends AbstractActionController
                 $siteHomeData[$ctr1][$key] = $val;
             }
 
+            //data for site config
+            if (strstr($datum,'sconf_')) {
+                $lang = explode('_', $datum)[0];
+                $key = substr($datum, (strpos($datum, '_') ?: -1) + 1);
+                $tableColumns = [
+                    'sconf_id',
+                    'sconf_site_id',
+                    'sconf_lang_id'
+                ];
+
+                if (in_array($key, $tableColumns)) {
+                    $siteConfigTabData[$lang][$key] = $val;
+                } else {
+                    $siteConfigTabData[$lang]['config'][$key] = $val;
+                }
+            }
         }
 
         //saving module load
@@ -749,6 +766,8 @@ class SitesController extends AbstractActionController
 
         $this->saveSiteHomePages($siteHomeData, $errors, $status);
         $this->saveSiteLanguagesTab($siteId, $data);
+        $this->saveSiteConfig($siteId,$siteConfigTabData);
+
 
 //        //saving site properties
 //        $form = $this->getTool()->getForm('meliscms_tool_sites_properties_form');
@@ -869,6 +888,54 @@ class SitesController extends AbstractActionController
 
         // Update site to add site option language url
         $siteTable->save(['site_opt_lang_url' => $data['site_opt_lang_url']], $siteId);
+    }
+
+    private function saveSiteConfig($siteId, $siteConfigTabData) {
+        $siteConfigTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteConfig');
+        $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+
+        // Get site data
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $site = $siteTable->getEntryById($siteId)->toArray()[0];
+        $siteName = $site['site_name'];
+
+        // get config
+        $siteConfigSrv = $this->getServiceLocator()->get('MelisSiteConfigService');
+        $config = $siteConfigSrv->getSiteConfigById($siteId);
+
+        foreach ($siteConfigTabData as $langKey => $langValue) {
+            $locale = !empty($siteLangsTable->getSiteLangs(null, $siteId, $langKey, true, true)->toArray()) ?
+                $siteLangsTable->getSiteLangs(null, $siteId, $langKey, true, true)->toArray()[0] : null;
+            $data = [];
+            $sconf_id = !empty($langValue['sconf_id']) ? $langValue['sconf_id'] : 0;
+
+            if (!empty($langValue['config'])) {
+                foreach ($langValue['config'] as $configKey => $configValue) {
+                    $confKey = substr($configKey, strpos($configKey, '_') + 1);
+
+                    if ($langKey == 'gen') {
+                        if ($config['site'][$siteName]['allSites'][$confKey] !== $configValue) {
+                            $data['site'][$siteName]['allSites'][$confKey] = $this->getTool()->sanitize($configValue, true);
+                        }
+                    } else {
+                        if ($config['site'][$siteName][$siteId][$locale['lang_cms_locale']][$confKey] !== $configValue) {
+                            $data['site'][$siteName][$siteId][$locale['lang_cms_locale']][$confKey] = $this->getTool()->sanitize($configValue, true);
+                        }
+                    }
+                }
+            }
+
+            if (!empty($data)) {
+                $siteConfigTable->save(
+                    [
+                        'sconf_site_id' => $siteId,
+                        'sconf_lang_id' => $langKey === 'gen' ? -1 : $langKey,
+                        'sconf_datas' => serialize($data)
+                    ],
+                    $sconf_id
+                );
+            }
+        }
     }
 
     private function getMelisKey()

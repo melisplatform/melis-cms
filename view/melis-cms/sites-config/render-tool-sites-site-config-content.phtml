@@ -1,5 +1,6 @@
 <?php
 $id = '';
+
 if (!empty($this->zoneconfig['conf']['id'])) {
     $id = ' id="' . $this->siteId . '_' . $this->zoneconfig['conf']['id'] . '"';
 }
@@ -29,6 +30,7 @@ $data_melisKey = $this->melisKey;
                             </a>
                         </li>
                         <!-- GENERAL TAB END -->
+                        <!-- OTHER LANGUAGES START -->
                         <?php foreach($this->activeSiteLangs as $lang) :?>
                             <li class="">
                                 <a class="clearfix" data-toggle="tab" id="news_cms_lang_<?= $lang['slang_lang_id'] ?>" href="#<?= $lang['lang_cms_locale']; ?>-config-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $lang['slang_lang_id'] ?>">
@@ -36,6 +38,7 @@ $data_melisKey = $this->melisKey;
                                 </a>
                             </li>
                         <?php endforeach; ?>
+                        <!-- OTHER LANGUAGES END -->
                     </ul>
                 </div>
             </div>
@@ -53,6 +56,12 @@ $data_melisKey = $this->melisKey;
                             foreach ($form->getElements() as $element => $attributes)  {
                                 $el =  $form->get((string) $element);
 
+                                if ($el->getName() == 'sconf_id') {
+                                    if (array_key_exists(-1, $this->conff)) {
+                                        $el->setValue($this->conff[-1]);
+                                    }
+                                }
+
                                 $el->setName("gen_".$el->getName());
                                 $el->setAttribute('id', $el->getName());
                             }
@@ -64,9 +73,7 @@ $data_melisKey = $this->melisKey;
                             <?php if (!empty($this->config['site'][$this->siteName]['allSites'])) : ?>
                                 <?php foreach ($this->config['site'][$this->siteName]['allSites'] as $configKey => $config) : ?>
                                     <div class="form-group ">
-                                        <label for="1_shome_page_id"><?= $configKey ?>
-                                            <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="Identifier of the home page per language"></i>
-                                        </label>
+                                        <label><?= $configKey ?></label>
                                         <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>" id="gen_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
                                     </div>
                                 <?php endforeach; ?>
@@ -78,6 +85,7 @@ $data_melisKey = $this->melisKey;
                         </div>
                     </div>
                     <!-- GENERAL TAB END -->
+                    <!-- OTHER LANGUAGES START -->
                     <?php foreach ($this->activeSiteLangs as $lang) : ?>
                         <div id="<?= $lang['lang_cms_locale']; ?>-config-<?= $this->siteId; ?>" class="tab-pane product-text-tab-content">
                             <div class="bg-white">
@@ -96,9 +104,11 @@ $data_melisKey = $this->melisKey;
 //                                        }
 //                                    }
 //
-//                                    if ($el->getName() == 'shome_site_id') {
-//                                        $el->setValue($this->siteId);
-//                                    }
+                                    if ($el->getName() == 'sconf_id') {
+                                        if (array_key_exists($lang['slang_lang_id'], $this->conff)) {
+                                            $el->setValue($this->conff[$lang['slang_lang_id']]);
+                                        }
+                                    }
 //
 //                                    if ($el->getName() == 'shome_lang_id') {
 //                                        $el->setValue($lang['slang_lang_id']);
@@ -115,9 +125,7 @@ $data_melisKey = $this->melisKey;
                                 <?php if (!empty($this->config['site'][$this->siteName][$this->siteId][$lang['lang_cms_locale']])) : ?>
                                     <?php foreach ($this->config['site'][$this->siteName][$this->siteId][$lang['lang_cms_locale']] as $configKey => $config) : ?>
                                         <div class="form-group ">
-                                            <label for="1_shome_page_id"><?= $configKey ?>
-                                                <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="Identifier of the home page per language"></i>
-                                            </label>
+                                            <label><?= $configKey ?></label>
                                             <input type="text" class="form-control" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
                                         </div>
                                     <?php endforeach; ?>
@@ -129,6 +137,7 @@ $data_melisKey = $this->melisKey;
                             </div>
                         </div>
                     <?php endforeach; ?>
+                    <!-- OTHER LANGUAGES END -->
                 </div>
             </div>
         </div>

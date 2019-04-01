@@ -15,8 +15,8 @@ use Zend\Stdlib\ArrayUtils;
 
 class SitesConfigController extends AbstractActionController
 {
-    public function renderToolSitesSiteConfigAction() {
-
+    public function renderToolSitesSiteConfigAction()
+    {
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
 
@@ -28,7 +28,8 @@ class SitesConfigController extends AbstractActionController
         return $view;
     }
 
-    public function renderToolSitesSiteConfigContentAction() {
+    public function renderToolSitesSiteConfigContentAction()
+    {
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
         $melisTool = $this->getTool();
@@ -45,11 +46,19 @@ class SitesConfigController extends AbstractActionController
         $site = $siteTable->getEntryById($siteId)->toArray()[0];
         $siteName = $site['site_name'];
 
-        // Get site config | Priority = 2
-        $config = include __DIR__ . "/../../../../../module/MelisSites/$siteName/config/$siteName.config.php";
-        // Get site config on DB | Priority = 1
+        // get config
+        $siteConfigSrv = $this->getServiceLocator()->get('MelisSiteConfigService');
+        $config = $siteConfigSrv->getSiteConfigById($siteId);
 
-        // Merge config
+        // get site configs
+        $siteConfigTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteConfig');
+        $siteConfig = $siteConfigTable->getEntryByField('sconf_site_id', $siteId)->toArray();
+
+        $conff = [];
+
+        foreach ($siteConfig as $conf) {
+            $conff[$conf['sconf_lang_id']] = $conf['sconf_id'];
+        }
 
         $view = new ViewModel();
 
@@ -59,6 +68,7 @@ class SitesConfigController extends AbstractActionController
         $view->configForm = $configForm;
         $view->config = $config;
         $view->siteName = $siteName;
+        $view->conff = $conff;
 
         return $view;
     }
