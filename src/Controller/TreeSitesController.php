@@ -642,7 +642,6 @@ class TreeSitesController extends AbstractActionController
             $form = $factory->createForm($appConfigForm);
 
             $postValues = $this->getRequest()->getPost()->toArray();
-            $duplicateStartingFrom = empty($postValues['sourcePageId']) ? 0 : $postValues['sourcePageId'];
             $postValues['destinationPageId'] = ($postValues['use_root']) ? -1 : $postValues['destinationPageId'];
 
             $postValues = $melisTool->sanitizePost($postValues);
@@ -651,6 +650,7 @@ class TreeSitesController extends AbstractActionController
             //validation
             if ($form->isValid()) {
                 $data = $form->getData();
+                $duplicateStartingFrom = empty($data['sourcePageId']) ? 0 : $data['sourcePageId'];
                 $destinationPage = $data['destinationPageId'];
                 $langId = $data['lang_id'];
                 $pageRelation = $data['pageRelation'];
