@@ -30,7 +30,7 @@ class MelisCmsFlashMessengerListener extends MelisCoreGeneralListener implements
 
         $callBackHandler = $sharedEvents->attach(
             'MelisCms',
-            array(
+            [
                 'meliscms_page_save_end',
                 'meliscms_page_publish_end',
                 'meliscms_page_unpublish_end',
@@ -54,8 +54,9 @@ class MelisCmsFlashMessengerListener extends MelisCoreGeneralListener implements
                 'meliscms_style_save_details_end',
                 'meliscms_style_delete_end',
                 'meliscms_create_new_page_lang_end',
-                'meliscms_tree_duplicate_page_trees_end'
-            ),
+                'meliscms_tree_duplicate_page_trees_end',
+                'meliscms_gdpr_save_banner_end'
+            ],
             function ($e) {
                 $params = $e->getParams();
                 $e->getTarget()->forward()->dispatch(

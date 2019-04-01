@@ -469,6 +469,9 @@
 
         /** Banner */
         'tr_melis_cms_gdpr_banner_tabname' => 'Bannières',
-        'tr_melis_cms_gdpr_banner_content' => 'Banner content',
-        'tr_melis_cms_gdpr_banner_desc' => 'Customize the message notifying the users about cookies & data protection rights of the site.',
+        'tr_melis_cms_gdpr_banner_content' => 'Contenu de la bannière',
+        'tr_melis_cms_gdpr_banner_content_tooltip' => 'Personnalisez ici le texte de la bannière RGPD',
+        'tr_melis_cms_gdpr_banner_save_ok' => 'Contenu de la bannière enregistré avec succès.',
+        'tr_melis_cms_gdpr_banner_save_ko' => 'Impossible d\'enregistrer le contenu de la bannière.',
+        'tr_melis_cms_gdpr_banner_empty_field' => 'Le champ ne peut être vide.',
 	);

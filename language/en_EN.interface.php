@@ -467,6 +467,8 @@
         /** Banner */
         'tr_melis_cms_gdpr_banner_tabname' => 'Banners',
         'tr_melis_cms_gdpr_banner_content' => 'Banner content',
-        'tr_melis_cms_gdpr_banner_content_tooltip' => 'This will be the message shown notifying the user about cookies & data protection rights of the site.',
-        'tr_melis_cms_gdpr_banner_desc' => 'Customize the message notifying the users about cookies & data protection rights of the site.',
+        'tr_melis_cms_gdpr_banner_content_tooltip' => 'Customize here the text of the GDPR banner',
+        'tr_melis_cms_gdpr_banner_save_ok' => 'Banner content saved successfully.',
+        'tr_melis_cms_gdpr_banner_save_ko' => 'Unable to save banner content',
+        'tr_melis_cms_gdpr_banner_empty_field' => 'The field cannot be empty.',
 	);

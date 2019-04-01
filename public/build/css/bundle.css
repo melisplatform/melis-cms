@@ -993,17 +993,17 @@ body.modal-open {
 
 /** GDPR Banner */
 .mcms-gdpr-banner-header {
-	margin-bottom: 8px;
+	margin: 10px 0 25px 0;
 }
 
-.mcms-gdpr-banner-desc {
-	margin-bottom: 8px;
+.cms_gdpr_banner_site_filter_form {
+	display: inline;
 }
 
-.mcms-gdpr-banner-header p {
-	display: inline-block;
-	margin: 4px 0;
+.cms_gdpr_banner_site_filter_form .form-group {
+	display: inline;
 }
+
 .cms_gdpr_banner_site_filter_form label {
 	display: inline-block !important;
 	font-size: 1em;
@@ -1013,4 +1013,12 @@ body.modal-open {
 .cms_gdpr_banner_site_filter_form select {
 	display: inline-block !important;
 	font-size: 1em;
+}
+
+#id_melis_core_gdpr_tabs .page-content-container .nav-tabs > li.active, .page-content-container .nav-tabs > li:hover {
+	border-bottom: none;
+}
+
+#id_melis_core_gdpr_tabs.page-content-container .nav-tabs > li.active > a, .page-content-container .nav-tabs > li.active:focus > a, .page-content-container .nav-tabs > li.active:active > a {
+	border: none;
 }

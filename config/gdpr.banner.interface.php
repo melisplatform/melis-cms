@@ -101,8 +101,21 @@ return [
                     ],
                     'input_filter' => [
                         'mcgdprbanner_site_id' => [
-                            'required' => false,
-                            'filters' => []
+                            'required' => true,
+                            'validators' => [
+                                [
+                                    'name' => 'NotEmpty',
+                                    'options' => [
+                                        'messages' => [
+                                            \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_gdpr_banner_empty_field',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                            'filters' => [
+                                ['name' => 'StripTags'],
+                                ['name' => 'StringTrim'],
+                            ],
                         ],
                     ],
                 ],
@@ -118,7 +131,18 @@ return [
                     'elements' => [
                         [
                             'spec' => [
-                                'name' => 'mcgdprbanner_content',
+                                'name' => 'mcgdpr_text_id',
+                                'type' => 'hidden',
+                                'options' => [],
+                                'attributes' => [
+                                    'id' => 'mcgdpr_text_id',
+                                    'value' => '',
+                                ],
+                            ],
+                        ],
+                        [
+                            'spec' => [
+                                'name' => 'mcgdpr_text_value',
                                 'type' => 'TextArea',
                                 'options' => [
                                     'label' => 'tr_melis_cms_gdpr_banner_content',
@@ -126,16 +150,34 @@ return [
                                 ],
 
                                 'attributes' => [
-                                    'id' => 'id_mcgdprbanner_content',
+                                    'id' => 'id_mcgdpr_text_value',
                                     'value' => '',
-                                    'class' => 'form-control mcgdprbanner_content',
+                                    'class' => 'form-control mcgdpr_text_value',
                                     'style' => 'max-width:100%',
                                     'rows' => '4',
                                 ],
                             ],
                         ],
                     ],
-                    'input_filter' => [],
+                    'input_filter' => [
+//                        'mcgdpr_text_value' => [
+//                            'required' => true,
+//                            'validators' => [
+//                                [
+//                                    'name' => 'NotEmpty',
+//                                    'options' => [
+//                                        'messages' => [
+//                                            \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_gdpr_banner_empty_field',
+//                                        ],
+//                                    ],
+//                                ],
+//                            ],
+//                            'filters' => [
+//                                ['name' => 'StripTags'],
+//                                ['name' => 'StringTrim'],
+//                            ],
+//                        ],
+                    ],
                 ],
             ],
         ],

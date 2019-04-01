@@ -11,7 +11,9 @@ namespace MelisCms\Controller;
 
 
 use Zend\Form\Factory;
+use Zend\Form\Form;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 /**
@@ -21,6 +23,7 @@ use Zend\View\Model\ViewModel;
 class GdprBannerController extends AbstractActionController
 {
     const MODULE_NAME = 'MelisCmsGdprBanner';
+    const LOG_UPDATE = 'UDPATE';
 
     /**
      * @return ViewModel
@@ -42,12 +45,12 @@ class GdprBannerController extends AbstractActionController
     {
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $tool = $this->getTool();
-        /** @var \Zend\Form\Form $form */
+        /** @var Form $form */
         $form = $this->getForm('site_filter_form');
+        $form->get('mcgdprbanner_site_id')->setLabel($form->get('mcgdprbanner_site_id')->getLabel() . ' *');
 
         $label = [
             'saveBtn' => $tool->getTranslation('tr_meliscms_common_save'),
-            'toolDesc' => $tool->getTranslation('tr_melis_cms_gdpr_banner_desc'),
         ];
 
         $view = new ViewModel();
@@ -104,9 +107,24 @@ class GdprBannerController extends AbstractActionController
     public function bannerDetailsAction()
     {
         $melisKey = $this->params()->fromRoute('melisKey', '');
-        $tool = $this->getTool();
+        $siteId = $this->params()->fromQuery('siteId', null);
 
-        /** @var \Zend\Form\Form $form */
+        $bannerContents = [];
+        if (!empty($siteId)) {
+            /** @var \MelisCms\Service\MelisCmsGdprService $bannerSvc */
+            $bannerSvc = $this->getServiceLocator()->get('MelisCmsGdprService');
+            $result = $bannerSvc->getGdprBannerText((int)$siteId)->toArray();
+            if (!empty($result)) {
+                foreach ($result as $content) {
+                    $bannerContents[$content['mcgdpr_text_lang_id']] = [
+                        'mcgdpr_text_id' => $content['mcgdpr_text_id'],
+                        'mcgdpr_text_value' => $content['mcgdpr_text_value'],
+                    ];
+                }
+            }
+        }
+
+        /** @var Form $form */
         $form = $this->getForm('banner_content_form');
 
         $melisEngineLangTable = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
@@ -116,8 +134,127 @@ class GdprBannerController extends AbstractActionController
         $view = new ViewModel();
         $view->melisKey = $melisKey;
         $view->languages = $languages;
-        $view->form = $form;
+        $view->bannerContentform = $form;
+        $view->bannerContents = $bannerContents;
 
         return $view;
+    }
+
+    /**
+     * Saves banner contents
+     * @return JsonModel
+     */
+    public function saveBannerAction()
+    {
+        $tool = $this->getTool();
+        $request = $this->getRequest();
+        $logItemId = 0;
+        $response = [
+            'success' => false,
+            'textTitle' => $tool->getTranslation('tr_melis_core_gdpr'),
+            'textMessage' => $tool->getTranslation('tr_melis_cms_gdpr_banner_save_ko'),
+            'errors' => []
+        ];
+
+        if ($request->isPost()) {
+            $data = $request->getPost()->toArray();
+            //$data = $this->getServiceLocator()->get('MelisCoreTool')->sanitizePost($data);
+
+            /**
+             * Validate Site & Content
+             * @var Form $siteForm
+             * @var Form $contentForm
+             */
+            $siteForm = $this->getForm('site_filter_form');
+            $siteId = [];
+            if (!empty($data['filters']['siteId'][0]['value'])) {
+                $siteForm->setData([
+                    $data['filters']['siteId'][0]['name'] => $data['filters']['siteId'][0]['value']
+                ]);
+                $siteId = $data['filters']['siteId'][0]['value'];
+            } else {
+                $siteForm->setData($siteId);
+            }
+
+            if (!$siteForm->isValid()) {
+                $errors = $this->formatErrorMsg($siteForm);
+                $response['errors'] = array_merge($response['errors'], $errors);
+            }
+
+            $contentForm = $this->getForm('banner_content_form');
+            $bannerContents = $data['bannerContent'];
+            foreach ($bannerContents as $langId => $bannerContent) {
+                $contentChecker = clone $contentForm;
+
+                $contentChecker->setData([$bannerContent[0]['name'] => $bannerContent[0]['value']]);
+                if (!$contentChecker->isValid()) {
+                    $errors = $this->formatErrorMsg($contentChecker);
+                    $response['errors'] = array_merge($response['errors'], $errors);
+                }
+            }
+
+            if (empty($response['errors'])) {
+                /** @var \MelisCms\Service\MelisCmsGdprService $bannerService */
+                $bannerService = $this->getServiceLocator()->get('MelisCmsGdprService');
+                /** Save languages with non-empty content */
+                foreach ($bannerContents as $langId => $bannerContent) {
+                    /** Save the content */
+                    $id = (int)$bannerContent[0]['value'];
+                    $content = $bannerContent[1]['value'];
+
+                    if ($id > 0) {
+                        /** Update */
+                        if (empty($content)) {
+                            /** Delete the corresponding row for this language & site from the database */
+                            $result = $bannerService->deleteBannerById($id);
+                        } else {
+                            $result = $bannerService->saveBanner($id, $content, $siteId, $langId);
+                        }
+                    } else {
+                        /** Add */
+                        $result = $bannerService->saveBanner(null, $content, $siteId, $langId);
+                    }
+
+                    if ($result > 0) {
+                        $logItemId = $result;
+                        $response['success'] = true;
+                        $response['textMessage'] = $tool->getTranslation('tr_melis_cms_gdpr_banner_save_ok');
+                    }
+                }
+            }
+        }
+
+        // add to flash messenger
+        $this->getEventManager()->trigger(
+            'meliscms_gdpr_save_banner_end',
+            $this,
+            array_merge(
+                $response,
+                ['typeCode' => self::LOG_UPDATE, 'itemId' => $logItemId]
+            )
+        );
+
+        return new JsonModel($response);
+    }
+
+    /**
+     * Formats the form errors to a melis-notification-friendly format
+     * @param Form|null $form
+     * @return array
+     */
+    private function formatErrorMsg(Form $form = null)
+    {
+        $formattedErrors = [];
+        $formErrors = $form->getMessages();
+        if (empty($formErrors)) {
+            return $formattedErrors;
+        } else {
+            foreach ($formErrors as $fieldName => $fieldErrors) {
+                $formattedErrors[$fieldName] = $fieldErrors;
+                $formattedErrors[$fieldName]['label'] = $form->get($fieldName)->getLabel();
+            }
+
+            return $formattedErrors;
+        }
     }
 }

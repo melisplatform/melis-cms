@@ -113,6 +113,10 @@ return array(
             'MelisCmsPageGetterService' => 'MelisCms\Service\Factory\MelisCmsPageGetterServiceFactory',
             'MelisCms\Listener\MelisCmsPluginSaveEditionSessionListener' => 'MelisCms\Listener\Factory\MelisCmsPluginSaveEditionSessionListenerFactory',
             'MelisCmsPageService' => 'MelisCms\Service\Factory\MelisCmsPageServiceFactory',
+            'MelisCmsGdprService' => 'MelisCms\Service\Factory\MelisCmsGdprServiceFactory',
+
+            // Tables
+            'MelisCmsGdprTextsTable' => 'MelisCms\Model\Tables\Factory\MelisCmsGdprTextsFactory',
         ),
     ),
     'controllers' => array(
