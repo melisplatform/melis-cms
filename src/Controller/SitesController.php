@@ -554,8 +554,10 @@ class SitesController extends AbstractActionController
                 //check if $domainData is empty
                 if (empty($domainData) && !empty($domainDataTemp)) {
                     foreach ($siteLanguages as $locale => $langId) {
-                        foreach ($domainDataTemp as $dom => $val) {
-                            $domainData[$locale] = array($dom => $val);
+                        if($locale != 'sites_url_setting') {
+                            foreach ($domainDataTemp as $dom => $val) {
+                                $domainData[$locale] = array($dom => $val);
+                            }
                         }
                     }
                 }

@@ -323,6 +323,7 @@ $(document).ready(function() {
                 }
                 melisCore.flashMessenger();
                 melisCoreTool.done("#btn-finish-step");
+                initVariables();
             },
             error: function(){
                 console.log(translations.tr_melis_cms_sites_tool_add_create_site_unknown_error);
@@ -554,6 +555,19 @@ $(document).ready(function() {
         });
 
         ul.find("span.step-name").text(ul.find("li.active").attr("data-stepName"));
+    }
+
+    function initVariables()
+    {
+        formData = {};
+        selectedLanguages = '';
+        domainType = '';
+        createFile = true;
+        newSite = true;
+        owlStep = null;
+        currentStepForm = '';
+        siteName = '';
+        selectedDomainValue = [];
     }
 
     /**

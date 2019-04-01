@@ -44,16 +44,24 @@ return array(
                             ),
                         ),
                         'columns' => array(
+                            'mst_trans_indicator' => array(
+                                'text' => '',
+                                'css' => ['width' => '3%', 'padding-right' => '0'],
+                                'sortable' => false,
+                            ),
                             'mst_key' => array(
                                 'text' => 'tr_melis_site_translation_key_col',
+                                'css' => ['width' => '30%', 'padding-right' => '0'],
                                 'sortable' => false,
                             ),
                             'module' => array(
                                 'text' => 'tr_melis_site_translation_module_col',
+                                'css' => ['width' => '20%', 'padding-right' => '0'],
                                 'sortable' => false,
                             ),
                             'mstt_text' => array(
                                 'text' => 'tr_melis_site_translation_text_col',
+                                'css' => ['width' => '50%', 'padding-right' => '0'],
                                 'sortable' => false,
                             )
                         ),
