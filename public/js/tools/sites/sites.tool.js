@@ -318,12 +318,13 @@ $(document).ready(function() {
                 if(data.success){
                     $('#id_meliscms_tool_sites_modal_container_container').modal('hide');
                     openSiteEditTab(data.siteName, data.siteId);
+                    //re init variables
+                    initVariables();
                 }else{
                     melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
                 }
                 melisCore.flashMessenger();
                 melisCoreTool.done("#btn-finish-step");
-                initVariables();
             },
             error: function(){
                 console.log(translations.tr_melis_cms_sites_tool_add_create_site_unknown_error);

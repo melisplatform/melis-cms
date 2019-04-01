@@ -145,10 +145,16 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                     'success' => true
                 );
 
+                /**
+                 * Check if the user want's to create a new module
+                 */
                 if ($arrayParameters['createModule'] && !empty($siteModuleName))
                 {
                     $moduleName = $this->generateModuleNameCase($siteModuleName);
                     $tempRes = $this->createSiteModule($moduleName);
+                    /**
+                     * Check if the creation of module is successful
+                     */
                     if($tempRes['success']) {
                         if (!is_null($siteModuleName)) {
                             // Getting the DemoSite config
@@ -163,6 +169,10 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                     }
                 }
 
+                /**
+                 * If success, then we proceed on creating the sites
+                 * and its pages
+                 */
                 if ($tempRes['success'])
                 {
                     /**
@@ -211,6 +221,10 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                              */
                             $siteCtr = 0;
                             /**
+                             * prepare page id initial
+                             */
+                            $pageIdInitial = 0;
+                            /**
                              * Loop through each language
                              * to make a site per language
                              */
@@ -218,6 +232,19 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                                 /**
                                  * This will check if we are going to create a site
                                  * and domain per language
+                                 * 
+                                 * Ex Scenario:
+                                 * 1. If the user choose to create a site with multi domain,
+                                 * then we need to create a site PER LANGUAGE. So we need
+                                 * to create a site for English and another site for French
+                                 * for example if the user choose 2 languages.
+                                 *
+                                 * 2. If the user choose to create a site but not a multi domain
+                                 * and have two languages. Then we only need to create one site
+                                 * that has two languages.
+                                 *
+                                 * This condition will help us to achieve that kind of scenario.
+                                 *
                                  */
                                 if($createSiteAndDomain) {
                                     /**
@@ -262,11 +289,22 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                                 $tplId = (int)$cmsCurPlatformData->pids_tpl_id_current;
 
                                 /**
+                                 * This will get the page id initial of the page
+                                 */
+                                if($createSiteAndDomain){
+                                    $pageIdInitial = $pageId;
+                                }else{
+                                    if(!$pageIdInitial){
+                                        $pageIdInitial = $pageId;
+                                    }
+                                }
+
+                                /**
                                  * Create home page and template
                                  */
                                 //Creating Site Homepage page and template
                                 $this->createSitePageTemplate($tplId, $savedSiteId, $siteModuleName, $langName[1] . ': Home', 'Index', 'index', $platformId);
-                                $this->createSitePage($langName[1] . ':' . $siteLabel . ' - Home', -1, $langId, 'SITE', $pageId, $tplId, $platformId);
+                                $this->createSitePage($langName[1] . ':' . $siteLabel . ' - Home', -1, $langId, 'SITE', $pageId, $tplId, $platformId, $pageIdInitial);
                                 /**
                                  * This will save the homepage id
                                  * to the SiteName.config.php file
@@ -314,6 +352,9 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                                 $arrayParameters['site404']['s404_site_id'] = $savedSiteId;
                                 $site404Table->save($arrayParameters['site404']);
 
+                                /**
+                                 * check if we are going to create another site for this language
+                                 */
                                 if(!$isMultiDomain){
                                     $createSiteAndDomain = false;
                                 }else{
@@ -666,9 +707,10 @@ class MelisCmsSiteService extends MelisCoreGeneralService
 	 * @param Int $pageId
 	 * @param Int $templateId
 	 * @param Int $platformId
+	 * @param null $pageIdInitial
 	 * @return Int
 	 */
-	private function createSitePage($siteName, $fatherId, $siteLangId, $pageType, $pageId, $templateId, $platformId)
+	private function createSitePage($siteName, $fatherId, $siteLangId, $pageType, $pageId, $templateId, $platformId, $pageIdInitial = null)
 	{
 	    // Event parameters prepare
 	    $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
@@ -700,7 +742,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
 	    $pageLangTable->save(array(
 	        'plang_page_id' => $arrayParameters['pageId'],
 	        'plang_lang_id' => $arrayParameters['siteLangId'],
-	        'plang_page_id_initial' => $arrayParameters['pageId']
+	        'plang_page_id_initial' => (!empty($arrayParameters['pageIdInitial']) ? $arrayParameters['pageIdInitial'] : $arrayParameters['pageId'] ),
 	    ));
 	    
 	    // Saving Site page in Save Version as new page entry
