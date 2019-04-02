@@ -162,14 +162,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                      */
                     if($tempRes['success']) {
                         if (!is_null($siteModuleName)) {
-                            // Getting the DemoSite config
-                            $outputFileName = 'module.config.php';
-                            $moduleConfigDir = $modulePath . '/config/' . $outputFileName;
-
-                            // Replacing the Site homepage id to site module config
-                            $moduleConfig = file_get_contents($moduleConfigDir);
-                            $moduleConfig = str_replace('\'homePageId\'', $mainPageId, $moduleConfig);
-                            file_put_contents($moduleConfigDir, $moduleConfig);
+                            $this->updateModuleConfig($modulePath, $mainPageId);
                         }
                     }
                 }
@@ -189,9 +182,6 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                     $con = $db->getDriver()->getConnection();//get db driver connection
                     $con->beginTransaction();//begin transaction
                     try {
-                        // Assigning the next page id from Platform Id's
-                        $arrayParameters['siteData']['site_main_page_id'] = $mainPageId;
-
                         if (!empty($arrayParameters['siteLanguages'])) {
                             $siteLangConfig = '';
                             $siteUrlSetting = 0;
@@ -234,6 +224,15 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                              * to make a site per language
                              */
                             foreach ($arrayParameters['siteLanguages'] as $langLabel => $langId) {
+
+                                /**
+                                 * get the current page id and template id
+                                 * from the platform ids
+                                 */
+                                $cmsCurPlatformData = $cmsPlatformTable->getEntryById($platformId)->current();
+                                $pageId = (int)$cmsCurPlatformData->pids_page_id_current;
+                                $tplId = (int)$cmsCurPlatformData->pids_tpl_id_current;
+
                                 /**
                                  * This will check if we are going to create a site
                                  * and domain per language
@@ -252,6 +251,8 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                                  *
                                  */
                                 if($createSiteAndDomain) {
+                                    // Assigning the next page id from Platform Id's
+                                    $arrayParameters['siteData']['site_main_page_id'] = $pageId;
                                     /**
                                      * Save site per language
                                      */
@@ -289,13 +290,6 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                                 }
 
                                 $langName = explode('_', $langLabel);
-                                /**
-                                 * get the current page id and template id
-                                 * from the platform ids
-                                 */
-                                $cmsCurPlatformData = $cmsPlatformTable->getEntryById($platformId)->current();
-                                $pageId = (int)$cmsCurPlatformData->pids_page_id_current;
-                                $tplId = (int)$cmsCurPlatformData->pids_tpl_id_current;
 
                                 /**
                                  * This will get the page id initial of the page
@@ -447,6 +441,27 @@ class MelisCmsSiteService extends MelisCoreGeneralService
 	     
 	    return $arrayParameters['results'];
 	}
+
+    /**
+     * Update the page id on site module config file
+     *
+     * @param $modulePath
+     * @param $homePageId
+     * @param $isUpdate
+     */
+	public function updateModuleConfig($modulePath, $homePageId, $isUpdate = true)
+    {
+        // Getting the Site config
+        $outputFileName = 'module.config.php';
+        $moduleConfigDir = $modulePath . '/config/' . $outputFileName;
+
+        if($isUpdate) {
+            // Replacing the Site homepage id to site module config
+            $moduleConfig = file_get_contents($moduleConfigDir);
+            $moduleConfig = str_replace('\'homePageId\'', $homePageId, $moduleConfig);
+            file_put_contents($moduleConfigDir, $moduleConfig);
+        }
+    }
 
     /**
      * Function to update site config

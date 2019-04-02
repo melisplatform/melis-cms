@@ -262,7 +262,6 @@ return array(
                                         'attributes' => array(
                                             'id' => 'site_label',
                                             'class' => 'form-control',
-                                            'value' => getenv('MELIS_MODULE'),
                                             'required' => 'required',
                                         ),
                                     ),
