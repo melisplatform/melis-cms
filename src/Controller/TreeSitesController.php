@@ -643,7 +643,7 @@ class TreeSitesController extends AbstractActionController
 
             $postValues = $this->getRequest()->getPost()->toArray();
             $postValues['destinationPageId'] = ($postValues['use_root']) ? -1 : $postValues['destinationPageId'];
-
+            $postValues['sourcePageId'] = empty($postValues['sourcePageId']) ? null : $postValues['sourcePageId'];
             $postValues = $melisTool->sanitizePost($postValues);
             $form->setData($postValues);
 
