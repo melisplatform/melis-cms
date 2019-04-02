@@ -48,34 +48,38 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
 
 
         $filePath = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/'.$siteModuleName.'/config/module.load.php';
-        chmod($filePath,0777);
-        $moduleLoadList = file_exists($filePath) ? include($filePath) : array();
-        $moduleLoadFile = $this->getModuleSvc()->getModulePlugins($exclude_modules);
 
-        $modules = $moduleLoadList;
+        /**
+         * Check if file exist
+         */
+        if(file_exists($filePath)) {
+            chmod($filePath, 0777);
+            $moduleLoadList = file_exists($filePath) ? include($filePath) : array();
+            $moduleLoadFile = $this->getModuleSvc()->getModulePlugins($exclude_modules);
 
-        foreach($modules as $index => $modValues) {
+            $modules = $moduleLoadList;
 
-            if(!in_array($modValues, $exclude_modules)) {
+            foreach ($modules as $index => $modValues) {
 
-                if(in_array($modValues, $moduleLoadFile)) {
-                    $modulesList[$modValues] = 1;
-                }
-                else {
-                    $modulesList[$modValues] = 0;
+                if (!in_array($modValues, $exclude_modules)) {
+
+                    if (in_array($modValues, $moduleLoadFile)) {
+                        $modulesList[$modValues] = 1;
+                    } else {
+                        $modulesList[$modValues] = 0;
+                    }
                 }
             }
-        }
 
-        // add the inactive modules
-        foreach($moduleLoadFile as $index => $module) {
+            // add the inactive modules
+            foreach ($moduleLoadFile as $index => $module) {
 
-            if(!isset($modulesList[$module])) {
-                $modulesList[$module] = 0;
+                if (!isset($modulesList[$module])) {
+                    $modulesList[$module] = 0;
+                }
+
             }
-
         }
-
         // Service implementation end
 
         // Adding results to parameters for events treatment if needed
