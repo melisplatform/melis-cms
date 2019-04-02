@@ -251,6 +251,24 @@ return array(
                                 ),
                                 array(
                                     'spec' => array(
+                                        'name' => 'site_label',
+                                        'type' => 'MelisText',
+                                        'options' => array(
+                                            'label' => 'Site label',
+                                            'label_attributes' => array(
+                                                'class' => 'err_site_label',
+                                            )
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'site_label',
+                                            'class' => 'form-control',
+                                            'value' => getenv('MELIS_MODULE'),
+                                            'required' => 'required',
+                                        ),
+                                    ),
+                                ),
+                                array(
+                                    'spec' => array(
                                         'type' => 'Zend\Form\Element\Radio',
                                         'name' => 'create_sites_file',
                                         'options' => array(

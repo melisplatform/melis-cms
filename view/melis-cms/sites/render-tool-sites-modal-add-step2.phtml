@@ -13,7 +13,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                 $form->prepare();
                 echo $this->form()->openTag($form);
                 ?>
-                <label class="err_site_selected_lang"><?= $this->translate('tr_melis_cms_sites_tool_add_step2_select_language'); ?><sup>*</sup></label>
+                <label class="err_site_selected_lang"><?= $this->translate('tr_melis_cms_sites_tool_add_step2_select_languages'); ?><sup>*</sup></label>
                 <div class="row">
                     <?php
                     foreach($this->langList as $key => $val) {

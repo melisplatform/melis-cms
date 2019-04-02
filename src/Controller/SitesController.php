@@ -410,9 +410,10 @@ class SitesController extends AbstractActionController
      */
     public function createNewSiteAction()
     {
+        $sId = null;
         $errors = array();
         $status = false;
-        $siteId = null;
+        $siteIds = array();
         $siteName = '';
         $textMessage = '';
         $siteTablePrefix = self::SITE_TABLE_PREFIX;
@@ -615,7 +616,7 @@ class SitesController extends AbstractActionController
 
                     if ($saveSiteResult['success'])
                     {
-                        $siteId = $saveSiteResult['site_id'];
+                        $siteIds = $saveSiteResult['site_ids'];
                         $textMessage = 'tr_melis_cms_sites_tool_add_create_site_success';
                         $status = true;
                     }
@@ -645,12 +646,21 @@ class SitesController extends AbstractActionController
             'success' => $status,
             'textTitle' => 'tr_meliscms_tool_site',
             'textMessage' => $textMessage,
-            'siteId' => $siteId,
+            'siteIds' => $siteIds,
             'siteName' => $siteName,
             'errors' => $errors
         );
 
-        $this->getEventManager()->trigger('meliscms_site_save_end', $this, array_merge($response, array('typeCode' => 'CMS_SITE_ADD', 'itemId' => $siteId)));
+        /**
+         * add logs
+         */
+        if(empty($siteIds)) {
+            $this->getEventManager()->trigger('meliscms_site_save_end', $this, array_merge($response, array('typeCode' => 'CMS_SITE_ADD', 'itemId' => $sId)));
+        }else{
+            foreach ($siteIds as $key => $id) {
+                $this->getEventManager()->trigger('meliscms_site_save_end', $this, array_merge($response, array('typeCode' => 'CMS_SITE_ADD', 'itemId' => $id)));
+            }
+        }
 
        return new JsonModel($response);
     }

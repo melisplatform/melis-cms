@@ -14,7 +14,7 @@ return array(
                         'target' => '#tableMelisSiteTranslation',
                         'ajaxUrl' => '/melis/MelisCms/SitesTranslation/getTranslation',
                         'dataFunction' => 'initAdditionalTransParam',
-                        'ajaxCallback' => 'initSiteTranslationTable()',
+                        'ajaxCallback' => 'siteTransTableCallBack()',
                         'filters' => array(
                             'left' => array(
                                 'mt-tr-limit' => array(

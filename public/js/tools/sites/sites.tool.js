@@ -317,7 +317,9 @@ $(document).ready(function() {
             success: function(data){
                 if(data.success){
                     $('#id_meliscms_tool_sites_modal_container_container').modal('hide');
-                    openSiteEditTab(data.siteName, data.siteId);
+                    $.each(data.siteIds, function(i, id){
+                        openSiteEditTab(data.siteName, id);
+                    });
                     //re init variables
                     initVariables();
                 }else{

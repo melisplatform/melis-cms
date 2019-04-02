@@ -7,7 +7,7 @@ $(document).ready(function(){
     /**
      * This will trigger the language filter
      */
-    body.on("change", "#siteTranslationLanguageName", function(){
+    body.on("change", ".transLangFilter", function(){
         var tableId = $(this).parents().eq(6).find('table').attr('id');
         $("#"+tableId).DataTable().ajax.reload();
     });
@@ -118,14 +118,29 @@ $(document).ready(function(){
 });
 
 /**
- * Remove the delete button if the
- * translation is came from the file
- * @param data
- * @param tblSetting
+ * Callback for site translation table
+ *
  */
-window.initSiteTranslationTable = function(data, tblSetting){
-    //hide delete button if data-mst-id is 0
-    $("#"+activeTabId.split("_")[0]+"_tableMelisSiteTranslation tbody tr[data-mst-id='0']").find("#btnDeleteSiteTranslation").remove();
+window.siteTransTableCallBack = function(){
+    /**
+     * get the current site id
+     */
+    var siteId = activeTabId.split("_")[0];
+    /**
+     * Remove the delete button if the
+     * translation is came from the file
+     */
+    $("#"+siteId+"_tableMelisSiteTranslation tbody tr[data-mst-id='0']").find("#btnDeleteSiteTranslation").remove();
+
+    /**
+     * Update the class of language filter container to avoid duplicate
+     */
+    setTimeout(function(){
+        var filterLangCont = $("#"+siteId+"_siteTranslation_language").parent();
+        var contClass = filterLangCont.attr("class");
+        filterLangCont.removeClass(contClass);
+        filterLangCont.addClass(siteId+"_"+contClass);
+    }, 300);
 };
 
 /**
@@ -134,8 +149,7 @@ window.initSiteTranslationTable = function(data, tblSetting){
  * @param data
  */
 window.initAdditionalTransParam = function(data){
-    if($('#siteTranslationLanguageName').length){
-        data.site_translation_language_name = $('#siteTranslationLanguageName').val();
-    }
-    data.siteId = activeTabId.split("_")[0];
+    var siteId = activeTabId.split("_")[0];
+    data.site_translation_language_name = $('#'+siteId+'_siteTranslationLanguageName').val();
+    data.siteId = siteId;
 };

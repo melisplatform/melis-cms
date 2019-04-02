@@ -82,12 +82,6 @@ class MelisCmsSiteService extends MelisCoreGeneralService
      */
     public function saveSite($siteData, $domainData, $siteLanguages, $site404, $siteModuleName = null, $createModule = false, $isNewSite = false)
 	{
-	    $results = array(
-	        'site_id' => null,
-	        'success' => false,
-	        'message' => null,
-	    );
-	    
 	    // Event parameters prepare
 	    $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
 	     
@@ -109,6 +103,22 @@ class MelisCmsSiteService extends MelisCoreGeneralService
         $siteLabel = $arrayParameters['siteData']['site_label'];
         //module name
         $siteModuleName = $arrayParameters['siteModuleName'];
+
+        //declare variables
+        $siteDomainId = null;
+        $site404Id = null;
+        $hasError = false;
+        $savedSiteId = null;
+        $savedSiteIds = array();
+
+        //declare default result data
+        $results = array(
+            'site_ids' => $savedSiteIds,
+            'success' => false,
+            'message' => null,
+            'siteName' => $siteLabel,
+        );
+
         /**
          * get the module path
          */
@@ -119,11 +129,6 @@ class MelisCmsSiteService extends MelisCoreGeneralService
         }else {
             $modulePath = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/' . $siteModuleName;
         }
-
-        $siteDomainId = null;
-        $site404Id = null;
-        $hasError = false;
-        $savedSiteId = null;
 
         $curPlatform = !empty(getenv('MELIS_PLATFORM'))  ? getenv('MELIS_PLATFORM') : 'development';
         $corePlatformTable = $this->getServiceLocator()->get('MelisCoreTablePlatform');
@@ -277,6 +282,10 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                                      * created site
                                      */
                                     $siteLangConfig = '';
+                                    /**
+                                     * add saved site id to the array to return
+                                     */
+                                    array_push($savedSiteIds, $savedSiteId);
                                 }
 
                                 $langName = explode('_', $langLabel);
@@ -422,7 +431,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
         if (!$hasError)
         {
             $results = array(
-                'site_id' => $savedSiteId,
+                'site_ids' => $savedSiteIds,
                 'success' => true,
                 'message' => 'tr_melis_cms_sites_tool_add_create_site_success',
                 'siteName' => $siteLabel,
