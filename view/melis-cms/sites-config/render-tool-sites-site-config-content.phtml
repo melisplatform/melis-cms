@@ -72,10 +72,26 @@ $data_melisKey = $this->melisKey;
                             <!-- ADDITIONAL INPUTS START -->
                             <?php if (!empty($this->config['site'][$this->siteName]['allSites'])) : ?>
                                 <?php foreach ($this->config['site'][$this->siteName]['allSites'] as $configKey => $config) : ?>
-                                    <div class="form-group ">
-                                        <label><?= $configKey ?></label>
-                                        <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>" id="gen_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
-                                    </div>
+                                    <?php if (!empty($this->valuesFromDb && array_key_exists('allSites', $this->valuesFromDb))) : ?>
+                                        <?php if (in_array($configKey, $this->valuesFromDb['allSites'])) : ?>
+                                            <label><?= $configKey ?></label>
+                                            <div class="input-group ">
+                                                <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>" id="gen_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
+                                                <span class="input-group-addon"><i class="fa fa-database fa-lg" title="From DB (Overridden)"></i></span>
+                                            </div>
+                                            <br>
+                                        <?php else : ?>
+                                            <div class="form-group ">
+                                                <label><?= $configKey ?></label>
+                                                <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>" id="gen_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
+                                            </div>
+                                        <?php endif; ?>
+                                    <?php else : ?>
+                                        <div class="form-group ">
+                                            <label><?= $configKey ?></label>
+                                            <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>" id="gen_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
+                                        </div>
+                                    <?php endif; ?>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                             <!-- ADDITIONAL INPUTS END -->
@@ -124,10 +140,26 @@ $data_melisKey = $this->melisKey;
                                 <!-- ADDITIONAL INPUTS START -->
                                 <?php if (!empty($this->config['site'][$this->siteName][$this->siteId][$lang['lang_cms_locale']])) : ?>
                                     <?php foreach ($this->config['site'][$this->siteName][$this->siteId][$lang['lang_cms_locale']] as $configKey => $config) : ?>
-                                        <div class="form-group ">
-                                            <label><?= $configKey ?></label>
-                                            <input type="text" class="form-control" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
-                                        </div>
+                                        <?php if (!empty($this->valuesFromDb && array_key_exists($lang['lang_cms_locale'], $this->valuesFromDb))) : ?>
+                                            <?php if (in_array($configKey, $this->valuesFromDb[$lang['lang_cms_locale']])) : ?>
+                                                <label><?= $configKey ?></label>
+                                                <div class="input-group ">
+                                                    <input type="text" class="form-control col-md-10" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
+                                                    <span class="input-group-addon"><i class="fa fa-database fa-lg" title="From DB (Overridden)"></i></span>
+                                                </div>
+                                                <br>
+                                            <?php else : ?>
+                                                <div class="form-group ">
+                                                    <label><?= $configKey ?></label>
+                                                    <input type="text" class="form-control" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
+                                                </div>
+                                            <?php endif; ?>
+                                        <?php else : ?>
+                                            <div class="form-group ">
+                                                <label><?= $configKey ?></label>
+                                                <input type="text" class="form-control" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
+                                            </div>
+                                        <?php endif; ?>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                                 <!-- ADDITIONAL INPUTS END -->

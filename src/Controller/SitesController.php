@@ -896,31 +896,69 @@ class SitesController extends AbstractActionController
         $siteConfigTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteConfig');
         $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
 
-        // Get site data
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
-        $site = $siteTable->getEntryById($siteId)->toArray()[0];
+        $site = $this->getSiteDataById($siteId);
         $siteName = $site['site_name'];
 
-        // get config
-        $siteConfigSrv = $this->getServiceLocator()->get('MelisSiteConfigService');
-        $config = $siteConfigSrv->getSiteConfigById($siteId);
+        $config = $this->getSiteConfigById($siteId);
+        $configFromDb = $this->getSiteConfigFromDbById($siteId);
 
         foreach ($siteConfigTabData as $langKey => $langValue) {
-            $locale = !empty($siteLangsTable->getSiteLangs(null, $siteId, $langKey, true, true)->toArray()) ?
-                $siteLangsTable->getSiteLangs(null, $siteId, $langKey, true, true)->toArray()[0] : null;
-            $data = [];
+            $locale = $siteLangsTable->getSiteLangs(null, $siteId, $langKey, true, true)->toArray();
             $sconf_id = !empty($langValue['sconf_id']) ? $langValue['sconf_id'] : 0;
+            $data = [];
 
-            if (!empty($langValue['config'])) {
-                foreach ($langValue['config'] as $configKey => $configValue) {
-                    $confKey = substr($configKey, strpos($configKey, '_') + 1);
+            if (!empty($locale)) {
+                $locale = $locale[0];
+            }
 
-                    if ($langKey == 'gen') {
-                        if ($config['site'][$siteName]['allSites'][$confKey] !== $configValue) {
-                            $data['site'][$siteName]['allSites'][$confKey] = $this->getTool()->sanitize($configValue, true);
+            foreach ($langValue['config'] as $configKey => $configValue) {
+                $confKey = substr($configKey, strpos($configKey, '_') + 1);
+
+                if ($langKey == 'gen') {
+                    $dataFromConfig = $config['site'][$siteName]['allSites'][$confKey];
+
+                    if (!empty($configFromDb)) {
+                        foreach ($configFromDb as $confDb) {
+                            if ($confDb['sconf_lang_id'] == '-1') {
+                                if (array_key_exists($confKey, unserialize($confDb['sconf_datas'])['site'][$siteName]['allSites'])) {
+                                    $data['site'][$siteName]['allSites'][$confKey] = $this->getTool()->sanitize($configValue, true);
+                                } else {
+                                    if ($dataFromConfig !== $configValue) {
+                                        $data['site'][$siteName]['allSites'][$confKey] = $this->getTool()->sanitize($configValue, true);
+                                    }
+                                }
+                            } else {
+                                if ($dataFromConfig !== $configValue) {
+                                    $data['site'][$siteName]['allSites'][$confKey] = $this->getTool()->sanitize($configValue, true);
+                                }
+                            }
                         }
                     } else {
-                        if ($config['site'][$siteName][$siteId][$locale['lang_cms_locale']][$confKey] !== $configValue) {
+                        if ($dataFromConfig !== $configValue) {
+                            $data['site'][$siteName]['allSites'][$confKey] = $this->getTool()->sanitize($configValue, true);
+                        }
+                    }
+                } else {
+                    $dataFromConfig = $config['site'][$siteName][$siteId][$locale['lang_cms_locale']][$confKey];
+
+                    if (!empty($configFromDb)) {
+                        foreach ($configFromDb as $confDb) {
+                            if ($confDb['sconf_lang_id'] == $langKey) {
+                                if (array_key_exists($confKey, unserialize($confDb['sconf_datas'])['site'][$siteName][$siteId])) {
+                                    $data['site'][$siteName][$siteId][$locale['lang_cms_locale']][$confKey] = $this->getTool()->sanitize($configValue, true);
+                                } else {
+                                    if ($dataFromConfig !== $configValue) {
+                                        $data['site'][$siteName][$siteId][$locale['lang_cms_locale']][$confKey] = $this->getTool()->sanitize($configValue, true);
+                                    }
+                                }
+                            } else {
+                                if ($dataFromConfig !== $configValue) {
+                                    $data['site'][$siteName][$siteId][$locale['lang_cms_locale']][$confKey] = $this->getTool()->sanitize($configValue, true);
+                                }
+                            }
+                        }
+                    } else {
+                        if ($dataFromConfig != $configValue) {
                             $data['site'][$siteName][$siteId][$locale['lang_cms_locale']][$confKey] = $this->getTool()->sanitize($configValue, true);
                         }
                     }
@@ -940,19 +978,63 @@ class SitesController extends AbstractActionController
         }
     }
 
+    /**
+     * return site config (from db only)
+     * @param $siteId
+     * @return mixed
+     */
+    private function getSiteConfigFromDbById($siteId)
+    {
+        $siteConfigTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteConfig');
+
+        return $siteConfigTable->getEntryByField('sconf_site_id', $siteId)->toArray();
+    }
+
+    /**
+     * returns site config (merged)
+     * @param $siteId
+     * @return mixed
+     */
+    private function getSiteConfigById($siteId)
+    {
+        $siteConfigSrv = $this->getServiceLocator()->get('MelisSiteConfigService');
+
+        return $siteConfigSrv->getSiteConfigById($siteId);
+    }
+
+    /**
+     * returns site data
+     * @param $siteId
+     * @return array
+     */
+    private function getSiteDataById($siteId)
+    {
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $site = $siteTable->getEntryById($siteId)->toArray();
+
+        return !empty($site) ? $site[0] : [];
+    }
+
+    /**
+     * returns meliskey from route or from query
+     * @return mixed
+     */
     private function getMelisKey()
     {
         $melisKey = $this->params()->fromRoute('melisKey', $this->params()->fromQuery('melisKey'), null);
+
         return $melisKey;
     }
+
     /**
-     * this method will get the meliscore tool
+     * returns tools service
+     * @return array|object
      */
     private function getTool()
     {
         $toolSvc = $this->getServiceLocator()->get('MelisCoreTool');
         $toolSvc->setMelisToolKey('meliscms', 'meliscms_tool_sites');
+
         return $toolSvc;
     }
-
 }
