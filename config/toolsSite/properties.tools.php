@@ -83,6 +83,8 @@ return array(
                                         'options' => array(
                                             'label' => 'tr_melis_cms_sites_s404_page_id',
                                             'tooltip' => 'tr_melis_cms_sites_s404_page_id tooltip',
+                                            'button' => 'fa fa-sitemap',
+                                            'button-id' => 's404_page_id_button',
                                         ),
                                         'attributes' => array(
                                             'id' => 's404_page_id',
@@ -98,6 +100,8 @@ return array(
                                         'options' => array(
                                             'label' => 'tr_melis_cms_sites_site_main_page_id',
                                             'tooltip' => 'tr_melis_cms_sites_site_main_page_id tooltip',
+                                            'button' => 'fa fa-sitemap',
+                                            'button-id' => 'site_main_page_id_button',
                                         ),
                                         'attributes' => array(
                                             'id' => 'site_main_page_id',
@@ -148,7 +152,7 @@ return array(
                                 ),
                                 'site_label' => array(
                                     'name' => 'site_label',
-                                    'required' => false,
+                                    'required' => true,
                                     'validators' => array(),
                                     'filters' => array(
                                         array('name' => 'StripTags'),
@@ -157,7 +161,7 @@ return array(
                                 ),
                                 'site_name' => array(
                                     'name' => 'site_name',
-                                    'required' => false,
+                                    'required' => true,
                                     'validators' => array(),
                                     'filters' => array(
                                         array('name' => 'StripTags'),
@@ -166,7 +170,7 @@ return array(
                                 ),
                                 's404_page_id' => array(
                                     'name' => 's404_page_id',
-                                    'required' => false,
+                                    'required' => true,
                                     'validators' => array(
                                         array(
                                             'name' => 'IsInt',
@@ -185,7 +189,7 @@ return array(
                                 ),
                                 'site_main_page_id' => array(
                                     'name' => 'site_main_page_id',
-                                    'required' => false,
+                                    'required' => true,
                                     'validators' => array(),
                                     'filters' => array(
                                         array('name' => 'StripTags'),
