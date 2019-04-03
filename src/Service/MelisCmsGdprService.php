@@ -18,7 +18,6 @@ use MelisCore\Service\MelisCoreGeneralService;
  */
 class MelisCmsGdprService extends MelisCoreGeneralService
 {
-
     /**
      * Saves the banner content
      * @param int|null $bannerId
@@ -102,46 +101,11 @@ class MelisCmsGdprService extends MelisCoreGeneralService
         return $arrayParameters['results'];
     }
 
-    public function deleteBannerContentWhere(int $siteId = null, int $langId = null)
-    {
-        // Event parameters prepare
-        $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
-        $results = false;
-
-        // Sending service start event
-        $arrayParameters = $this->sendEvent('melis_cms_gdpr_delete_banner_where_start', $arrayParameters);
-
-        // START BUSINESS LOGIC
-        // Transferring variables for readability
-        $siteId = $arrayParameters['siteId'];
-        $langId = $arrayParameters['langId'];
-
-        if (!empty($siteId) && !empty($langId)) {
-            $bannerTable = $this->getMelisCmsGdprTextsTable();
-            try {
-                $results = $bannerTable->deleteWhere([
-                    'mcgdpr_text_site_id' => $siteId,
-                    'mcgdpr_text_lang_id' => $langId,
-                ]);
-            } catch (\Exception $e) {
-                echo $e->getMessage();
-            }
-        }
-        // END BUSINESS LOGIC
-
-        // Adding results to parameters for events treatment if needed
-        $arrayParameters['results'] = $results;
-        // Sending service end event
-        $arrayParameters = $this->sendEvent('melis_cms_gdpr_delete_banner_where_end', $arrayParameters);
-
-        return $arrayParameters['results'];
-    }
-
     public function getGdprBannerText(int $siteId = null, int $langId = null)
     {
         // Event parameters prepare
         $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
-        $results = '';
+        $results = [];
 
         // Sending service start event
         $arrayParameters = $this->sendEvent('melis_cms_gdpr_delete_banner_where_start', $arrayParameters);

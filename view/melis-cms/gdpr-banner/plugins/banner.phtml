@@ -1,0 +1,39 @@
+<div id="<?= $this->pluginId; ?>" class="melis-cms-gdpr-banner-container">
+    <p>Our site uses cookies. By continuing to use our site you are agreeing to our&nbsp;
+        <a href="" target="_blank">Cookie Policy</a>.  <a class="btn btn-success gdpr-banner-agree" href="javascript:void(0)" onclick="
+            (function(){
+                var banner = $('#<?= $this->pluginId; ?>');
+                if (banner.length > 0) {
+                    banner.slideToggle('fast', null, function() {console.log('GDPR Banner hidden...')});
+                }
+            })();">OK, I understand
+        </a>
+    </p>
+</div>
+<?php if ($this->renderMode === 'melis'): ?>
+<pre><p><?= $this->labels['pluginLoaded']; ?></p></pre>
+<?php endif; ?>
+<script type="text/javascript">
+    (function() {
+        lookForJquery(melisCmsGdprBanner);
+
+        function lookForJquery(fn) {
+            if ( window.jQuery && typeof fn === 'function' && fn !== null) {
+                fn();
+            } else {
+                setTimeout(function () {
+                    lookForJquery(fn)
+                }, 50);
+            }
+        }
+
+        function melisCmsGdprBanner() {
+            var banner = $("#<?= $this->pluginId; ?>");
+
+            if (banner.length > 0) {
+                $("body").append(banner);
+                banner.slideToggle('fast');
+            }
+        }
+    })();
+</script>
