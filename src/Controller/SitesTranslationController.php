@@ -128,7 +128,7 @@ class SitesTranslationController extends AbstractActionController
         $view = new ViewModel();
         $view->melisKey = $melisKey;
         $view->tableColumns = $columns;
-        $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration('#'.$siteId.'_tableMelisSiteTranslation');
+        $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration('#'.$siteId.'_tableMelisSiteTranslation', true);
         $view->siteId = $siteId;
 
         return $view;
@@ -483,6 +483,7 @@ class SitesTranslationController extends AbstractActionController
         }
 
         $view = new ViewModel();
+        $view->siteId = $siteId;
         $view->languages = $langs;
         return $view;
     }

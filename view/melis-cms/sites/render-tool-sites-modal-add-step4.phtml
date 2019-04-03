@@ -24,7 +24,18 @@ if (!empty($this->zoneconfig['conf']['id']))
                     echo '<div class="form-group '.$hide.'" id="'.$newId.'">';
                     if ($val->getLabel())
                     {
-                        echo $this->formLabel($val);
+                        if($key == 'siteCreateModuleName') {
+                            echo $this->formLabel($val);
+                        }else{
+                            $required = '';
+                            if(!empty($val->getAttribute('required'))){
+                                $required = '<sup>*</sup>';
+                            }
+                            echo $this->formLabel()->openTag($val);
+                            echo $val->getLabel();
+                            echo $required;
+                            echo $this->formLabel()->closeTag();
+                        }
                     }
                     echo $this->formElement($val);
                     echo '</div>';
