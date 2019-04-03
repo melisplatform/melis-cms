@@ -25,6 +25,40 @@ $(document).ready(function() {
     var siteName = '';
     var selectedDomainValue = [];
 
+    /**
+     * This will delete the site
+     */
+    $body.on("click", ".btnDeleteSite", function(e) {
+        var siteId = $(this).parents("tr").attr("id");
+        melisCoreTool.confirm(
+            translations.tr_meliscore_common_yes,
+            translations.tr_meliscore_common_no,
+            translations.tr_meliscms_tool_site_delete_confirm_title,
+            translations.tr_meliscms_tool_site_delete_confirm,
+            function(){
+                $.ajax({
+                    type        : "POST",
+                    url         : "/melis/MelisCms/Sites/deleteSite",
+                    data		: {siteId: siteId},
+                    dataType    : 'json',
+                    encode		: true,
+                    success		: function(data){
+                        melisCoreTool.pending(".btnDeleteSite");
+                        if(data.success) {
+                            melisHelper.melisOkNotification(data.textTitle, data.textMessage);
+                            // melisHelper.zoneReload("id_meliscms_tool_site", "meliscms_tool_site");
+                            //refresh site table
+                            $("#tableToolSites").DataTable().ajax.reload();
+                        }
+                        else {
+                            melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 0);
+                        }
+                        melisCore.flashMessenger();
+                        melisCoreTool.done(".btnDeleteSite");
+                    }
+                });
+            });
+    });
 
     var modalUrl = "/melis/MelisCms/Sites/renderToolSitesModalContainer";
 
@@ -322,6 +356,12 @@ $(document).ready(function() {
                     });
                     //re init variables
                     initVariables();
+                    //refresh site table
+                    $("#tableToolSites").DataTable().ajax.reload();
+                    //refresh site tree view
+                    $("input[name=left_tree_search]").val('');
+                    $("#id-mod-menu-dynatree").fancytree("destroy");
+                    mainTree();
                 }else{
                     melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
                 }

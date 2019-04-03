@@ -810,16 +810,73 @@ class SitesController extends AbstractActionController
 
         return new JsonModel($response);
     }
-    
+
+    /**
+     * Function to delete site
+     *
+     * @return JsonModel
+     */
     public function deleteSiteAction()
     {
         $request = $this->getRequest();
-        $status  = 0;
-        $textMessage = '';
+        $status  = false;
+        $textMessage = 'tr_meliscms_tool_site_delete_failed';
         $eventDatas = array();
-        $this->getEventManager()->trigger('meliscms_site_delete_start', $this, $eventDatas);
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $siteId = null;
 
+        $this->getEventManager()->trigger('meliscms_site_delete_start', $this, $eventDatas);
+        if($request->isPost()) {
+            /**
+             * get site id
+             */
+            $siteId = (int) $request->getPost('siteId');
+            /**
+             * Get services/tables
+             */
+            $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+            $domainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
+            $site404Table = $this->getServiceLocator()->get('MelisEngineTableSite404');
+            $siteHomeTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
+            $sitelangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+
+            // make sure our ID is not empty
+            if(!empty($siteId))
+            {
+                /**
+                 * Prepare the transaction so that
+                 * we can rollback the db insertion if
+                 * there are some error occurred
+                 */
+                $db = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');//get db adapter
+                $con = $db->getDriver()->getConnection();//get db driver connection
+                $con->beginTransaction();//begin transaction
+                try {
+                    /**
+                     * Prepare to delete site datas
+                     */
+                    $siteTable->deleteByField('site_id', $siteId);
+                    $domainTable->deleteByField('sdom_site_id', $siteId);
+                    $site404Table->deleteByField('s404_site_id', $siteId);
+                    $siteHomeTable->deleteByField('shome_site_id', $siteId);
+                    $sitelangsTable->deleteByField('slang_site_id', $siteId);
+
+                    $status = true;
+                    $textMessage = 'tr_meliscms_tool_site_delete_success';
+
+                    /**
+                     * If there is no error
+                     * execute the deletion
+                     */
+                    $con->commit();
+                }catch (\Exception $ex){
+                    /**
+                     * If error occurred
+                     * rollback the process
+                     */
+                    $con->rollback();
+                }
+            }
+        }
 
         $response = array(
             'success' => $status ,
