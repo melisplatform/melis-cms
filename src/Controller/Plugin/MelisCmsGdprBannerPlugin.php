@@ -63,6 +63,7 @@ class MelisCmsGdprBannerPlugin extends MelisTemplatingPlugin
      */
     public function front()
     {
+        $locale = 'en_EN';
         $data = $this->getFormData();
         $translator = $this->getServiceLocator()->get('translator');
         /**
@@ -77,6 +78,7 @@ class MelisCmsGdprBannerPlugin extends MelisTemplatingPlugin
             $pageData = $pageService->getDatasPage($pageId)->getMelisPageTree();
             if (!empty($pageData)) {
                 $langId = $pageData->lang_cms_id?? $langId;
+                $locale = $pageData->lang_cms_locale;
                 if (!empty($pageData->page_tpl_id)) {
                     /** @var \MelisEngine\Model\Tables\MelisTemplateTable $tplTable */
                     $tplTable = $this->getServiceLocator()->get('MelisEngineTableTemplate');
@@ -95,11 +97,12 @@ class MelisCmsGdprBannerPlugin extends MelisTemplatingPlugin
         $bannerService = $this->getServiceLocator()->get('MelisCmsGdprService');
         $bannerContents = $bannerService->getGdprBannerText($siteId, $langId)->toArray();
         if (!empty($bannerContents[0])) {
-            $bannerContents = $bannerContents[0];
+            $bannerContents = $bannerContents[0]['mcgdpr_text_value'];
         }
 
         $labels = [
             'pluginLoaded' => $translator->translate('tr_melis_cms_gdpr_banner_plugin_loaded'),
+            'agree' => $translator->translate('tr_melis_cms_gdpr_banner_plugin_agree_' . $locale),
         ];
 
         $viewVariables = [

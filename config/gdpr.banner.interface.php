@@ -154,7 +154,7 @@ return [
                                     'value' => '',
                                     'class' => 'form-control mcgdpr_text_value',
                                     'style' => 'max-width:100%',
-                                    'rows' => '4',
+                                    'rows' => '12',
                                 ],
                             ],
                         ],

@@ -1,26 +1,27 @@
 <div id="<?= $this->pluginId; ?>" class="melis-cms-gdpr-banner-container">
-    <p>Our site uses cookies. By continuing to use our site you are agreeing to our&nbsp;
-        <a href="" target="_blank">Cookie Policy</a>.  <a class="btn btn-success gdpr-banner-agree" href="javascript:void(0)" onclick="
-            (function(){
-                var banner = $('#<?= $this->pluginId; ?>');
-                if (banner.length > 0) {
-                    banner.slideToggle('fast', null, function() {console.log('GDPR Banner hidden...')});
-                }
-            })();">OK, I understand
-        </a>
-    </p>
+    <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <p>
+                <?= $this->bannerContents; ?>
+                <a class="btn btn-success gdpr-banner-agree" data-gdpr-banner-plugin-id="<?= $this->pluginId; ?>"
+                   href="javascript:void(0)"><?= $this->translate($this->labels['agree']); ?>
+                </a>
+            </p>
+        </div>
+    </div>
 </div>
 <?php if ($this->renderMode === 'melis'): ?>
-<pre><p><?= $this->labels['pluginLoaded']; ?></p></pre>
+    <pre><?= $this->labels['pluginLoaded']; ?></pre>
 <?php endif; ?>
 <script type="text/javascript">
-    (function() {
+    (function () {
         lookForJquery(melisCmsGdprBanner);
 
         function lookForJquery(fn) {
-            if ( window.jQuery && typeof fn === 'function' && fn !== null) {
+            if (window.jQuery && typeof fn === 'function' && fn !== null && typeof MelisCmsGdprBanner !== 'undefined') {
                 fn();
-            } else {
+            }
+            else {
                 setTimeout(function () {
                     lookForJquery(fn)
                 }, 50);
@@ -28,11 +29,17 @@
         }
 
         function melisCmsGdprBanner() {
-            var banner = $("#<?= $this->pluginId; ?>");
+            let bannerCookie = MelisCmsGdprBanner.getCookie(MelisCmsGdprBanner.getCookieName);
 
-            if (banner.length > 0) {
-                $("body").append(banner);
-                banner.slideToggle('fast');
+            if (bannerCookie === undefined) {
+                /** User's first visit: Declare banner cookie for this site */
+                MelisCmsGdprBanner.setCookie(MelisCmsGdprBanner.getCookieName, true);
+                bannerCookie = true;
+            }
+
+            let banner = $("#<?= $this->pluginId; ?>");
+            if (bannerCookie) {
+                banner.show();
             }
         }
     })();

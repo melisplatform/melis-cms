@@ -473,7 +473,10 @@
         'tr_melis_cms_gdpr_banner_save_ko' => 'Unable to save banner content',
         'tr_melis_cms_gdpr_banner_empty_field' => 'The field cannot be empty.',
         'tr_melis_cms_gdpr_banner_plugin' => 'GDPR banner',
+        'tr_melis_cms_gdpr_banner_plugin_properties' => 'Properties',
         'tr_melis_cms_gdpr_banner_plugin_desc' => 'Add a GDPR banner on your site.',
         'tr_melis_cms_gdpr_banner_plugin_empty_props' => 'No properties available.',
         'tr_melis_cms_gdpr_banner_plugin_loaded' => 'GDPR banner has been loaded.<br><em>Note: This message is only shown in the back office.</em>',
+        'tr_melis_cms_gdpr_banner_plugin_agree_en_EN' => 'OK, I understand',
+        'tr_melis_cms_gdpr_banner_plugin_agree_fr_FR' => 'Accepter',
 	);

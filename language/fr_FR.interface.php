@@ -476,7 +476,10 @@
         'tr_melis_cms_gdpr_banner_save_ko' => 'Impossible d\'enregistrer le contenu de la bannière.',
         'tr_melis_cms_gdpr_banner_empty_field' => 'Le champ ne peut être vide.',
         'tr_melis_cms_gdpr_banner_plugin' => 'RGPD bannière',
+        'tr_melis_cms_gdpr_banner_plugin_properties' => 'Propriétés',
         'tr_melis_cms_gdpr_banner_plugin_desc' => 'Ajoutez une bannière RGPD sur votre site.',
         'tr_melis_cms_gdpr_banner_plugin_empty_props' => 'Aucune propriété disponible.',
         'tr_melis_cms_gdpr_banner_plugin_loaded' => 'La bannière RGPD a été chargée.<br><em>Note: Ce message est affiché uniquement dans le back office</em>',
+        'tr_melis_cms_gdpr_banner_plugin_agree_fr_FR' => 'Accepter',
+        'tr_melis_cms_gdpr_banner_plugin_agree_en_EN' => 'OK, I understand',
 	);

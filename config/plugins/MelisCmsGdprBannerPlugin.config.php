@@ -36,7 +36,7 @@ return [
                         'js_initialization' => [],
                         'modal_form' => [
                             'melis_cms_gdpr_banner_plugin_settings_form' => [
-                                'tab_title' => 'tr_melis_cms_gdpr_banner_plugin_settings_form',
+                                'tab_title' => 'tr_melis_cms_gdpr_banner_plugin_properties',
                                 'tab_icon' => 'fa fa-cog',
                                 'tab_form_layout' => 'melis-cms-gdpr/modal-template-form',
                                 'attributes' => [
