@@ -12,16 +12,14 @@ namespace MelisCms\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-/**
- * Site Tool Plugin
- */
 class SitesLanguagesController extends AbstractActionController
 {
     /**
      * Renders the languages tab
      * @return ViewModel
      */
-    public function renderToolSitesLanguagesAction() {
+    public function renderToolSitesLanguagesAction()
+    {
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
 
@@ -37,31 +35,17 @@ class SitesLanguagesController extends AbstractActionController
      * Renders the languages tab content
      * @return ViewModel
      */
-    public function renderToolSitesLanguagesContentAction() {
+    public function renderToolSitesLanguagesContentAction()
+    {
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
 
-        // Tables & Services
-        $melisEngineLangSvc = $this->getServiceLocator()->get('MelisEngineLang');
-        $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
-
-        // Get languages form
         $form = $this->getTool()->getForm('meliscms_tool_sites_languages_form');
 
-        // Get all site languages
-        $availableLangs = $melisEngineLangSvc->getAvailableLanguages();
-        // Get active site languages
-        $activeLangs = $siteLangsTable->getSiteLangs(null, $siteId, null, true)->toArray();
-
+        $availableLangs = $this->getCmsLanguages();
+        $activeLangs = $this->getSiteActiveLanguages($siteId);
+        $siteOptLangUrl = $this->getSiteField($siteId, 'site_opt_lang_url');
         $siteLangs = [];
-
-        // Get site language url option
-        $siteOptLangUrl = $siteTable->getEntryById($siteId)->toArray();
-
-        if (!empty($siteOptLangUrl)) {
-            $siteOptLangUrl = $siteOptLangUrl[0]['site_opt_lang_url'];
-        }
 
         // Store all active lang ids. This will be used in the view to check for active languages
         foreach ($activeLangs as $language) {
@@ -83,7 +67,57 @@ class SitesLanguagesController extends AbstractActionController
     }
 
     /**
-     *  Returns meliskey
+     * Returns Site Field
+     * @param $siteId
+     * @param $field
+     * @return mixed
+     */
+    private function getSiteField($siteId, $field)
+    {
+        $siteData = $this->getSiteData($siteId);
+
+        if (!empty($siteData)) {
+            $field = $siteData[0][$field];
+        }
+
+        return $field;
+    }
+
+    /**
+     * Returns Site
+     * @param $siteId
+     * @return mixed
+     */
+    private function getSiteData($siteId)
+    {
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        return $siteTable->getEntryById($siteId)->toArray();
+    }
+
+    /**
+     * Return Site Active Languages
+     * @param $siteId
+     * @return mixed
+     */
+    private function getSiteActiveLanguages($siteId)
+    {
+        $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+        return $siteLangsTable->getSiteLangs(null, $siteId, null, true)->toArray();
+    }
+
+    /**
+     * Return Available Languages
+     * @return mixed
+     *
+     */
+    private function getCmsLanguages()
+    {
+        $melisEngineLangSvc = $this->getServiceLocator()->get('MelisEngineLang');
+        return $melisEngineLangSvc->getAvailableLanguages();
+    }
+
+    /**
+     *  Returns Meliskey
      * @return mixed
      */
     private function getMelisKey()
@@ -94,7 +128,7 @@ class SitesLanguagesController extends AbstractActionController
     }
 
     /**
-     * Returns tool
+     * Returns Tool
      * @return array|object
      */
     private function getTool()
