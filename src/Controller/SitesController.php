@@ -669,9 +669,6 @@ class SitesController extends AbstractActionController
         $textMessage = 'tr_melis_cms_site_save_ko';
         $logTypeCode = '';
         $translator = $this->getServiceLocator()->get('translator');
-        $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
-        $siteDomainsSvc = $this->getServiceLocator()->get("MelisCmsSitesDomainsService");
-        $sitePropSvc = $this->getServiceLocator()->get("MelisCmsSitesPropertiesService");
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $request = $this->getRequest();
         $data = $request->getPost()->toArray();
@@ -683,19 +680,15 @@ class SitesController extends AbstractActionController
         $ctr = 0;
         $ctr1 = 0;
 
-        $moduleList = array();
-        $domainData = array();
-        $siteProp = array();
-        $siteHomeData = array();
+        $moduleList = [];
+        $domainData = [];
+        $sitePropData = [];
+        $siteHomeData = [];
         $siteConfigTabData = [];
 
-        $shomeErrors = array();
-
-
         foreach ($data as $datum => $val){
-
             //collecting data for site module load
-            if($isAdmin) {
+            if ($isAdmin) {
                 if (strstr($datum,'moduleLoad')) {
                     $datum = str_replace("moduleLoad", '', $datum);
                     array_push($moduleList, $datum);
@@ -714,7 +707,7 @@ class SitesController extends AbstractActionController
             //collecting data for site properties
             if (strstr($datum,'siteprop_')) {
                 $datum = str_replace("siteprop_", '', $datum);
-                array_push($siteProp, $datum);
+                $sitePropData[$datum] = $val;
             }
 
             //collecting data for site language homepages
@@ -744,43 +737,12 @@ class SitesController extends AbstractActionController
             }
         }
 
-        //saving module load
-        if($isAdmin) {
-            $siteModuleLoadSvc->saveModuleLoad($siteId, $moduleList);
-        }
-
-        //saving site domains
-        foreach($domainData as $domainDatum){
-            $form = $this->getTool()->getForm('meliscms_tool_sites_domain_form');
-            $form->setData($domainDatum);
-
-            if($form->isValid()) {
-                $siteDomainsSvc->saveSiteDomain($domainDatum);
-            }else{
-                $currErr = array();
-                foreach ($form->getMessages() as $key => $err){
-                    $currErr[$domainDatum["sdom_env"]."_".$key] = $err;
-                }
-                $errors = array_merge($errors,$currErr);
-                $status = 0;
-            }
-        }
-
+        $this->saveSiteModules($isAdmin, $siteId, $moduleList);
+        $this->saveSiteDomains($domainData, $errors, $status);
         $this->saveSiteHomePages($siteHomeData, $errors, $status);
         $this->saveSiteLanguagesTab($siteId, $data);
         $this->saveSiteConfig($siteId,$siteConfigTabData);
-
-
-//        //saving site properties
-//        $form = $this->getTool()->getForm('meliscms_tool_sites_properties_form');
-//        $form->setData($siteProp);
-//        if($form->isValid()) {
-//            $sitePropSvc->saveSiteLangHome($siteProp);
-//        }else{
-//            $errors = array_merge($errors,$form->getMessages());
-//            $status = 0;
-//        }
-
+        $this->saveSiteProperties($siteId, $sitePropData, $errors, $status);
 
         $response = array(
             'success' => $status,
@@ -797,6 +759,82 @@ class SitesController extends AbstractActionController
         $this->getEventManager()->trigger('meliscms_sites_save_end', $this, array_merge($response, array('typeCode' => $logTypeCode, 'itemId' => $siteId)));
 
         return new JsonModel($response);
+    }
+
+    private function saveSiteProperties($siteId, $sitePropData, &$errors, &$status)
+    {
+        $form = $this->getTool()->getForm('meliscms_tool_sites_properties_form');
+        $form->setData($sitePropData);
+
+        if ($form->isValid()) {
+            $siteTbl = $this->getServiceLocator()->get('MelisEngineTableSite');
+            $siteData = $siteTbl->getEntryById($siteId)->toArray()[0];
+            $dataToUpdate = [];
+
+            foreach ($siteData as $siteDatumKey => $siteDatum) {
+                if (array_key_exists($siteDatumKey, $sitePropData)) {
+                    if ($sitePropData[$siteDatumKey] != $siteDatum) {
+                        $dataToUpdate[$siteDatumKey] = $sitePropData[$siteDatumKey];
+                    }
+                }
+            }
+
+            if (!empty($dataToUpdate)) {
+                $siteTbl->update($dataToUpdate, 'site_id', $siteId);
+            }
+
+            $site404Tbl = $this->getServiceLocator()->get('MelisEngineTableSite404');
+            $site404 = $site404Tbl->getEntryByField('s404_site_id', $siteId)->toArray()[0];
+
+            if ($site404['s404_page_id'] != $sitePropData['s404_page_id']) {
+                $site404Tbl->update(
+                    [
+                        's404_page_id' => $sitePropData['s404_page_id']
+                    ],
+                    's404_site_id',
+                    $siteId
+                );
+            }
+        } else {
+            $err = [];
+
+            foreach ($form->getMessages() as $key => $val) {
+                $err[$key] = $val;
+            }
+
+            $errors = array_merge($errors, $err);
+            $status = 0;
+        }
+    }
+
+    private function saveSiteModules($isAdmin, $siteId, $moduleList)
+    {
+        $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
+
+        if ($isAdmin) {
+            $siteModuleLoadSvc->saveModuleLoad($siteId, $moduleList);
+        }
+    }
+
+    private function saveSiteDomains($siteDomainData, &$errors, &$status)
+    {
+        $siteDomainsSvc = $this->getServiceLocator()->get("MelisCmsSitesDomainsService");
+
+        foreach($siteDomainData as $domainDatum){
+            $form = $this->getTool()->getForm('meliscms_tool_sites_domain_form');
+            $form->setData($domainDatum);
+
+            if($form->isValid()) {
+                $siteDomainsSvc->saveSiteDomain($domainDatum);
+            }else{
+                $currErr = array();
+                foreach ($form->getMessages() as $key => $err){
+                    $currErr[$domainDatum["sdom_env"]."_".$key] = $err;
+                }
+                $errors = array_merge($errors,$currErr);
+                $status = 0;
+            }
+        }
     }
     
     public function deleteSiteAction()
