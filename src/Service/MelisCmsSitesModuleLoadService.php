@@ -46,15 +46,38 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
             '.', '..','.gitignore',
         );
 
+        $moduleSrv = $this->getServiceLocator()->get('ModulesService');
+        /**
+         * Check if module is site to exclude it
+         */
+        $vendordModules = $moduleSrv->getVendorModules();
+        foreach ($vendordModules as $key => $module) {
+            if ($moduleSrv->isSiteModule($module)) {
+                $siteMod = $this->generateModuleNameCase($module);
+                array_push($exclude_modules, $siteMod);
+            }
+        }
 
-        $filePath = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/'.$siteModuleName.'/config/module.load.php';
+        /**
+         * get the module path
+         *
+         * This will check also if the module is came
+         * from the vendor or from the MelisSites
+         */
+        if(!empty($moduleSrv->getComposerModulePath($siteModuleName))){
+            $modulePath = $moduleSrv->getComposerModulePath($siteModuleName);
+        }else {
+            $modulePath = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/' . $siteModuleName;
+        }
+
+        $filePath = $modulePath.'/config/module.load.php';
 
         /**
          * Check if file exist
          */
         if(file_exists($filePath)) {
             chmod($filePath, 0777);
-            $moduleLoadList = file_exists($filePath) ? include($filePath) : array();
+            $moduleLoadList = include $filePath;
             $moduleLoadFile = $this->getModuleSvc()->getModulePlugins($exclude_modules);
 
             $modules = $moduleLoadList;
