@@ -162,7 +162,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                      */
                     if($tempRes['success']) {
                         if (!is_null($siteModuleName)) {
-                            $this->updateModuleConfig($modulePath, $mainPageId);
+                            $this->updateSiteModuleConfig($modulePath, $mainPageId);
                         }
                     }
                 }
@@ -324,12 +324,24 @@ class MelisCmsSiteService extends MelisCoreGeneralService
 
                                 /**
                                  * Create 404 template and page
+                                 *
+                                 * We only need to create one
+                                 * 404 page per site, not per
+                                 * language
                                  */
-                                $nxtTplId = ++$tplId;
-                                $this->createSitePageTemplate($nxtTplId, $savedSiteId, $siteModuleName, $langName[1] . ': 404', 'Page404', 'index', $platformId);
-                                $page404Id = $pageId + 1;
-                                $this->createSitePage($langName[1] . ':' . $siteLabel . ' - 404', $pageId, $langId, 'PAGE', $page404Id, $nxtTplId, $platformId);
+                                if($createSiteAndDomain) {
+                                    $nxtTplId = ++$tplId;
+                                    $this->createSitePageTemplate($nxtTplId, $savedSiteId, $siteModuleName, $siteLabel.' - 404', 'Page404', 'index', $platformId);
+                                    $page404Id = $pageId + 1;
+                                    $this->createSitePage($siteLabel . ' - 404', $pageId, $langId, 'PAGE', $page404Id, $nxtTplId, $platformId);
 
+                                    /**
+                                     * save 404 data
+                                     */
+                                    $arrayParameters['site404']['s404_page_id'] = $page404Id;
+                                    $arrayParameters['site404']['s404_site_id'] = $savedSiteId;
+                                    $site404Table->save($arrayParameters['site404']);
+                                }
                                 /**
                                  * save the site home page language id
                                  */
@@ -347,13 +359,6 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                                     'slang_lang_id' => $langId,
                                 );
                                 $sitelangsTable->save($siteLangsData);
-
-                                /**
-                                 * save 404 data
-                                 */
-                                $arrayParameters['site404']['s404_page_id'] = $page404Id;
-                                $arrayParameters['site404']['s404_site_id'] = $savedSiteId;
-                                $site404Table->save($arrayParameters['site404']);
 
                                 /**
                                  * check if we are going to create another site for this language
@@ -449,7 +454,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
      * @param $homePageId
      * @param $isUpdate
      */
-	public function updateModuleConfig($modulePath, $homePageId, $isUpdate = true)
+	public function updateSiteModuleConfig($modulePath, $homePageId, $isUpdate = true)
     {
         // Getting the Site config
         $outputFileName = 'module.config.php';
