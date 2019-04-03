@@ -415,6 +415,7 @@ class SitesController extends AbstractActionController
         $status = false;
         $siteIds = array();
         $siteName = '';
+        $siteLabel = '';
         $textMessage = '';
         $siteTablePrefix = self::SITE_TABLE_PREFIX;
         $domainTablePrefix = self::DOMAIN_TABLE_PREFIX;
@@ -581,7 +582,8 @@ class SitesController extends AbstractActionController
                 //field the site data
                 if (!empty($siteData)) {
                     $siteName = (!empty($siteData['site_name'])) ? $siteData['site_name'] : '';
-                    $siteData['site_label'] = (!empty($siteData['site_label'])) ? $siteData['site_label'] : $siteName;
+                    $siteLabel = (!empty($siteData['site_label'])) ? $siteData['site_label'] : $siteName;
+                    $siteData['site_label'] = $siteLabel;
                 }
 
                 /**
@@ -647,7 +649,7 @@ class SitesController extends AbstractActionController
             'textTitle' => 'tr_meliscms_tool_site',
             'textMessage' => $textMessage,
             'siteIds' => $siteIds,
-            'siteName' => $siteName,
+            'siteName' => $siteLabel,
             'errors' => $errors
         );
 

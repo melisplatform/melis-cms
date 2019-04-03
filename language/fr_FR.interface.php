@@ -466,6 +466,8 @@
         'tr_meliscms_drag_and_drop_modal_content' => 'Êtes-vous sur de vouloir ajouter ce plugin à cette page ?',
 
         //New site tools
+        'tr_meliscms_tool_sites' => 'Sites',
+        'tr_meliscms_tool_sites_save' => 'Save site',
         'tr_melis_cms_sites_tool_add' => 'Ajouter un site',
         'tr_melis_cms_sites_tool_create' => 'Créer un site',
 

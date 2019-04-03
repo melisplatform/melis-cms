@@ -467,6 +467,8 @@
 	    'tr_meliscms_drag_and_drop_modal_content' => 'Are you sure you want to add this plugin to the page?',
 
         //New site tools
+        'tr_meliscms_tool_sites' => 'Sites',
+        'tr_meliscms_tool_sites_save' => 'Save site',
         'tr_melis_cms_sites_tool_add' => 'Add site',
         'tr_melis_cms_sites_tool_create' => 'Create site',
 
