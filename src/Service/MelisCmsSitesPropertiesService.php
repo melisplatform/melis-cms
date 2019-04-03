@@ -8,8 +8,6 @@ use Zend\Config\Writer\PhpArray;
 
 class MelisCmsSitesPropertiesService extends MelisCoreGeneralService
 {
-
-
     /**
      * Returns the site property of a specific site
      * @param $siteId param int $siteId | id of the site property to retrieve
@@ -24,7 +22,7 @@ class MelisCmsSitesPropertiesService extends MelisCoreGeneralService
         $arrayParameters = $this->sendEvent('meliscmssite_service_get_site_property_start', $arrayParameters);
 
         // Service implementation start
-        $siteProp = array();
+        $siteProp = [];
         $sitePropTable = $this->getServiceLocator()->get('MelisEngineTableSite');
         $site404Table = $this->getServiceLocator()->get('MelisEngineTableSite404');
         if(is_numeric($siteId)) {
@@ -43,7 +41,6 @@ class MelisCmsSitesPropertiesService extends MelisCoreGeneralService
 
         return $arrayParameters['results'];
     }
-
 
     /**
      * Returns the site language homepages of a specific site
@@ -74,7 +71,6 @@ class MelisCmsSitesPropertiesService extends MelisCoreGeneralService
 
         return $arrayParameters['results'];
     }
-
 
     /**
      * save the domains of a specific site

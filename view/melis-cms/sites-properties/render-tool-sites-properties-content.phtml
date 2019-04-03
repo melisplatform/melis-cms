@@ -24,10 +24,15 @@ $data_melisKey = $this->melisKey;
                         $form->prepare();
                         foreach($form->getElements() as $element => $attributes)  {
                             $el =  $form->get((string) $element);
-                            if($el->getName() == "site_id")
+
+                            if ($el->getName() == "site_id") {
                                 $el->setValue($this->siteId);
-                            if($el->getName() == "site_id_disp")
+                            }
+
+                            if ($el->getName() == "site_id_disp") {
                                 $el->setValue($this->siteId);
+                            }
+
                             $el->setName("siteprop_".$el->getName());
                         }
                         echo $this->form()->openTag($form);

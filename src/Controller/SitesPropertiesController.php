@@ -14,9 +14,10 @@ use Zend\View\Model\ViewModel;
 
 class SitesPropertiesController extends AbstractActionController
 {
-    const TOOL_INDEX = 'meliscms';
-    const TOOL_KEY = 'meliscms_tool_sites';
-
+    /**
+     * Render Site Properties Container
+     * @return ViewModel
+     */
     public function renderToolSitesPropertiesAction() {
 
         $siteId = (int) $this->params()->fromQuery('siteId', '');
@@ -30,11 +31,14 @@ class SitesPropertiesController extends AbstractActionController
         return $view;
     }
 
+    /**
+     * Render Site Properties Content
+     * @return ViewModel
+     */
     public function renderToolSitesPropertiesContentAction() {
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
-        $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
+        $melisTool = $this->getTool();
 
         // GET FORMS
         $propertiesForm = $melisTool->getForm("meliscms_tool_sites_properties_form");
@@ -52,6 +56,9 @@ class SitesPropertiesController extends AbstractActionController
         $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
         $activeSiteLangs = $siteLangsTable->getSiteLangs(null, $siteId, null, true)->toArray();
 
+        // GET SITE HOME PAGE IDS
+        $siteHomePageIds = $this->getSiteHomePageIds($siteId, null);
+
         $view = new ViewModel();
 
         $view->melisKey = $melisKey;
@@ -60,21 +67,40 @@ class SitesPropertiesController extends AbstractActionController
         $view->homepageForm = $homepageForm;
         $view->siteLangHomepages = $siteLangHomepages;
         $view->activeSiteLangs = $activeSiteLangs;
+        $view->siteHomePageIds = $siteHomePageIds;
 
         return $view;
     }
 
-    private function getMelisKey()
-    {
-        $melisKey = $this->params()->fromRoute('melisKey', $this->params()->fromQuery('melisKey'), null);
+    /**
+     * Returns Site Home Page Ids
+     * @param $siteId
+     * @param $langId
+     * @return mixed
+     */
+    private function getSiteHomePageIds($siteId, $langId) {
+        $siteLangHomeTbl = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
 
-        return $melisKey;
+        return $siteLangHomeTbl->getHomePageBySiteIdAndLangId($siteId, $langId)->toArray();
     }
 
+    /**
+     * Returns Melis Key
+     * @return mixed
+     */
+    private function getMelisKey()
+    {
+        return $this->params()->fromRoute('melisKey', $this->params()->fromQuery('melisKey'), null);
+    }
+
+    /**
+     * Returns Tool
+     * @return array|object
+     */
     private function getTool()
     {
         $toolSvc = $this->getServiceLocator()->get('MelisCoreTool');
-        $toolSvc->setMelisToolKey('MelisCmsUserAccount', 'melis_cms_user_account');
+        $toolSvc->setMelisToolKey('meliscms', 'meliscms_tool_sites');
 
         return $toolSvc;
     }
