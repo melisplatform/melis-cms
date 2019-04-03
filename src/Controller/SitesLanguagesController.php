@@ -57,7 +57,11 @@ class SitesLanguagesController extends AbstractActionController
         $siteLangs = [];
 
         // Get site language url option
-        $siteOptLangUrl = $siteTable->getEntryById($siteId)->toArray()[0]['site_opt_lang_url'];
+        $siteOptLangUrl = $siteTable->getEntryById($siteId)->toArray();
+
+        if (!empty($siteOptLangUrl)) {
+            $siteOptLangUrl = $siteOptLangUrl[0]['site_opt_lang_url'];
+        }
 
         // Store all active lang ids. This will be used in the view to check for active languages
         foreach ($activeLangs as $language) {
@@ -73,7 +77,7 @@ class SitesLanguagesController extends AbstractActionController
         $view->form = $form;
         $view->activeLangs = $activeLangs;
         $view->availableLangs = $availableLangs;
-        $view->siteOptionLangUrl = $siteOptLangUrl;
+        $view->siteOptLangUrl = $siteOptLangUrl;
 
         return $view;
     }
