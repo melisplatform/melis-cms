@@ -48,29 +48,53 @@ class SitesConfigController extends AbstractActionController
         $siteName = $site['site_name'];
 
         $config = $this->getSiteConfig($siteId);
-        $siteConfig = $this->getSiteConfigFromDb($siteId);
+        $dbConfigs = $this->getSiteConfigFromDb($siteId);
+        $dbConfIds = $this->getDbConfigIds($dbConfigs);
+        $this->kSortSiteConfig($config, $siteName, $siteId);
+        $this->prepareDbConfigs($siteId, $siteName, $dbConfigs);
+        $valuesFromDb = $this->getDbConfigKeys($siteId, $siteName, $dbConfigs, $config);
 
-        $conff = [];
+        $view = new ViewModel();
 
-        foreach ($siteConfig as $conf) {
-            $conff[$conf['sconf_lang_id']] = $conf['sconf_id'];
+        $view->melisKey = $melisKey;
+        $view->siteId = $siteId;
+        $view->activeSiteLangs = $activeSiteLangs;
+        $view->configForm = $configForm;
+        $view->config = $config;
+        $view->siteName = $siteName;
+        $view->dbConfIds = $dbConfIds;
+        $view->valuesFromDb = $valuesFromDb;
+
+        return $view;
+    }
+
+    private function getDbConfigIds($dbConfig)
+    {
+        $dbConfIds = [];
+
+        foreach ($dbConfig as $conf) {
+            $dbConfIds[$conf['sconf_lang_id']] = $conf['sconf_id'];
         }
 
-        // check if the data is from the db or not
+        return $dbConfIds;
+    }
+
+    private function getDbConfigKeys($siteId, $siteName, $dbConfigs, $config)
+    {
         $valuesFromDb = [];
 
-        foreach ($siteConfig as $dbConff) {
-            if ($dbConff['sconf_lang_id'] === '-1') {
-                if (array_key_exists('allSites', unserialize($dbConff['sconf_datas'])['site'][$siteName])) {
-                    foreach (unserialize($dbConff['sconf_datas'])['site'][$siteName]['allSites'] as $key => $value) {
+        foreach ($dbConfigs as $dbConfig) {
+            if ($dbConfig['sconf_lang_id'] == '-1') {
+                if (array_key_exists('allSites', $dbConfig['sconf_datas']['site'][$siteName])) {
+                    foreach ($dbConfig['sconf_datas']['site'][$siteName]['allSites'] as $key => $value) {
                         if ($config['site'][$siteName]['allSites'][$key] == $value) {
                             $valuesFromDb['allSites'][] = $key;
                         }
                     }
                 }
             } else {
-                if (array_key_exists($siteId, unserialize($dbConff['sconf_datas'])['site'][$siteName])) {
-                    foreach (unserialize($dbConff['sconf_datas'])['site'][$siteName][$siteId] as $langKey => $langValue) {
+                if (array_key_exists($siteId, $dbConfig['sconf_datas']['site'][$siteName])) {
+                    foreach ($dbConfig['sconf_datas']['site'][$siteName][$siteId] as $langKey => $langValue) {
                         foreach ($langValue as $confKey => $confVal) {
                             if ($config['site'][$siteName][$siteId][$langKey][$confKey] == $confVal) {
                                 $valuesFromDb[$langKey][] = $confKey;
@@ -81,20 +105,36 @@ class SitesConfigController extends AbstractActionController
             }
         }
 
-        $this->kSortSiteConfig($config, $siteName, $siteId);
+        return $valuesFromDb;
+    }
 
-        $view = new ViewModel();
-
-        $view->melisKey = $melisKey;
-        $view->siteId = $siteId;
-        $view->activeSiteLangs = $activeSiteLangs;
-        $view->configForm = $configForm;
-        $view->config = $config;
-        $view->siteName = $siteName;
-        $view->conff = $conff;
-        $view->valuesFromDb = $valuesFromDb;
-
-        return $view;
+    /**
+     * Prepares the db config. unserialize array & form the complete config
+     * @param $siteId
+     * @param $siteName
+     * @param $dbConfigs
+     */
+    private function prepareDbConfigs($siteId, $siteName, &$dbConfigs)
+    {
+        foreach ($dbConfigs as &$dbConfig) {
+            if ($dbConfig['sconf_lang_id'] == '-1') {
+                $dbConfig['sconf_datas'] = [
+                    'site' => [
+                        $siteName => [
+                            'allSites' => unserialize($dbConfig['sconf_datas'])
+                        ],
+                    ],
+                ];
+            } else {
+                $dbConfig['sconf_datas'] = [
+                    'site' => [
+                        $siteName => [
+                            $siteId => unserialize($dbConfig['sconf_datas'])
+                        ],
+                    ],
+                ];
+            }
+        }
     }
 
     /**

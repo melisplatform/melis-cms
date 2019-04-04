@@ -1008,6 +1008,7 @@ class SitesController extends AbstractActionController
 
         $config = $this->getSiteConfigById($siteId);
         $configFromDb = $this->getSiteConfigFromDbById($siteId);
+        $this->prepareDbConfigs($siteId, $siteName, $configFromDb);
 
         foreach ($siteConfigTabData as $langKey => $langValue) {
             $locale = $siteLangsTable->getSiteLangs(null, $siteId, $langKey, true, true)->toArray();
@@ -1027,46 +1028,55 @@ class SitesController extends AbstractActionController
                     if (!empty($configFromDb)) {
                         foreach ($configFromDb as $confDb) {
                             if ($confDb['sconf_lang_id'] == '-1') {
-                                if (array_key_exists($confKey, unserialize($confDb['sconf_datas'])['site'][$siteName]['allSites'])) {
-                                    $data['site'][$siteName]['allSites'][$confKey] = $this->getTool()->sanitize($configValue, true);
+                                if (array_key_exists($confKey, $confDb['sconf_datas']['site'][$siteName]['allSites'])) {
+                                    $data['allSites'][$confKey] = $this->getTool()->sanitize($configValue, true);
                                 } else {
                                     if ($dataFromConfig !== $configValue) {
-                                        $data['site'][$siteName]['allSites'][$confKey] = $this->getTool()->sanitize($configValue, true);
+                                        $data['allSites'][$confKey] = $this->getTool()->sanitize($configValue, true);
                                     }
                                 }
                             } else {
                                 if ($dataFromConfig !== $configValue) {
-                                    $data['site'][$siteName]['allSites'][$confKey] = $this->getTool()->sanitize($configValue, true);
+                                    $data['allSites'][$confKey] = $this->getTool()->sanitize($configValue, true);
                                 }
                             }
                         }
                     } else {
                         if ($dataFromConfig !== $configValue) {
-                            $data['site'][$siteName]['allSites'][$confKey] = $this->getTool()->sanitize($configValue, true);
+                            $data['allSites'][$confKey] = $this->getTool()->sanitize($configValue, true);
                         }
                     }
                 } else {
                     $dataFromConfig = $config['site'][$siteName][$siteId][$locale['lang_cms_locale']][$confKey];
 
                     if (!empty($configFromDb)) {
+                        $hasDbData = false;
                         foreach ($configFromDb as $confDb) {
                             if ($confDb['sconf_lang_id'] == $langKey) {
-                                if (array_key_exists($confKey, unserialize($confDb['sconf_datas'])['site'][$siteName][$siteId])) {
-                                    $data['site'][$siteName][$siteId][$locale['lang_cms_locale']][$confKey] = $this->getTool()->sanitize($configValue, true);
+                                if (array_key_exists($confKey, $confDb['sconf_datas']['site'][$siteName][$siteId][$locale['lang_cms_locale']])) {
+                                    $data[$locale['lang_cms_locale']][$confKey] = $this->getTool()->sanitize($configValue, true);
                                 } else {
-                                    if ($dataFromConfig !== $configValue) {
-                                        $data['site'][$siteName][$siteId][$locale['lang_cms_locale']][$confKey] = $this->getTool()->sanitize($configValue, true);
+//                                    print_r('---------------------');
+//                                    var_dump($dataFromConfig);
+//                                    var_dump($configValue);
+//                                    print_r('---------------------');
+                                    if ($dataFromConfig != $configValue) {
+                                        $data[$locale['lang_cms_locale']][$confKey] = $this->getTool()->sanitize($configValue, true);
                                     }
                                 }
-                            } else {
-                                if ($dataFromConfig !== $configValue) {
-                                    $data['site'][$siteName][$siteId][$locale['lang_cms_locale']][$confKey] = $this->getTool()->sanitize($configValue, true);
-                                }
+
+                                $hasDbData = true;
+                            }
+                        }
+
+                        if ($hasDbData) {
+                            if ($dataFromConfig != $configValue) {
+                                $data[$locale['lang_cms_locale']][$confKey] = $this->getTool()->sanitize($configValue, true);
                             }
                         }
                     } else {
                         if ($dataFromConfig != $configValue) {
-                            $data['site'][$siteName][$siteId][$locale['lang_cms_locale']][$confKey] = $this->getTool()->sanitize($configValue, true);
+                            $data[$locale['lang_cms_locale']][$confKey] = $this->getTool()->sanitize($configValue, true);
                         }
                     }
                 }
@@ -1081,6 +1091,35 @@ class SitesController extends AbstractActionController
                     ],
                     $sconf_id
                 );
+            }
+        }
+    }
+
+    /**
+     * Prepares the db config. unserialize array & form the complete config
+     * @param $siteId
+     * @param $siteName
+     * @param $dbConfigs
+     */
+    private function prepareDbConfigs($siteId, $siteName, &$dbConfigs)
+    {
+        foreach ($dbConfigs as &$dbConfig) {
+            if ($dbConfig['sconf_lang_id'] == '-1') {
+                $dbConfig['sconf_datas'] = [
+                    'site' => [
+                        $siteName => [
+                            'allSites' => unserialize($dbConfig['sconf_datas'])
+                        ],
+                    ],
+                ];
+            } else {
+                $dbConfig['sconf_datas'] = [
+                    'site' => [
+                        $siteName => [
+                            $siteId => unserialize($dbConfig['sconf_datas'])
+                        ],
+                    ],
+                ];
             }
         }
     }
