@@ -56,6 +56,10 @@ class MelisCmsSiteService extends MelisCoreGeneralService
      *
      * @param $siteData
      * @param $domainData
+     *
+     *          IF $genSingleLangSite IS SET TO FALSE, THE DOMAIN DATA
+     *          AND LANGUAGE DATA MUST LOOK LIKE THIS:
+     *
      *          Example Format: array(
      *                                  'en_EN' => array(
      *                                       'sdom_domain' => 'english.com',
@@ -74,28 +78,31 @@ class MelisCmsSiteService extends MelisCoreGeneralService
      *                                  'fr_FR' => 2,
      *                              )
      *
+     *
+     *          ELSE JUST PASS THE DEFAULT STRUCTURE:
+     *          $domainData:
+     *              array(
+     *                  'sdom_domain' => 'english.com',
+     *                  'sdom_env'    => 'development',
+     *                  etc.....
+     *              )
+     *
+     *          $siteLanguages = 1 (the desired language id)
+     *
      * @param $site404
      * @param null $siteModuleName
      * @param bool $createModule
      * @param bool $isNewSite
+     * @param bool $genSingleLangSite
      * @return mixed
      */
-    public function saveSite($siteData, $domainData, $siteLanguages, $site404, $siteModuleName = null, $createModule = false, $isNewSite = false)
+    public function saveSite($siteData, $domainData, $siteLanguages, $site404, $siteModuleName = null, $createModule = false, $isNewSite = false, $genSingleLangSite = false)
 	{
 	    // Event parameters prepare
 	    $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
 	     
 	    // Sending service start event
 	    $arrayParameters = $this->sendEvent('meliscmssite_service_save_site_start', $arrayParameters);
-	     
-	    // Service implementation start
-	    
-        // Table services
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
-        $siteDomainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
-        $site404Table = $this->getServiceLocator()->get('MelisEngineTableSite404');
-        $siteHomeTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
-        $sitelangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
 
         // Site Name
         $siteName = $arrayParameters['siteData']['site_name'];
@@ -208,23 +215,14 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                              */
                             $createSiteAndDomain = true;
                             /**
-                             * This counter will help us
-                             * determine whether we are going
-                             * to put languages config
-                             * on one or they have a lang config
-                             * per site
-                             */
-                            $siteCtr = 0;
-                            /**
                              * prepare page id initial
                              */
                             $pageIdInitial = 0;
-                            /**
-                             * Loop through each language
-                             * to make a site per language
-                             */
-                            foreach ($arrayParameters['siteLanguages'] as $langLabel => $langId) {
 
+                            /**
+                             * Check if it is just a single language
+                             */
+                            if($genSingleLangSite){
                                 /**
                                  * get the current page id and template id
                                  * from the platform ids
@@ -234,147 +232,137 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                                 $tplId = (int)$cmsCurPlatformData->pids_tpl_id_current;
 
                                 /**
-                                 * This will check if we are going to create a site
-                                 * and domain per language
-                                 * 
-                                 * Ex Scenario:
-                                 * 1. If the user choose to create a site with multi domain,
-                                 * then we need to create a site PER LANGUAGE. So we need
-                                 * to create a site for English and another site for French
-                                 * for example if the user choose 2 languages.
-                                 *
-                                 * 2. If the user choose to create a site but not a multi domain
-                                 * and have two languages. Then we only need to create one site
-                                 * that has two languages.
-                                 *
-                                 * This condition will help us to achieve that kind of scenario.
-                                 *
+                                 * Save site and domain
                                  */
-                                if($createSiteAndDomain) {
-                                    // Assigning the next page id from Platform Id's
-                                    $arrayParameters['siteData']['site_main_page_id'] = $pageId;
+                                $savedSiteId = $this->saveSiteAndDomain($pageId, $arrayParameters['domainData'], $arrayParameters['siteData']);
+
+                                /**
+                                 * Function to save other site data like pages
+                                 */
+                                $data = $this->saveSiteOtherDatas($savedSiteId, $tplId,
+                                    $pageId, $arrayParameters['siteLanguages'],
+                                    $siteModuleName, $siteLabel,
+                                    $platformId, $createSiteAndDomain,
+                                    $siteLangConfig, $pageId);
+
+                                $siteLangConfig = $data['siteLangConfig'];
+
+                                /**
+                                 * add saved site id to the array to return
+                                 */
+                                array_push($savedSiteIds, $savedSiteId);
+
+                            }else {
+                                /**
+                                 * This counter will help us
+                                 * determine whether we are going
+                                 * to put languages config
+                                 * on one or they have a lang config
+                                 * per site
+                                 */
+                                $siteCtr = 0;
+                                /**
+                                 * Loop through each language
+                                 * to make a site per language
+                                 */
+                                foreach ($arrayParameters['siteLanguages'] as $langLabel => $langId) {
+
                                     /**
-                                     * Save site per language
+                                     * get the current page id and template id
+                                     * from the platform ids
                                      */
-                                    $savedSiteId = $siteTable->save($arrayParameters['siteData']);
+                                    $cmsCurPlatformData = $cmsPlatformTable->getEntryById($platformId)->current();
+                                    $pageId = (int)$cmsCurPlatformData->pids_page_id_current;
+                                    $tplId = (int)$cmsCurPlatformData->pids_tpl_id_current;
+
                                     /**
-                                     * Process the insertion of domain by each language
+                                     * This will check if we are going to create a site
+                                     * and domain per language
                                      *
-                                     * Get the domain data by language
+                                     * Ex Scenario:
+                                     * 1. If the user choose to create a site with multi domain,
+                                     * then we need to create a site PER LANGUAGE. So we need
+                                     * to create a site for English and another site for French
+                                     * for example if the user choose 2 languages.
+                                     *
+                                     * 2. If the user choose to create a site but not a multi domain
+                                     * and have two languages. Then we only need to create one site
+                                     * that has two languages.
+                                     *
+                                     * This condition will help us to achieve that kind of scenario.
+                                     *
                                      */
-                                    $siteDomain = array();
-                                    foreach ($arrayParameters['domainData'] as $langKey => $domain) {
-                                        if ($langKey == $langLabel) {
-                                            $siteDomain = $domain;
+                                    if ($createSiteAndDomain) {
+                                        /**
+                                         * Process the insertion of domain by each language
+                                         *
+                                         * Get the domain data by language
+                                         */
+                                        $siteDomain = array();
+                                        foreach ($arrayParameters['domainData'] as $langKey => $domain) {
+                                            if ($langKey == $langLabel) {
+                                                $siteDomain = $domain;
+                                            }
+                                        }
+                                        /**
+                                         * Save site and domain
+                                         */
+                                        $savedSiteId = $this->saveSiteAndDomain($pageId, $siteDomain, $arrayParameters['siteData']);
+
+                                        /**
+                                         * increment counter
+                                         */
+                                        $siteCtr++;
+                                        /**
+                                         * clear the site lang config
+                                         * to remove the previous data of the
+                                         * created site
+                                         */
+                                        $siteLangConfig = '';
+                                        /**
+                                         * add saved site id to the array to return
+                                         */
+                                        array_push($savedSiteIds, $savedSiteId);
+                                    }
+
+                                    /**
+                                     * This will get the page id initial of the page
+                                     */
+                                    if ($createSiteAndDomain) {
+                                        $pageIdInitial = $pageId;
+                                    } else {
+                                        if (!$pageIdInitial) {
+                                            $pageIdInitial = $pageId;
                                         }
                                     }
-                                    //insert the domain
-                                    if (!empty($siteDomain)) {
-                                        $siteDomain['sdom_site_id'] = $savedSiteId;
-                                        $siteDomainTable->save($siteDomain);
+
+                                    /**
+                                     * Function to save other site data like pages
+                                     */
+                                    $data = $this->saveSiteOtherDatas($savedSiteId, $tplId,
+                                        $pageId, $langId,
+                                        $siteModuleName, $siteLabel,
+                                        $platformId, $createSiteAndDomain,
+                                        $siteLangConfig, $pageIdInitial);
+
+                                    $siteLangConfig = $data['siteLangConfig'];
+
+                                    /**
+                                     * check if we are going to create another site for this language
+                                     */
+                                    if (!$isMultiDomain) {
+                                        $createSiteAndDomain = false;
+                                    } else {
+                                        /**
+                                         * This will create config for every site per language
+                                         */
+                                        if ($siteCtr <= 1) {
+                                            $createMod = $arrayParameters['createModule'];
+                                        } else {
+                                            $createMod = false;
+                                        }
+                                        $this->updateSiteConfig($siteModuleName, $savedSiteId, $siteLangConfig, $arrayParameters['isNewSite'], $createMod);
                                     }
-                                    /**
-                                     * increment counter
-                                     */
-                                    $siteCtr++;
-                                    /**
-                                     * clear the site lang config
-                                     * to remove the previous data of the
-                                     * created site
-                                     */
-                                    $siteLangConfig = '';
-                                    /**
-                                     * add saved site id to the array to return
-                                     */
-                                    array_push($savedSiteIds, $savedSiteId);
-                                }
-
-                                $langName = explode('_', $langLabel);
-
-                                /**
-                                 * This will get the page id initial of the page
-                                 */
-                                if($createSiteAndDomain){
-                                    $pageIdInitial = $pageId;
-                                }else{
-                                    if(!$pageIdInitial){
-                                        $pageIdInitial = $pageId;
-                                    }
-                                }
-
-                                /**
-                                 * Create home page and template
-                                 */
-                                //Creating Site Homepage page and template
-                                $this->createSitePageTemplate($tplId, $savedSiteId, $siteModuleName, $langName[1] . ': Home', 'Index', 'index', $platformId);
-                                $this->createSitePage($langName[1] . ':' . $siteLabel . ' - Home', -1, $langId, 'SITE', $pageId, $tplId, $platformId, $pageIdInitial);
-                                /**
-                                 * This will save the homepage id
-                                 * to the SiteName.config.php file
-                                 */
-                                $tab = '';
-                                if ($siteLangConfig != '') {
-                                    $tab = "\t\t\t\t";
-                                }
-                                //make an array of language
-                                $siteLangConfig .= $tab . '\'' . $langLabel . '\'' . ' => array(' . "\n\t\t\t\t\t" .
-                                    '\'' . 'homePageId' . '\'' . ' => ' . $pageId . "\n\t\t\t\t" .
-                                    '),' . "\n";
-
-
-                                /**
-                                 * Create 404 template and page
-                                 *
-                                 * We only need to create one
-                                 * 404 page per site, not per
-                                 * language
-                                 */
-                                if($createSiteAndDomain) {
-                                    $nxtTplId = ++$tplId;
-                                    $this->createSitePageTemplate($nxtTplId, $savedSiteId, $siteModuleName, $siteLabel.' - 404', 'Page404', 'index', $platformId);
-                                    $page404Id = $pageId + 1;
-                                    $this->createSitePage($siteLabel . ' - 404', $pageId, $langId, 'PAGE', $page404Id, $nxtTplId, $platformId);
-
-                                    /**
-                                     * save 404 data
-                                     */
-                                    $arrayParameters['site404']['s404_page_id'] = $page404Id;
-                                    $arrayParameters['site404']['s404_site_id'] = $savedSiteId;
-                                    $site404Table->save($arrayParameters['site404']);
-                                }
-                                /**
-                                 * save the site home page language id
-                                 */
-                                $siteHomeData = array(
-                                    'shome_site_id' => $savedSiteId,
-                                    'shome_lang_id' => $langId,
-                                    'shome_page_id' => $pageId
-                                );
-                                $siteHomeTable->save($siteHomeData);
-                                /**
-                                 * Save the site lang id
-                                 */
-                                $siteLangsData = array(
-                                    'slang_site_id' =>   $savedSiteId,
-                                    'slang_lang_id' => $langId,
-                                );
-                                $sitelangsTable->save($siteLangsData);
-
-                                /**
-                                 * check if we are going to create another site for this language
-                                 */
-                                if(!$isMultiDomain){
-                                    $createSiteAndDomain = false;
-                                }else{
-                                    /**
-                                     * This will create config for every site per language
-                                     */
-                                    if($siteCtr <= 1){
-                                        $createMod = $arrayParameters['createModule'];
-                                    }else{
-                                        $createMod = false;
-                                    }
-                                    $this->updateSiteConfig($siteModuleName, $savedSiteId, $siteLangConfig, $arrayParameters['isNewSite'], $createMod);
                                 }
                             }
 
@@ -448,13 +436,128 @@ class MelisCmsSiteService extends MelisCoreGeneralService
 	}
 
     /**
+     * @param $savedSiteId
+     * @param $tplId
+     * @param $pageId
+     * @param $langId
+     * @param $siteModuleName
+     * @param $siteLabel
+     * @param $platformId
+     * @param $createSiteAndDomain
+     * @param $siteLangConfig
+     * @param $pageIdInitial
+     * @return array
+     */
+	private function saveSiteOtherDatas($savedSiteId, $tplId,
+                                       $pageId, $langId,
+                                       $siteModuleName, $siteLabel,
+                                       $platformId, $createSiteAndDomain,
+                                        $siteLangConfig, $pageIdInitial)
+    {
+        $site404Table = $this->getServiceLocator()->get('MelisEngineTableSite404');
+        $siteHomeTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
+        $sitelangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+        $langCmsTbl = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+
+        /**
+         * get lang data
+         */
+        $langData = $langCmsTbl->getEntryById($langId)->current();
+
+        $langLocale = $langData->lang_cms_locale;
+        $langName = explode('_', $langLocale);
+        /**
+         * Create home page and template
+         */
+        //Creating Site Homepage page and template
+        $this->createSitePageTemplate($tplId, $savedSiteId, $siteModuleName, $langName[1] . ': Home', 'Index', 'index', $platformId);
+        $this->createSitePage($langName[1] . ':' . $siteLabel . ' - Home', -1, $langId, 'SITE', $pageId, $tplId, $platformId, $pageIdInitial);
+
+        /**
+         * Create site config per site and language
+         */
+        $siteLangConfig = $this->generateSiteConfigData($siteLangConfig, $langLocale, $pageId);
+
+        /**
+         * Create 404 template and page
+         *
+         * We only need to create one
+         * 404 page per site, not per
+         * language
+         */
+        if ($createSiteAndDomain) {
+            $nxtTplId = ++$tplId;
+            $this->createSitePageTemplate($nxtTplId, $savedSiteId, $siteModuleName, $siteLabel . ' - 404', 'Page404', 'index', $platformId);
+            $page404Id = $pageId + 1;
+            $this->createSitePage($siteLabel . ' - 404', $pageId, $langId, 'PAGE', $page404Id, $nxtTplId, $platformId);
+
+            /**
+             * save 404 data
+             */
+            $arrayParameters['site404']['s404_page_id'] = $page404Id;
+            $arrayParameters['site404']['s404_site_id'] = $savedSiteId;
+            $site404Table->save($arrayParameters['site404']);
+        }
+        /**
+         * save the site home page language id
+         */
+        $siteHomeData = array(
+            'shome_site_id' => $savedSiteId,
+            'shome_lang_id' => $langId,
+            'shome_page_id' => $pageId
+        );
+        $siteHomeTable->save($siteHomeData);
+        /**
+         * Save the site lang id
+         */
+        $siteLangsData = array(
+            'slang_site_id' => $savedSiteId,
+            'slang_lang_id' => $langId,
+        );
+        $sitelangsTable->save($siteLangsData);
+
+        return array(
+            'siteLangConfig' => $siteLangConfig,
+        );
+    }
+
+    /**
+     * Function to save site and domain
+     *
+     * @param $pageId
+     * @param $siteDomain
+     * @param $siteData
+     * @return int $savedSiteId
+     */
+    private function saveSiteAndDomain($pageId, $siteDomain, $siteData)
+    {
+        // Table services
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $siteDomainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
+        // Assigning the next page id from Platform Id's
+        $siteData['site_main_page_id'] = $pageId;
+        /**
+         * Save site per language
+         */
+        $savedSiteId = $siteTable->save($siteData);
+
+        //insert the domain
+        if (!empty($siteDomain)) {
+            $siteDomain['sdom_site_id'] = $savedSiteId;
+            $siteDomainTable->save($siteDomain);
+        }
+
+        return $savedSiteId;
+    }
+
+    /**
      * Update the page id on site module config file
      *
      * @param $modulePath
      * @param $homePageId
      * @param $isUpdate
      */
-	public function updateSiteModuleConfig($modulePath, $homePageId, $isUpdate = true)
+	private function updateSiteModuleConfig($modulePath, $homePageId, $isUpdate = true)
     {
         // Getting the Site config
         $outputFileName = 'module.config.php';
@@ -469,6 +572,33 @@ class MelisCmsSiteService extends MelisCoreGeneralService
     }
 
     /**
+     * Function to generate the config of the site
+     * per language
+     *
+     * @param $siteLangConfig
+     * @param $langLabel
+     * @param $pageId
+     * @return string
+     */
+    private function generateSiteConfigData($siteLangConfig, $langLabel, $pageId)
+    {
+        /**
+         * This will save the homepage id
+         * to the SiteName.config.php file
+         */
+        $tab = '';
+        if ($siteLangConfig != '') {
+            $tab = "\t\t\t\t";
+        }
+        //make an array of language
+        $siteLangConfig .= $tab . '\'' . $langLabel . '\'' . ' => array(' . "\n\t\t\t\t\t" .
+            '\'' . 'homePageId' . '\'' . ' => ' . $pageId . "\n\t\t\t\t" .
+            '),' . "\n";
+
+        return $siteLangConfig;
+    }
+
+    /**
      * Function to update site config
      *
      * @param $siteModuleName
@@ -477,7 +607,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
      * @param bool $isNewSite
      * @param bool $isCreateModule
      */
-	public function updateSiteConfig($siteModuleName, $siteId, $configData, $isNewSite = false, $isCreateModule = false)
+	private function updateSiteConfig($siteModuleName, $siteId, $configData, $isNewSite = false, $isCreateModule = false)
     {
         /**
          * get the module path
