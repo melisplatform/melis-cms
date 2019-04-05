@@ -111,8 +111,8 @@ class GdprBannerController extends AbstractActionController
 
         $bannerContents = [];
         if (!empty($siteId)) {
-            /** @var \MelisCms\Service\MelisCmsGdprService $bannerSvc */
-            $bannerSvc = $this->getServiceLocator()->get('MelisCmsGdprService');
+            /** @var \MelisEngine\Service\MelisGdprService $bannerSvc */
+            $bannerSvc = $this->getServiceLocator()->get('MelisGdprService');
             $result = $bannerSvc->getGdprBannerText((int)$siteId)->toArray();
             if (!empty($result)) {
                 foreach ($result as $content) {
@@ -194,8 +194,8 @@ class GdprBannerController extends AbstractActionController
             }
 
             if (empty($response['errors'])) {
-                /** @var \MelisCms\Service\MelisCmsGdprService $bannerService */
-                $bannerService = $this->getServiceLocator()->get('MelisCmsGdprService');
+                /** @var \MelisEngine\Service\MelisGdprService $bannerService */
+                $bannerService = $this->getServiceLocator()->get('MelisGdprService');
                 /** Save languages with non-empty content */
                 foreach ($bannerContents as $langId => $bannerContent) {
                     /** Save the content */
