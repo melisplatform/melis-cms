@@ -2,17 +2,9 @@
     
     // cache DOM
     var dataUrl,
-        $body           = $('body'),
-        $t              = tinymce.dom.DomQuery,
-        $taux           = $t(".tox-tinymce-aux"),
-        $mceLinkTree    = $t("#mce-link-tree");
+        $body           = $("body");
 
     // Binding Events =================================================================================================================
-    //$insertEditLink.on("click", checkBtn);
-    //$editLink.on("click", checkBtn);
-
-    // tox menu
-    //$body.on("contextmenu", ".tox-collection__item--active", checkBtn);
 
     // CreateTreeModal
     $body.on("click", "#mce-link-tree", createTreeModal);
@@ -134,33 +126,32 @@
     }
 
     function checkBtn() {
-        var $aux            = $t(".tox-tinymce-aux"),
-            $dialog         = $aux.find(".tox-dialog"),
-            $conHStacks     = $dialog.find(".tox-form__controls-h-stack"),
-            $inputUrl       = $conHStacks.find(".tox-control-wrap input"),
-            $urlBtn         = $conHStacks.find("#mce-link-tree");
+        var $t              = tinymce.dom.DomQuery,
+            $body           = window.parent.$("body"),
+            $iaux           = $t(".tox-tinymce-aux"),
+            $baux           = $body.find(".tox-tinymce-aux"),
 
-            if ( !$urlBtn.length ) {
-                if ( $conHStacks.length ) {
-                    $conHStacks.append('<button title="Site tree view" id="mce-link-tree" class="mce-btn mce-open" style="width: 34px; height: 34px;"><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; font-size: 16px; display: block; text-align: center;"></i></button>');
-                }
+            $idialog        = $iaux.find(".tox-dialog"),
+            $bdialog        = $baux.find(".tox-dialog"),
+
+            $iconHStacks    = $idialog.find(".tox-form__controls-h-stack"),
+            $bconHStacks    = $bdialog.find(".tox-form__controls-h-stack"),
+
+            $iurlBtn        = $iconHStacks.find("#mce-link-tree"),
+            $burlBtn        = $bconHStacks.find("#mce-link-tree");
+
+        var $melisTreeBtn   = '<button title="Site tree view" id="mce-link-tree" class="mce-btn mce-open" style="width: 34px; height: 34px;"><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; font-size: 16px; display: block; text-align: center;"></i></button>';
+
+            if ( $iurlBtn.length === 0 && $iconHStacks.length > 0 ) {
+                console.log("$iurlBtn: ", $iurlBtn.length);
+                console.log("$iconHStacks");
+                $iconHStacks.append( $melisTreeBtn );
+            } else if ( ! $burlBtn.length === 0 && $bconHStacks.length > 0 ) {
+                console.log("$burlBtn: ", $burlBtn.length);
+                console.log("$bconHStacks");
+                $bconHStacks.append( $melisTreeBtn );
             }
     }
-
-    /*function addTreeBtnMoxie() {
-        console.log("addTreeBtnMovie");
-
-        var //$melisIframe    = $body.find(".melis-iframe"),
-            //$melisIframe    = $(window).parent,
-            //$dialog         = $(".melis-iframe").contents().find(".tox-dialog"),
-            $aux            = $t(".tox-tinymce-aux"),
-            $dialog         = $aux.find(".tox-dialog"),
-            $conHStacks     = $dialog.find(".tox-form__controls-h-stack");
-
-            if ( $conHStacks.length ) {
-                $conHStacks.append('<button title="Site tree view" id="mce-link-tree" class="mce-btn mce-open" style="width: 34px; height: 34px;"><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; font-size: 16px; display: block; text-align: center;"></i></button>');
-            }
-    }*/
 
     function createTreeModal() {
         // initialation of local variable
