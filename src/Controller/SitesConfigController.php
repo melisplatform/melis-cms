@@ -171,7 +171,7 @@ class SitesConfigController extends AbstractActionController
     {
         $siteConfigSrv = $this->getServiceLocator()->get('MelisSiteConfigService');
 
-        return $siteConfigSrv->getSiteConfigById($siteId);
+        return $siteConfigSrv->getSiteConfig($siteId, true);
     }
 
     /**

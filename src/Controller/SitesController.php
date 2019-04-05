@@ -9,6 +9,7 @@
 
 namespace MelisCms\Controller;
 
+use MelisFront\Service\MelisSiteConfigService;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
@@ -1007,10 +1008,16 @@ class SitesController extends AbstractActionController
         $siteName = $site['site_name'];
 
         $config = $this->getSiteConfigById($siteId);
+
         $configFromDb = $this->getSiteConfigFromDbById($siteId);
         $this->prepareDbConfigs($siteId, $siteName, $configFromDb);
 
         foreach ($siteConfigTabData as $langKey => $langValue) {
+
+            if(empty($langValue['config'])){
+                $langValue['config'] = [];
+            }
+
             $locale = $siteLangsTable->getSiteLangs(null, $siteId, $langKey, true, true)->toArray();
             $sconf_id = !empty($langValue['sconf_id']) ? $langValue['sconf_id'] : 0;
             $data = [];
@@ -1143,9 +1150,9 @@ class SitesController extends AbstractActionController
      */
     private function getSiteConfigById($siteId)
     {
+        /** @var MelisSiteConfigService $siteConfigSrv */
         $siteConfigSrv = $this->getServiceLocator()->get('MelisSiteConfigService');
-
-        return $siteConfigSrv->getSiteConfigById($siteId);
+        return $siteConfigSrv->getSiteConfig($siteId, true);
     }
 
     /**
