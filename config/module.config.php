@@ -144,9 +144,6 @@ return array(
     'controller_plugins' => array(
         'invokables' => array(
             'MelisCmsPagesIndicatorsPlugin' => 'MelisCms\Controller\DashboardPlugins\MelisCmsPagesIndicatorsPlugin',
-
-            // GDPR Banner
-            'MelisCmsGdprBannerPlugin' => 'MelisCms\Controller\Plugin\MelisCmsGdprBannerPlugin',
         )
     ),
     'form_elements' => array(
@@ -173,10 +170,6 @@ return array(
             
             // Dashboard plugin templates
             'melis-cms/dashboard/page-indicators' => __DIR__ . '/../view/melis-cms/dashboard-plugins/page-indicators.phtml',
-
-            // Gdpr Banner
-            'melis-cms-gdpr/banner' => __DIR__ . '/../view/melis-cms/gdpr-banner/plugins/banner.phtml',
-            'melis-cms-gdpr/modal-template-form' => __DIR__ . '/../view/melis-cms/gdpr-banner/plugins/modal-template-form.phtml',
         ),
         'template_path_stack' => array(
             __DIR__ . '/../view',
