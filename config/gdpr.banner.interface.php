@@ -87,7 +87,7 @@ return [
                                 'options' => [
                                     'label' => 'tr_meliscms_page_tab_properties_form_type_Site',
                                     //'tooltip' => 'tr_meliscms_comments_form_site_tooltip',
-                                    'empty_option' => 'tr_meliscms_comments_form_site',
+                                    'empty_option' => 'tr_melis_cms_gdpr_banner_site_select',
                                     'disable_inarray_validator' => true,
                                 ],
                                 'attributes' => [
