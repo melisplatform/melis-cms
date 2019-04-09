@@ -764,10 +764,9 @@ class SitesController extends AbstractActionController
              */
             $this->saveSiteDomains($domainData, $errors, $status);
             $this->saveSiteHomePages($siteHomeData, $errors, $status);
-            $this->saveSiteLanguagesTab($siteId, $data);
             $this->saveSiteConfig($siteId,$siteConfigTabData);
             $this->saveSiteProperties($siteId, $sitePropData, $errors, $status);
-
+            $this->saveSiteLanguagesTab($siteId, $data);
             /**
              * If there is no error
              * execute the saving
@@ -1015,7 +1014,7 @@ class SitesController extends AbstractActionController
         // Catch if there are changes on the selected languages over the active languages
         if (!$noChangesOnSiteLangs) {
             // Disable all active languages of site
-            $siteLangsTable->update(['status' => 0], 'slang_site_id', $siteId);
+            $siteLangsTable->update(['slang_status' => 0], 'slang_site_id', $siteId);
 
             // Because all of the active languages are disabled. All we have to do
             // is to save if it's a new language or to active(update) the language back
@@ -1033,7 +1032,7 @@ class SitesController extends AbstractActionController
                     [
                         'slang_site_id' => $siteId,
                         'slang_lang_id' => $selectedSiteLang,
-                        'status' => 1
+                        'slang_status' => 1
                     ],
                     $slangId
                 );
