@@ -81,16 +81,20 @@ $data_melisKey = $this->melisKey;
                                             </div>
                                             <br>
                                         <?php else : ?>
-                                            <div class="form-group ">
-                                                <label><?= $configKey ?></label>
+                                            <label><?= $configKey ?></label>
+                                            <div class="input-group ">
                                                 <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>" id="gen_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
+                                                <span class="input-group-addon"><i class="fa fa-cogs fa-lg" title="From DB (Overridden)"></i></span>
                                             </div>
+                                            <br>
                                         <?php endif; ?>
                                     <?php else : ?>
-                                        <div class="form-group ">
-                                            <label><?= $configKey ?></label>
+                                        <label><?= $configKey ?></label>
+                                        <div class="input-group ">
                                             <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>" id="gen_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
+                                            <span class="input-group-addon"><i class="fa fa-cogs fa-lg" title="From DB (Overridden)"></i></span>
                                         </div>
+                                        <br>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -139,16 +143,20 @@ $data_melisKey = $this->melisKey;
                                                 </div>
                                                 <br>
                                             <?php else : ?>
-                                                <div class="form-group ">
-                                                    <label><?= $configKey ?></label>
-                                                    <input type="text" class="form-control" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
+                                                <label><?= $configKey ?></label>
+                                                <div class="input-group ">
+                                                    <input type="text" class="form-control col-md-10" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
+                                                    <span class="input-group-addon"><i class="fa fa-cogs fa-lg" title="From File (Default Value)"></i></span>
                                                 </div>
+                                                <br>
                                             <?php endif; ?>
                                         <?php else : ?>
-                                            <div class="form-group ">
-                                                <label><?= $configKey ?></label>
-                                                <input type="text" class="form-control" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
+                                            <label><?= $configKey ?></label>
+                                            <div class="input-group ">
+                                                <input type="text" class="form-control col-md-10" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
+                                                <span class="input-group-addon"><i class="fa fa-cogs fa-lg" title="From File (Default Value)"></i></span>
                                             </div>
+                                            <br>
                                         <?php endif; ?>
                                     <?php endforeach; ?>
                                 <?php endif; ?>

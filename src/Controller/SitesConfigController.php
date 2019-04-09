@@ -85,21 +85,13 @@ class SitesConfigController extends AbstractActionController
 
         foreach ($dbConfigs as $dbConfig) {
             if ($dbConfig['sconf_lang_id'] == '-1') {
-                if (array_key_exists('allSites', $dbConfig['sconf_datas']['site'][$siteName])) {
-                    foreach ($dbConfig['sconf_datas']['site'][$siteName]['allSites'] as $key => $value) {
-                        if ($config['site'][$siteName]['allSites'][$key] == $value) {
-                            $valuesFromDb['allSites'][] = $key;
-                        }
-                    }
+                foreach ($dbConfig['sconf_datas']['site'][$siteName]['allSites'] as $key => $value) {
+                    $valuesFromDb['allSites'][] = $key;
                 }
             } else {
-                if (array_key_exists($siteId, $dbConfig['sconf_datas']['site'][$siteName])) {
-                    foreach ($dbConfig['sconf_datas']['site'][$siteName][$siteId] as $langKey => $langValue) {
-                        foreach ($langValue as $confKey => $confVal) {
-                            if ($config['site'][$siteName][$siteId][$langKey][$confKey] == $confVal) {
-                                $valuesFromDb[$langKey][] = $confKey;
-                            }
-                        }
+                foreach ($dbConfig['sconf_datas']['site'][$siteName][$siteId] as $langKey => $langValue) {
+                    foreach ($langValue as $confKey => $confVal) {
+                        $valuesFromDb[$langKey][] = $confKey;
                     }
                 }
             }
@@ -120,9 +112,7 @@ class SitesConfigController extends AbstractActionController
             if ($dbConfig['sconf_lang_id'] == '-1') {
                 $dbConfig['sconf_datas'] = [
                     'site' => [
-                        $siteName => [
-                            'allSites' => unserialize($dbConfig['sconf_datas'])
-                        ],
+                        $siteName => unserialize($dbConfig['sconf_datas'])
                     ],
                 ];
             } else {
