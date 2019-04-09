@@ -786,13 +786,14 @@ class SitesController extends AbstractActionController
                 $con->commit();
             }else{
                 $status = false;
-                $textMessage = 'tr_melis_cms_site_save_ko';
                 /**
                  * rollback everything
                  */
                 $con->rollback();
             }
         }catch (\Exception $ex){
+            $status = false;
+            $textMessage = 'tr_melis_cms_site_save_ko';
             /**
              * If error occurred
              * rollback the process
