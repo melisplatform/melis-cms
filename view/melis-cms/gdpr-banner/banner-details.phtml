@@ -53,12 +53,12 @@ $data_melisKey = $this->melisKey;
         </div>
     </div>
     <script type="text/javascript">
-        melisTinyMCE.createTinyMCE("tool", ".mcgdpr_text_value");
+        melisTinyMCE.createTinyMCE("tool", ".mcgdpr_text_value", {height: 450});
         var siteSelector = $("body").find(".cms_gdpr_banner_site_filter_form #id_mcgdprbanner_site_id");
         if (siteSelector.length > 0) {
             siteSelector.select2({
                 minimumResultsForSearch: -1,
-                placeholder: translations.tr_meliscms_comments_form_site
+                placeholder: translations.tr_melis_cms_gdpr_banner_site_select
             });
         }
     </script>
