@@ -1078,11 +1078,15 @@ class SitesController extends AbstractActionController
                     if (!empty($configFromDb)) {
                         foreach ($configFromDb as $confDb) {
                             if ($confDb['sconf_lang_id'] == '-1') {
-                                if (array_key_exists($confKey, $confDb['sconf_datas']['site'][$siteName]['allSites'])) {
-                                    $data['allSites'][$confKey] = $this->getTool()->sanitize($configValue, true);
-                                } else {
-                                    if ($dataFromConfig !== $configValue) {
-                                        $data['allSites'][$confKey] = $this->getTool()->sanitize($configValue, true);
+                                if (!empty($confDb['sconf_datas']['site'][$siteName])) {
+                                    if (array_key_exists($confKey, $confDb['sconf_datas']['site'][$siteName]['allSites'])) {
+                                        if ($configValue != '') {
+                                            $data['allSites'][$confKey] = $this->getTool()->sanitize($configValue, true);
+                                        }
+                                    } else {
+                                        if ($dataFromConfig !== $configValue) {
+                                            $data['allSites'][$confKey] = $this->getTool()->sanitize($configValue, true);
+                                        }
                                     }
                                 }
                             }
@@ -1104,11 +1108,15 @@ class SitesController extends AbstractActionController
                     if (!empty($configFromDb)) {
                         foreach ($configFromDb as $confDb) {
                             if ($confDb['sconf_lang_id'] == $langKey) {
-                                if (array_key_exists($confKey, $confDb['sconf_datas']['site'][$siteName][$siteId][$locale['lang_cms_locale']])) {
-                                    $data[$locale['lang_cms_locale']][$confKey] = $this->getTool()->sanitize($configValue, true);
-                                } else {
-                                    if ($dataFromConfig != $configValue) {
-                                        $data[$locale['lang_cms_locale']][$confKey] = $this->getTool()->sanitize($configValue, true);
+                                if (!empty($confDb['sconf_datas']['site'][$siteName][$siteId])) {
+                                    if (array_key_exists($confKey, $confDb['sconf_datas']['site'][$siteName][$siteId][$locale['lang_cms_locale']])) {
+                                        if ($configValue != '') {
+                                            $data[$locale['lang_cms_locale']][$confKey] = $this->getTool()->sanitize($configValue, true);
+                                        }
+                                    } else {
+                                        if ($dataFromConfig != $configValue) {
+                                            $data[$locale['lang_cms_locale']][$confKey] = $this->getTool()->sanitize($configValue, true);
+                                        }
                                     }
                                 }
                             }
@@ -1127,16 +1135,14 @@ class SitesController extends AbstractActionController
                 }
             }
 
-            if (!empty($data)) {
-                $siteConfigTable->save(
-                    [
-                        'sconf_site_id' => $siteId,
-                        'sconf_lang_id' => $langKey === 'gen' ? -1 : $langKey,
-                        'sconf_datas' => serialize($data)
-                    ],
-                    $sconf_id
-                );
-            }
+            $siteConfigTable->save(
+                [
+                    'sconf_site_id' => $siteId,
+                    'sconf_lang_id' => $langKey === 'gen' ? -1 : $langKey,
+                    'sconf_datas' => serialize($data)
+                ],
+                $sconf_id
+            );
         }
     }
 
@@ -1152,9 +1158,7 @@ class SitesController extends AbstractActionController
             if ($dbConfig['sconf_lang_id'] == '-1') {
                 $dbConfig['sconf_datas'] = [
                     'site' => [
-                        $siteName => [
-                            'allSites' => unserialize($dbConfig['sconf_datas'])
-                        ],
+                        $siteName => unserialize($dbConfig['sconf_datas']),
                     ],
                 ];
             } else {

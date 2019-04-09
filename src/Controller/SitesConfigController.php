@@ -85,8 +85,10 @@ class SitesConfigController extends AbstractActionController
 
         foreach ($dbConfigs as $dbConfig) {
             if ($dbConfig['sconf_lang_id'] == '-1') {
-                foreach ($dbConfig['sconf_datas']['site'][$siteName]['allSites'] as $key => $value) {
-                    $valuesFromDb['allSites'][] = $key;
+                if (array_key_exists('allSites', $dbConfig['sconf_datas']['site'][$siteName])) {
+                    foreach ($dbConfig['sconf_datas']['site'][$siteName]['allSites'] as $key => $value) {
+                        $valuesFromDb['allSites'][] = $key;
+                    }
                 }
             } else {
                 foreach ($dbConfig['sconf_datas']['site'][$siteName][$siteId] as $langKey => $langValue) {
