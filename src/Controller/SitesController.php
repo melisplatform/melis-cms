@@ -750,12 +750,56 @@ class SitesController extends AbstractActionController
             }
         }
 
-        $this->saveSiteModules($isAdmin, $siteId, $moduleList);
-        $this->saveSiteDomains($domainData, $errors, $status);
-        $this->saveSiteHomePages($siteHomeData, $errors, $status);
-        $this->saveSiteLanguagesTab($siteId, $data);
-        $this->saveSiteConfig($siteId,$siteConfigTabData);
-        $this->saveSiteProperties($siteId, $sitePropData, $errors, $status);
+        /**
+         * Prepare the transaction so that
+         * we can rollback the db process if
+         * there are some error occurred
+         */
+        $db = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');//get db adapter
+        $con = $db->getDriver()->getConnection();//get db driver connection
+        $con->beginTransaction();//begin transaction
+        try {
+            /**
+             * Try to save the site data's
+             */
+            $this->saveSiteDomains($domainData, $errors, $status);
+            $this->saveSiteHomePages($siteHomeData, $errors, $status);
+            $this->saveSiteLanguagesTab($siteId, $data);
+            $this->saveSiteConfig($siteId,$siteConfigTabData);
+            $this->saveSiteProperties($siteId, $sitePropData, $errors, $status);
+
+            /**
+             * If there is no error
+             * execute the saving
+             */
+            if(empty($errors)){
+                $textMessage = 'tr_melis_cms_site_save_ok';
+                /**
+                 * If there are no errors
+                 * on db saving, we can now process
+                 * the module saving
+                 */
+                $this->saveSiteModules($isAdmin, $siteId, $moduleList);
+                /**
+                 * if no error, execute the saving
+                 */
+                $con->commit();
+            }else{
+                $status = false;
+                /**
+                 * rollback everything
+                 */
+                $con->rollback();
+            }
+        }catch (\Exception $ex){
+            $status = false;
+            $textMessage = 'tr_melis_cms_site_save_ko';
+            /**
+             * If error occurred
+             * rollback the process
+             */
+            $con->rollback();
+        }
 
         $response = array(
             'success' => $status,
