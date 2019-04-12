@@ -6,7 +6,8 @@ var melisCms = (function(){
 		$document = $("document");
 	
 	// ---=[ BUG FIX ] =---  TINYMCE POPUP MODAL FOCUS 
-	var windowOffset
+	var windowOffset;
+
 	window.scrollToViewTinyMCE = function(dialogHeight, iframeHeight){
 		
 		// window scroll offest
@@ -25,6 +26,7 @@ var melisCms = (function(){
 			return windowOffset;
 		}
 	}
+
 	window.scrollOffsetTinyMCE = function(){
 		return windowOffset;
 	}
@@ -85,7 +87,7 @@ var melisCms = (function(){
 	} 
 	
 	// NEW PAGE
-	function newPage(){
+	function newPage() {
    	  	//close page creation tab and open new one (in case if its already open - updated parent ID)
 		var pageID = $(this).data('pagenumber');
    	  	melisHelper.tabClose('0_id_meliscms_page');
@@ -94,7 +96,7 @@ var melisCms = (function(){
 	}
 	
 		// SAVE PAGE
-	function savePage(idPage){
+	function savePage(idPage) {
 		
 		var pageNumber = (typeof idPage === 'string') ? idPage :  $(this).data("pagenumber"); 
 		var fatherPageId = $(this).data("fatherpageid"); 
@@ -172,7 +174,7 @@ var melisCms = (function(){
 	}
 	
 	// PUBLISH PAGE 
-	function publishPage(idPage){
+	function publishPage(idPage) {
 		var pageNumber = (typeof idPage === 'string') ? idPage :  $(this).data("pagenumber"); 
 		
 		// convert the serialized form values into an array
@@ -367,15 +369,13 @@ var melisCms = (function(){
 	}
 	
 	// Deactivating page edition action buttons
-    function disableCmsButtons(id)
-    {
+    function disableCmsButtons(id) {
         $("div.make-switch label on, off").parent().css("z-index", -1).parents("div.make-switch").css("opacity", 0.5);
         $("#"+id+"_id_meliscms_page_action_tabs").addClass('relative').prepend("<li class='btn-disabled'></li>");
     }
     
     // Activating page edition action buttons
-    function enableCmsbuttons(id)
-    {
+    function enableCmsbuttons(id) {
         $("#"+id+"_action_tabs").removeClass('relative');
         $("#"+id+"_action_tabs li.btn-disabled").remove();
         
@@ -529,7 +529,6 @@ var melisCms = (function(){
 		$("#"+ activeTabId + " .melis-iframe").css("height", iHeight);
 	}
 	
-	
 	// REFRESH PAGE TAB (historic, versionining etc)
     function refreshPageTable(){
     	var zoneParent = $(this).parents(".melis-page-table-cont");
@@ -539,8 +538,7 @@ var melisCms = (function(){
     	melisHelper.zoneReload(zoneId, melisKey, { idPage: pageId }); 
     }
     
-    function disableCmsButtons(id)
-    {
+    function disableCmsButtons(id) {
         $("#" + activeTabId + " .page-publishunpublish").append("<div class='overlay-switch' style='width: 100%;height: 100%;" +
             "position: absolute;top: 0;" +
             "left: 0;z-index: 99999999;" +
@@ -548,15 +546,14 @@ var melisCms = (function(){
         $("#"+id+"_id_meliscms_page_action_tabs").addClass('relative').prepend("<li class='btn-disabled'></li>");
     }
     
-    function enableCmsbuttons(id)
-    {
+    function enableCmsbuttons(id) {
         $("#"+id+"_action_tabs").removeClass('relative');
         $("#"+id+"_action_tabs li.btn-disabled").remove();
         $("#" + activeTabId + " .overlay-switch").remove();
     }
 	
     // IFRAME HEIGHT CONTROLS (for onload, displaySettings & sidebar collapse)
-    function iframeLoad(){
+    function iframeLoad() {
     	var height = $("#"+ activeTabId + " .melis-iframe").contents().height();
     	$("#"+ activeTabId + " .melis-iframe").css("height", height);
     	$("#"+ activeTabId + " .melis-iframe").css("min-height", "700px");  
@@ -2193,31 +2190,27 @@ window.initRedirectTemplateList = function(data, tblSettings){
  var melisLinkTree = (function($, window){
     
     // cache DOM
-    var $body = $('body');
-    var dataUrl;
+    var dataUrl,
+        $body = $("body");
 
     // Binding Events =================================================================================================================
-    console.log("insert: ", $("button[aria-label='Insert/edit link']").length );
-
-    $body.on("click", "div[aria-label='Insert/edit link']", checkBtn);
-    $body.on("click", "div.mce-menu-item", checkBtn);
 
     // CreateTreeModal
     $body.on("click", "#mce-link-tree", createTreeModal);
-    
+
     // Filter Search
-    $(document).on("keyup", "input[name=tree_search]", function(event){
+    $(document).on("keyup", "input[name=tree_search]", function(event) {
     	var keycode = (event.keyCode ? event.keyCode : event.which);
     	if(keycode == '13'){
     		startTreeSearch();
     	}   
     }).focus();
     
-    $body.on("click", "#searchTreeView", function(e){
+    $body.on("click", "#searchTreeView", function(e) {
     	startTreeSearch();
 	});
     
-    $body.on("click", "#resetTreeView", function(e){
+    $body.on("click", "#resetTreeView", function(e) {
     	melisHelper.loadingZone($('.page-evolution-content'));
     	$("input[name=tree_search]").val('');
     	var tree = $("#find-page-dynatree").fancytree("getTree");
@@ -2230,7 +2223,7 @@ window.initRedirectTemplateList = function(data, tblSettings){
 		}, 2000);
 	});
         
-    $body.on("click", "#generateTreePageLink", function(){
+    $body.on("click", "#generateTreePageLink", function() {
         melisCoreTool.pending('#generateTreePageLink');
         var id = $('#find-page-dynatree .fancytree-active').parent('li'). attr('id').split("_")[1];
         $.ajax({
@@ -2247,10 +2240,9 @@ window.initRedirectTemplateList = function(data, tblSettings){
              console.log('failed');
          });
         melisCoreTool.done('#generateTreePageLink');
-
     });
     
-    $body.on("click", "#generateTreePageId", function(){
+    $body.on("click", "#generateTreePageId", function() {
     	melisCoreTool.pending('#generateTreePageLink');
     	var id = $('#find-page-dynatree .fancytree-active').parent('li'). attr('id').split("_")[1];
     	var inputId = $('#generateTreePageId').data('inputid');
@@ -2260,7 +2252,7 @@ window.initRedirectTemplateList = function(data, tblSettings){
     	
     	melisCoreTool.done('#generateTreePageLink');
     });
-    
+
     function startTreeSearch() {
     	var match = $("input[name=tree_search]").val();
 		var tree = $("#find-page-dynatree").fancytree("getTree");
@@ -2305,7 +2297,6 @@ window.initRedirectTemplateList = function(data, tblSettings){
         					node.makeVisible();
         					break;
             			}
-
                     }
         			filterFunc.call(tree, match, opts);					
     			}).done(function(){
@@ -2313,55 +2304,55 @@ window.initRedirectTemplateList = function(data, tblSettings){
                     searchContainer.removeClass("searching");
     			});					
             }
-	    	
-		
 	     }).error(function(){
 	    	 console.log('failed');
 	     });
     }
     
     function showUrl() {
-        //var inputBox = $('.melis-iframe').contents().find('#mce-link-tree').prev().val(dataUrl);
-        //var inputBox = $('#mce-link-tree').parent().find('input').val(dataUrl);
     	var inputBox = $('.melis-iframe').contents().find('#mce-link-tree').parent().find('input').val(dataUrl);
-    	    $(".mce-floatpanel.mce-window").find('#mce-link-tree').parent().find('input').val(dataUrl);
+                       $(".mce-floatpanel.mce-window").find('#mce-link-tree').parent().find('input').val(dataUrl);
     }
 
+    // transfered to melis_tinymce.js as tinyMceAddTreeViewBtn
     function checkBtn() {
-        var urlBox = $('body').find('.mce-has-open').prev().text();
+        console.log("melisLinkTree checkBtn");
 
-        var check = $body.find('.mce-has-open')[0];
+        var //$t              = tinymce.dom.DomQuery,
+            $iframe         = $(".melis-iframe"),
+            $body           = window.parent.$("body"),
 
-        var urlLabel = $('body').find('.mce-widget.mce-label');
-        
-        urlLabel.each( function() {
-            var $this = $(this);
+            //$iaux           = $t(".tox-tinymce-aux"),
+            $iaux           = $iframe.contents().find(".tox-tinymce-aux"),
+            $baux           = $body.find(".tox-tinymce-aux"),
 
-            if( $this.text() === "Url" ) {
-                var moxie = $body.find('.mce-btn.mce-open');
-                var moxieWidth = moxie.width() + 1;
-                var urlInputBox = $this.next();
-                var urlInput = urlInputBox.children('.mce-textbox');
-                var cInput;
+            $idialog        = $iaux.find(".tox-dialog"),
+            $bdialog        = $baux.find(".tox-dialog"),
 
-                if(moxie.length){
-                    cInput = urlInput.width() - moxieWidth;
-                    moxie.css({'left':'0'});
-                    urlInput.css({'width': cInput})
-                    addTreeBtnMoxie();
-                }else{
-                    cInput = urlInput.width() - 32;
-                    urlInput.css({'width': cInput});
-                    urlInputBox.append('<div id="mce-link-tree" class="mce-btn mce-open" style="position: absolute; right: 0; width: 32px; height: 28px;"><button><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; top: 2px; font-size: 16px;"></i></button></div>');
+            $iconHStacks    = $idialog.find(".tox-form__controls-h-stack"),
+            $bconHStacks    = $bdialog.find(".tox-form__controls-h-stack"),
+
+            $iurlBtn        = $iconHStacks.find("#mce-link-tree"),
+            $burlBtn        = $bconHStacks.find("#mce-link-tree");
+
+        var melisTreeBtn    = '<button title="Site tree view" id="mce-link-tree" class="mce-btn mce-open" style="width: 34px; height: 34px;"><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; font-size: 16px; display: block; text-align: center;"></i></button>';
+
+            console.log("$iaux length: ", $iaux.length);
+            console.log("$baux length: ", $baux.length);
+
+            if ( $iaux.length ) {
+                if ( $iurlBtn.length === 0 && $iconHStacks.length > 0 ) {
+                    console.log("i series");
+                    $iconHStacks.append( melisTreeBtn );    
                 }
-                
             }
-        });
-    }
 
-    function addTreeBtnMoxie() {
-        var box = $body.find('.mce-has-open');
-        box.append('<div id="mce-link-tree" class="mce-btn mce-open" style="position: absolute; right: 0; width: 32px; height: 28px;"><button><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; top: 2px; font-size: 16px;"></i></button></div>');
+            if ( $baux.length ) {
+                if ( $burlBtn.length === 0 && $bconHStacks.length > 0 ) {
+                    console.log("b series");
+                    $bconHStacks.append( melisTreeBtn );    
+                }
+            }
     }
 
     function createTreeModal() {
@@ -2396,14 +2387,12 @@ window.initRedirectTemplateList = function(data, tblSettings){
     	}
     	
     	window.parent.melisHelper.createModal(zoneId, melisKey, false, {'pageTreeInputId' : id}, modalUrl, function() {
-    	});
-    	
+    	}); 	
     }
 
     function selectedNodes() {
         var title = $(this).closest('li').attr('id');
-        $('#statusLine').append(title);
-        console.log(title);
+            $('#statusLine').append(title);
     }
 
     function findPageMainTree() {
@@ -2459,21 +2448,17 @@ window.initRedirectTemplateList = function(data, tblSettings){
                 mode: "hide"       // Grayout unmatched nodes (pass "hide" to remove unmatched node instead)
               },
         });
-        
-
     }
-
 
     return {
         createTreeModal         :       createTreeModal,
         createInputTreeModal	: 		createInputTreeModal,
         findPageMainTree        :       findPageMainTree,
         checkBtn                :       checkBtn,
-        showUrl                 :       showUrl,
-    }
+        showUrl                 :       showUrl
+    };
 
 })(jQuery, window);
-
 $(function() {
 
     $("body").on("click", "a.melis-pageduplicate", function() {

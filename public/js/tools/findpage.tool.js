@@ -2,7 +2,7 @@
     
     // cache DOM
     var dataUrl,
-        $body           = $("body");
+        $body = $("body");
 
     // Binding Events =================================================================================================================
 
@@ -125,10 +125,16 @@
                        $(".mce-floatpanel.mce-window").find('#mce-link-tree').parent().find('input').val(dataUrl);
     }
 
+    // transfered to melis_tinymce.js as tinyMceAddTreeViewBtn
     function checkBtn() {
-        var $t              = tinymce.dom.DomQuery,
+        console.log("melisLinkTree checkBtn");
+
+        var //$t              = tinymce.dom.DomQuery,
+            $iframe         = $(".melis-iframe"),
             $body           = window.parent.$("body"),
-            $iaux           = $t(".tox-tinymce-aux"),
+
+            //$iaux           = $t(".tox-tinymce-aux"),
+            $iaux           = $iframe.contents().find(".tox-tinymce-aux"),
             $baux           = $body.find(".tox-tinymce-aux"),
 
             $idialog        = $iaux.find(".tox-dialog"),
@@ -140,16 +146,23 @@
             $iurlBtn        = $iconHStacks.find("#mce-link-tree"),
             $burlBtn        = $bconHStacks.find("#mce-link-tree");
 
-        var $melisTreeBtn   = '<button title="Site tree view" id="mce-link-tree" class="mce-btn mce-open" style="width: 34px; height: 34px;"><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; font-size: 16px; display: block; text-align: center;"></i></button>';
+        var melisTreeBtn    = '<button title="Site tree view" id="mce-link-tree" class="mce-btn mce-open" style="width: 34px; height: 34px;"><i class="icon icon-sitemap fa fa-sitemap" style="font-family: FontAwesome; position: relative; font-size: 16px; display: block; text-align: center;"></i></button>';
 
-            if ( $iurlBtn.length === 0 && $iconHStacks.length > 0 ) {
-                console.log("$iurlBtn: ", $iurlBtn.length);
-                console.log("$iconHStacks");
-                $iconHStacks.append( $melisTreeBtn );
-            } else if ( ! $burlBtn.length === 0 && $bconHStacks.length > 0 ) {
-                console.log("$burlBtn: ", $burlBtn.length);
-                console.log("$bconHStacks");
-                $bconHStacks.append( $melisTreeBtn );
+            console.log("$iaux length: ", $iaux.length);
+            console.log("$baux length: ", $baux.length);
+
+            if ( $iaux.length ) {
+                if ( $iurlBtn.length === 0 && $iconHStacks.length > 0 ) {
+                    console.log("i series");
+                    $iconHStacks.append( melisTreeBtn );    
+                }
+            }
+
+            if ( $baux.length ) {
+                if ( $burlBtn.length === 0 && $bconHStacks.length > 0 ) {
+                    console.log("b series");
+                    $bconHStacks.append( melisTreeBtn );    
+                }
             }
     }
 
