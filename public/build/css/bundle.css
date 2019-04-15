@@ -1022,3 +1022,7 @@ body.modal-open {
 #id_melis_core_gdpr_tabs.page-content-container .nav-tabs > li.active > a, .page-content-container .nav-tabs > li.active:focus > a, .page-content-container .nav-tabs > li.active:active > a {
 	border: none;
 }
+
+.mcms-gdpr-banner-details .mce-branding {
+	display: none;
+}
