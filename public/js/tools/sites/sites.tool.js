@@ -551,12 +551,14 @@ $(document).ready(function() {
      * @param form
      */
     function removeFormError(form){
-        var curForm = $(form+" input");
-        curForm.each(function(){
-            var inputName = $(this).attr("name");
-            var errlabel = $(this).closest("form").find("label.err_"+inputName).not(":has(input)");
-            errlabel.removeClass("fieldErrorColor");
-        });
+        if(form != "" && form != "skip") {
+            var curForm = $(form + " input");
+            curForm.each(function () {
+                var inputName = $(this).attr("name");
+                var errlabel = $(this).closest("form").find("label.err_" + inputName).not(":has(input)");
+                errlabel.removeClass("fieldErrorColor");
+            });
+        }
     }
 
     /**
