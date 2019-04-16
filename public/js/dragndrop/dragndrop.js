@@ -236,6 +236,32 @@ var melisDragnDrop = (function($, window) {
         $(this).children(".melis-plugin-tooltip").fadeIn();
     });
 
+    $("body").on('click', ".melis-cms-filter-btn-sub-category", function(){
+        var elem = $(this);
+        var next = elem.next();
+        var textVal = elem.text();
+        var activeMenu =  elem.parent().find('.active');
+        if (activeMenu.length > 0) {
+            activeMenu.next().slideUp();
+            activeMenu.removeClass('active');
+
+            if (activeMenu.text() !== textVal) {
+                next.slideDown();
+                elem.addClass('active');
+            }
+        } else {
+            // show menu
+            console.log(elem.hasClass('active'));
+            if (elem.hasClass('active')) {
+                next.slideUp();
+                elem.removeClass('active');
+            } else {
+                elem.addClass('active');
+                next.slideDown();
+            }
+        }
+    });
+
     // $( ".melis-editable" ).resizable({ disabled: true, handles: 'e' });
 
     function requestPlugin(module, plugin, dropzone, pageId, dropLocation, siteModule) {

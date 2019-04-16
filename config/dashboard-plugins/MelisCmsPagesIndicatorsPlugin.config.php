@@ -17,7 +17,7 @@
                         'thumbnail' => '/MelisCms/plugins/images/MelisCmsPagesIndicatorsPlugin.jpg',
                         'jscallback' => '',
                         'height' => 4,
-                        
+                        'section' => 'MelisCms',
                         'interface' => array(
                             'meliscms_page_indicators' => array(
                                 'forward' => array(

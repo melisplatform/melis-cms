@@ -28,13 +28,26 @@ class FrontPluginsController extends AbstractActionController
         $pluginsConfig = array();
         
         $siteModule = $this->params()->fromRoute('siteModule');
-        
+        $pluginList_ = $this->putSectionOnPlugins($config['plugins'], $siteModule);
+        $newPluginList = $this->organizedPluginsBySection($pluginList_);
+
         foreach ($config['plugins'] as $moduleName => $conf)
         {
             if (!empty($conf['plugins']))
             {
                 foreach ($conf['plugins'] as $pluginName => $pluginConf)
                 {
+                    /**
+                     * this is for sectioning the templating plugins
+                     * @var $melisSections
+                     */
+                    if (isset($pluginConf['melis']['section']) && ! empty($pluginConf['melis']['section'])) {
+                        // sometihing to do
+                    } else {
+                        // if no section key then we will put to the OTHERS section
+                        $pluginConf['melis']['section'] = "OTHERS";
+                    }
+
                     if ($pluginName == 'MelisFrontDragDropZonePlugin')
                         continue; // Exception, dragdropplugin can't be found in menu...
                         
@@ -109,10 +122,12 @@ class FrontPluginsController extends AbstractActionController
                 }
             }
         }
-        
+
+
         $view = new ViewModel();
         $view->pluginsConfig = $finalPluginList;
         $view->siteModule = $siteModule;
+        $view->newPluginList = $newPluginList;
         return $view;
     }
 
@@ -304,6 +319,122 @@ class FrontPluginsController extends AbstractActionController
 
 
         die;
+    }
+
+    private function putSectionOnPlugins($configurations, $siteModule)
+    {
+        $pluginList = [];
+        // melis plugins configurations
+        foreach ($configurations as $moduleName => $melisPluginsConfig) {
+            // melis plugins configrations
+            // this means the module has a templating plugins or plugins
+            if (isset($melisPluginsConfig['plugins']) && ! empty($melisPluginsConfig['plugins'])) {
+                foreach ($melisPluginsConfig['plugins'] as $pluginName =>  $pluginConfig) {
+                    // list of excluded plugins
+                    $excludedPlugins = [
+                        'MelisFrontDragDropZonePlugin'
+                    ];
+                    if (!in_array($pluginName,$excludedPlugins)) {
+                        // put site_module key under ['melis'] key
+                        $pluginConfig['melis']['site_module'] = $siteModule;
+                        // put section key  under['melis'] key
+                        if ((! isset($pluginConfig['melis']['section']) || isset($pluginConfig['melis']['section'])) && empty($pluginConfig['melis']['section'])) {
+                            // if there is no section key on [melis] config
+                            // or there is a section key but empty
+                            // we put it in the OTHER section directly
+                            $pluginConfig['melis']['section'] = "Others";
+                        }
+                        // put a moduleName for easy sectioning of plugins
+                        if (! isset($pluginConfig['melis']['moduleName']) && empty($pluginConfig['melis']['moduleName'])) {
+                            $pluginConfig['melis']['moduleName'] = $moduleName;
+                        }
+                        //
+                        $pluginList[$moduleName][$pluginName] = $pluginConfig;
+                    }
+                }
+
+            }
+        }
+
+        return $pluginList;
+    }
+    private function organizedPluginsBySection($pluginList)
+    {
+        // get module categories
+        $moduleSvc = $this->getServiceLocator()->get('ModulesService');
+        $configSvc = $this->getServiceLocator()->get('MelisCoreConfig');
+        $marketPlaceModuleSection = $moduleSvc->getPackagistCategories();
+        /*
+         * In case there is no internet or cant connect to the markeplace domain
+         * we put a predefined section just not destroy the plugins menu
+         */
+        if (empty($marketPlaceModuleSection)) {
+            $fallbackSection = $configSvc->getItem('/meliscore/datas/fallBacksection');
+            $marketPlaceModuleSection= $fallbackSection;
+        }
+        //custom section
+        $customSection = [
+            'Others',
+            'CustomProjects'
+        ];
+        // merge all sections
+        $melisSection = array_merge($marketPlaceModuleSection, $customSection);
+        $newPluginList = [];
+        // put the section in order
+        if (! empty($melisSection)) {
+            foreach ($melisSection as $idx => $val) {
+                $newPluginList[$val] = [];
+            }
+        }
+        if (! empty($pluginList)) {
+            /*
+             * organized plugins with no subcategory
+             */
+            foreach ($pluginList as $moduleName => $plugins) {
+                if (! empty($plugins)) {
+                    foreach ($plugins as $pluginName => $pluginConfig) {
+                        $pluginSection = $pluginConfig['melis']['section'];
+                        $module =  $moduleName ;
+                        if (in_array($pluginSection,$melisSection)) {
+                            // melis conifguration
+                            $melisConfig = $pluginConfig['melis'];
+                            if (isset($melisConfig['subcategory']) && ! empty($melisConfig['subcategory'])) {
+                                // this is for subsection
+                                $subsectionId = $melisConfig['subcategory']['id'] ?? null;
+                                $subsectionText = $melisConfig['subcategory']['title'] ?? null;
+                                $newPluginList[$pluginSection][$module]['hasSubsection'] = true;
+                                $newPluginList[$pluginSection][$module][$subsectionId][$pluginName] = $pluginConfig;
+                                // label of sub category
+                                $newPluginList[$pluginSection][$module][$subsectionId]['title'] = $subsectionText;
+                            } else {
+                                $newPluginList[$pluginSection][$module][$pluginName] = $pluginConfig;
+                            }
+                        } else {
+                            /*
+                            * if the section does not belong to the group it will go to the
+                            * others section direclty
+                            */
+                            $melisConfig = $pluginConfig['melis'];
+                            if (isset($melisConfig['subcategory']) && ! empty($melisConfig['subcategory'])) {
+                                // this is for subsection
+                                $subsectionId = $melisConfig['subcategory']['id'] ?? null;
+                                $subsectionText = $melisConfig['subcategory']['title'] ?? null;
+                                $newPluginList['Others'][$module]['hasSubsection'] = true;
+                                $newPluginList['Others'][$module][$subsectionId][$pluginName] = $pluginConfig;
+                                // label of sub category
+                                $newPluginList['Others'][$module][$subsectionId]['title'] = $subsectionText;
+                            } else {
+                                $newPluginList['Others'][$module][$pluginName] = $pluginConfig;
+                            }
+
+
+                        }
+                    }
+                }
+            }
+        }
+
+        return $newPluginList;
     }
 
 }

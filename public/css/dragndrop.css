@@ -138,7 +138,7 @@ body {
 }
 
 .melis-cms-ps-box .melis-cms-filter-btn,
-.melis-cms-category-btn {
+.melis-cms-category-btn , .melis-cms-filter-btn-sub-category{
     display: block;
     position: relative;
     padding: 7px 15px;
@@ -158,7 +158,8 @@ body {
 }
 
 .melis-cms-ps-box .melis-cms-filter-btn:hover,
-.melis-cms-category-btn:hover {
+.melis-cms-category-btn:hover ,
+.melis-cms-filter-btn-sub-category:hover{
     background: #2c2c2c;
     border-color: #2c2c2c;
 }
@@ -771,6 +772,22 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
     -ms-animation: shrinking-cog .3s 1 ease forwards;
     -o-animation: shrinking-cog .3s 1 ease forwards;
     animation: shrinking-cog .3s 1 ease forwards;
+}
+.melis-cms-category-plugins-box-sub {
+    display:none;
+}
+.melis-cms-filter-btn-sub-category {
+    text-indent:30px;
+}
+.melis-cms-filter-btn-sub-category i {
+    right:15px;
+    font-size:13px;
+    top:10px;
+    position:absolute;
+}
+span.melis-cms-filter-btn-sub-category.active {
+    background: #672f2d;
+    border: 1px solid #711b17;
 }
 
 @-webkit-keyframes pulse {to {box-shadow: 0 0 0 45px rgba(147, 46, 42, 0);}}

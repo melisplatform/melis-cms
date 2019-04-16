@@ -47,54 +47,144 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
         <div class="melis-cms-dnd-title"><?= $this->translate('tr_meliscms_Plugins'); ?></div>
         <div class="melis-cms-plugin-filter-box">
             <?php 
-               foreach ($this->pluginsConfig as $moduleName => $pluginList)
-               {
-                   $sectionTranslated = $this->translate('tr_PluginSection_' . $moduleName);
-                   if ($sectionTranslated == 'tr_PluginSection_' . $moduleName)
-                       $sectionTranslated = $moduleName;
+               foreach ($this->newPluginList as $section => $plugin)
+               {?>
+                   <?php
+                   /**
+                    * count first the children of the current section
+                    * before displaying the parent tab
+                    */
+                   $sectionChildrenCtr = count($plugin);
                    ?>
-                    <div class="melis-cms-ps-box">
-                        <span class="melis-cms-filter-btn"><?= $sectionTranslated; ?> <i class="fa fa-angle-down"></i></span>
-                        <div class="melis-cms-plugin-snippets-box">
-                        
-                        	<?php 
-                        	   
-                        	
-                        	   if (!empty($pluginList['subcategories']))
-                        	   {
-                        	       $cpt = 1;
-                            	   foreach ($pluginList['subcategories'] as $categoryPluginId => $categoryPlugins)
-                            	   {
-                        	           if (!empty($categoryPlugins['name']))
-                        	               $nameSubCategory = $categoryPlugins['name'];
-                        	           else
-                        	               $nameSubCategory = $categoryPluginId;
-                        	           
-                            	       ?>
-                        	       		<div class="melis-cms-category-box">
-                                       		<span class="melis-cms-category-btn"><?= $nameSubCategory; ?> <i class="fa fa-angle-down"></i></span>
-                            	       		<div class="melis-cms-category-plugins-box">
-                            	       <?php   
-
-                            	       foreach ($categoryPlugins['plugins'] as $catPluginName => $catPluginConf)
-                            	           displayMenuPlugin($moduleName, $catPluginName, $catPluginConf, $this->siteModule);
-                            	       
-                            	       ?>    
+                   <?php if($sectionChildrenCtr > 0) {?>
+                        <div class="melis-cms-ps-box">
+                            <span class="melis-cms-filter-btn"><?= $section; ?> <i class="fa fa-angle-down"></i></span>
+                            <div class="melis-cms-plugin-snippets-box">
+                                <?php foreach ($plugin as $moduleName => $templatingPlugins) { ?>
+                                    <?php
+                                        $moduleText = $this->translate('tr_PluginSection_' . $moduleName);
+                                        // one special rule
+                                        // if there's only one subsection then dont
+                                        // rewrite the module name and just list plugins
+                                    ?>
+                                    <?php if ($sectionChildrenCtr > 1) {?>
+                                        <div class="melis-cms-category-box">
+                                            <span class="melis-cms-category-btn"><?= $moduleText; ?> <i class="fa fa-angle-down"></i></span>
+                                            <div class="melis-cms-category-plugins-box">
+                                                <?php
+                                                    if (! empty($templatingPlugins)) {
+                                                        $hasSubsection = false;
+                                                        foreach ($templatingPlugins as $pluginName => $pluginConfig) { ?>
+                                                            <?php
+                                                                if ($pluginName == 'hasSubsection') {
+                                                                    $hasSubsection = true;
+                                                                }
+                                                                if ($hasSubsection) {
+                                                                    if ($pluginName != 'hasSubsection') {
+                                                                        $subsectionTitle = $this->translate($pluginConfig['title'] ?? null);?>
+                                                                        <span class="melis-cms-filter-btn-sub-category"><?= $subsectionTitle; ?> <i class="fa fa-angle-down"></i></span>
+                                                                        <div class="melis-cms-category-plugins-box-sub">
+                                                                            <?php
+                                                                                if (! empty($pluginConfig) && is_array($pluginConfig)) {
+                                                                                    foreach ($pluginConfig as $plugin => $config) {
+                                                                                        $conf = $config['melis'] ?? null;
+                                                                                        $thumbnail = $conf['thumbnail'] ?? "/MelisFront/plugins/images/default.jpg";
+                                                                                        $name = $conf['name'] ?? $pluginName;
+                                                                                        $subcategory = $conf['subcategory'];
+                                                                                        $subcategoryId = $subcategory['id'] ?? null;
+                                                                                        if ($plugin != 'title') { ?>
+                                                                                            <div class="melis-cms-plugin-snippets"
+                                                                                                 data-module-name="<?= $moduleName; ?>"
+                                                                                                 data-plugin-name="<?= $plugin; ?>"
+                                                                                                 data-plugin-site-module="<?= $this->siteModule ?>"
+                                                                                                 title="<?php if (!empty($conf['description'])) {
+                                                                                                     echo $this->translate($conf['description']);
+                                                                                                 } ?>">
+                                                                                                <img src="<?= $thumbnail; ?>"
+                                                                                                     alt="">
+                                                                                                <span class="melis-cms-plugin-title"><?= $this->translate($name); ?></span>
+                                                                                            </div>
+                                                                                        <?php }
+                                                                                    }
+                                                                                }
+                                                                            ?>
+                                                                        </div>
+                                                                    <?php }?>
+                                                                    <?php
+                                                                } else {
+                                                                    $conf = $pluginConfig['melis'];
+                                                                    $thumbnail = $conf['thumbnail']  ?? "/MelisFront/plugins/images/default.jpg";
+                                                                    $name      = $conf['name'] ?? $pluginName;
+                                                                    $moduleTextDisplay = $conf['moduleName'];?>
+                                                                    <div class="melis-cms-plugin-snippets" data-module-name="<?= $moduleName; ?>" data-plugin-name="<?= $pluginName; ?>" data-plugin-site-module="<?= $this->siteModule ?>" title="<?php if (!empty($conf['description'])){ echo $this->translate($conf['description']); } ?>">
+                                                                        <img src="<?= $thumbnail; ?>" alt="">
+                                                                        <span class="melis-cms-plugin-title"><?= $this->translate($name); ?></span>
+                                                                    </div>
+                                                                <?php } ?>
+                                                        <?php }
+                                                    }
+                                                ?>
                                             </div>
-                            	   		</div>
-                            	       <?php    
-                            	       
-                            	       $cpt++;
-                            	   }
-                        	   }
-                        	   
-                               foreach ($pluginList['plugins'] as $pluginName => $pluginConf)
-                               {
-                                   displayMenuPlugin($moduleName, $pluginName, $pluginConf, $this->siteModule);
-                               }
-                            ?>
-                        </div>  
-                    </div>
+                                        </div>
+                                    <?php } else {?>
+                                        <?php
+                                        if (! empty($templatingPlugins)) {
+                                            $hasSubsection = false;
+                                            foreach ($templatingPlugins as $pluginName => $pluginConfig) { ?>
+                                                <?php
+                                                if ($pluginName == 'hasSubsection') {
+                                                    $hasSubsection = true;
+                                                }
+                                                if ($hasSubsection) {
+                                                    if ($pluginName != 'hasSubsection') {
+                                                        $subsectionTitle = $this->translate($pluginConfig['title'] ?? null);?>
+                                                        <span class="melis-cms-filter-btn-sub-category"><?= $subsectionTitle; ?> <i class="fa fa-angle-down"></i></span>
+                                                        <div class="melis-cms-category-plugins-box-sub">
+                                                            <?php
+                                                            if (! empty($pluginConfig) && is_array($pluginConfig)) {
+                                                                foreach ($pluginConfig as $plugin => $config) {
+                                                                    $conf = $config['melis'] ?? null;
+                                                                    $thumbnail = $conf['thumbnail'] ?? "/MelisFront/plugins/images/default.jpg";
+                                                                    $name = $conf['name'] ?? $pluginName;
+                                                                    $subcategory = $conf['subcategory'];
+                                                                    $subcategoryId = $subcategory['id'] ?? null;
+                                                                    if ($plugin != 'title') { ?>
+                                                                        <div class="melis-cms-plugin-snippets"
+                                                                             data-module-name="<?= $moduleName; ?>"
+                                                                             data-plugin-name="<?= $plugin; ?>"
+                                                                             data-plugin-site-module="<?= $this->siteModule ?>"
+                                                                             title="<?php if (!empty($conf['description'])) {
+                                                                                 echo $this->translate($conf['description']);
+                                                                             } ?>">
+                                                                            <img src="<?= $thumbnail; ?>"
+                                                                                 alt="">
+                                                                            <span class="melis-cms-plugin-title"><?= $this->translate($name); ?></span>
+                                                                        </div>
+                                                                    <?php }
+                                                                }
+                                                            }
+                                                            ?>
+                                                        </div>
+                                                    <?php }?>
+                                               <?php } else {
+                                                    // this is for plugins doesnt have subsection(s)
+                                                    $conf = $pluginConfig['melis'];
+                                                    $thumbnail = $conf['thumbnail']  ?? "/MelisFront/plugins/images/default.jpg";
+                                                    $name      = $conf['name'] ?? $pluginName;
+                                                    $moduleTextDisplay = $conf['moduleName'];?>
+                                                    <div class="melis-cms-plugin-snippets" data-module-name="<?= $moduleName; ?>" data-plugin-name="<?= $pluginName; ?>" data-plugin-site-module="<?= $this->siteModule ?>" title="<?php if (!empty($conf['description'])){ echo $this->translate($conf['description']); } ?>">
+                                                        <img src="<?= $thumbnail; ?>" alt="">
+                                                        <span class="melis-cms-plugin-title"><?= $this->translate($name); ?></span>
+                                                    </div>
+                                                <?php } ?>
+                                            <?php }
+                                        }
+                                        ?>
+                                    <?php }?>
+                                <?php }?>
+                            </div>
+                        </div>
+                   <?php }?>
                    <?php
                }
             ?>
