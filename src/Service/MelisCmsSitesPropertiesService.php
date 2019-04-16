@@ -87,7 +87,7 @@ class MelisCmsSitesPropertiesService extends MelisCoreGeneralService
 
         // Service implementation start
         $siteLangHomeTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
-        $siteLangHomeId = (isset($arrayParameters['data']['shome_id']) || $arrayParameters['data']['shome_id'] > 0) ? $arrayParameters['data']['shome_id'] : null;
+        $siteLangHomeId = (isset($arrayParameters['data']['shome_id']) && $arrayParameters['data']['shome_id'] > 0) ? $arrayParameters['data']['shome_id'] : null;
 
         $siteLangHomeData = $siteLangHomeTable->save(
             [
