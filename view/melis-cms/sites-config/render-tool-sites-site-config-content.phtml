@@ -72,29 +72,36 @@ $data_melisKey = $this->melisKey;
                             <!-- ADDITIONAL INPUTS START -->
                             <?php if (!empty($this->config['site'][$this->siteName]['allSites'])) : ?>
                                 <?php foreach ($this->config['site'][$this->siteName]['allSites'] as $configKey => $config) : ?>
-                                    <?php if (!empty($this->valuesFromDb && array_key_exists('allSites', $this->valuesFromDb))) : ?>
-                                        <?php if (in_array($configKey, $this->valuesFromDb['allSites'])) : ?>
+                                    <?php if (!is_array($config)) : ?>
+                                        <?php if (!empty($this->valuesFromDb) && array_key_exists('allSites', $this->valuesFromDb) && in_array($configKey, $this->valuesFromDb['allSites'])) : ?>
                                             <label><?= $configKey ?></label>
                                             <div class="input-group ">
-                                                <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>" id="gen_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
+                                                <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>" id="gen_<?= $configKey ?>" value="<?= $config ?>">
                                                 <span class="input-group-addon"><i class="fa fa-database fa-lg" title="From DB (Overridden)"></i></span>
                                             </div>
                                             <br>
                                         <?php else : ?>
                                             <label><?= $configKey ?></label>
                                             <div class="input-group ">
-                                                <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>" id="gen_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
+                                                <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>" id="gen_<?= $configKey ?>" value="<?= $config ?>">
                                                 <span class="input-group-addon"><i class="fa fa-cogs fa-lg" title="From File (Default Value)"></i></span>
                                             </div>
                                             <br>
                                         <?php endif; ?>
                                     <?php else : ?>
-                                        <label><?= $configKey ?></label>
-                                        <div class="input-group ">
-                                            <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>" id="gen_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
-                                            <span class="input-group-addon"><i class="fa fa-cogs fa-lg" title="From File (Default Value)"></i></span>
-                                        </div>
+                                        <label><?= $configKey ?> (array)</label>
                                         <br>
+                                        <?php foreach ($config as $key => $value) : ?>
+                                            <?php if (!is_array($value)) : ?>
+                                                <div>
+                                                    <label style="margin-left: 50px;"><?= $key ?></label>
+                                                    <div class="input-group" style="left: 50px;">
+                                                        <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>[<?= $key ?>]" id="gen_<?= $key ?>" value="<?= $value ?>">
+                                                        <span class="input-group-addon"><i class="fa fa-database fa-lg" title="From DB (Overridden)"></i></span>
+                                                    </div>
+                                                </div>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -134,29 +141,57 @@ $data_melisKey = $this->melisKey;
                                 <!-- ADDITIONAL INPUTS START -->
                                 <?php if (!empty($this->config['site'][$this->siteName][$this->siteId][$lang['lang_cms_locale']])) : ?>
                                     <?php foreach ($this->config['site'][$this->siteName][$this->siteId][$lang['lang_cms_locale']] as $configKey => $config) : ?>
-                                        <?php if (!empty($this->valuesFromDb && array_key_exists($lang['lang_cms_locale'], $this->valuesFromDb))) : ?>
-                                            <?php if (in_array($configKey, $this->valuesFromDb[$lang['lang_cms_locale']])) : ?>
-                                                <label><?= $configKey ?></label>
-                                                <div class="input-group ">
-                                                    <input type="text" class="form-control col-md-10" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
-                                                    <span class="input-group-addon"><i class="fa fa-database fa-lg" title="From DB (Overridden)"></i></span>
-                                                </div>
-                                                <br>
+                                        <?php if (!is_array($config)) : ?>
+                                            <?php if (!empty($this->valuesFromDb) && array_key_exists($lang['lang_cms_locale'], $this->valuesFromDb)) : ?>
+                                                <?php if (in_array($configKey, $this->valuesFromDb[$lang['lang_cms_locale']])) : ?>
+                                                    <label><?= $configKey ?></label>
+                                                    <div class="input-group ">
+                                                        <input type="text" class="form-control col-md-10" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" value="<?= $config ?>">
+                                                        <span class="input-group-addon"><i class="fa fa-database fa-lg" title="From DB (Overridden)"></i></span>
+                                                    </div>
+                                                    <br>
+                                                <?php else : ?>
+                                                    <label><?= $configKey ?></label>
+                                                    <div class="input-group ">
+                                                        <input type="text" class="form-control col-md-10" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" value="<?= $config ?>">
+                                                        <span class="input-group-addon"><i class="fa fa-cogs fa-lg" title="From File (Default Value)"></i></span>
+                                                    </div>
+                                                    <br>
+                                                <?php endif; ?>
                                             <?php else : ?>
                                                 <label><?= $configKey ?></label>
                                                 <div class="input-group ">
-                                                    <input type="text" class="form-control col-md-10" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
+                                                    <input type="text" class="form-control col-md-10" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" value="<?= $config ?>">
                                                     <span class="input-group-addon"><i class="fa fa-cogs fa-lg" title="From File (Default Value)"></i></span>
                                                 </div>
                                                 <br>
                                             <?php endif; ?>
                                         <?php else : ?>
-                                            <label><?= $configKey ?></label>
-                                            <div class="input-group ">
-                                                <input type="text" class="form-control col-md-10" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" placeholder="<?= $configKey ?>" value="<?= $config ?>">
-                                                <span class="input-group-addon"><i class="fa fa-cogs fa-lg" title="From File (Default Value)"></i></span>
-                                            </div>
+                                            <label><?= $configKey ?> (array)</label>
                                             <br>
+                                            <?php foreach ($config as $key => $value) : ?>
+                                                <?php if (!is_array($value)) : ?>
+                                                    <?php if (!empty($this->valuesFromDb) && array_key_exists('allSites', $this->valuesFromDb) && array_key_exists($configKey, $this->valuesFromDb['allSites'])) : ?>
+                                                        <?php if (in_array($key, $this->valuesFromDb['allSites'][$configKey])) : ?>
+                                                            <div>
+                                                                <label style="margin-left: 50px;"><?= $key ?></label>
+                                                                <div class="input-group" style="left: 50px;">
+                                                                    <input type="text" class="form-control" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>[<?= $key ?>]" id="gen_<?= $key ?>" value="<?= $value ?>">
+                                                                    <span class="input-group-addon"><i class="fa fa-database fa-lg" title="From DB (Overridden)"></i></span>
+                                                                </div>
+                                                            </div>
+                                                        <?php endif; ?>
+                                                    <?php else : ?>
+                                                        <div>
+                                                            <label style="margin-left: 50px;"><?= $key ?></label>
+                                                            <div class="input-group" style="left: 50px;">
+                                                                <input type="text" class="form-control" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>[<?= $key ?>]" id="gen_<?= $key ?>" value="<?= $value ?>">
+                                                                <span class="input-group-addon"><i class="fa fa-cogs fa-lg" title="From File (Default Value)"></i></span>
+                                                            </div>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
                                         <?php endif; ?>
                                     <?php endforeach; ?>
                                 <?php endif; ?>

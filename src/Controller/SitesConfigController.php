@@ -88,12 +88,24 @@ class SitesConfigController extends AbstractActionController
                 if (array_key_exists('allSites', $dbConfig['sconf_datas']['site'][$siteName])) {
                     foreach ($dbConfig['sconf_datas']['site'][$siteName]['allSites'] as $key => $value) {
                         $valuesFromDb['allSites'][] = $key;
+
+                        if (is_array($value) && !empty($value)) {
+                            foreach ($value as $aKey => $aVal) {
+                                $valuesFromDb['allSites'][$key][] = $aKey;
+                            }
+                        }
                     }
                 }
             } else {
                 foreach ($dbConfig['sconf_datas']['site'][$siteName][$siteId] as $langKey => $langValue) {
                     foreach ($langValue as $confKey => $confVal) {
                         $valuesFromDb[$langKey][] = $confKey;
+
+                        if (is_array($confVal) && !empty($confVal)) {
+                            foreach ($confVal as $aKey => $aVal) {
+                                $valuesFromDb[$langKey][$confKey][] = $aKey;
+                            }
+                        }
                     }
                 }
             }
