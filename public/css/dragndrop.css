@@ -807,10 +807,6 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
         font-size: 12px;
     }
 }
-
-/* .tox-form__controls-h-stack .tox-control-wrap .tox-textfield {
-  width: 372px;
-} */
 .tox .tox-tbtn:hover,
 .mce-btn.mce-open:hover {
     background-color: #dee0e2;
