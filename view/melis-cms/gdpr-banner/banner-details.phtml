@@ -6,6 +6,7 @@ if (!empty($this->zoneconfig['conf']['id'])) {
 $data_melisKey = $this->melisKey;
 ?>
 <div class="mcms-gdpr-banner-details" id="<?= $id ?>" data-melisKey="<?= $this->melisKey; ?>">
+    <?php if (!empty($this->languages)): ?>
     <div class="row">
         <div class="col-xs-12 col-md-2">
             <div class="product-text-tab-container">
@@ -31,7 +32,6 @@ $data_melisKey = $this->melisKey;
                         </div>
                         <div id="cms-gdpr-content-<?= $lang['lang_cms_id']; ?>">
                             <?php
-                            //die(print_r($this->bannerContent));
                             /**
                              * Set the form's attributes & data
                              * @var \Zend\Form\Form $form
@@ -53,13 +53,9 @@ $data_melisKey = $this->melisKey;
         </div>
     </div>
     <script type="text/javascript">
-        melisTinyMCE.createTinyMCE("tool", ".mcgdpr_text_value", {height: 450});
-        var siteSelector = $("body").find(".cms_gdpr_banner_site_filter_form #id_mcgdprbanner_site_id");
-        if (siteSelector.length > 0) {
-            siteSelector.select2({
-                minimumResultsForSearch: -1,
-                placeholder: translations.tr_melis_cms_gdpr_banner_site_select
-            });
-        }
+        (function () {
+            melisTinyMCE.createTinyMCE("tool", ".mcgdpr_text_value", {height: 450});
+        })();
     </script>
+    <?php endif; ?>
 </div>

@@ -13,7 +13,20 @@ $data_melisKey = $this->melisKey;
             echo $this->melisFieldCollection($this->form);
             echo $this->form()->closeTag();
             ?>
-            <a class="btn btn-success cms-gdpr-save pull-right" title="<?= $this->label['saveBtn']; ?>"><i class="fa fa-save"></i> <?= $this->label['saveBtn']; ?></a>
+            <a class="btn btn-success cms-gdpr-save pull-right" title="<?= $this->label['saveBtn']; ?>" style="display: none;">
+                <i class="fa fa-save"></i> <?= $this->label['saveBtn']; ?>
+            </a>
+            <script type="text/javascript">
+                (function () {
+                    var siteSelector = $body.find(".cms_gdpr_banner_site_filter_form #id_mcgdprbanner_site_id");
+                    if (siteSelector.length > 0) {
+                        siteSelector.select2({
+                            minimumResultsForSearch: -1,
+                            placeholder: translations.tr_melis_cms_gdpr_banner_site_select
+                        });
+                    }
+                })();
+            </script>
         </div>
     </div>
 </div>

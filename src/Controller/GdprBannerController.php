@@ -108,12 +108,13 @@ class GdprBannerController extends AbstractActionController
     {
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $siteId = $this->params()->fromQuery('siteId', null);
+        $view = new ViewModel();
 
-        $bannerContents = [];
         if (!empty($siteId)) {
             /** @var \MelisEngine\Service\MelisGdprService $bannerSvc */
             $bannerSvc = $this->getServiceLocator()->get('MelisGdprService');
             $result = $bannerSvc->getGdprBannerText((int)$siteId)->toArray();
+            $bannerContents = [];
             if (!empty($result)) {
                 foreach ($result as $content) {
                     $bannerContents[$content['mcgdpr_text_lang_id']] = [
@@ -122,20 +123,19 @@ class GdprBannerController extends AbstractActionController
                     ];
                 }
             }
+
+            /** @var Form $form */
+            $form = $this->getForm('banner_content_form');
+
+            $melisEngineLangTable = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+            $melisEngineLang = $melisEngineLangTable->fetchAll();
+            $languages = $melisEngineLang->toArray();
+
+            $view->languages = $languages;
+            $view->bannerContentform = $form;
+            $view->bannerContents = $bannerContents;
         }
-
-        /** @var Form $form */
-        $form = $this->getForm('banner_content_form');
-
-        $melisEngineLangTable = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
-        $melisEngineLang = $melisEngineLangTable->fetchAll();
-        $languages = $melisEngineLang->toArray();
-
-        $view = new ViewModel();
         $view->melisKey = $melisKey;
-        $view->languages = $languages;
-        $view->bannerContentform = $form;
-        $view->bannerContents = $bannerContents;
 
         return $view;
     }

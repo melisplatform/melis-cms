@@ -2787,6 +2787,11 @@ $(function () {
         melisCoreTool.highlightErrors(1, null, "id_melis_cms_gdpr_banner_header");
 
         melisHelper.zoneReload("id_melis_cms_gdpr_banner_details", "melis_cms_gdpr_banner_details", {siteId: this.value});
+        if (this.value > 0) {
+            $body.find(".cms-gdpr-save").show();
+        } else {
+            $body.find(".cms-gdpr-save").hide();
+        }
     });
 
     /**
