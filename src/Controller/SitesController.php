@@ -699,7 +699,7 @@ class SitesController extends AbstractActionController
         $siteHomeData = [];
         $siteConfigTabData = [];
 
-        foreach ($data as $datum => $val){
+        foreach ($data as $datum => $val) {
             //collecting data for site module load
             if ($isAdmin) {
                 if (strstr($datum,'moduleLoad')) {
@@ -741,9 +741,6 @@ class SitesController extends AbstractActionController
                     'sconf_site_id',
                     'sconf_lang_id'
                 ];
-
-                $siteConfigTabData[$lang]['configArray'] = [];
-                $siteConfigTabData[$lang]['config'] = [];
 
                 if (in_array($key, $tableColumns)) {
                     $siteConfigTabData[$lang][$key] = $val;
@@ -1092,6 +1089,14 @@ class SitesController extends AbstractActionController
         foreach ($siteConfigTabData as $langKey => $langValue) {
             $sconf_id = !empty($langValue['sconf_id']) ? $langValue['sconf_id'] : 0;
             $result = [];
+
+            if (empty($langValue['config'])) {
+                $langValue['config'] = [];
+            }
+
+            if (empty($langValue['configArray'])) {
+                $langValue['configArray'] = [];
+            }
 
             if ($langKey == 'gen') {
                 $diff = array_diff($langValue['config'], $configFromFile['site'][$siteName]['allSites']);
