@@ -91,7 +91,7 @@ $status = '';
                 </form>
             </div>
         <?php } else { ?>
-            <span>This site has no module.load.php file.</span>
+            <span class="alert alert-warning"><?= $this->translate('tr_melis_cms_sites_module_no_module_to_load');?></span>
         <?php } ?>
     </div>
 </div>

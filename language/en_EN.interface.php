@@ -501,6 +501,7 @@
         'tr_melis_cms_sites_module_loading' => 'Module loading',
         'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice' => '<i class="fa fa-warning"></i>Below is the list of modules required by <strong>%s</strong>, are you sure you want to activate <strong>%s</strong>? ',
         'tr_melis_cms_sites_module_load_no_access' => 'You need to have and admin level of rights to modify this section.',
+        'tr_melis_cms_sites_module_no_module_to_load' => 'This site has no module to load.',
 
         #DOMAINS TAB
         'tr_melis_cms_sites_domains' => 'Domains',
