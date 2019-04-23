@@ -149,8 +149,10 @@ class SitesConfigController extends AbstractActionController
      */
     private function kSortSiteConfig(&$config, $siteName, $siteId)
     {
-        foreach ($config['site'][$siteName][$siteId] as $langKey => $langConfig) {
-            ksort($config['site'][$siteName][$siteId][$langKey]);
+        if(!empty($config)) {
+            foreach ($config['site'][$siteName][$siteId] as $langKey => $langConfig) {
+                ksort($config['site'][$siteName][$siteId][$langKey]);
+            }
         }
     }
 
