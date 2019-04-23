@@ -774,6 +774,12 @@ class SitesController extends AbstractActionController
                  */
                 $this->saveSiteModules($isAdmin, $siteId, $moduleList);
                 /**
+                 * remove languages from other tabs
+                 */
+                if ($data['to_delete_languages_data'] == 'true') {
+                    $this->deleteOtherTabsData($siteId);
+                }
+                /**
                  * if no error, execute the saving
                  */
                 $con->commit();
@@ -792,10 +798,6 @@ class SitesController extends AbstractActionController
              * rollback the process
              */
             $con->rollback();
-        }
-
-        if ($data['to_delete_languages_data'] == 'true') {
-            $this->deleteOtherTabsData($siteId);
         }
 
         $response = array(
@@ -1098,9 +1100,9 @@ class SitesController extends AbstractActionController
         $configFromFile = $this->getSiteConfigFromFile($siteName);
 
         /**
-         * Make sure tha config is not empty
+         * Make sure that config is not empty
          */
-        if($configFromFile) {
+        if(!empty($configFromFile)) {
             foreach ($configFromFile['site'][$siteName]['allSites'] as $key => $val) {
                 if (is_array($val)) {
                     foreach ($val as $vKey => $vVal) {
