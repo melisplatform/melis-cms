@@ -232,5 +232,13 @@
         'tr_melis_cms_tool_template_layout_invalid'     => 'Layout du template invalide',
         'tr_melis_cms_tool_template_controller_invalid' => 'Controlleur du template invalide',
         'tr_melis_cms_tool_template_action_invalid'     => 'Action du template invalide',
+
+        #New sites tools
+        'tr_melis_cms_site_save_ko' => "Impossible d'enregistrer le site.",
+        'tr_melis_cms_site_save_ok' => "Le site a été enregistré avec succès.",
+        'tr_melis_cms_sites_domain_scheme' => "Scheme",
+        'tr_melis_cms_sites_domain_scheme tooltip' => "Protocole http ou https",
+        'tr_melis_cms_sites_domain' => "Domaine",
+        'tr_melis_cms_sites_domain tooltip' => "Domaine sur lequel le site est accessible (ex: www.monsite.com)",
     );
 ?>

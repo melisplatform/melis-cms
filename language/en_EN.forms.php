@@ -229,8 +229,7 @@
         'tr_melis_cms_tool_template_controller_invalid' => 'Invalid template controller',
         'tr_melis_cms_tool_template_action_invalid'     => 'Invalid template action',
 
-
-        //New site tools
+        #New sites tools
         'tr_melis_cms_site_save_ko' => "Unable to save the site.",
         'tr_melis_cms_site_save_ok' => "Site has been saved successfully.",
         'tr_melis_cms_sites_domain_scheme' => "Scheme",
