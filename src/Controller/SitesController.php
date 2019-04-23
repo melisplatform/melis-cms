@@ -1103,106 +1103,111 @@ class SitesController extends AbstractActionController
          * Make sure that config is not empty
          */
         if(!empty($configFromFile)) {
-            foreach ($configFromFile['site'][$siteName]['allSites'] as $key => $val) {
-                if (is_array($val)) {
-                    foreach ($val as $vKey => $vVal) {
-                        if (!is_array($vVal)) {
-                            $configFromFile['site'][$siteName]['allSitesArray'][$key][$vKey] = $vVal;
-                        }
-                    }
-                    unset($configFromFile['site'][$siteName]['allSites'][$key]);
-                }
-            }
-
-            foreach ($configFromFile['site'][$siteName][$siteId] as $locale => $lVal) {
-                foreach ($lVal as $key => $val) {
+            /**
+             * make sure the site config exist
+             */
+            if(isset($configFromFile['site'][$siteName][$siteId])) {
+                foreach ($configFromFile['site'][$siteName]['allSites'] as $key => $val) {
                     if (is_array($val)) {
                         foreach ($val as $vKey => $vVal) {
                             if (!is_array($vVal)) {
-                                $configFromFile['site'][$siteName][$siteId][$locale . 'Array'][$key][$vKey] = $vVal;
+                                $configFromFile['site'][$siteName]['allSitesArray'][$key][$vKey] = $vVal;
                             }
                         }
-
-                        unset($configFromFile['site'][$siteName][$siteId][$locale][$key]);
+                        unset($configFromFile['site'][$siteName]['allSites'][$key]);
                     }
                 }
-            }
 
-            foreach ($siteConfigTabData as $langKey => $langValue) {
-                $sconf_id = !empty($langValue['sconf_id']) ? $langValue['sconf_id'] : 0;
-                $result = [];
-
-                if (empty($langValue['config'])) {
-                    $langValue['config'] = [];
-                }
-
-                if (empty($langValue['configArray'])) {
-                    $langValue['configArray'] = [];
-                }
-
-                if ($langKey == 'gen') {
-                    $diff = array_diff($langValue['config'], $configFromFile['site'][$siteName]['allSites']);
-
-                    if (!empty($diff)) {
-                        foreach ($diff as $key => $val) {
-                            if ($val != '') {
-                                $result['allSites'][$key] = $val;
+                foreach ($configFromFile['site'][$siteName][$siteId] as $locale => $lVal) {
+                    foreach ($lVal as $key => $val) {
+                        if (is_array($val)) {
+                            foreach ($val as $vKey => $vVal) {
+                                if (!is_array($vVal)) {
+                                    $configFromFile['site'][$siteName][$siteId][$locale . 'Array'][$key][$vKey] = $vVal;
+                                }
                             }
+
+                            unset($configFromFile['site'][$siteName][$siteId][$locale][$key]);
                         }
                     }
+                }
 
-                    if (!empty($langValue['configArray'])) {
-                        foreach ($langValue['configArray'] as $cKey => $cVal) {
-                            $diff = array_diff($langValue['configArray'][$cKey], $configFromFile['site'][$siteName]['allSitesArray'][$cKey]);
+                foreach ($siteConfigTabData as $langKey => $langValue) {
+                    $sconf_id = !empty($langValue['sconf_id']) ? $langValue['sconf_id'] : 0;
+                    $result = [];
 
+                    if (empty($langValue['config'])) {
+                        $langValue['config'] = [];
+                    }
+
+                    if (empty($langValue['configArray'])) {
+                        $langValue['configArray'] = [];
+                    }
+
+                    if ($langKey == 'gen') {
+                        $diff = array_diff($langValue['config'], $configFromFile['site'][$siteName]['allSites']);
+
+                        if (!empty($diff)) {
                             foreach ($diff as $key => $val) {
                                 if ($val != '') {
-                                    $result['allSites'][$cKey][$key] = $val;
+                                    $result['allSites'][$key] = $val;
                                 }
                             }
                         }
-                    }
-                } else {
-                    $locale = $this->getLangField(null, $siteId, $langKey, 1, 'lang_cms_locale');
-                    if (array_key_exists($locale, $configFromFile['site'][$siteName][$siteId])) {
-                        $diff = array_diff($langValue['config'], $configFromFile['site'][$siteName][$siteId][$locale]);
+
+                        if (!empty($langValue['configArray'])) {
+                            foreach ($langValue['configArray'] as $cKey => $cVal) {
+                                $diff = array_diff($langValue['configArray'][$cKey], $configFromFile['site'][$siteName]['allSitesArray'][$cKey]);
+
+                                foreach ($diff as $key => $val) {
+                                    if ($val != '') {
+                                        $result['allSites'][$cKey][$key] = $val;
+                                    }
+                                }
+                            }
+                        }
                     } else {
-                        $diff = array_diff($langValue['config'], []);
-                    }
-
-                    if (!empty($diff)) {
-                        foreach ($diff as $key => $val) {
-                            if ($val != '') {
-                                $result[$locale][$key] = $val;
-                            }
+                        $locale = $this->getLangField(null, $siteId, $langKey, 1, 'lang_cms_locale');
+                        if (array_key_exists($locale, $configFromFile['site'][$siteName][$siteId])) {
+                            $diff = array_diff($langValue['config'], $configFromFile['site'][$siteName][$siteId][$locale]);
+                        } else {
+                            $diff = array_diff($langValue['config'], []);
                         }
-                    }
 
-                    if (!empty($langValue['configArray'])) {
-                        foreach ($langValue['configArray'] as $cKey => $cVal) {
-                            if (array_key_exists($locale . 'Array', $configFromFile['site'][$siteName][$siteId])) {
-                                $diff = array_diff($langValue['configArray'][$cKey], $configFromFile['site'][$siteName][$siteId][$locale . 'Array'][$cKey]);
-                            } else {
-                                $diff = array_diff($langValue['configArray'][$cKey], []);
-                            }
-
+                        if (!empty($diff)) {
                             foreach ($diff as $key => $val) {
                                 if ($val != '') {
-                                    $result[$locale][$cKey][$key] = $val;
+                                    $result[$locale][$key] = $val;
+                                }
+                            }
+                        }
+
+                        if (!empty($langValue['configArray'])) {
+                            foreach ($langValue['configArray'] as $cKey => $cVal) {
+                                if (array_key_exists($locale . 'Array', $configFromFile['site'][$siteName][$siteId])) {
+                                    $diff = array_diff($langValue['configArray'][$cKey], $configFromFile['site'][$siteName][$siteId][$locale . 'Array'][$cKey]);
+                                } else {
+                                    $diff = array_diff($langValue['configArray'][$cKey], []);
+                                }
+
+                                foreach ($diff as $key => $val) {
+                                    if ($val != '') {
+                                        $result[$locale][$cKey][$key] = $val;
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                $siteConfigTable->save(
-                    [
-                        'sconf_site_id' => $siteId,
-                        'sconf_lang_id' => $langKey === 'gen' ? -1 : $langKey,
-                        'sconf_datas' => serialize($result)
-                    ],
-                    $sconf_id
-                );
+                    $siteConfigTable->save(
+                        [
+                            'sconf_site_id' => $siteId,
+                            'sconf_lang_id' => $langKey === 'gen' ? -1 : $langKey,
+                            'sconf_datas' => serialize($result)
+                        ],
+                        $sconf_id
+                    );
+                }
             }
         }
     }
