@@ -86,7 +86,9 @@ $data_melisKey = $this->melisKey;
                                                 }
 
                                                 if ($el->getName() == 'shome_id') {
-                                                    $el->setValue($siteLangHomepage['shome_id']);
+                                                    if ($siteLangHomepage['shome_lang_id'] == $lang['slang_lang_id']) {
+                                                        $el->setValue($siteLangHomepage['shome_id']);
+                                                    }
                                                 }
                                             }
 
