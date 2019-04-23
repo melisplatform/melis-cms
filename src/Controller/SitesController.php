@@ -742,6 +742,9 @@ class SitesController extends AbstractActionController
                     'sconf_lang_id'
                 ];
 
+                $siteConfigTabData[$lang]['configArray'] = [];
+                $siteConfigTabData[$lang]['config'] = [];
+
                 if (in_array($key, $tableColumns)) {
                     $siteConfigTabData[$lang][$key] = $val;
                 } else {
