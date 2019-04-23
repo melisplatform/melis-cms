@@ -1160,16 +1160,14 @@ class SitesController extends AbstractActionController
                 }
             }
 
-            if (!empty($result)) {
-                $siteConfigTable->save(
-                    [
-                        'sconf_site_id' => $siteId,
-                        'sconf_lang_id' => $langKey === 'gen' ? -1 : $langKey,
-                        'sconf_datas' => serialize($result)
-                    ],
-                    $sconf_id
-                );
-            }
+            $siteConfigTable->save(
+                [
+                    'sconf_site_id' => $siteId,
+                    'sconf_lang_id' => $langKey === 'gen' ? -1 : $langKey,
+                    'sconf_datas' => serialize($result)
+                ],
+                $sconf_id
+            );
         }
     }
 
