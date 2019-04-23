@@ -927,16 +927,23 @@ class SitesController extends AbstractActionController
             }
 
             $site404Tbl = $this->getServiceLocator()->get('MelisEngineTableSite404');
-            $site404 = $site404Tbl->getEntryByField('s404_site_id', $siteId)->toArray()[0];
-
-            if ($site404['s404_page_id'] != $sitePropData['s404_page_id']) {
-                $site404Tbl->update(
-                    [
-                        's404_page_id' => $sitePropData['s404_page_id']
-                    ],
-                    's404_site_id',
-                    $siteId
-                );
+            $site404 = $site404Tbl->getEntryByField('s404_site_id', $siteId)->current();
+            if(!empty($site404)) {
+                if ($site404->s404_page_id != $sitePropData['s404_page_id']) {
+                    $site404Tbl->update(
+                        [
+                            's404_page_id' => $sitePropData['s404_page_id']
+                        ],
+                        's404_site_id',
+                        $siteId
+                    );
+                }
+            }else{
+                //save the 404 id
+                $site404Tbl->save([
+                    's404_site_id' => $siteId,
+                    's404_page_id' => $sitePropData['s404_page_id']
+                ]);
             }
         } else {
             $err = [];
