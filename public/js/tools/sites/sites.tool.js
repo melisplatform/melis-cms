@@ -1,5 +1,49 @@
 $(document).ready(function() {
     $body = $("body");
+
+    /**
+     * Get all input values into one array on clicking save button except for the site translation inputs
+     */
+    $body.on("click","#btn-save-meliscms-tool-sites", function () {
+        var currentTabId = activeTabId.split("_")[0];
+        var dataString = $("#"+currentTabId+"_id_meliscms_tool_sites_edit_site form").serializeArray();
+        // serialize the new array and send it to server
+        dataString = $.param(dataString);
+
+        $.ajax({
+            type        : 'POST',
+            url         : '/melis/MelisCms/Sites/saveSite?siteId='+currentTabId,
+            data        : dataString,
+            dataType    : 'json',
+            encode		: true
+        }).success(function (data) {
+            if (data.success === 1) {
+                // call melisOkNotification
+                melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
+                // update flash messenger values
+                melisCore.flashMessenger();
+
+                melisHelper.zoneReload(
+                    currentTabId + '_id_meliscms_tool_sites_edit_site',
+                    'meliscms_tool_sites_edit_site',
+                    {
+                        siteId: currentTabId,
+                        cpath: 'meliscms_tool_sites_edit_site'
+                    }
+                );
+            } else {
+                melisCoreTool.highlightErrors(data.success, data.errors, currentTabId+"_id_meliscms_tool_sites_edit_site");
+                // error modal
+                melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors );
+            }
+
+            // update flash messenger values
+            melisCore.flashMessenger();
+        }).error(function(xhr, textStatus, errorThrown) {
+            alert( translations.tr_meliscore_error_message );
+        });
+    });
+
     /**
      * This will open a new tab when editing a site
      */
