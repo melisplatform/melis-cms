@@ -12,13 +12,14 @@ $data_melisKey = $this->melisKey;
         <div class="switch-all-container">
             <div class="row">
                 <div class="col-md-12">
-                    <h3 class="pull-left">Site Config</h3>
+                    <h3 class="pull-left"><?= $this->translate('tr_melis_cms_sites_tool_config_title') ?></h3>
                 </div>
             </div>
         </div>
         <br>
-        <br>
-        <br>
+        <div class="alert alert-warning" role="alert">
+            <?= $this->translate('tr_melis_cms_sites_tool_config_array_warning'); ?>
+        </div>
         <div class="row">
             <div class="col-xs-12 col-md-2">
                 <div class="product-text-tab-container" >

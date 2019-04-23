@@ -497,28 +497,28 @@
         'tr_melis_cms_sites_tool_add_create_site_required_field' => 'Veuillez remplir tous les champs obligatoires',
 
         #MODULE LOAD TAB
-        'tr_melis_cms_sites_module_loading' => 'Module Loading',
-        'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice' => '<i class="fa fa-warning"></i> Below are the lists of module(s) that is required by <strong>%s</strong>, are you sure you want to activate <strong>%s</strong>? ',
-        'tr_melis_cms_sites_module_load_no_access' => 'You need to have and admin level of rights to modify this section.',
+        'tr_melis_cms_sites_module_loading' => 'Chargement du module',
+        'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice' => '<i class="fa fa-warning"></i>Ci-dessous est la liste des modules requis par <strong>%s</strong>, êtes-vous sûr de vouloir activer <strong>%s</strong>? ',
+        'tr_melis_cms_sites_module_load_no_access' => 'Vous avez besoin d\'un niveau de droits d\'administrateur pour modifier cette section.',
 
         #DOMAINS TAB
-        'tr_melis_cms_sites_domains' => 'Domains',
+        'tr_melis_cms_sites_domains' => 'Domaines',
 
         #PROPERTIES TAB
-        'tr_melis_cms_sites_properties' => 'Properties',
-        'tr_melis_cms_sites_site_id' => 'Site ID',
-        'tr_melis_cms_sites_site_id tooltip' => 'Identifier of the site currently editing',
-        'tr_melis_cms_sites_site_label' => 'Site Name',
-        'tr_melis_cms_sites_site_label tooltip' => 'The name of the site displayed in the platform',
-        'tr_melis_cms_sites_site_name' => 'Site Module',
-        'tr_melis_cms_sites_site_name tooltip' => 'The module name as defined in the code (or folder name in MelisSites/)',
-        'tr_melis_cms_sites_s404_page_id' => '404 Page ID',
-        'tr_melis_cms_sites_s404_page_id tooltip' => 'Identifier of the 404 page',
-        'tr_melis_cms_sites_site_main_page_id' => 'Main Home Page ID',
-        'tr_melis_cms_sites_site_main_page_id tooltip' => 'Identifier of the home page',
-        'tr_melis_cms_sites_homepages' => 'Homepages',
-        'tr_melis_cms_sites_shome_page_id' => 'Home Page ID',
-        'tr_melis_cms_sites_shome_page_id tooltip' => 'Identifier of the home page per language',
+        'tr_melis_cms_sites_properties' => 'Propriétés',
+        'tr_melis_cms_sites_site_id' => 'ID site',
+        'tr_melis_cms_sites_site_id tooltip' => 'Identifant du site en cours d\'édition',
+        'tr_melis_cms_sites_site_label' => 'Nom du site',
+        'tr_melis_cms_sites_site_label tooltip' => 'Nom du site affiché dans la plateforme',
+        'tr_melis_cms_sites_site_name' => 'Module du site',
+        'tr_melis_cms_sites_site_name tooltip' => 'Nom du module tel que défini dans le code (ou le nom du dossier dans MelisSites/)',
+        'tr_melis_cms_sites_s404_page_id' => 'ID de la page 404',
+        'tr_melis_cms_sites_s404_page_id tooltip' => 'Identifiant de la page 404',
+        'tr_melis_cms_sites_site_main_page_id' => 'ID de la page d\'accueil principale',
+        'tr_melis_cms_sites_site_main_page_id tooltip' => 'Identifiant de la page d\'accueil',
+        'tr_melis_cms_sites_homepages' => 'Pages d\'accueil',
+        'tr_melis_cms_sites_shome_page_id' => 'ID de la page d\'accueil',
+        'tr_melis_cms_sites_shome_page_id tooltip' => 'Identifiant de la page d\'accueil par langue',
 
         #SITE TRANSLATION TAB
         'tr_melis_site_translation_name' => 'Traduction du site Melis',
@@ -550,5 +550,17 @@
         'tr_melis_site_translation_select_language_site' => 'Choisir le site',
         'tr_melis_site_translation_empty_site' => 'Veuillez sélectionner un site',
         'tr_melis_site_translation_select_site_tooltip' => 'Spécifiez à quel site appartient cette traduction',
+        'tr_melis_site_translation_language' => 'Langue',
+
+        #SITES LANGUAGES TAB
+        'tr_melis_cms_sites_tool_languages_title' => 'Langues',
+        'tr_melis_cms_sites_tool_languages_question1' => 'Choisissez les langues affectées à ce site',
+        'tr_melis_cms_sites_tool_languages_question2' => 'Comment souhaitez-vous refléter la langue dans les URLs du site ?',
+        'tr_melis_cms_sites_tool_languages_option2' => 'Je veux afficher la locale après mon domaine (ex: www.monsite.com/en/monurl)',
+        'tr_melis_cms_sites_tool_languages_option1' => 'Je ne veux rien, l\'url de la page sera établie uniquement sur le nom de la page',
+
+        #SITES CONFIG TAB
+        'tr_melis_cms_sites_tool_config_title' => 'Configuration du site',
+        'tr_melis_cms_sites_tool_config_array_warning' => 'Les tableaux imbriqués avec une profondeur de 2 ou plus ne sont pas affichés. Vous pouvez les éditer manuellement sur le fichier.'
 	);
 ?>

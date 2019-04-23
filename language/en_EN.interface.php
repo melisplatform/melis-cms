@@ -498,8 +498,8 @@
         'tr_melis_cms_sites_tool_add_create_site_required_field' => 'Please fill out all the required fields',
 
         #MODULE LOAD TAB
-        'tr_melis_cms_sites_module_loading' => 'Module Loading',
-        'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice' => '<i class="fa fa-warning"></i> Below are the lists of module(s) that is required by <strong>%s</strong>, are you sure you want to activate <strong>%s</strong>? ',
+        'tr_melis_cms_sites_module_loading' => 'Module loading',
+        'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice' => '<i class="fa fa-warning"></i>Below is the list of modules required by <strong>%s</strong>, are you sure you want to activate <strong>%s</strong>? ',
         'tr_melis_cms_sites_module_load_no_access' => 'You need to have and admin level of rights to modify this section.',
 
         #DOMAINS TAB
@@ -553,5 +553,15 @@
         'tr_melis_site_translation_select_site_tooltip' => 'Specify what site does this translation belongs to',
         'tr_melis_site_translation_language' => 'Language',
 
+        #SITES LANGUAGES TAB
+        'tr_melis_cms_sites_tool_languages_title' => 'Languages',
+        'tr_melis_cms_sites_tool_languages_question1' => 'Choose the languages affected to this site',
+        'tr_melis_cms_sites_tool_languages_question2' => 'How do you want to reflect the language in the site\'s URLs?',
+        'tr_melis_cms_sites_tool_languages_option2' => 'I want the locale shown after my domain (ex: www.mysite.com/en/myurl)',
+        'tr_melis_cms_sites_tool_languages_option1' => 'I want nothing, my page url will be solely built on the page\'s name',
+
+        #SITES CONFIG TAB
+        'tr_melis_cms_sites_tool_config_title' => 'Site Config',
+        'tr_melis_cms_sites_tool_config_array_warning' => 'Nested arrays with depth of 2 or more are not displayed. You can edit it manually on the file instead.'
 	);
 ?>

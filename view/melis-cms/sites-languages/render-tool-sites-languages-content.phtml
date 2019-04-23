@@ -11,7 +11,16 @@ $data_melisKey = $this->melisKey;
         <div class="switch-all-container">
             <div class="row">
                 <div class="col-md-12">
-                    <h3 class="pull-left">Choose the languages affected to this site</h3>
+                    <h3 class="pull-left"><?= $this->translate('tr_melis_cms_sites_tool_languages_title'); ?></h3>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+        <div class="switch-all-container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="pull-left"><?= $this->translate('tr_melis_cms_sites_tool_languages_question1'); ?></h3>
                 </div>
             </div>
         </div>
@@ -40,7 +49,7 @@ $data_melisKey = $this->melisKey;
         <!--LANGUAGES LISTING END-->
         <br>
         <br>
-        <h3>How do you want to reflect the language in the site's URLs?</h3>
+        <h3><?= $this->translate('tr_melis_cms_sites_tool_languages_question2'); ?></h3>
         <!-- SITE OPTION LANGUAGE URL -->
         <?php
             $option1 = '';
@@ -55,14 +64,14 @@ $data_melisKey = $this->melisKey;
         <div class="row">
             <div class="col-md-12">
                 <label class="radio-inline">
-                    <input type="radio" class="radio" name="site_opt_lang_url" value="2" <?= $option2 ?>> I want the locale shown after my domain (ex: www.mysite.com/en/myurl)
+                    <input type="radio" class="radio" name="site_opt_lang_url" value="2" <?= $option2 ?>> <?= $this->translate('tr_melis_cms_sites_tool_languages_option2'); ?>
                 </label>
             </div>
         </div>
         <div class="row">
             <div class="col-md-12">
                 <label class="radio-inline">
-                    <input type="radio" class="radio" name="site_opt_lang_url" value="1" <?= $option1 ?>> I want nothing, my page url will be solely built on the page's name
+                    <input type="radio" class="radio" name="site_opt_lang_url" value="1" <?= $option1 ?>> <?= $this->translate('tr_melis_cms_sites_tool_languages_option1'); ?>
                 </label>
             </div>
         </div>
