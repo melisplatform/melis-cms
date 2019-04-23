@@ -1216,11 +1216,18 @@ class SitesController extends AbstractActionController
         $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
         $siteConfigTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteConfig');
         $siteHomePageTbl = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
+        $transTextTbl = $this->getServiceLocator()->get('MelisSiteTranslationTextTable');
+        $transSvc = $this->getServiceLocator()->get('MelisSiteTranslationService');
         $inactiveLangs = $siteLangsTable->getSiteLangs(null, $siteId, null, 0)->toArray();
 
         foreach ($inactiveLangs as $inactiveLang) {
             $siteConfigTable->deleteConfig(null, $siteId, $inactiveLang['slang_lang_id']);
             $siteHomePageTbl->deleteHomePageId(null, $siteId, $inactiveLang['slang_lang_id'], null);
+
+            $trans = $transSvc->getSiteTranslationFromDb(null, $inactiveLang['slang_lang_id'], $siteId);
+            foreach ($trans as $tran) {
+                $transTextTbl->deleteById($tran['mstt_id']);
+            }
         }
     }
 
@@ -1272,7 +1279,7 @@ class SitesController extends AbstractActionController
             $langId = -1;
         }
 
-        $lang = $siteLangsTable->getSiteLangs($id, $siteId, $langId, $isActive, 'test')->toArray();
+        $lang = $siteLangsTable->getSiteLangs($id, $siteId, $langId, $isActive)->toArray();
 
         if (!empty($lang)) {
             $lang = $lang[0];
