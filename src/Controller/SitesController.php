@@ -1016,10 +1016,17 @@ class SitesController extends AbstractActionController
             if ($form->isValid()) {
                 $sitePropSvc->saveSiteLangHome($siteHomeDatum);
             } else {
+                $locale = $this->getLangField(
+                    null,
+                    $siteHomeDatum["shome_site_id"],
+                    $siteHomeDatum["shome_lang_id"],
+                    1,
+                    'lang_cms_name'
+                );
                 $currErr = [];
 
                 foreach ($form->getMessages() as $key => $err) {
-                    $currErr[$siteHomeDatum["shome_lang_id"]."_".$key] = $err;
+                    $currErr[$locale." homepage ID"] = $err;
                 }
 
                 $errors = array_merge($errors, $currErr);
