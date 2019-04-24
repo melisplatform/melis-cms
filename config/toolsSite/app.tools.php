@@ -220,7 +220,7 @@ return array(
                                 array(
                                     'spec' => array(
                                         'name' => 'siteSelectModuleName',
-                                        'type' => 'MelisCmsPluginSiteModuleSelect',
+                                        'type' => 'MelisCmsSiteModuleSelect',
                                         'options' => array(
                                             'label' => 'tr_melis_cms_sites_tool_add_step4_select_module',
                                             'empty_option' => 'tr_melis_cms_sites_tool_add_step4_select_module_placeholder',

@@ -163,6 +163,7 @@ return array(
             'MelisSwitch' => 'MelisCms\Form\Factory\MelisSwitchFactory',
             'MelisCmsLanguageSelect' => 'MelisCms\Form\Factory\MelisCmsLanguageSelectFactory',
             'MelisCmsPageLanguagesSelect' => 'MelisCms\Form\Factory\MelisCmsPageLanguagesSelectFactory',
+            'MelisCmsSiteModuleSelect' => 'MelisCms\Form\Factory\MelisCmsSiteModuleSelectFactory',
         ),
     ),
     'view_manager' => array(
