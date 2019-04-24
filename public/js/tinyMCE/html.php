@@ -6,7 +6,7 @@
        'inline' => true,
        'templates' => 'miniTemplates',
        'menubar' => false,
-       'forced_root_block' => 'p',
+       'forced_root_block' => '',
        'paste_word_valid_elements'=> "p,b,strong,i,em,h1,h2,h3,h4",
        'cleanup' => false,
        'verify_html' => false,
