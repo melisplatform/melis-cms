@@ -722,8 +722,8 @@ $(document).ready(function() {
             melisCoreTool.confirm(
                 translations.tr_meliscore_common_yes,
                 translations.tr_meliscore_common_no,
-                'Site Languague',
-                'Do you want to delete all data from other tabs of this language? ',
+                translations.tr_melis_cms_sites_tool_languages_title,
+                translations.tr_melis_cms_sites_tool_languages_prompt_delete_data,
                 function() {
                     input.val('true');
                 }

@@ -559,6 +559,7 @@
         'tr_melis_cms_sites_tool_languages_question2' => 'Comment souhaitez-vous refléter la langue dans les URLs du site ?',
         'tr_melis_cms_sites_tool_languages_option2' => 'Je veux afficher la locale après mon domaine (ex: www.monsite.com/en/monurl)',
         'tr_melis_cms_sites_tool_languages_option1' => 'Je ne veux rien, l\'url de la page sera établie uniquement sur le nom de la page',
+        'tr_melis_cms_sites_tool_languages_prompt_delete_data' => 'Souhaitez-vous supprimer toutes les données de la base de données avec cette langue? (ID page d\'accueil, configurations et traductions du site)',
 
         #SITES CONFIG TAB
         'tr_melis_cms_sites_tool_config_title' => 'Configuration du site',
