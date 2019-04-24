@@ -252,9 +252,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                                 /**
                                  * Add site translation file
                                  */
-                                if($arrayParameters['createModule'] && !empty($siteModuleName)) {
-                                    $this->addSiteTranslationFile($siteModuleName, $arrayParameters['siteLanguages']);
-                                }
+                                $this->addSiteTranslationFile($siteModuleName, $arrayParameters['siteLanguages']);
 
                                 /**
                                  * add saved site id to the array to return
@@ -376,9 +374,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                                     /**
                                      * Add site translation file
                                      */
-                                    if($arrayParameters['createModule'] && !empty($siteModuleName)) {
-                                        $this->addSiteTranslationFile($siteModuleName, $langId);
-                                    }
+                                    $this->addSiteTranslationFile($siteModuleName, $langId);
                                 }
                             }
 
@@ -714,11 +710,19 @@ class MelisCmsSiteService extends MelisCoreGeneralService
         $phpArray = new PhpArray();
         $config->{$siteModuleName . '_trans_key_test'} = 'Test translation '.$localeExp[0];
         $languagePath = $modulePath.'/language';
+        /**
+         * make sure language folder is exist
+         */
         if(!file_exists($languagePath)){
             mkdir($languagePath, 0777, true);
         }
         $transFileName = $languagePath.'/'.$langLocale.'.php';
-        $phpArray->toFile($transFileName, $config);
+        /**
+         * Make sure the file is not yet created
+         */
+        if(!file_exists($transFileName)) {
+            $phpArray->toFile($transFileName, $config);
+        }
     }
 	
 	/**
