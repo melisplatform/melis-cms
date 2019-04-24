@@ -696,32 +696,37 @@ class MelisCmsSiteService extends MelisCoreGeneralService
          */
         $modulePath = $this->getModulePath($siteModuleName);
         /**
-         * Get lang data
+         * Make sure that the site is exist
          */
-        $langCmsTbl = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
-        $langData = $langCmsTbl->getEntryById($langId)->current();
-        $langLocale = $langData->lang_cms_locale;
-        $localeExp = explode('_', $langLocale);
+        if(file_exists($modulePath)) {
+            /**
+             * Get lang data
+             */
+            $langCmsTbl = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+            $langData = $langCmsTbl->getEntryById($langId)->current();
+            $langLocale = $langData->lang_cms_locale;
+            $localeExp = explode('_', $langLocale);
 
-        /**
-         * Lets add the translation file on language folder
-         */
-        $config = new Config(array(), true);
-        $phpArray = new PhpArray();
-        $config->{$siteModuleName . '_trans_key_test'} = 'Test translation '.$localeExp[0];
-        $languagePath = $modulePath.'/language';
-        /**
-         * make sure language folder is exist
-         */
-        if(!file_exists($languagePath)){
-            mkdir($languagePath, 0777, true);
-        }
-        $transFileName = $languagePath.'/'.$langLocale.'.php';
-        /**
-         * Make sure the file is not yet created
-         */
-        if(!file_exists($transFileName)) {
-            $phpArray->toFile($transFileName, $config);
+            /**
+             * Lets add the translation file on language folder
+             */
+            $config = new Config(array(), true);
+            $phpArray = new PhpArray();
+            $config->{$siteModuleName . '_trans_key_test'} = 'Test translation ' . $localeExp[0];
+            $languagePath = $modulePath . '/language';
+            /**
+             * make sure language folder is exist
+             */
+            if (!file_exists($languagePath)) {
+                mkdir($languagePath, 0777, true);
+            }
+            $transFileName = $languagePath . '/' . $langLocale . '.php';
+            /**
+             * Make sure the file is not yet created
+             */
+            if (!file_exists($transFileName)) {
+                $phpArray->toFile($transFileName, $config);
+            }
         }
     }
 	
