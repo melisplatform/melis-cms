@@ -69,7 +69,6 @@ var melisPluginEdition = (function($, window) {
         catch (e) {
            console.log(e);
         }
-
     }
 
     // Validate form in modal
@@ -467,8 +466,8 @@ var melisPluginEdition = (function($, window) {
         if(generate) {
             generateScript(url);
         }
-
     }
+
     function generateLink(url) {
         var el = document.createElement('link');
         el.href = url;
@@ -519,8 +518,6 @@ var melisPluginEdition = (function($, window) {
                 console.log("Something went wrong");
             }
         });
-
-
     }
 
     function pluginDetector() {
