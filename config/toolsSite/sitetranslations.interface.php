@@ -44,7 +44,7 @@ return array(
                     'conf' => array(
                         'id' => 'id_meliscms_tool_sites_site_translations',
                         'melisKey' => 'meliscms_tool_sites_site_translations',
-                        'name' => 'Site Translations',
+                        'name' => 'tr_melis_cms_sites_tool_content_edit_site_translations_tab',
                         'icon' => 'font',
                     ),
                     'forward' => array(
@@ -55,7 +55,18 @@ return array(
                         'jsdatas' => array()
                     ),
                     'interface' => array(
-
+                        'meliscms_tool_sites_site_translations_content' => array(
+                            'conf' => array(
+                                'id' => 'id_meliscms_tool_sites_site_translations_content',
+                                'melisKey' => 'meliscms_tool_sites_site_translations_content',
+                                'name' => 'tr_melis_cms_sites_tool_content_edit_site_translations_tab_content',
+                            ),
+                            'forward' => array(
+                                'module' => 'MelisCms',
+                                'controller' => 'SitesTranslation',
+                                'action' => 'render-tool-sites-site-translations-content',
+                            ),
+                        ),
                     ),
                 ),
 
@@ -63,7 +74,7 @@ return array(
                     'conf' => array(
                         'id' => 'id_meliscms_tool_sites_site_translations_modal_edit',
                         'melisKey' => 'meliscms_tool_sites_site_translations_modal_edit',
-                        'name' => 'tr_melis_site_translation_edit_translation',
+                        'name' => 'Site Translation Content',
                         'icon' => 'fa fa-pencil',
                     ),
                     'forward' => array(

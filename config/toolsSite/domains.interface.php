@@ -73,6 +73,7 @@ return array(
                             'conf' => array(
                                 'id' => 'id_meliscms_tool_sites_domains_content',
                                 'melisKey' => 'meliscms_tool_sites_domains_content',
+                                'name' => 'Domain Content',
                                 'rightsDisplay' => 'true',
                             ),
                             'forward' => array(

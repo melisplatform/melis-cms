@@ -1,6 +1,31 @@
 <?php
 return array(
     'plugins' => array(
+        'meliscore' => array(
+            'interface' => array(
+                'meliscore_leftmenu' => array(
+                    'interface' => array(
+                        'meliscms_toolstree_section' => array(
+                            'interface' => array(
+                                'meliscms_site_tools' => array(
+                                    'interface' => array(
+                                        'meliscms_tool_sites' => array(
+                                            'interface' => array(
+                                                'meliscms_tool_sites_edit_site_tabs_properties' => array(
+                                                    'conf' => array(
+                                                        'type' => 'melistoolsitesproperties/interface/meliscms_tool_sites_properties'
+                                                    )
+                                                ),
+                                            )
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
         'meliscms' => array(
             'interface' => array(
                 'meliscms_toolstree' => array(
@@ -18,6 +43,15 @@ return array(
                                 ),
                             ),
                         ),
+//                        'meliscms_tool_sites' => array(
+//                            'interface' => array(
+//                                'meliscms_tool_sites_edit_site_tabs_properties' => array(
+//                                    'conf' => array(
+//                                        'type' => 'melistoolsitesproperties/interface/meliscms_tool_sites_properties'
+//                                    )
+//                                ),
+//                            )
+//                        ),
                     ),
                 ),
             ),
@@ -58,7 +92,7 @@ return array(
                     'conf' => array(
                         'id' => 'id_meliscms_tool_sites_properties',
                         'melisKey' => 'meliscms_tool_sites_properties',
-                        'name' => 'Properties',
+                        'name' => 'tr_melis_cms_sites_tool_content_edit_properties_tab',
                         'icon' => 'cogwheel',
                     ),
                     'forward' => array(
@@ -73,6 +107,7 @@ return array(
                             'conf' => array(
                                 'id' => 'id_meliscms_tool_sites_properties_content',
                                 'melisKey' => 'meliscms_tool_sites_properties_content',
+                                'name' => 'tr_melis_cms_sites_tool_content_edit_properties_tab_content',
                                 'rightsDisplay' => 'true',
                             ),
                             'forward' => array(

@@ -8,14 +8,16 @@ $data_melisKey = $this->melisKey;
 ?>
 <div data-melisKey='<?= $data_melisKey; ?>'<?= $id; ?> class="tab-pane widget-body-regular meliscms_center_tabs">
     <?php
-    if (empty($this->noAccess)) {
+    if($this->canAccess) {
         if (!empty($this->zoneconfig['interface'])) {
             foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
                 echo $this->$keyConfig;
             }
         }
-    } else {
-        echo '<h4>'.$this->noAccess.'</h4>';
+    }
+    else
+    {
+        echo '<span>'.$this->translate('tr_melis_cms_sites_tool_content_edit_tab_no_access').'</span>';
     }
     ?>
 </div>

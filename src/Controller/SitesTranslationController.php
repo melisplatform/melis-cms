@@ -109,17 +109,43 @@ class SitesTranslationController extends AbstractActionController
     }
 
     /**
-     * Function to render the site translation content
-     *
      * @return ViewModel
      */
     public function renderToolSitesSiteTranslationsAction()
     {
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $melisKey = $this->params()->fromRoute('melisKey', '');;
+
+        $rightService = $this->getServiceLocator()->get('MelisCoreRights');
+        $canAccess = $rightService->canAccess('meliscms_tool_sites_site_translations_content');
+
+        $view = new ViewModel();
+
+        $view->melisKey = $melisKey;
+        $view->siteId = $siteId;
+        $view->canAccess = $canAccess;
+
+        return $view;
+    }
+
+    /**
+     * Function to render the site translation content
+     *
+     * @return ViewModel
+     */
+    public function renderToolSitesSiteTranslationsContentAction()
+    {
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        /**
+         * Make sure site id is not empty
+         */
+        if(empty($siteId))
+            return;
+
         $translator = $this->getServiceLocator()->get('translator');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
 
         $columns = $melisTool->getColumns();
         // pre-add Action Columns

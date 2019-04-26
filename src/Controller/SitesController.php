@@ -616,7 +616,7 @@ class SitesController extends AbstractActionController
                         $textMessage = 'tr_melis_cms_sites_tool_add_unable_to_create_site';
                         $errors = array(
                             'Error' => array(
-                                'siteAlreadyExists' => $translator->translate($saveSiteResult['message'])
+                                'error' => $translator->translate($saveSiteResult['message'])
                             ),
                         );
                         $status = false;
@@ -776,8 +776,10 @@ class SitesController extends AbstractActionController
                 /**
                  * remove languages from other tabs
                  */
-                if ($data['to_delete_languages_data'] == 'true') {
-                    $this->deleteOtherTabsData($siteId);
+                if(isset($data['to_delete_languages_data'])) {
+                    if ($data['to_delete_languages_data'] == 'true') {
+                        $this->deleteOtherTabsData($siteId);
+                    }
                 }
                 /**
                  * if no error, execute the saving
@@ -904,54 +906,59 @@ class SitesController extends AbstractActionController
      */
     private function saveSiteProperties($siteId, $sitePropData, &$errors, &$status)
     {
-        $form = $this->getTool()->getForm('meliscms_tool_sites_properties_form');
-        $form->setData($sitePropData);
+        /**
+         * Check if there is data to be process
+         */
+        if(!empty($sitePropData)) {
+            $form = $this->getTool()->getForm('meliscms_tool_sites_properties_form');
+            $form->setData($sitePropData);
 
-        if ($form->isValid()) {
-            $siteTbl = $this->getServiceLocator()->get('MelisEngineTableSite');
-            $siteData = $siteTbl->getEntryById($siteId)->toArray()[0];
-            $dataToUpdate = [];
+            if ($form->isValid()) {
+                $siteTbl = $this->getServiceLocator()->get('MelisEngineTableSite');
+                $siteData = $siteTbl->getEntryById($siteId)->toArray()[0];
+                $dataToUpdate = [];
 
-            foreach ($siteData as $siteDatumKey => $siteDatum) {
-                if (array_key_exists($siteDatumKey, $sitePropData)) {
-                    if ($sitePropData[$siteDatumKey] != $siteDatum) {
-                        $dataToUpdate[$siteDatumKey] = $sitePropData[$siteDatumKey];
+                foreach ($siteData as $siteDatumKey => $siteDatum) {
+                    if (array_key_exists($siteDatumKey, $sitePropData)) {
+                        if ($sitePropData[$siteDatumKey] != $siteDatum) {
+                            $dataToUpdate[$siteDatumKey] = $sitePropData[$siteDatumKey];
+                        }
                     }
                 }
-            }
 
-            if (!empty($dataToUpdate)) {
-                $siteTbl->update($dataToUpdate, 'site_id', $siteId);
-            }
-
-            $site404Tbl = $this->getServiceLocator()->get('MelisEngineTableSite404');
-            $site404 = $site404Tbl->getEntryByField('s404_site_id', $siteId)->current();
-            if(!empty($site404)) {
-                if ($site404->s404_page_id != $sitePropData['s404_page_id']) {
-                    $site404Tbl->update(
-                        [
-                            's404_page_id' => $sitePropData['s404_page_id']
-                        ],
-                        's404_site_id',
-                        $siteId
-                    );
+                if (!empty($dataToUpdate)) {
+                    $siteTbl->update($dataToUpdate, 'site_id', $siteId);
                 }
-            }else{
-                //save the 404 id
-                $site404Tbl->save([
-                    's404_site_id' => $siteId,
-                    's404_page_id' => $sitePropData['s404_page_id']
-                ]);
-            }
-        } else {
-            $err = [];
 
-            foreach ($form->getMessages() as $key => $val) {
-                $err[$key] = $val;
-            }
+                $site404Tbl = $this->getServiceLocator()->get('MelisEngineTableSite404');
+                $site404 = $site404Tbl->getEntryByField('s404_site_id', $siteId)->current();
+                if (!empty($site404)) {
+                    if ($site404->s404_page_id != $sitePropData['s404_page_id']) {
+                        $site404Tbl->update(
+                            [
+                                's404_page_id' => $sitePropData['s404_page_id']
+                            ],
+                            's404_site_id',
+                            $siteId
+                        );
+                    }
+                } else {
+                    //save the 404 id
+                    $site404Tbl->save([
+                        's404_site_id' => $siteId,
+                        's404_page_id' => $sitePropData['s404_page_id']
+                    ]);
+                }
+            } else {
+                $err = [];
 
-            $errors = array_merge($errors, $err);
-            $status = 0;
+                foreach ($form->getMessages() as $key => $val) {
+                    $err[$key] = $val;
+                }
+
+                $errors = array_merge($errors, $err);
+                $status = 0;
+            }
         }
     }
 
@@ -980,21 +987,26 @@ class SitesController extends AbstractActionController
      */
     private function saveSiteDomains($siteDomainData, &$errors, &$status)
     {
-        $siteDomainsSvc = $this->getServiceLocator()->get("MelisCmsSitesDomainsService");
+        /**
+         * Check if there is data to be process
+         */
+        if(!empty($siteDomainData)) {
+            $siteDomainsSvc = $this->getServiceLocator()->get("MelisCmsSitesDomainsService");
 
-        foreach($siteDomainData as $domainDatum){
-            $form = $this->getTool()->getForm('meliscms_tool_sites_domain_form');
-            $form->setData($domainDatum);
+            foreach ($siteDomainData as $domainDatum) {
+                $form = $this->getTool()->getForm('meliscms_tool_sites_domain_form');
+                $form->setData($domainDatum);
 
-            if($form->isValid()) {
-                $siteDomainsSvc->saveSiteDomain($domainDatum);
-            }else{
-                $currErr = array();
-                foreach ($form->getMessages() as $key => $err){
-                    $currErr[$domainDatum["sdom_env"]."_".$key] = $err;
+                if ($form->isValid()) {
+                    $siteDomainsSvc->saveSiteDomain($domainDatum);
+                } else {
+                    $currErr = array();
+                    foreach ($form->getMessages() as $key => $err) {
+                        $currErr[$domainDatum["sdom_env"] . "_" . $key] = $err;
+                    }
+                    $errors = array_merge($errors, $currErr);
+                    $status = 0;
                 }
-                $errors = array_merge($errors,$currErr);
-                $status = 0;
             }
         }
     }
@@ -1006,31 +1018,37 @@ class SitesController extends AbstractActionController
      * @param $errors
      * @param $status
      */
-    private function saveSiteHomePages($siteHomeData, &$errors, &$status) {
-        $sitePropSvc = $this->getServiceLocator()->get("MelisCmsSitesPropertiesService");
+    private function saveSiteHomePages($siteHomeData, &$errors, &$status)
+    {
+        /**
+         * Check if there is data to be process
+         */
+        if(!empty($siteHomeData)) {
+            $sitePropSvc = $this->getServiceLocator()->get("MelisCmsSitesPropertiesService");
 
-        foreach ($siteHomeData as $siteHomeDatum) {
-            $form = $this->getTool()->getForm('meliscms_tool_sites_properties_homepage_form');
-            $form->setData($siteHomeDatum);
+            foreach ($siteHomeData as $siteHomeDatum) {
+                $form = $this->getTool()->getForm('meliscms_tool_sites_properties_homepage_form');
+                $form->setData($siteHomeDatum);
 
-            if ($form->isValid()) {
-                $sitePropSvc->saveSiteLangHome($siteHomeDatum);
-            } else {
-                $locale = $this->getLangField(
-                    null,
-                    $siteHomeDatum["shome_site_id"],
-                    $siteHomeDatum["shome_lang_id"],
-                    1,
-                    'lang_cms_name'
-                );
-                $currErr = [];
+                if ($form->isValid()) {
+                    $sitePropSvc->saveSiteLangHome($siteHomeDatum);
+                } else {
+                    $locale = $this->getLangField(
+                        null,
+                        $siteHomeDatum["shome_site_id"],
+                        $siteHomeDatum["shome_lang_id"],
+                        1,
+                        'lang_cms_name'
+                    );
+                    $currErr = [];
 
-                foreach ($form->getMessages() as $key => $err) {
-                    $currErr[$locale." homepage ID"] = $err;
+                    foreach ($form->getMessages() as $key => $err) {
+                        $currErr[$locale . " homepage ID"] = $err;
+                    }
+
+                    $errors = array_merge($errors, $currErr);
+                    $status = 0;
                 }
-
-                $errors = array_merge($errors, $currErr);
-                $status = 0;
             }
         }
     }
@@ -1041,55 +1059,58 @@ class SitesController extends AbstractActionController
      * @param $siteId
      * @param $data
      */
-    private function saveSiteLanguagesTab($siteId, $data) {
-        $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+    private function saveSiteLanguagesTab($siteId, $data)
+    {
+        if(isset($data['site_opt_lang_url'])) {
+            $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+            $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
 
-        // Saving languages
-        $siteLangs = $siteLangsTable->getSiteLangs(null, $siteId, null, null)->toArray();
-        $activeSiteLangs = $siteLangsTable->getSiteLangs(null, $siteId, null, true)->toArray();
-        $selectedSiteLangs = $data['slang_lang_id'] ?? [];
-        $noChangesOnSiteLangs = false;
+            // Saving languages
+            $siteLangs = $siteLangsTable->getSiteLangs(null, $siteId, null, null)->toArray();
+            $activeSiteLangs = $siteLangsTable->getSiteLangs(null, $siteId, null, true)->toArray();
+            $selectedSiteLangs = $data['slang_lang_id'] ?? [];
+            $noChangesOnSiteLangs = false;
 
-        // Check if active languages and selected languages are the same
-        if (count($activeSiteLangs) === count($selectedSiteLangs)) {
-            foreach ($activeSiteLangs as $activeSiteLang) {
-                if (in_array($activeSiteLang['slang_lang_id'], $selectedSiteLangs)) {
-                    $noChangesOnSiteLangs = true;
-                }
-            }
-        }
-
-        // Catch if there are changes on the selected languages over the active languages
-        if (!$noChangesOnSiteLangs) {
-            // Disable all active languages of site
-            $siteLangsTable->update(['slang_status' => 0], 'slang_site_id', $siteId);
-
-            // Because all of the active languages are disabled. All we have to do
-            // is to save if it's a new language or to active(update) the language back
-            foreach ($selectedSiteLangs as $selectedSiteLang) {
-                $slangId = 0;
-
-                foreach ($siteLangs as $siteLang) {
-                    if ($selectedSiteLang == $siteLang['slang_lang_id']) {
-                        $slangId = $siteLang['slang_id'];
-                        break;
+            // Check if active languages and selected languages are the same
+            if (count($activeSiteLangs) === count($selectedSiteLangs)) {
+                foreach ($activeSiteLangs as $activeSiteLang) {
+                    if (in_array($activeSiteLang['slang_lang_id'], $selectedSiteLangs)) {
+                        $noChangesOnSiteLangs = true;
                     }
                 }
-
-                $siteLangsTable->save(
-                    [
-                        'slang_site_id' => $siteId,
-                        'slang_lang_id' => $selectedSiteLang,
-                        'slang_status' => 1
-                    ],
-                    $slangId
-                );
             }
-        }
 
-        // Update site to add site option language url
-        $siteTable->save(['site_opt_lang_url' => $data['site_opt_lang_url']], $siteId);
+            // Catch if there are changes on the selected languages over the active languages
+            if (!$noChangesOnSiteLangs) {
+                // Disable all active languages of site
+                $siteLangsTable->update(['slang_status' => 0], 'slang_site_id', $siteId);
+
+                // Because all of the active languages are disabled. All we have to do
+                // is to save if it's a new language or to active(update) the language back
+                foreach ($selectedSiteLangs as $selectedSiteLang) {
+                    $slangId = 0;
+
+                    foreach ($siteLangs as $siteLang) {
+                        if ($selectedSiteLang == $siteLang['slang_lang_id']) {
+                            $slangId = $siteLang['slang_id'];
+                            break;
+                        }
+                    }
+
+                    $siteLangsTable->save(
+                        [
+                            'slang_site_id' => $siteId,
+                            'slang_lang_id' => $selectedSiteLang,
+                            'slang_status' => 1
+                        ],
+                        $slangId
+                    );
+                }
+            }
+
+            // Update site to add site option language url
+            $siteTable->save(['site_opt_lang_url' => $data['site_opt_lang_url']], $siteId);
+        }
     }
 
     /**

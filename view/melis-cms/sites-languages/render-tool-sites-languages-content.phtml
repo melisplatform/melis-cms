@@ -6,6 +6,7 @@ if (!empty($this->zoneconfig['conf']['id'])) {
 
 $data_melisKey = $this->melisKey;
 ?>
+<?php if(!empty($this->siteId)) { ?>
 <div <?= $id; ?> data-melisKey="<?= $data_melisKey; ?>">
     <div class="spacing-x2 innerAll">
         <div class="switch-all-container">
@@ -81,3 +82,4 @@ $data_melisKey = $this->melisKey;
         ?>
     </div>
 </div>
+<?php } ?>

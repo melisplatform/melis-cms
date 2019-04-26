@@ -58,7 +58,7 @@ return array(
                     'conf' => array(
                         'id' => 'id_meliscms_tool_sites_site_config',
                         'melisKey' => 'meliscms_tool_sites_site_config',
-                        'name' => 'Site Config',
+                        'name' => 'tr_melis_cms_sites_tool_content_edit_site_config_tab',
                         'icon' => 'settings',
                     ),
                     'forward' => array(
@@ -73,7 +73,7 @@ return array(
                             'conf' => array(
                                 'id' => 'id_meliscms_tool_sites_site_config_content',
                                 'melisKey' => 'meliscms_tool_sites_site_config_content',
-                                'name' => '',
+                                'name' => 'tr_melis_cms_sites_tool_content_edit_site_config_tab_content',
                             ),
                             'forward' => array(
                                 'module' => 'MelisCms',

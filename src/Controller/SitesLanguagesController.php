@@ -23,10 +23,14 @@ class SitesLanguagesController extends AbstractActionController
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
 
+        $rightService = $this->getServiceLocator()->get('MelisCoreRights');
+        $canAccess = $rightService->canAccess('meliscms_tool_sites_languages_content');
+
         $view = new ViewModel();
 
         $view->melisKey = $melisKey;
         $view->siteId = $siteId;
+        $view->canAccess = $canAccess;
 
         return $view;
     }
@@ -38,6 +42,12 @@ class SitesLanguagesController extends AbstractActionController
     public function renderToolSitesLanguagesContentAction()
     {
         $siteId = (int) $this->params()->fromQuery('siteId', '');
+        /**
+         * Make sure site id is not empty
+         */
+        if(empty($siteId))
+            return;
+
         $melisKey = $this->getMelisKey();
 
         $form = $this->getTool()->getForm('meliscms_tool_sites_languages_form');

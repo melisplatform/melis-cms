@@ -49,7 +49,7 @@ return array(
                     'conf' => array(
                         'id' => 'id_meliscms_tool_sites_languages',
                         'melisKey' => 'meliscms_tool_sites_languages',
-                        'name' => 'Languages',
+                        'name' => 'tr_melis_cms_sites_tool_content_edit_languages_tab',
                         'icon' => 'font',
                     ),
                     'forward' => array(
@@ -64,7 +64,7 @@ return array(
                             'conf' => array(
                                 'id' => 'id_meliscms_tool_sites_languages_content',
                                 'melisKey' => 'meliscms_tool_sites_languages_content',
-                                'name' => 'languages_content',
+                                'name' => 'tr_melis_cms_sites_tool_content_edit_languages_tab_content',
                             ),
                             'forward' => array(
                                 'module' => 'MelisCms',

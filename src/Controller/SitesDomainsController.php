@@ -24,15 +24,30 @@ class SitesDomainsController extends AbstractActionController
 
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
+
+        $rightService = $this->getServiceLocator()->get('MelisCoreRights');
+        $canAccess = $rightService->canAccess('meliscms_tool_sites_domains_content');
+
         $view = new ViewModel();
         $view->melisKey = $melisKey;
         $view->siteId = $siteId;
+        $view->canAccess = $canAccess;
+
         return $view;
     }
 
+    /**
+     * @return void|ViewModel
+     */
     public function renderToolSitesDomainsContentAction() {
 
         $siteId = (int) $this->params()->fromQuery('siteId', '');
+        /**
+         * Make sure site id is not empty
+         */
+        if(empty($siteId))
+            return;
+
         $melisKey = $this->getMelisKey();
         $siteDomainsSvc = $this->getServiceLocator()->get("MelisCmsSitesDomainsService");
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');

@@ -7,7 +7,8 @@ if (!empty($this->zoneconfig['conf']['id']))
     <?php
     if(!empty($this->zoneconfig['interface'])) {
         foreach($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
-            echo $this->$keyConfig;
+            if($keyConfig == 'meliscms_tool_sites_contents' || $keyConfig == 'meliscms_tool_sites_header')
+                echo $this->$keyConfig;
         }
     }
     ?>

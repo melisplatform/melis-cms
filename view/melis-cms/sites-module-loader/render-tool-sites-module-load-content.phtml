@@ -8,6 +8,7 @@ $data_melisKey = $this->melisKey;
 $status = '';
 
 ?>
+<?php if(!empty($this->siteId)) { ?>
 <div <?= $id; ?> data-melisKey="<?= $data_melisKey; ?>">
     <div class="spacing-x2 innerAll">
         <?php if (!empty($this->modules)) { ?>
@@ -95,8 +96,6 @@ $status = '';
         <?php } ?>
     </div>
 </div>
-
-
 <script type="text/javascript">
     $(document).ready(function() {
         // initialize jquery sortable
@@ -109,3 +108,4 @@ $status = '';
         });
     });
 </script>
+<?php } ?>

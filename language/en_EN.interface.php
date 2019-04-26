@@ -564,6 +564,27 @@
 
         #SITES CONFIG TAB
         'tr_melis_cms_sites_tool_config_title' => 'Site Config',
-        'tr_melis_cms_sites_tool_config_array_warning' => 'Nested arrays with depth of 2 or more are not displayed. You can edit it manually on the file instead.'
-	);
+        'tr_melis_cms_sites_tool_config_array_warning' => 'Nested arrays with depth of 2 or more are not displayed. You can edit it manually on the file instead.',
+
+        #SITES INTERFACES
+        'tr_melis_cms_sites_tool_add_site_button' => 'Add site button',
+        'tr_melis_cms_sites_tool_content' => 'Site content',
+        'tr_melis_cms_sites_tool_content_header' => 'Site content header',
+        'tr_melis_cms_sites_tool_content_edit_header' => 'Site edit header',
+        'tr_melis_cms_sites_tool_content_edit_button_save' => 'Site edit button save',
+        'tr_melis_cms_sites_tool_content_edit_tab_list' => 'Edit site tabs',
+        'tr_melis_cms_sites_tool_content_edit_properties_tab' => 'Properties',
+        'tr_melis_cms_sites_tool_content_edit_properties_tab_content' => 'Properties content',
+        'tr_melis_cms_sites_tool_content_edit_module_loading_tab' => 'Module Loading',
+        'tr_melis_cms_sites_tool_content_edit_module_loading_tab_content' => 'Module loading content',
+        'tr_melis_cms_sites_tool_content_edit_languages_tab' => 'Languages',
+        'tr_melis_cms_sites_tool_content_edit_languages_tab_content' => 'Languages content',
+        'tr_melis_cms_sites_tool_content_edit_site_config_tab' => 'Site Config',
+        'tr_melis_cms_sites_tool_content_edit_site_config_tab_content' => 'Site config content',
+        'tr_melis_cms_sites_tool_content_edit_site_translations_tab' => 'Site Translations',
+        'tr_melis_cms_sites_tool_content_edit_site_translations_tab_content' => 'Site translations content',
+
+        #SITES NO ACCESS MESSAGE
+        'tr_melis_cms_sites_tool_content_edit_tab_no_access' => 'You have no rights to access this tab',
+    );
 ?>

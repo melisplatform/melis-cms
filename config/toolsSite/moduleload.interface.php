@@ -18,6 +18,15 @@ return array(
                                 ),
                             ),
                         ),
+//                        'meliscms_tool_sites' => array(
+//                            'interface' => array(
+//                                'meliscms_tool_sites_edit_site_tabs_module_load' => array(
+//                                    'conf' => array(
+//                                        'type' => 'melistoolsitesmoduleload/interface/meliscms_tool_sites_module_load'
+//                                    )
+//                                ),
+//                            ),
+//                        ),
                     ),
                 ),
             ),
@@ -58,7 +67,7 @@ return array(
                     'conf' => array(
                         'id' => 'id_meliscms_tool_sites_module_load',
                         'melisKey' => 'meliscms_tool_sites_module_load',
-                        'name' => 'Module Loading',
+                        'name' => 'tr_melis_cms_sites_tool_content_edit_module_loading_tab',
                         'icon' => 'list',
                     ),
                     'forward' => array(
@@ -73,6 +82,7 @@ return array(
                             'conf' => array(
                                 'id' => 'id_meliscms_tool_sites_module_load_content',
                                 'melisKey' => 'meliscms_tool_sites_module_load_content',
+                                'name' => 'tr_melis_cms_sites_tool_content_edit_module_loading_tab_content',
                                 'rightsDisplay' => 'true',
                             ),
                             'forward' => array(
