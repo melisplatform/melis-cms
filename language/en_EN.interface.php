@@ -500,6 +500,7 @@
         'tr_melis_cms_sites_tool_add_step4_site_label' => 'Site name',
         'tr_melis_cms_sites_tool_add_header_title_lang' => 'Languages',
         'tr_melis_cms_sites_tool_add_header_title_domains' => 'Domains',
+        'tr_melis_cms_sites_tool_add_header_title_multi_lingual' => 'Multilingual',
         'tr_melis_cms_sites_tool_add_header_title_site_summary' => 'Site summary',
 
         #ADD SITE FORMS TOOLTIPS

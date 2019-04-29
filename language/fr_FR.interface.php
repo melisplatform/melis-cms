@@ -502,6 +502,7 @@
         'tr_melis_cms_sites_tool_add_step4_site_label' => 'Site name',
         'tr_melis_cms_sites_tool_add_header_title_lang' => 'Langages',
         'tr_melis_cms_sites_tool_add_header_title_domains' => 'Domaines',
+        'tr_melis_cms_sites_tool_add_header_title_multi_lingual' => 'Multilingue',
         'tr_melis_cms_sites_tool_add_header_title_site_summary' => 'Résumé',
 
         #ADD SITE FORMS TOOLTIPS
