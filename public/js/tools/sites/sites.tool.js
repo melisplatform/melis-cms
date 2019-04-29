@@ -695,12 +695,17 @@ $(document).ready(function() {
      * ============================== START PROPERTIES TAB ============================
      * ================================================================================
      */
-    $body.on("click", "#s404_page_id_button", function(){
+    $body.on("click", "#s404_page_id_button", function() {
         melisLinkTree.createInputTreeModal('#s404_page_id');
     });
 
-    $body.on("click", "#site_main_page_id_button", function(){
+    $body.on("click", "#site_main_page_id_button", function() {
         melisLinkTree.createInputTreeModal('#site_main_page_id');
+    });
+
+    $body.on("click", ".pageSelect", function() {
+        var id = $(this).find('input').attr('id');
+        melisLinkTree.createInputTreeModal('#' + id);
     });
     /**
      * ================================================================================

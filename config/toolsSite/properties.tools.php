@@ -257,6 +257,9 @@ return array(
                                         'options' => array(
                                             'label' => 'tr_melis_cms_sites_shome_page_id',
                                             'tooltip' => 'tr_melis_cms_sites_shome_page_id tooltip',
+                                            'button' => 'fa fa-sitemap',
+                                            'button-id' => '',
+                                            'button-class' => 'pageSelect',
                                         ),
                                         'attributes' => array(
                                             'id' => 'shome_page_id',
