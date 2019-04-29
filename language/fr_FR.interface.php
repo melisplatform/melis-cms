@@ -593,13 +593,13 @@
         'tr_melis_cms_sites_tool_content_edit_tab_list' => 'Onglet éditer site',
         'tr_melis_cms_sites_tool_content_edit_properties_tab' => 'Propriétés',
         'tr_melis_cms_sites_tool_content_edit_properties_tab_content' => 'Contenu de Propriétés',
-        'tr_melis_cms_sites_tool_content_edit_module_loading_tab' => 'Onglet chargement des modules',
+        'tr_melis_cms_sites_tool_content_edit_module_loading_tab' => 'Chargement des modules',
         'tr_melis_cms_sites_tool_content_edit_module_loading_tab_content' => 'Contenu de chargement des modules',
         'tr_melis_cms_sites_tool_content_edit_languages_tab' => 'Langages',
         'tr_melis_cms_sites_tool_content_edit_languages_tab_content' => 'Contenu de Langages',
-        'tr_melis_cms_sites_tool_content_edit_site_config_tab' => 'Onglet configuration site',
+        'tr_melis_cms_sites_tool_content_edit_site_config_tab' => 'Configuration site',
         'tr_melis_cms_sites_tool_content_edit_site_config_tab_content' => 'Contenu de configuration site',
-        'tr_melis_cms_sites_tool_content_edit_site_translations_tab' => 'Onglet traductions de site',
+        'tr_melis_cms_sites_tool_content_edit_site_translations_tab' => 'Traductions de site',
         'tr_melis_cms_sites_tool_content_edit_site_translations_tab_content' => 'Contenu de traductions de site',
 
         #SITES NO ACCESS MESSAGE
