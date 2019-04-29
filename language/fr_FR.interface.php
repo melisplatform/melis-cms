@@ -470,6 +470,9 @@
         'tr_meliscms_tool_sites_save' => 'Save site',
         'tr_melis_cms_sites_tool_add' => 'Ajouter un site',
         'tr_melis_cms_sites_tool_create' => 'Créer un site',
+        'tr_meliscms_tool_sites_cancel' => 'Annuler',
+        'tr_meliscms_tool_sites_prev' => 'Pr&eacute;c&eacute;dent',
+        'tr_meliscms_tool_sites_next' => 'Suivant',
 
         'tr_melis_cms_sites_tool_add_step1_text' => 'Cet outil vous accompagnera à créer la configuration adaptée à votre site. Cela assurera la génération adéquate des fichiers dans vos modules et une compatibilité optimale avec l\'écosystème de Melis Platform.',
         'tr_melis_cms_sites_tool_add_step1_is_multi_lang' => 'Ce site sera t-il multilingue ?',
