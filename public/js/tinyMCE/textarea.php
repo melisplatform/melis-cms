@@ -18,4 +18,4 @@
 	    'toolbar' => 'undo redo link unlink | forecolor backcolor | code',
 	    'setup' => 'melisTinyMCE.tinyMceActionEvent',
 	    'init_instance_callback'  => 'tinyMceCleaner'
-	); 
+	);

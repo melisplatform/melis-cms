@@ -128,11 +128,13 @@
     }
     
     function showUrl() {
+        console.log("showUrl");
+        
         var inputBox = $('.melis-iframe').contents().find('#mce-link-tree').parent().find('input').val(dataUrl);
                        $(".mce-floatpanel.mce-window").find('#mce-link-tree').parent().find('input').val(dataUrl);
     }
 
-    // not used
+    // not used anymore on tinymce v5
     function checkBtn() {
         var urlBox = $('body').find('.mce-has-open').prev().text();
 
@@ -212,7 +214,6 @@
     }
 
     function findPageMainTree() {
-
         $("#find-page-dynatree").fancytree({
             extensions: ["filter"],
             keyboard: true,
