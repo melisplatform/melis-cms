@@ -2630,15 +2630,6 @@ return array(
                                     'required' => true,
                                     'validators' => array(
                                         array(
-                                            'name'    => 'IsInt',
-                                            'break_chain_on_failure' => true,
-                                            'options' => array(
-                                                'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_meliscms_tool_duplicate_field_digits',
-                                                )
-                                            )
-                                        ),
-                                        array(
                                             'name' => 'NotEmpty',
                                             'break_chain_on_failure' => true,
                                             'options' => array(
@@ -2646,6 +2637,15 @@ return array(
                                                     \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_tool_duplicate_field_empty',
                                                 ),
                                             ),
+                                        ),
+                                        array(
+                                            'name'    => 'IsInt',
+                                            'break_chain_on_failure' => true,
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_meliscms_tool_duplicate_field_digits',
+                                                )
+                                            )
                                         ),
                                     ),
                                     'filters' => array(
@@ -2674,15 +2674,6 @@ return array(
                                     'required' => true,
                                     'validators' => array(
                                         array(
-                                            'name'    => 'IsInt',
-                                            'break_chain_on_failure' => true,
-                                            'options' => array(
-                                                'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_meliscms_tool_duplicate_field_digits',
-                                                )
-                                            )
-                                        ),
-                                        array(
                                             'name' => 'NotEmpty',
                                             'break_chain_on_failure' => true,
                                             'options' => array(
@@ -2690,6 +2681,15 @@ return array(
                                                     \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_tool_duplicate_field_empty',
                                                 ),
                                             ),
+                                        ),
+                                        array(
+                                            'name'    => 'IsInt',
+                                            'break_chain_on_failure' => true,
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_meliscms_tool_duplicate_field_digits',
+                                                )
+                                            )
                                         ),
                                     ),
                                     'filters' => array(

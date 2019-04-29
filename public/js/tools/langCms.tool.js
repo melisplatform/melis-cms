@@ -100,10 +100,10 @@ $(document).ready(function() {
 		var getId = $(this).parents("tr").attr("id");
 		
 		melisCoreTool.confirm(
-			translations.tr_meliscore_common_yes, 
-			translations.tr_meliscore_common_no, 
-			translations.tr_meliscore_tool_language, 
-			translations.tr_meliscore_tool_language_delete_confirm, 
+            translations.tr_meliscms_common_yes,
+			translations.tr_meliscore_common_no,
+            translations.tr_meliscms_tool_language,
+			translations.tr_meliscms_tool_language_delete_confirm,
 			function() {
 	    		$.ajax({
 	    	        type        : 'POST', 
