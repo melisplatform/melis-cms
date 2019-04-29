@@ -635,53 +635,56 @@ class MelisCmsSiteService extends MelisCoreGeneralService
         $siteConfigName = $siteModuleName . '.config.php';
         $siteConfigDir = $modulePath . '/config/' . $siteConfigName;
 
-        /**
-         * Make an array for the site config per language
-         */
-        $siteLangArray = 'array(' . "\n\t\t\t\t" .
-            $configData .
-            "\t\t\t" . '),' . "\n";
-        $siteLangConfig = '\'' . $siteId . '\' => '.$siteLangArray;
-        /**
-         * Check if it is a new site(new site module) so that we can determine
-         * whether we are going to create a site config per language
-         * or we're just going to update the site config
-         */
-        if($isNewSite) {
+        if(file_exists($siteConfigDir)) {
+
             /**
-             * Check if site has a file created
+             * Make an array for the site config per language
              */
-            if(file_exists($siteConfigDir)) {
-                if ($isCreateModule) {
-                    /**
-                     * Update the site config to add
-                     * the config per language
-                     */
-                    $moduleConfig = file_get_contents($siteConfigDir);
-                    $moduleConfig = preg_replace('/(\'siteLangConfig\'\s*,)/im', $siteLangConfig, $moduleConfig);
-                    file_put_contents($siteConfigDir, $moduleConfig);
-                } else {
-                    /**
-                     * Update the SiteName.config.php
-                     * to include the new site language config
-                     *
-                     * This will include the new site lang config above the
-                     * allSites config array
-                     */
-                    $moduleConfig = preg_replace('/(\'allSites(?![\s\S]*\'allSites[\s\S]*$))/im', "$siteLangConfig\t\t\t$1", file_get_contents($siteConfigDir));
-                    file_put_contents($siteConfigDir, $moduleConfig);
+            $siteLangArray = 'array(' . "\n\t\t\t\t" .
+                $configData .
+                "\t\t\t" . '),' . "\n";
+            $siteLangConfig = '\'' . $siteId . '\' => ' . $siteLangArray;
+            /**
+             * Check if it is a new site(new site module) so that we can determine
+             * whether we are going to create a site config per language
+             * or we're just going to update the site config
+             */
+            if ($isNewSite) {
+                /**
+                 * Check if site has a file created
+                 */
+                if (file_exists($siteConfigDir)) {
+                    if ($isCreateModule) {
+                        /**
+                         * Update the site config to add
+                         * the config per language
+                         */
+                        $moduleConfig = file_get_contents($siteConfigDir);
+                        $moduleConfig = preg_replace('/(\'siteLangConfig\'\s*,)/im', $siteLangConfig, $moduleConfig);
+                        file_put_contents($siteConfigDir, $moduleConfig);
+                    } else {
+                        /**
+                         * Update the SiteName.config.php
+                         * to include the new site language config
+                         *
+                         * This will include the new site lang config above the
+                         * allSites config array
+                         */
+                        $moduleConfig = preg_replace('/(\'allSites(?![\s\S]*\'allSites[\s\S]*$))/im', "$siteLangConfig\t\t\t$1", file_get_contents($siteConfigDir));
+                        file_put_contents($siteConfigDir, $moduleConfig);
+                    }
                 }
+            } else {
+                /**
+                 * Update the SiteName.config.php
+                 * to include the new site language config
+                 *
+                 * This will include the new site lang config above the
+                 * allSites config array
+                 */
+                $moduleConfig = preg_replace('/(\'allSites(?![\s\S]*\'allSites[\s\S]*$))/im', "$siteLangConfig\t\t\t$1", file_get_contents($siteConfigDir));
+                file_put_contents($siteConfigDir, $moduleConfig);
             }
-        }else{
-            /**
-             * Update the SiteName.config.php
-             * to include the new site language config
-             *
-             * This will include the new site lang config above the
-             * allSites config array
-             */
-            $moduleConfig = preg_replace('/(\'allSites(?![\s\S]*\'allSites[\s\S]*$))/im', "$siteLangConfig\t\t\t$1", file_get_contents($siteConfigDir));
-            file_put_contents($siteConfigDir, $moduleConfig);
         }
     }
 
