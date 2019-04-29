@@ -45,7 +45,7 @@ return array(
                         'id' => 'id_meliscms_tool_sites_site_translations',
                         'melisKey' => 'meliscms_tool_sites_site_translations',
                         'name' => 'tr_melis_cms_sites_tool_content_edit_site_translations_tab',
-                        'icon' => 'font',
+                        'icon' => 'language',
                     ),
                     'forward' => array(
                         'module' => 'MelisCms',

@@ -68,7 +68,7 @@ return array(
                         'id' => 'id_meliscms_tool_sites_module_load',
                         'melisKey' => 'meliscms_tool_sites_module_load',
                         'name' => 'tr_melis_cms_sites_tool_content_edit_module_loading_tab',
-                        'icon' => 'list',
+                        'icon' => 'puzzle-piece',
                     ),
                     'forward' => array(
                         'module' => 'MelisCms',

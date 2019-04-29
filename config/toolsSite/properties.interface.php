@@ -93,7 +93,7 @@ return array(
                         'id' => 'id_meliscms_tool_sites_properties',
                         'melisKey' => 'meliscms_tool_sites_properties',
                         'name' => 'tr_melis_cms_sites_tool_content_edit_properties_tab',
-                        'icon' => 'cogwheel',
+                        'icon' => 'tag',
                     ),
                     'forward' => array(
                         'module' => 'MelisCms',

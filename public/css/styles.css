@@ -689,6 +689,16 @@ body.modal-open {
 	border-color: #ccc;
 }
 
+/*Adding icons for site tabs*/
+.glyphicons.language i:before {
+	font-family: "Fontawesome";
+	content: "\f1ab";
+}
+.glyphicons.puzzle-piece i:before {
+	 font-family: "Fontawesome";
+	 content: "\f12e";
+}
+
 
 
 
