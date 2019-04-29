@@ -111,7 +111,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
         // Site label
         $siteLabel = $arrayParameters['siteData']['site_label'];
         //module name
-        $siteModuleName = $arrayParameters['siteModuleName'];
+        $siteModuleName = str_replace(' ', '', $arrayParameters['siteModuleName']);
 
         //declare variables
         $siteDomainId = null;
