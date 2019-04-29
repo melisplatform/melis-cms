@@ -473,8 +473,9 @@
         'tr_meliscms_tool_sites_cancel' => 'Annuler',
         'tr_meliscms_tool_sites_prev' => 'Pr&eacute;c&eacute;dent',
         'tr_meliscms_tool_sites_next' => 'Suivant',
+        'tr_meliscms_tool_sites_finish' => 'Terminer',
 
-        'tr_melis_cms_sites_tool_add_step1_text' => 'Cet outil vous accompagnera à créer la configuration adaptée à votre site. Cela assurera la génération adéquate des fichiers dans vos modules et une compatibilité optimale avec l\'écosystème de Melis Platform.',
+        'tr_melis_cms_sites_tool_add_step1_text' => 'Cet outil vous accompagnera à créer la configuration adaptée pour votre site. Cela assurera la génération adéquate des fichiers dans vos modules et une compatibilité optimale avec l\'écosystème de Melis Platform.',
         'tr_melis_cms_sites_tool_add_step1_is_multi_lang' => 'Ce site sera t-il multilingue ?',
         'tr_melis_cms_sites_tool_add_step2_select_languages' => 'Veuillez choisir les langues du site :',
         'tr_melis_cms_sites_tool_add_step2_reflect_urls' => 'Comment souhaitez-vous refléter la langue dans les URLs du site ?',
@@ -498,6 +499,21 @@
         'tr_melis_cms_sites_tool_add_create_site_unknown_error' => 'Une erreur s\'est produite pendant la création du site, veuillez réessayer',
         'tr_melis_cms_sites_tool_add_create_site_no_site_language' => 'Veuillez fournir les langues du site',
         'tr_melis_cms_sites_tool_add_create_site_required_field' => 'Veuillez remplir tous les champs obligatoires',
+        'tr_melis_cms_sites_tool_add_step4_site_label' => 'Site name',
+        'tr_melis_cms_sites_tool_add_header_title_lang' => 'Langages',
+        'tr_melis_cms_sites_tool_add_header_title_domains' => 'Domaines',
+        'tr_melis_cms_sites_tool_add_header_title_site_summary' => 'Résumé',
+
+        #ADD SITE FORMS TOOLTIPS
+        'tr_melis_cms_sites_tool_add_step1_is_multi_lang tooltip' => 'Identifier if site is multi lingual or not',
+        'tr_melis_cms_sites_tool_add_step2_reflect_urls tooltip' => 'This will determine how will the language reflect on your url.',
+        'tr_melis_cms_sites_tool_add_step2_select_languages tooltip' => 'Select language(s) for this site',
+        'tr_melis_cms_sites_tool_add_step3_single_domain_name tooltip' => 'Domain name for this site',
+        'tr_melis_cms_sites_tool_add_step3_multi_domain_name tooltip' => 'Domain name for each language',
+        'tr_melis_cms_sites_tool_add_step4_select_module tooltip' => 'Select module for this site(s)',
+        'tr_melis_cms_sites_tool_add_step4_create_module tooltip' => 'Create a new module for this site(s)',
+        'tr_melis_cms_sites_tool_add_step4_site_label tooltip' => 'Enter the site name',
+        'tr_melis_cms_sites_tool_add_step4_create_file_for_website tooltip' => 'Determine whether we create a files for this site',
 
         #MODULE LOAD TAB
         'tr_melis_cms_sites_module_loading' => 'Chargement du module',

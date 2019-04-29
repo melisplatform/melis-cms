@@ -317,7 +317,7 @@ $(document).ready(function() {
                 formData.languages = langData.data;
                 formData.domains = domainData;
 
-                selectedLanguages = '- Languages: ' + lang;
+                selectedLanguages = '- '+translations.tr_melis_cms_sites_tool_add_header_title_lang+': ' + lang;
                 break;
             case "step_4":
                 currentStepForm = "#step4form_module";
@@ -336,7 +336,7 @@ $(document).ready(function() {
                     domain = 'Single';
                 }
 
-                domainType = '- Domains: ' + domain;
+                domainType = '- '+translations.tr_melis_cms_sites_tool_add_header_title_domains+': ' + domain;
                 formData.domains.data = processSiteDomain(domainFormData);
 
                 /**

@@ -471,6 +471,7 @@
         'tr_meliscms_tool_sites_cancel' => 'Cancel',
         'tr_meliscms_tool_sites_prev' => 'Previous',
         'tr_meliscms_tool_sites_next' => 'Next',
+        'tr_meliscms_tool_sites_finish' => 'Finish',
 
         'tr_melis_cms_sites_tool_add_step1_text' => 'This tool will help you create the right configuration for your site. This will ensure the right generations of files in your modules and an optimum compatibility with the Melis Platform ecosystem.',
         'tr_melis_cms_sites_tool_add_step1_is_multi_lang' => 'Will this site be multilingual?',
@@ -496,6 +497,21 @@
         'tr_melis_cms_sites_tool_add_create_site_unknown_error' => 'Something went wrong while creating the site, please try again',
         'tr_melis_cms_sites_tool_add_create_site_no_site_language' => 'Please provide the site language(s)',
         'tr_melis_cms_sites_tool_add_create_site_required_field' => 'Please fill out all the required fields',
+        'tr_melis_cms_sites_tool_add_step4_site_label' => 'Site name',
+        'tr_melis_cms_sites_tool_add_header_title_lang' => 'Languages',
+        'tr_melis_cms_sites_tool_add_header_title_domains' => 'Domains',
+        'tr_melis_cms_sites_tool_add_header_title_site_summary' => 'Site summary',
+
+        #ADD SITE FORMS TOOLTIPS
+        'tr_melis_cms_sites_tool_add_step1_is_multi_lang tooltip' => 'Identifier if site is multi lingual or not',
+        'tr_melis_cms_sites_tool_add_step2_reflect_urls tooltip' => 'This will determine how will the language reflect on your url.',
+        'tr_melis_cms_sites_tool_add_step2_select_languages tooltip' => 'Select language(s) for this site',
+        'tr_melis_cms_sites_tool_add_step3_single_domain_name tooltip' => 'Domain name for this site',
+        'tr_melis_cms_sites_tool_add_step3_multi_domain_name tooltip' => 'Domain name for each language',
+        'tr_melis_cms_sites_tool_add_step4_select_module tooltip' => 'Select module for this site(s)',
+        'tr_melis_cms_sites_tool_add_step4_create_module tooltip' => 'Create a new module for this site(s)',
+        'tr_melis_cms_sites_tool_add_step4_site_label tooltip' => 'Enter the site name',
+        'tr_melis_cms_sites_tool_add_step4_create_file_for_website tooltip' => 'Determine whether we create a files for this site',
 
         #MODULE LOAD TAB
         'tr_melis_cms_sites_module_loading' => 'Module loading',

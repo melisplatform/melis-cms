@@ -575,11 +575,13 @@ class MelisCmsSiteService extends MelisCoreGeneralService
         $outputFileName = 'module.config.php';
         $moduleConfigDir = $modulePath . '/config/' . $outputFileName;
 
-        if($isUpdate) {
-            // Replacing the Site homepage id to site module config
-            $moduleConfig = file_get_contents($moduleConfigDir);
-            $moduleConfig = str_replace('\'homePageId\'', $homePageId, $moduleConfig);
-            file_put_contents($moduleConfigDir, $moduleConfig);
+        if(file_exists($moduleConfigDir)) {
+            if ($isUpdate) {
+                // Replacing the Site homepage id to site module config
+                $moduleConfig = file_get_contents($moduleConfigDir);
+                $moduleConfig = str_replace('\'homePageId\'', $homePageId, $moduleConfig);
+                file_put_contents($moduleConfigDir, $moduleConfig);
+            }
         }
     }
 
