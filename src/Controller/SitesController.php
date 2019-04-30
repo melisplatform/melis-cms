@@ -60,9 +60,12 @@ class SitesController extends AbstractActionController
     public function renderToolSitesEditHeaderAction() {
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
+
         $view = new ViewModel();
         $view->melisKey = $melisKey;
         $view->siteId = $siteId;
+        $view->siteLabel = $this->getSiteDataById($siteId)['site_label'] ?? '';
+
         return $view;
     }
 

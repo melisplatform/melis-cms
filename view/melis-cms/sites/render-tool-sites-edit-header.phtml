@@ -1,16 +1,19 @@
 <?php
+    $id = '';
 
-$id = '';
-if (!empty($this->zoneconfig['conf']['id']))
-    $id = ' id="' . $this->siteId . '_' . $this->zoneconfig['conf']['id'] . '"';
+    if (!empty($this->zoneconfig['conf']['id'])) {
+        $id = ' id="' . $this->siteId . '_' . $this->zoneconfig['conf']['id'] . '"';
+    }
 
-$data_melisKey = $this->melisKey;
-
+    $data_melisKey = $this->melisKey;
 ?>
 <div class="me-heading bg-white border-bottom" <?= $id; ?> data-melisKey='<?= $data_melisKey; ?>'>
     <div class="row">
         <div class="me-hl col-xs-12 col-sm-8 col-md-9">
-            <h1 class="content-heading"><?= $this->title; ?></h1>
+            <h1 class="content-heading">
+                <a href="#" class="melis-opentools" data-tool-icon="fa-book" data-tool-name="Sites" data-tool-id="id_meliscms_tool_sites" data-tool-meliskey="meliscms_tool_sites" style="color: #686868;">Sites</a>
+                / <?= $this->siteLabel ?>
+            </h1>
             <p><?= $this->translate('tr_meliscms_tool_templates_tpl_site_text') ?> </p>
         </div>
         <div class="me-hr col-xs-12 col-sm-4 col-md-3">
@@ -24,4 +27,3 @@ $data_melisKey = $this->melisKey;
         </div>
     </div>
 </div>
-
