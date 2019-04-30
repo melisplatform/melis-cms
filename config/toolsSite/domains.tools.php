@@ -143,7 +143,7 @@ return array(
                                 ),
                                 'sdom_scheme' => array(
                                     'name' => 'sdom_scheme',
-                                    'required' => false,
+                                    'required' => true,
                                     'validators' => array(),
                                     'filters' => array(
                                         array('name' => 'StripTags'),
@@ -152,7 +152,7 @@ return array(
                                 ),
                                 'sdom_domain' => array(
                                     'name' => 'sdom_domain',
-                                    'required' => false,
+                                    'required' => true,
                                     'validators' => array(),
                                     'filters' => array(
                                         array('name' => 'StripTags'),
