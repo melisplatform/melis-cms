@@ -487,6 +487,7 @@
         'tr_melis_cms_sites_tool_add_step4_select_module' => 'Veuillez choisir le module lié à ce site dans la liste :',
         'tr_melis_cms_sites_tool_add_step4_select_module_placeholder' => 'Choisissez un module',
         'tr_melis_cms_sites_tool_add_step4_create_module' => 'Ou créez un nouveau module et saisissez le nom :',
+        'tr_melis_cms_sites_tool_add_step4_create_module_error' => 'Les espaces et les caractères spéciaux ne sont pas autorisés pour le nom du module',
         'tr_melis_cms_sites_tool_add_step4_create_file_for_website' => 'Créer les dossier et fichiers pour le nouveau site ?',
         'tr_melis_cms_sites_tool_add_step5_new_site_is_created' => 'Un nouveau site sera créé avec les paramètres suivants :',
         'tr_melis_cms_sites_tool_add_step5_new_site_using_existing_module' => 'Le site utilisera le module existant <b>“%s”</b>. Les dossiers et fichiers du module ne seront pas créés.',

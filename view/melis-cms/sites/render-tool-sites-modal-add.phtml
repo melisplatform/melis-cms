@@ -29,7 +29,9 @@ if (!empty($this->zoneconfig['conf']['id']))
                 </div>
                 <!-- // Widget heading END -->
                 <div class="widget-body innerAll inner-2x">
-                    <div id="siteAddAlert" class="alert alert-danger hidden"><strong></strong> <?= $this->translate('tr_melis_cms_sites_tool_add_create_site_required_field'); ?></div>
+                    <div id="siteAddAlert" class="alert alert-danger hidden">
+                        <?= $this->translate('tr_melis_cms_sites_tool_add_create_site_required_field'); ?>
+                    </div>
                     <div class="owl-carousel owl-theme owl-loaded sites-steps-owl">
                         <?php
                             if (!empty($this->zoneconfig['interface'])) {

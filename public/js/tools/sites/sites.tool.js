@@ -616,8 +616,16 @@ $(document).ready(function() {
      * @returns {boolean}
      */
     function showFormError(form, fieldNames){
+        var newModuleLabel = "";
+        var newModuleValue = "";
         var errCtr = 0;
         var curForm = $(form+" input");
+
+        /**
+         * Bring back the original message
+         */
+        $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_create_site_required_field);
+
         curForm.each(function(){
             if($(this).prop('required')){
                 var inputName = $(this).attr("name");
@@ -628,11 +636,29 @@ $(document).ready(function() {
                 } else {
                     errlabel.removeClass("fieldErrorColor");
                 }
+
+                if(inputName == "siteCreateModuleName"){
+                    newModuleValue = $(this).val();
+                    newModuleLabel = $(this).closest("form").find("label.err_" + inputName).not(":has(input)");
+                }
             }
         });
 
         if(errCtr > 0)
             return true;
+
+        /**
+         * This will avoid the user to input
+         * space and special characters to
+         * create a new module name
+         */
+        if(newModuleValue != "") {
+            if (/^[a-zA-Z0-9-]*$/.test(newModuleValue) === false) {
+                newModuleLabel.addClass("fieldErrorColor");
+                $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_step4_create_module_error).removeClass("hidden");
+                return true;
+            }
+        }
 
         return false;
     }
