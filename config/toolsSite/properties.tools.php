@@ -58,6 +58,7 @@ return array(
                                             'id' => 'site_label',
                                             'value' => '',
                                             'placeholder' => 'tr_melis_cms_sites_site_label',
+                                            'required' => 'required'
                                         ),
                                     ),
                                 ),
@@ -73,6 +74,7 @@ return array(
                                             'id' => 'site_name',
                                             'value' => '',
                                             'placeholder' => 'tr_melis_cms_sites_site_name',
+                                            'required' => 'required'
                                         ),
                                     ),
                                 ),
@@ -90,6 +92,7 @@ return array(
                                             'id' => 's404_page_id',
                                             'value' => '',
                                             'placeholder' => 'tr_melis_cms_sites_s404_page_id',
+                                            'required' => 'required'
                                         ),
                                     ),
                                 ),
@@ -107,6 +110,7 @@ return array(
                                             'id' => 'site_main_page_id',
                                             'value' => '',
                                             'placeholder' => 'tr_melis_cms_sites_site_main_page_id',
+                                            'required' => 'required'
                                         ),
                                     ),
                                 ),
@@ -265,6 +269,7 @@ return array(
                                             'id' => 'shome_page_id',
                                             'value' => '',
                                             'placeholder' => 'tr_melis_cms_sites_shome_page_id',
+                                            'required' => 'required'
                                         ),
                                     ),
                                 ),

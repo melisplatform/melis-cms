@@ -74,6 +74,7 @@ return array(
                                             'id' => 'sdom_scheme',
                                             'value' => '',
                                             'placeholder' => 'tr_melis_cms_sites_domain_scheme',
+                                            'required' => 'required'
                                         ),
                                     ),
                                 ),
@@ -89,6 +90,7 @@ return array(
                                             'id' => 'sdom_domain',
                                             'value' => '',
                                             'placeholder' => 'tr_melis_cms_sites_domain',
+                                            'required' => 'required'
                                         ),
                                     ),
                                 ),
