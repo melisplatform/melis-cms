@@ -35,6 +35,8 @@ $data_melisKey = $this->melisKey;
                             }
 
                             $el->setName("siteprop_".$el->getName());
+                            $el->setAttribute('id', $el->getName());
+                            $el->setLabel($el->getLabel() . '*');
                         }
                         echo $this->form()->openTag($form);
                         echo $this->melisFieldCollection($form);
@@ -59,7 +61,7 @@ $data_melisKey = $this->melisKey;
                             <ul class="nav-tabs product-text-tab meliscms-site-language-homepage-list">
                                 <?php foreach($this->activeSiteLangs as $lang) :?>
                                     <li class="">
-                                        <a class="clearfix" data-toggle="tab" id="news_cms_lang_<?= $lang['slang_lang_id'] ?>" href="#<?= $lang['lang_cms_locale']; ?>-log-type-details-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $lang['slang_lang_id'] ?>">
+                                        <a class="clearfix" data-toggle="tab" id="cms_homepages_lang_<?= $lang['slang_lang_id'] ?>" href="#<?= $lang['lang_cms_locale']; ?>-log-type-details-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $lang['slang_lang_id'] ?>">
                                             <span><?= $lang['lang_cms_name'] ?></span>
                                         </a>
                                     </li>
@@ -74,7 +76,7 @@ $data_melisKey = $this->melisKey;
                                     <div class="bg-white">
                                         <h4 class=""><i class="fa fa-map-marker"></i>  <?= $lang['lang_cms_name']; ?></h4>
                                     </div>
-                                    <div id="cms_domain_<?= $lang['slang_lang_id']; ?>">
+                                    <div id="cms_sites_homepages_<?= $lang['slang_lang_id']; ?>">
                                         <?php
                                         $form = clone $this->homepageForm;
 
@@ -101,8 +103,10 @@ $data_melisKey = $this->melisKey;
                                                 $el->setValue($lang['slang_lang_id']);
                                             }
 
+                                            $el->setAttribute('data-lang', $lang['lang_cms_name']);
                                             $el->setName($lang['slang_lang_id']."_".$el->getName());
                                             $el->setAttribute('id', $el->getName());
+                                            $el->setLabel($el->getLabel() . '*');
                                         }
 
                                         echo $this->form()->openTag($form);

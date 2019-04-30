@@ -953,7 +953,7 @@ class SitesController extends AbstractActionController
                 $err = [];
 
                 foreach ($form->getMessages() as $key => $val) {
-                    $err[$key] = $val;
+                    $err['siteprop_' . $key] = $val;
                 }
 
                 $errors = array_merge($errors, $err);
@@ -1033,17 +1033,10 @@ class SitesController extends AbstractActionController
                 if ($form->isValid()) {
                     $sitePropSvc->saveSiteLangHome($siteHomeDatum);
                 } else {
-                    $locale = $this->getLangField(
-                        null,
-                        $siteHomeDatum["shome_site_id"],
-                        $siteHomeDatum["shome_lang_id"],
-                        1,
-                        'lang_cms_name'
-                    );
                     $currErr = [];
 
                     foreach ($form->getMessages() as $key => $err) {
-                        $currErr[$locale . " homepage ID"] = $err;
+                        $currErr[$siteHomeDatum["shome_lang_id"]."_".$key] = $err;
                     }
 
                     $errors = array_merge($errors, $currErr);

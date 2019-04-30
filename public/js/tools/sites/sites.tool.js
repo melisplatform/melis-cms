@@ -19,7 +19,7 @@ $(document).ready(function() {
         }).success(function (data) {
             if (data.success === 1) {
                 // call melisOkNotification
-                melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
+                melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46' );
                 // update flash messenger values
                 melisCore.flashMessenger();
 
@@ -32,9 +32,13 @@ $(document).ready(function() {
                     }
                 );
             } else {
-                melisCoreTool.highlightErrors(data.success, data.errors, currentTabId+"_id_meliscms_tool_sites_edit_site");
+                var container = currentTabId + "_id_meliscms_tool_sites_edit_site";
+                var errors = prepareErrs(data.errors, container);
+
+                highlightErrs(data.success, data.errors, container);
+
                 // error modal
-                melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors );
+                melisHelper.melisKoNotification(data.textTitle, data.textMessage, errors);
             }
 
             // update flash messenger values
@@ -43,6 +47,42 @@ $(document).ready(function() {
             alert( translations.tr_meliscore_error_message );
         });
     });
+
+    function highlightErrs(success, errors, container) {
+        if (success === 0 || success === false) {
+            $("#" + container + " .form-group label").css("color", "#686868");
+
+            $.each(errors, function (key, error) {
+                $("#" + container + " .form-control[name='" + key + "']").parents(".form-group").children("label").css("color", "red");
+            });
+        } else {
+            $("#" + container + " .form-group label").css("color", "#686868");
+        }
+    }
+
+    function prepareErrs(errors, container) {
+        var errs = {};
+
+        $.each(errors, function (key, error) {
+            var $input = $("#" + container + " #" + key);
+            var lang = $input.data('lang');
+            var label = $input.siblings('label').text().slice(0, -1);
+
+            if (lang != undefined) {
+                label = $input.closest("div").siblings('label').text().slice(0, -1);
+                errs[lang + ' ' + label] = error;
+            } else {
+                if (label === "") {
+                    label = $input.closest("div").siblings('label').text().slice(0, -1);
+                    errs[label] = error;
+                } else {
+                    errs[label] = error;
+                }
+            }
+        });
+
+        return errs;
+    }
 
     /**
      * This will open a new tab when editing a site
