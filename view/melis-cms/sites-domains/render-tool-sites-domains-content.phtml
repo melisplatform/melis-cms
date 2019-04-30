@@ -63,7 +63,6 @@ $data_melisKey = $this->melisKey;
                                                 $el->setValue($this->siteId);
                                             $el->setName($siteEnv['plf_name']."_".$el->getName());
                                             $el->setAttribute('id', $el->getName());
-                                            $el->setLabel($el->getLabel() . '*');
                                         }
 
                                         echo $this->form()->openTag($form);

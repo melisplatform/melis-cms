@@ -36,7 +36,6 @@ $data_melisKey = $this->melisKey;
 
                             $el->setName("siteprop_".$el->getName());
                             $el->setAttribute('id', $el->getName());
-                            $el->setLabel($el->getLabel() . '*');
                         }
                         echo $this->form()->openTag($form);
                         echo $this->melisFieldCollection($form);
@@ -106,7 +105,6 @@ $data_melisKey = $this->melisKey;
                                             $el->setAttribute('data-lang', $lang['lang_cms_name']);
                                             $el->setName($lang['slang_lang_id']."_".$el->getName());
                                             $el->setAttribute('id', $el->getName());
-                                            $el->setLabel($el->getLabel() . '*');
                                         }
 
                                         echo $this->form()->openTag($form);
