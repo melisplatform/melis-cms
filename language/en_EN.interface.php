@@ -526,7 +526,7 @@
         #PROPERTIES TAB
         'tr_melis_cms_sites_properties' => 'Properties',
         'tr_melis_cms_sites_site_id' => 'Site ID',
-        'tr_melis_cms_sites_site_id tooltip' => 'Identifier of the site currently editing',
+        'tr_melis_cms_sites_site_id tooltip' => 'Site identifier',
         'tr_melis_cms_sites_site_label' => 'Site Name',
         'tr_melis_cms_sites_site_label tooltip' => 'The name of the site displayed in the platform',
         'tr_melis_cms_sites_site_name' => 'Site Module',
