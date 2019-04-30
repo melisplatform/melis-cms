@@ -69,6 +69,7 @@ return array(
                                                 'https' => 'https',
                                                 'http' => 'http',
                                             ),
+                                            'disable_inarray_validator' => true,
                                         ),
                                         'attributes' => array(
                                             'id' => 'sdom_scheme',
