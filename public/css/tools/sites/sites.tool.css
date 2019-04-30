@@ -50,9 +50,10 @@ div[data-meliskey="meliscms_tool_sites_edit_site_tabs"] .widget-head.nav {
     right: 22px;
 }
 div[data-meliskey="meliscms_tool_sites_module_load_content"] .switch-all-noti {
-    z-index: 0;
-    top: -45px;
+    z-index: 5;
+    top: -25px;
 }
+
 div[data-meliskey="meliscms_tool_sites_module_load_content"] #header-version {
     padding: 15px 0px;
 }
