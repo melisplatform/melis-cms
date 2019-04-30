@@ -81,3 +81,7 @@ ul.meliscms-site-language-homepage-list > li:hover {
     border: 0 solid #e61c23 !important;
 }
 
+.no-box-shadow {
+    box-shadow: none;
+}
+
