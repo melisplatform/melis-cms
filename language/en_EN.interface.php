@@ -582,6 +582,7 @@
         #SITES CONFIG TAB
         'tr_melis_cms_sites_tool_config_title' => 'Site Config',
         'tr_melis_cms_sites_tool_config_array_warning' => 'Nested arrays with depth of 2 or more are not displayed. You can edit it manually on the file instead.',
+        'tr_melis_cms_sites_tool_general' => 'General',
 
         #SITES INTERFACES
         'tr_melis_cms_sites_tool_add_site_button' => 'Add site button',
