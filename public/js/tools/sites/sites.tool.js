@@ -777,7 +777,7 @@ $(document).ready(function() {
     });
 
     $body.on("click", ".pageSelect span", function() {
-        var id = $(this).find('input').attr('id');
+        var id = $(this).siblings('input').attr('id');
         melisLinkTree.createInputTreeModal('#' + id);
     });
     /**
