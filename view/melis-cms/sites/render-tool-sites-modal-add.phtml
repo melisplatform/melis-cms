@@ -20,11 +20,11 @@ if (!empty($this->zoneconfig['conf']['id']))
                         <li class="status">
                             <span class="r">Step <span class="step-current">1</span> of <span class="steps-total">5</span></span><span class="r text-primary step-name">Multilingual</span>
                         </li>
-                        <li class="step_1 active" data-stepName="Multilingual"><a>1</a></li>
-                        <li class="step_2" data-stepName="Languages"><a>2</a></li>
-                        <li class="step_3" data-stepName="Domains"><a>3</a></li>
+                        <li class="step_1 active" data-stepName="<?= $this->translate('tr_melis_cms_sites_tool_add_header_title_multi_lingual');?>"><a>1</a></li>
+                        <li class="step_2" data-stepName="<?= $this->translate('tr_melis_cms_sites_tool_add_header_title_lang');?>"><a>2</a></li>
+                        <li class="step_3" data-stepName="<?= $this->translate('tr_melis_cms_sites_tool_add_header_title_domains');?>"><a>3</a></li>
                         <li class="step_4" data-stepName="Modules"><a>4</a></li>
-                        <li class="step_5" data-stepName="Site Summary"><a>5</a></li>
+                        <li class="step_5" data-stepName="<?= $this->translate('tr_melis_cms_sites_tool_add_header_title_site_summary');?>"><a>5</a></li>
                     </ul>
                 </div>
                 <!-- // Widget heading END -->
@@ -45,7 +45,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                         <button type="button" data-dismiss="modal" class="btn btn-danger pull-left"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
                         <button type="button" class="btn btn-success" id="btn-prev-step"><?php echo $this->translate('tr_meliscms_tool_sites_prev') ?></button>
                         <button type="button" class="btn btn-success" id="btn-next-step"><?php echo $this->translate('tr_meliscms_tool_sites_next') ?></button>
-                        <button type="button" class="btn btn-success" id="btn-finish-step"><?php echo $this->translate('Finish') ?></button>
+                        <button type="button" class="btn btn-success" id="btn-finish-step"><?php echo $this->translate('tr_meliscms_tool_sites_finish') ?></button>
                     </div>
                 </div>
             </div>

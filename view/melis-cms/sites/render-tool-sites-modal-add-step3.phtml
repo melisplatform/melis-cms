@@ -24,9 +24,13 @@ if (!empty($this->zoneconfig['conf']['id']))
                 $form->prepare();
                 echo $this->form()->openTag($form);
                 ?>
-                <label for=""><?= $this->translate('tr_melis_cms_sites_tool_add_step3_multi_domain_name');?></label>
-                <div id="multi-domains_container" class="tool-sites_container_fixed_width">
-                    <!-- This is where the dynamic input fields loaded-->
+                <div class="form-group">
+                    <label for=""><?= $this->translate('tr_melis_cms_sites_tool_add_step3_multi_domain_name');?>
+                        <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="<?= $this->translate('tr_melis_cms_sites_tool_add_step3_multi_domain_name tooltip')?>"></i>
+                    </label>
+                    <div id="multi-domains_container" class="tool-sites_container_fixed_width">
+                        <!-- This is where the dynamic input fields loaded-->
+                    </div>
                 </div>
                 <?php
                 echo $this->melisFieldCollection($form);

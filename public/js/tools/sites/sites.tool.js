@@ -357,7 +357,7 @@ $(document).ready(function() {
                 formData.languages = langData.data;
                 formData.domains = domainData;
 
-                selectedLanguages = '- Languages: ' + lang;
+                selectedLanguages = '- '+translations.tr_melis_cms_sites_tool_add_header_title_lang+': ' + lang;
                 break;
             case "step_4":
                 currentStepForm = "#step4form_module";
@@ -376,7 +376,7 @@ $(document).ready(function() {
                     domain = 'Single';
                 }
 
-                domainType = '- Domains: ' + domain;
+                domainType = '- '+translations.tr_melis_cms_sites_tool_add_header_title_domains+': ' + domain;
                 formData.domains.data = processSiteDomain(domainFormData);
 
                 /**
@@ -663,7 +663,7 @@ $(document).ready(function() {
      * @param siteId
      */
     function openSiteEditTab(name, siteId){
-        melisHelper.tabOpen(name, 'fa-globe', siteId+'_id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site',  { siteId : siteId }, null, function(){
+        melisHelper.tabOpen(name, 'fa-book', siteId+'_id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site',  { siteId : siteId }, null, function(){
 
         });
     }

@@ -98,6 +98,7 @@ return array(
                                         'type' => 'Select',
                                         'options' => array(
                                             'label' => 'tr_melis_cms_sites_tool_add_step1_is_multi_lang',
+                                            'tooltip' => 'tr_melis_cms_sites_tool_add_step1_is_multi_lang tooltip',
                                             'checked_value' => 1,
                                             'unchecked_value' => 0,
                                             'switchOptions' => array(
@@ -132,6 +133,7 @@ return array(
                                         'name' => 'sites_url_setting',
                                         'options' => array(
                                             'label' => 'tr_melis_cms_sites_tool_add_step2_reflect_urls',
+                                            'tooltip' => 'tr_melis_cms_sites_tool_add_step2_reflect_urls tooltip',
                                             'label_options' => array(
                                                 'disable_html_escape' => true,
                                             ),
@@ -181,6 +183,7 @@ return array(
                                         'type' => 'MelisText',
                                         'options' => array(
                                             'label' => 'tr_melis_cms_sites_tool_add_step3_single_domain_name',
+                                            'tooltip' => 'tr_melis_cms_sites_tool_add_step3_single_domain_name tooltip',
                                             'label_attributes' => array(
                                                 'class' => 'err_sdom_domain',
                                             )
@@ -223,6 +226,7 @@ return array(
                                         'type' => 'MelisCmsSiteModuleSelect',
                                         'options' => array(
                                             'label' => 'tr_melis_cms_sites_tool_add_step4_select_module',
+                                            'tooltip' => 'tr_melis_cms_sites_tool_add_step4_select_module tooltip',
                                             'empty_option' => 'tr_melis_cms_sites_tool_add_step4_select_module_placeholder',
                                         ),
                                         'attributes' => array(
@@ -237,6 +241,7 @@ return array(
                                         'type' => 'MelisText',
                                         'options' => array(
                                             'label' => 'tr_melis_cms_sites_tool_add_step4_create_module',
+                                            'tooltip' => 'tr_melis_cms_sites_tool_add_step4_create_module tooltip',
                                             'label_attributes' => array(
                                                 'class' => 'err_siteCreateModuleName',
                                             )
@@ -254,7 +259,8 @@ return array(
                                         'name' => 'site_label',
                                         'type' => 'MelisText',
                                         'options' => array(
-                                            'label' => 'Site label',
+                                            'label' => 'tr_melis_cms_sites_tool_add_step4_site_label',
+                                            'tooltip' => 'tr_melis_cms_sites_tool_add_step4_site_label tooltip',
                                             'label_attributes' => array(
                                                 'class' => 'err_site_label',
                                             )
@@ -272,6 +278,7 @@ return array(
                                         'name' => 'create_sites_file',
                                         'options' => array(
                                             'label' => 'tr_melis_cms_sites_tool_add_step4_create_file_for_website',
+                                            'tooltip' => 'tr_melis_cms_sites_tool_add_step4_create_file_for_website tooltip',
                                             'label_options' => array(
                                                 'disable_html_escape' => true,
                                             ),

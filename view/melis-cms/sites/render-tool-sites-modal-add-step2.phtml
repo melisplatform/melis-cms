@@ -13,19 +13,23 @@ if (!empty($this->zoneconfig['conf']['id']))
                 $form->prepare();
                 echo $this->form()->openTag($form);
                 ?>
-                <label class="err_site_selected_lang"><?= $this->translate('tr_melis_cms_sites_tool_add_step2_select_languages'); ?><sup>*</sup></label>
-                <div class="row">
-                    <?php
-                    foreach($this->langList as $key => $val) {
-                        $id = $val['lang_cms_id'].'-'.$val['lang_cms_locale'];
-                        ?>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <input type="radio" value="<?= $id.'-'.$val['lang_cms_name'] ?>" name="site_selected_lang" id="<?= $id ?>" required="required"/>
-                                <label for="<?= $id ?>"><?= $val['lang_cms_name']; ?></label>
+                <div class="form-group">
+                    <label class="err_site_selected_lang"><?= $this->translate('tr_melis_cms_sites_tool_add_step2_select_languages'); ?><sup>*</sup>
+                        <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="<?= $this->translate('tr_melis_cms_sites_tool_add_step2_select_languages tooltip')?>"></i>
+                    </label>
+                    <div class="row">
+                        <?php
+                        foreach($this->langList as $key => $val) {
+                            $id = $val['lang_cms_id'].'-'.$val['lang_cms_locale'];
+                            ?>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <input type="radio" value="<?= $id.'-'.$val['lang_cms_name'] ?>" name="site_selected_lang" id="<?= $id ?>" required="required"/>
+                                    <label for="<?= $id ?>"><?= $val['lang_cms_name']; ?></label>
+                                </div>
                             </div>
-                        </div>
-                    <?php } ?>
+                        <?php } ?>
+                    </div>
                 </div>
                 <?php
                 echo $this->melisFieldCollection($form);
@@ -38,19 +42,23 @@ if (!empty($this->zoneconfig['conf']['id']))
                 $form->prepare();
                 echo $this->form()->openTag($form);
                 ?>
-                <label class="err_site_selected_lang"><?= $this->translate('tr_melis_cms_sites_tool_add_step2_select_languages'); ?> <sup>*</sup></label>
-                <div class="row">
-                    <?php
-                    foreach($this->langList as $key => $val) {
-                            $id = $val['lang_cms_id'].'-'.$val['lang_cms_locale'];
-                            $selected = ($val['lang_cms_locale'] == 'en_EN') ? 'checked' : '';
-                        ?>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <input type="checkbox" value="<?= $id.'-'.$val['lang_cms_name'] ?>" name="site_selected_lang" id="<?= $id ?>" <?= $selected ?> required="required" /> <label for="<?= $id ?>" id=""><?= $val['lang_cms_name']; ?></label>
+                <div class="form-group">
+                    <label class="err_site_selected_lang"><?= $this->translate('tr_melis_cms_sites_tool_add_step2_select_languages'); ?> <sup>*</sup>
+                        <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="<?= $this->translate('tr_melis_cms_sites_tool_add_step2_select_languages tooltip')?>"></i>
+                    </label>
+                    <div class="row">
+                        <?php
+                        foreach($this->langList as $key => $val) {
+                                $id = $val['lang_cms_id'].'-'.$val['lang_cms_locale'];
+                                $selected = ($val['lang_cms_locale'] == 'en_EN') ? 'checked' : '';
+                            ?>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <input type="checkbox" value="<?= $id.'-'.$val['lang_cms_name'] ?>" name="site_selected_lang" id="<?= $id ?>" <?= $selected ?> required="required" /> <label for="<?= $id ?>" id=""><?= $val['lang_cms_name']; ?></label>
+                                </div>
                             </div>
-                        </div>
-                    <?php } ?>
+                        <?php } ?>
+                    </div>
                 </div>
                 <?php
                 foreach ($form->getElements() As $key => $val)
@@ -65,6 +73,9 @@ if (!empty($this->zoneconfig['conf']['id']))
                         echo $this->formLabel()->openTag($val);
                         echo $val->getLabel();
                         echo $required;
+                        ?>
+                        <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="<?= $val->getOption('tooltip'); ?>"></i>
+                        <?php
                         echo $this->formLabel()->closeTag();
                     }
                     echo $this->formElement($val);

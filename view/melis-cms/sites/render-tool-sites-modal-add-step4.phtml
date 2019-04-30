@@ -24,18 +24,20 @@ if (!empty($this->zoneconfig['conf']['id']))
                     echo '<div class="form-group '.$hide.'" id="'.$newId.'">';
                     if ($val->getLabel())
                     {
-                        if($key == 'siteCreateModuleName') {
-                            echo $this->formLabel($val);
-                        }else{
-                            $required = '';
-                            if(!empty($val->getAttribute('required'))){
-                                $required = '<sup>*</sup>';
-                            }
-                            echo $this->formLabel()->openTag($val);
-                            echo $val->getLabel();
-                            echo $required;
-                            echo $this->formLabel()->closeTag();
+                        $required = '';
+                        if(!empty($val->getAttribute('required'))){
+                            $required = '<sup>*</sup>';
                         }
+                        if($key == 'siteCreateModuleName') {
+                            $required = '';
+                        }
+                        echo $this->formLabel()->openTag($val);
+                        echo $val->getLabel();
+                        echo $required;
+                        ?>
+                        <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="<?= $val->getOption('tooltip'); ?>"></i>
+                        <?php
+                        echo $this->formLabel()->closeTag();
                     }
                     echo $this->formElement($val);
                     echo '</div>';

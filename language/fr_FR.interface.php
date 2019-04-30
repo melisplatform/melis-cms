@@ -473,8 +473,9 @@
         'tr_meliscms_tool_sites_cancel' => 'Annuler',
         'tr_meliscms_tool_sites_prev' => 'Pr&eacute;c&eacute;dent',
         'tr_meliscms_tool_sites_next' => 'Suivant',
+        'tr_meliscms_tool_sites_finish' => 'Terminer',
 
-        'tr_melis_cms_sites_tool_add_step1_text' => 'Cet outil vous accompagnera à créer la configuration adaptée à votre site. Cela assurera la génération adéquate des fichiers dans vos modules et une compatibilité optimale avec l\'écosystème de Melis Platform.',
+        'tr_melis_cms_sites_tool_add_step1_text' => 'Cet outil vous accompagnera à créer la configuration adaptée pour votre site. Cela assurera la génération adéquate des fichiers dans vos modules et une compatibilité optimale avec l\'écosystème de Melis Platform.',
         'tr_melis_cms_sites_tool_add_step1_is_multi_lang' => 'Ce site sera t-il multilingue ?',
         'tr_melis_cms_sites_tool_add_step2_select_languages' => 'Veuillez choisir les langues du site :',
         'tr_melis_cms_sites_tool_add_step2_reflect_urls' => 'Comment souhaitez-vous refléter la langue dans les URLs du site ?',
@@ -498,6 +499,22 @@
         'tr_melis_cms_sites_tool_add_create_site_unknown_error' => 'Une erreur s\'est produite pendant la création du site, veuillez réessayer',
         'tr_melis_cms_sites_tool_add_create_site_no_site_language' => 'Veuillez fournir les langues du site',
         'tr_melis_cms_sites_tool_add_create_site_required_field' => 'Veuillez remplir tous les champs obligatoires',
+        'tr_melis_cms_sites_tool_add_step4_site_label' => 'Nom du site',
+        'tr_melis_cms_sites_tool_add_header_title_lang' => 'Langages',
+        'tr_melis_cms_sites_tool_add_header_title_domains' => 'Domaines',
+        'tr_melis_cms_sites_tool_add_header_title_multi_lingual' => 'Multilingue',
+        'tr_melis_cms_sites_tool_add_header_title_site_summary' => 'Résumé',
+
+        #ADD SITE FORMS TOOLTIPS
+        'tr_melis_cms_sites_tool_add_step1_is_multi_lang tooltip' => 'Choisissez si votre site est multilingue ou non',
+        'tr_melis_cms_sites_tool_add_step2_reflect_urls tooltip' => 'Sélectionnez la manière dans laquelle les langages doivent être reflétés dans les URLs',
+        'tr_melis_cms_sites_tool_add_step2_select_languages tooltip' => 'Sélectionnez les langages du site',
+        'tr_melis_cms_sites_tool_add_step3_single_domain_name tooltip' => 'Domaine sur lequel le site est accessible (ex: www.monsite.com)',
+        'tr_melis_cms_sites_tool_add_step3_multi_domain_name tooltip' => 'Domaines sur lesquels chaque site est accessible en fonstion de leur langage (ex: www.monsite.com)',
+        'tr_melis_cms_sites_tool_add_step4_select_module tooltip' => 'Sélectionnez le module associé au(x) site(s)',
+        'tr_melis_cms_sites_tool_add_step4_create_module tooltip' => 'Créez un nouveau module pour le(s) site(s)',
+        'tr_melis_cms_sites_tool_add_step4_site_label tooltip' => 'Saisissez le nom du site',
+        'tr_melis_cms_sites_tool_add_step4_create_file_for_website tooltip' => 'Sélectionnez si vous souhaitez que les dossiers et fichiers soient créés pour le(s) site(s) ou non',
 
         #MODULE LOAD TAB
         'tr_melis_cms_sites_module_loading' => 'Chargement du module',
@@ -577,13 +594,13 @@
         'tr_melis_cms_sites_tool_content_edit_tab_list' => 'Onglet éditer site',
         'tr_melis_cms_sites_tool_content_edit_properties_tab' => 'Propriétés',
         'tr_melis_cms_sites_tool_content_edit_properties_tab_content' => 'Contenu de Propriétés',
-        'tr_melis_cms_sites_tool_content_edit_module_loading_tab' => 'Onglet chargement des modules',
+        'tr_melis_cms_sites_tool_content_edit_module_loading_tab' => 'Chargement des modules',
         'tr_melis_cms_sites_tool_content_edit_module_loading_tab_content' => 'Contenu de chargement des modules',
         'tr_melis_cms_sites_tool_content_edit_languages_tab' => 'Langages',
         'tr_melis_cms_sites_tool_content_edit_languages_tab_content' => 'Contenu de Langages',
-        'tr_melis_cms_sites_tool_content_edit_site_config_tab' => 'Onglet configuration site',
+        'tr_melis_cms_sites_tool_content_edit_site_config_tab' => 'Configuration site',
         'tr_melis_cms_sites_tool_content_edit_site_config_tab_content' => 'Contenu de configuration site',
-        'tr_melis_cms_sites_tool_content_edit_site_translations_tab' => 'Onglet traductions de site',
+        'tr_melis_cms_sites_tool_content_edit_site_translations_tab' => 'Traductions de site',
         'tr_melis_cms_sites_tool_content_edit_site_translations_tab_content' => 'Contenu de traductions de site',
 
         #SITES NO ACCESS MESSAGE
