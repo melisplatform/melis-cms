@@ -517,7 +517,7 @@
         'tr_melis_cms_sites_tool_add_step4_create_file_for_website tooltip' => 'Sélectionnez si vous souhaitez que les dossiers et fichiers soient créés pour le(s) site(s) ou non',
 
         #MODULE LOAD TAB
-        'tr_melis_cms_sites_module_loading' => 'Chargement du module',
+        'tr_melis_cms_sites_module_loading' => 'Chargement des modules',
         'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice' => '<i class="fa fa-warning"></i>Ci-dessous est la liste des modules requis par <strong>%s</strong>, êtes-vous sûr de vouloir activer <strong>%s</strong>? ',
         'tr_melis_cms_sites_module_load_no_access' => 'Vous avez besoin d\'un niveau de droits d\'administrateur pour modifier cette section.',
         'tr_melis_cms_sites_module_no_module_to_load' => 'This site has no module to load.',
