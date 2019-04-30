@@ -236,5 +236,7 @@
         'tr_melis_cms_sites_domain_scheme tooltip' => "http or https protocol",
         'tr_melis_cms_sites_domain' => "Domain",
         'tr_melis_cms_sites_domain tooltip' => "Domain on which the site is accessible (ex: www.mysite.com)",
+        'tr_melis_cms_sites_field_empty' => 'Value is required and can\'t be empty',
+        'tr_melis_cms_sites_field_digits' => 'The input must contain only digits',
 	);
 ?>

@@ -146,7 +146,16 @@ return array(
                                 'sdom_scheme' => array(
                                     'name' => 'sdom_scheme',
                                     'required' => true,
-                                    'validators' => array(),
+                                    'validators' => array(
+                                        array(
+                                            'name'    => 'NotEmpty',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
+                                                ),
+                                            ),
+                                        ),
+                                    ),
                                     'filters' => array(
                                         array('name' => 'StripTags'),
                                         array('name' => 'StringTrim'),
@@ -155,7 +164,16 @@ return array(
                                 'sdom_domain' => array(
                                     'name' => 'sdom_domain',
                                     'required' => true,
-                                    'validators' => array(),
+                                    'validators' => array(
+                                        array(
+                                            'name'    => 'NotEmpty',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
+                                                ),
+                                            ),
+                                        ),
+                                    ),
                                     'filters' => array(
                                         array('name' => 'StripTags'),
                                         array('name' => 'StringTrim'),
