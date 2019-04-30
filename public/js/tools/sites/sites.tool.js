@@ -140,6 +140,13 @@ $(document).ready(function() {
                 }else{
                     showElement("#btn-prev-step");
                 }
+
+                /**
+                 * tooltip data container to body
+                 */
+                setTimeout(function(){
+                    $(".sites-steps-owl .tool-sites_container_fixed_width").find("i.tip-info").attr("data-container", "body");
+                }, 100);
             },
             beforeMove: function(elem){
                 var current = this.currentItem;
