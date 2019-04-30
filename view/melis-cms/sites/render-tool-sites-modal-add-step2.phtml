@@ -54,7 +54,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                             ?>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <input type="checkbox" value="<?= $id.'-'.$val['lang_cms_name'] ?>" name="site_selected_lang" id="<?= $id ?>" <?= $selected ?> required="required" /> <label for="<?= $id ?>" id=""><?= $val['lang_cms_name']; ?></label>
+                                    <input class="no-box-shadow" type="checkbox" value="<?= $id.'-'.$val['lang_cms_name'] ?>" name="site_selected_lang" id="<?= $id ?>" <?= $selected ?> required="required" /> <label for="<?= $id ?>" id=""><?= $val['lang_cms_name']; ?></label>
                                 </div>
                             </div>
                         <?php } ?>
