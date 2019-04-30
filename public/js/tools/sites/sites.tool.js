@@ -90,6 +90,23 @@ $(document).ready(function() {
     $body.on("click", ".btnEditSites", function(){
         var tableId = $(this).closest('tr').attr('id');
         var name = $(this).closest('tr').find("td:nth-child(2)").text();
+        var siteLang = $(this).closest('tr').find("td:nth-child(4)").text();
+        var siteModule = $(this).closest('tr').find("td:nth-child(3)").text();
+        var selId = $(this).closest('tr').attr("id");
+
+        $("#tableToolSites tbody tr").each(function(i, v){
+            var siteNames = $(this).find("td:nth-child(2)").text();
+            var siteModules = $(this).find("td:nth-child(3)").text();
+            var id = $(this).attr("id");
+            if(selId != id) {
+                if (name == siteNames) {
+                    if (siteModule == siteModules) {
+                        name += " - " + siteLang;
+                        return false;
+                    }
+                }
+            }
+        });
         openSiteEditTab(name, tableId);
     });
 
@@ -654,7 +671,7 @@ $(document).ready(function() {
          * create a new module name
          */
         if(newModuleValue != "") {
-            if (/^[a-zA-Z0-9-]*$/.test(newModuleValue) === false) {
+            if (/^[A-Za-z_]\w*$/.test(newModuleValue) === false) {
                 newModuleLabel.addClass("fieldErrorColor");
                 $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_step4_create_module_error).removeClass("hidden");
                 return true;
@@ -698,7 +715,7 @@ $(document).ready(function() {
      */
     function openSiteEditTab(name, siteId){
         melisHelper.tabOpen(name, 'fa-book', siteId+'_id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site',  { siteId : siteId }, 'id_meliscms_tool_sites', function(){
-
+            $("site-title-tag").text(" / " + name);
         });
     }
 
