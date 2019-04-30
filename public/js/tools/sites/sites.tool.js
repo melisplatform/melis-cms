@@ -623,7 +623,7 @@ $(document).ready(function() {
      * @param siteId
      */
     function openSiteEditTab(name, siteId){
-        melisHelper.tabOpen(name, 'fa-globe', siteId+'_id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site',  { siteId : siteId }, null, function(){
+        melisHelper.tabOpen(name, 'fa-book', siteId+'_id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site',  { siteId : siteId }, null, function(){
 
         });
     }

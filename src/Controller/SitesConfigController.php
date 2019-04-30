@@ -78,6 +78,11 @@ class SitesConfigController extends AbstractActionController
         return $view;
     }
 
+    public function getModuleSitesListAction()
+    {
+
+    }
+
     private function getDbConfigIds($dbConfig)
     {
         $dbConfIds = [];
