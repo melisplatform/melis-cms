@@ -112,7 +112,7 @@ $(document).ready(function() {
     /**
      * This will delete the site
      */
-    $body.on("click", ".btnDeleteSite", function(e) {
+    $body.on("click", "#tableToolSites .btnDeleteSite", function(e) {
         var siteId = $(this).parents("tr").attr("id");
         melisCoreTool.confirm(
             translations.tr_meliscore_common_yes,
@@ -129,6 +129,7 @@ $(document).ready(function() {
                     success		: function(data){
                         melisCoreTool.pending(".btnDeleteSite");
                         if(data.success) {
+                            melisHelper.tabClose(siteId + "_id_meliscms_tool_sites_edit_site");
                             melisHelper.melisOkNotification(data.textTitle, data.textMessage);
                             // melisHelper.zoneReload("id_meliscms_tool_site", "meliscms_tool_site");
                             //refresh site table
