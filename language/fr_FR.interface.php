@@ -538,7 +538,7 @@
         'tr_melis_cms_sites_site_main_page_id' => 'ID page d\'accueil principale',
         'tr_melis_cms_sites_site_main_page_id tooltip' => 'Identifiant de la page d\'accueil',
         'tr_melis_cms_sites_homepages' => 'Pages d\'accueil',
-        'tr_melis_cms_sites_shome_page_id' => 'ID de la page d\'accueil',
+        'tr_melis_cms_sites_shome_page_id' => 'ID page d\'accueil',
         'tr_melis_cms_sites_shome_page_id tooltip' => 'Identifiant de la page d\'accueil par langue',
 
         #SITE TRANSLATION TAB
