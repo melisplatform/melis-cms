@@ -504,15 +504,15 @@
         'tr_melis_cms_sites_tool_add_header_title_site_summary' => 'Site summary',
 
         #ADD SITE FORMS TOOLTIPS
-        'tr_melis_cms_sites_tool_add_step1_is_multi_lang tooltip' => 'Identifier if site is multi lingual or not',
-        'tr_melis_cms_sites_tool_add_step2_reflect_urls tooltip' => 'This will determine how will the language reflect on your url.',
-        'tr_melis_cms_sites_tool_add_step2_select_languages tooltip' => 'Select language(s) for this site',
-        'tr_melis_cms_sites_tool_add_step3_single_domain_name tooltip' => 'Domain name for this site',
-        'tr_melis_cms_sites_tool_add_step3_multi_domain_name tooltip' => 'Domain name for each language',
-        'tr_melis_cms_sites_tool_add_step4_select_module tooltip' => 'Select module for this site(s)',
-        'tr_melis_cms_sites_tool_add_step4_create_module tooltip' => 'Create a new module for this site(s)',
+        'tr_melis_cms_sites_tool_add_step1_is_multi_lang tooltip' => 'Select if your site is multilingual or not',
+        'tr_melis_cms_sites_tool_add_step2_reflect_urls tooltip' => 'Select the way the languages should be reflected in the URLs',
+        'tr_melis_cms_sites_tool_add_step2_select_languages tooltip' => 'Select the languages of the site',
+        'tr_melis_cms_sites_tool_add_step3_single_domain_name tooltip' => 'Domain on which the site is accessible (ex: www.mysite.com)',
+        'tr_melis_cms_sites_tool_add_step3_multi_domain_name tooltip' => 'Domains on which each site is accessible according to their language (ex: www.mysite.com)',
+        'tr_melis_cms_sites_tool_add_step4_select_module tooltip' => 'Select the module associated to the site(s)',
+        'tr_melis_cms_sites_tool_add_step4_create_module tooltip' => 'Create a new module for the site(s)',
         'tr_melis_cms_sites_tool_add_step4_site_label tooltip' => 'Enter the site name',
-        'tr_melis_cms_sites_tool_add_step4_create_file_for_website tooltip' => 'Determine whether we create a files for this site',
+        'tr_melis_cms_sites_tool_add_step4_create_file_for_website tooltip' => 'Select if you want the folders and files created for the site(s) or not',
 
         #MODULE LOAD TAB
         'tr_melis_cms_sites_module_loading' => 'Module loading',
