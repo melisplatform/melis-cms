@@ -601,7 +601,7 @@
         'tr_melis_cms_sites_tool_content_edit_languages_tab_content' => 'Contenu de Langages',
         'tr_melis_cms_sites_tool_content_edit_site_config_tab' => 'Configuration sites',
         'tr_melis_cms_sites_tool_content_edit_site_config_tab_content' => 'Contenu de configuration site',
-        'tr_melis_cms_sites_tool_content_edit_site_translations_tab' => 'Traductions de site',
+        'tr_melis_cms_sites_tool_content_edit_site_translations_tab' => 'Traductions',
         'tr_melis_cms_sites_tool_content_edit_site_translations_tab_content' => 'Contenu de traductions de site',
 
         #SITES NO ACCESS MESSAGE

@@ -599,7 +599,7 @@
         'tr_melis_cms_sites_tool_content_edit_languages_tab_content' => 'Languages content',
         'tr_melis_cms_sites_tool_content_edit_site_config_tab' => 'Site Config',
         'tr_melis_cms_sites_tool_content_edit_site_config_tab_content' => 'Site config content',
-        'tr_melis_cms_sites_tool_content_edit_site_translations_tab' => 'Site Translations',
+        'tr_melis_cms_sites_tool_content_edit_site_translations_tab' => 'Translations',
         'tr_melis_cms_sites_tool_content_edit_site_translations_tab_content' => 'Site translations content',
 
         #SITES NO ACCESS MESSAGE
