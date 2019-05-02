@@ -625,61 +625,6 @@ body.modal-open {
 	white-space: nowrap;
 }
 
-/*
- * Added by: Junry @ 02/28/2019
- * Custom checkbox on duplicate tree, contextmenu modal container
- */
-*, *:before, *:after {
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
-}
-
-.form-group {
-	margin-bottom: 15px;
-	position: relative;
-}
-
-.form-group .melis-check-box {
-	padding: 0;
-	height: initial;
-	width: initial;
-	margin-bottom: 0;
-	display: none;
-	cursor: pointer;
-}
-
-.form-group .cls-checkbox-label {
-	position: relative;
-	cursor: pointer;
-}
-
-.form-group .cls-checkbox-label::before {
-	content: '';
-	border: 0.1em solid red;
-	padding: 0.65em;
-	display: inline-block;
-	position: absolute;
-	vertical-align: middle;
-	cursor: pointer;
-	margin-right: 5px;
-	top: -0.5em;
-}
-
-.form-group .melis-check-box:checked + .cls-checkbox-label::after {
-	content: '';
-	background: red;
-	border: 0.1em solid red;
-	width: 1em;
-	height: 1em;
-	display: inline-block;
-	position: absolute;
-	top: -0.25em;
-	left: 0.2em;
-}
-
 /* ===============================================================[ -= RESPONSIVE =- ]==================================================================== */
 
 @media (min-width: 1200px) and (max-width: 1600px) {
