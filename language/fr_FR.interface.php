@@ -516,7 +516,7 @@
         'tr_melis_cms_sites_tool_add_step2_reflect_urls tooltip' => 'Sélectionnez la manière dans laquelle les langages doivent être reflétés dans les URLs',
         'tr_melis_cms_sites_tool_add_step2_select_languages tooltip' => 'Sélectionnez les langages du site',
         'tr_melis_cms_sites_tool_add_step3_single_domain_name tooltip' => 'Domaine sur lequel le site est accessible (ex: www.monsite.com)',
-        'tr_melis_cms_sites_tool_add_step3_multi_domain_name tooltip' => 'Domaines sur lesquels chaque site est accessible en fonstion de leur langage (ex: www.monsite.com)',
+        'tr_melis_cms_sites_tool_add_step3_multi_domain_name tooltip' => 'Domaines sur lesquels chaque site est accessible en fonction de leur langage (ex: www.monsite.com)',
         'tr_melis_cms_sites_tool_add_step4_select_module tooltip' => 'Sélectionnez le module associé au(x) site(s)',
         'tr_melis_cms_sites_tool_add_step4_create_module tooltip' => 'Créez un nouveau module pour le(s) site(s)',
         'tr_melis_cms_sites_tool_add_step4_site_label tooltip' => 'Saisissez le nom du site',
