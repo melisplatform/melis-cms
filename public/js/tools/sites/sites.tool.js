@@ -8,41 +8,135 @@ $(document).ready(function() {
         var currentTabId = activeTabId.split("_")[0];
         var dataString = $("#"+currentTabId+"_id_meliscms_tool_sites_edit_site form").serializeArray();
         // serialize the new array and send it to server
-        dataString = $.param(dataString);
+        var newEnabledModule = [];
+        $.each(dataString, function( key, value ) {
+            str1 = value.name;
+            str2 = "moduleLoad";
+            if(str1.indexOf(str2) != -1){
+                newEnabledModule.push(str1.replace('moduleLoad',''));
+            }
+        });
+        var currentEnabledModule = $("#currentEnabledModule").val();
+        var sitesUsingModules = $("#sitesUsingModules").val();
 
-        $.ajax({
-            type        : 'POST',
-            url         : '/melis/MelisCms/Sites/saveSite?siteId='+currentTabId,
-            data        : dataString,
-            dataType    : 'json',
-            encode		: true
-        }).success(function (data) {
-            if (data.success === 1) {
-                // call melisOkNotification
-                melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
+        currentEnabledModule = jQuery.parseJSON(currentEnabledModule);
+        sitesUsingModules = jQuery.parseJSON(sitesUsingModules);
+
+        var sitesUsingModulesStr = "";
+        $.each(sitesUsingModules,function (key, val) {
+            sitesUsingModulesStr += "<br>- "+ val;
+        });
+        var moduleDiff = arrayDiff(currentEnabledModule,newEnabledModule);
+
+        if(moduleDiff.length > 0){
+            melisCoreTool.confirm(
+                translations.tr_meliscore_common_yes,
+                translations.tr_meliscore_common_no,
+                translations.tr_meliscms_tool_site_module_load_update_title,
+                translations.tr_meliscms_tool_site_module_load_update_confirm.replace(/%s/g, sitesUsingModulesStr),
+                function(){
+                    dataString = $.param(dataString);
+
+                    $.ajax({
+                        type        : 'POST',
+                        url         : '/melis/MelisCms/Sites/saveSite?siteId='+currentTabId,
+                        data        : dataString,
+                        dataType    : 'json',
+                        encode		: true
+                    }).success(function (data) {
+                        if (data.success === 1) {
+                            // call melisOkNotification
+                            melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
+                            // update flash messenger values
+                            melisCore.flashMessenger();
+
+                            melisHelper.zoneReload(
+                                currentTabId + '_id_meliscms_tool_sites_edit_site',
+                                'meliscms_tool_sites_edit_site',
+                                {
+                                    siteId: currentTabId,
+                                    cpath: 'meliscms_tool_sites_edit_site'
+                                }
+                            );
+                        } else {
+                            melisCoreTool.highlightErrors(data.success, data.errors, currentTabId+"_id_meliscms_tool_sites_edit_site");
+                            // error modal
+                            melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors );
+                        }
+
+                        // update flash messenger values
+                        melisCore.flashMessenger();
+                    }).error(function(xhr, textStatus, errorThrown) {
+                        alert( translations.tr_meliscore_error_message );
+                    });
+                }
+            );
+        }else{
+            dataString = $.param(dataString);
+
+            $.ajax({
+                type        : 'POST',
+                url         : '/melis/MelisCms/Sites/saveSite?siteId='+currentTabId,
+                data        : dataString,
+                dataType    : 'json',
+                encode		: true
+            }).success(function (data) {
+                if (data.success === 1) {
+                    // call melisOkNotification
+                    melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
+                    // update flash messenger values
+                    melisCore.flashMessenger();
+
+                    melisHelper.zoneReload(
+                        currentTabId + '_id_meliscms_tool_sites_edit_site',
+                        'meliscms_tool_sites_edit_site',
+                        {
+                            siteId: currentTabId,
+                            cpath: 'meliscms_tool_sites_edit_site'
+                        }
+                    );
+                } else {
+                    melisCoreTool.highlightErrors(data.success, data.errors, currentTabId+"_id_meliscms_tool_sites_edit_site");
+                    // error modal
+                    melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors );
+                }
+
                 // update flash messenger values
                 melisCore.flashMessenger();
+            }).error(function(xhr, textStatus, errorThrown) {
+                alert( translations.tr_meliscore_error_message );
+            });
+        }
 
-                melisHelper.zoneReload(
-                    currentTabId + '_id_meliscms_tool_sites_edit_site',
-                    'meliscms_tool_sites_edit_site',
-                    {
-                        siteId: currentTabId,
-                        cpath: 'meliscms_tool_sites_edit_site'
-                    }
-                );
-            } else {
-                melisCoreTool.highlightErrors(data.success, data.errors, currentTabId+"_id_meliscms_tool_sites_edit_site");
-                // error modal
-                melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors );
+
+    });
+
+    /**
+     * This Function gets the difference between two arrays
+     * difference in terms of order and value
+     * @param array1
+     * @param array2
+     */
+    function arrayDiff(a1,a2) {
+        var result = [];
+        for (var i = 0; i < a1.length; i++) {
+
+            if(a2[i] !== a1[i]){
+                result.push(a1[i]);
             }
 
-            // update flash messenger values
-            melisCore.flashMessenger();
-        }).error(function(xhr, textStatus, errorThrown) {
-            alert( translations.tr_meliscore_error_message );
-        });
-    });
+        }
+        if(result.length < 1){
+            for (var i = 0; i < a2.length; i++) {
+
+                if(a2[i] !== a1[i]){
+                    result.push(a1[i]);
+                }
+
+            }
+        }
+        return result;
+    }
 
     /**
      * This will open a new tab when editing a site
@@ -50,7 +144,8 @@ $(document).ready(function() {
     $body.on("click", ".btnEditSites", function(){
         var tableId = $(this).closest('tr').attr('id');
         var name = $(this).closest('tr').find("td:nth-child(2)").text();
-        openSiteEditTab(name, tableId);
+        var moduleName = $(this).closest('tr').find("td:nth-child(3)").text();
+        openSiteEditTab(name, tableId,moduleName);
     });
 
 
@@ -396,7 +491,7 @@ $(document).ready(function() {
                 if(data.success){
                     $('#id_meliscms_tool_sites_modal_container_container').modal('hide');
                     $.each(data.siteIds, function(i, id){
-                        openSiteEditTab(data.siteName, id);
+                        openSiteEditTab(data.siteName, id, data.moduleName);
                     });
                     //re init variables
                     initVariables();
@@ -621,9 +716,11 @@ $(document).ready(function() {
      * Open site edition tab
      * @param name
      * @param siteId
+     * @param moduleName
      */
-    function openSiteEditTab(name, siteId){
-        melisHelper.tabOpen(name, 'fa-globe', siteId+'_id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site',  { siteId : siteId }, null, function(){
+    function openSiteEditTab(name, siteId, moduleName){
+        moduleName = (moduleName === undefined) ? null : moduleName;
+        melisHelper.tabOpen(name, 'fa-globe', siteId+'_id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site',  { siteId : siteId, moduleName : moduleName }, null, function(){
 
         });
     }

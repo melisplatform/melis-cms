@@ -110,10 +110,18 @@ class SitesModuleLoaderController extends AbstractActionController
      * @return void|ViewModel
      */
     public function renderToolSitesModuleLoadContentAction() {
-
+        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $moduleName = $this->params()->fromQuery('moduleName', '');
         $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
         $modulesSvc = $this->getServiceLocator()->get('ModulesService');
-        $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $siteData = $siteTable->getEntryByField("site_name",$moduleName)->toArray();
+        $siteNames = array();
+        if(isset($siteData)){
+            foreach ($siteData as $siteDatum){
+                array_push($siteNames,$siteDatum['site_label']);
+            }
+        }
 
         /**
          * check if site id is empty
@@ -138,6 +146,7 @@ class SitesModuleLoaderController extends AbstractActionController
         $view->melisKey = $melisKey;
         $view->isAdmin = $isAdmin;
         $view->siteId = $siteId;
+        $view->siteNames = $siteNames;
 
         return $view;
     }

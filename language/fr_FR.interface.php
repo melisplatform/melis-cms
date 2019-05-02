@@ -521,6 +521,8 @@
         'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice' => '<i class="fa fa-warning"></i>Ci-dessous est la liste des modules requis par <strong>%s</strong>, êtes-vous sûr de vouloir activer <strong>%s</strong>? ',
         'tr_melis_cms_sites_module_load_no_access' => 'Vous avez besoin d\'un niveau de droits d\'administrateur pour modifier cette section.',
         'tr_melis_cms_sites_module_no_module_to_load' => 'This site has no module to load.',
+        'tr_meliscms_tool_site_module_load_update_title' => "Activation/Deactivation of Sites' module",
+        'tr_meliscms_tool_site_module_load_update_confirm' => "Please, be careful when changing modules to be loaded, or their order, as it can impact all sites using this module. <br><br> Sites using this module are the following ones: <br><br> %s",
 
         #DOMAINS TAB
         'tr_melis_cms_sites_domains' => 'Domaines',

@@ -639,6 +639,7 @@ class SitesController extends AbstractActionController
             'textMessage' => $textMessage,
             'siteIds' => $siteIds,
             'siteName' => $siteLabel,
+            'moduleName' => $siteName,
             'errors' => $errors
         );
 

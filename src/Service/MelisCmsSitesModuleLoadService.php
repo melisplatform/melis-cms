@@ -35,6 +35,7 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
             'MelisEngine',
             'MelisFront',
             'MelisCore',
+            'MelisCms',
             'MelisSites',
             'MelisInstaller',
             'MelisModuleConfig',

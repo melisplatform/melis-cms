@@ -61,8 +61,12 @@ $status = '';
                 <form>
                     <div class="module-sortable">
                         <?php
-                            foreach($this->modules as $moduleName => $moduleStatus)
+                        $currentEnabled = array();
+
+                        foreach($this->modules as $moduleName => $moduleStatus)
                             {
+                                if($moduleStatus > 0)
+                                    array_push($currentEnabled,$moduleName);
                                 ?>
                                 <div class="module-cont clearfix">
                                     <div class="pull-left">
@@ -88,6 +92,8 @@ $status = '';
                                 <?php
                             }
                         ?>
+                        <input type="hidden" id="currentEnabledModule" value='<?= json_encode($currentEnabled);?>'>
+                        <input type="hidden" id="sitesUsingModules" value='<?= json_encode($siteNames);?>'>
                     </div>
                 </form>
             </div>
