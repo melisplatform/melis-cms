@@ -642,6 +642,7 @@ class SitesController extends AbstractActionController
             'textMessage' => $textMessage,
             'siteIds' => $siteIds,
             'siteName' => $siteLabel,
+            'siteModuleName' => $siteName,
             'errors' => $errors
         );
 
@@ -817,7 +818,7 @@ class SitesController extends AbstractActionController
             $response['siteId'] = $siteId;
         }
 
-        $this->getEventManager()->trigger('meliscms_sites_save_end', $this, array_merge($response, array('typeCode' => $logTypeCode, 'itemId' => $siteId)));
+        $this->getEventManager()->trigger('meliscms_site_save_end', $this, array_merge($response, array('typeCode' => $logTypeCode, 'itemId' => $siteId)));
 
         return new JsonModel($response);
     }

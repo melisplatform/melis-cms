@@ -91,87 +91,87 @@ $(document).ready(function() {
 	});
 	
 	// Add Event to "Edit Site" button
-	addEvent(".btnEditSite", function(e) {
-		
-		melisCoreTool.showOnlyTab('#modal-cms-tool-site', '#id_meliscms_tool_site_modal_edit');
-		var tempLoader = '<div id="loader" class="overlay-loader"><img class="loader-icon spinning-cog" src="/MelisCore/assets/images/cog12.svg" data-cog="cog12"></div>';
-		$(".widget #siteEditionForm").append(tempLoader);
-		var tdParent = $(this).parents("td");
-		var trParent = tdParent.parents("tr");
-		var siteID = trParent.attr("id");
-		var options = $("#siteEditionForm #id_sdom_env");
-
-		$("#siteEditionForm #id_site_id").val(siteID);
-		melisCoreTool.hideAlert("#siteeditalert");
-		melisCoreTool.resetLabels("#siteEditionForm");
-		$(options).show();
-		melisCoreTool.clearForm("siteEditionForm");
-		// clear current environments first
-		$(options).html("");
-		
-		// retrieve environments
-		$.ajax({
-	        type        : 'GET', 
-	        url         : '/melis/MelisCms/Site/getSiteEnvironment',
-	        data		: {siteId: siteID},
-	        dataType    : 'json',
-	        encode		: true,
-	        success		: function(res) {
-			    // environment retrieval
-	    		$.getJSON("/melis/MelisCms/Site/getSiteEnvironments", {siteId: siteID}, function(json)
-	    		{
-	    		    $.each(json.data, function(idx, item){
-	    		    	options.append($("<option />").val(item).text(item));
-	    		    });
-	    		    
-	    		    $('#siteEditionForm #id_sdom_env>option:eq(0)').prop('selected', true);
-	    		    
-				    var env = res.data;
-				    
-				    getSiteInfo(siteID, env);
-				    
-					var checkValue = setInterval(function() {
-						var value = $("#siteEditionForm #id_site_name").val();
-						if(value !== null || value !== "") {
-							clearInterval(checkValue);
-							$(".overlay-loader").remove();
-						}
-					},300);
-	    	    });
-	        }
-		});
-	});
+	// addEvent(".btnEditSite", function(e) {
+	//
+	// 	melisCoreTool.showOnlyTab('#modal-cms-tool-site', '#id_meliscms_tool_site_modal_edit');
+	// 	var tempLoader = '<div id="loader" class="overlay-loader"><img class="loader-icon spinning-cog" src="/MelisCore/assets/images/cog12.svg" data-cog="cog12"></div>';
+	// 	$(".widget #siteEditionForm").append(tempLoader);
+	// 	var tdParent = $(this).parents("td");
+	// 	var trParent = tdParent.parents("tr");
+	// 	var siteID = trParent.attr("id");
+	// 	var options = $("#siteEditionForm #id_sdom_env");
+	//
+	// 	$("#siteEditionForm #id_site_id").val(siteID);
+	// 	melisCoreTool.hideAlert("#siteeditalert");
+	// 	melisCoreTool.resetLabels("#siteEditionForm");
+	// 	$(options).show();
+	// 	melisCoreTool.clearForm("siteEditionForm");
+	// 	// clear current environments first
+	// 	$(options).html("");
+	//
+	// 	// retrieve environments
+	// 	$.ajax({
+	//         type        : 'GET',
+	//         url         : '/melis/MelisCms/Site/getSiteEnvironment',
+	//         data		: {siteId: siteID},
+	//         dataType    : 'json',
+	//         encode		: true,
+	//         success		: function(res) {
+	// 		    // environment retrieval
+	//     		$.getJSON("/melis/MelisCms/Site/getSiteEnvironments", {siteId: siteID}, function(json)
+	//     		{
+	//     		    $.each(json.data, function(idx, item){
+	//     		    	options.append($("<option />").val(item).text(item));
+	//     		    });
+	//
+	//     		    $('#siteEditionForm #id_sdom_env>option:eq(0)').prop('selected', true);
+	//
+	// 			    var env = res.data;
+	//
+	// 			    getSiteInfo(siteID, env);
+	//
+	// 				var checkValue = setInterval(function() {
+	// 					var value = $("#siteEditionForm #id_site_name").val();
+	// 					if(value !== null || value !== "") {
+	// 						clearInterval(checkValue);
+	// 						$(".overlay-loader").remove();
+	// 					}
+	// 				},300);
+	//     	    });
+	//         }
+	// 	});
+	// });
 	
 	// Add Event to "Delete Button"
-	addEvent(".btnDeleteSite", function(e) {
-		var getId = $(this).parents("tr").attr("id");
-		melisCoreTool.confirm(
-			translations.tr_meliscore_common_yes,
-			translations.tr_meliscore_common_no,
-			translations.tr_meliscms_tool_site_delete_confirm_title, 
-			translations.tr_meliscms_tool_site_delete_confirm, 
-			function(){
-				$.ajax({
-			        type        : 'POST', 
-			        url         : '/melis/MelisCms/Site/deleteSite',
-			        data		: {id: getId},
-			        dataType    : 'json',
-			        encode		: true,
-			        success		: function(data){
-			        	melisCoreTool.pending(".btnDeleteSite");
-		    	    	if(data.success) {
-		    	    		melisHelper.melisOkNotification(data.textTitle, data.textMessage);
-		    	    		melisHelper.zoneReload("id_meliscms_tool_site", "meliscms_tool_site");
-		    	    	}
-		    	    	else {
-		    	    		melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 0);
-		    	    	}
-		    	    	melisCore.flashMessenger();
-		    	    	melisCoreTool.done(".btnDeleteSite");
-			        }	
-			    });
-			});
-	});
+	// addEvent(".btnDeleteSite", function(e) {
+	// 	var getId = $(this).parents("tr").attr("id");
+	// 	melisCoreTool.confirm(
+	// 		translations.tr_meliscore_common_yes,
+	// 		translations.tr_meliscore_common_no,
+	// 		translations.tr_meliscms_tool_site_delete_confirm_title,
+	// 		translations.tr_meliscms_tool_site_delete_confirm,
+	// 		function(){
+	// 			$.ajax({
+	// 		        type        : 'POST',
+	// 		        url         : '/melis/MelisCms/Site/deleteSite',
+	// 		        data		: {id: getId},
+	// 		        dataType    : 'json',
+	// 		        encode		: true,
+	// 		        success		: function(data){
+	// 		        	melisCoreTool.pending(".btnDeleteSite");
+	// 	    	    	if(data.success) {
+	// 	    	    		melisHelper.melisOkNotification(data.textTitle, data.textMessage);
+	// 	    	    		melisHelper.zoneReload("id_meliscms_tool_site", "meliscms_tool_site");
+	// 	    	    	}
+	// 	    	    	else {
+	// 	    	    		melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 0);
+	// 	    	    	}
+	// 	    	    	melisCore.flashMessenger();
+	// 	    	    	melisCoreTool.done(".btnDeleteSite");
+	// 		        }
+	// 		    });
+	// 		});
+	// });
 	
 	addEvent("#btnDelEnv", function(e) {
 		var isClicked = false;
@@ -236,100 +236,100 @@ $(document).ready(function() {
 	});
 	
 	// Add Event to New Site Modal Save Button
-	addEvent("#btnSiteAdd", function(e){ 
-		
-		var dataString = $("#siteCreationForm").serializeArray();
-		
-		if (e.originalEvent !== undefined){
-			dataString.push({
-				name : 'gen_site_mod',
-				value: true
-			});
-		}
-		
-		melisCoreTool.pending("#btnSiteAdd");
-		
-		melisCoreTool.hideAlert("#siteaddalert");
-		
-		$.ajax({
-	        type        : 'POST', 
-	        url         : '/melis/MelisCms/Site/saveSite',
-	        data		: dataString,
-	        dataType    : 'json',
-	        encode		: true
-		}).done(function(data){
-			if(data.success){
-				$('#modal-cms-tool-site').modal('hide');
-				
-				newSiteConfirmation(data.siteId);
-				
-				melisHelper.melisOkNotification(data.textTitle, data.textMessage);
-			}else{
-				
-				melisCoreTool.highlightErrors(data.success, data.errors, "siteCreationForm");
-				
-				if(data.textMessage === "tr_meliscms_tool_site_directory_exist"){
-					
-					melisCoreTool.confirm(
-						translations.tr_meliscore_common_yes,
-						translations.tr_meliscore_common_no,
-						translations.tr_meliscms_tool_site_add, 
-						translations.tr_meliscms_tool_site_directory_exist, 
-						function(){
-							$("#btnSiteAdd").trigger("click");
-						}
-					);
-					
-				}else{
-					melisCoreTool.alertDanger("#siteaddalert", '', data.textMessage);
-					melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
-				}
-			}
-			melisCoreTool.done("#btnSiteAdd");
-    		melisCore.flashMessenger();
-    		
-		}).fail(function(){
-			alert( translations.tr_meliscore_error_message );
-		});
-	});
+	// addEvent("#btnSiteAdd", function(e){
+	//
+	// 	var dataString = $("#siteCreationForm").serializeArray();
+	//
+	// 	if (e.originalEvent !== undefined){
+	// 		dataString.push({
+	// 			name : 'gen_site_mod',
+	// 			value: true
+	// 		});
+	// 	}
+	//
+	// 	melisCoreTool.pending("#btnSiteAdd");
+	//
+	// 	melisCoreTool.hideAlert("#siteaddalert");
+	//
+	// 	$.ajax({
+	//         type        : 'POST',
+	//         url         : '/melis/MelisCms/Site/saveSite',
+	//         data		: dataString,
+	//         dataType    : 'json',
+	//         encode		: true
+	// 	}).done(function(data){
+	// 		if(data.success){
+	// 			$('#modal-cms-tool-site').modal('hide');
+	//
+	// 			newSiteConfirmation(data.siteId);
+	//
+	// 			melisHelper.melisOkNotification(data.textTitle, data.textMessage);
+	// 		}else{
+	//
+	// 			melisCoreTool.highlightErrors(data.success, data.errors, "siteCreationForm");
+	//
+	// 			if(data.textMessage === "tr_meliscms_tool_site_directory_exist"){
+	//
+	// 				melisCoreTool.confirm(
+	// 					translations.tr_meliscore_common_yes,
+	// 					translations.tr_meliscore_common_no,
+	// 					translations.tr_meliscms_tool_site_add,
+	// 					translations.tr_meliscms_tool_site_directory_exist,
+	// 					function(){
+	// 						$("#btnSiteAdd").trigger("click");
+	// 					}
+	// 				);
+	//
+	// 			}else{
+	// 				melisCoreTool.alertDanger("#siteaddalert", '', data.textMessage);
+	// 				melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
+	// 			}
+	// 		}
+	// 		melisCoreTool.done("#btnSiteAdd");
+    // 		melisCore.flashMessenger();
+    //
+	// 	}).fail(function(){
+	// 		alert( translations.tr_meliscore_error_message );
+	// 	});
+	// });
 	
-	addEvent(".btnSiteUpdate", function(e){ 
-		var dataString = $("#siteEditionForm").serializeArray();
-		
-		var siteId  = $("#siteEditionForm #id_site_id").val();
-		dataString.push({
-			name: "site_id",
-			value: siteId,
-		});
-		
-		melisCoreTool.pending(".btnSiteUpdate");
-		
-		$.ajax({
-	        type        : 'POST', 
-	        url         : '/melis/MelisCms/Site/saveSite',
-	        data		: dataString,
-	        dataType    : 'json',
-	        encode		: true
-		}).done(function(data){
-			if(data.success){
-				$('#modal-cms-tool-site').modal('hide');
-				
-				melisHelper.zoneReload("id_meliscms_tool_site", "meliscms_tool_site");
-				
-				melisHelper.melisOkNotification(data.textTitle, data.textMessage);
-			}else{
-				melisCoreTool.alertDanger("#siteeditalert", '', data.textMessage);
-				melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
-				melisCoreTool.highlightErrors(data.success, data.errors, "siteEditionForm");
-			}
-			
-    		melisCore.flashMessenger();
-			melisCoreTool.done(".btnSiteUpdate");
-			
-		}).fail(function(){
-			alert( translations.tr_meliscore_error_message );
-		});
-	});
+	// addEvent(".btnSiteUpdate", function(e){
+	// 	var dataString = $("#siteEditionForm").serializeArray();
+	//
+	// 	var siteId  = $("#siteEditionForm #id_site_id").val();
+	// 	dataString.push({
+	// 		name: "site_id",
+	// 		value: siteId,
+	// 	});
+	//
+	// 	melisCoreTool.pending(".btnSiteUpdate");
+	//
+	// 	$.ajax({
+	//         type        : 'POST',
+	//         url         : '/melis/MelisCms/Site/saveSite',
+	//         data		: dataString,
+	//         dataType    : 'json',
+	//         encode		: true
+	// 	}).done(function(data){
+	// 		if(data.success){
+	// 			$('#modal-cms-tool-site').modal('hide');
+	//
+	// 			melisHelper.zoneReload("id_meliscms_tool_site", "meliscms_tool_site");
+	//
+	// 			melisHelper.melisOkNotification(data.textTitle, data.textMessage);
+	// 		}else{
+	// 			melisCoreTool.alertDanger("#siteeditalert", '', data.textMessage);
+	// 			melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
+	// 			melisCoreTool.highlightErrors(data.success, data.errors, "siteEditionForm");
+	// 		}
+	//
+    // 		melisCore.flashMessenger();
+	// 		melisCoreTool.done(".btnSiteUpdate");
+	//
+	// 	}).fail(function(){
+	// 		alert( translations.tr_meliscore_error_message );
+	// 	});
+	// });
 
     // Add Event to "Minify Button"
     addEvent(".btnMinifyAssets", function(e) {

@@ -94,20 +94,7 @@ $(document).ready(function() {
         var siteModule = $(this).closest('tr').find("td:nth-child(3)").text();
         var selId = $(this).closest('tr').attr("id");
 
-        $("#tableToolSites tbody tr").each(function(i, v){
-            var siteNames = $(this).find("td:nth-child(2)").text();
-            var siteModules = $(this).find("td:nth-child(3)").text();
-            var id = $(this).attr("id");
-            if(selId != id) {
-                if (name == siteNames) {
-                    if (siteModule == siteModules) {
-                        name += " - " + siteLang;
-                        return false;
-                    }
-                }
-            }
-        });
-        openSiteEditTab(name, tableId);
+        openSiteEditTab(updateSiteTitle(selId, name, siteModule, siteLang), tableId);
     });
 
 
@@ -459,14 +446,18 @@ $(document).ready(function() {
             },
             success: function(data){
                 if(data.success){
+                    // call melisOkNotification
+                    melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46' );
+
                     $('#id_meliscms_tool_sites_modal_container_container').modal('hide');
-                    $.each(data.siteIds, function(i, id){
-                        openSiteEditTab(data.siteName, id);
-                    });
                     //re init variables
                     initVariables();
                     //refresh site table
                     $("#tableToolSites").DataTable().ajax.reload();
+                    //open tabs for newly created site
+                    $.each(data.siteIds, function(i, id){
+                        openSiteEditTab(updateSiteTitle(id, data.siteName, data.siteModule), id);
+                    });
                     //refresh site tree view
                     $("input[name=left_tree_search]").val('');
                     $("#id-mod-menu-dynatree").fancytree("destroy");
@@ -748,6 +739,26 @@ $(document).ready(function() {
         currentStepForm = '';
         siteName = '';
         selectedDomainValue = [];
+    }
+
+    function updateSiteTitle(selId, siteName, siteModule, siteLang)
+    {
+        $("#tableToolSites tbody tr").each(function(){
+            var siteNames = $(this).find("td:nth-child(2)").text();
+            var siteModules = $(this).find("td:nth-child(3)").text();
+            var lang = $(this).find("td:nth-child(4)").text();
+            siteLang = (siteLang == undefined ? lang : siteLang);
+            var id = $(this).attr("id");
+            if(selId != id) {
+                if (siteName == siteNames) {
+                    if (siteModule == siteModules) {
+                        siteName += " - " + siteLang;
+                        return siteName;
+                    }
+                }
+            }
+        });
+        return siteName;
     }
 
     /**
