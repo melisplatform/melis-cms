@@ -15,13 +15,18 @@ $(document).ready(function() {
             url         : '/melis/MelisCms/Sites/saveSite?siteId='+currentTabId,
             data        : dataString,
             dataType    : 'json',
-            encode		: true
+            encode		: true,
+            beforeSend  : function(){
+                melisCoreTool.pending("#btn-save-meliscms-tool-sites");
+            },
         }).success(function (data) {
             if (data.success === 1) {
                 // call melisOkNotification
                 melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46' );
                 // update flash messenger values
                 melisCore.flashMessenger();
+
+                melisCoreTool.done("#btn-save-meliscms-tool-sites");
 
                 melisHelper.zoneReload(
                     currentTabId + '_id_meliscms_tool_sites_edit_site',
@@ -31,6 +36,11 @@ $(document).ready(function() {
                         cpath: 'meliscms_tool_sites_edit_site'
                     }
                 );
+
+                //refresh site tree view
+                $("input[name=left_tree_search]").val('');
+                $("#id-mod-menu-dynatree").fancytree("destroy");
+                mainTree();
             } else {
                 var container = currentTabId + "_id_meliscms_tool_sites_edit_site";
                 var errors = prepareErrs(data.errors, container);
@@ -185,19 +195,21 @@ $(document).ready(function() {
                 }else{
                     showElement("#btn-prev-step");
                 }
-
-                /**
-                 * tooltip data container to body
-                 */
-                setTimeout(function(){
-                    $(".sites-steps-owl .tool-sites_container_fixed_width").find("i.tip-info").attr("data-container", "body");
-                }, 100);
             },
             beforeMove: function(elem){
                 var current = this.currentItem;
                 var step = elem.find(".item").eq(current).attr("data-step");
                 checkStep(step);
                 updateActiveStep(step);
+            },
+            afterInit: function(){
+                $(".sites-steps-owl .tool-sites_container_fixed_width").find("input, label, select, div").attr("tabindex", "-1");
+                /**
+                 * tooltip data container to body
+                 */
+                setTimeout(function(){
+                    $(".sites-steps-owl .tool-sites_container_fixed_width").find("i.tip-info").attr("data-container", "body");
+                }, 100);
             }
         });
     };
@@ -324,7 +336,8 @@ $(document).ready(function() {
                                 class: "form-control",
                                 name: domainName,
                                 value: applyDomainValue(domainName),
-                                required: "required"
+                                required: "required",
+                                tabindex: "-1"
                             }).attr("data-langId", langData[0]);
                             div.append(input);
                             multiDomainsContainer.append(div);
@@ -842,4 +855,61 @@ $(document).ready(function() {
      * ============================== END LANGUAGES TAB ===============================
      * ================================================================================
      */
+
+
+    window.generatePageLink = function(pageId, inputTarget){
+        var pageId = (typeof pageId !== "undifined") ? pageId : null;
+
+        inputTarget.data("idPage", pageId);
+
+        dataString = inputTarget.data();
+
+        if(pageId){
+            $.ajax({
+                type        : 'GET',
+                url         : '/melis/MelisCms/Page/getPageLink',
+                data		: dataString,
+                dataType    : 'json',
+                encode		: true,
+                success		: function(res) {
+                    inputTarget.val(res.link);
+                }
+            });
+        }else{
+            console.log("PageId is null");
+        }
+    };
+
+    // Add Event to "Minify Button"
+    $body.on("click", ".btnMinifyAssets", function(){
+        var _this 	= $(this),
+            siteId 	= _this.parents("tr").attr("id");
+
+        $.ajax({
+            type        : 'POST',
+            url         : '/minify-assets',
+            data		: {siteId : siteId},
+            dataType    : 'json',
+            encode		: true,
+            beforeSend  : function(){
+                _this.attr('disabled', true);
+            },
+            success		: function(data){
+                if(data.success) {
+                    melisHelper.melisOkNotification(data.title, 'tr_front_minify_assets_compiled_successfully');
+                }else{
+                    var errorTexts = '<h3>'+ melisHelper.melisTranslator(data.title) +'</h3>';
+                    errorTexts += '<p><strong>Error: </strong>  ';
+                    errorTexts += '<span>'+ data.message + '</span>';
+                    errorTexts += '</p>';
+
+                    var div = "<div class='melis-modaloverlay overlay-hideonclick'></div>";
+                    div += "<div class='melis-modal-cont KOnotif'>  <div class='modal-content'>"+ errorTexts +" <span class='btn btn-block btn-primary'>"+ translations.tr_meliscore_notification_modal_Close +"</span></div> </div>";
+                    $body.append(div);
+                }
+
+                _this.attr('disabled', false);
+            }
+        });
+    });
 });

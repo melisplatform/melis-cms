@@ -170,6 +170,15 @@ class SitesController extends AbstractActionController
         $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration();
         return $view;
     }
+
+    /**
+     * Renders to the edit button in the table
+     * @return \Zend\View\Model\ViewModel
+     */
+    public function renderToolSitesContentActionMinifyAssetsAction()
+    {
+        return new ViewModel();
+    }
     
     /**
      * This is the container of the modal
@@ -1409,5 +1418,23 @@ class SitesController extends AbstractActionController
         $toolSvc->setMelisToolKey('meliscms', 'meliscms_tool_sites');
 
         return $toolSvc;
+    }
+
+    /**
+     * delete site domain platform
+     */
+    public function deleteSiteDomainPlatformAction()
+    {
+        $platform   = $this->params()->fromRoute('platform', $this->params()->fromQuery('platform', ''));
+        $id         = $this->params()->fromRoute('id', $this->params()->fromQuery('id', ''));
+        $success    = (int) $this->params()->fromRoute('success', $this->params()->fromQuery('success', ''));
+
+        if($success == 1) {
+            $domainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
+            $platformIdTable = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+
+            $platformIdTable->deleteByField('pids_id', $id);
+            $domainTable->deleteByField('sdom_env', $platform);
+        }
     }
 }
