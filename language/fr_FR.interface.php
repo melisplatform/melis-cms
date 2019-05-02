@@ -183,16 +183,16 @@
 	    'tr_meliscms_menu_new' => 'Nouvelle page',
 	    'tr_meliscms_menu_edit' => 'Editer',
 	    'tr_meliscms_menu_delete' => 'Supprimer',
-	    'tr_meliscms_menu_dupe' => 'Dupliquer l&#39;arborescence',
-	    'tr_meliscms_menu_dupe_fail' => 'Echec de la duplication de l&#39;arborescence',
+	    'tr_meliscms_menu_dupe' => 'Dupliquer l\'arborescence',
+	    'tr_meliscms_menu_dupe_fail' => 'Echec de la duplication de l\'arborescence',
 	    'tr_meliscms_menu_dupe_success' => 'L\'arborescence a été dupliquée avec succès',
-	    'tr_meliscms_menu_dupe_destination_fail' => 'La page de destination n&#39;existe pas',
+	    'tr_meliscms_menu_dupe_destination_fail' => 'La page de destination n\'existe pas',
         'tr_meliscms_menu_dupe_page_relation_fail' => 'conflit dans la duplication de la nouvelle langue de page de',
-        'tr_meliscms_menu_dupe_source_fail' => 'La page d&#39;origine n&#39;existe pas',
-	    'tr_meliscms_tree_sites_duplication_source' => 'ID page d&#39;origine',
-	    'tr_meliscms_tree_sites_duplication_source tooltip' => 'Identifiant de la page de l&#39;arborescence à dupliquer',
+        'tr_meliscms_menu_dupe_source_fail' => 'La page d\'origine n\'existe pas',
+	    'tr_meliscms_tree_sites_duplication_source' => 'ID page d\'origine',
+	    'tr_meliscms_tree_sites_duplication_source tooltip' => 'Identifiant de la page de l\'arborescence à dupliquer',
 	    'tr_meliscms_tree_sites_duplication_destination' => 'ID page de destination',
-	    'tr_meliscms_tree_sites_duplication_destination tooltip' => 'Identifiant de la page de destination de l&#39;arboresence dupliquée ou cochez &#34;Racine&#34; pour mettre l&#39;arborescence à la racine',
+	    'tr_meliscms_tree_sites_duplication_destination tooltip' => 'Identifiant de la page de destination de l\'arboresence dupliquée ou cochez &#34;Racine&#34; pour mettre l\'arborescence à la racine',
 	    
 	    'tr_meliscms_menu_cancel' => 'Annuler',
 	    
@@ -291,7 +291,7 @@
 	    'tr_meliscms_tool_platform_ids_header' => 'Header',
 	    'tr_meliscms_tool_platform_ids_content' => 'Contenu',
 	    'tr_meliscms_tool_platform_pids_id' => 'ID',
-	    'tr_meliscms_tool_platform_pids_id tooltip' => 'Identifiant de la plage d&#39;identifiants',
+	    'tr_meliscms_tool_platform_pids_id tooltip' => 'Identifiant de la plage d\'identifiants',
 	    'tr_meliscms_tool_platform_pids_name' => 'Nom',
 	    'tr_meliscms_tool_platform_pids_name tooltip' => 'Nom de la plateforme correspondante. (La plateforme doit être créée au préalable depuis l&lsquo;outil Plateformes)',
 	    'tr_meliscms_tool_platform_pids_page_id_start' => 'Page ID début',
@@ -312,7 +312,8 @@
 	    'tr_meliscms_tool_platform_ids_table' => 'Tableau',
 	    'tr_meliscms_tool_platform_ids_modal_content' => 'Add and update modal',
 	    'tr_meliscms_tool_platform_modal_info' => 'Déclarez ici la plage d\'identifiants d\'une plateforme spécifique',
-	    
+        'tr_meliscms_tool_platform_modal_info_assigned_page_ids' => 'Toutes les plateformes ont déjà des plages d\'identifiants assigné.',
+
 	    //Platform Success messages
 	    'tr_meliscms_tool_platform_add_success' => 'Nouvelle plage d\'IDs de la plateforme ajoutée avec succès',
 	    'tr_meliscms_tool_platform_update_success' => 'Plage d\'IDs de la plateforme mise à jour avec succès',
@@ -360,13 +361,13 @@
         'tr_meliscms_tool_site_301_s301_id' => 'ID',
 	    'tr_meliscms_tool_site_301_s301_modal_info' => 'Déclarez ici une redirection pour un site spécifique (donc un domaine)',
 	    'tr_meliscms_tool_site_301_s301_site' => 'Site',
-	    'tr_meliscms_tool_site_301_s301_site tooltip' => 'Site/Domaine sur lequel l&#39;url sera vérifiée',
+	    'tr_meliscms_tool_site_301_s301_site tooltip' => 'Site/Domaine sur lequel l\'url sera vérifiée',
         'tr_meliscms_tool_site_301_s301_old_url' => 'Ancienne url',
 	    'tr_meliscms_tool_site_301_s301_old_url holder' => '/monancienneurl',
         'tr_meliscms_tool_site_301_s301_old_url tooltip' => 'Ancienne URL au format &quot;/monancienneurl&quot;',
         'tr_meliscms_tool_site_301_s301_new_url' => 'Nouvelle url',
 
-        'tr_meliscms_tool_site_301_s301_old_url_site_error' => 'L&#39;ancienne URL existe déjà pour ce site',
+        'tr_meliscms_tool_site_301_s301_old_url_site_error' => 'L\'ancienne URL existe déjà pour ce site',
 	    'tr_meliscms_tool_site_301_s301_new_url holder' => 'http://www.monsite.com ou /monnouveausite/id/300',
         'tr_meliscms_tool_site_301_s301_new_url tooltip' => 'Nouvelle URL (format externe &quot;http://www.monsite.com&quot; ou format interne &quot;/monnouveausite/id/300&quot;)',
 
@@ -383,7 +384,7 @@
         'meliscms_tool_site_301_unable_to_delete' => 'Impossible de suprimer la redirection 301',
         'meliscms_tool_site_301_value_too_long_255' => 'Valeur trop longue, elle doit être de moins de 255 caractères',
         'meliscms_tool_site_301_value_empty' => 'Le champ est requis et ne peut être vide',
-        'meliscms_tool_site_301_old_url_exist' => 'L&#39;ancienne URL existe déjà pour ce site',
+        'meliscms_tool_site_301_old_url_exist' => 'L\'ancienne URL existe déjà pour ce site',
         'meliscms_tool_site_301_delete_confirm_msg' => 'Etes-vous sûr de vouloir supprimer cette redirection 301?',
 	    'tr_meliscms_tool_site_301_s301_new_url_mismatch' => 'The new url domain does not match the site domain',
 	    
@@ -397,6 +398,7 @@
         'tr_melis_cms_duplicate_text_identifier' => '[Dupliquée]',
         'tr_meliscms_tree_sites_duplication_page_relation' => 'Relation avec une page initiale',
         'tr_meliscms_tree_sites_duplication_page_relation tooltip' => 'Permer de créer une page en relation avec une page initiale',
+        'tr_meliscms_tree_sites_duplication_root tooltip' => 'Cochez cette case pour placer les pages à la racine.',
 
         // plugins edition
 	    'tr_meliscms_plugins_modal_cancel' => 'Annuler',
@@ -429,9 +431,9 @@
 	    'tr_meliscms_tool_styles_delete_details' => 'Etes-vous sûr de vouloir supprimer ce style ?',
 	    'tr_meliscms_tool_styles_delete_fail' => 'Echec de la suppression du style',
 	    'tr_meliscms_tool_styles_delete_success' => 'Le style a été supprimé avec succès',
-	    'tr_meliscms_tool_styles_save_page_style_fail' => 'Echec de l&#39;ajout du style',
+	    'tr_meliscms_tool_styles_save_page_style_fail' => 'Echec de l\'ajout du style',
 	    
-	    'tr_meliscms_tool_duplicate_field_empty' => 'Valeur requise, ne peut être vide',
+	    'tr_meliscms_tool_duplicate_field_empty' => 'Le champ ne peut être vide',
 	    'tr_meliscms_tool_duplicate_field_digits' => 'La saisie ne doit contenir que des chiffres',
 	    
 	    // Page languages
@@ -465,6 +467,9 @@
         'tr_meliscms_drag_and_drop_modal_title' => 'Drag\'n\'Drop confirmation',
         'tr_meliscms_drag_and_drop_modal_content' => 'Êtes-vous sur de vouloir ajouter ce plugin à cette page ?',
 
+        /** Banner */
+        'tr_melis_cms_gdpr_banner_tabname' => 'Bannières',
+
         //New site tools
         'tr_meliscms_tool_sites' => 'Sites',
         'tr_meliscms_tool_sites_save' => 'Save site',
@@ -487,6 +492,7 @@
         'tr_melis_cms_sites_tool_add_step4_select_module' => 'Veuillez choisir le module lié à ce site dans la liste :',
         'tr_melis_cms_sites_tool_add_step4_select_module_placeholder' => 'Choisissez un module',
         'tr_melis_cms_sites_tool_add_step4_create_module' => 'Ou créez un nouveau module et saisissez le nom :',
+        'tr_melis_cms_sites_tool_add_step4_create_module_error' => 'Les caractères autorisés sont alphanumerique et underscore. Le nom du module ne peut pas commencer par un numéro ni ne contenir d\'espace',
         'tr_melis_cms_sites_tool_add_step4_create_file_for_website' => 'Créer les dossier et fichiers pour le nouveau site ?',
         'tr_melis_cms_sites_tool_add_step5_new_site_is_created' => 'Un nouveau site sera créé avec les paramètres suivants :',
         'tr_melis_cms_sites_tool_add_step5_new_site_using_existing_module' => 'Le site utilisera le module existant <b>“%s”</b>. Les dossiers et fichiers du module ne seront pas créés.',
@@ -499,25 +505,25 @@
         'tr_melis_cms_sites_tool_add_create_site_unknown_error' => 'Une erreur s\'est produite pendant la création du site, veuillez réessayer',
         'tr_melis_cms_sites_tool_add_create_site_no_site_language' => 'Veuillez fournir les langues du site',
         'tr_melis_cms_sites_tool_add_create_site_required_field' => 'Veuillez remplir tous les champs obligatoires',
-        'tr_melis_cms_sites_tool_add_step4_site_label' => 'Site name',
+        'tr_melis_cms_sites_tool_add_step4_site_label' => 'Nom du site',
         'tr_melis_cms_sites_tool_add_header_title_lang' => 'Langages',
         'tr_melis_cms_sites_tool_add_header_title_domains' => 'Domaines',
         'tr_melis_cms_sites_tool_add_header_title_multi_lingual' => 'Multilingue',
         'tr_melis_cms_sites_tool_add_header_title_site_summary' => 'Résumé',
 
         #ADD SITE FORMS TOOLTIPS
-        'tr_melis_cms_sites_tool_add_step1_is_multi_lang tooltip' => 'Identifier if site is multi lingual or not',
-        'tr_melis_cms_sites_tool_add_step2_reflect_urls tooltip' => 'This will determine how will the language reflect on your url.',
-        'tr_melis_cms_sites_tool_add_step2_select_languages tooltip' => 'Select language(s) for this site',
-        'tr_melis_cms_sites_tool_add_step3_single_domain_name tooltip' => 'Domain name for this site',
-        'tr_melis_cms_sites_tool_add_step3_multi_domain_name tooltip' => 'Domain name for each language',
-        'tr_melis_cms_sites_tool_add_step4_select_module tooltip' => 'Select module for this site(s)',
-        'tr_melis_cms_sites_tool_add_step4_create_module tooltip' => 'Create a new module for this site(s)',
-        'tr_melis_cms_sites_tool_add_step4_site_label tooltip' => 'Enter the site name',
-        'tr_melis_cms_sites_tool_add_step4_create_file_for_website tooltip' => 'Determine whether we create a files for this site',
+        'tr_melis_cms_sites_tool_add_step1_is_multi_lang tooltip' => 'Choisissez si votre site est multilingue ou non',
+        'tr_melis_cms_sites_tool_add_step2_reflect_urls tooltip' => 'Sélectionnez la manière dans laquelle les langages doivent être reflétés dans les URLs',
+        'tr_melis_cms_sites_tool_add_step2_select_languages tooltip' => 'Sélectionnez les langages du site',
+        'tr_melis_cms_sites_tool_add_step3_single_domain_name tooltip' => 'Domaine sur lequel le site est accessible (ex: www.monsite.com)',
+        'tr_melis_cms_sites_tool_add_step3_multi_domain_name tooltip' => 'Domaines sur lesquels chaque site est accessible en fonction de leur langage (ex: www.monsite.com)',
+        'tr_melis_cms_sites_tool_add_step4_select_module tooltip' => 'Sélectionnez le module associé au(x) site(s)',
+        'tr_melis_cms_sites_tool_add_step4_create_module tooltip' => 'Créez un nouveau module pour le(s) site(s)',
+        'tr_melis_cms_sites_tool_add_step4_site_label tooltip' => 'Saisissez le nom du site',
+        'tr_melis_cms_sites_tool_add_step4_create_file_for_website tooltip' => 'Sélectionnez si vous souhaitez que les dossiers et fichiers soient créés pour le(s) site(s) ou non',
 
         #MODULE LOAD TAB
-        'tr_melis_cms_sites_module_loading' => 'Chargement du module',
+        'tr_melis_cms_sites_module_loading' => 'Chargement des modules',
         'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice' => '<i class="fa fa-warning"></i>Ci-dessous est la liste des modules requis par <strong>%s</strong>, êtes-vous sûr de vouloir activer <strong>%s</strong>? ',
         'tr_melis_cms_sites_module_load_no_access' => 'Vous avez besoin d\'un niveau de droits d\'administrateur pour modifier cette section.',
         'tr_melis_cms_sites_module_no_module_to_load' => 'This site has no module to load.',
@@ -530,17 +536,17 @@
         #PROPERTIES TAB
         'tr_melis_cms_sites_properties' => 'Propriétés',
         'tr_melis_cms_sites_site_id' => 'ID site',
-        'tr_melis_cms_sites_site_id tooltip' => 'Identifant du site en cours d\'édition',
+        'tr_melis_cms_sites_site_id tooltip' => 'Identifiant du site',
         'tr_melis_cms_sites_site_label' => 'Nom du site',
         'tr_melis_cms_sites_site_label tooltip' => 'Nom du site affiché dans la plateforme',
         'tr_melis_cms_sites_site_name' => 'Module du site',
         'tr_melis_cms_sites_site_name tooltip' => 'Nom du module tel que défini dans le code (ou le nom du dossier dans MelisSites/)',
-        'tr_melis_cms_sites_s404_page_id' => 'ID de la page 404',
+        'tr_melis_cms_sites_s404_page_id' => 'ID page 404',
         'tr_melis_cms_sites_s404_page_id tooltip' => 'Identifiant de la page 404',
-        'tr_melis_cms_sites_site_main_page_id' => 'ID de la page d\'accueil principale',
+        'tr_melis_cms_sites_site_main_page_id' => 'ID page d\'accueil principale',
         'tr_melis_cms_sites_site_main_page_id tooltip' => 'Identifiant de la page d\'accueil',
         'tr_melis_cms_sites_homepages' => 'Pages d\'accueil',
-        'tr_melis_cms_sites_shome_page_id' => 'ID de la page d\'accueil',
+        'tr_melis_cms_sites_shome_page_id' => 'ID page d\'accueil',
         'tr_melis_cms_sites_shome_page_id tooltip' => 'Identifiant de la page d\'accueil par langue',
 
         #SITE TRANSLATION TAB
@@ -584,8 +590,9 @@
         'tr_melis_cms_sites_tool_languages_prompt_delete_data' => 'Souhaitez-vous supprimer toutes les données de la base de données avec cette langue? (ID page d\'accueil, configurations et traductions du site)',
 
         #SITES CONFIG TAB
-        'tr_melis_cms_sites_tool_config_title' => 'Configuration du site',
+        'tr_melis_cms_sites_tool_config_title' => 'Configuration sites',
         'tr_melis_cms_sites_tool_config_array_warning' => 'Les tableaux imbriqués avec une profondeur de 2 ou plus ne sont pas affichés. Vous pouvez les éditer manuellement sur le fichier.',
+        'tr_melis_cms_sites_tool_general' => 'Général',
 
         #SITES INTERFACES
         'tr_melis_cms_sites_tool_add_site_button' => 'Bouton ajouter un site',
@@ -600,9 +607,9 @@
         'tr_melis_cms_sites_tool_content_edit_module_loading_tab_content' => 'Contenu de chargement des modules',
         'tr_melis_cms_sites_tool_content_edit_languages_tab' => 'Langages',
         'tr_melis_cms_sites_tool_content_edit_languages_tab_content' => 'Contenu de Langages',
-        'tr_melis_cms_sites_tool_content_edit_site_config_tab' => 'Configuration site',
+        'tr_melis_cms_sites_tool_content_edit_site_config_tab' => 'Configuration sites',
         'tr_melis_cms_sites_tool_content_edit_site_config_tab_content' => 'Contenu de configuration site',
-        'tr_melis_cms_sites_tool_content_edit_site_translations_tab' => 'Traductions de site',
+        'tr_melis_cms_sites_tool_content_edit_site_translations_tab' => 'Traductions',
         'tr_melis_cms_sites_tool_content_edit_site_translations_tab_content' => 'Contenu de traductions de site',
 
         #SITES NO ACCESS MESSAGE

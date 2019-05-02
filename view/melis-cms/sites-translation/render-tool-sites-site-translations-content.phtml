@@ -9,6 +9,14 @@ $data_melisKey = $this->melisKey;
 <?php if(!empty($this->siteId)) { ?>
 <div data-melisKey='<?= $data_melisKey; ?>'<?= $id; ?> class="tab-pane widget-body-regular meliscms_center_tabs">
     <div class="spacing-x2 innerAll">
+        <div class="switch-all-container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="pull-left padding-10"><?= $this->translate('tr_melis_cms_sites_tool_content_edit_site_translations_tab'); ?></h3>
+                </div>
+            </div>
+        </div>
+
         <?php
         /*
          * This functions prepares the TABLE element in HTML. ID and class associative array attribute will be placed in table like

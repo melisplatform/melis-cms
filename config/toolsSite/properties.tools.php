@@ -58,6 +58,7 @@ return array(
                                             'id' => 'site_label',
                                             'value' => '',
                                             'placeholder' => 'tr_melis_cms_sites_site_label',
+                                            'required' => 'required'
                                         ),
                                     ),
                                 ),
@@ -73,6 +74,7 @@ return array(
                                             'id' => 'site_name',
                                             'value' => '',
                                             'placeholder' => 'tr_melis_cms_sites_site_name',
+                                            'required' => 'required'
                                         ),
                                     ),
                                 ),
@@ -90,6 +92,7 @@ return array(
                                             'id' => 's404_page_id',
                                             'value' => '',
                                             'placeholder' => 'tr_melis_cms_sites_s404_page_id',
+                                            'required' => 'required'
                                         ),
                                     ),
                                 ),
@@ -107,6 +110,7 @@ return array(
                                             'id' => 'site_main_page_id',
                                             'value' => '',
                                             'placeholder' => 'tr_melis_cms_sites_site_main_page_id',
+                                            'required' => 'required'
                                         ),
                                     ),
                                 ),
@@ -120,8 +124,8 @@ return array(
                                             'name' => 'IsInt',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'invalid id',
-                                                    \Zend\I18n\Validator\IsInt::INVALID => 'invalid id',
+                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_melis_cms_sites_field_digits',
+                                                    \Zend\I18n\Validator\IsInt::INVALID => 'tr_melis_cms_sites_field_digits',
                                                 )
                                             )
                                         ),
@@ -134,17 +138,7 @@ return array(
                                 'site_id_disp' => array(
                                     'name' => 'site_id_disp',
                                     'required' => false,
-                                    'validators' => array(
-                                        array(
-                                            'name' => 'IsInt',
-                                            'options' => array(
-                                                'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'invalid id',
-                                                    \Zend\I18n\Validator\IsInt::INVALID => 'invalid id',
-                                                )
-                                            )
-                                        ),
-                                    ),
+                                    'validators' => array(),
                                     'filters' => array(
                                         array('name' => 'StripTags'),
                                         array('name' => 'StringTrim'),
@@ -153,7 +147,16 @@ return array(
                                 'site_label' => array(
                                     'name' => 'site_label',
                                     'required' => true,
-                                    'validators' => array(),
+                                    'validators' => array(
+                                        array(
+                                            'name'    => 'NotEmpty',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
+                                                ),
+                                            ),
+                                        ),
+                                    ),
                                     'filters' => array(
                                         array('name' => 'StripTags'),
                                         array('name' => 'StringTrim'),
@@ -162,7 +165,16 @@ return array(
                                 'site_name' => array(
                                     'name' => 'site_name',
                                     'required' => true,
-                                    'validators' => array(),
+                                    'validators' => array(
+                                        array(
+                                            'name'    => 'NotEmpty',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
+                                                ),
+                                            ),
+                                        ),
+                                    ),
                                     'filters' => array(
                                         array('name' => 'StripTags'),
                                         array('name' => 'StringTrim'),
@@ -173,11 +185,20 @@ return array(
                                     'required' => true,
                                     'validators' => array(
                                         array(
+                                            'name'    => 'NotEmpty',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
+                                                ),
+                                            ),
+                                            'break_chain_on_failure' => true,
+                                        ),
+                                        array(
                                             'name' => 'IsInt',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'invalid id',
-                                                    \Zend\I18n\Validator\IsInt::INVALID => 'invalid id',
+                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_melis_cms_sites_field_digits',
+                                                    \Zend\I18n\Validator\IsInt::INVALID => 'tr_melis_cms_sites_field_digits',
                                                 )
                                             )
                                         ),
@@ -190,7 +211,26 @@ return array(
                                 'site_main_page_id' => array(
                                     'name' => 'site_main_page_id',
                                     'required' => true,
-                                    'validators' => array(),
+                                    'validators' => array(
+                                        array(
+                                            'name'    => 'NotEmpty',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
+                                                ),
+                                            ),
+                                            'break_chain_on_failure' => true,
+                                        ),
+                                        array(
+                                            'name' => 'IsInt',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_melis_cms_sites_field_digits',
+                                                    \Zend\I18n\Validator\IsInt::INVALID => 'tr_melis_cms_sites_field_digits',
+                                                )
+                                            )
+                                        ),
+                                    ),
                                     'filters' => array(
                                         array('name' => 'StripTags'),
                                         array('name' => 'StringTrim'),
@@ -265,6 +305,7 @@ return array(
                                             'id' => 'shome_page_id',
                                             'value' => '',
                                             'placeholder' => 'tr_melis_cms_sites_shome_page_id',
+                                            'required' => 'required'
                                         ),
                                     ),
                                 ),
@@ -273,17 +314,7 @@ return array(
                                 'shome_id' => array(
                                     'name' => 'shome_id',
                                     'required' => false,
-                                    'validators' => array(
-                                        array(
-                                            'name' => 'IsInt',
-                                            'options' => array(
-                                                'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'invalid id',
-                                                    \Zend\I18n\Validator\IsInt::INVALID => 'invalid id',
-                                                )
-                                            )
-                                        ),
-                                    ),
+                                    'validators' => array(),
                                     'filters' => array(
                                         array('name' => 'StripTags'),
                                         array('name' => 'StringTrim'),
@@ -292,17 +323,7 @@ return array(
                                 'shome_site_id' => array(
                                     'name' => 'shome_site_id',
                                     'required' => false,
-                                    'validators' => array(
-                                        array(
-                                            'name' => 'IsInt',
-                                            'options' => array(
-                                                'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'invalid id',
-                                                    \Zend\I18n\Validator\IsInt::INVALID => 'invalid id',
-                                                )
-                                            )
-                                        ),
-                                    ),
+                                    'validators' => array(),
                                     'filters' => array(
                                         array('name' => 'StripTags'),
                                         array('name' => 'StringTrim'),
@@ -311,17 +332,7 @@ return array(
                                 'shome_lang_id' => array(
                                     'name' => 'shome_lang_id',
                                     'required' => false,
-                                    'validators' => array(
-                                        array(
-                                            'name' => 'IsInt',
-                                            'options' => array(
-                                                'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'invalid id',
-                                                    \Zend\I18n\Validator\IsInt::INVALID => 'invalid id',
-                                                )
-                                            )
-                                        ),
-                                    ),
+                                    'validators' => array(),
                                     'filters' => array(
                                         array('name' => 'StripTags'),
                                         array('name' => 'StringTrim'),
@@ -332,11 +343,20 @@ return array(
                                     'required' => true,
                                     'validators' => array(
                                         array(
+                                            'name'    => 'NotEmpty',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
+                                                ),
+                                            ),
+                                            'break_chain_on_failure' => true,
+                                        ),
+                                        array(
                                             'name' => 'IsInt',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'invalid id',
-                                                    \Zend\I18n\Validator\IsInt::INVALID => 'invalid id',
+                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_melis_cms_sites_field_digits',
+                                                    \Zend\I18n\Validator\IsInt::INVALID => 'tr_melis_cms_sites_field_digits',
                                                 )
                                             )
                                         ),

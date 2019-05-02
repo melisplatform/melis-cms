@@ -50,9 +50,10 @@ div[data-meliskey="meliscms_tool_sites_edit_site_tabs"] .widget-head.nav {
     right: 22px;
 }
 div[data-meliskey="meliscms_tool_sites_module_load_content"] .switch-all-noti {
-    z-index: 0;
-    top: -45px;
+    z-index: 5;
+    top: -25px;
 }
+
 div[data-meliskey="meliscms_tool_sites_module_load_content"] #header-version {
     padding: 15px 0px;
 }
@@ -78,5 +79,13 @@ ul.meliscms-site-language-homepage-list > li:hover {
 .page-content-container .nav-tabs.meliscms-site-language-homepage-list > li.active:focus > a,
 .page-content-container .nav-tabs.meliscms-site-language-homepage-list > li.active:active > a {
     border: 0 solid #e61c23 !important;
+}
+
+.no-box-shadow {
+    box-shadow: none;
+}
+
+.padding-10 {
+    padding: 0px 10px 10px 10px;
 }
 

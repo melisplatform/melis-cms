@@ -2,9 +2,9 @@
 
 return array(
     'css' => array(
-        '/SiteSample/css/styles.css',
+        '/SiteSample/public/css/styles.css',
     ),
     'js' => array(
-        '/SiteSample/js/custom.js',
+        '/SiteSample/public/js/custom.js',
     )
 );

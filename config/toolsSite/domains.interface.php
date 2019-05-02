@@ -58,7 +58,7 @@ return array(
                     'conf' => array(
                         'id' => 'id_meliscms_tool_sites_domains',
                         'melisKey' => 'meliscms_tool_sites_domains',
-                        'name' => 'Domains',
+                        'name' => 'tr_melis_cms_sites_domains',
                         'icon' => 'google_maps',
                     ),
                     'forward' => array(

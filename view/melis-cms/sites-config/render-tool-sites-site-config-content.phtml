@@ -13,7 +13,7 @@ $data_melisKey = $this->melisKey;
         <div class="switch-all-container">
             <div class="row">
                 <div class="col-md-12">
-                    <h3 class="pull-left"><?= $this->translate('tr_melis_cms_sites_tool_config_title') ?></h3>
+                    <h3 class="pull-left"><?= $this->translate('tr_melis_cms_sites_tool_content_edit_site_config_tab') ?></h3>
                 </div>
             </div>
         </div>
@@ -28,7 +28,7 @@ $data_melisKey = $this->melisKey;
                         <!-- GENERAL TAB START -->
                         <li class="">
                             <a class="clearfix" data-toggle="tab" href="#general-config-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="general">
-                                <span>General</span>
+                                <span><?= $this->translate('tr_melis_cms_sites_tool_general') ?></span>
                             </a>
                         </li>
                         <!-- GENERAL TAB END -->
@@ -49,7 +49,7 @@ $data_melisKey = $this->melisKey;
                     <!-- GENERAL TAB START -->
                     <div id="general-config-<?= $this->siteId; ?>" class="tab-pane product-text-tab-content">
                         <div class="bg-white">
-                            <h4 class=""><i class="fa fa-map-marker"></i>  General</h4>
+                            <h4 class=""><i class="fa fa-map-marker"></i>  <?= $this->translate('tr_melis_cms_sites_tool_general') ?></h4>
                         </div>
                         <div id="cms_site_config_general">
                             <?php

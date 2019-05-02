@@ -18,7 +18,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                 <div class="widget-head bg-gray">
                     <ul class="create-site-step">
                         <li class="status">
-                            <span class="r">Step <span class="step-current">1</span> of <span class="steps-total">5</span></span><span class="r text-primary step-name">Multilingual</span>
+                            <span class="r">Step <span class="step-current">1</span> of <span class="steps-total">5</span></span><span class="r text-primary step-name"><?= $this->translate('tr_melis_cms_sites_tool_add_header_title_multi_lingual');?></span>
                         </li>
                         <li class="step_1 active" data-stepName="<?= $this->translate('tr_melis_cms_sites_tool_add_header_title_multi_lingual');?>"><a>1</a></li>
                         <li class="step_2" data-stepName="<?= $this->translate('tr_melis_cms_sites_tool_add_header_title_lang');?>"><a>2</a></li>
@@ -29,7 +29,9 @@ if (!empty($this->zoneconfig['conf']['id']))
                 </div>
                 <!-- // Widget heading END -->
                 <div class="widget-body innerAll inner-2x">
-                    <div id="siteAddAlert" class="alert alert-danger hidden"><strong></strong> <?= $this->translate('tr_melis_cms_sites_tool_add_create_site_required_field'); ?></div>
+                    <div id="siteAddAlert" class="alert alert-danger hidden">
+                        <?= $this->translate('tr_melis_cms_sites_tool_add_create_site_required_field'); ?>
+                    </div>
                     <div class="owl-carousel owl-theme owl-loaded sites-steps-owl">
                         <?php
                             if (!empty($this->zoneconfig['interface'])) {

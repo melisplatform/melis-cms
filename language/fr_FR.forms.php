@@ -240,5 +240,7 @@
         'tr_melis_cms_sites_domain_scheme tooltip' => "Protocole http ou https",
         'tr_melis_cms_sites_domain' => "Domaine",
         'tr_melis_cms_sites_domain tooltip' => "Domaine sur lequel le site est accessible (ex: www.monsite.com)",
+        'tr_melis_cms_sites_field_empty' => 'Le champ ne peut être vide',
+        'tr_melis_cms_sites_field_digits' => 'La saisie ne doit contenir que des chiffres',
     );
 ?>

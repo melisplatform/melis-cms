@@ -60,9 +60,12 @@ class SitesController extends AbstractActionController
     public function renderToolSitesEditHeaderAction() {
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
+
         $view = new ViewModel();
         $view->melisKey = $melisKey;
         $view->siteId = $siteId;
+        $view->siteLabel = $this->getSiteDataById($siteId)['site_label'] ?? '';
+
         return $view;
     }
 
@@ -167,7 +170,16 @@ class SitesController extends AbstractActionController
         $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration();
         return $view;
     }
-    
+
+    /**
+     * Renders to the edit button in the table
+     * @return \Zend\View\Model\ViewModel
+     */
+    public function renderToolSitesContentActionMinifyAssetsAction()
+    {
+        return new ViewModel();
+    }
+
     /**
      * This is the container of the modal
      * @return \Zend\View\Model\ViewModel
@@ -639,7 +651,7 @@ class SitesController extends AbstractActionController
             'textMessage' => $textMessage,
             'siteIds' => $siteIds,
             'siteName' => $siteLabel,
-            'moduleName' => $siteName,
+            'siteModuleName' => $siteName,
             'errors' => $errors
         );
 
@@ -815,7 +827,7 @@ class SitesController extends AbstractActionController
             $response['siteId'] = $siteId;
         }
 
-        $this->getEventManager()->trigger('meliscms_sites_save_end', $this, array_merge($response, array('typeCode' => $logTypeCode, 'itemId' => $siteId)));
+        $this->getEventManager()->trigger('meliscms_site_save_end', $this, array_merge($response, array('typeCode' => $logTypeCode, 'itemId' => $siteId)));
 
         return new JsonModel($response);
     }
@@ -954,7 +966,7 @@ class SitesController extends AbstractActionController
                 $err = [];
 
                 foreach ($form->getMessages() as $key => $val) {
-                    $err[$key] = $val;
+                    $err['siteprop_' . $key] = $val;
                 }
 
                 $errors = array_merge($errors, $err);
@@ -1034,17 +1046,10 @@ class SitesController extends AbstractActionController
                 if ($form->isValid()) {
                     $sitePropSvc->saveSiteLangHome($siteHomeDatum);
                 } else {
-                    $locale = $this->getLangField(
-                        null,
-                        $siteHomeDatum["shome_site_id"],
-                        $siteHomeDatum["shome_lang_id"],
-                        1,
-                        'lang_cms_name'
-                    );
                     $currErr = [];
 
                     foreach ($form->getMessages() as $key => $err) {
-                        $currErr[$locale . " homepage ID"] = $err;
+                        $currErr[$siteHomeDatum["shome_lang_id"]."_".$key] = $err;
                     }
 
                     $errors = array_merge($errors, $currErr);
@@ -1413,5 +1418,23 @@ class SitesController extends AbstractActionController
         $toolSvc->setMelisToolKey('meliscms', 'meliscms_tool_sites');
 
         return $toolSvc;
+    }
+
+    /**
+     * delete site domain platform
+     */
+    public function deleteSiteDomainPlatformAction()
+    {
+        $platform   = $this->params()->fromRoute('platform', $this->params()->fromQuery('platform', ''));
+        $id         = $this->params()->fromRoute('id', $this->params()->fromQuery('id', ''));
+        $success    = (int) $this->params()->fromRoute('success', $this->params()->fromQuery('success', ''));
+
+        if($success == 1) {
+            $domainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
+            $platformIdTable = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+
+            $platformIdTable->deleteByField('pids_id', $id);
+            $domainTable->deleteByField('sdom_env', $platform);
+        }
     }
 }

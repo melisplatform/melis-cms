@@ -69,11 +69,13 @@ return array(
                                                 'https' => 'https',
                                                 'http' => 'http',
                                             ),
+                                            'disable_inarray_validator' => true,
                                         ),
                                         'attributes' => array(
                                             'id' => 'sdom_scheme',
                                             'value' => '',
                                             'placeholder' => 'tr_melis_cms_sites_domain_scheme',
+                                            'required' => 'required'
                                         ),
                                     ),
                                 ),
@@ -89,6 +91,7 @@ return array(
                                             'id' => 'sdom_domain',
                                             'value' => '',
                                             'placeholder' => 'tr_melis_cms_sites_domain',
+                                            'required' => 'required'
                                         ),
                                     ),
                                 ),
@@ -143,8 +146,17 @@ return array(
                                 ),
                                 'sdom_scheme' => array(
                                     'name' => 'sdom_scheme',
-                                    'required' => false,
-                                    'validators' => array(),
+                                    'required' => true,
+                                    'validators' => array(
+                                        array(
+                                            'name'    => 'NotEmpty',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
+                                                ),
+                                            ),
+                                        ),
+                                    ),
                                     'filters' => array(
                                         array('name' => 'StripTags'),
                                         array('name' => 'StringTrim'),
@@ -152,8 +164,17 @@ return array(
                                 ),
                                 'sdom_domain' => array(
                                     'name' => 'sdom_domain',
-                                    'required' => false,
-                                    'validators' => array(),
+                                    'required' => true,
+                                    'validators' => array(
+                                        array(
+                                            'name'    => 'NotEmpty',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
+                                                ),
+                                            ),
+                                        ),
+                                    ),
                                     'filters' => array(
                                         array('name' => 'StripTags'),
                                         array('name' => 'StringTrim'),

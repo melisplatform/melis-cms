@@ -381,7 +381,8 @@ class MelisCmsPageService extends MelisCoreGeneralService
         $iconTypes = array(
             'SITE'   => 'fa-home',
             'FOLDER' => 'fa-folder-open-o',
-            'PAGE'   => 'fa-file-o'
+            'PAGE'   => 'fa-file-o',
+            'NEWSLETTER' => 'fa fa-newspaper-o'
         );
 
 

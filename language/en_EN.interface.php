@@ -310,7 +310,8 @@
 	    'tr_meliscms_tool_platform_ids_table' => 'Table',
 	    'tr_meliscms_tool_platform_ids_modal_content' => 'Add and update modal',
 	    'tr_meliscms_tool_platform_modal_info' => 'Declare here the range of identifiers of a specific platform',
-	    
+        'tr_meliscms_tool_platform_modal_info_assigned_page_ids' => 'All platforms have already been assigned with page IDs.',
+
 	    //Platform Success messages
 	    'tr_meliscms_tool_platform_add_success' => 'New platform IDs added successfully',
 	    'tr_meliscms_tool_platform_update_success' => 'Platform IDS updated successfully',
@@ -394,7 +395,7 @@
         'tr_melis_cms_duplicate_text_identifier' => '[Duplicated]',
         'tr_meliscms_tree_sites_duplication_page_relation' => 'Relationship with an initial page',
         'tr_meliscms_tree_sites_duplication_page_relation tooltip' => 'Allow to create a page in relation to an initial page',
-
+        'tr_meliscms_tree_sites_duplication_root tooltip' => 'Check this box to place the pages at the root.',
 
         // plugins edition
 	    'tr_meliscms_plugins_modal_cancel' => 'Cancel',
@@ -429,7 +430,7 @@
 	    'tr_meliscms_tool_styles_delete_success' => 'The style has been deleted successfully',
 	    'tr_meliscms_tool_styles_save_page_style_fail' => 'Failed to add style',
 	    
-	    'tr_meliscms_tool_duplicate_field_empty' => 'Value is required and can&#39;t be empty',
+	    'tr_meliscms_tool_duplicate_field_empty' => 'The field cannot be empty',
 	    'tr_meliscms_tool_duplicate_field_digits' => 'The input must contain only digits',
 	    
 	    // Page languages
@@ -463,6 +464,9 @@
 	    'tr_meliscms_drag_and_drop_modal_title' => 'Drag\'n\'Drop confirmation',
 	    'tr_meliscms_drag_and_drop_modal_content' => 'Are you sure you want to add this plugin to the page?',
 
+        /** Banner */
+        'tr_melis_cms_gdpr_banner_tabname' => 'Banners',
+
         //New site tools
         'tr_meliscms_tool_sites' => 'Sites',
         'tr_meliscms_tool_sites_save' => 'Save site',
@@ -485,6 +489,7 @@
         'tr_melis_cms_sites_tool_add_step4_select_module' => 'Please choose the module attached to the site in the list:',
         'tr_melis_cms_sites_tool_add_step4_select_module_placeholder' => 'Choose a module',
         'tr_melis_cms_sites_tool_add_step4_create_module' => 'Or create a new module and enter the name:',
+        'tr_melis_cms_sites_tool_add_step4_create_module_error' => 'Alphanumeric and underscore are the only valid characters allowed. The module name cannot start by a number neither contain any space',
         'tr_melis_cms_sites_tool_add_step4_create_file_for_website' => 'Create the folders & files for the new site?',
         'tr_melis_cms_sites_tool_add_step5_new_site_is_created' => 'A new site will be created with following parameters:',
         'tr_melis_cms_sites_tool_add_step5_new_site_using_existing_module' => 'The site will use the existing module <b>“%s”</b>.The module folders and files will not be created.',
@@ -504,15 +509,15 @@
         'tr_melis_cms_sites_tool_add_header_title_site_summary' => 'Site summary',
 
         #ADD SITE FORMS TOOLTIPS
-        'tr_melis_cms_sites_tool_add_step1_is_multi_lang tooltip' => 'Identifier if site is multi lingual or not',
-        'tr_melis_cms_sites_tool_add_step2_reflect_urls tooltip' => 'This will determine how will the language reflect on your url.',
-        'tr_melis_cms_sites_tool_add_step2_select_languages tooltip' => 'Select language(s) for this site',
-        'tr_melis_cms_sites_tool_add_step3_single_domain_name tooltip' => 'Domain name for this site',
-        'tr_melis_cms_sites_tool_add_step3_multi_domain_name tooltip' => 'Domain name for each language',
-        'tr_melis_cms_sites_tool_add_step4_select_module tooltip' => 'Select module for this site(s)',
-        'tr_melis_cms_sites_tool_add_step4_create_module tooltip' => 'Create a new module for this site(s)',
+        'tr_melis_cms_sites_tool_add_step1_is_multi_lang tooltip' => 'Select if your site is multilingual or not',
+        'tr_melis_cms_sites_tool_add_step2_reflect_urls tooltip' => 'Select the way the languages should be reflected in the URLs',
+        'tr_melis_cms_sites_tool_add_step2_select_languages tooltip' => 'Select the languages of the site',
+        'tr_melis_cms_sites_tool_add_step3_single_domain_name tooltip' => 'Domain on which the site is accessible (ex: www.mysite.com)',
+        'tr_melis_cms_sites_tool_add_step3_multi_domain_name tooltip' => 'Domains on which each site is accessible according to their language (ex: www.mysite.com)',
+        'tr_melis_cms_sites_tool_add_step4_select_module tooltip' => 'Select the module associated to the site(s)',
+        'tr_melis_cms_sites_tool_add_step4_create_module tooltip' => 'Create a new module for the site(s)',
         'tr_melis_cms_sites_tool_add_step4_site_label tooltip' => 'Enter the site name',
-        'tr_melis_cms_sites_tool_add_step4_create_file_for_website tooltip' => 'Determine whether we create a files for this site',
+        'tr_melis_cms_sites_tool_add_step4_create_file_for_website tooltip' => 'Select if you want the folders and files created for the site(s) or not',
 
         #MODULE LOAD TAB
         'tr_melis_cms_sites_module_loading' => 'Module loading',
@@ -528,7 +533,7 @@
         #PROPERTIES TAB
         'tr_melis_cms_sites_properties' => 'Properties',
         'tr_melis_cms_sites_site_id' => 'Site ID',
-        'tr_melis_cms_sites_site_id tooltip' => 'Identifier of the site currently editing',
+        'tr_melis_cms_sites_site_id tooltip' => 'Site identifier',
         'tr_melis_cms_sites_site_label' => 'Site Name',
         'tr_melis_cms_sites_site_label tooltip' => 'The name of the site displayed in the platform',
         'tr_melis_cms_sites_site_name' => 'Site Module',
@@ -584,6 +589,7 @@
         #SITES CONFIG TAB
         'tr_melis_cms_sites_tool_config_title' => 'Site Config',
         'tr_melis_cms_sites_tool_config_array_warning' => 'Nested arrays with depth of 2 or more are not displayed. You can edit it manually on the file instead.',
+        'tr_melis_cms_sites_tool_general' => 'General',
 
         #SITES INTERFACES
         'tr_melis_cms_sites_tool_add_site_button' => 'Add site button',
@@ -600,7 +606,7 @@
         'tr_melis_cms_sites_tool_content_edit_languages_tab_content' => 'Languages content',
         'tr_melis_cms_sites_tool_content_edit_site_config_tab' => 'Site Config',
         'tr_melis_cms_sites_tool_content_edit_site_config_tab_content' => 'Site config content',
-        'tr_melis_cms_sites_tool_content_edit_site_translations_tab' => 'Site Translations',
+        'tr_melis_cms_sites_tool_content_edit_site_translations_tab' => 'Translations',
         'tr_melis_cms_sites_tool_content_edit_site_translations_tab_content' => 'Site translations content',
 
         #SITES NO ACCESS MESSAGE

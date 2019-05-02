@@ -11,11 +11,9 @@ namespace MelisCms\Controller;
 
 
 use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\View\Model\JsonModel;
 use Zend\Session\Container;
-
-use MelisCore\Service\MelisCoreRightsService;
+use Zend\View\Model\JsonModel;
+use Zend\View\Model\ViewModel;
 
 /**
  * This class deals with the languages button in the header
@@ -427,33 +425,33 @@ class LanguageController extends AbstractActionController
          
         return new JsonModel($response);
     }
-    
-    public function editLanguageAction(){
-        $response = array();
+
+    /**
+     * @return JsonModel
+     */
+    public function editLanguageAction()
+    {
+        $response = [];
         $this->getEventManager()->trigger('meliscms_platform_update_start', $this, $response);
         $platformTable = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
-        $translator = $this->getServiceLocator()->get('translator');
-        
-        $id = null;
+
+        $id = 0;
         $success = 0;
-        $errors  = array();
+        $errors = [];
         $textTitle = 'tr_meliscms_tool_language';
         $textMessage = 'tr_meliscms_tool_language_prompts_edit_failed';
-    
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
-        $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
-    
-        $form = $melisTool->getForm('meliscms_tool_language_generic_form');
-    
-        if($this->getRequest()->isPost()) {
-    
-            $postValues = get_object_vars($this->getRequest()->getPost());
+
+        if ($this->getRequest()->isPost()) {
+            $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+            $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
+            $form = $melisTool->getForm('meliscms_tool_language_generic_form');
+
+            $postValues = $this->getRequest()->getPost()->toArray();
             $postValues = $melisTool->sanitize($postValues);
+            $id = empty($postValues['id']) ? 0 : $postValues['id'];
             $form->setData($postValues);
-    
-            if($form->isValid()) {
-    
-                $id = $postValues['id'];
+
+            if ($form->isValid()) {
                 $data = $form->getData();
                 $data['lang_cms_id'] = $id;
                 $platformTable->save($data, $id);
@@ -462,31 +460,36 @@ class LanguageController extends AbstractActionController
             } else {
                 $errors = $form->getMessages();
             }
-    
+
             $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
             $appConfigForm = $melisMelisCoreConfig->getItem('meliscms/tools/meliscms_language_tool/forms/meliscms_tool_language_generic_form');
             $appConfigForm = $appConfigForm['elements'];
-    
-            foreach ($errors as $keyError => $valueError)
-            {
-                foreach ($appConfigForm as $keyForm => $valueForm)
-                {
+
+            foreach ($errors as $keyError => $valueError) {
+                foreach ($appConfigForm as $keyForm => $valueForm) {
                     if ($valueForm['spec']['name'] == $keyError &&
                         !empty($valueForm['spec']['options']['label']))
                         $errors[$keyError]['label'] = $valueForm['spec']['options']['label'];
                 }
             }
         }
-    
-        $response = array(
+
+        $response = [
             'success' => $success,
             'textTitle' => $textTitle,
             'textMessage' => $textMessage,
             'errors' => $errors
+        ];
+
+        $this->getEventManager()->trigger(
+            'meliscms_language_update_end',
+            $this,
+            array_merge(
+                $response,
+                ['typeCode' => 'CMS_LANGUAGE_UPDATE', 'itemId' => $id]
+            )
         );
-    
-        $this->getEventManager()->trigger('meliscms_language_update_end', $this, array_merge($response, array('typeCode' => 'CMS_LANGUAGE_UPDATE', 'itemId' => $id)));
-         
+
         return new JsonModel($response);
     }
     
