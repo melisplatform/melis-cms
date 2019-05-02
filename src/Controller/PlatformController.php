@@ -10,10 +10,8 @@
 namespace MelisCms\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
-use MelisCore\Service\MelisCoreRightsService;
-use Zend\View\View;
+use Zend\View\Model\ViewModel;
 
 /**
  * Platform Tool Plugin
@@ -137,32 +135,31 @@ class PlatformController extends AbstractActionController
         return $view;
         
     }
-    
-    /*
+
+    /**
      * Render Platform Content Modal
+     * @return ViewModel
      */
-    public function renderPlatformModalContentAction(){
-        
+    public function renderPlatformModalContentAction()
+    {
         $pids_id = $this->params()->fromQuery('id');
-        
+
         // Get Cms Platform ID form from  App Tool
         $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
-        $genericPlatformForm = $melisMelisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_platform_tool/forms/meliscms_tool_platform_generic_form','meliscms_tool_platform_generic_form');
-        
+        $genericPlatformForm = $melisMelisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_platform_tool/forms/meliscms_tool_platform_generic_form', 'meliscms_tool_platform_generic_form');
+
         // Factoring Calendar event and pass to view
         $factory = new \Zend\Form\Factory();
         $formElements = $this->serviceLocator->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $propertyForm = $factory->createForm($genericPlatformForm);
-        
+
         $view = new ViewModel();
         $melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
         $availablePlatform = $melisEngineTablePlatformIds->getAvailablePlatforms()->toArray();
         // Check if Cms Platform Id is Set
-        if (isset($pids_id)&&$pids_id!=''){
-
+        if (!empty($pids_id)) {
             // Get Platform ID Details
-
             $platformIdsData = $melisEngineTablePlatformIds->getEntryById($pids_id);
             $platformIdsData = $platformIdsData->current();
 
@@ -181,7 +178,7 @@ class PlatformController extends AbstractActionController
             // Set variable to View
             $view->pids_id = $pids_id;
             $view->tabTitle = 'tr_meliscms_tool_platform_ids_btn_edit';
-        }else{
+        } else {
             // Removing Id input and Platform input
             $propertyForm->remove('pids_id');
             $propertyForm->remove('pids_name_input');
@@ -192,6 +189,7 @@ class PlatformController extends AbstractActionController
         $view->setVariable('meliscms_tool_platform_generic_form', $propertyForm);
         $view->setVariable('available_platform', $availablePlatform);
         $view->melisKey = $this->params()->fromRoute('melisKey', '');
+
         return $view;
     }
 

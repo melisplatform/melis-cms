@@ -183,16 +183,16 @@
 	    'tr_meliscms_menu_new' => 'Nouvelle page',
 	    'tr_meliscms_menu_edit' => 'Editer',
 	    'tr_meliscms_menu_delete' => 'Supprimer',
-	    'tr_meliscms_menu_dupe' => 'Dupliquer l&#39;arborescence',
-	    'tr_meliscms_menu_dupe_fail' => 'Echec de la duplication de l&#39;arborescence',
+	    'tr_meliscms_menu_dupe' => 'Dupliquer l\'arborescence',
+	    'tr_meliscms_menu_dupe_fail' => 'Echec de la duplication de l\'arborescence',
 	    'tr_meliscms_menu_dupe_success' => 'L\'arborescence a été dupliquée avec succès',
-	    'tr_meliscms_menu_dupe_destination_fail' => 'La page de destination n&#39;existe pas',
+	    'tr_meliscms_menu_dupe_destination_fail' => 'La page de destination n\'existe pas',
         'tr_meliscms_menu_dupe_page_relation_fail' => 'conflit dans la duplication de la nouvelle langue de page de',
-        'tr_meliscms_menu_dupe_source_fail' => 'La page d&#39;origine n&#39;existe pas',
-	    'tr_meliscms_tree_sites_duplication_source' => 'ID page d&#39;origine',
-	    'tr_meliscms_tree_sites_duplication_source tooltip' => 'Identifiant de la page de l&#39;arborescence à dupliquer',
+        'tr_meliscms_menu_dupe_source_fail' => 'La page d\'origine n\'existe pas',
+	    'tr_meliscms_tree_sites_duplication_source' => 'ID page d\'origine',
+	    'tr_meliscms_tree_sites_duplication_source tooltip' => 'Identifiant de la page de l\'arborescence à dupliquer',
 	    'tr_meliscms_tree_sites_duplication_destination' => 'ID page de destination',
-	    'tr_meliscms_tree_sites_duplication_destination tooltip' => 'Identifiant de la page de destination de l&#39;arboresence dupliquée ou cochez &#34;Racine&#34; pour mettre l&#39;arborescence à la racine',
+	    'tr_meliscms_tree_sites_duplication_destination tooltip' => 'Identifiant de la page de destination de l\'arboresence dupliquée ou cochez &#34;Racine&#34; pour mettre l\'arborescence à la racine',
 	    
 	    'tr_meliscms_menu_cancel' => 'Annuler',
 	    
@@ -291,7 +291,7 @@
 	    'tr_meliscms_tool_platform_ids_header' => 'Header',
 	    'tr_meliscms_tool_platform_ids_content' => 'Contenu',
 	    'tr_meliscms_tool_platform_pids_id' => 'ID',
-	    'tr_meliscms_tool_platform_pids_id tooltip' => 'Identifiant de la plage d&#39;identifiants',
+	    'tr_meliscms_tool_platform_pids_id tooltip' => 'Identifiant de la plage d\'identifiants',
 	    'tr_meliscms_tool_platform_pids_name' => 'Nom',
 	    'tr_meliscms_tool_platform_pids_name tooltip' => 'Nom de la plateforme correspondante. (La plateforme doit être créée au préalable depuis l&lsquo;outil Plateformes)',
 	    'tr_meliscms_tool_platform_pids_page_id_start' => 'Page ID début',
@@ -312,7 +312,8 @@
 	    'tr_meliscms_tool_platform_ids_table' => 'Tableau',
 	    'tr_meliscms_tool_platform_ids_modal_content' => 'Add and update modal',
 	    'tr_meliscms_tool_platform_modal_info' => 'Déclarez ici la plage d\'identifiants d\'une plateforme spécifique',
-	    
+        'tr_meliscms_tool_platform_modal_info_assigned_page_ids' => 'Toutes les plateformes ont déjà des plages d\'identifiants assigné.',
+
 	    //Platform Success messages
 	    'tr_meliscms_tool_platform_add_success' => 'Nouvelle plage d\'IDs de la plateforme ajoutée avec succès',
 	    'tr_meliscms_tool_platform_update_success' => 'Plage d\'IDs de la plateforme mise à jour avec succès',
@@ -360,13 +361,13 @@
         'tr_meliscms_tool_site_301_s301_id' => 'ID',
 	    'tr_meliscms_tool_site_301_s301_modal_info' => 'Déclarez ici une redirection pour un site spécifique (donc un domaine)',
 	    'tr_meliscms_tool_site_301_s301_site' => 'Site',
-	    'tr_meliscms_tool_site_301_s301_site tooltip' => 'Site/Domaine sur lequel l&#39;url sera vérifiée',
+	    'tr_meliscms_tool_site_301_s301_site tooltip' => 'Site/Domaine sur lequel l\'url sera vérifiée',
         'tr_meliscms_tool_site_301_s301_old_url' => 'Ancienne url',
 	    'tr_meliscms_tool_site_301_s301_old_url holder' => '/monancienneurl',
         'tr_meliscms_tool_site_301_s301_old_url tooltip' => 'Ancienne URL au format &quot;/monancienneurl&quot;',
         'tr_meliscms_tool_site_301_s301_new_url' => 'Nouvelle url',
 
-        'tr_meliscms_tool_site_301_s301_old_url_site_error' => 'L&#39;ancienne URL existe déjà pour ce site',
+        'tr_meliscms_tool_site_301_s301_old_url_site_error' => 'L\'ancienne URL existe déjà pour ce site',
 	    'tr_meliscms_tool_site_301_s301_new_url holder' => 'http://www.monsite.com ou /monnouveausite/id/300',
         'tr_meliscms_tool_site_301_s301_new_url tooltip' => 'Nouvelle URL (format externe &quot;http://www.monsite.com&quot; ou format interne &quot;/monnouveausite/id/300&quot;)',
 
@@ -383,7 +384,7 @@
         'meliscms_tool_site_301_unable_to_delete' => 'Impossible de suprimer la redirection 301',
         'meliscms_tool_site_301_value_too_long_255' => 'Valeur trop longue, elle doit être de moins de 255 caractères',
         'meliscms_tool_site_301_value_empty' => 'Le champ est requis et ne peut être vide',
-        'meliscms_tool_site_301_old_url_exist' => 'L&#39;ancienne URL existe déjà pour ce site',
+        'meliscms_tool_site_301_old_url_exist' => 'L\'ancienne URL existe déjà pour ce site',
         'meliscms_tool_site_301_delete_confirm_msg' => 'Etes-vous sûr de vouloir supprimer cette redirection 301?',
 	    'tr_meliscms_tool_site_301_s301_new_url_mismatch' => 'The new url domain does not match the site domain',
 	    
@@ -397,6 +398,7 @@
         'tr_melis_cms_duplicate_text_identifier' => '[Dupliquée]',
         'tr_meliscms_tree_sites_duplication_page_relation' => 'Relation avec une page initiale',
         'tr_meliscms_tree_sites_duplication_page_relation tooltip' => 'Permer de créer une page en relation avec une page initiale',
+        'tr_meliscms_tree_sites_duplication_root tooltip' => 'Cochez cette case pour placer les pages à la racine.',
 
         // plugins edition
 	    'tr_meliscms_plugins_modal_cancel' => 'Annuler',
@@ -429,9 +431,9 @@
 	    'tr_meliscms_tool_styles_delete_details' => 'Etes-vous sûr de vouloir supprimer ce style ?',
 	    'tr_meliscms_tool_styles_delete_fail' => 'Echec de la suppression du style',
 	    'tr_meliscms_tool_styles_delete_success' => 'Le style a été supprimé avec succès',
-	    'tr_meliscms_tool_styles_save_page_style_fail' => 'Echec de l&#39;ajout du style',
+	    'tr_meliscms_tool_styles_save_page_style_fail' => 'Echec de l\'ajout du style',
 	    
-	    'tr_meliscms_tool_duplicate_field_empty' => 'Valeur requise, ne peut être vide',
+	    'tr_meliscms_tool_duplicate_field_empty' => 'Le champ ne peut être vide',
 	    'tr_meliscms_tool_duplicate_field_digits' => 'La saisie ne doit contenir que des chiffres',
 	    
 	    // Page languages
@@ -464,6 +466,9 @@
         // Drag and drop CMS
         'tr_meliscms_drag_and_drop_modal_title' => 'Drag\'n\'Drop confirmation',
         'tr_meliscms_drag_and_drop_modal_content' => 'Êtes-vous sur de vouloir ajouter ce plugin à cette page ?',
+
+        /** Banner */
+        'tr_melis_cms_gdpr_banner_tabname' => 'Bannières',
 
         //New site tools
         'tr_meliscms_tool_sites' => 'Sites',

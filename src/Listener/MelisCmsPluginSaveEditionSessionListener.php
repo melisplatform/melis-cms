@@ -51,10 +51,11 @@ class MelisCmsPluginSaveEditionSessionListener implements ListenerAggregateInter
         		
         		$postValues = $params['postValues'];
         		
-        		$idPage = $params['idPage'];
-        		$plugin = isset($postValues['melisPluginName']) ? $postValues['melisPluginName'] : null;
-        		$tag    = isset($postValues['melisPluginTag'])  ? $postValues['melisPluginTag']  : null;
-        		$id     = isset($postValues['melisPluginId'])   ? $postValues['melisPluginId']   : null;
+        		$idPage     = $params['idPage'];
+        		$plugin     = isset($postValues['melisPluginName']) ? $postValues['melisPluginName'] : null;
+        		$tag        = isset($postValues['melisPluginTag'])  ? $postValues['melisPluginTag']  : null;
+        		$id         = isset($postValues['melisPluginId'])   ? $postValues['melisPluginId']   : null;
+                $fromResize = isset($postValues['resize']) ? $postValues['resize'] : null;
 
                 /**
                  * check if plugin is came from the mini template
@@ -75,17 +76,23 @@ class MelisCmsPluginSaveEditionSessionListener implements ListenerAggregateInter
         		{
         		    $melisPlugin = $sm->get('ControllerPluginManager')->get($plugin);
         		    $xml = $melisPlugin->savePluginConfigToXml($postValues);
+
         		}
         		catch(\Exception $e)
         		{
         		    return;
         		}
-        		  
     		    // Save in session
     		    if ($xml != '')
     		    {
-    		        $container = new Container('meliscms');
-    		        $container['content-pages'][$idPage][$tag][$id] = $xml;
+    		        // if request came from resizing plugin
+                    // then we do not override session so that
+                    // data in renderModalPlguin will not disappear
+    		        if (!$fromResize) {
+                        $container = new Container('meliscms');
+                        $container['content-pages'][$idPage][$tag][$id] = $xml;
+                    }
+
     		    }
         	},
         80);

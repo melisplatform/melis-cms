@@ -310,7 +310,8 @@
 	    'tr_meliscms_tool_platform_ids_table' => 'Table',
 	    'tr_meliscms_tool_platform_ids_modal_content' => 'Add and update modal',
 	    'tr_meliscms_tool_platform_modal_info' => 'Declare here the range of identifiers of a specific platform',
-	    
+        'tr_meliscms_tool_platform_modal_info_assigned_page_ids' => 'All platforms have already been assigned with page IDs.',
+
 	    //Platform Success messages
 	    'tr_meliscms_tool_platform_add_success' => 'New platform IDs added successfully',
 	    'tr_meliscms_tool_platform_update_success' => 'Platform IDS updated successfully',
@@ -394,7 +395,7 @@
         'tr_melis_cms_duplicate_text_identifier' => '[Duplicated]',
         'tr_meliscms_tree_sites_duplication_page_relation' => 'Relationship with an initial page',
         'tr_meliscms_tree_sites_duplication_page_relation tooltip' => 'Allow to create a page in relation to an initial page',
-
+        'tr_meliscms_tree_sites_duplication_root tooltip' => 'Check this box to place the pages at the root.',
 
         // plugins edition
 	    'tr_meliscms_plugins_modal_cancel' => 'Cancel',
@@ -429,7 +430,7 @@
 	    'tr_meliscms_tool_styles_delete_success' => 'The style has been deleted successfully',
 	    'tr_meliscms_tool_styles_save_page_style_fail' => 'Failed to add style',
 	    
-	    'tr_meliscms_tool_duplicate_field_empty' => 'Value is required and can&#39;t be empty',
+	    'tr_meliscms_tool_duplicate_field_empty' => 'The field cannot be empty',
 	    'tr_meliscms_tool_duplicate_field_digits' => 'The input must contain only digits',
 	    
 	    // Page languages
@@ -462,6 +463,9 @@
         // Drag and drop CMS
 	    'tr_meliscms_drag_and_drop_modal_title' => 'Drag\'n\'Drop confirmation',
 	    'tr_meliscms_drag_and_drop_modal_content' => 'Are you sure you want to add this plugin to the page?',
+
+        /** Banner */
+        'tr_melis_cms_gdpr_banner_tabname' => 'Banners',
 
         //New site tools
         'tr_meliscms_tool_sites' => 'Sites',

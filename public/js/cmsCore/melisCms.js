@@ -2,7 +2,8 @@
 var melisCms = (function(){
 	
 	// CACHE SELECTORS
-	var $body = $("body");
+	var $body 	  = $("body"),
+		$document = $("document");
 	
 	// ---=[ BUG FIX ] =---  TINYMCE POPUP MODAL FOCUS 
 	var windowOffset
@@ -27,8 +28,8 @@ var melisCms = (function(){
 	window.scrollOffsetTinyMCE = function(){
 		return windowOffset;
 	}
-	
-	$("body").on("click", ".mce-btn", function(){
+
+	$body.on("click", ".mce-btn", function(){
 		
 		var mcePopUp = $("#mce-modal-block").length;
 		
@@ -631,7 +632,7 @@ var melisCms = (function(){
         	alert( translations.tr_meliscore_error_message );
         });
     }
-	
+
 	// WINDOW SCROLL FUNCTIONALITIES ========================================================================================================
 	if( melisCore.screenSize >= 768){
 		jQuery(window).scroll(function(){
@@ -731,9 +732,9 @@ var melisCms = (function(){
     // main tab click event (edition, properties etc..)
     $body.on("shown.bs.tab", '.page-content-container .widget-head.nav ul li a', cmsTabEvents);
     
-    //  refresh page tab (historic, versionining etc)
+    // refresh page tab (historic, versionining etc)
     $body.on("shown.bs.tab", '.melis-refreshPageTable', refreshPageTable );
-    
+
 
     
     

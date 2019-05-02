@@ -13,7 +13,7 @@ use Zend\View\Model\ViewModel;
 
 class IndexController extends BaseController
 {
-    public function indexsiteAction()
+    public function indexAction()
     {
     	$view = new ViewModel();
     	

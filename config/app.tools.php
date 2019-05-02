@@ -745,7 +745,7 @@ return array(
                                 'sortable' => true,
 
                             ),
-                            'site_name' => array(
+                            'site_label' => array(
                                 'text' => 'tr_meliscms_tool_templates_tpl_site_id',
                                 'css' => array('width' => '20%', 'padding-right' => '0'),
                                 'sortable' => true,
@@ -852,6 +852,11 @@ return array(
 
                         ),
                         'actionButtons' => array(
+                            'minify' => array(
+                                'module' => 'MelisCms',
+                                'controller' => 'Site',
+                                'action' => 'render-tool-site-content-action-minify-assets',
+                            ),
                             'edit' => array(
                                 'module' => 'MelisCms',
                                 'controller' => 'Site',
@@ -2327,7 +2332,7 @@ return array(
                                 'css' => array('width' => '1%'),
                                 'sortable' => true,
                             ),
-                            'site_name' => array(
+                            'site_label' => array(
                                 'text' => 'tr_meliscms_tool_site_301_s301_site',
                                 'css' => array('width' => '30%'),
                                 'sortable' => true,
@@ -2584,6 +2589,7 @@ return array(
                                         ),
                                         'attributes' => array(
                                             'id' => 'pageRelation',
+                                            'class' => 'melis-check-box',
                                         ),
                                     ),
                                 ),
@@ -2603,22 +2609,26 @@ return array(
                                         ),
                                     ),
                                 ),
-
+                                array(
+                                    'spec' => array(
+                                        'name' => 'use_root',
+                                        'type' => 'checkbox',
+                                        'options' => array(
+                                            'label' => 'tr_meliscms_tree_sites_duplication_use_root',
+                                            'tooltip' => 'tr_meliscms_tree_sites_duplication_root tooltip',
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'use_root',
+                                            'class' => 'use_root_orig_checkbox melis-check-box'
+                                        ),
+                                    ),
+                                ),
                             ),
                             'input_filter' => array(
                                 'sourcePageId' => array(
                                     'name'     => 'sourcePageId',
                                     'required' => true,
                                     'validators' => array(
-                                        array(
-                                            'name'    => 'IsInt',
-                                            'break_chain_on_failure' => true,
-                                            'options' => array(
-                                                'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_meliscms_tool_duplicate_field_digits',
-                                                )
-                                            )
-                                        ),
                                         array(
                                             'name' => 'NotEmpty',
                                             'break_chain_on_failure' => true,
@@ -2627,6 +2637,15 @@ return array(
                                                     \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_tool_duplicate_field_empty',
                                                 ),
                                             ),
+                                        ),
+                                        array(
+                                            'name'    => 'IsInt',
+                                            'break_chain_on_failure' => true,
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_meliscms_tool_duplicate_field_digits',
+                                                )
+                                            )
                                         ),
                                     ),
                                     'filters' => array(
@@ -2655,15 +2674,6 @@ return array(
                                     'required' => true,
                                     'validators' => array(
                                         array(
-                                            'name'    => 'IsInt',
-                                            'break_chain_on_failure' => true,
-                                            'options' => array(
-                                                'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_meliscms_tool_duplicate_field_digits',
-                                                )
-                                            )
-                                        ),
-                                        array(
                                             'name' => 'NotEmpty',
                                             'break_chain_on_failure' => true,
                                             'options' => array(
@@ -2671,6 +2681,15 @@ return array(
                                                     \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_tool_duplicate_field_empty',
                                                 ),
                                             ),
+                                        ),
+                                        array(
+                                            'name'    => 'IsInt',
+                                            'break_chain_on_failure' => true,
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_meliscms_tool_duplicate_field_digits',
+                                                )
+                                            )
                                         ),
                                     ),
                                     'filters' => array(
