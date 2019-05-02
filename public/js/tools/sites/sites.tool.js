@@ -76,6 +76,7 @@ $(document).ready(function() {
 
                             // error modal
                             melisHelper.melisKoNotification(data.textTitle, data.textMessage, errors);
+                            melisCoreTool.done("#btn-save-meliscms-tool-sites");
                         }
 
                         // update flash messenger values
