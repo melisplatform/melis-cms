@@ -681,7 +681,7 @@ class SitesController extends AbstractActionController
         $status  = 1;
         $errors  = array();
         $textMessage = 'tr_melis_cms_site_save_ko';
-        $logTypeCode = '';
+        $logTypeCode = 'CMS_SITE_UPDATE';
         $translator = $this->getServiceLocator()->get('translator');
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $request = $this->getRequest();

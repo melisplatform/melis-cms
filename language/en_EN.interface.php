@@ -525,7 +525,7 @@
         'tr_melis_cms_sites_module_load_no_access' => 'You need to have and admin level of rights to modify this section.',
         'tr_melis_cms_sites_module_no_module_to_load' => 'This site has no module to load.',
         'tr_meliscms_tool_site_module_load_update_title' => "Activation/Deactivation of Sites' module",
-        'tr_meliscms_tool_site_module_load_update_confirm' => "Please, be careful when changing modules to be loaded, or their order, as it can impact all sites using this module. <br><br> Sites using this module are the following ones: <br><br> %s",
+        'tr_meliscms_tool_site_module_load_update_confirm' => "Please, be careful when changing modules to be loaded, or their order, as it can impact all sites using this module. <br><br> Sites using this module are the following ones: <br> %s <br> <br>Are you sure you want to modify the loading of modules for all sites using this module?",
 
         #DOMAINS TAB
         'tr_melis_cms_sites_domains' => 'Domains',
