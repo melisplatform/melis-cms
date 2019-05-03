@@ -226,7 +226,7 @@ ul.meliscms-site-language-homepage-list > li:hover {
     display: block;
 }
 
-input[type=checkbox] {
+.sites-tool-lang-tab-checkbox input[type=checkbox] {
     margin-left: -15px;
 }
 
