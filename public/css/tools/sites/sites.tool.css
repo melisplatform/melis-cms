@@ -51,15 +51,18 @@ div[data-meliskey="meliscms_tool_sites_edit_site_tabs"] .widget-head.nav {
 
 /** Site V2 MODULE LOAD TAB **/
 #site-select-deselect-all-module.has-switch {
-    right: 22px;
+    right: -5px;
+    margin-bottom: 8px;
 }
 div[data-meliskey="meliscms_tool_sites_module_load_content"] .switch-all-noti {
     z-index: 5;
-    top: -25px;
+    top: -8px;
+    right: 0;
 }
 
 div[data-meliskey="meliscms_tool_sites_module_load_content"] #header-version {
     padding: 15px 0px;
+    margin-right: 200px;
 }
 
 /** SITE V2 DOMAIN TAB **/
@@ -96,6 +99,12 @@ ul.meliscms-site-language-homepage-list > li:hover {
 #not-admin-notice h5{
     color: #e61c23;
     margin-bottom: 13px;
+    text-align: left;
+    margin-left: -8px;
+}
+
+.switch-all-container{
+    margin-bottom: 0;
 }
 
 /** SITE V2 LANGUAGES TAB CHECKBOX & RADIO BUTTON **/
@@ -235,4 +244,12 @@ ul.meliscms-site-language-homepage-list > li:hover {
     cursor: pointer;
 }
 /** SITE V2 LANGUAGES TAB CHECKBOX & RADIO BUTTON END **/
+
+/*Mobile Tool Sites*/
+
+@media only screen and (max-width: 991px) {
+    div[data-meliskey="meliscms_tool_sites_module_load_content"] .switch-all-noti{
+        top: 6px;
+    }
+}
 
