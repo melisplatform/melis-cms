@@ -470,6 +470,9 @@
         /** Banner */
         'tr_melis_cms_gdpr_banner_tabname' => 'Bannières',
 
+        //minify assets
+        'tr_melis_cms_minify_assets_button_title' => 'Minifier les assets',
+
         //New site tools
         'tr_meliscms_tool_sites' => 'Sites',
         'tr_meliscms_tool_sites_save' => 'Save site',
