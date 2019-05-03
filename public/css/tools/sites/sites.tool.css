@@ -113,7 +113,7 @@ ul.meliscms-site-language-homepage-list > li:hover {
     top: 0;
     width: 18px;
     height: 18px;
-    border: 1px solid red;
+    border: 1px solid #e61c23;
     border-radius: 100%;
     background: #fff;
 }
@@ -122,10 +122,10 @@ ul.meliscms-site-language-homepage-list > li:hover {
     content: '';
     width: 12px;
     height: 12px;
-    background: red;
+    background: #e61c23;
     position: absolute;
-    top: 4px;
-    left: 4px;
+    top: 3px;
+    left: 3px;
     border-radius: 100%;
     -webkit-transition: all 0.2s ease;
     transition: all 0.2s ease;
@@ -191,7 +191,7 @@ ul.meliscms-site-language-homepage-list > li:hover {
     position: absolute;
     left: 3px;
     top: 2px;
-    border: 2px solid #e61c23;
+    border: 2px solid #e61c23 !important;
     text-align: center;
     padding: 2px;
 }

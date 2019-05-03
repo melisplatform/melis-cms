@@ -78,16 +78,18 @@ $data_melisKey = $this->melisKey;
         ?>
         <div class="row">
             <div class="col-md-12">
-                <label class="radio-inline">
-                    <input type="radio" class="radio" name="site_opt_lang_url" value="2" <?= $option2 ?>> <?= $this->translate('tr_melis_cms_sites_tool_languages_option2'); ?>
-                </label>
+                <p>
+                    <input type="radio" class="melis-radio-button" id="cms-sites-lang-radio-2" name="site_opt_lang_url" value="2" <?= $option2 ?>>
+                    <label for="cms-sites-lang-radio-2"><?= $this->translate('tr_melis_cms_sites_tool_languages_option2'); ?></label>
+                </p>
             </div>
         </div>
         <div class="row">
             <div class="col-md-12">
-                <label class="radio-inline">
-                    <input type="radio" class="radio" name="site_opt_lang_url" value="1" <?= $option1 ?>> <?= $this->translate('tr_melis_cms_sites_tool_languages_option1'); ?>
-                </label>
+                <p>
+                    <input type="radio" class="melis-radio-button" id="cms-sites-lang-radio-1" name="site_opt_lang_url" value="1" <?= $option1 ?>>
+                    <label for="cms-sites-lang-radio-1"><?= $this->translate('tr_melis_cms_sites_tool_languages_option1'); ?></label>
+                </p>
             </div>
         </div>
         <!-- SITE OPTION LANGUAGE URL END -->
