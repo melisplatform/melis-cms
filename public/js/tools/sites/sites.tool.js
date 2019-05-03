@@ -30,8 +30,8 @@ $(document).ready(function() {
 
         if(moduleDiff.length > 0){
             melisCoreTool.confirm(
-                translations.tr_meliscore_common_yes,
-                translations.tr_meliscore_common_no,
+                translations.tr_meliscms_common_save,
+                translations.tr_meliscms_tool_sites_cancel,
                 translations.tr_meliscms_tool_site_module_load_update_title,
                 translations.tr_meliscms_tool_site_module_load_update_confirm.replace(/%s/g, sitesUsingModulesStr),
                 function(){
