@@ -1084,7 +1084,7 @@ return array(
                                             ),
                                         ),
                                         'attributes' => array(
-                                            'id' => 'create_sites_file',
+
                                         ),
                                     )
                                 )

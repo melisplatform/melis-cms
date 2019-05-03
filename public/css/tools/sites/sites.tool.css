@@ -3,6 +3,10 @@
     margin-bottom:10px;
     margin-top: 6px;
 }
+.tool-sites_container_fixed_width #createSiteFiles input[value="no"]{
+    margin-left:10px;
+}
+
 .tab-header-title-container {
     width: 100%;
     text-align: right;
@@ -87,6 +91,11 @@ ul.meliscms-site-language-homepage-list > li:hover {
 
 .padding-10 {
     padding: 0px 10px 10px 10px;
+}
+
+#not-admin-notice h5{
+    color: #e61c23;
+    margin-bottom: 13px;
 }
 
 /** SITE V2 LANGUAGES TAB CHECKBOX & RADIO BUTTON **/
