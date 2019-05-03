@@ -48,13 +48,12 @@
             encode      : true
          }).success(function(data){
             dataUrl = data.link;
-            showUrl();
+            showUrl(dataUrl);
             $("#id_meliscms_find_page_tree_container").modal("hide");
          }).error(function(){
              console.log('failed');
          });
         melisCoreTool.done('#generateTreePageLink');
-
     });
     
     $body.on("click", "#generateTreePageId", function(){
@@ -127,11 +126,22 @@
          });
     }
     
-    function showUrl() {
-        console.log("showUrl");
+    function showUrl( dataUrl ) {
+        var $body           = $("body"),
+            $dialog         = $body.find(".tox-dialog"),
+            $mceLinkTree    = $body.find("#mce-link-tree"),
+
+            $iframe         = window.parent.$(".melis-iframe"),
+            $idialog        = $iframe.contents().find(".tox-dialog"),
+            $imceLinkTree   = $iframe.contents().find("#mce-link-tree");
         
-        var inputBox = $('.melis-iframe').contents().find('#mce-link-tree').parent().find('input').val(dataUrl);
-                       $(".mce-floatpanel.mce-window").find('#mce-link-tree').parent().find('input').val(dataUrl);
+            if ( $idialog.length ) {
+                $imceLinkTree.parent().find("input").val(dataUrl);
+            }
+
+            if ( $dialog.length ) {
+                $mceLinkTree.parent().find("input").val(dataUrl);
+            }
     }
 
     // not used anymore on tinymce v5
@@ -186,8 +196,8 @@
         window.parent.melisHelper.createModal(zoneId, melisKey, false, {}, modalUrl, function() {
         });
         
-        $("#mce-link-tree").closest('.mce-panel').css('z-index', 1049);
-        $("#mce-modal-block").css('z-index', 1048);
+        //$("#mce-link-tree").closest('.tox-dialog').css('z-index', 1049);
+        //$(".tox-tinymce-aux").css('z-index', 1048);
     }
     
     // used in regular form buttons
@@ -210,7 +220,6 @@
     function selectedNodes() {
         var title = $(this).closest('li').attr('id');
         $('#statusLine').append(title);
-        //console.log(title);
     }
 
     function findPageMainTree() {

@@ -23,7 +23,7 @@
    );
 
 # For Reference
-/*return array(
+/* return array(
      'relative_urls' => false,
      'selector' => 'html-editable-selector',
      'language' => 'en',
