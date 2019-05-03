@@ -582,8 +582,8 @@
         'tr_melis_cms_sites_tool_languages_title' => 'Languages',
         'tr_melis_cms_sites_tool_languages_question1' => 'Choose the languages affected to this site',
         'tr_melis_cms_sites_tool_languages_question2' => 'How do you want to reflect the language in the site\'s URLs?',
-        'tr_melis_cms_sites_tool_languages_option2' => 'I want the locale shown after my domain (ex: www.mysite.com/en/myurl)',
-        'tr_melis_cms_sites_tool_languages_option1' => 'I want nothing, my page url will be solely built on the page\'s name',
+        'tr_melis_cms_sites_tool_languages_option2' => 'I want the locale shown after my domain (ex: www.mysite.com/en/myurl) <span class="melis-radio-box-circle"></span>',
+        'tr_melis_cms_sites_tool_languages_option1' => 'I want nothing, my page url will be solely built on the page\'s name <span class="melis-radio-box-circle"></span>',
         'tr_melis_cms_sites_tool_languages_prompt_delete_data' => 'Do you want to delete all data of homepage ids, site config, and site translations text from the database with this language?',
 
         #SITES CONFIG TAB

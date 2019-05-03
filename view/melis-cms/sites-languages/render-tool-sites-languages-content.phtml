@@ -18,14 +18,6 @@ $data_melisKey = $this->melisKey;
         </div>
         <br>
         <br>
-        <div class="switch-all-container">
-            <div class="row">
-                <div class="col-md-12">
-                    <h3 class="pull-left"><?= $this->translate('tr_melis_cms_sites_tool_languages_question1'); ?></h3>
-                </div>
-            </div>
-        </div>
-        <br>
         <?php
             $form = clone $this->form;
             $form->prepare();
@@ -33,6 +25,13 @@ $data_melisKey = $this->melisKey;
             echo $this->form()->openTag($form);
         ?>
         <!--LANGUAGES LISTING-->
+        <div class="switch-all-container">
+            <div class="row">
+                <div class="col-md-12">
+                    <legend class="pull-left" style="margin-bottom: -10px;"><?= $this->translate('tr_melis_cms_sites_tool_languages_question1'); ?></legend>
+                </div>
+            </div>
+        </div>
         <div class="row sites-language">
             <?php foreach ($this->availableLangs as $language) { ?>
                 <?php
@@ -46,7 +45,7 @@ $data_melisKey = $this->melisKey;
                 ?>
                 <div class="col-md-1">
                     <div class="checkbox">
-                        <div class="checkbox cb-cont" style="position:relative">
+                        <div class="checkbox cb-cont" style="position:relative;">
                             <label class="remember-me-cont">
                                 <span class="cbmask-outer clearfix">
                                     <span class="cbmask-inner cb-modules-mask <?php echo $checked ? 'cb-active' : '';  ?>"></span>
@@ -62,38 +61,8 @@ $data_melisKey = $this->melisKey;
         </div>
         <!--LANGUAGES LISTING END-->
         <br>
-        <br>
-        <h3><?= $this->translate('tr_melis_cms_sites_tool_languages_question2'); ?></h3>
-        <br>
-        <!-- SITE OPTION LANGUAGE URL -->
         <?php
-            $option1 = '';
-            $option2 = '';
-
-            if ($this->siteOptLangUrl == 1) {
-                $option1 = 'checked';
-            } else {
-                $option2 = 'checked';
-            }
-        ?>
-        <div class="row">
-            <div class="col-md-12">
-                <p>
-                    <input type="radio" class="melis-radio-button" id="cms-sites-lang-radio-2" name="site_opt_lang_url" value="2" <?= $option2 ?>>
-                    <label for="cms-sites-lang-radio-2"><?= $this->translate('tr_melis_cms_sites_tool_languages_option2'); ?></label>
-                </p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <p>
-                    <input type="radio" class="melis-radio-button" id="cms-sites-lang-radio-1" name="site_opt_lang_url" value="1" <?= $option1 ?>>
-                    <label for="cms-sites-lang-radio-1"><?= $this->translate('tr_melis_cms_sites_tool_languages_option1'); ?></label>
-                </p>
-            </div>
-        </div>
-        <!-- SITE OPTION LANGUAGE URL END -->
-        <?php
+            echo $this->melisFieldCollection($form);
             echo $this->form()->closeTag();
         ?>
     </div>
