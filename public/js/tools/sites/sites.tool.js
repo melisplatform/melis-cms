@@ -945,11 +945,9 @@ $(document).ready(function() {
      * ================================================================================
      */
     $body.on('change', '.sites-tool-lang-tab-checkbox', function () {
-        var input = $(this).closest('label').siblings('.to-delete-languages-data');
+        var input = $(this).siblings('.sites-tool-lang-tab-checkbox-lang');
 
         if ($(this).data('active') === 'active' && !this.checked) {
-            input.val('false');
-
             melisCoreTool.confirm(
                 translations.tr_meliscore_common_yes,
                 translations.tr_meliscore_common_no,
@@ -959,6 +957,20 @@ $(document).ready(function() {
                     input.val('true');
                 }
             );
+        } else {
+            input.val('false');
+        }
+    });
+
+    // Toggle single checkbox
+    $body.on("click", ".cb-cont input[type=checkbox]", function () {
+        //alert("junry");
+        if ($(this).is(':checked')) {
+            $(this).prop("checked", true);
+            $(this).prev("span").find(".cbmask-inner").addClass('cb-active');
+        } else {
+            $(this).not(".requried-module").prop("checked", false);
+            $(this).not(".requried-module").prev("span").find(".cbmask-inner").removeClass('cb-active');
         }
     });
     /**
