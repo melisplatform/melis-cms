@@ -98,3 +98,141 @@ ul.meliscms-site-language-homepage-list > li:hover {
     margin-bottom: 13px;
 }
 
+/** SITE V2 LANGUAGES TAB CHECKBOX & RADIO BUTTON **/
+.melis-radio-button:checked,
+.melis-radio-button:not(:checked) {
+    position: absolute;
+    left: -9999px;
+}
+.melis-radio-button:checked + label,
+.melis-radio-button:not(:checked) + label
+{
+    position: relative;
+    padding-left: 28px;
+    cursor: pointer;
+    line-height: 20px;
+    display: inline-block;
+    color: #666;
+}
+.melis-radio-button:checked + label:before,
+.melis-radio-button:not(:checked) + label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18px;
+    height: 18px;
+    border: 1px solid #e61c23;
+    border-radius: 100%;
+    background: #fff;
+}
+.melis-radio-button:checked + label:after,
+.melis-radio-button:not(:checked) + label:after {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background: #e61c23;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    border-radius: 100%;
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+.melis-radio-button:not(:checked) + label:after {
+    opacity: 0;
+    -webkit-transform: scale(0);
+    transform: scale(0);
+}
+.melis-radio-button:checked + label:after {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+}
+
+.melis-checkbox-label-right {
+    position: absolute;
+    top: 5px;
+    left: 35px;
+}
+
+.form-modules {
+    padding: 30px 0 30px;
+    margin-top: 15px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.checkbox, .radio {
+    display: block;
+    min-height: 20px;
+    padding-left: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    vertical-align: middle;
+}
+
+.radio, .checkbox {
+    padding: 10px 10px 0 0;
+    margin: 0;
+    position: relative;
+}
+
+.cb-cont label {
+    padding-left: 25px;
+}
+
+.checkbox label, .radio label {
+    display: inline;
+    margin-bottom: 0;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.sites-language .cb-cont .cbmask-outer {
+    top: 12px;
+}
+
+.cb-cont .cbmask-outer {
+    height: 18px;
+    width: 18px;
+    display: block;
+    position: absolute;
+    left: 3px;
+    top: 2px;
+    border: 2px solid #e61c23 !important;
+    text-align: center;
+    padding: 2px;
+}
+
+.clearfix:after {
+    content: '';
+    clear: both;
+    display: block;
+}
+
+.clearfix:after, .clearfix:before {
+    display: table;
+    content: " ";
+}
+
+.cb-cont .cbmask-inner.cb-active {
+    background: #e61c23;
+}
+
+.cb-cont .cbmask-inner {
+    padding: 5px;
+    background: #fff;
+    display: block;
+}
+
+input[type=checkbox] {
+    margin-left: -15px;
+}
+
+.cb-cont input[type=checkbox] {
+    opacity: 0;
+    cursor: pointer;
+}
+/** SITE V2 LANGUAGES TAB CHECKBOX & RADIO BUTTON END **/
+

@@ -33,9 +33,8 @@ $data_melisKey = $this->melisKey;
             echo $this->form()->openTag($form);
         ?>
         <!--LANGUAGES LISTING-->
-        <input type="text" class="to-delete-languages-data" name="to_delete_languages_data" value="false" hidden="hidden">
-        <?php foreach ($this->availableLangs as $language) { ?>
-            <label class="checkbox-inline">
+        <div class="row sites-language">
+            <?php foreach ($this->availableLangs as $language) { ?>
                 <?php
                     $checked = '';
                     $active = '';
@@ -45,9 +44,22 @@ $data_melisKey = $this->melisKey;
                         $active = 'active';
                     }
                 ?>
-                <input type="checkbox" class="sites-tool-lang-tab-checkbox" name="slang_lang_id[]" data-active="<?= $active ?>" value="<?= $language['lang_cms_id'] ?>" <?= $checked ?>> <?= $language['lang_cms_name'] ?>
-            </label>
-        <?php } ?>
+                <div class="col-md-1">
+                    <div class="checkbox">
+                        <div class="checkbox cb-cont" style="position:relative">
+                            <label class="remember-me-cont">
+                                <span class="cbmask-outer clearfix">
+                                    <span class="cbmask-inner cb-modules-mask <?php echo $checked ? 'cb-active' : '';  ?>"></span>
+                                </span>
+                                <input type="checkbox" class="sites-tool-lang-tab-checkbox" id="cms-sites-lang-checkbox-<?= $language['lang_cms_id'] ?>" name="slang_lang_id[]" data-active="<?= $active ?>" value="<?= $language['lang_cms_id'] ?>" <?= $checked ?>>
+                                <input type="text" class="sites-tool-lang-tab-checkbox-lang" name="to_delete_languages_data[<?= $language['lang_cms_id'] ?>]" value="false" hidden="hidden">
+                            </label>
+                            <span><?= $language['lang_cms_name'] ?></span>
+                        </div>
+                    </div>
+                </div>
+            <?php } ?>
+        </div>
         <!--LANGUAGES LISTING END-->
         <br>
         <br>
@@ -66,16 +78,18 @@ $data_melisKey = $this->melisKey;
         ?>
         <div class="row">
             <div class="col-md-12">
-                <label class="radio-inline">
-                    <input type="radio" class="radio" name="site_opt_lang_url" value="2" <?= $option2 ?>> <?= $this->translate('tr_melis_cms_sites_tool_languages_option2'); ?>
-                </label>
+                <p>
+                    <input type="radio" class="melis-radio-button" id="cms-sites-lang-radio-2" name="site_opt_lang_url" value="2" <?= $option2 ?>>
+                    <label for="cms-sites-lang-radio-2"><?= $this->translate('tr_melis_cms_sites_tool_languages_option2'); ?></label>
+                </p>
             </div>
         </div>
         <div class="row">
             <div class="col-md-12">
-                <label class="radio-inline">
-                    <input type="radio" class="radio" name="site_opt_lang_url" value="1" <?= $option1 ?>> <?= $this->translate('tr_melis_cms_sites_tool_languages_option1'); ?>
-                </label>
+                <p>
+                    <input type="radio" class="melis-radio-button" id="cms-sites-lang-radio-1" name="site_opt_lang_url" value="1" <?= $option1 ?>>
+                    <label for="cms-sites-lang-radio-1"><?= $this->translate('tr_melis_cms_sites_tool_languages_option1'); ?></label>
+                </p>
             </div>
         </div>
         <!-- SITE OPTION LANGUAGE URL END -->
