@@ -50,11 +50,18 @@ if (!empty($this->zoneconfig['conf']['id']))
                         <?php
                         foreach($this->langList as $key => $val) {
                                 $id = $val['lang_cms_id'].'-'.$val['lang_cms_locale'];
-                                $selected = ($val['lang_cms_locale'] == 'en_EN') ? 'checked' : '';
                             ?>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <input class="no-box-shadow" type="checkbox" value="<?= $id.'-'.$val['lang_cms_name'] ?>" name="site_selected_lang" id="<?= $id ?>" <?= $selected ?> required="required" /> <label for="<?= $id ?>" id=""><?= $val['lang_cms_name']; ?></label>
+                                    <div class="checkbox cb-cont" style="position:relative">
+                                        <label class="remember-me-cont">
+                                            <span class="cbmask-outer clearfix">
+                                                <span class="cbmask-inner cb-modules-mask"></span>
+                                            </span>
+                                            <input class="no-box-shadow" type="checkbox" value="<?= $id.'-'.$val['lang_cms_name'] ?>" name="site_selected_lang" id="<?= $id ?>" required="required" />
+                                        </label>
+                                        <span><?= $val['lang_cms_name']; ?></span>
+                                    </div>
                                 </div>
                             </div>
                         <?php } ?>
