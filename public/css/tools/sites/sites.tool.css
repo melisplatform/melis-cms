@@ -247,6 +247,11 @@ ul.meliscms-site-language-homepage-list > li:hover {
 #step2form-multi_language .checkbox{
     padding: 0;
 }
+
+.sites_step2-single-language .form-group .row{
+    margin: 0px -6.5px !important;
+}
+
 /** SITE V2 LANGUAGES TAB CHECKBOX & RADIO BUTTON END **/
 
 /*Mobile Tool Sites*/

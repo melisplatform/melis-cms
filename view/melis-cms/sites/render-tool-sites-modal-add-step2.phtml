@@ -23,10 +23,11 @@ if (!empty($this->zoneconfig['conf']['id']))
                             $id = $val['lang_cms_id'].'-'.$val['lang_cms_locale'];
                             ?>
                             <div class="col-md-3">
-                                <div class="form-group">
+                                <label class="melis-radio-box" for="<?= $id ?>">
                                     <input type="radio" value="<?= $id.'-'.$val['lang_cms_name'] ?>" name="site_selected_lang" id="<?= $id ?>" required="required"/>
-                                    <label for="<?= $id ?>"><?= $val['lang_cms_name']; ?></label>
-                                </div>
+                                    <?= $val['lang_cms_name']; ?>
+                                    <span class="melis-radio-box-circle"></span>
+                                </label>
                             </div>
                         <?php } ?>
                     </div>

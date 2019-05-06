@@ -315,6 +315,7 @@ $(document).ready(function() {
             },
             afterInit: function(){
                 $(".sites-steps-owl .tool-sites_container_fixed_width").find("input, label, select, div").attr("tabindex", "-1");
+                $(".sites-steps-owl .tool-sites_container_fixed_width").find("label").not(":has(input)").removeClass("melis-radio-box");
                 /**
                  * tooltip data container to body
                  */
