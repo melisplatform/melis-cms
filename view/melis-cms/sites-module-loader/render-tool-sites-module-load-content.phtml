@@ -101,7 +101,8 @@ $status = '';
                             }
                             ?>
                             <input type="hidden" id="currentEnabledModule" value='<?= json_encode($currentEnabled);?>'>
-                            <input type="hidden" id="sitesUsingModules" value='<?= json_encode($siteNames);?>'>
+                            <input type="hidden" id="sitesUsingModules" value='<?= json_encode($this->siteNames);?>'>
+                            <input type="hidden" id="siteModuleName" value='<?= $this->siteModuleName; ?>'>
                         </div>
                     </form>
                 </div>
