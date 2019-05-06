@@ -167,7 +167,7 @@ class SitesController extends AbstractActionController
         $view = new ViewModel();
         $view->melisKey = $melisKey;
         $view->tableColumns = $columns;
-        $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration();
+        $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration('#tableToolSites',false,false,array('order' => '[[ 0, "desc" ]]'));
         return $view;
     }
 

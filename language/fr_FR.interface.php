@@ -488,6 +488,7 @@
         'tr_melis_cms_sites_tool_add_step1_text' => 'Cet outil vous accompagnera à créer la configuration adaptée pour votre site. Cela assurera la génération adéquate des fichiers dans vos modules et une compatibilité optimale avec l\'écosystème de Melis Platform.',
         'tr_melis_cms_sites_tool_add_step1_is_multi_lang' => 'Ce site sera t-il multilingue ?',
         'tr_melis_cms_sites_tool_add_step2_select_languages' => 'Veuillez choisir les langues du site :',
+        'tr_melis_cms_sites_tool_add_step2_select_language' => 'Veuillez choisir la langue du site :',
         'tr_melis_cms_sites_tool_add_step2_reflect_urls' => 'Comment souhaitez-vous refléter la langue dans les URLs du site ?',
         'tr_melis_cms_sites_tool_add_step2_url_local_after_domain' => 'Je veux la locale affichée après mon domaine (ex: www.monsite.com/en/monurl) <span class="melis-radio-box-circle"></span>',
         'tr_melis_cms_sites_tool_add_step2_url_different_domains' => 'Je veux différents domaines ou sous-domaines pour chaque langue (ex: en.mysite.com and fr.mysite.com) et l\'outil va créer les différents sites correspondants <span class="melis-radio-box-circle"></span>',
