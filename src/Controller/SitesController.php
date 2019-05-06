@@ -789,9 +789,17 @@ class SitesController extends AbstractActionController
                 /**
                  * remove languages from other tabs
                  */
-                if(isset($data['to_delete_languages_data'])) {
-                    if ($data['to_delete_languages_data'] == 'true') {
-                        $this->deleteOtherTabsData($siteId);
+                if (isset($data['to_delete_languages_data'])) {
+                    $LangIds = [];
+
+                    foreach ($data['to_delete_languages_data'] as $langKey => $langVal) {
+                        if ($langVal === 'true') {
+                            array_push($LangIds, $langKey);
+                        }
+                    }
+
+                    if (!empty($data['to_delete_languages_data'])) {
+                        $this->deleteOtherTabsData($siteId, $LangIds);
                     }
                 }
                 /**
@@ -1250,20 +1258,18 @@ class SitesController extends AbstractActionController
      * Deletes data
      * @param $siteId
      */
-    private function deleteOtherTabsData($siteId)
+    private function deleteOtherTabsData($siteId, $langIds)
     {
-        $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
         $siteConfigTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteConfig');
         $siteHomePageTbl = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
         $transTextTbl = $this->getServiceLocator()->get('MelisSiteTranslationTextTable');
         $transSvc = $this->getServiceLocator()->get('MelisSiteTranslationService');
-        $inactiveLangs = $siteLangsTable->getSiteLangs(null, $siteId, null, 0)->toArray();
 
-        foreach ($inactiveLangs as $inactiveLang) {
-            $siteConfigTable->deleteConfig(null, $siteId, $inactiveLang['slang_lang_id']);
-            $siteHomePageTbl->deleteHomePageId(null, $siteId, $inactiveLang['slang_lang_id'], null);
+        foreach ($langIds as $langId) {
+            $siteConfigTable->deleteConfig(null, $siteId, $langId);
+            $siteHomePageTbl->deleteHomePageId(null, $siteId, $langId, null);
+            $trans = $transSvc->getSiteTranslationFromDb(null, $langId, $siteId);
 
-            $trans = $transSvc->getSiteTranslationFromDb(null, $inactiveLang['slang_lang_id'], $siteId);
             foreach ($trans as $tran) {
                 $transTextTbl->deleteById($tran['mstt_id']);
             }

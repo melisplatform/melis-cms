@@ -50,12 +50,15 @@ class SitesLanguagesController extends AbstractActionController
 
         $melisKey = $this->getMelisKey();
 
-        $form = $this->getTool()->getForm('meliscms_tool_sites_languages_form');
-
         $availableLangs = $this->getCmsLanguages();
         $activeLangs = $this->getSiteActiveLanguages($siteId);
         $siteOptLangUrl = $this->getSiteField($siteId, 'site_opt_lang_url');
         $siteLangs = [];
+
+        $form = $this->getTool()->getForm('meliscms_tool_sites_languages_form');
+        $form->setData([
+            'site_opt_lang_url' => $siteOptLangUrl
+        ]);
 
         // Store all active lang ids. This will be used in the view to check for active languages
         foreach ($activeLangs as $language) {

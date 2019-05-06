@@ -703,17 +703,27 @@ class ToolTemplateController extends AbstractActionController
     private function getTemplateStatus(array $template) : bool
     {
         $status      = false;
+        $fromMelisSites = false;
 
         $moduleSrv = $this->getServiceLocator()->get('ModulesService');
         $modulePath = $moduleSrv->getModulePath($template['module']);
 
+        /**
+         * if path is still empty,
+         * try to get it inside MelisSites
+         */
+        if(empty($modulePath)){
+            $modulePath = $moduleSrv->getUserSitePath($template['module']);
+            $fromMelisSites = true;
+        }
+        
         if (!empty($modulePath)){
 
             $viewPath = $modulePath.'/view/'.$this->moduleNameToViewName($template['module']);
-            $ctrlPath = $modulePath.'/src/Controller';
+            $ctrlPath = ($fromMelisSites) ? $modulePath.'/src/'.$template['module'].'/Controller' : $modulePath.'/src/Controller';
 
             if (strpos($modulePath, '/module/') != false){
-                $ctrlPath = $modulePath.'/'.$template['module'].'/src/Controller';
+                $ctrlPath = ($fromMelisSites) ? $modulePath.'/src/'.$template['module'].'/Controller' : $modulePath.'/'.$template['module'].'/src/Controller';
             }
 
             $ctrlFile = $ctrlPath.'/'.$template['controller'].'Controller.php';

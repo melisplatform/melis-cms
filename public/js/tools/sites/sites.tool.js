@@ -318,6 +318,7 @@ $(document).ready(function() {
             },
             afterInit: function(){
                 $(".sites-steps-owl .tool-sites_container_fixed_width").find("input, label, select, div").attr("tabindex", "-1");
+                $(".sites-steps-owl .tool-sites_container_fixed_width").find("label").not(":has(input)").removeClass("melis-radio-box");
                 /**
                  * tooltip data container to body
                  */
@@ -948,11 +949,9 @@ $(document).ready(function() {
      * ================================================================================
      */
     $body.on('change', '.sites-tool-lang-tab-checkbox', function () {
-        var input = $(this).closest('label').siblings('.to-delete-languages-data');
+        var input = $(this).siblings('.sites-tool-lang-tab-checkbox-lang');
 
         if ($(this).data('active') === 'active' && !this.checked) {
-            input.val('false');
-
             melisCoreTool.confirm(
                 translations.tr_meliscore_common_yes,
                 translations.tr_meliscore_common_no,
@@ -962,6 +961,20 @@ $(document).ready(function() {
                     input.val('true');
                 }
             );
+        } else {
+            input.val('false');
+        }
+    });
+
+    // Toggle single checkbox
+    $body.on("click", ".cb-cont input[type=checkbox]", function () {
+        //alert("junry");
+        if ($(this).is(':checked')) {
+            $(this).prop("checked", true);
+            $(this).prev("span").find(".cbmask-inner").addClass('cb-active');
+        } else {
+            $(this).not(".requried-module").prop("checked", false);
+            $(this).not(".requried-module").prev("span").find(".cbmask-inner").removeClass('cb-active');
         }
     });
     /**

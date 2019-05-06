@@ -9,61 +9,69 @@ $status = '';
 
 ?>
 <?php if(!empty($this->siteId)) { ?>
-<div <?= $id; ?> data-melisKey="<?= $data_melisKey; ?>">
-    <div class="spacing-x2 innerAll">
-        <?php if (!empty($this->modules)) { ?>
-            <div class="switch-all-container">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h3 class="pull-left"><?= $this->translate('tr_melis_cms_sites_module_loading'); ?></h3>
-                    </div>
-                    <div class="col-md-6">
-                        <div id="site-select-deselect-all-module" class="<?= $this->siteId ?>_main_switch make-switch " data-on-label="<?= $this->translate('tr_meliscore_common_active'); ?>" data-off-label="<?= $this->translate('tr_meliscore_common_inactive'); ?>" data-text-label="<?= $this->translate('tr_meliscore_tool_user_col_status'); ?>">
-                            <input type="checkbox" <?= $status; ?> checked/>
-                        </div>
-                    </div>
-                    <div class="switch-all-noti">
-                        <div class="icon-cont clearfix">
-                            <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="<?=$this->translate('tr_meliscore_module_management_select_deselect_all_module_noti'); ?>"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <?php if(!$this->isAdmin) {?>
-            <div class="row" id="not-admin-notice">
-                <div class="col-md-12">
-                    <h5 class="pull-left" style="color:#e61c23;"><strong><?= $this->translate('tr_melis_cms_sites_module_load_no_access'); ?></strong></h5>
-                </div>
-            </div>
-            <?php } ?>
-            <!-- modules -->
-            <div class="module-settings">
-                <div class="ms-heading">
-                    <div class="pull-left">
-                        <h4 id="meliscore-tool-module-content-title"><?= $this->translate('tr_meliscore_module_management_modules'); ?></h4>
-                    </div>
-                    <div class="pull-right" style="width: 15%;">
-                        <div class="clearfix ms-cont">
-                            <div class="row ">
-                                <div class="col-md-6 col-sm-6 col-xs-6"><!--  module-version-display -->
-                                    <h4 id="header-version">Version </h4>
+    <div <?= $id; ?> data-melisKey="<?= $data_melisKey; ?>">
+        <div class="spacing-x2 innerAll">
+            <?php if (!empty($this->modules)) { ?>
+                <div class="switch-all-container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3 class="pull-left <?= ($this->isAdmin) ? 'module-loading-title' : ''; ?>"><?= $this->translate('tr_melis_cms_sites_module_loading'); ?></h3>
                                 </div>
-                                <div>
-                                    <div class="icon-cont clearfix">
-                                        <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="<?=$this->translate('tr_meliscore_module_management_notification_tip'); ?>"></i>
+                                <div class="col-md-12">
+                                    <div class="switch-all-noti">
+                                        <div class="icon-cont clearfix">
+                                            <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="<?=$this->translate('tr_meliscore_module_management_select_deselect_all_module_noti'); ?>"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-12">
+                            <div class="col-md-5 col-sm-4 col-xs-7">
+                                <?php if(!$this->isAdmin) {?>
+                                    <div id="not-admin-notice">
+                                        <h5 class="pull-left"><strong><?= $this->translate('tr_melis_cms_sites_module_load_no_access'); ?></strong></h5>
+                                    </div>
+                                <?php } ?>
+                            </div>
+                            <div class="col-md-7 col-sm-8">
+                                <div id="site-select-deselect-all-module" class="<?= $this->siteId ?>_main_switch make-switch " data-on-label="<?= $this->translate('tr_meliscore_common_active'); ?>" data-off-label="<?= $this->translate('tr_meliscore_common_inactive'); ?>" data-text-label="<?= $this->translate('tr_meliscore_tool_user_col_status'); ?>">
+                                    <input type="checkbox" <?= $status; ?> checked/>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="clearfix"></div>
                 </div>
-                <form>
-                    <div class="module-sortable">
-                        <?php
-                        $currentEnabled = array();
+                <!-- modules -->
+                <div class="module-settings">
+                    <div class="ms-heading">
+                        <div class="pull-left">
+                            <h4 id="meliscore-tool-module-content-title"><?= $this->translate('tr_meliscore_module_management_modules'); ?></h4>
+                        </div>
+                        <div class="pull-right">
+                            <div class="clearfix ms-cont">
+                                <div class="row ">
+                                    <div class="col-md-6 col-sm-6 col-xs-6"><!--  module-version-display -->
+                                        <h4 id="header-version">Version </h4>
+                                    </div>
+                                    <div>
+                                        <div class="icon-cont clearfix">
+                                            <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="<?=$this->translate('tr_meliscore_module_management_notification_tip'); ?>"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <form>
+                        <div class="module-sortable">
+                            <?php
+                            $currentEnabled = array();
 
-                        foreach($this->modules as $moduleName => $moduleStatus)
+                            foreach($this->modules as $moduleName => $moduleStatus)
                             {
                                 if($moduleStatus > 0)
                                     array_push($currentEnabled,$moduleName);
@@ -91,28 +99,28 @@ $status = '';
                                 </div>
                                 <?php
                             }
-                        ?>
-                        <input type="hidden" id="currentEnabledModule" value='<?= json_encode($currentEnabled);?>'>
-                        <input type="hidden" id="sitesUsingModules" value='<?= json_encode($this->siteNames);?>'>
-                        <input type="hidden" id="siteModuleName" value='<?= $this->siteModuleName; ?>'>
-                    </div>
-                </form>
-            </div>
-        <?php } else { ?>
-            <span class="alert alert-warning"><?= $this->translate('tr_melis_cms_sites_module_no_module_to_load');?></span>
-        <?php } ?>
+                            ?>
+                            <input type="hidden" id="currentEnabledModule" value='<?= json_encode($currentEnabled);?>'>
+                            <input type="hidden" id="sitesUsingModules" value='<?= json_encode($this->siteNames);?>'>
+                            <input type="hidden" id="siteModuleName" value='<?= $this->siteModuleName; ?>'>
+                        </div>
+                    </form>
+                </div>
+            <?php } else { ?>
+                <span class="alert alert-warning"><?= $this->translate('tr_melis_cms_sites_module_no_module_to_load');?></span>
+            <?php } ?>
+        </div>
     </div>
-</div>
-<script type="text/javascript">
-    $(document).ready(function() {
-        // initialize jquery sortable
-        $(".module-sortable").sortable({
-            containment: "parent",
-            placeholder: "ui-sortable-placeholder",
-            opacity: 0.8,
-            revert: 300,
-            tolerance: "pointer",
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // initialize jquery sortable
+            $(".module-sortable").sortable({
+                containment: "parent",
+                placeholder: "ui-sortable-placeholder",
+                opacity: 0.8,
+                revert: 300,
+                tolerance: "pointer",
+            });
         });
-    });
-</script>
+    </script>
 <?php } ?>

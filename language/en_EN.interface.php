@@ -467,6 +467,9 @@
         /** Banner */
         'tr_melis_cms_gdpr_banner_tabname' => 'Banners',
 
+        //minify assets
+        'tr_melis_cms_minify_assets_button_title' => 'Minify Assets',
+
         //New site tools
         'tr_meliscms_tool_sites' => 'Sites',
         'tr_meliscms_tool_sites_save' => 'Save site',
@@ -476,14 +479,16 @@
         'tr_meliscms_tool_sites_prev' => 'Previous',
         'tr_meliscms_tool_sites_next' => 'Next',
         'tr_meliscms_tool_sites_finish' => 'Finish',
+        'tr_meliscms_tool_sites_yes' => 'Yes <span class="melis-radio-box-circle"></span>',
+        'tr_meliscms_tool_sites_no' => 'No <span class="melis-radio-box-circle"></span>',
 
         'tr_melis_cms_sites_tool_add_step1_text' => 'This tool will help you create the right configuration for your site. This will ensure the right generations of files in your modules and an optimum compatibility with the Melis Platform ecosystem.',
         'tr_melis_cms_sites_tool_add_step1_is_multi_lang' => 'Will this site be multilingual?',
         'tr_melis_cms_sites_tool_add_step2_select_languages' => 'Please choose the languages of the site:',
         'tr_melis_cms_sites_tool_add_step2_reflect_urls' => 'How do you want to reflect the language in the site’s URLs?',
-        'tr_melis_cms_sites_tool_add_step2_url_local_after_domain' => 'I want the locale displayed after my domain (ex: www.mysite.com/en/myurl)',
-        'tr_melis_cms_sites_tool_add_step2_url_different_domains' => 'I want to have different domains or subdomains for each language (ex: en.mysite.com and fr.mysite.com) and the tool will create the corresponding sites',
-        'tr_melis_cms_sites_tool_add_step2_url_do_nothing' => 'I want nothing, my page url will be solely built on the page’s name',
+        'tr_melis_cms_sites_tool_add_step2_url_local_after_domain' => 'I want the locale displayed after my domain (ex: www.mysite.com/en/myurl) <span class="melis-radio-box-circle"></span>',
+        'tr_melis_cms_sites_tool_add_step2_url_different_domains' => 'I want to have different domains or subdomains for each language (ex: en.mysite.com and fr.mysite.com) and the tool will create the corresponding sites <span class="melis-radio-box-circle"></span>',
+        'tr_melis_cms_sites_tool_add_step2_url_do_nothing' => 'I want nothing, my page url will be solely built on the page’s name <span class="melis-radio-box-circle"></span>',
         'tr_melis_cms_sites_tool_add_step3_single_domain_name' => 'What is the domain of this site?',
         'tr_melis_cms_sites_tool_add_step3_multi_domain_name' => 'What are the domains of these sites?',
         'tr_melis_cms_sites_tool_add_step4_select_module' => 'Please choose the module attached to the site in the list:',
@@ -522,7 +527,7 @@
         #MODULE LOAD TAB
         'tr_melis_cms_sites_module_loading' => 'Module loading',
         'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice' => '<i class="fa fa-warning"></i>Below is the list of modules required by <strong>%s</strong>, are you sure you want to activate <strong>%s</strong>? ',
-        'tr_melis_cms_sites_module_load_no_access' => 'You need to have and admin level of rights to modify this section.',
+        'tr_melis_cms_sites_module_load_no_access' => 'You need to have an admin level of rights to modify this section.',
         'tr_melis_cms_sites_module_no_module_to_load' => 'This site has no module to load.',
         'tr_meliscms_tool_site_module_load_update_title' => "Activation/Deactivation of Sites' module",
         'tr_meliscms_tool_site_module_load_update_confirm' => "Please, be careful when changing modules to be loaded, or their order, as it can impact all sites using this module. <br><br> Sites using this module are the following ones: <br> %s <br> <br>Are you sure you want to modify the loading of modules for all sites using this module?",
@@ -582,8 +587,8 @@
         'tr_melis_cms_sites_tool_languages_title' => 'Languages',
         'tr_melis_cms_sites_tool_languages_question1' => 'Choose the languages affected to this site',
         'tr_melis_cms_sites_tool_languages_question2' => 'How do you want to reflect the language in the site\'s URLs?',
-        'tr_melis_cms_sites_tool_languages_option2' => 'I want the locale shown after my domain (ex: www.mysite.com/en/myurl)',
-        'tr_melis_cms_sites_tool_languages_option1' => 'I want nothing, my page url will be solely built on the page\'s name',
+        'tr_melis_cms_sites_tool_languages_option2' => 'I want the locale shown after my domain (ex: www.mysite.com/en/myurl) <span class="melis-radio-box-circle"></span>',
+        'tr_melis_cms_sites_tool_languages_option1' => 'I want nothing, my page url will be solely built on the page\'s name <span class="melis-radio-box-circle"></span>',
         'tr_melis_cms_sites_tool_languages_prompt_delete_data' => 'Do you want to delete all data of homepage ids, site config, and site translations text from the database with this language?',
 
         #SITES CONFIG TAB
