@@ -111,7 +111,7 @@ return array(
                     // fancty tree init
                     '/MelisCms/js/fancytreeInit/fancyTreeInit.js',
                     '/MelisCms/js/tools/template.tool.js',
-                    '/MelisCms/js/tools/site.tool.js',
+//                    '/MelisCms/js/tools/site.tool.js',
                     '/MelisCms/js/tools/langCms.tool.js',
                     '/MelisCms/js/tools/platform.tool.js',
                     '/MelisCms/js/tools/site-redirect.tool.js',
