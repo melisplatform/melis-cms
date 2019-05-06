@@ -501,7 +501,7 @@
         'tr_melis_cms_sites_tool_add_step4_create_module_error' => 'Les caractères autorisés sont alphanumerique et underscore. Le nom du module ne peut pas commencer par un numéro ni ne contenir d\'espace',
         'tr_melis_cms_sites_tool_add_step4_create_file_for_website' => 'Créer les dossier et fichiers pour le nouveau site ?',
         'tr_melis_cms_sites_tool_add_step5_new_site_is_created' => 'Un nouveau site sera créé avec les paramètres suivants :',
-        'tr_melis_cms_sites_tool_add_step5_new_site_using_existing_module' => 'Le site utilisera le module existant <b>“%s”</b>. Les dossiers et fichiers du module ne seront pas créés.',
+        'tr_melis_cms_sites_tool_add_step5_new_site_using_existing_module' => 'Le site utilisera le module existant <b>“%s”</b>. <br/>Les dossiers et fichiers du module ne seront pas créés.',
         'tr_melis_cms_sites_tool_add_step5_new_site_using_new_module' => 'Le module <b>“%s”</b> sera créé adéquatement avec ces paramètres, vous permettant de commencer le développement du site sur la meilleure base possible.​',
 
         'tr_melis_cms_sites_tool_add_unable_to_create_site' => 'Impossible de créer le site',
