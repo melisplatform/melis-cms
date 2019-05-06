@@ -251,9 +251,20 @@ ul.meliscms-site-language-homepage-list > li:hover {
 
 /*Mobile Tool Sites*/
 
+@media only screen and (min-width: 992px) {
+    .switch-all-container .module-loading-title{
+        margin-bottom: -25px !important;
+    }
+}
+
 @media only screen and (max-width: 991px) {
     div[data-meliskey="meliscms_tool_sites_module_load_content"] .switch-all-noti{
         top: 6px;
     }
+
+    .switch-all-container .module-loading-title{
+        margin-bottom: -25px;
+    }
 }
+
 
