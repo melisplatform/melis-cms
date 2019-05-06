@@ -147,6 +147,7 @@ class SitesModuleLoaderController extends AbstractActionController
         $view->isAdmin = $isAdmin;
         $view->siteId = $siteId;
         $view->siteNames = $siteNames;
+        $view->siteModuleName = $moduleName;
 
         return $view;
     }

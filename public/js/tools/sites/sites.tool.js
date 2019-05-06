@@ -28,6 +28,8 @@ $(document).ready(function() {
         });
         var moduleDiff = arrayDiff(currentEnabledModule,newEnabledModule);
 
+        var siteModuleName = $("#siteModuleName").val();
+
         if(moduleDiff.length > 0){
             melisCoreTool.confirm(
                 translations.tr_meliscms_common_save,
@@ -60,6 +62,7 @@ $(document).ready(function() {
                                 'meliscms_tool_sites_edit_site',
                                 {
                                     siteId: currentTabId,
+                                    moduleName: siteModuleName,
                                     cpath: 'meliscms_tool_sites_edit_site'
                                 }
                             );
@@ -89,7 +92,6 @@ $(document).ready(function() {
             );
         }else{
             dataString = $.param(dataString);
-
             $.ajax({
                 type        : 'POST',
                 url         : '/melis/MelisCms/Sites/saveSite?siteId='+currentTabId,
@@ -113,6 +115,7 @@ $(document).ready(function() {
                         'meliscms_tool_sites_edit_site',
                         {
                             siteId: currentTabId,
+                            moduleName: siteModuleName,
                             cpath: 'meliscms_tool_sites_edit_site'
                         }
                     );
