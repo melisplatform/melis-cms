@@ -29,8 +29,9 @@ $(document).ready(function() {
         var moduleDiff = arrayDiff(currentEnabledModule,newEnabledModule);
 
         var siteModuleName = $("#siteModuleName").val();
+        var isAdmin = $("#not-admin-notice").length < 1 ? true : false;
 
-        if(moduleDiff.length > 0){
+        if(moduleDiff.length > 0 && isAdmin){
             melisCoreTool.confirm(
                 translations.tr_meliscms_common_save,
                 translations.tr_meliscms_tool_sites_cancel,
@@ -38,7 +39,6 @@ $(document).ready(function() {
                 translations.tr_meliscms_tool_site_module_load_update_confirm.replace(/%s/g, sitesUsingModulesStr),
                 function(){
                     dataString = $.param(dataString);
-
                     $.ajax({
                         type        : 'POST',
                         url         : '/melis/MelisCms/Sites/saveSite?siteId='+currentTabId,
