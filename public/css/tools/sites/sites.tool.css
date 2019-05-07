@@ -247,13 +247,29 @@ ul.meliscms-site-language-homepage-list > li:hover {
 #step2form-multi_language .checkbox{
     padding: 0;
 }
+
+.sites_step2-single-language .form-group .row{
+    margin: 0px -6.5px !important;
+}
+
 /** SITE V2 LANGUAGES TAB CHECKBOX & RADIO BUTTON END **/
 
 /*Mobile Tool Sites*/
+
+@media only screen and (min-width: 992px) {
+    .switch-all-container .module-loading-title{
+        margin-bottom: -25px !important;
+    }
+}
 
 @media only screen and (max-width: 991px) {
     div[data-meliskey="meliscms_tool_sites_module_load_content"] .switch-all-noti{
         top: 6px;
     }
+
+    .switch-all-container .module-loading-title{
+        margin-bottom: -25px;
+    }
 }
+
 

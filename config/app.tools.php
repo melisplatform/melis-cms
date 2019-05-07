@@ -934,7 +934,7 @@ return array(
                                                 'disable_html_escape' => true,
                                             ),
                                             'label_attributes' => array(
-                                                'class' => 'err_sites_url_setting',
+                                                'class' => 'err_sites_url_setting melis-radio-box',
                                             ),
                                             'value_options' => array(
                                                 '1' => 'tr_melis_cms_sites_tool_add_step2_url_local_after_domain',
@@ -1078,9 +1078,12 @@ return array(
                                             'label_options' => array(
                                                 'disable_html_escape' => true,
                                             ),
+                                            'label_attributes' => array(
+                                                'class' => 'melis-radio-box',
+                                            ),
                                             'value_options' => array(
-                                                'yes' => 'tr_meliscms_common_yes',
-                                                'no' => 'tr_meliscms_common_no',
+                                                'yes' => 'tr_meliscms_tool_sites_yes',
+                                                'no' => 'tr_meliscms_tool_sites_no',
                                             ),
                                         ),
                                         'attributes' => array(

@@ -120,12 +120,18 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
         $siteModuleName = $this->generateModuleNameCase($siteData->site_name);
 
         $moduleList = array('MelisAssetManager');
+
         foreach ($modules as $module) {
             array_push($moduleList,$module);
         }
 
         $filePath = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/'.$siteModuleName.'/config/';
-        $status = $this->createModuleLoader($filePath, $moduleList);
+
+        if (!file_exists($filePath)) {
+            $filePath  = $_SERVER['DOCUMENT_ROOT'] . '/../vendor/melisplatform/melis-demo-cms/config/';
+        }
+
+        $status = $this->createModuleLoader($filePath, $moduleList, array('MelisAssetManager','MelisEngine', 'MelisFront'));
 
         // Service implementation end
 

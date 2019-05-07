@@ -28,7 +28,10 @@ $(document).ready(function() {
         });
         var moduleDiff = arrayDiff(currentEnabledModule,newEnabledModule);
 
-        if(moduleDiff.length > 0){
+        var siteModuleName = $("#siteModuleName").val();
+        var isAdmin = $("#not-admin-notice").length < 1 ? true : false;
+
+        if(moduleDiff.length > 0 && isAdmin){
             melisCoreTool.confirm(
                 translations.tr_meliscms_common_save,
                 translations.tr_meliscms_tool_sites_cancel,
@@ -36,7 +39,6 @@ $(document).ready(function() {
                 translations.tr_meliscms_tool_site_module_load_update_confirm.replace(/%s/g, sitesUsingModulesStr),
                 function(){
                     dataString = $.param(dataString);
-
                     $.ajax({
                         type        : 'POST',
                         url         : '/melis/MelisCms/Sites/saveSite?siteId='+currentTabId,
@@ -60,6 +62,7 @@ $(document).ready(function() {
                                 'meliscms_tool_sites_edit_site',
                                 {
                                     siteId: currentTabId,
+                                    moduleName: siteModuleName,
                                     cpath: 'meliscms_tool_sites_edit_site'
                                 }
                             );
@@ -89,7 +92,6 @@ $(document).ready(function() {
             );
         }else{
             dataString = $.param(dataString);
-
             $.ajax({
                 type        : 'POST',
                 url         : '/melis/MelisCms/Sites/saveSite?siteId='+currentTabId,
@@ -113,6 +115,7 @@ $(document).ready(function() {
                         'meliscms_tool_sites_edit_site',
                         {
                             siteId: currentTabId,
+                            moduleName: siteModuleName,
                             cpath: 'meliscms_tool_sites_edit_site'
                         }
                     );
@@ -315,6 +318,7 @@ $(document).ready(function() {
             },
             afterInit: function(){
                 $(".sites-steps-owl .tool-sites_container_fixed_width").find("input, label, select, div").attr("tabindex", "-1");
+                $(".sites-steps-owl .tool-sites_container_fixed_width").find("label").not(":has(input)").removeClass("melis-radio-box");
                 /**
                  * tooltip data container to body
                  */
