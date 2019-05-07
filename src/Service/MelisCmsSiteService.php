@@ -112,6 +112,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
         $siteLabel = $arrayParameters['siteData']['site_label'];
         //module name
         $siteModuleName = str_replace(' ', '', $arrayParameters['siteModuleName']);
+        $siteModuleName = $this->generateModuleNameCase($siteModuleName);
 
         //declare variables
         $siteDomainId = null;
@@ -164,8 +165,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                  */
                 if ($arrayParameters['createModule'] && !empty($siteModuleName))
                 {
-                    $moduleName = $this->generateModuleNameCase($siteModuleName);
-                    $tempRes = $this->createSiteModule($moduleName);
+                    $tempRes = $this->createSiteModule($siteModuleName);
                     /**
                      * Check if the creation of module is successful
                      */
@@ -1043,7 +1043,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
 	 * @param string $str
 	 * @return string
 	 */
-	private function generateModuleNameCase($str) {
+	public function generateModuleNameCase($str) {
 	    $i = array("-","_");
 	    $str = preg_replace('/([a-z])([A-Z])/', "$1 $2", $str);
 	    $str = str_replace($i, ' ', $str);

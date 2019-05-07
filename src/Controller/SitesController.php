@@ -434,6 +434,7 @@ class SitesController extends AbstractActionController
         $domainTablePrefix = self::DOMAIN_TABLE_PREFIX;
 
         $translator = $this->getServiceLocator()->get('translator');
+        $cmsSiteSrv = $this->getServiceLocator()->get('MelisCmsSiteService');
 
         if ($this->getRequest()->isPost()) {
             $sitesData = $this->getRequest()->getPost('data');
@@ -594,9 +595,10 @@ class SitesController extends AbstractActionController
                 }
                 //field the site data
                 if (!empty($siteData)) {
-                    $siteName = (!empty($siteData['site_name'])) ? $siteData['site_name'] : '';
+                    $siteName = (!empty($siteData['site_name'])) ? $cmsSiteSrv->generateModuleNameCase($siteData['site_name']) : '';
                     $siteLabel = (!empty($siteData['site_label'])) ? $siteData['site_label'] : $siteName;
                     $siteData['site_label'] = $siteLabel;
+                    $siteData['site_name'] = $siteName;
                 }
 
                 /**
@@ -614,7 +616,6 @@ class SitesController extends AbstractActionController
                 }
 
                 if ($isValidName) {
-                    $cmsSiteSrv = $this->getServiceLocator()->get('MelisCmsSiteService');
                     $saveSiteResult = $cmsSiteSrv->saveSite($siteData, $domainData, $siteLanguages, $site404Data, $siteName, $createNewFile, $isNewSIte);
 
                     if ($saveSiteResult['success'])
