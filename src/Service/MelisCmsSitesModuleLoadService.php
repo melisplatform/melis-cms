@@ -8,8 +8,6 @@ use Zend\Config\Writer\PhpArray;
 
 class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
 {
-
-
     /**
      * Returns all the available modules (enabled/disabled modules)
      * @param $siteId param int $siteId | id of the site of which module load is configured
@@ -25,15 +23,12 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
         $arrayParameters = $this->sendEvent('meliscmssite_service_module_load_start', $arrayParameters);
 
         // Service implementation start
-        $modules = array();
         $modulesList = null;
         $siteData = $this->getMelisSitesTbl()->getEntryById($siteId)->current();
         $siteModuleName = $this->generateModuleNameCase($siteData->site_name);
 
         $exclude_modules = array(
             'MelisAssetManager',
-            'MelisEngine',
-            'MelisFront',
             'MelisCore',
             'MelisCms',
             'MelisSites',
@@ -43,7 +38,6 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
             'MelisDbDeploy',
             'MelisSmallBusiness',
             'MelisMarketPlace',
-            $siteModuleName,
             '.', '..','.gitignore',
         );
 
@@ -76,7 +70,7 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
         /**
          * Check if file exist
          */
-        if(file_exists($filePath)) {
+        if (file_exists($filePath)) {
             chmod($filePath, 0777);
             $moduleLoadList = include $filePath;
             $moduleLoadFile = $this->getModuleSvc()->getModulePlugins($exclude_modules);
@@ -84,24 +78,16 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
             $modules = $moduleLoadList;
 
             foreach ($modules as $index => $modValues) {
-
                 if (!in_array($modValues, $exclude_modules)) {
-
-                    if (in_array($modValues, $moduleLoadFile)) {
-                        $modulesList[$modValues] = 1;
-                    } else {
-                        $modulesList[$modValues] = 0;
-                    }
+                    $modulesList[$modValues] = 1;
                 }
             }
 
             // add the inactive modules
             foreach ($moduleLoadFile as $index => $module) {
-
                 if (!isset($modulesList[$module])) {
                     $modulesList[$module] = 0;
                 }
-
             }
         }
         // Service implementation end
@@ -133,13 +119,13 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
         $siteData = $this->getMelisSitesTbl()->getEntryById($siteId)->current();
         $siteModuleName = $this->generateModuleNameCase($siteData->site_name);
 
-        $moduleList = array('MelisAssetManager','MelisEngine', 'MelisFront', $siteModuleName);
-        foreach($modules as $module){
+        $moduleList = array('MelisAssetManager');
+        foreach ($modules as $module) {
             array_push($moduleList,$module);
         }
 
         $filePath = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/'.$siteModuleName.'/config/';
-        $status = $this->createModuleLoader($filePath, $moduleList, array('MelisAssetManager','MelisEngine', 'MelisFront'));
+        $status = $this->createModuleLoader($filePath, $moduleList);
 
         // Service implementation end
 
