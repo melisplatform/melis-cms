@@ -481,6 +481,7 @@
         'tr_meliscms_tool_sites_finish' => 'Finish',
         'tr_meliscms_tool_sites_yes' => 'Yes <span class="melis-radio-box-circle"></span>',
         'tr_meliscms_tool_sites_no' => 'No <span class="melis-radio-box-circle"></span>',
+        'tr_meliscms_tool_sites_module_name' => 'Module Name',
 
         'tr_melis_cms_sites_tool_add_step1_text' => 'This tool will help you create the right configuration for your site. This will ensure the right generations of files in your modules and an optimum compatibility with the Melis Platform ecosystem.',
         'tr_melis_cms_sites_tool_add_step1_is_multi_lang' => 'Will this site be multilingual?',
@@ -492,14 +493,17 @@
         'tr_melis_cms_sites_tool_add_step2_url_do_nothing' => 'I want nothing, my page url will be solely built on the page’s name <span class="melis-radio-box-circle"></span>',
         'tr_melis_cms_sites_tool_add_step3_single_domain_name' => 'What is the domain of this site?',
         'tr_melis_cms_sites_tool_add_step3_multi_domain_name' => 'What are the domains of these sites?',
+        'tr_melis_cms_sites_tool_add_step4_is_new_module' => 'Do you want to use an existing module?',
+        'tr_melis_cms_sites_tool_add_step4_select_module_option_err' => 'Please select if you want to use an existing module',
         'tr_melis_cms_sites_tool_add_step4_select_module' => 'Please choose the module attached to the site in the list:',
         'tr_melis_cms_sites_tool_add_step4_select_module_placeholder' => 'Choose a module',
-        'tr_melis_cms_sites_tool_add_step4_create_module' => 'Or create a new module and enter the name:',
+        'tr_melis_cms_sites_tool_add_step4_create_module' => 'Name of the new module:',
         'tr_melis_cms_sites_tool_add_step4_create_module_error' => 'Alphanumeric and underscore are the only valid characters allowed. The module name cannot start by a number neither contain any space',
-        'tr_melis_cms_sites_tool_add_step4_create_file_for_website' => 'Create the folders & files for the new site?',
+        'tr_melis_cms_sites_tool_add_step4_create_file_for_website' => 'Create the folders & files for the new module?',
         'tr_melis_cms_sites_tool_add_step5_new_site_is_created' => 'A new site will be created with following parameters:',
-        'tr_melis_cms_sites_tool_add_step5_new_site_using_existing_module' => 'The site will use the existing module <b>“%s”</b>.</br>The module folders and files will not be created.',
-        'tr_melis_cms_sites_tool_add_step5_new_site_using_new_module' => 'The <b>“%s”</b> module will be properly created with those parameters, allowing you to start the development of the site the best way possible.​',
+        'tr_melis_cms_sites_tool_add_step5_new_site_using_existing_module' => 'The site <b>“%siteName”</b> will use the existing module <b>“%siteModule”</b>.</br>The module folders and files will not be created.',
+        'tr_melis_cms_sites_tool_add_step5_new_site_using_new_module' => 'The <b>“%siteModule”</b> module will be properly created with those parameters, allowing you to start the development of the site the best way possible.​',
+        'tr_melis_cms_sites_tool_add_site_module_already_exist' => 'Module name already exists, please choose another',
 
         'tr_melis_cms_sites_tool_add_unable_to_create_site' => 'Unable to create the site',
         'tr_melis_cms_sites_tool_add_site_language_already_created' => '%s version of the site is already created',
@@ -524,6 +528,7 @@
         'tr_melis_cms_sites_tool_add_step4_create_module tooltip' => 'Create a new module for the site(s)',
         'tr_melis_cms_sites_tool_add_step4_site_label tooltip' => 'Enter the site name',
         'tr_melis_cms_sites_tool_add_step4_create_file_for_website tooltip' => 'Select if you want the folders and files created for the site(s) or not',
+        'tr_melis_cms_sites_tool_add_step4_is_new_module tooltip' => 'Select if you want to use an existing module or not, if not you will have to create a new one.',
 
         #MODULE LOAD TAB
         'tr_melis_cms_sites_module_loading' => 'Module loading',

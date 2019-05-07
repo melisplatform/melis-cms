@@ -235,6 +235,8 @@ ul.meliscms-site-language-homepage-list > li:hover {
     display: block;
 }
 
+/** SITE V2 LANGUAGES TAB CHECKBOX & RADIO BUTTON END **/
+
 .sites-tool-lang-tab-checkbox input[type=checkbox] {
     margin-left: -15px;
 }
@@ -252,7 +254,9 @@ ul.meliscms-site-language-homepage-list > li:hover {
     margin: 0px -6.5px !important;
 }
 
-/** SITE V2 LANGUAGES TAB CHECKBOX & RADIO BUTTON END **/
+#is_create_new_module_for_site .row{
+    margin: 0 -5.5px !important;
+}
 
 /*Mobile Tool Sites*/
 
@@ -269,6 +273,33 @@ ul.meliscms-site-language-homepage-list > li:hover {
 
     .switch-all-container .module-loading-title{
         margin-bottom: -25px;
+    }
+
+    .widget.widget-wizard-pills .widget-head ul li a,
+    .widget.widget-wizard-pills .widget-head ul li.active a{
+        width: 60px;
+    }
+    .widget.widget-wizard-pills .widget-head ul li.active a{
+        background: #fff;
+        color: #505050;
+    }
+
+    .widget.widget-tabs>.widget-head ul.create-site-step{
+        padding: 0;
+    }
+}
+
+@media only screen and (max-width: 530px) {
+    .widget.widget-wizard-pills .widget-head ul li a,
+    .widget.widget-wizard-pills .widget-head ul li.active a{
+        width: 60px;
+    }
+}
+
+@media only screen and (max-width: 420px) {
+    .widget.widget-wizard-pills .widget-head ul li a,
+    .widget.widget-wizard-pills .widget-head ul li.active a{
+        width: 37px;
     }
 }
 

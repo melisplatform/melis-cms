@@ -1024,10 +1024,14 @@ return array(
                                             'label' => 'tr_melis_cms_sites_tool_add_step4_select_module',
                                             'tooltip' => 'tr_melis_cms_sites_tool_add_step4_select_module tooltip',
                                             'empty_option' => 'tr_melis_cms_sites_tool_add_step4_select_module_placeholder',
+                                            'label_attributes' => array(
+                                                'class' => 'err_siteSelectModuleName',
+                                            )
                                         ),
                                         'attributes' => array(
                                             'id' => 'siteSelectModuleName',
                                             'class' => 'form-control',
+                                            'required' => 'required',
                                         ),
                                     ),
                                 ),
@@ -1079,7 +1083,7 @@ return array(
                                                 'disable_html_escape' => true,
                                             ),
                                             'label_attributes' => array(
-                                                'class' => 'melis-radio-box',
+                                                'class' => 'melis-radio-box err_create_sites_file',
                                             ),
                                             'value_options' => array(
                                                 'yes' => 'tr_meliscms_tool_sites_yes',
@@ -1087,7 +1091,7 @@ return array(
                                             ),
                                         ),
                                         'attributes' => array(
-
+                                            'required' => 'required',
                                         ),
                                     )
                                 )

@@ -636,8 +636,8 @@ class SitesController extends AbstractActionController
                 }else{
                     $textMessage = 'tr_melis_cms_sites_tool_add_unable_to_create_site';
                     $errors = array(
-                        'Error' => array(
-                            'siteAlreadyExists' => $translator->translate('tr_meliscms_tool_site_name_exists')
+                        $translator->translate('tr_meliscms_tool_sites_module_name') => array(
+                            'moduleAlreadyExists' => $translator->translate('tr_melis_cms_sites_tool_add_site_module_already_exist')
                         ),
                     );
                     $status = false;

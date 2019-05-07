@@ -484,6 +484,7 @@
         'tr_meliscms_tool_sites_finish' => 'Terminer',
         'tr_meliscms_tool_sites_yes' => 'Oui <span class="melis-radio-box-circle"></span>',
         'tr_meliscms_tool_sites_no' => 'Non <span class="melis-radio-box-circle"></span>',
+        'tr_meliscms_tool_sites_module_name' => 'Nom du module',
 
         'tr_melis_cms_sites_tool_add_step1_text' => 'Cet outil vous accompagnera à créer la configuration adaptée pour votre site. Cela assurera la génération adéquate des fichiers dans vos modules et une compatibilité optimale avec l\'écosystème de Melis Platform.',
         'tr_melis_cms_sites_tool_add_step1_is_multi_lang' => 'Ce site sera t-il multilingue ?',
@@ -494,15 +495,18 @@
         'tr_melis_cms_sites_tool_add_step2_url_different_domains' => 'Je veux différents domaines ou sous-domaines pour chaque langue (ex: en.mysite.com and fr.mysite.com) et l\'outil va créer les différents sites correspondants <span class="melis-radio-box-circle"></span>',
         'tr_melis_cms_sites_tool_add_step2_url_do_nothing' => 'Je ne veux rien, les urls de mes pages seront construites à partir du nom des pages <span class="melis-radio-box-circle"></span>',
         'tr_melis_cms_sites_tool_add_step3_single_domain_name' => 'Quel est le domaine de ce site ?',
+        'tr_melis_cms_sites_tool_add_step4_is_new_module' => 'Souhaitez-vous utiliser un module existant ?',
+        'tr_melis_cms_sites_tool_add_step4_select_module_option_err' => 'Veuillez choisir si vous souhaitez utiliser un module existant',
         'tr_melis_cms_sites_tool_add_step3_multi_domain_name' => 'Quel sont les domaines de ces sites ?',
         'tr_melis_cms_sites_tool_add_step4_select_module' => 'Veuillez choisir le module lié à ce site dans la liste :',
         'tr_melis_cms_sites_tool_add_step4_select_module_placeholder' => 'Choisissez un module',
-        'tr_melis_cms_sites_tool_add_step4_create_module' => 'Ou créez un nouveau module et saisissez le nom :',
+        'tr_melis_cms_sites_tool_add_step4_create_module' => 'Nom du nouveau module :',
         'tr_melis_cms_sites_tool_add_step4_create_module_error' => 'Les caractères autorisés sont alphanumerique et underscore. Le nom du module ne peut pas commencer par un numéro ni ne contenir d\'espace',
-        'tr_melis_cms_sites_tool_add_step4_create_file_for_website' => 'Créer les dossier et fichiers pour le nouveau site ?',
+        'tr_melis_cms_sites_tool_add_step4_create_file_for_website' => 'Créer les dossier et fichiers pour le nouveau module ?',
         'tr_melis_cms_sites_tool_add_step5_new_site_is_created' => 'Un nouveau site sera créé avec les paramètres suivants :',
-        'tr_melis_cms_sites_tool_add_step5_new_site_using_existing_module' => 'Le site utilisera le module existant <b>“%s”</b>. <br/>Les dossiers et fichiers du module ne seront pas créés.',
-        'tr_melis_cms_sites_tool_add_step5_new_site_using_new_module' => 'Le module <b>“%s”</b> sera créé adéquatement avec ces paramètres, vous permettant de commencer le développement du site sur la meilleure base possible.​',
+        'tr_melis_cms_sites_tool_add_step5_new_site_using_existing_module' => 'Le site <b>“%siteName”</b> utilisera le module existant <b>“%siteModule”</b>. <br/>Les dossiers et fichiers du module ne seront pas créés.',
+        'tr_melis_cms_sites_tool_add_step5_new_site_using_new_module' => 'Le module <b>“%siteModule”</b> sera créé adéquatement avec ces paramètres, vous permettant de commencer le développement du site sur la meilleure base possible.​',
+        'tr_melis_cms_sites_tool_add_site_module_already_exist' => 'Le nom du module existe déjà, veuillez en choisir un autre',
 
         'tr_melis_cms_sites_tool_add_unable_to_create_site' => 'Impossible de créer le site',
         'tr_melis_cms_sites_tool_add_site_language_already_created' => 'La version %s du site est déjà créée.',
@@ -527,6 +531,7 @@
         'tr_melis_cms_sites_tool_add_step4_create_module tooltip' => 'Créez un nouveau module pour le(s) site(s)',
         'tr_melis_cms_sites_tool_add_step4_site_label tooltip' => 'Saisissez le nom du site',
         'tr_melis_cms_sites_tool_add_step4_create_file_for_website tooltip' => 'Sélectionnez si vous souhaitez que les dossiers et fichiers soient créés pour le(s) site(s) ou non',
+        'tr_melis_cms_sites_tool_add_step4_is_new_module tooltip' => 'Sélectionnez si vous souhaitez utiliser un module existant ou non, si non vous devrez en créer un nouveau.',
 
         #MODULE LOAD TAB
         'tr_melis_cms_sites_module_loading' => 'Chargement des modules',
