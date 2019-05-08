@@ -1019,15 +1019,21 @@ class SitesController extends AbstractActionController
                 $form = $this->getTool()->getForm('meliscms_tool_sites_domain_form');
                 $form->setData($domainDatum);
 
-                if ($form->isValid()) {
-                    $siteDomainsSvc->saveSiteDomain($domainDatum);
-                } else {
-                    $currErr = array();
-                    foreach ($form->getMessages() as $key => $err) {
-                        $currErr[$domainDatum["sdom_env"] . "_" . $key] = $err;
+                if ($domainDatum['sdom_env'] == getenv('MELIS_PLATFORM')) {
+                    if ($form->isValid()) {
+                        $siteDomainsSvc->saveSiteDomain($domainDatum);
+                    } else {
+                        $currErr = array();
+                        foreach ($form->getMessages() as $key => $err) {
+                            $currErr[$domainDatum["sdom_env"] . "_" . $key] = $err;
+                        }
+                        $errors = array_merge($errors, $currErr);
+                        $status = 0;
                     }
-                    $errors = array_merge($errors, $currErr);
-                    $status = 0;
+                } else {
+                    if (!empty($domainDatum['sdom_scheme']) && !empty($domainDatum['sdom_domain'])) {
+                        $siteDomainsSvc->saveSiteDomain($domainDatum);
+                    }
                 }
             }
         }
