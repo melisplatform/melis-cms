@@ -426,7 +426,8 @@ $(document).ready(function() {
                                 class: "form-control",
                                 name: domainName,
                                 value: applyDomainValue(domainName),
-                                required: "required"
+                                required: "required",
+                                title: ''
                             }).attr("data-langId", langData[0]);
                             div.append(input);
                             multiDomainsContainer.append(div);
