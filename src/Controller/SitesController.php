@@ -623,6 +623,8 @@ class SitesController extends AbstractActionController
                         $siteIds = $saveSiteResult['site_ids'];
                         $textMessage = 'tr_melis_cms_sites_tool_add_create_site_success';
                         $status = true;
+                        //regenerate modules path
+                        $this->regenerateModulesPath();
                     }
                     else
                     {
@@ -1443,5 +1445,19 @@ class SitesController extends AbstractActionController
             $platformIdTable->deleteByField('pids_id', $id);
             $domainTable->deleteByField('sdom_env', $platform);
         }
+    }
+
+    /**
+     * Regenerate modules path
+     *
+     * @return bool
+     */
+    private function regenerateModulesPath()
+    {
+       $file = $_SERVER['DOCUMENT_ROOT'] . "/../config/melis.modules.path.php";
+       if (file_exists($file)) {
+           unlink($file);
+           return true;
+       }
     }
 }
