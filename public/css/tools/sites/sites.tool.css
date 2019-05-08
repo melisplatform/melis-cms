@@ -287,12 +287,26 @@ ul.meliscms-site-language-homepage-list > li:hover {
     .widget.widget-tabs>.widget-head ul.create-site-step{
         padding: 0;
     }
+
+    .container-level-a .widget.widget-tabs.widget-tabs-responsive > .widget-head ul li {
+        display: block;
+        border: none;
+        float: none;
+    }
 }
 
 @media only screen and (max-width: 530px) {
     .widget.widget-wizard-pills .widget-head ul li a,
     .widget.widget-wizard-pills .widget-head ul li.active a{
         width: 60px;
+    }
+}
+
+@media only screen and (max-width: 510px) {
+    .container-level-a .widget.widget-tabs.widget-tabs-responsive > .widget-head ul li {
+        display: block;
+        border-bottom: 1px solid #e5e5e5;
+        float: none;
     }
 }
 

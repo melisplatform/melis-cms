@@ -987,6 +987,7 @@ return array(
                                         'attributes' => array(
                                             'id' => 'sdom_domain',
                                             'required' => 'required',
+                                            'tabindex' => '-1',
                                         ),
                                     ),
                                 ),

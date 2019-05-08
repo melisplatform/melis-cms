@@ -281,7 +281,6 @@ $(document).ready(function() {
                 updateActiveStep(step);
             },
             afterInit: function(){
-                $(".sites-steps-owl .tool-sites_container_fixed_width").find("input, label, select, div").attr("tabindex", "-1");
                 $(".sites-steps-owl .tool-sites_container_fixed_width").find("label").not(":has(input)").removeClass("melis-radio-box");
                 /**
                  * tooltip data container to body
@@ -340,6 +339,11 @@ $(document).ready(function() {
             case "step_1":
                 //skip step 1 form
                 currentStepForm = 'skip';
+                /**
+                 * Hide the step 2 forms
+                 */
+                hideElement(".step2-forms .sites_step2-multi-language");
+                hideElement(".step2-forms .sites_step2-single-language");
                 break;
             case "step_2":
                 //include the from in step1
@@ -362,6 +366,11 @@ $(document).ready(function() {
 
                     currentStepForm = "#step2form-single_language";
                 }
+                /**
+                 * Hide the step 3 forms
+                 */
+                hideElement(".sites_step3-single-domain");
+                hideElement(".sites_step3-multi-domain");
                 break;
             case "step_3":
                 //clear selected languages
@@ -417,8 +426,7 @@ $(document).ready(function() {
                                 class: "form-control",
                                 name: domainName,
                                 value: applyDomainValue(domainName),
-                                required: "required",
-                                tabindex: "-1"
+                                required: "required"
                             }).attr("data-langId", langData[0]);
                             div.append(input);
                             multiDomainsContainer.append(div);
@@ -464,8 +472,14 @@ $(document).ready(function() {
                 formData.domains = domainData;
 
                 selectedLanguages = '- '+translations.tr_melis_cms_sites_tool_add_header_title_lang+' : ' + lang;
+
+                /**
+                 * hide the step 4 forms
+                 */
+                hideElement('.step-4-datas');
                 break;
             case "step_4":
+                showElement('.step-4-datas');
                 currentStepForm = "#step4form_module";
                 /**
                  * Process the domain form
