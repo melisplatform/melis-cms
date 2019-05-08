@@ -16,8 +16,8 @@ $(document).ready(function() {
                 newEnabledModule.push(str1.replace('moduleLoad',''));
             }
         });
-        var currentEnabledModule = $("#currentEnabledModule").val();
-        var sitesUsingModules = $("#sitesUsingModules").val();
+        var currentEnabledModule = $("#"+currentTabId+"_currentEnabledModule").val();
+        var sitesUsingModules = $("#"+currentTabId+"_sitesUsingModules").val();
 
         currentEnabledModule = jQuery.parseJSON(currentEnabledModule);
         sitesUsingModules = jQuery.parseJSON(sitesUsingModules);
@@ -28,7 +28,7 @@ $(document).ready(function() {
         });
         var moduleDiff = arrayDiff(currentEnabledModule,newEnabledModule);
 
-        var siteModuleName = $("#siteModuleName").val();
+        var siteModuleName = $("#"+currentTabId+"_siteModuleName").val();
         var isAdmin = $("#not-admin-notice").length < 1 ? true : false;
 
         if(moduleDiff.length > 0 && isAdmin){

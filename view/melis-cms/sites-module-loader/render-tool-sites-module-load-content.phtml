@@ -73,8 +73,9 @@ $status = '';
 
                             foreach($this->modules as $moduleName => $moduleStatus)
                             {
-                                if($moduleStatus > 0)
+                                if($moduleStatus === 1){
                                     array_push($currentEnabled,$moduleName);
+                                }
                                 ?>
                                 <div class="module-cont clearfix">
                                     <div class="pull-left">
@@ -100,9 +101,9 @@ $status = '';
                                 <?php
                             }
                             ?>
-                            <input type="hidden" id="currentEnabledModule" value='<?= json_encode($currentEnabled);?>'>
-                            <input type="hidden" id="sitesUsingModules" value='<?= json_encode($this->siteNames);?>'>
-                            <input type="hidden" id="siteModuleName" value='<?= $this->siteModuleName; ?>'>
+                            <input type="hidden" id="<?= $this->siteId ?>_currentEnabledModule" value='<?= json_encode($currentEnabled);?>'>
+                            <input type="hidden" id="<?= $this->siteId ?>_sitesUsingModules" value='<?= json_encode($this->siteNames);?>'>
+                            <input type="hidden" id="<?= $this->siteId ?>_siteModuleName" value='<?= $this->siteModuleName; ?>'>
                         </div>
                     </form>
                 </div>
