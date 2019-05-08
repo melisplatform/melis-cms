@@ -36,6 +36,9 @@ $data_melisKey = $this->melisKey;
                         <?php foreach($this->activeSiteLangs as $lang) :?>
                             <li class="">
                                 <a class="clearfix" data-toggle="tab" id="news_cms_lang_<?= $lang['slang_lang_id'] ?>" href="#<?= $lang['lang_cms_locale']; ?>-config-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $lang['slang_lang_id'] ?>">
+                                    <span class="pull-right">
+                                        <img src="<?= $this->serverUrl() . '/MelisCms/images/lang-flags/' . $lang['lang_cms_locale'] . '.png' ?>" class="imgDisplay pull-right">
+                                    </span>
                                     <span><?= $lang['lang_cms_name'] ?></span>
                                 </a>
                             </li>
@@ -54,6 +57,7 @@ $data_melisKey = $this->melisKey;
                         <div id="cms_site_config_general">
                             <?php
                             $form = clone $this->configForm;
+                            $form->setAttribute('id', 'gen_' . $form->getAttribute('id'));
 
                             foreach ($form->getElements() as $element => $attributes)  {
                                 $el =  $form->get((string) $element);
@@ -132,6 +136,7 @@ $data_melisKey = $this->melisKey;
                             <div id="cms_domain_<?= $lang['slang_lang_id']; ?>">
                                 <?php
                                 $form = clone $this->configForm;
+                                $form->setAttribute('id', $lang['slang_lang_id'] . '_' . $form->getAttribute('id'));
 
                                 foreach ($form->getElements() as $element => $attributes)  {
                                     $el =  $form->get((string) $element);
