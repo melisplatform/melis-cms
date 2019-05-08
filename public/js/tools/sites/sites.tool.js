@@ -834,7 +834,7 @@ $(document).ready(function() {
      */
     function openSiteEditTab(name, siteId, moduleName){
         melisHelper.tabOpen(name, 'fa-book', siteId+'_id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site',  { siteId : siteId, moduleName : moduleName }, 'id_meliscms_tool_sites', function(){
-            $("site-title-tag").text(" / " + name);
+            $("#" + siteId + "_id_meliscms_tool_sites_edit_site_header site-title-tag").text(" / " + name);
         });
     }
 
