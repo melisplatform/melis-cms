@@ -548,6 +548,7 @@ var melisCms = (function(){
     	var height = $("#"+ activeTabId + " .melis-iframe").contents().height();
     	$("#"+ activeTabId + " .melis-iframe").css("height", height);
     	$("#"+ activeTabId + " .melis-iframe").css("min-height", "700px");  
+    	$("#"+ activeTabId + " .melis-iframe").css("width", "100%");
     	
 		// Check and Get all Editable Value and dataTags from Editor TinyMCE
 		// $.ajax({
