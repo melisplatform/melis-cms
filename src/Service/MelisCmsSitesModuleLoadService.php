@@ -74,13 +74,21 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
 
             $modules = $moduleLoadList;
 
+            // add all modules listed in site load
             foreach ($modules as $index => $modValues) {
                 if (!in_array($modValues, $exclude_modules)) {
                     $modulesList[$modValues] = 1;
                 }
             }
 
-            // add the inactive modules
+            // add site module to the list
+            if (in_array($siteModuleName, $moduleLoadList)) {
+                $modulesList[$siteModuleName] = 1;
+            } else {
+                $modulesList[$siteModuleName] = 0;
+            }
+
+            // add other modules
             foreach ($moduleLoadFile as $index => $module) {
                 if (!isset($modulesList[$module])) {
                     $modulesList[$module] = 0;
