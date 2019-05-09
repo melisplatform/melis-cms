@@ -469,6 +469,7 @@
 
         //minify assets
         'tr_melis_cms_minify_assets_button_title' => 'Minify Assets',
+        'tr_melis_cms_minify_assets_no_module_button_title' => 'Cannot be minifyed because the site has no module',
 
         //New site tools
         'tr_meliscms_tool_sites' => 'Sites',

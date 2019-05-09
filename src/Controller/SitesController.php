@@ -407,6 +407,20 @@ class SitesController extends AbstractActionController
 
                 // add DataTable RowID, this will be added in the <tr> tags in each rows
                 $tableData[$ctr]['DT_RowId'] = $tableData[$ctr]['site_id'];
+
+                /**
+                 * Check if module exist to disable the
+                 * minify button
+                 */
+                $rootMelisSites = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites'. '/' . $tableData[$ctr]['site_name'] . '/config/assets.config.php';
+                if(file_exists($rootMelisSites)){
+                    $attrArray = array('data-mod-found'   => true);
+                }else{
+                    $attrArray = array('data-mod-found'   => false);
+                }
+
+                //assign attribute data to table row
+                $tableData[$ctr]['DT_RowAttr'] = $attrArray;
             }
         }
 

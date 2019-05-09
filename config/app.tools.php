@@ -804,7 +804,7 @@ return array(
                         'target' => '#tableToolSites',
                         'ajaxUrl' => '/melis/MelisCms/Sites/getSiteData',
                         'dataFunction' => '',
-                        'ajaxCallback' => '',
+                        'ajaxCallback' => 'sitesTableCallback()',
                         'filters' => array(
                             'left' => array(
                                 'site-tool-table-limit' => array(

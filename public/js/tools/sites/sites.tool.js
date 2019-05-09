@@ -1063,3 +1063,14 @@ $(document).ready(function() {
         });
     });
 });
+
+window.sitesTableCallback = function(){
+    /**
+     * Disable the minify button if
+     * module is not found
+     */
+    var minifBtn = $("#tableToolSites tbody tr[data-mod-found='false']").find(".btnMinifyAssets");
+    minifBtn.prop("disabled", true);
+    minifBtn.attr("disabled", true);
+    minifBtn.attr("title", translations.tr_melis_cms_minify_assets_no_module_button_title);
+};
