@@ -550,7 +550,7 @@
         'tr_melis_cms_sites_site_label tooltip' => 'The name of the site displayed in the platform',
         'tr_melis_cms_sites_site_name' => 'Site Module',
         'tr_melis_cms_sites_site_name tooltip' => 'The module name as defined in the code (or folder name in MelisSites/)',
-        'tr_melis_cms_sites_s404_page_id' => '404 Pagusr_emaile ID',
+        'tr_melis_cms_sites_s404_page_id' => '404 Page ID',
         'tr_melis_cms_sites_s404_page_id tooltip' => 'Identifier of the 404 page',
         'tr_melis_cms_sites_site_main_page_id' => 'Main Home Page ID',
         'tr_melis_cms_sites_site_main_page_id tooltip' => 'Identifier of the home page',

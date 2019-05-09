@@ -152,7 +152,7 @@ return array(
                                             'name'    => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_domain_field_empty',
                                                 ),
                                             ),
                                         ),
@@ -170,7 +170,7 @@ return array(
                                             'name'    => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_domain_field_empty',
                                                 ),
                                             ),
                                         ),
