@@ -43,24 +43,35 @@ $data_melisKey = $this->melisKey;
                                         <?php
                                         $form = clone $this->domainsForm;
 
-                                        if(isset($this->siteDomains) && !empty($this->siteDomains)){
-                                            foreach ($this->siteDomains as $siteDomain){
-                                                if($siteDomain["sdom_env"] == $siteEnv['plf_name']){
-                                                    foreach($form->getElements() as $element => $attributes)  {
-                                                        $el =  $form->get((string) $element);
-                                                        if(isset($siteDomain[$el->getName()])){
+                                        if (isset($this->siteDomains) && !empty($this->siteDomains)) {
+                                            foreach ($this->siteDomains as $siteDomain) {
+                                                if ($siteDomain['sdom_env'] == $siteEnv['plf_name']) {
+                                                    foreach ($form->getElements() as $element => $attributes)  {
+                                                        $el = $form->get((string) $element);
+                                                        if ( isset($siteDomain[$el->getName()])) {
                                                             $el->setValue($siteDomain[$el->getName()]);
                                                         }
                                                     }
                                                 }
                                             }
                                         }
-                                        foreach($form->getElements() as $element => $attributes)  {
+
+                                        foreach ($form->getElements() as $element => $attributes)  {
                                             $el =  $form->get((string) $element);
-                                            if($el->getName() == "sdom_env")
+
+                                            if ($el->getName() == 'sdom_env')
                                                 $el->setValue($siteEnv['plf_name']);
-                                            if($el->getName() == "sdom_site_id")
+
+                                            if ($el->getName() == 'sdom_site_id')
                                                 $el->setValue($this->siteId);
+
+                                            // Only display the asterisk on the current platform
+                                            if ($el->getName() == 'sdom_scheme' || $el->getName('sdom_domain')) {
+                                                if ($siteEnv['plf_name'] != getenv('MELIS_PLATFORM')) {
+                                                    $el->setAttribute('required', '');
+                                                }
+                                            }
+
                                             $el->setName($siteEnv['plf_name']."_".$el->getName());
                                             $el->setAttribute('id', $el->getName());
                                         }
