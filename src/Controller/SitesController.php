@@ -361,6 +361,7 @@ class SitesController extends AbstractActionController
      */
     public function getSiteDataAction()
     {
+        $cmsSiteSrv = $this->getServiceLocator()->get('MelisCmsSiteService');
         $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
         $translator = $this->getServiceLocator()->get('translator');
 
@@ -412,8 +413,8 @@ class SitesController extends AbstractActionController
                  * Check if module exist to disable the
                  * minify button
                  */
-                $rootMelisSites = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites'. '/' . $tableData[$ctr]['site_name'] . '/config/assets.config.php';
-                if(file_exists($rootMelisSites)){
+                $modulePath = $cmsSiteSrv->getModulePath($tableData[$ctr]['site_name']);
+                if(file_exists($modulePath)){
                     $attrArray = array('data-mod-found'   => true);
                 }else{
                     $attrArray = array('data-mod-found'   => false);

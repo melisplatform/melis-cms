@@ -1025,7 +1025,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
      * @param $siteModuleName
      * @return string
      */
-	private function getModulePath($siteModuleName)
+	public function getModulePath($siteModuleName)
     {
         //check if site is came from the vendor
         $moduleSrv = $this->getServiceLocator()->get('ModulesService');
