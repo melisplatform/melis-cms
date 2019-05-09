@@ -185,7 +185,8 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
             if (file_exists($pathToStore . '/' . $tmpFileName)) {
                 // check if the array is not empty
                 $checkConfig = include($pathToStore . '/' . $tmpFileName);
-                if (count($checkConfig) > 1) {
+
+                if (count($checkConfig) > 0) {
                     // delete the current module loader file
                     unlink($pathToStore . '/' . $fileName);
                     // rename the module loader tmp file into module.load.php
