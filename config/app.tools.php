@@ -988,6 +988,7 @@ return array(
                                             'id' => 'sdom_domain',
                                             'required' => 'required',
                                             'tabindex' => '-1',
+                                            'value' => $_SERVER['HTTP_HOST'],
                                             'title' => '',
                                         ),
                                     ),
