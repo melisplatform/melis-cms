@@ -61,6 +61,9 @@ $data_melisKey = $this->melisKey;
                                 <?php foreach($this->activeSiteLangs as $lang) :?>
                                     <li class="">
                                         <a class="clearfix" data-toggle="tab" id="cms_homepages_lang_<?= $lang['slang_lang_id'] ?>" href="#<?= $lang['lang_cms_locale']; ?>-log-type-details-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $lang['slang_lang_id'] ?>">
+                                            <span class="pull-right">
+                                                <img src="<?= $this->serverUrl() . '/MelisCms/images/lang-flags/' . $lang['lang_cms_locale'] . '.png' ?>" class="pull-right">
+                                            </span>
                                             <span><?= $lang['lang_cms_name'] ?></span>
                                         </a>
                                     </li>
