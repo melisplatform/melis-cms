@@ -1147,7 +1147,71 @@ class SitesController extends AbstractActionController
             }
 
             // Update site to add site option language url
-            $siteTable->save(['site_opt_lang_url' => $data['site_opt_lang_url']], $siteId);
+            /**
+             * Update only if there are not the same data
+             */
+            $siteDatas = $siteTable->getEntryById($siteId)->current();
+            if(!empty($siteDatas)){
+                if($siteDatas->site_opt_lang_url != $data['site_opt_lang_url']){
+                    $updatedSiteId = $siteTable->save(['site_opt_lang_url' => $data['site_opt_lang_url']], $siteId);
+                    if($updatedSiteId){
+                        $this->deleteDefaultUrls($siteId, $siteDatas->site_main_page_id);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Delete the default page url
+     * when change the site option language
+     * so that it will re generate the correct url
+     *
+     * @param $siteId
+     * @param $siteMainHomePageId
+     */
+    private function deleteDefaultUrls($siteId, $siteMainHomePageId)
+    {
+        $siteLangHomeTbl = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
+        $pageIds = array();
+
+        $siteHomeDatas = $siteLangHomeTbl->getHomePageBySiteId($siteId)->toArray();
+        if(!empty($siteHomeDatas)){
+            foreach($siteHomeDatas as $key => $val) {
+                array_push($pageIds, $val['shome_page_id']);
+                $this->getAllPagesId($val['shome_page_id'], $pageIds);
+            }
+        }else{
+            array_push($pageIds, $siteMainHomePageId);
+            $this->getAllPagesId($siteMainHomePageId, $pageIds);
+        }
+
+        $tablePageDefaultUrls = $this->getServiceLocator()->get('MelisEngineTablePageDefaultUrls');
+        foreach($pageIds as $key => $id){
+            $tablePageDefaultUrls->deleteById($id);
+        }
+    }
+
+    /**
+     * Get all page ids
+     *
+     * @param $pageId
+     * @param $pageIds
+     */
+    private function getAllPagesId($pageId, &$pageIds) {
+        $pageTreeService = $this->getServiceLocator()->get('MelisEngineTree');
+        $data = $pageTreeService->getAllPages($pageId);
+        foreach($data as $key => $val){
+            foreach($val as $k => $v){
+                //add only the page if seo url is empty
+                if(empty($v['pseo_url'])) {
+                    array_push($pageIds, $v['tree_page_id']);
+                }
+
+                if(!empty($v['children'])){
+                    $this->getAllPagesId($v['tree_page_id'], $pageIds);
+                }
+            }
         }
     }
 
