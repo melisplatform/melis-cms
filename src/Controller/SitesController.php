@@ -1154,9 +1154,9 @@ class SitesController extends AbstractActionController
             if(!empty($siteDatas)){
                 if($siteDatas->site_opt_lang_url != $data['site_opt_lang_url']){
                     $updatedSiteId = $siteTable->save(['site_opt_lang_url' => $data['site_opt_lang_url']], $siteId);
-//                    if($updatedSiteId){
-//                        $this->deleteDefaultUrls($siteId, $siteDatas->site_main_page_id);
-//                    }
+                    if($updatedSiteId){
+                        $this->deleteDefaultUrls($siteId, $siteDatas->site_main_page_id);
+                    }
                 }
             }
         }
