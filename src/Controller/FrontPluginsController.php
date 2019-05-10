@@ -124,6 +124,7 @@ class FrontPluginsController extends AbstractActionController
         }
 
 
+
         $view = new ViewModel();
         $view->pluginsConfig = $finalPluginList;
         $view->siteModule = $siteModule;
@@ -372,7 +373,7 @@ class FrontPluginsController extends AbstractActionController
             $fallbackSection = $configSvc->getItem('/meliscore/datas/fallBacksection');
             $marketPlaceModuleSection= $fallbackSection;
         }
-        //custom section
+        //custom sections
         $customSection = [
             'Others',
             'CustomProjects'
@@ -412,7 +413,7 @@ class FrontPluginsController extends AbstractActionController
                         } else {
                             /*
                             * if the section does not belong to the group it will go to the
-                            * others section direclty
+                            * Others section direclty
                             */
                             $melisConfig = $pluginConfig['melis'];
                             if (isset($melisConfig['subcategory']) && ! empty($melisConfig['subcategory'])) {
