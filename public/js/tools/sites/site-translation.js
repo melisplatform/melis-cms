@@ -121,7 +121,7 @@ $(document).ready(function(){
  * Callback for site translation table
  *
  */
-window.siteTransTableCallBack = function(){
+window.siteTransTableCallBack = function(data, tblSetting){
     /**
      * get the current site id
      */
@@ -131,16 +131,6 @@ window.siteTransTableCallBack = function(){
      * translation is came from the file
      */
     $("#"+siteId+"_tableMelisSiteTranslation tbody tr[data-mst-id='0']").find("#btnDeleteSiteTranslation").remove();
-
-    /**
-     * Update the class of language filter container to avoid duplicate
-     */
-    setTimeout(function(){
-        var filterLangCont = $("#"+siteId+"_siteTranslation_language").parent();
-        var contClass = filterLangCont.attr("class");
-        filterLangCont.removeClass(contClass);
-        filterLangCont.addClass(siteId+"_"+contClass);
-    }, 300);
 };
 
 /**

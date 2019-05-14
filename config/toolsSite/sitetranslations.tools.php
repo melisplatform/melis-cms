@@ -22,7 +22,7 @@ return array(
                                     'controller' => 'SitesTranslation',
                                     'action' => 'render-tool-sites-site-translation-content-filters-limit'
                                 ),
-                                'mt-tr-languages' => array(
+                                'mt-tr-languages_'.uniqid() => array(
                                     'module' => 'MelisCms',
                                     'controller' => 'SitesTranslation',
                                     'action' => 'render-tool-sites-site-translation-filters-languages'
