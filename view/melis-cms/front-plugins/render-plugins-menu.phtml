@@ -63,9 +63,7 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                 <?php foreach ($plugin as $moduleName => $templatingPlugins) { ?>
                                     <?php
                                         $moduleText = $this->translate('tr_PluginSection_' . $moduleName);
-                                        // one special rule
-                                        // if there's only one subsection then dont
-                                        // rewrite the module name and just list plugins
+                                        // regular rendering of menu
                                     ?>
                                     <?php if ($sectionChildrenCtr > 1) {?>
                                         <div class="melis-cms-category-box">
@@ -76,6 +74,9 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                                         $hasSubsection = false;
                                                         foreach ($templatingPlugins as $pluginName => $pluginConfig) { ?>
                                                             <?php
+                                                                /*
+                                                                 * modules that has subsection
+                                                                 */
                                                                 if ($pluginName == 'hasSubsection') {
                                                                     $hasSubsection = true;
                                                                 }
@@ -100,8 +101,9 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                                                                                  title="<?php if (!empty($conf['description'])) {
                                                                                                      echo $this->translate($conf['description']);
                                                                                                  } ?>">
-                                                                                                <img src="<?= $thumbnail; ?>"
-                                                                                                     alt="">
+                                                                                                <?php if ($moduleName!= "MelisMiniTemplate") {?>
+                                                                                                    <img  src="<?= $thumbnail; ?>" alt="">
+                                                                                                <?php }?>
                                                                                                 <span class="melis-cms-plugin-title"><?= $this->translate($name); ?></span>
                                                                                             </div>
                                                                                         <?php }
@@ -112,12 +114,17 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                                                     <?php }?>
                                                                     <?php
                                                                 } else {
+                                                                    /*
+                                                                     * this is for module that has no subsections
+                                                                     */
                                                                     $conf = $pluginConfig['melis'];
                                                                     $thumbnail = $conf['thumbnail']  ?? "/MelisFront/plugins/images/default.jpg";
                                                                     $name      = $conf['name'] ?? $pluginName;
                                                                     $moduleTextDisplay = $conf['moduleName'];?>
                                                                     <div class="melis-cms-plugin-snippets" data-module-name="<?= $moduleName; ?>" data-plugin-name="<?= $pluginName; ?>" data-plugin-site-module="<?= $this->siteModule ?>" title="<?php if (!empty($conf['description'])){ echo $this->translate($conf['description']); } ?>">
-                                                                        <img src="<?= $thumbnail; ?>" alt="">
+                                                                        <?php if ($moduleName!= "MelisMiniTemplate") {?>
+                                                                            <img  src="<?= $thumbnail; ?>" alt="">
+                                                                        <?php }?>
                                                                         <span class="melis-cms-plugin-title"><?= $this->translate($name); ?></span>
                                                                     </div>
                                                                 <?php } ?>
@@ -128,6 +135,9 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                         </div>
                                     <?php } else {?>
                                         <?php
+                                        // one special rule
+                                        // if there's only one subsection then dont
+                                        // rewrite the module name and just list plugins
                                         if (! empty($templatingPlugins)) {
                                             $hasSubsection = false;
                                             foreach ($templatingPlugins as $pluginName => $pluginConfig) { ?>
@@ -148,6 +158,7 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                                                     $name = $conf['name'] ?? $pluginName;
                                                                     $subcategory = $conf['subcategory'];
                                                                     $subcategoryId = $subcategory['id'] ?? null;
+                                                                    echo $plugin;
                                                                     if ($plugin != 'title') { ?>
                                                                         <div class="melis-cms-plugin-snippets"
                                                                              data-module-name="<?= $moduleName; ?>"
@@ -156,8 +167,9 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                                                              title="<?php if (!empty($conf['description'])) {
                                                                                  echo $this->translate($conf['description']);
                                                                              } ?>">
-                                                                            <img src="<?= $thumbnail; ?>"
-                                                                                 alt="">
+                                                                            <?php if ($moduleName!= "MelisMiniTemplate") {?>
+                                                                                <img  src="<?= $thumbnail; ?>" alt="">
+                                                                            <?php }?>
                                                                             <span class="melis-cms-plugin-title"><?= $this->translate($name); ?></span>
                                                                         </div>
                                                                     <?php }
@@ -173,7 +185,9 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                                     $name      = $conf['name'] ?? $pluginName;
                                                     $moduleTextDisplay = $conf['moduleName'];?>
                                                     <div class="melis-cms-plugin-snippets" data-module-name="<?= $moduleName; ?>" data-plugin-name="<?= $pluginName; ?>" data-plugin-site-module="<?= $this->siteModule ?>" title="<?php if (!empty($conf['description'])){ echo $this->translate($conf['description']); } ?>">
-                                                        <img src="<?= $thumbnail; ?>" alt="">
+                                                        <?php if ($moduleName!= "MelisMiniTemplate") {?>
+                                                            <img  src="<?= $thumbnail; ?>" alt="">
+                                                        <?php }?>
                                                         <span class="melis-cms-plugin-title"><?= $this->translate($name); ?></span>
                                                     </div>
                                                 <?php } ?>
