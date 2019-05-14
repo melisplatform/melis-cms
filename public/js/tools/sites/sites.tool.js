@@ -200,6 +200,7 @@ $(document).ready(function() {
     var siteLabel = '';
     var selectedDomainValue = [];
     var isUserSelectModuleOption = false;
+    var domainSingleOpt = '';
 
     /**
      * This will delete the site
@@ -290,6 +291,7 @@ $(document).ready(function() {
                 }, 100);
 
                 isUserSelectModuleOption = false;
+                domainSingleOpt = "";
             }
         });
     };
@@ -371,6 +373,8 @@ $(document).ready(function() {
                  */
                 hideElement(".sites_step3-single-domain");
                 hideElement(".sites_step3-multi-domain");
+
+                domainSingleOpt = "";
                 break;
             case "step_3":
                 //clear selected languages
@@ -444,6 +448,8 @@ $(document).ready(function() {
                                 domainData.isMultiDomain = true;
 
                                 currentStepForm = "#step3form-multi_domain";
+
+                                domainSingleOpt = '';
                             }else{
                                 //load the single domain form
                                 showElement(".sites_step3-single-domain");
@@ -451,6 +457,12 @@ $(document).ready(function() {
                                 domainData.isMultiDomain= false;
 
                                 currentStepForm = "#step3form-single_domain";
+
+                                if(this.value == 1){
+                                    domainSingleOpt = " ("+translations.tr_melis_cms_sites_tool_add_step5_single_dom_opt_1_msg+")";
+                                }else if(this.value == 3){
+                                    domainSingleOpt = " ("+translations.tr_melis_cms_sites_tool_add_step5_single_dom_opt_3_msg+")";
+                                }
                             }
                         }
                     });
@@ -494,7 +506,7 @@ $(document).ready(function() {
                     domain = 'Multiple';
                 }else{
                     domainFormData = getSerializedForm("#step3form-single_domain");
-                    domain = 'Single';
+                    domain = 'Single'+domainSingleOpt;
                 }
 
                 domainType = '- '+translations.tr_melis_cms_sites_tool_add_header_title_domains+' : ' + domain;

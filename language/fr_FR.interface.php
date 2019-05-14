@@ -507,6 +507,8 @@
         'tr_melis_cms_sites_tool_add_step5_new_site_is_created' => 'Un nouveau site sera créé avec les paramètres suivants :',
         'tr_melis_cms_sites_tool_add_step5_new_site_using_existing_module' => 'Le site <b>“%siteName”</b> utilisera le module existant <b>“%siteModule”</b>. <br/>Les dossiers et fichiers du module ne seront pas créés.',
         'tr_melis_cms_sites_tool_add_step5_new_site_using_new_module' => 'Le module <b>“%siteModule”</b> sera créé adéquatement avec ces paramètres, vous permettant de commencer le développement du site sur la meilleure base possible.​',
+        'tr_melis_cms_sites_tool_add_step5_single_dom_opt_1_msg' => 'Langage dans l\'URL',
+        'tr_melis_cms_sites_tool_add_step5_single_dom_opt_3_msg' => 'URL de la page uniquement',
         'tr_melis_cms_sites_tool_add_site_module_already_exist' => 'Le nom du module existe déjà, veuillez en choisir un autre',
 
         'tr_melis_cms_sites_tool_add_unable_to_create_site' => 'Impossible de créer le site',

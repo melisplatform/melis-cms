@@ -504,6 +504,8 @@
         'tr_melis_cms_sites_tool_add_step5_new_site_is_created' => 'A new site will be created with following parameters:',
         'tr_melis_cms_sites_tool_add_step5_new_site_using_existing_module' => 'The site <b>“%siteName”</b> will use the existing module <b>“%siteModule”</b>.</br>The module folders and files will not be created.',
         'tr_melis_cms_sites_tool_add_step5_new_site_using_new_module' => 'The <b>“%siteModule”</b> module will be properly created with those parameters, allowing you to start the development of the site the best way possible.​',
+        'tr_melis_cms_sites_tool_add_step5_single_dom_opt_1_msg' => 'Language in URL',
+        'tr_melis_cms_sites_tool_add_step5_single_dom_opt_3_msg' => 'Only page URL',
         'tr_melis_cms_sites_tool_add_site_module_already_exist' => 'Module name already exists, please choose another',
 
         'tr_melis_cms_sites_tool_add_unable_to_create_site' => 'Unable to create the site',
