@@ -397,30 +397,33 @@ var melisDragnDrop = (function($, window) {
             var stickyHead = window.parent.$("#"+parent.activeTabId).find(".bg-white.innerAll");
             var widgetHeight = window.parent.$("#"+parent.activeTabId).find(".widget-head.nav");
             $(".melis-cms-dnd-box").css("height", "100vh" ); // default height
-        // Chrome, Firefox etc browser
-        $(window.parent).scroll(function() {
-            if( (stickyHead.offset().top + stickyHead.height() + 30) >= currentFrame.offset().top ) {
-                $(".melis-cms-dnd-box").css("top", stickyHead.offset().top - currentFrame.offset().top + stickyHead.height() + 30);
-                dndHeight = $(window.parent).height() - stickyHead.height() - widgetHeight.height() - 15;
-                $(".melis-cms-dnd-box").height(dndHeight);
-            } else {
-                if( $(window).width() <= 767){
-                    var mobileHeader =(mobileHeader !== 'undefined') ? window.parent.$('body').find("#id_meliscore_header") : '';
-                    if( $(mobileHeader).length ) {
-                        $(".melis-cms-dnd-box").css("height", "100vh" );
-                        var topPosition = window.parent.$('body').find("#id_meliscore_header").offset().top - currentFrame.offset().top + window.parent.$('body').find("#id_meliscore_header").height() ;
-                        if(topPosition > 0) {
-                            $(".melis-cms-dnd-box").css("top", topPosition );
-                            $(".melis-cms-dnd-box").height($(window.parent).height() - window.parent.$('body').find("#id_meliscore_header").height() - 5);
-                        }
-                    }
-                } else {
-                    dndHeight = $(window.parent).height() - currentFrame.offset().top - 5;
-                    $(".melis-cms-dnd-box").css("top", 0);
+
+            // Chrome, Firefox etc browser
+            $(window.parent).scroll(function() {
+                if( (stickyHead.offset().top + stickyHead.height() + 30) >= currentFrame.offset().top ) {
+                    $(".melis-cms-dnd-box").css("top", stickyHead.offset().top - currentFrame.offset().top + stickyHead.height() + 30);
+                    dndHeight = $(window.parent).height() - stickyHead.height() - widgetHeight.height() - 15;
+                    //console.log("dndHeight: ", dndHeight);
+
                     $(".melis-cms-dnd-box").height(dndHeight);
+                } else {
+                    if( $(window).width() <= 767){
+                        var mobileHeader =(mobileHeader !== 'undefined') ? window.parent.$('body').find("#id_meliscore_header") : '';
+                        if( $(mobileHeader).length ) {
+                            $(".melis-cms-dnd-box").css("height", "100vh" );
+                            var topPosition = window.parent.$('body').find("#id_meliscore_header").offset().top - currentFrame.offset().top + window.parent.$('body').find("#id_meliscore_header").height() ;
+                            if(topPosition > 0) {
+                                $(".melis-cms-dnd-box").css("top", topPosition );
+                                $(".melis-cms-dnd-box").height($(window.parent).height() - window.parent.$('body').find("#id_meliscore_header").height() - 5);
+                            }
+                        }
+                    } else {
+                        dndHeight = $(window.parent).height() - currentFrame.offset().top - 5;
+                        $(".melis-cms-dnd-box").css("top", 0);
+                        $(".melis-cms-dnd-box").height(dndHeight);
+                    }
                 }
-            }
-        });
+            });
 
             // For IE scroll giving different value
             if (window.parent) {
