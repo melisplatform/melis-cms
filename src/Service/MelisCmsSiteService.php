@@ -236,7 +236,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                                 /**
                                  * Save site and domain
                                  */
-                                $savedSiteId = $this->saveSiteAndDomain($pageId, $arrayParameters['domainData'], $arrayParameters['siteData']);
+                                $savedSiteId = $this->saveSiteAndDomain($pageId, $arrayParameters['domainData'], $arrayParameters['siteData'], $siteUrlSetting);
 
                                 /**
                                  * Function to save other site data like pages
@@ -314,7 +314,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                                         /**
                                          * Save site and domain
                                          */
-                                        $savedSiteId = $this->saveSiteAndDomain($pageId, $siteDomain, $arrayParameters['siteData']);
+                                        $savedSiteId = $this->saveSiteAndDomain($pageId, $siteDomain, $arrayParameters['siteData'], $siteUrlSetting);
 
                                         /**
                                          * increment counter
@@ -539,15 +539,21 @@ class MelisCmsSiteService extends MelisCoreGeneralService
      * @param $pageId
      * @param $siteDomain
      * @param $siteData
+     * @param $siteUrlSetting
      * @return int $savedSiteId
      */
-    private function saveSiteAndDomain($pageId, $siteDomain, $siteData)
+    private function saveSiteAndDomain($pageId, $siteDomain, $siteData, $siteUrlSetting)
     {
         // Table services
         $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
         $siteDomainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
         // Assigning the next page id from Platform Id's
         $siteData['site_main_page_id'] = $pageId;
+        if($siteUrlSetting == 1){
+            $siteData['site_opt_lang_url'] = 2;
+        }else{
+            $siteData['site_opt_lang_url'] = 1;
+        }
         /**
          * Save site per language
          */
