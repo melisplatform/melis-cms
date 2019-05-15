@@ -21,6 +21,8 @@ use MelisCms\Service\MelisCmsRightsService;
 class FrontPluginsController extends AbstractActionController
 {
     private $sectionHasNewPlugins = [];
+    private $modulesHasNewPlugins = [];
+    private $subsectionHasNewPlugins = [];
 
     public function renderPluginsMenuAction()
     {
@@ -132,11 +134,17 @@ class FrontPluginsController extends AbstractActionController
 
         $view = new ViewModel();
        // $view->pluginsConfig = $finalPluginList;
-        $view->siteModule = $siteModule;
-        $view->newPluginList = $newPluginList;
-        $view->latestPlugin = $latesPlugin;
-        $view->sectionNewPlugins = array_unique($this->sectionHasNewPlugins);
-
+        $view->siteModule           = $siteModule;
+        $view->newPluginList        = $newPluginList;
+        $view->latestPlugin         = $latesPlugin;
+        $view->sectionNewPlugins    = array_unique($this->sectionHasNewPlugins);
+        $view->modulesHasNewPlugins = array_unique($this->modulesHasNewPlugins);
+        $view->subsectionHasNewPlugins = $this->subsectionHasNewPlugins;
+//        print_r($this->modulesHasNewPlugins);
+//        print_r($this->sectionHasNewPlugins);
+//        print_r($latesPlugin);
+//        print_r($this->newPlugins);
+//die;
         return $view;
     }
 
@@ -421,6 +429,8 @@ class FrontPluginsController extends AbstractActionController
                                 $newPluginList[$pluginSection][$module][$subsectionId][$pluginName]['isNew'] = $isNew;
                                 if ($isNew) {
                                     $this->sectionHasNewPlugins[] = $pluginSection;
+                                    $this->modulesHasNewPlugins[] = $module;
+                                    $this->subsectionHasNewPlugins[] = $subsectionText;
                                 }
                             } else {
                                 // no subsection
@@ -430,6 +440,7 @@ class FrontPluginsController extends AbstractActionController
                                 $newPluginList[$pluginSection][$module][$pluginName]['isNew'] = $isNew;
                                 if ($isNew) {
                                     $this->sectionHasNewPlugins[] = $pluginSection;
+                                    $this->modulesHasNewPlugins[] = $module;
                                 }
                             }
                         } else {
@@ -451,6 +462,8 @@ class FrontPluginsController extends AbstractActionController
                                 $newPluginList['Others'][$module][$subsectionId][$pluginName]['isNew'] = $isNew;
                                 if ($isNew) {
                                     $this->sectionHasNewPlugins[] = $pluginSection;
+                                    $this->modulesHasNewPlugins[] = $module;
+                                    $this->subsectionHasNewPlugins[] = $subsectionText;
                                 }
                             } else {
                                 $newPluginList['Others'][$module][$pluginName] = $pluginConfig;
@@ -459,6 +472,7 @@ class FrontPluginsController extends AbstractActionController
                                 $newPluginList['Others'][$module][$pluginName]['isNew'] = $isNew;
                                 if ($isNew) {
                                     $this->sectionHasNewPlugins[] = $pluginSection;
+                                    $this->modulesHasNewPlugins[] = $module;
                                 }
                             }
                         }

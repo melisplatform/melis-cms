@@ -44,6 +44,8 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
 <?php
     $ctrNewPlugins = 0;
     $sectionHasNewPlugins = $this->sectionNewPlugins;
+    $moduleHasNewPlugins  = $this->modulesHasNewPlugins;
+    $subsectionHasNewPlugins = $this->subsectionHasNewPlugins;
 ?>
 <div class="melis-cms-dnd-box">
     <div class="melis-cms-dnd-fix-menu">
@@ -60,19 +62,19 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                    $sectionChildrenCtr = count($plugin);
                    ?>
                    <?php if($sectionChildrenCtr > 0) {?>
-                        <div class="melis-cms-ps-box" style="position:relative;">
-                            <div class="melis-section-icons">
-                                <?php
-                                    // get melis module section icons
-                                    echo $this->getMelisSectionIcons($section);
-                                ?>
-                            </div>
-                            <span class="melis-cms-filter-btn"><?= $section; ?> <i class="fa fa-angle-down"></i></span>
-                            <?php if(in_array($section,$sectionHasNewPlugins)) {?>
-                                <div class="melis-plugins-icon-new-parent">
-                                    <span class="fa fa-certificate melis-plugins-icon-new"></span>
+                        <div class="melis-cms-ps-box">
+                            <span class="melis-cms-filter-btn" style="position:relative;">
+                                <div class="melis-section-icons">
+                                    <?php echo $this->getMelisSectionIcons($section); // get melis module section icons ?>
                                 </div>
-                            <?php }?>
+                                <?= $section; ?>
+                                <?php if(in_array($section,$sectionHasNewPlugins)) {?>
+                                    <div class="melis-plugins-icon-new-parent">
+                                        <span class="fa fa-certificate melis-plugins-icon-new"></span>
+                                    </div>
+                                <?php }?>
+                                <i class="fa fa-angle-down angle-down-menu"></i>
+                            </span>
                             <div class="melis-cms-plugin-snippets-box">
                                 <?php foreach ($plugin as $moduleName => $templatingPlugins) { ?>
                                     <?php
@@ -81,7 +83,14 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                     ?>
                                     <?php if ($sectionChildrenCtr > 1) {?>
                                         <div class="melis-cms-category-box">
-                                            <span class="melis-cms-category-btn"><?= $moduleText; ?> <i class="fa fa-angle-down"></i></span>
+                                            <span class="melis-cms-category-btn"><?= $moduleText; ?>
+                                                <?php if(in_array($moduleName,$moduleHasNewPlugins)) {?>
+                                                    <div class="melis-plugins-icon-new-child">
+                                                        <span class="fa fa-certificate melis-plugins-icon-new"></span>
+                                                    </div>
+                                                <?php }?>
+                                                <i class="fa fa-angle-down angle-down-menu"></i>
+                                            </span>
                                             <div class="melis-cms-category-plugins-box">
                                                 <?php
                                                     if (! empty($templatingPlugins)) {
@@ -97,7 +106,14 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                                                 if ($hasSubsection) {
                                                                     if ($pluginName != 'hasSubsection') {
                                                                         $subsectionTitle = $this->translate($pluginConfig['title'] ?? null);?>
-                                                                        <span class="melis-cms-filter-btn-sub-category"><?= $subsectionTitle; ?> <i class="fa fa-angle-down"></i></span>
+                                                                        <span class="melis-cms-filter-btn-sub-category"><?= $subsectionTitle; ?>
+                                                                            <?php if(in_array($pluginConfig['title'],$subsectionHasNewPlugins)) {?>
+                                                                                    <div class="melis-plugins-icon-new-sub-child">
+                                                                                        <span class="fa fa-certificate melis-plugins-icon-new"></span>
+                                                                                    </div>
+                                                                            <?php }?>
+                                                                            <i class="fa fa-angle-down"></i>
+                                                                        </span>
                                                                         <div class="melis-cms-category-plugins-box-sub">
                                                                             <?php
                                                                                 if (! empty($pluginConfig) && is_array($pluginConfig)) {
@@ -174,7 +190,14 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                                 if ($hasSubsection) {
                                                     if ($pluginName != 'hasSubsection') {
                                                         $subsectionTitle = $this->translate($pluginConfig['title'] ?? null);?>
-                                                        <span class="melis-cms-filter-btn-sub-category"><?= $subsectionTitle; ?> <i class="fa fa-angle-down"></i></span>
+                                                        <span class="melis-cms-filter-btn-sub-category">
+                                                            <?= $subsectionTitle; ?>
+                                                            <?php if(in_array($pluginConfig['title'],$subsectionHasNewPlugins)) {?>
+                                                                <div class="melis-plugins-icon-new-sub-child">
+                                                                    <span class="fa fa-certificate melis-plugins-icon-new"></span>
+                                                                </div>
+                                                            <?php }?>
+                                                            <i class="fa fa-angle-down"></i></span>
                                                         <div class="melis-cms-category-plugins-box-sub">
                                                             <?php
                                                             if (! empty($pluginConfig) && is_array($pluginConfig)) {
@@ -246,7 +269,7 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                 // latesplugin installed
                 $latestPlugin = $this->latestPlugin;
                 $latestPluginDatetime = $latestPlugin['latest_plugin_datetime'];
-                $dateTimeElapse = date('Y-m-d h:i:s',strtotime("+5 day",strtotime($latestPluginDatetime)));
+                $dateTimeElapse = date('Y-m-d h:i:s',strtotime("+60 minutes",strtotime($latestPluginDatetime)));
                 $dateToday      = date('Y-m-d h:i:s');
             ?>
             <?php if ($dateToday < $dateTimeElapse) {?>
