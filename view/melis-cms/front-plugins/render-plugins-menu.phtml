@@ -57,7 +57,13 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                    $sectionChildrenCtr = count($plugin);
                    ?>
                    <?php if($sectionChildrenCtr > 0) {?>
-                        <div class="melis-cms-ps-box">
+                        <div class="melis-cms-ps-box" style="position:relative;">
+                            <div class="melis-section-icons">
+                                <?php
+                                    // get melis module section icons
+                                    echo $this->getMelisSectionIcons($section);
+                                ?>
+                            </div>
                             <span class="melis-cms-filter-btn"><?= $section; ?> <i class="fa fa-angle-down"></i></span>
                             <div class="melis-cms-plugin-snippets-box">
                                 <?php foreach ($plugin as $moduleName => $templatingPlugins) { ?>

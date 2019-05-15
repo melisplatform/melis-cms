@@ -251,7 +251,6 @@ var melisDragnDrop = (function($, window) {
             }
         } else {
             // show menu
-            console.log(elem.hasClass('active'));
             if (elem.hasClass('active')) {
                 next.slideUp();
                 elem.removeClass('active');

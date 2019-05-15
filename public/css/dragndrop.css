@@ -141,7 +141,7 @@ body {
 .melis-cms-category-btn , .melis-cms-filter-btn-sub-category{
     display: block;
     position: relative;
-    padding: 4px 15px;
+    padding: 8px 15px;
     font-weight: normal;
     letter-spacing: 1px;
     color: #fff;
@@ -789,7 +789,22 @@ span.melis-cms-filter-btn-sub-category.active {
     background: #672f2d;
     border: 1px solid #711b17;
 }
-
+.melis-section-icons {
+    position: absolute;
+    z-index: 99;
+    top: 7px;
+    left: 7px;
+}
+.melis-cms-filter-btn {
+    text-indent:29px;
+}
+.melis-cms-filter-btn i {
+    text-indent:0;
+}
+.melis-cms-filter-btn-sub-category {
+    padding-top:2px !important;
+    padding-bottom:2px !important;
+}
 @-webkit-keyframes pulse {to {box-shadow: 0 0 0 45px rgba(147, 46, 42, 0);}}
 @-moz-keyframes pulse {to {box-shadow: 0 0 0 45px rgba(147, 46, 42, 0);}}
 @-ms-keyframes pulse {to {box-shadow: 0 0 0 45px rgba(147, 46, 42, 0);}}

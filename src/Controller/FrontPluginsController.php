@@ -31,104 +31,109 @@ class FrontPluginsController extends AbstractActionController
         $pluginList_ = $this->putSectionOnPlugins($config['plugins'], $siteModule);
         $newPluginList = $this->organizedPluginsBySection($pluginList_);
 
-        foreach ($config['plugins'] as $moduleName => $conf)
-        {
-            if (!empty($conf['plugins']))
-            {
-                foreach ($conf['plugins'] as $pluginName => $pluginConf)
-                {
-                    /**
-                     * this is for sectioning the templating plugins
-                     * @var $melisSections
-                     */
-                    if (isset($pluginConf['melis']['section']) && ! empty($pluginConf['melis']['section'])) {
-                        // sometihing to do
-                    } else {
-                        // if no section key then we will put to the OTHERS section
-                        $pluginConf['melis']['section'] = "OTHERS";
-                    }
-
-                    if ($pluginName == 'MelisFrontDragDropZonePlugin')
-                        continue; // Exception, dragdropplugin can't be found in menu...
-                        
-                    if (empty($pluginsConfig[$moduleName]))
-                        $pluginsConfig[$moduleName] = array();
-                    if (empty($pluginsConfig[$moduleName][$pluginName]))
-                        $pluginsConfig[$moduleName][$pluginName] = array();
-                        
-                    foreach ($pluginConf['melis'] as $key => $value)
-                    {
-                        if (!is_array($value) && substr($value, 0, 3) == 'tr_')
-                        {
-                            $pluginConf['melis'][$key] = $translator->translate($value);
-                        }
-                    }
-                    if (!empty($pluginConf['melis']['subcategory']))
-                    {
-                        foreach ($pluginConf['melis']['subcategory'] as $key => $value)
-                        {
-                            if (!is_array($value) && substr($value, 0, 3) == 'tr_')
-                            {
-                                $pluginConf['melis']['subcategory'][$key] = $translator->translate($value);
-                            }
-                        }
-                    }
-                        
-                    if (!empty($pluginConf['melis']['subcategory']) && !empty($pluginConf['melis']['subcategory']['id']))
-                    {
-                        $subcategoryId = $pluginConf['melis']['subcategory']['id'];
-                        if (empty($pluginsConfig[$moduleName][$subcategoryId]))
-                            $pluginsConfig[$moduleName][$subcategoryId] = array();
-                            
-                            $pluginsConfig[$moduleName][$subcategoryId][$pluginName] = $pluginConf;
-                            unset($pluginsConfig[$moduleName][$pluginName]);
-                    }
-                    else
-                        $pluginsConfig[$moduleName][$pluginName] = $pluginConf;
-                }
-            }
-        }
-        
-        // reorganizing for subcategories
-        $finalPluginList = array();
-        foreach ($pluginsConfig as $moduleName => $pluginList)
-        {
-            
-            foreach ($pluginList as $pluginName => $pluginConf)
-            {
-                if (empty($finalPluginList[$moduleName]))
-                    $finalPluginList[$moduleName] = array('subcategories' => array(), 'plugins' => array());
-                if (empty($pluginConf['front']))
-                {
-                    if (empty($finalPluginList[$moduleName]['subcategories'][$pluginName]))
-                        $finalPluginList[$moduleName]['subcategories'][$pluginName] = array('name' => '', 'plugins' => array());
-                        
-                    $nameCategory = '';
-                    foreach ($pluginConf as $codePlugin => $plugin)
-                    {
-                        if (!empty($plugin['melis']['subcategory']['title']))
-                        {
-                            $nameCategory = $plugin['melis']['subcategory']['title'];
-                            break;
-                        }
-                    }
-                    
-                    $finalPluginList[$moduleName]['subcategories'][$pluginName]['name'] = $nameCategory;
-                    $finalPluginList[$moduleName]['subcategories'][$pluginName]['plugins'] = $pluginConf;
-                }
-                else
-                {
-                    $finalPluginList[$moduleName]['plugins'][$pluginName] = $pluginConf;
-                }
-            }
-        }
-
-
+//        foreach ($config['plugins'] as $moduleName => $conf)
+//        {
+//            if (!empty($conf['plugins']))
+//            {
+//                foreach ($conf['plugins'] as $pluginName => $pluginConf)
+//                {
+//                    /**
+//                     * this is for sectioning the templating plugins
+//                     * @var $melisSections
+//                     */
+//                    if (isset($pluginConf['melis']['section']) && ! empty($pluginConf['melis']['section'])) {
+//                        // sometihing to do
+//                    } else {
+//                        // if no section key then we will put to the OTHERS section
+//                        $pluginConf['melis']['section'] = "OTHERS";
+//                    }
+//
+//                    if ($pluginName == 'MelisFrontDragDropZonePlugin')
+//                        continue; // Exception, dragdropplugin can't be found in menu...
+//
+//                    if (empty($pluginsConfig[$moduleName]))
+//                        $pluginsConfig[$moduleName] = array();
+//                    if (empty($pluginsConfig[$moduleName][$pluginName]))
+//                        $pluginsConfig[$moduleName][$pluginName] = array();
+//
+//                    foreach ($pluginConf['melis'] as $key => $value)
+//                    {
+//                        if (!is_array($value) && substr($value, 0, 3) == 'tr_')
+//                        {
+//                            $pluginConf['melis'][$key] = $translator->translate($value);
+//                        }
+//                    }
+//                    if (!empty($pluginConf['melis']['subcategory']))
+//                    {
+//                        foreach ($pluginConf['melis']['subcategory'] as $key => $value)
+//                        {
+//                            if (!is_array($value) && substr($value, 0, 3) == 'tr_')
+//                            {
+//                                $pluginConf['melis']['subcategory'][$key] = $translator->translate($value);
+//                            }
+//                        }
+//                    }
+//
+//                    if (!empty($pluginConf['melis']['subcategory']) && !empty($pluginConf['melis']['subcategory']['id']))
+//                    {
+//                        $subcategoryId = $pluginConf['melis']['subcategory']['id'];
+//                        if (empty($pluginsConfig[$moduleName][$subcategoryId]))
+//                            $pluginsConfig[$moduleName][$subcategoryId] = array();
+//
+//                            $pluginsConfig[$moduleName][$subcategoryId][$pluginName] = $pluginConf;
+//                            unset($pluginsConfig[$moduleName][$pluginName]);
+//                    }
+//                    else
+//                        $pluginsConfig[$moduleName][$pluginName] = $pluginConf;
+//                }
+//            }
+//        }
+//        // reorganizing for subcategories
+//        $finalPluginList = array();
+//        foreach ($pluginsConfig as $moduleName => $pluginList)
+//        {
+//
+//            foreach ($pluginList as $pluginName => $pluginConf)
+//            {
+//                if (empty($finalPluginList[$moduleName]))
+//                    $finalPluginList[$moduleName] = array('subcategories' => array(), 'plugins' => array());
+//                if (empty($pluginConf['front']))
+//                {
+//                    if (empty($finalPluginList[$moduleName]['subcategories'][$pluginName]))
+//                        $finalPluginList[$moduleName]['subcategories'][$pluginName] = array('name' => '', 'plugins' => array());
+//
+//                    $nameCategory = '';
+//                    foreach ($pluginConf as $codePlugin => $plugin)
+//                    {
+//                        if (!empty($plugin['melis']['subcategory']['title']))
+//                        {
+//                            $nameCategory = $plugin['melis']['subcategory']['title'];
+//                            break;
+//                        }
+//                    }
+//
+//                    $finalPluginList[$moduleName]['subcategories'][$pluginName]['name'] = $nameCategory;
+//                    $finalPluginList[$moduleName]['subcategories'][$pluginName]['plugins'] = $pluginConf;
+//                }
+//                else
+//                {
+//                    $finalPluginList[$moduleName]['plugins'][$pluginName] = $pluginConf;
+//                }
+//            }
+//        }
+        // melis plugin service
+        $pluginSvc = $this->getServiceLocator()->get('MelisCorePluginsService');
+        // check for new plugins or manually installed and insert in db
+        $pluginSvc->checkTemplatingPlugins();
+        // get the latest plugin installed
+        $latesPlugin = $pluginSvc->getLatestPlugin($pluginSvc::TEMPLATING_PLUGIN_TYPE);
 
         $view = new ViewModel();
-        $view->pluginsConfig = $finalPluginList;
+       // $view->pluginsConfig = $finalPluginList;
         $view->siteModule = $siteModule;
         $view->newPluginList = $newPluginList;
+        $view->latestPlugin = $latesPlugin;
+
         return $view;
     }
 
