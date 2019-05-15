@@ -3,7 +3,8 @@ var melisCms = (function(){
 	
 	// CACHE SELECTORS
 	var $body 	  = $("body"),
-		$document = $("document");
+		$document = $("document"),
+		$openedPageIds = [];
 	
 	// ---=[ BUG FIX ] =---  TINYMCE POPUP MODAL FOCUS 
 	var windowOffset
@@ -570,9 +571,24 @@ var melisCms = (function(){
 		// 	dataType    : 'json',
 		// 	encode		: true
 		// });
-		
+
 		// Activating page edition button action
-		melisCms.enableCmsButtons(activeTabId);
+		/**
+		 * we need to loop every opened pages
+		 * so that we can enable the tab buttons
+		 *
+		 * We must not use the activeTabId here
+		 * because it will just enable the active tab
+		 * button, but the non active tab button will still
+		 * remain disabled
+		 */
+		$.each($openedPageIds, function(i, v){
+			var newTabId = activeTabId.replace(/[0-9]+/, v);
+			melisCms.enableCmsButtons(newTabId);
+		});
+
+		//clear the opened tab pages id
+		$openedPageIds = [];
 
         // PAGE ACCESS user rights checking
         $.ajax({
@@ -632,6 +648,20 @@ var melisCms = (function(){
         	alert( translations.tr_meliscore_error_message );
         });
     }
+
+	/**
+	 * Callback function when opening a page
+	 *
+	 * Add another parameter if needed
+	 * @param pageId
+	 */
+	function pageTabOpenCallback(pageId)
+	{
+		//store the opened pages id
+		$openedPageIds.push(pageId);
+
+		//add another statement below if needed
+	}
 
 	// WINDOW SCROLL FUNCTIONALITIES ========================================================================================================
 	if( melisCore.screenSize >= 768){
@@ -765,6 +795,8 @@ var melisCms = (function(){
 		enableCmsButtons								: 			enableCmsbuttons,
 		
 		iframeLoad										:			iframeLoad,
+
+		pageTabOpenCallback								:			pageTabOpenCallback,
 	};
 
 })();
