@@ -41,7 +41,10 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
     	<?php       
     }
 ?>
-
+<?php
+    $ctrNewPlugins = 0;
+    $sectionHasNewPlugins = $this->sectionNewPlugins;
+?>
 <div class="melis-cms-dnd-box">
     <div class="melis-cms-dnd-fix-menu">
         <div class="melis-cms-dnd-title"><?= $this->translate('tr_meliscms_Plugins'); ?></div>
@@ -65,6 +68,11 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                 ?>
                             </div>
                             <span class="melis-cms-filter-btn"><?= $section; ?> <i class="fa fa-angle-down"></i></span>
+                            <?php if(in_array($section,$sectionHasNewPlugins)) {?>
+                                <div class="melis-plugins-icon-new-parent">
+                                    <span class="fa fa-certificate melis-plugins-icon-new"></span>
+                                </div>
+                            <?php }?>
                             <div class="melis-cms-plugin-snippets-box">
                                 <?php foreach ($plugin as $moduleName => $templatingPlugins) { ?>
                                     <?php
@@ -99,8 +107,13 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                                                                         $name = $conf['name'] ?? $pluginName;
                                                                                         $subcategory = $conf['subcategory'];
                                                                                         $subcategoryId = $subcategory['id'] ?? null;
+                                                                                        $isNew = $config['isNew'] ?? false;
+                                                                                        $borderNewClass = '';
+                                                                                        if ($isNew) {
+                                                                                            $borderNewClass = 'border-new-plugin';
+                                                                                        }
                                                                                         if ($plugin != 'title') { ?>
-                                                                                            <div class="melis-cms-plugin-snippets"
+                                                                                            <div class="melis-cms-plugin-snippets <?= $borderNewClass ?>"
                                                                                                  data-module-name="<?= $moduleName; ?>"
                                                                                                  data-plugin-name="<?= $plugin; ?>"
                                                                                                  data-plugin-site-module="<?= $this->siteModule ?>"
@@ -120,15 +133,22 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                                                     <?php }?>
                                                                     <?php
                                                                 } else {
-                                                                    /*
-                                                                     * this is for module that has no subsections
-                                                                     */
-                                                                    $conf = $pluginConfig['melis'];
-                                                                    $thumbnail = $conf['thumbnail']  ?? "/MelisFront/plugins/images/default.jpg";
-                                                                    $name      = $conf['name'] ?? $pluginName;
-                                                                    $moduleTextDisplay = $conf['moduleName'];?>
-                                                                    <div class="melis-cms-plugin-snippets" data-module-name="<?= $moduleName; ?>" data-plugin-name="<?= $pluginName; ?>" data-plugin-site-module="<?= $this->siteModule ?>" title="<?php if (!empty($conf['description'])){ echo $this->translate($conf['description']); } ?>">
-                                                                        <?php if ($moduleName!= "MelisMiniTemplate") {?>
+                                                                        /*
+                                                                         * this is for module that has no subsections
+                                                                         */
+                                                                        $conf = $pluginConfig['melis'];
+                                                                        $thumbnail = $conf['thumbnail']  ?? "/MelisFront/plugins/images/default.jpg";
+                                                                        $name      = $conf['name'] ?? $pluginName;
+                                                                        $moduleTextDisplay = $conf['moduleName'];
+                                                                        $titleTextClass = '';
+                                                                        $isNew = $pluginConfig['isNew'] ?? false;
+                                                                        $borderNewClass = '';
+                                                                        if ($isNew) {
+                                                                            $borderNewClass = 'border-new-plugin';
+                                                                        }
+                                                                    ?>
+                                                                    <div class="melis-cms-plugin-snippets <?= $borderNewClass ?>" data-module-name="<?= $moduleName; ?>" data-plugin-name="<?= $pluginName; ?>" data-plugin-site-module="<?= $this->siteModule ?>" title="<?php if (!empty($conf['description'])){ echo $this->translate($conf['description']); } ?>">
+                                                                        <?php if ($moduleName!= "MelisMiniTemplate") { ?>
                                                                             <img  src="<?= $thumbnail; ?>" alt="">
                                                                         <?php }?>
                                                                         <span class="melis-cms-plugin-title"><?= $this->translate($name); ?></span>
@@ -164,9 +184,13 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                                                     $name = $conf['name'] ?? $pluginName;
                                                                     $subcategory = $conf['subcategory'];
                                                                     $subcategoryId = $subcategory['id'] ?? null;
-                                                                    echo $plugin;
+                                                                    $isNew = $config['isNew'] ?? false;
+                                                                    $borderNewClass = '';
+                                                                    if ($isNew) {
+                                                                        $borderNewClass = 'border-new-plugin';
+                                                                    }
                                                                     if ($plugin != 'title') { ?>
-                                                                        <div class="melis-cms-plugin-snippets"
+                                                                        <div class="melis-cms-plugin-snippets <?=$borderNewClass?>"
                                                                              data-module-name="<?= $moduleName; ?>"
                                                                              data-plugin-name="<?= $plugin; ?>"
                                                                              data-plugin-site-module="<?= $this->siteModule ?>"
@@ -185,12 +209,18 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                                         </div>
                                                     <?php }?>
                                                <?php } else {
-                                                    // this is for plugins doesnt have subsection(s)
-                                                    $conf = $pluginConfig['melis'];
-                                                    $thumbnail = $conf['thumbnail']  ?? "/MelisFront/plugins/images/default.jpg";
-                                                    $name      = $conf['name'] ?? $pluginName;
-                                                    $moduleTextDisplay = $conf['moduleName'];?>
-                                                    <div class="melis-cms-plugin-snippets" data-module-name="<?= $moduleName; ?>" data-plugin-name="<?= $pluginName; ?>" data-plugin-site-module="<?= $this->siteModule ?>" title="<?php if (!empty($conf['description'])){ echo $this->translate($conf['description']); } ?>">
+                                                        // this is for plugins doesnt have subsection(s)
+                                                        $conf = $pluginConfig['melis'];
+                                                        $thumbnail = $conf['thumbnail']  ?? "/MelisFront/plugins/images/default.jpg";
+                                                        $name      = $conf['name'] ?? $pluginName;
+                                                        $moduleTextDisplay = $conf['moduleName'];
+                                                        $isNew = $pluginConfig['isNew'] ?? false;
+                                                        $borderNewClass = '';
+                                                        if ($isNew) {
+                                                            $borderNewClass = 'border-new-plugin';
+                                                        }
+                                                    ?>
+                                                    <div class="melis-cms-plugin-snippets <?= $borderNewClass ?>" data-module-name="<?= $moduleName; ?>" data-plugin-name="<?= $pluginName; ?>" data-plugin-site-module="<?= $this->siteModule ?>" title="<?php if (!empty($conf['description'])){ echo $this->translate($conf['description']); } ?>">
                                                         <?php if ($moduleName!= "MelisMiniTemplate") {?>
                                                             <img  src="<?= $thumbnail; ?>" alt="">
                                                         <?php }?>
@@ -211,6 +241,18 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
         </div>
     </div>
     <div id="melisPluginBtn">
+        <?php if (!empty($sectionHasNewPlugins) ) {?>
+            <?php
+                // latesplugin installed
+                $latestPlugin = $this->latestPlugin;
+                $latestPluginDatetime = $latestPlugin['latest_plugin_datetime'];
+                $dateTimeElapse = date('Y-m-d h:i:s',strtotime("+5 day",strtotime($latestPluginDatetime)));
+                $dateToday      = date('Y-m-d h:i:s');
+            ?>
+            <?php if ($dateToday < $dateTimeElapse) {?>
+                <span class="melis-templating-new-plugin">New</span>
+            <?php }?>
+        <?php }?>
         <i class="fa fa-plug"></i>
     </div>
 </div>

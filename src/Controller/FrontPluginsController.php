@@ -20,6 +20,8 @@ use MelisCms\Service\MelisCmsRightsService;
  */
 class FrontPluginsController extends AbstractActionController
 {
+    private $sectionHasNewPlugins = [];
+
     public function renderPluginsMenuAction()
     {
         $translator = $this->getServiceLocator()->get('translator');
@@ -133,6 +135,7 @@ class FrontPluginsController extends AbstractActionController
         $view->siteModule = $siteModule;
         $view->newPluginList = $newPluginList;
         $view->latestPlugin = $latesPlugin;
+        $view->sectionNewPlugins = array_unique($this->sectionHasNewPlugins);
 
         return $view;
     }
@@ -369,6 +372,7 @@ class FrontPluginsController extends AbstractActionController
         // get module categories
         $moduleSvc = $this->getServiceLocator()->get('ModulesService');
         $configSvc = $this->getServiceLocator()->get('MelisCoreConfig');
+        $melisPuginsSvc = $this->getServiceLocator()->get('MelisCorePluginsService');
         $marketPlaceModuleSection = $moduleSvc->getPackagistCategories();
         /*
          * In case there is no internet or cant connect to the markeplace domain
@@ -412,8 +416,21 @@ class FrontPluginsController extends AbstractActionController
                                 $newPluginList[$pluginSection][$module][$subsectionId][$pluginName] = $pluginConfig;
                                 // label of sub category
                                 $newPluginList[$pluginSection][$module][$subsectionId]['title'] = $subsectionText;
+                                // indication that the plugin is newly installed
+                                $isNew = $melisPuginsSvc->pluginIsNew($pluginName);
+                                $newPluginList[$pluginSection][$module][$subsectionId][$pluginName]['isNew'] = $isNew;
+                                if ($isNew) {
+                                    $this->sectionHasNewPlugins[] = $pluginSection;
+                                }
                             } else {
+                                // no subsection
                                 $newPluginList[$pluginSection][$module][$pluginName] = $pluginConfig;
+                                // indication that the plugin is newly installed
+                                $isNew = $melisPuginsSvc->pluginIsNew($pluginName);
+                                $newPluginList[$pluginSection][$module][$pluginName]['isNew'] = $isNew;
+                                if ($isNew) {
+                                    $this->sectionHasNewPlugins[] = $pluginSection;
+                                }
                             }
                         } else {
                             /*
@@ -429,11 +446,21 @@ class FrontPluginsController extends AbstractActionController
                                 $newPluginList['Others'][$module][$subsectionId][$pluginName] = $pluginConfig;
                                 // label of sub category
                                 $newPluginList['Others'][$module][$subsectionId]['title'] = $subsectionText;
+                                // indication that the plugin is newly installed
+                                $isNew = $melisPuginsSvc->pluginIsNew($pluginName);
+                                $newPluginList['Others'][$module][$subsectionId][$pluginName]['isNew'] = $isNew;
+                                if ($isNew) {
+                                    $this->sectionHasNewPlugins[] = $pluginSection;
+                                }
                             } else {
                                 $newPluginList['Others'][$module][$pluginName] = $pluginConfig;
+                                // indication that the plugin is newly installed
+                                $isNew = $melisPuginsSvc->pluginIsNew($pluginName);
+                                $newPluginList['Others'][$module][$pluginName]['isNew'] = $isNew;
+                                if ($isNew) {
+                                    $this->sectionHasNewPlugins[] = $pluginSection;
+                                }
                             }
-
-
                         }
                     }
                 }
