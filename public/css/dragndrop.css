@@ -849,6 +849,18 @@ span.melis-cms-filter-btn-sub-category.active {
 .reverse-color {
     text-shadow: -1px 0 3px #944242, 0 1px 3px #944242, 1px 0 3px #944242, 0 -1px 3px #944242;
 }
+.text-new-plugin-indicator {
+    position:absolute;
+    font-size:11px;
+    top:-18px;
+    left:-16px;
+}
+.melis-templating-new-plugin i {
+    font-size: 44px;
+    color: #f52929;
+    text-shadow: 0 0 3px #000000;
+}
+
 @-webkit-keyframes pulse {to {box-shadow: 0 0 0 45px rgba(147, 46, 42, 0);}}
 @-moz-keyframes pulse {to {box-shadow: 0 0 0 45px rgba(147, 46, 42, 0);}}
 @-ms-keyframes pulse {to {box-shadow: 0 0 0 45px rgba(147, 46, 42, 0);}}

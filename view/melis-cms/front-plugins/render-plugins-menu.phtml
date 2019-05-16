@@ -273,7 +273,10 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                 $dateToday      = date('Y-m-d h:i:s');
             ?>
             <?php if ($dateToday < $dateTimeElapse) {?>
-                <span class="melis-templating-new-plugin">New</span>
+                <span class="melis-templating-new-plugin">
+                    <i class="fa fa-certificate new-plugin-indicator"></i>
+                </span>
+                <span class="text-new-plugin-indicator">New</span>
             <?php }?>
         <?php }?>
         <i class="fa fa-plug"></i>
