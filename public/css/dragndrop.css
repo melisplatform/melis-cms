@@ -837,9 +837,8 @@ span.melis-cms-filter-btn-sub-category.active {
 }
 .melis-templating-new-plugin {
     position: absolute;
-    top: -14px;
-    left: -17px;
-    background: #72af46;
+    top: -25px;
+    left: -27px;
     padding-left: 5px;
     padding-right: 5px;
     border-radius: 15px;
@@ -856,7 +855,7 @@ span.melis-cms-filter-btn-sub-category.active {
     left:-16px;
 }
 .melis-templating-new-plugin i {
-    font-size: 44px;
+    font-size: 44px !important;
     color: #f52929;
     text-shadow: 0 0 3px #000000;
 }
