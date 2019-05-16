@@ -393,10 +393,15 @@ class FrontPluginsController extends AbstractActionController
         //custom sections
         $customSection = [
             'Others',
-            'CustomProjects'
+            'CustomProjects',
+            'MelisCommerce' // special section
         ];
         // merge all sections
         $melisSection = array_merge($marketPlaceModuleSection, $customSection);
+        // remove MelisCore section because there is no melis-core in front or templating plugins
+        if (($key = array_search('MelisCore',$melisSection)) !== false) {
+            unset($melisSection[$key]);
+        }
         $newPluginList = [];
         // put the section in order
         if (! empty($melisSection)) {

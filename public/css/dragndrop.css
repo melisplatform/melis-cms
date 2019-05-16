@@ -268,7 +268,7 @@ body {
     border-color: #373737;
 }
 .melis-cms-category-btn.active {
-    background: #b11e23;
+    background: #c71920;
     border-color: #b33a35;
     -webkit-box-shadow: inset 0px 2px 4px rgba(34, 34, 34, 0.4);
     -moz-box-shadow: inset 0px 2px 4px rgba(34, 34, 34, 0.4);
@@ -789,7 +789,7 @@ body {
     position:absolute;
 }
 span.melis-cms-filter-btn-sub-category.active {
-    background: #9c1015;
+    background: #ab141a;
     border: 1px solid #711b17;
 }
 .melis-cms-filter-btn {
