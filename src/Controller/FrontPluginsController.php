@@ -476,7 +476,7 @@ class FrontPluginsController extends AbstractActionController
                                 $isNew = $melisPuginsSvc->pluginIsNew($pluginName);
                                 $newPluginList['Others'][$module][$pluginName]['isNew'] = $isNew;
                                 if ($isNew) {
-                                    $this->sectionHasNewPlugins[] = $pluginSection;
+                                    $this->sectionHasNewPlugins[] = 'Others';
                                     $this->modulesHasNewPlugins[] = $module;
                                 }
                             }
