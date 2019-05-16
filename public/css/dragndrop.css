@@ -837,8 +837,8 @@ span.melis-cms-filter-btn-sub-category.active {
 }
 .melis-templating-new-plugin {
     position: absolute;
-    top: -25px;
-    left: -27px;
+    top: -28px;
+    left: -29px;
     padding-left: 5px;
     padding-right: 5px;
     border-radius: 15px;
@@ -849,13 +849,14 @@ span.melis-cms-filter-btn-sub-category.active {
     text-shadow: -1px 0 3px #944242, 0 1px 3px #944242, 1px 0 3px #944242, 0 -1px 3px #944242;
 }
 .text-new-plugin-indicator {
-    position:absolute;
-    font-size:11px;
-    top:-18px;
-    left:-16px;
+    position: absolute;
+    font-size: 11px;
+    top: -18px;
+    left: -14px;
+    font-weight: 700;
 }
 .melis-templating-new-plugin i {
-    font-size: 44px !important;
+    font-size: 50px !important;
     color: #f52929;
     text-shadow: 0 0 3px #000000;
 }
