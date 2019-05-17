@@ -70,7 +70,7 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                 <?= $section; ?>
                                 <?php if(in_array($section,$sectionHasNewPlugins)) {?>
                                     <div class="melis-plugins-icon-new-parent">
-                                        <span class="fa fa-certificate melis-plugins-icon-new"></span>
+                                        <span class="fa fa-circle melis-plugins-icon-new"></span>
                                     </div>
                                 <?php }?>
                                 <i class="fa fa-angle-down angle-down-menu"></i>
@@ -86,7 +86,7 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                             <span class="melis-cms-category-btn"><?= $moduleText; ?>
                                                 <?php if(in_array($moduleName,$moduleHasNewPlugins)) {?>
                                                     <div class="melis-plugins-icon-new-child">
-                                                        <span class="fa fa-certificate melis-plugins-icon-new"></span>
+                                                        <span class="fa fa-circle melis-plugins-icon-new"></span>
                                                     </div>
                                                 <?php }?>
                                                 <i class="fa fa-angle-down angle-down-menu"></i>
@@ -109,7 +109,7 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                                                         <span class="melis-cms-filter-btn-sub-category"><?= $subsectionTitle; ?>
                                                                             <?php if(in_array($pluginConfig['title'],$subsectionHasNewPlugins)) {?>
                                                                                     <div class="melis-plugins-icon-new-sub-child">
-                                                                                        <span class="fa fa-certificate melis-plugins-icon-new"></span>
+                                                                                        <span class="fa fa-circle melis-plugins-icon-new"></span>
                                                                                     </div>
                                                                             <?php }?>
                                                                             <i class="fa fa-angle-down"></i>
@@ -194,7 +194,7 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                                             <?= $subsectionTitle; ?>
                                                             <?php if(in_array($pluginConfig['title'],$subsectionHasNewPlugins)) {?>
                                                                 <div class="melis-plugins-icon-new-sub-child">
-                                                                    <span class="fa fa-certificate melis-plugins-icon-new"></span>
+                                                                    <span class="fa fa-circle melis-plugins-icon-new"></span>
                                                                 </div>
                                                             <?php }?>
                                                             <i class="fa fa-angle-down"></i></span>
@@ -274,7 +274,7 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
             ?>
             <?php if ($dateToday < $dateTimeElapse) {?>
                 <span class="melis-templating-new-plugin">
-                    <i class="fa fa-certificate new-plugin-indicator"></i>
+                    <i class="fa fa-circle new-plugin-indicator"></i>
                 </span>
                 <span class="text-new-plugin-indicator">
                      <i class="fa fa-bell-o"></i>
