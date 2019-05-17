@@ -323,9 +323,9 @@ ul.meliscms-site-language-homepage-list > li:hover {
         padding: 10px;
     }
 
-    .module-display-indicator{
-        display: none !important;
-    }
+    /*.module-display-indicator{*/
+        /*display: none !important;*/
+    /*}*/
 }
 
 @media only screen and (max-width: 420px) {
