@@ -258,6 +258,10 @@ ul.meliscms-site-language-homepage-list > li:hover {
     margin: 0 -5.5px !important;
 }
 
+.create-site-step li.steps_number_indicator, .module-display-indicator{
+    display: block;
+}
+
 /*Mobile Tool Sites*/
 
 @media only screen and (min-width: 992px) {
@@ -295,10 +299,10 @@ ul.meliscms-site-language-homepage-list > li:hover {
     }
 }
 
-@media only screen and (max-width: 530px) {
+@media only screen and (max-width: 534px) {
     .widget.widget-wizard-pills .widget-head ul li a,
     .widget.widget-wizard-pills .widget-head ul li.active a{
-        width: 60px;
+        width: 50px;
     }
 }
 
@@ -310,11 +314,30 @@ ul.meliscms-site-language-homepage-list > li:hover {
     }
 }
 
-@media only screen and (max-width: 420px) {
-    .widget.widget-wizard-pills .widget-head ul li a,
-    .widget.widget-wizard-pills .widget-head ul li.active a{
-        width: 37px;
+@media only screen and (max-width: 484px) {
+    .create-site-step li.steps_number_indicator{
+        display: none !important;
     }
+
+    .widget.widget-tabs>.widget-head ul.create-site-step{
+        padding: 10px;
+    }
+
+    .module-display-indicator{
+        display: none !important;
+    }
+}
+
+@media only screen and (max-width: 420px) {
+    /*.mod-name-container{*/
+        /*width: 120px;*/
+    /*}*/
+
+    /*.module-cont h4 {*/
+        /*text-overflow: ellipsis;*/
+        /*overflow: hidden;*/
+        /*width: 100%;*/
+    /*}*/
 }
 
 

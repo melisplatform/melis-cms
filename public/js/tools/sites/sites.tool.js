@@ -265,7 +265,10 @@ $(document).ready(function() {
             loop: false,
             rewindNav: false,
             autoHeight: true,
-            responsive: false,
+            itemsMobile : false,
+            itemsTablet: false,
+            itemsDesktopSmall : false,
+            itemsDesktop : false,
             afterMove: function (elem) {
                 var current = this.currentItem;
                 //hide the prev button when we are on the first step
