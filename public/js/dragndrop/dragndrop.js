@@ -401,6 +401,7 @@ var melisDragnDrop = (function($, window) {
 
     function showPlugLists() {
         if($(this).hasClass("active")) {
+            $(this).siblings('.melis-cms-plugin-snippets-box').find(".melis-cms-category-btn.active").find('.reverse-color').removeClass('reverse-color');
             $(this).find('.melis-plugins-icon-new-parent').removeClass('reverse-color');
             $(this).removeClass("active").siblings(".melis-cms-plugin-snippets-box").slideUp();
             $(this).siblings(".melis-cms-plugin-snippets-box").find(".melis-cms-category-btn.active").removeClass("active").siblings(".melis-cms-category-plugins-box").slideUp();
@@ -417,7 +418,6 @@ var melisDragnDrop = (function($, window) {
         if($(this).hasClass("active")) {
             $(this).removeClass("active").siblings(".melis-cms-category-plugins-box").slideUp();
             $(this).find('.melis-plugins-icon-new-child').removeClass('reverse-color');
-
         } else {
             $(".melis-cms-category-btn.active").find('.melis-plugins-icon-new-child').removeClass('reverse-color');
             $(".melis-cms-category-btn.active").removeClass("active").siblings(".melis-cms-category-plugins-box").slideUp();
