@@ -322,22 +322,15 @@ ul.meliscms-site-language-homepage-list > li:hover {
     .widget.widget-tabs>.widget-head ul.create-site-step{
         padding: 10px;
     }
-
-    /*.module-display-indicator{*/
-        /*display: none !important;*/
-    /*}*/
 }
 
 @media only screen and (max-width: 420px) {
-    /*.mod-name-container{*/
-        /*width: 120px;*/
-    /*}*/
 
-    /*.module-cont h4 {*/
-        /*text-overflow: ellipsis;*/
-        /*overflow: hidden;*/
-        /*width: 100%;*/
-    /*}*/
 }
 
+@media only screen and (max-width: 360px) {
+    .module-cont h4 {
+        font-size: 13px;
+    }
+}
 
