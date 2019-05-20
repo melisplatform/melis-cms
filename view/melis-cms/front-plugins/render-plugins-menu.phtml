@@ -67,7 +67,13 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                                 <div class="melis-section-icons">
                                     <?php echo $this->getMelisSectionIcons($section); // get melis module section icons ?>
                                 </div>
-                                <?= $section; ?>
+                                <?php
+                                    $sectionName = $section;
+                                    if ($section == 'CustomProjects') {
+                                        $sectionName = "Custom / Projects";
+                                    }
+                                ?>
+                                <?= $sectionName; ?>
                                 <?php if(in_array($section,$sectionHasNewPlugins)) {?>
                                     <div class="melis-plugins-icon-new-parent">
                                         <span class="fa fa-circle melis-plugins-icon-new"></span>
