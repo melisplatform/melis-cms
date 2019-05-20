@@ -198,7 +198,7 @@
     	// initialation of local variable
     	zoneId = 'id_meliscms_input_page_tree';
     	melisKey = 'meliscms_input_page_tree';
-    	modalUrl = 'melis/MelisCms/Page/renderPageModal';
+    	modalUrl = '/melis/MelisCms/Page/renderPageModal';
     	
     	// requesitng to create modal and display after
     	if($('#id_meliscms_input_page_tree_container').length){

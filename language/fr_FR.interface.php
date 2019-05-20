@@ -608,6 +608,8 @@
         'tr_melis_cms_sites_tool_config_title' => 'Configuration sites',
         'tr_melis_cms_sites_tool_config_array_warning' => 'Les tableaux imbriqués avec une profondeur de 2 ou plus ne sont pas affichés. Vous pouvez les éditer manuellement sur le fichier.',
         'tr_melis_cms_sites_tool_general' => 'Général',
+        'tr_melis_cms_sites_tool_default_value' => 'Valeur par défaut du fichier de configuration',
+        'tr_melis_cms_sites_tool_database_value' => 'Valeur dans la base de données',
 
         #SITES INTERFACES
         'tr_melis_cms_sites_tool_add_site_button' => 'Bouton ajouter un site',

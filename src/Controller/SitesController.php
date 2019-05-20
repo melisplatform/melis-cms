@@ -1275,7 +1275,7 @@ class SitesController extends AbstractActionController
                     }
 
                     if ($langKey == 'gen') {
-                        $diff = array_diff($langValue['config'], $configFromFile['site'][$siteName]['allSites']);
+                        $diff = array_diff_assoc($langValue['config'], $configFromFile['site'][$siteName]['allSites']);
 
                         if (!empty($diff)) {
                             foreach ($diff as $key => $val) {
@@ -1287,7 +1287,7 @@ class SitesController extends AbstractActionController
 
                         if (!empty($langValue['configArray'])) {
                             foreach ($langValue['configArray'] as $cKey => $cVal) {
-                                $diff = array_diff($langValue['configArray'][$cKey], $configFromFile['site'][$siteName]['allSitesArray'][$cKey]);
+                                $diff = array_diff_assoc($langValue['configArray'][$cKey], $configFromFile['site'][$siteName]['allSitesArray'][$cKey]);
 
                                 foreach ($diff as $key => $val) {
                                     if ($val != '') {
@@ -1299,9 +1299,9 @@ class SitesController extends AbstractActionController
                     } else {
                         $locale = $this->getLangField(null, $siteId, $langKey, 1, 'lang_cms_locale');
                         if (array_key_exists($locale, $configFromFile['site'][$siteName][$siteId])) {
-                            $diff = array_diff($langValue['config'], $configFromFile['site'][$siteName][$siteId][$locale]);
+                            $diff = array_diff_assoc($langValue['config'], $configFromFile['site'][$siteName][$siteId][$locale]);
                         } else {
-                            $diff = array_diff($langValue['config'], []);
+                            $diff = array_diff_assoc($langValue['config'], []);
                         }
 
                         if (!empty($diff)) {
@@ -1315,9 +1315,9 @@ class SitesController extends AbstractActionController
                         if (!empty($langValue['configArray'])) {
                             foreach ($langValue['configArray'] as $cKey => $cVal) {
                                 if (array_key_exists($locale . 'Array', $configFromFile['site'][$siteName][$siteId])) {
-                                    $diff = array_diff($langValue['configArray'][$cKey], $configFromFile['site'][$siteName][$siteId][$locale . 'Array'][$cKey]);
+                                    $diff = array_diff_assoc($langValue['configArray'][$cKey], $configFromFile['site'][$siteName][$siteId][$locale . 'Array'][$cKey]);
                                 } else {
-                                    $diff = array_diff($langValue['configArray'][$cKey], []);
+                                    $diff = array_diff_assoc($langValue['configArray'][$cKey], []);
                                 }
 
                                 foreach ($diff as $key => $val) {
