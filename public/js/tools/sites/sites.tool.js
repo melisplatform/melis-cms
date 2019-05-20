@@ -84,6 +84,9 @@ $(document).ready(function() {
                     }
                 );
 
+                //refresh table tool sites
+                $("#tableToolSites").DataTable().ajax.reload();
+
                 //refresh site tree view
                 $("input[name=left_tree_search]").val('');
                 $("#id-mod-menu-dynatree").fancytree("destroy");
@@ -115,20 +118,24 @@ $(document).ready(function() {
      */
     function arrayDiff(a1,a2) {
         var result = [];
-        for (var i = 0; i < a1.length; i++) {
+        if(a1 != null) {
+            if (a1.length > 0) {
+                for (var i = 0; i < a1.length; i++) {
 
-            if(a2[i] !== a1[i]){
-                result.push(a1[i]);
-            }
+                    if (a2[i] !== a1[i]) {
+                        result.push(a1[i]);
+                    }
 
-        }
-        if(result.length < 1){
-            for (var i = 0; i < a2.length; i++) {
-
-                if(a2[i] !== a1[i]){
-                    result.push(a1[i]);
                 }
+                if (result.length < 1) {
+                    for (var i = 0; i < a2.length; i++) {
 
+                        if (a2[i] !== a1[i]) {
+                            result.push(a1[i]);
+                        }
+
+                    }
+                }
             }
         }
         return result;
