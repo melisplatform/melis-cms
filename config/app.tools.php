@@ -846,7 +846,7 @@ return array(
                                 'sortable' => true,
                             ),
                             'site_langs' => array(
-                                'text' => 'Site language(s)',
+                                'text' => 'tr_meliscms_tool_sites_site_languages',
                                 'css' => array('width' => '30%', 'padding-right' => '0'),
                                 'sortable' => false,
                             ),

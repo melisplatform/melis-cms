@@ -483,6 +483,7 @@
         'tr_meliscms_tool_sites_yes' => 'Yes <span class="melis-radio-box-circle"></span>',
         'tr_meliscms_tool_sites_no' => 'No <span class="melis-radio-box-circle"></span>',
         'tr_meliscms_tool_sites_module_name' => 'Module Name',
+        'tr_meliscms_tool_sites_site_languages' => 'Language(s)',
 
         'tr_melis_cms_sites_tool_add_step1_text' => 'This tool will help you create the right configuration for your site. This will ensure the right generations of files in your modules and an optimum compatibility with the Melis Platform ecosystem.',
         'tr_melis_cms_sites_tool_add_step1_is_multi_lang' => 'Will this site be multilingual?',
