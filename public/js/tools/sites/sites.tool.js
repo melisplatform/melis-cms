@@ -766,6 +766,9 @@ $(document).ready(function() {
     function showFormError(form, fieldNames){
         var newModuleLabel = "";
         var newModuleValue = "";
+        var newSDOmLabel = "";
+        var newSDOmValue = "";
+        var multiDomainErr = {};
         var errCtr = 0;
         var curForm = $(form+" input, "+form+" select");
 
@@ -800,6 +803,16 @@ $(document).ready(function() {
                     newModuleValue = $(this).val();
                     newModuleLabel = $(this).closest("form").find("label.err_" + inputName).not(":has(input)");
                 }
+
+                if(inputName == "sdom_domain"){
+                    newSDOmValue = $(this).val();
+                    newSDOmLabel = $(this).closest("form").find("label.err_" + inputName).not(":has(input)");
+                }
+
+                if(inputName.indexOf("site-domain-") !== -1){
+                    var sdomMultiVal = $(this).val();
+                    multiDomainErr[inputName] = sdomMultiVal;
+                }
             }
         });
 
@@ -819,6 +832,30 @@ $(document).ready(function() {
             }
         }
 
+        var domainNameErrCtr = 0;
+        /**
+         * Check if domain name is valide
+         */
+        //for single domain
+        if(newSDOmValue != "") {
+            if(validatedDomainName(newSDOmLabel, newSDOmValue)){
+                domainNameErrCtr++;
+            }
+        }
+
+        //for multi domain
+        $.each(multiDomainErr, function(lbl, value){
+            var sdomMultiLbl = $("#step3form-multi_domain").find("label.err_" + lbl).not(":has(input)");
+            if(validatedDomainName(sdomMultiLbl, value)){
+                domainNameErrCtr++;
+            }
+        });
+
+        if(domainNameErrCtr > 0) {
+            $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_step3_invalid_domain_name).removeClass("hidden");
+            return true;
+        }
+
         return false;
     }
 
@@ -835,6 +872,14 @@ $(document).ready(function() {
                 errlabel.removeClass("fieldErrorColor");
             });
         }
+    }
+
+    function validatedDomainName(label, value){
+        if (/^(http(s)?:\/\/)?(www\.)?([a-z0-9-])+\.?[a-zA-Z\-]{1,}(\.([a-zA-Z]{2,}))$/.test(value) === false) {
+            label.addClass("fieldErrorColor");
+            return true;
+        }
+        return false;
     }
 
     /**

@@ -495,6 +495,7 @@
         'tr_melis_cms_sites_tool_add_step2_url_do_nothing' => 'I want nothing, my page url will be solely built on the page’s name <span class="melis-radio-box-circle"></span>',
         'tr_melis_cms_sites_tool_add_step3_single_domain_name' => 'What is the domain of this site?',
         'tr_melis_cms_sites_tool_add_step3_multi_domain_name' => 'What are the domains of these sites?',
+        'tr_melis_cms_sites_tool_add_step3_invalid_domain_name' => 'Invalid domain name',
         'tr_melis_cms_sites_tool_add_step4_is_new_module' => 'Do you want to use an existing module?',
         'tr_melis_cms_sites_tool_add_step4_select_module_option_err' => 'Please select if you want to use an existing module',
         'tr_melis_cms_sites_tool_add_step4_select_module' => 'Please choose the module attached to the site in the list:',
