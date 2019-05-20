@@ -392,9 +392,9 @@ class FrontPluginsController extends AbstractActionController
         }
         //custom sections
         $customSection = [
+            'MelisCommerce', // special section
             'Others',
-            'CustomProjects',
-            'MelisCommerce' // special section
+            'CustomProjects'
         ];
         // merge all sections
         $melisSection = array_merge($marketPlaceModuleSection, $customSection);
