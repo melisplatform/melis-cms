@@ -501,7 +501,7 @@
         'tr_melis_cms_sites_tool_add_step4_select_module' => 'Please choose the module attached to the site in the list:',
         'tr_melis_cms_sites_tool_add_step4_select_module_placeholder' => 'Choose a module',
         'tr_melis_cms_sites_tool_add_step4_create_module' => 'Name of the new module:',
-        'tr_melis_cms_sites_tool_add_step4_create_module_error' => 'Alphanumeric and underscore are the only valid characters allowed. The module name cannot start by a number neither contain any space',
+        'tr_melis_cms_sites_tool_add_step4_create_module_error' => 'Only alphabetic characters are authorized',
         'tr_melis_cms_sites_tool_add_step4_create_file_for_website' => 'Create the folders & files for the new module?',
         'tr_melis_cms_sites_tool_add_step5_new_site_is_created' => 'A new site will be created with following parameters:',
         'tr_melis_cms_sites_tool_add_step5_new_site_using_existing_module' => 'The site <b>“%siteName”</b> will use the existing module <b>“%siteModule”</b>.</br>The module folders and files will not be created.',

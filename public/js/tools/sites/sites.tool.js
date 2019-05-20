@@ -825,7 +825,7 @@ $(document).ready(function() {
          * create a new module name
          */
         if(newModuleValue != "") {
-            if (/^[A-Za-z_]\w*$/.test(newModuleValue) === false) {
+            if (/^[A-Za-z]*$/.test(newModuleValue) === false) {
                 newModuleLabel.addClass("fieldErrorColor");
                 $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_step4_create_module_error).removeClass("hidden");
                 return true;

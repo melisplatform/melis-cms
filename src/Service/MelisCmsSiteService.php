@@ -1047,16 +1047,45 @@ class MelisCmsSiteService extends MelisCoreGeneralService
 	/**
 	 * This will modified a string to valid zf2 module name
 	 * @param string $str
+	 * @param boolean $genSmallCase
 	 * @return string
 	 */
-	public function generateModuleNameCase($str) {
-	    $i = array("-","_");
-	    $str = preg_replace('/([a-z])([A-Z])/', "$1 $2", $str);
-	    $str = str_replace($i, ' ', $str);
-	    $str = str_replace(' ', '', ucwords(strtolower($str)));
-	    $str = strtolower(substr($str,0,1)).substr($str,1);
-	    $str = ucfirst($str);
-	    return $str;
+	public function generateModuleNameCase($str, $genSmallCase = false) {
+
+        $engineTree = $this->getServiceLocator()->get('MelisEngineTree');
+
+        //store the given module name
+        $strBp = $str;
+
+        $replaceMent = "$1 $2";
+        $i = array("-","_");
+
+        //if $genSmallCase is true, then the module name will force to make it small letters aside from first letter
+        if($genSmallCase){
+            $replaceMent = "$1$2";
+        }
+
+        /**
+         * Process the module name
+         * generation
+         */
+        $str = preg_replace('/([a-z])([A-Z])/',  $replaceMent, $str);
+        $str = str_replace($i, ' ', $str);
+        $str = str_replace(' ', '', ucwords(strtolower($str)));
+        $str = strtolower(substr($str,0,1)).substr($str,1);
+        $str = ucfirst($str);
+        $str = $engineTree->cleanString($str);
+
+        /**
+         * if the given name is already correct,
+         * we just need to return it, else we make
+         * it small letters aside from first letter
+         */
+        if($strBp == $str || $genSmallCase){
+            return $str;
+        }else{
+            return $this->generateModuleNameCase($strBp, true);
+        }
 	}
 	
 	/**
