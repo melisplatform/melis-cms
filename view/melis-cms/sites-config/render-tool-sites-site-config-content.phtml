@@ -83,14 +83,14 @@ $data_melisKey = $this->melisKey;
                                             <label><?= $configKey ?></label>
                                             <div class="input-group ">
                                                 <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>" id="gen_<?= $configKey ?>" value="<?= $config ?>">
-                                                <span class="input-group-addon"><i class="fa fa-database fa-lg" title="From DB (Overridden)"></i></span>
+                                                <span class="input-group-addon"><i class="fa fa-database fa-lg" style="width: 20px;" title="<?= $this->translate('tr_melis_cms_sites_tool_database_value') ?>"></i></span>
                                             </div>
                                             <br>
                                         <?php else : ?>
                                             <label><?= $configKey ?></label>
                                             <div class="input-group ">
                                                 <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>" id="gen_<?= $configKey ?>" value="<?= $config ?>">
-                                                <span class="input-group-addon"><i class="fa fa-cogs fa-lg" title="From File (Default Value)"></i></span>
+                                                <span class="input-group-addon"><i class="fa fa-cogs fa-lg" style="width: 20px;" title="<?= $this->translate('tr_melis_cms_sites_tool_default_value') ?>"></i></span>
                                             </div>
                                             <br>
                                         <?php endif; ?>
@@ -103,15 +103,15 @@ $data_melisKey = $this->melisKey;
                                                     <?php if (!is_int($key)) : ?>
                                                         <label style="margin-left: 50px;"><?= $key ?></label>
                                                     <?php endif; ?>
-                                                    <?php if (!empty($this->valuesFromDb['allSites'][$configKey][$key])) : ?>
+                                                    <?php if (isset($this->valuesFromDb['allSites'][$configKey][$key])) : ?>
                                                         <div class="input-group" style="left: 50px;">
                                                             <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>[<?= $key ?>]" id="gen_<?= $key ?>" value="<?= $value ?>">
-                                                            <span class="input-group-addon"><i class="fa fa-database fa-lg" title="From DB (Overridden)"></i></span>
+                                                            <span class="input-group-addon"><i class="fa fa-database fa-lg" style="width: 20px;" title="<?= $this->translate('tr_melis_cms_sites_tool_database_value') ?>"></i></span>
                                                         </div>
                                                     <?php else : ?>
                                                         <div class="input-group" style="left: 50px;">
                                                             <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>[<?= $key ?>]" id="gen_<?= $key ?>" value="<?= $value ?>">
-                                                            <span class="input-group-addon"><i class="fa fa-cogs fa-lg" title="From File (Default Value)"></i></span>
+                                                            <span class="input-group-addon"><i class="fa fa-cogs fa-lg" style="width: 20px;" title="<?= $this->translate('tr_melis_cms_sites_tool_default_value') ?>"></i></span>
                                                         </div>
                                                     <?php endif; ?>
                                                 </div>
@@ -162,14 +162,14 @@ $data_melisKey = $this->melisKey;
                                                 <label><?= $configKey ?></label>
                                                 <div class="input-group ">
                                                     <input type="text" class="form-control col-md-10" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" value="<?= $config ?>">
-                                                    <span class="input-group-addon"><i class="fa fa-database fa-lg" title="From DB (Overridden)"></i></span>
+                                                    <span class="input-group-addon"><i class="fa fa-database fa-lg" style="width: 20px;" title="<?= $this->translate('tr_melis_cms_sites_tool_database_value') ?>"></i></span>
                                                 </div>
                                                 <br>
                                             <?php else : ?>
                                                 <label><?= $configKey ?></label>
                                                 <div class="input-group ">
                                                     <input type="text" class="form-control col-md-10" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" value="<?= $config ?>">
-                                                    <span class="input-group-addon"><i class="fa fa-cogs fa-lg" title="From File (Default Value)"></i></span>
+                                                    <span class="input-group-addon"><i class="fa fa-cogs fa-lg" style="width: 20px;" title="<?= $this->translate('tr_melis_cms_sites_tool_default_value') ?>"></i></span>
                                                 </div>
                                                 <br>
                                             <?php endif; ?>
@@ -182,15 +182,15 @@ $data_melisKey = $this->melisKey;
                                                         <?php if (!is_int($key)) : ?>
                                                             <label style="margin-left: 50px;"><?= $key ?></label>
                                                         <?php endif; ?>
-                                                        <?php if (!empty($this->valuesFromDb[$lang['lang_cms_locale']][$configKey][$key])) : ?>
+                                                        <?php if (isset($this->valuesFromDb[$lang['lang_cms_locale']][$configKey][$key])) : ?>
                                                             <div class="input-group" style="left: 50px;">
                                                                 <input type="text" class="form-control" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>[<?= $key ?>]" id="gen_<?= $key ?>" value="<?= $value ?>">
-                                                                <span class="input-group-addon"><i class="fa fa-database fa-lg" title="From DB (Overridden)"></i></span>
+                                                                <span class="input-group-addon"><i class="fa fa-database fa-lg" style="width: 20px;" title="<?= $this->translate('tr_melis_cms_sites_tool_database_value') ?>"></i></span>
                                                             </div>
                                                         <?php else : ?>
                                                             <div class="input-group" style="left: 50px;">
                                                                 <input type="text" class="form-control" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>[<?= $key ?>]" id="gen_<?= $key ?>" value="<?= $value ?>">
-                                                                <span class="input-group-addon"><i class="fa fa-cogs fa-lg" title="From File (Default Value)"></i></span>
+                                                                <span class="input-group-addon"><i class="fa fa-cogs fa-lg" style="width: 20px;" title="<?= $this->translate('tr_melis_cms_sites_tool_default_value') ?>"></i></span>
                                                             </div>
                                                         <?php endif; ?>
                                                     </div>
