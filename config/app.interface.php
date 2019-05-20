@@ -56,11 +56,11 @@ return array(
                                     ),
                                     'interface' => [
 
-//                                        'meliscms_tool_site' => [
-//                                            'conf' => array(
-//                                                'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_site',
-//                                            ),
-//                                        ],
+                                        'meliscms_tool_sites' => array(
+                                            'conf' => array(
+                                                'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_sites',
+                                            ),
+                                        ),
                                         'meliscms_tool_site_301' => array(
                                             'conf' => array(
                                                 'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_site_301',

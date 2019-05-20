@@ -2,27 +2,6 @@
 
 return array(
     'plugins' => array(
-        'meliscore' => array(
-            'interface' => array(
-                'meliscore_leftmenu' => array(
-                    'interface' => array(
-                        'meliscms_toolstree_section' => array(
-                            'interface' => array(
-                                'meliscms_site_tools' => array(
-                                    'interface' => array(
-                                        'meliscms_tool_sites' => array(
-                                            'conf' => array(
-                                                'type' => '/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_sites',
-                                            ),
-                                        ),
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        ),
         'meliscms' => array(
             'ressources' => array(
                 'js' => array(
