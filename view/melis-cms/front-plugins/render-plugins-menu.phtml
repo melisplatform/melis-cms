@@ -275,7 +275,7 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
                 // latesplugin installed
                 $latestPlugin = $this->latestPlugin;
                 $latestPluginDatetime = $latestPlugin['latest_plugin_datetime'];
-                $dateTimeElapse = date('Y-m-d h:i:s',strtotime("+5 days",strtotime($latestPluginDatetime)));
+                $dateTimeElapse = date('Y-m-d h:i:s',strtotime("+" . $this->newPluginNotification . " days",strtotime($latestPluginDatetime)));
                 $dateToday      = date('Y-m-d h:i:s');
             ?>
             <?php if ($dateToday < $dateTimeElapse) {?>

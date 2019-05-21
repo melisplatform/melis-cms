@@ -131,7 +131,8 @@ class FrontPluginsController extends AbstractActionController
         $pluginSvc->checkTemplatingPlugins();
         // get the latest plugin installed
         $latesPlugin = $pluginSvc->getLatestPlugin($pluginSvc::TEMPLATING_PLUGIN_TYPE);
-
+        // for new plugin notifications
+        $pluginMenuHandler = $pluginSvc->getNewPluginMenuHandlerNotifDuration();
         $view = new ViewModel();
        // $view->pluginsConfig = $finalPluginList;
         $view->siteModule           = $siteModule;
@@ -140,11 +141,8 @@ class FrontPluginsController extends AbstractActionController
         $view->sectionNewPlugins    = array_unique($this->sectionHasNewPlugins);
         $view->modulesHasNewPlugins = array_unique($this->modulesHasNewPlugins);
         $view->subsectionHasNewPlugins = $this->subsectionHasNewPlugins;
-//        print_r($this->modulesHasNewPlugins);
-//        print_r($this->sectionHasNewPlugins);
-//        print_r($latesPlugin);
-//        print_r($this->newPlugins);
-//die;
+        $view->newPluginNotification = $pluginMenuHandler;
+
         return $view;
     }
 
