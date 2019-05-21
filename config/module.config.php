@@ -128,7 +128,6 @@ return array(
             'MelisCms\Controller\PageEdition' => 'MelisCms\Controller\PageEditionController',
             'MelisCms\Controller\ToolTemplate' => 'MelisCms\Controller\ToolTemplateController',
             'MelisCms\Controller\ToolStyle' => 'MelisCms\Controller\ToolStyleController',
-            'MelisCms\Controller\Site' => 'MelisCms\Controller\SiteController',
             'MelisCms\Controller\Language' => 'MelisCms\Controller\LanguageController',
             'MelisCms\Controller\Platform' => 'MelisCms\Controller\PlatformController',
             'MelisCms\Controller\SiteRedirect' => 'MelisCms\Controller\SiteRedirectController',

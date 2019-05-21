@@ -1,3 +1,6 @@
+//public variable for site translation loaded table detection
+var sitesTranslationLoadedTblLists = [];
+
 $(document).ready(function(){
     var body = $("body");
     var mst_id = 0;
@@ -114,6 +117,24 @@ $(document).ready(function(){
             }
         });
         e.preventDefault();
+    });
+
+    /**
+     * adjust table column to make it responsive on mobile
+     * when the user click on sites translation tab
+     */
+    body.on("shown.bs.tab", ".sites-tool-tabs a[data-toggle='tab']", function(){
+        if ($(window).width() <= 768) {
+            var target = $(this).attr("href");
+            target = target.replace("#", "");
+            var cleanString = target.replace(/\d+/g, '');
+            if (target != "") {
+                var transId = target.split("_");
+                if (cleanString == "_id_meliscms_tool_sites_site_translations") {
+                    $("#" + transId[0] + "_tableMelisSiteTranslation").DataTable().columns.adjust().responsive.recalc();
+                }
+            }
+        }
     });
 });
 
