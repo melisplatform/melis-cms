@@ -174,6 +174,16 @@ return array(
                                                 ),
                                             ),
                                         ),
+                                        array(
+                                            'name'    => 'regex', false,
+                                            'options' => array(
+                                                'pattern' => '/^(http(s)?:\/\/)?(www\.)?([a-zA-Z0-9-])+\.?([a-zA-Z0-9-])+\.?[a-zA-Z0-9\-]{0,}(\.([a-zA-Z]{2,}))$/',
+                                                'messages' => array(
+                                                    \Zend\Validator\Regex::NOT_MATCH => 'tr_melis_cms_sites_tool_add_step3_invalid_domain_name',
+                                                ),
+                                                'encoding' => 'UTF-8',
+                                            ),
+                                        ),
                                     ),
                                     'filters' => array(
                                         array('name' => 'StripTags'),
