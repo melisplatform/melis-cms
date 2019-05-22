@@ -836,12 +836,12 @@ return array(
 
                             ),
                             'site_label' => array(
-                                'text' => 'tr_meliscms_tool_site_site_label',
+                                'text' => 'Site',
                                 'css' => array('width' => '30%', 'padding-right' => '0'),
                                 'sortable' => true,
                             ),
                             'site_name' => array(
-                                'text' => 'tr_meliscms_tool_site_new_site_name',
+                                'text' => 'Module',
                                 'css' => array('width' => '30%', 'padding-right' => '0'),
                                 'sortable' => true,
                             ),
