@@ -2716,7 +2716,7 @@ return array(
                                         'options' => [
                                             'label' => 'tr_melis_core_gdpr_form_site',
                                             'form_type' => 'form-horizontal',
-                                            'empty_option' => 'tr_meliscore_common_choose',
+                                            'empty_option' => 'tr_melis_core_gdpr_form_site_select_default',
                                         ],
                                         'attributes' => [
                                             'id' => 'melis_core_gdpr_search_form_site_id',
