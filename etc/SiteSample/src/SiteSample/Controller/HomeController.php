@@ -11,7 +11,7 @@ namespace SiteSample\Controller;
 
 use Zend\View\Model\ViewModel;
 
-class IndexController extends BaseController
+class HomeController extends BaseController
 {
     public function indexAction()
     {

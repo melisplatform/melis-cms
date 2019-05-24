@@ -477,13 +477,13 @@ class MelisCmsSiteService extends MelisCoreGeneralService
         $langData = $langCmsTbl->getEntryById($langId)->current();
 
         $langLocale = $langData->lang_cms_locale;
-        $langName = explode('_', $langLocale);
+//        $langName = explode('_', $langLocale);
         /**
          * Create home page and template
          */
         //Creating Site Homepage page and template
-        $this->createSitePageTemplate($tplId, $savedSiteId, $siteModuleName, $langName[1] . ': Home', 'Index', 'index', $platformId);
-        $this->createSitePage($langName[1] . ':' . $siteLabel . ' - Home', -1, $langId, 'SITE', $pageId, $tplId, $platformId, $pageIdInitial);
+        $this->createSitePageTemplate($tplId, $savedSiteId, $siteModuleName, 'Home', 'Home', 'index', $platformId);
+        $this->createSitePage($siteLabel, -1, $langId, 'SITE', $pageId, $tplId, $platformId, $pageIdInitial);
 
         /**
          * Create site config per site and language
@@ -499,9 +499,9 @@ class MelisCmsSiteService extends MelisCoreGeneralService
          */
         if ($createSiteAndDomain) {
             $nxtTplId = ++$tplId;
-            $this->createSitePageTemplate($nxtTplId, $savedSiteId, $siteModuleName, $siteLabel . ' - 404', 'Page404', 'index', $platformId);
+            $this->createSitePageTemplate($nxtTplId, $savedSiteId, $siteModuleName, '404', 'Page404', 'index', $platformId);
             $page404Id = $pageId + 1;
-            $this->createSitePage($siteLabel . ' - 404', $pageId, $langId, 'PAGE', $page404Id, $nxtTplId, $platformId);
+            $this->createSitePage('404', $pageId, $langId, 'PAGE', $page404Id, $nxtTplId, $platformId);
 
             /**
              * save 404 data
