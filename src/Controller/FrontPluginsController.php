@@ -321,12 +321,16 @@ class FrontPluginsController extends AbstractActionController
             /*
              * organized plugins with no subcategory
              */
+            $publicModules = $melisPuginsSvc->getMelisPublicModules(true);
             foreach ($pluginList as $moduleName => $plugins) {
                 /*
                 * check first if the module is public or not
                 *  if public we will based the section on what is set from marketplace
                 */
-                $moduleSection = $melisPuginsSvc->getMelisPublicModuleSection($moduleName, true);
+                $moduleSection = "";
+                if (array_key_exists($moduleName,$publicModules)) {
+                    $moduleSection = $publicModules[$moduleName]['section'];
+                }
                 if (! empty($plugins)) {
                     foreach ($plugins as $pluginName => $pluginConfig) {
                         // put section for public module
