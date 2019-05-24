@@ -68,7 +68,7 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
          * Check if file exist
          */
         if (file_exists($filePath)) {
-            chmod($filePath, 0777);
+            //chmod($filePath, 0777);
             $moduleLoadList = include $filePath;
             $moduleLoadFile = $this->getModuleSvc()->getModulePlugins($exclude_modules);
 
