@@ -21,14 +21,20 @@ $data_melisKey = $this->melisKey;
                     <div class="widget-body innerAll inner-2x">
                         <div class="tab-content">
                             <div class="tab-pane active" <?php echo $id ?>>
-                                <label><?= "\"".$this->transKey."\""; ?></label><br>
                                 <div class="row">
+                                    <div class="col-md-12">
+                                        <h4>Key : <?= $this->transKey; ?></h4>
+                                        <br/>
+                                    </div>
                                     <div class="col-xs-12 col-md-4">
                                         <div class="product-text-tab-container" >
                                             <ul class="nav-tabs product-text-tab">
                                                 <?php foreach($this->siteLangs as $key => $transLang) { ?>
                                                     <li class="">
                                                         <a class="clearfix" data-toggle="tab" id="sites_translation_lang_<?= $transLang['lang_cms_id'] ?>" href="#<?= $transLang['lang_cms_locale']; ?>-log-type-details-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $transLang['lang_cms_id'] ?>">
+                                                            <span class="pull-right">
+                                                                <img src="<?= $this->serverUrl() . '/MelisCms/images/lang-flags/' . $transLang['lang_cms_locale'] . '.png' ?>" class="pull-right">
+                                                            </span>
                                                             <span><?= $transLang['lang_cms_name'] ?></span>
                                                         </a>
                                                     </li>
