@@ -792,6 +792,17 @@ span.melis-cms-filter-btn-sub-category.active {
     background: #ab141a;
     border: 1px solid #711b17;
 }
+span.melis-cms-filter-btn-sub-category i {
+    transition: transform 0.4s;
+    text-indent:0;
+}
+span.melis-cms-filter-btn-sub-category.active i {
+    -webkit-transform: rotateZ(-90deg);
+    -moz-transform: rotateZ(-90deg);
+    -ms-transform: rotateZ(-90deg);
+    -o-transform: rotateZ(-90deg);
+    transform: rotateZ(-90deg);
+}
 .melis-cms-filter-btn {
     text-indent:29px;
 }
