@@ -302,6 +302,7 @@ $(document).ready(function() {
 
                 isUserSelectModuleOption = false;
                 domainSingleOpt = "";
+                currentStepForm = '';
             }
         });
     };
