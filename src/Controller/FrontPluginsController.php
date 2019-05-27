@@ -288,6 +288,7 @@ class FrontPluginsController extends AbstractActionController
         // get module categories
         $moduleSvc = $this->getServiceLocator()->get('ModulesService');
         $configSvc = $this->getServiceLocator()->get('MelisCoreConfig');
+        $engineComposer  = $this->getServiceLocator()->get('MelisEngineComposer');
         $melisPuginsSvc = $this->getServiceLocator()->get('MelisCorePluginsService');
         $marketPlaceModuleSection = $moduleSvc->getPackagistCategories();
         /*
@@ -318,89 +319,98 @@ class FrontPluginsController extends AbstractActionController
             }
         }
         if (! empty($pluginList)) {
+            // get vendorModules
+            $vendorModules = $engineComposer->getVendorModules();
+            // convert string to lower
+            foreach ($vendorModules as $idx => $moduleName) {
+                $vendorModules[$idx] = strtolower($moduleName);
+            }
             /*
              * organized plugins with no subcategory
              */
             $publicModules = $melisPuginsSvc->getMelisPublicModules(true);
             foreach ($pluginList as $moduleName => $plugins) {
-                /*
-                * check first if the module is public or not
-                *  if public we will based the section on what is set from marketplace
-                */
-                $moduleSection = "";
-                if (array_key_exists($moduleName,$publicModules)) {
-                    $moduleSection = $publicModules[$moduleName]['section'];
-                }
-                if (! empty($plugins)) {
-                    foreach ($plugins as $pluginName => $pluginConfig) {
-                        // put section for public module
-                        if (! empty($moduleSection)) {
-                            $pluginSection = $moduleSection;
-                        } else {
-                            // if it goes here means module is either private or there is no internet connection
-                            $pluginSection = $pluginConfig['melis']['section'];
-                        }
-                        $module =  $moduleName ;
-                        if (in_array($pluginSection,$melisSection)) {
-                            // melis conifguration
-                            $melisConfig = $pluginConfig['melis'];
-                            if (isset($melisConfig['subcategory']) && ! empty($melisConfig['subcategory'])) {
-                                // this is for subsection
-                                $subsectionId = $melisConfig['subcategory']['id'] ?? null;
-                                $subsectionText = $melisConfig['subcategory']['title'] ?? null;
-                                $newPluginList[$pluginSection][$module]['hasSubsection'] = true;
-                                $newPluginList[$pluginSection][$module][$subsectionId][$pluginName] = $pluginConfig;
-                                // label of sub category
-                                $newPluginList[$pluginSection][$module][$subsectionId]['title'] = $subsectionText;
-                                // indication that the plugin is newly installed
-                                $isNew = $melisPuginsSvc->pluginIsNew($pluginName);
-                                $newPluginList[$pluginSection][$module][$subsectionId][$pluginName]['isNew'] = $isNew;
-                                if ($isNew) {
-                                    $this->sectionHasNewPlugins[] = $pluginSection;
-                                    $this->modulesHasNewPlugins[] = $module;
-                                    $this->subsectionHasNewPlugins[] = $subsectionText;
-                                }
+                // double check moduleName if it exisit on composer to avoid showing plugins that doesnt exists
+                if (in_array($moduleName,$vendorModules)) {
+                   /*
+                    * check first if the module is public or not
+                    *  if public we will based the section on what is set from marketplace
+                    */
+                    $moduleSection = "";
+                    if (array_key_exists($moduleName,$publicModules)) {
+                        $moduleSection = $publicModules[$moduleName]['section'];
+                    }
+                    if (! empty($plugins)) {
+                        foreach ($plugins as $pluginName => $pluginConfig) {
+                            // put section for public module
+                            if (! empty($moduleSection)) {
+                                $pluginSection = $moduleSection;
                             } else {
-                                // no subsection
-                                $newPluginList[$pluginSection][$module][$pluginName] = $pluginConfig;
-                                // indication that the plugin is newly installed
-                                $isNew = $melisPuginsSvc->pluginIsNew($pluginName);
-                                $newPluginList[$pluginSection][$module][$pluginName]['isNew'] = $isNew;
-                                if ($isNew) {
-                                    $this->sectionHasNewPlugins[] = $pluginSection;
-                                    $this->modulesHasNewPlugins[] = $module;
-                                }
+                                // if it goes here means module is either private or there is no internet connection
+                                $pluginSection = $pluginConfig['melis']['section'];
                             }
-                        } else {
-                            /*
-                            * if the section does not belong to the group it will go to the
-                            * Others section direclty
-                            */
-                            $melisConfig = $pluginConfig['melis'];
-                            if (isset($melisConfig['subcategory']) && ! empty($melisConfig['subcategory'])) {
-                                // this is for subsection
-                                $subsectionId = $melisConfig['subcategory']['id'] ?? null;
-                                $subsectionText = $melisConfig['subcategory']['title'] ?? null;
-                                $newPluginList['Others'][$module]['hasSubsection'] = true;
-                                $newPluginList['Others'][$module][$subsectionId][$pluginName] = $pluginConfig;
-                                // label of sub category
-                                $newPluginList['Others'][$module][$subsectionId]['title'] = $subsectionText;
-                                // indication that the plugin is newly installed
-                                $isNew = $melisPuginsSvc->pluginIsNew($pluginName);
-                                $newPluginList['Others'][$module][$subsectionId][$pluginName]['isNew'] = $isNew;
-                                if ($isNew) {
-                                    $this->sectionHasNewPlugins[] = $pluginSection;
-                                    $this->modulesHasNewPlugins[] = $module;
-                                    $this->subsectionHasNewPlugins[] = $subsectionText;
+                            $module =  $moduleName ;
+                            if (in_array($pluginSection,$melisSection)) {
+                                // melis conifguration
+                                $melisConfig = $pluginConfig['melis'];
+                                if (isset($melisConfig['subcategory']) && ! empty($melisConfig['subcategory'])) {
+                                    // this is for subsection
+                                    $subsectionId = $melisConfig['subcategory']['id'] ?? null;
+                                    $subsectionText = $melisConfig['subcategory']['title'] ?? null;
+                                    $newPluginList[$pluginSection][$module]['hasSubsection'] = true;
+                                    $newPluginList[$pluginSection][$module][$subsectionId][$pluginName] = $pluginConfig;
+                                    // label of sub category
+                                    $newPluginList[$pluginSection][$module][$subsectionId]['title'] = $subsectionText;
+                                    // indication that the plugin is newly installed
+                                    $isNew = $melisPuginsSvc->pluginIsNew($pluginName);
+                                    $newPluginList[$pluginSection][$module][$subsectionId][$pluginName]['isNew'] = $isNew;
+                                    if ($isNew) {
+                                        $this->sectionHasNewPlugins[] = $pluginSection;
+                                        $this->modulesHasNewPlugins[] = $module;
+                                        $this->subsectionHasNewPlugins[] = $subsectionText;
+                                    }
+                                } else {
+                                    // no subsection
+                                    $newPluginList[$pluginSection][$module][$pluginName] = $pluginConfig;
+                                    // indication that the plugin is newly installed
+                                    $isNew = $melisPuginsSvc->pluginIsNew($pluginName);
+                                    $newPluginList[$pluginSection][$module][$pluginName]['isNew'] = $isNew;
+                                    if ($isNew) {
+                                        $this->sectionHasNewPlugins[] = $pluginSection;
+                                        $this->modulesHasNewPlugins[] = $module;
+                                    }
                                 }
                             } else {
-                                $newPluginList['Others'][$module][$pluginName] = $pluginConfig;
-                                // indication that the plugin is newly installed
-                                $isNew = $melisPuginsSvc->pluginIsNew($pluginName);
-                                $newPluginList['Others'][$module][$pluginName]['isNew'] = $isNew;
-                                if ($isNew) {
-                                    $this->sectionHasNewPlugins[] = 'Others';
-                                    $this->modulesHasNewPlugins[] = $module;
+                                /*
+                                * if the section does not belong to the group it will go to the
+                                * Others section direclty
+                                */
+                                $melisConfig = $pluginConfig['melis'];
+                                if (isset($melisConfig['subcategory']) && ! empty($melisConfig['subcategory'])) {
+                                    // this is for subsection
+                                    $subsectionId = $melisConfig['subcategory']['id'] ?? null;
+                                    $subsectionText = $melisConfig['subcategory']['title'] ?? null;
+                                    $newPluginList['Others'][$module]['hasSubsection'] = true;
+                                    $newPluginList['Others'][$module][$subsectionId][$pluginName] = $pluginConfig;
+                                    // label of sub category
+                                    $newPluginList['Others'][$module][$subsectionId]['title'] = $subsectionText;
+                                    // indication that the plugin is newly installed
+                                    $isNew = $melisPuginsSvc->pluginIsNew($pluginName);
+                                    $newPluginList['Others'][$module][$subsectionId][$pluginName]['isNew'] = $isNew;
+                                    if ($isNew) {
+                                        $this->sectionHasNewPlugins[] = $pluginSection;
+                                        $this->modulesHasNewPlugins[] = $module;
+                                        $this->subsectionHasNewPlugins[] = $subsectionText;
+                                    }
+                                } else {
+                                    $newPluginList['Others'][$module][$pluginName] = $pluginConfig;
+                                    // indication that the plugin is newly installed
+                                    $isNew = $melisPuginsSvc->pluginIsNew($pluginName);
+                                    $newPluginList['Others'][$module][$pluginName]['isNew'] = $isNew;
+                                    if ($isNew) {
+                                        $this->sectionHasNewPlugins[] = 'Others';
+                                        $this->modulesHasNewPlugins[] = $module;
+                                    }
                                 }
                             }
                         }
