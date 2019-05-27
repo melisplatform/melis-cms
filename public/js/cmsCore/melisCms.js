@@ -577,15 +577,21 @@ var melisCms = (function(){
 		 * we need to loop every opened pages
 		 * so that we can enable the tab buttons
 		 *
-		 * We must not use the activeTabId here
+		 * We must not use the activeTabId here except
+		 * when the user publish or unpublish the page
 		 * because it will just enable the active tab
 		 * button, but the non active tab button will still
 		 * remain disabled
 		 */
-		$.each($openedPageIds, function(i, v){
-			var newTabId = activeTabId.replace(/[0-9]+/, v);
-			melisCms.enableCmsButtons(newTabId);
-		});
+		if($openedPageIds.length > 0) {
+			$.each($openedPageIds, function (i, v) {
+				var newTabId = activeTabId.replace(/[0-9]+/, v);
+				melisCms.enableCmsButtons(newTabId);
+			});
+		}else{
+			//activate what's the active page
+			melisCms.enableCmsButtons(activeTabId);
+		}
 
 		//clear the opened tab pages id
 		$openedPageIds = [];
