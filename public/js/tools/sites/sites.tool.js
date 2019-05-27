@@ -875,7 +875,7 @@ $(document).ready(function() {
     }
 
     function validatedDomainName(label, value){
-        if (/^(http(s)?:\/\/)?(www\.)?([a-zA-Z0-9-])+\.?([a-zA-Z0-9-])+\.?([a-zA-Z0-9-])+\.?([a-zA-Z0-9-])+\.?[a-zA-Z0-9\-]{0,}(\.([a-zA-Z]{2,}))$/.test(value) === false) {
+        if (/^(www\.)?(([a-zA-Z0-9-])+\.)?(([a-zA-Z0-9-])+\.)?(([a-zA-Z0-9-])+\.)?(([a-zA-Z0-9-])+\.)?[a-zA-Z0-9\-]{1,}(\.([a-zA-Z]{2,}))$/.test(value) === false) {
             label.addClass("fieldErrorColor");
             return true;
         }
