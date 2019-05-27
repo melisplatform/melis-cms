@@ -189,15 +189,16 @@
         modalUrl = 'melis/MelisCms/Page/renderPageModal';
 
         // requesitng to create modal and display after
-        if($('#id_meliscms_find_page_tree_container').length){
+        if( $('#id_meliscms_find_page_tree_container').length ) {
             $('#id_meliscms_find_page_tree_container').parent().remove();
         }
         
         window.parent.melisHelper.createModal(zoneId, melisKey, false, {}, modalUrl, function() {
         });
         
-        //$("#mce-link-tree").closest('.tox-dialog').css('z-index', 1049);
-        //$(".tox-tinymce-aux").css('z-index', 1048);
+        $("#mce-link-tree").closest('.tox-dialog').css('z-index', 1049);
+        $(".tox-tinymce-aux").css('z-index', 1048);
+        $(".tox-tinymce-aux").find(".tox-dialog-wrap__backdrop").css('z-index', 1047);
     }
     
     // used in regular form buttons

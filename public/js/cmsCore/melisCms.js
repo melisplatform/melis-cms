@@ -546,10 +546,12 @@ var melisCms = (function(){
     // IFRAME HEIGHT CONTROLS (for onload, displaySettings & sidebar collapse)
     function iframeLoad() {
     	var height = $("#"+ activeTabId + " .melis-iframe").contents().height();
+    		//width  = $("#"+ activeTabId + " .melis-iframe").contents().find("body").width();	
+
     	$("#"+ activeTabId + " .melis-iframe").css("height", height);
     	$("#"+ activeTabId + " .melis-iframe").css("min-height", "700px");  
-    	$("#"+ activeTabId + " .melis-iframe").css("width", "100%");
-    	
+    	//$("#"+ activeTabId + " .melis-iframe").css("width", width);
+   	
 		// Check and Get all Editable Value and dataTags from Editor TinyMCE
 		// $.ajax({
 		// 	type        : 'POST',

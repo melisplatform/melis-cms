@@ -485,7 +485,7 @@ var melisPluginEdition = (function($, window) {
     }
 
     function removePlugins() {
-        var pluginContainer = $(this).closest(".melis-ui-outlined");
+        var pluginluginContainer = $(this).closest(".melis-ui-outlined");
         var dragndropContainer = pluginContainer.closest(".melis-dragdropzone");
         var dropzone = dragndropContainer.data("plugin-id");
         var pluginsToolsBox = pluginContainer.find('.melis-plugin-tools-box');
@@ -544,7 +544,13 @@ var melisPluginEdition = (function($, window) {
         // recalculate frame height
         var frameHeight = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe").contents().find("body").height();
         var frame = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe");
-        frame.height(frameHeight);
+            /*
+             * Added iframe.length for fixing issue: Uncaught TypeError: Cannot read property 'calcFrameHeight' of undefined
+             * Added by: Junry 22/05/2019
+             */
+            if ( frame.length ) {
+                frame.height(frameHeight);
+            }
     }
 
     function disableLinks(e) {
