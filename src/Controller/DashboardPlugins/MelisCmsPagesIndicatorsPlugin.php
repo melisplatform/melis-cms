@@ -27,6 +27,15 @@ class MelisCmsPagesIndicatorsPlugin extends MelisCoreDashboardTemplatingPlugin
         // Get the current language
         $container = new Container('meliscore');
         $locale = $container['melis-lang-locale'];
+
+        // Checks wether the user has access to this tools or not
+        /** @var \MelisCore\Service\MelisCoreDashboardPluginsRightsService $dashboardPluginsService */
+        $dashboardPluginsService = $this->getServiceLocator()->get('MelisCoreDashboardPluginsService');
+        //get the class name to make it as a key
+        $path = explode('\\', __CLASS__);
+        $className = array_pop($path);
+
+        $isAccessible = $dashboardPluginsService->canAccess($className);
         
         // Variable Initializations
         $numSite = 0;
@@ -140,7 +149,8 @@ class MelisCmsPagesIndicatorsPlugin extends MelisCoreDashboardTemplatingPlugin
             'numUnpublished' => $numUnpublished
         );
         $view->pages = $pages;
-        
+        $view->toolIsAccessible = $isAccessible;
+
         return $view;
     }
 }

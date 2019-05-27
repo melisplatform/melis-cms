@@ -430,7 +430,7 @@
 	    'tr_meliscms_tool_styles_delete_success' => 'The style has been deleted successfully',
 	    'tr_meliscms_tool_styles_save_page_style_fail' => 'Failed to add style',
 	    
-	    'tr_meliscms_tool_duplicate_field_empty' => 'Value is required and can&#39;t be empty',
+	    'tr_meliscms_tool_duplicate_field_empty' => 'The field cannot be empty',
 	    'tr_meliscms_tool_duplicate_field_digits' => 'The input must contain only digits',
 	    
 	    // Page languages
@@ -464,5 +464,6 @@
 	    'tr_meliscms_drag_and_drop_modal_title' => 'Drag\'n\'Drop confirmation',
 	    'tr_meliscms_drag_and_drop_modal_content' => 'Are you sure you want to add this plugin to the page?',
 
+        /** Banner */
+        'tr_melis_cms_gdpr_banner_tabname' => 'Banners',
 	);
-?>

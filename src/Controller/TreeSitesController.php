@@ -642,15 +642,15 @@ class TreeSitesController extends AbstractActionController
             $form = $factory->createForm($appConfigForm);
 
             $postValues = $this->getRequest()->getPost()->toArray();
-            $duplicateStartingFrom = empty($postValues['sourcePageId']) ? 0 : $postValues['sourcePageId'];
             $postValues['destinationPageId'] = ($postValues['use_root']) ? -1 : $postValues['destinationPageId'];
-
+            $postValues['sourcePageId'] = empty($postValues['sourcePageId']) ? null : $postValues['sourcePageId'];
             $postValues = $melisTool->sanitizePost($postValues);
             $form->setData($postValues);
 
             //validation
             if ($form->isValid()) {
                 $data = $form->getData();
+                $duplicateStartingFrom = empty($data['sourcePageId']) ? 0 : $data['sourcePageId'];
                 $destinationPage = $data['destinationPageId'];
                 $langId = $data['lang_id'];
                 $pageRelation = $data['pageRelation'];
@@ -743,7 +743,12 @@ class TreeSitesController extends AbstractActionController
                     }
                 }
             } else {
-                $errors = $form->getMessages();
+                $formErrors = $form->getMessages();
+
+                foreach ($formErrors as $fieldName => $fieldErrors) {
+                    $errors[$fieldName] = $fieldErrors;
+                    $errors[$fieldName]['label'] = $form->get($fieldName)->getLabel();
+                }
             }
         }
 

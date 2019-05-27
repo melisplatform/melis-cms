@@ -307,52 +307,60 @@ class PageEditionController extends AbstractActionController
 	 * @return \Zend\View\Model\JsonModel
 	 */
 	public function getTinyTemplatesAction()
-	{
+    	{
 		$idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
 		$success = 1;
 		$tinyTemplates = array();
-		
+
 		// No pageId, return empty array 
 		if (!empty($idPage))
 		{
-			// Get datas from page
-			$melisPage = $this->getServiceLocator()->get('MelisEnginePage');
-			$datasPage = $melisPage->getDatasPage($idPage, 'saved');
-			$datasTemplate = $datasPage->getMelisTemplate();
-			
-			// No template, return empty array 
-			if (!empty($datasTemplate))
-			{
-				// Get the path of mini-templates to this website
-				$folderSite = $datasTemplate->tpl_zf2_website_folder;
-				$folderSite .= '/public/' . self::MINI_TEMPLATES_FOLDER;
-				$folderSite = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/' . $folderSite;
-				
-				// List the mini-templates from the folder
-				if (is_dir($folderSite))
-				{
-					if ($handle = opendir($folderSite))
-					{
-						while (false !== ($entry = readdir($handle)))
-						{
-							if (is_dir($folderSite . '/' . $entry) || $entry == '.' || $entry == '..')
-								continue;
-							array_push($tinyTemplates,
-										array(
-											'title' => $entry,
-											'url' => "/" .  $datasTemplate->tpl_zf2_website_folder . '/' . 
-													 self::MINI_TEMPLATES_FOLDER . '/' . $entry
-							));
-						}
-							
-						closedir($handle);
-					}
-				}
-			}
-		}
-		
-		return new JsonModel($tinyTemplates);
-	}
+		    // Get datas from page
+		    $melisPage = $this->getServiceLocator()->get('MelisEnginePage');
+		    $datasPage = $melisPage->getDatasPage($idPage, 'saved');
+		    $datasTemplate = $datasPage->getMelisTemplate();
 
+		    // No template, return empty array 
+		    if (!empty($datasTemplate))
+		    {
+			// Get the path of mini-templates to this website
+			$moduleName = $datasTemplate->tpl_zf2_website_folder;
+			$publicPath = '/public/' . self::MINI_TEMPLATES_FOLDER;
+
+			// Checking if the module path is vendor
+			$composerSrv = $this->getServiceLocator()->get('ModulesService');
+			$path = $composerSrv->getComposerModulePath($moduleName);
+
+			if (!empty($path)) {
+			    $folderSite = $path.$publicPath;
+			}else{
+			    $folderSite = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/' . $moduleName.$publicPath;
+			}
+
+			// List the mini-templates from the folder
+			if (is_dir($folderSite))
+			{
+			    if ($handle = opendir($folderSite))
+			    {
+				while (false !== ($entry = readdir($handle)))
+				{
+				    if (is_dir($folderSite . '/' . $entry) || $entry == '.' || $entry == '..')
+					continue;
+				    array_push($tinyTemplates,
+						array(
+						    'title' => $entry,
+						    'url' => "/" .  $datasTemplate->tpl_zf2_website_folder . '/' . 
+							     self::MINI_TEMPLATES_FOLDER . '/' . $entry
+				    ));
+				}
+
+				closedir($handle);
+			    }
+			}
+		    }
+		}
+
+		return new JsonModel($tinyTemplates);
+    	}
 }
 

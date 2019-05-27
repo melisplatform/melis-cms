@@ -433,7 +433,7 @@
 	    'tr_meliscms_tool_styles_delete_success' => 'Le style a été supprimé avec succès',
 	    'tr_meliscms_tool_styles_save_page_style_fail' => 'Echec de l\'ajout du style',
 	    
-	    'tr_meliscms_tool_duplicate_field_empty' => 'Valeur requise, ne peut être vide',
+	    'tr_meliscms_tool_duplicate_field_empty' => 'Le champ ne peut être vide',
 	    'tr_meliscms_tool_duplicate_field_digits' => 'La saisie ne doit contenir que des chiffres',
 	    
 	    // Page languages
@@ -466,5 +466,7 @@
         // Drag and drop CMS
         'tr_meliscms_drag_and_drop_modal_title' => 'Drag\'n\'Drop confirmation',
         'tr_meliscms_drag_and_drop_modal_content' => 'Êtes-vous sur de vouloir ajouter ce plugin à cette page ?',
+
+        /** Banner */
+        'tr_melis_cms_gdpr_banner_tabname' => 'Bannières',
 	);
-?>
