@@ -292,7 +292,7 @@ body {
 ::-webkit-scrollbar-track {
     background: #fff;
 }
- 
+
 ::-webkit-scrollbar-thumb {
     min-height: 48px;
     background: #e61c23;
@@ -330,6 +330,7 @@ body {
     line-height: 25px;
     transition: all 0.4s ease-in-out;
     /* added by: Junry @ 02082019*/
+    width: 100%;
    /*/ width: inherit;*/
 }
 .melis-ui-outlined.ui-sortable-helper,
@@ -782,8 +783,6 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 @-ms-keyframes pulse-sm {to {box-shadow: 0 0 0 15px rgba(147, 46, 42, 0);}}
 @keyframes pulse-sm {to {box-shadow: 0 0 0 15px rgba(147, 46, 42, 0);}}
 
-
-
 /* Media Queries */
 @media screen and (min-width: 768px) {
     .melis-cms-dnd-box {
@@ -808,4 +807,14 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
     .melis-cms-category-btn {
         font-size: 12px;
     }
+}
+.tox .tox-tbtn:hover,
+.mce-btn.mce-open:hover {
+    background-color: #dee0e2;
+    box-shadow: none;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #222f3e;
+    cursor: pointer;
 }

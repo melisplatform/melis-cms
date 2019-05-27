@@ -6,22 +6,24 @@
        'inline' => true,
        'templates' => 'miniTemplates',
        'menubar' => false,
-       'forced_root_block' => 'p',
+       'forced_root_block' => '',
        'paste_word_valid_elements'=> "p,b,strong,i,em,h1,h2,h3,h4",
        'cleanup' => false,
        'verify_html' => false,
        'plugins' => array(
-           'advlist autolink lists link paste image charmap preview anchor textcolor colorpicker emoticons help hr nonbreaking',
+            //[contextmenu, textcolor, colorpicker] this plugin is already built in the core editor as of TinyMCE v. 5
+           'advlist autolink lists link paste image charmap preview anchor emoticons help hr nonbreaking',
            'searchreplace visualblocks code fullscreen',
-           'insertdatetime media table contextmenu  template'
+           'insertdatetime media table template'
        ),
        'image_advtab' => true,
        'toolbar' => 'insertfile undo redo paste | formatselect | forecolor | bold italic strikethrough underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media template | code',
-       'init_instance_callback' => 'tinyMceCleaner',
+       'setup' => 'melisTinyMCE.tinyMceActionEvent',
+       'init_instance_callback' => 'tinyMceCleaner'
    );
 
 # For Reference
-/*return array(
+/* return array(
      'relative_urls' => false,
      'selector' => 'html-editable-selector',
      'language' => 'en',
