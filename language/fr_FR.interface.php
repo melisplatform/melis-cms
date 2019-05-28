@@ -468,5 +468,17 @@
         'tr_meliscms_drag_and_drop_modal_content' => 'Êtes-vous sur de vouloir ajouter ce plugin à cette page ?',
 
         /** Banner */
+        'tr_PluginSection_MelisCmsGdprBanner' => 'Melis Cms RGPD Bannière',
         'tr_melis_cms_gdpr_banner_tabname' => 'Bannières',
+        'tr_melis_cms_gdpr_banner_content' => 'Contenu de la bannière',
+        'tr_melis_cms_gdpr_banner_content_tooltip' => 'Personnalisez ici le texte de la bannière RGPD',
+        'tr_melis_cms_gdpr_banner_save_ok' => 'Contenu de la bannière enregistré avec succès.',
+        'tr_melis_cms_gdpr_banner_save_ko' => 'Impossible d\'enregistrer le contenu de la bannière.',
+        'tr_melis_cms_gdpr_banner_site_select' => 'Sélectionnez un site',
+        'tr_melis_cms_gdpr_banner_empty_field' => 'Le champ ne peut être vide.',
+        'tr_melis_cms_gdpr_banner_plugin' => 'bannière RGPD',
+        'tr_melis_cms_gdpr_banner_plugin_properties' => 'Propriétés',
+        'tr_melis_cms_gdpr_banner_plugin_desc' => 'Le plugin bannière RGPD ajoute une bannière RGPD sur votre site.',
+        'tr_melis_cms_gdpr_banner_plugin_empty_props' => 'Aucune propriété disponible.',
+        'tr_melis_cms_gdpr_banner_plugin_loaded' => 'La bannière RGPD a été chargée.<br><em>Note: Ce message est affiché uniquement dans le back office</em>',
 	);

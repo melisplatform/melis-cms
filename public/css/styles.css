@@ -696,15 +696,38 @@ body.modal-open {
 	border-color: #ccc;
 }
 
+/** GDPR Banner */
+.mcms-gdpr-banner-header {
+	margin: 10px 0 25px 0;
+}
 
+.cms_gdpr_banner_site_filter_form {
+	display: inline;
+}
 
+.cms_gdpr_banner_site_filter_form .form-group {
+	display: inline;
+}
 
+.cms_gdpr_banner_site_filter_form label {
+	display: inline-block !important;
+	font-size: 1em;
+	margin: 0 10px 5px 0;
+}
 
+.cms_gdpr_banner_site_filter_form select {
+	display: inline-block !important;
+	font-size: 1em;
+}
 
+#id_melis_core_gdpr_tabs .page-content-container .nav-tabs > li.active, .page-content-container .nav-tabs > li:hover {
+	border-bottom: none;
+}
 
+#id_melis_core_gdpr_tabs.page-content-container .nav-tabs > li.active > a, .page-content-container .nav-tabs > li.active:focus > a, .page-content-container .nav-tabs > li.active:active > a {
+	border: none;
+}
 
-
-
-
-
-
+.mcms-gdpr-banner-details .mce-branding {
+	display: none;
+}
