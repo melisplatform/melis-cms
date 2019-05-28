@@ -473,7 +473,7 @@
 
         //New site tools
         'tr_meliscms_tool_sites' => 'Sites',
-        'tr_meliscms_tool_sites_save' => 'Save site',
+        'tr_meliscms_tool_sites_save' => 'Save',
         'tr_melis_cms_sites_tool_add' => 'Add site',
         'tr_melis_cms_sites_tool_create' => 'Create site',
         'tr_meliscms_tool_sites_cancel' => 'Cancel',

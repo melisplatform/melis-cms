@@ -476,7 +476,7 @@
 
         //New site tools
         'tr_meliscms_tool_sites' => 'Sites',
-        'tr_meliscms_tool_sites_save' => 'Save site',
+        'tr_meliscms_tool_sites_save' => 'Enregistrer',
         'tr_melis_cms_sites_tool_add' => 'Ajouter un site',
         'tr_melis_cms_sites_tool_create' => 'Créer un site',
         'tr_meliscms_tool_sites_cancel' => 'Annuler',
