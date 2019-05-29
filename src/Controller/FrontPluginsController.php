@@ -57,24 +57,24 @@ class FrontPluginsController extends AbstractActionController
 
         return $data;
     }
-    
+
     public function renderPluginModalAction()
     {
         $translator = $this->getServiceLocator()->get('translator');
-        
+
         $parameters = $this->getRequest()->getQuery('parameters', array());
-        
+
         $module = (!empty($parameters['module'])) ? $parameters['module'] : '';
         $pluginName = (!empty($parameters['pluginName'])) ? $parameters['pluginName'] : '';
         $pluginId = (!empty($parameters['pluginId'])) ? $parameters['pluginId'] : 1;
         $pageId = (!empty($parameters['melisActivePageId'])) ? $parameters['melisActivePageId'] : 1;
         $siteModule = (!empty($parameters['siteModule'])) ? $parameters['siteModule'] : '';
         $pluginHardcodedConfig = (!empty($parameters['pluginFrontConfig'])) ? $parameters['pluginFrontConfig'] : '';
-        
+
         $pluginHardcodedConfig = html_entity_decode($pluginHardcodedConfig, ENT_QUOTES);
         $pluginHardcodedConfig = html_entity_decode($pluginHardcodedConfig, ENT_QUOTES);
         $pluginHardcodedConfig = unserialize($pluginHardcodedConfig);
-        
+
         $errors = '';
         $tag = '';
         $tabs = array();
@@ -92,7 +92,7 @@ class FrontPluginsController extends AbstractActionController
             else
             {
                 $pluginConf = $config['plugins'][$module]['plugins'][$pluginName];
-                
+
                 try
                 {
                     $pluginHardcodedConfig['id'] = $pluginId;
@@ -109,10 +109,10 @@ class FrontPluginsController extends AbstractActionController
                 }
             }
         }
-        
+
         if ($errors != '' || count($tabs) == 0)
             $tabs[] = array('tabName' => 'Error', 'html' => $errors);
-            
+
         $view = new ViewModel();
         $view->setTerminal(true);
         $view->tabs = $tabs;
@@ -125,19 +125,19 @@ class FrontPluginsController extends AbstractActionController
         $view->siteModule = $siteModule;
         return $view;
     }
-    
-    
+
+
     public function validatePluginModalAction()
     {
         $translator = $this->getServiceLocator()->get('translator');
-        
+
         $parameters = get_object_vars($this->getRequest()->getPost());
-        
+
         $module = (!empty($parameters['melisModule'])) ? $parameters['melisModule'] : '';
         $pluginName = (!empty($parameters['melisPluginName'])) ? $parameters['melisPluginName'] : '';
         $pluginId = (!empty($parameters['melisPluginId'])) ? $parameters['melisPluginId'] : 1;
         $pageId = (!empty($parameters['melisIdPage'])) ? $parameters['melisIdPage'] : 1;
-        
+
         $errors = '';
         $tag = '';
         $tabs = array();
@@ -155,7 +155,7 @@ class FrontPluginsController extends AbstractActionController
             else
             {
                 $pluginConf = $config['plugins'][$module]['plugins'][$pluginName];
-                
+
                 try
                 {
                     $pluginHardcodedConfig['id'] = $pluginId;
@@ -171,16 +171,16 @@ class FrontPluginsController extends AbstractActionController
                 }
             }
         }
-        
+
         $success = 1;
         $finalErrors = array();
-        
+
         if ($errors != '')
         {
             $success = 0;
             $finalErrors = array('general' => $errors);
         }
-        
+
         foreach($errorsTabs as $response) {
             if(!$response['success']) {
                 $success = 0;
@@ -190,16 +190,16 @@ class FrontPluginsController extends AbstractActionController
 
         }
         $finalErrors = $errorsTabs;
-        
-        
+
+
         $result = array(
             'success' => $success,
             'errors' => $finalErrors,
         );
-        
+
         return new JsonModel($result);
     }
-    
+
     public function checkSessionPageAction()
     {
         $container = new Container('meliscms');
@@ -236,35 +236,39 @@ class FrontPluginsController extends AbstractActionController
     private function putSectionOnPlugins($configurations, $siteModule)
     {
         $pluginList = [];
+
+        // get active modules in the platform
+        $activeModules = include $_SERVER['DOCUMENT_ROOT'] . '/../config/melis.module.load.php';
+        $activeModules = array_map('strtolower', $activeModules);
         // melis plugins configurations
         foreach ($configurations as $moduleName => $melisPluginsConfig) {
             // melis plugins configrations
             // this means the module has a templating plugins or plugins
             if (isset($melisPluginsConfig['plugins']) && ! empty($melisPluginsConfig['plugins'])) {
-                foreach ($melisPluginsConfig['plugins'] as $pluginName =>  $pluginConfig) {
-                    // list of excluded plugins
-                    $excludedPlugins = [
-                        'MelisFrontDragDropZonePlugin'
-                    ];
-                    if (!in_array($pluginName,$excludedPlugins)) {
-                        // put site_module key under ['melis'] key
-                        $pluginConfig['melis']['site_module'] = $siteModule;
-                        // put section key  under['melis'] key
-                        if ((! isset($pluginConfig['melis']['section']) || isset($pluginConfig['melis']['section'])) && empty($pluginConfig['melis']['section'])) {
-                            // if there is no section key on [melis] config
-                            // or there is a section key but empty
-                            // we put it in the OTHER section directly
-                            $pluginConfig['melis']['section'] = "Others";
+                if (in_array((strtolower($moduleName)),$activeModules)) {
+                    foreach ($melisPluginsConfig['plugins'] as $pluginName =>  $pluginConfig) {
+                        // list of excluded plugins
+                        $excludedPlugins = [
+                            'MelisFrontDragDropZonePlugin'
+                        ];
+                        if (!in_array($pluginName,$excludedPlugins)) {
+                            // put site_module key under ['melis'] key
+                            $pluginConfig['melis']['site_module'] = $siteModule;
+                            // put section key  under['melis'] key
+                            if ((! isset($pluginConfig['melis']['section']) || isset($pluginConfig['melis']['section'])) && empty($pluginConfig['melis']['section'])) {
+                                // if there is no section key on [melis] config
+                                // or there is a section key but empty
+                                // we put it in the OTHER section directly
+                                $pluginConfig['melis']['section'] = "Others";
+                            }
+                            // put a moduleName for easy sectioning of plugins
+                            if (! isset($pluginConfig['melis']['moduleName']) && empty($pluginConfig['melis']['moduleName'])) {
+                                $pluginConfig['melis']['moduleName'] = $moduleName;
+                            }
+                            $pluginList[$moduleName][$pluginName] = $pluginConfig;
                         }
-                        // put a moduleName for easy sectioning of plugins
-                        if (! isset($pluginConfig['melis']['moduleName']) && empty($pluginConfig['melis']['moduleName'])) {
-                            $pluginConfig['melis']['moduleName'] = $moduleName;
-                        }
-                        //
-                        $pluginList[$moduleName][$pluginName] = $pluginConfig;
                     }
                 }
-
             }
         }
 
