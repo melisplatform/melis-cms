@@ -35,23 +35,10 @@ class FrontPluginsController extends AbstractActionController
         $pluginList_ = $this->putSectionOnPlugins($config['plugins'], $siteModule);
         $newPluginList = $this->organizedPluginsBySection($pluginList_);
 
-        // melis plugin service
-        $pluginSvc = $this->getServiceLocator()->get('MelisCorePluginsService');
-        // check for new plugins or manually installed and insert in db
-        $pluginSvc->checkTemplatingPlugins();
-        // get the latest plugin installed
-        $latesPlugin = $pluginSvc->getLatestPlugin($pluginSvc::TEMPLATING_PLUGIN_TYPE);
-        // for new plugin notifications
-        $pluginMenuHandler = $pluginSvc->getNewPluginMenuHandlerNotifDuration();
         $view = new ViewModel();
        // $view->pluginsConfig = $finalPluginList;
         $view->siteModule              = $siteModule;
         $view->newPluginList           = $newPluginList;
-        $view->latestPlugin            = $latesPlugin;
-        $view->sectionNewPlugins       = array_unique($this->sectionHasNewPlugins);
-        $view->modulesHasNewPlugins    = array_unique($this->modulesHasNewPlugins);
-        $view->subsectionHasNewPlugins = $this->subsectionHasNewPlugins;
-        $view->newPluginNotification   = $pluginMenuHandler;
 
         return $view;
     }
@@ -362,7 +349,7 @@ class FrontPluginsController extends AbstractActionController
                                     // label of sub category
                                     $newPluginList[$pluginSection][$module][$subsectionId]['title'] = $subsectionText;
                                     // indication that the plugin is newly installed
-                                    $isNew = $melisPuginsSvc->pluginIsNew($pluginName);
+                                    $isNew = false;//;$melisPuginsSvc->pluginIsNew($pluginName);
                                     $newPluginList[$pluginSection][$module][$subsectionId][$pluginName]['isNew'] = $isNew;
                                     if ($isNew) {
                                         $this->sectionHasNewPlugins[] = $pluginSection;
@@ -373,7 +360,7 @@ class FrontPluginsController extends AbstractActionController
                                     // no subsection
                                     $newPluginList[$pluginSection][$module][$pluginName] = $pluginConfig;
                                     // indication that the plugin is newly installed
-                                    $isNew = $melisPuginsSvc->pluginIsNew($pluginName);
+                                    $isNew = false;//$melisPuginsSvc->pluginIsNew($pluginName);
                                     $newPluginList[$pluginSection][$module][$pluginName]['isNew'] = $isNew;
                                     if ($isNew) {
                                         $this->sectionHasNewPlugins[] = $pluginSection;

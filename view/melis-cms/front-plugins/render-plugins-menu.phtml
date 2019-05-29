@@ -43,9 +43,9 @@ function displayMenuPlugin($moduleName, $pluginName, $pluginConf, $siteModule)
 ?>
 <?php
     $ctrNewPlugins = 0;
-    $sectionHasNewPlugins = $this->sectionNewPlugins;
-    $moduleHasNewPlugins  = $this->modulesHasNewPlugins;
-    $subsectionHasNewPlugins = $this->subsectionHasNewPlugins;
+    $sectionHasNewPlugins = $this->sectionNewPlugins ?? [];
+    $moduleHasNewPlugins  = $this->modulesHasNewPlugins ?? [];
+    $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
 ?>
 <div class="melis-cms-dnd-box">
     <div class="melis-cms-dnd-fix-menu">
