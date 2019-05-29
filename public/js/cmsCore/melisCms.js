@@ -227,6 +227,8 @@ var melisCms = (function(){
 		    	
 		    	// reload the preview in edition tab 
 		    	melisHelper.zoneReload(pageNumber+'_id_meliscms_page','meliscms_page', {idPage:pageNumber});
+
+				$openedPageIds.push(data.datas.idPage);
 			}
 			else
 			{
@@ -265,6 +267,8 @@ var melisCms = (function(){
 	    		
 	    		// update flash messenger values
 		    	melisCore.flashMessenger();
+
+				$openedPageIds.push(pageNumber);
 			}
 			else{
 				// show error modal
