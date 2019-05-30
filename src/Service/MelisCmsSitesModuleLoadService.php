@@ -30,6 +30,8 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
         $exclude_modules = array(
             'MelisAssetManager',
             'MelisCore',
+            'MelisEngine',
+            'MelisFront',
             'MelisSites',
             'MelisInstaller',
             'MelisModuleConfig',
