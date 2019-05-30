@@ -290,9 +290,9 @@ class ToolStyleController extends AbstractActionController
 
             $limit = $this->getRequest()->getPost('length');
 
-            $dataCount = $tableStyle->getStyleList($search = '', $melisTool->getSearchableColumns(), $selCol, $sortOrder);
+            $dataCount = $tableStyle->getStyleList($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder);
 
-            $getData = $tableStyle->getStyleList($search = '', $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $limit);
+            $getData = $tableStyle->getStyleList($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $limit);
 
             $tableData = $getData->toArray();
 
