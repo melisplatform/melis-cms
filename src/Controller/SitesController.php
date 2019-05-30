@@ -803,27 +803,33 @@ class SitesController extends AbstractActionController
                  * on db saving, we can now process
                  * the module saving
                  */
-                $this->saveSiteModules($isAdmin, $siteId, $moduleList);
-                /**
-                 * remove languages from other tabs
-                 */
-                if (isset($data['to_delete_languages_data'])) {
-                    $LangIds = [];
+                $this->saveSiteModules($isAdmin, $siteId, $moduleList,$status);
+                if($status) {
+                    /**
+                     * remove languages from other tabs
+                     */
+                    if (isset($data['to_delete_languages_data'])) {
+                        $LangIds = [];
 
-                    foreach ($data['to_delete_languages_data'] as $langKey => $langVal) {
-                        if ($langVal === 'true') {
-                            array_push($LangIds, $langKey);
+                        foreach ($data['to_delete_languages_data'] as $langKey => $langVal) {
+                            if ($langVal === 'true') {
+                                array_push($LangIds, $langKey);
+                            }
+                        }
+
+                        if (!empty($data['to_delete_languages_data'])) {
+                            $this->deleteOtherTabsData($siteId, $LangIds);
                         }
                     }
-
-                    if (!empty($data['to_delete_languages_data'])) {
-                        $this->deleteOtherTabsData($siteId, $LangIds);
-                    }
+                    /**
+                     * if no error, execute the saving
+                     */
+                    $con->commit();
+                }else{
+                    $status = false;
+                    $textMessage = "tr_meliscms_tool_site_module_load_no_rights";
+                    $con->rollback();
                 }
-                /**
-                 * if no error, execute the saving
-                 */
-                $con->commit();
             }else{
                 $status = false;
                 /**
@@ -1007,13 +1013,18 @@ class SitesController extends AbstractActionController
      * @param $isAdmin
      * @param $siteId
      * @param $moduleList
+     * @param $status
      */
-    private function saveSiteModules($isAdmin, $siteId, $moduleList)
+    private function saveSiteModules($isAdmin, $siteId, $moduleList, &$status)
     {
         $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
 
         if ($isAdmin) {
-            $siteModuleLoadSvc->saveModuleLoad($siteId, $moduleList);
+            if(!empty($moduleList)) {
+                $status = $siteModuleLoadSvc->saveModuleLoad($siteId, $moduleList);
+            }else{
+                $status = 1;
+            }
         }
     }
 
