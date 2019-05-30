@@ -609,7 +609,7 @@
         'tr_melis_cms_sites_tool_default_value' => 'Default value from the config file',
         'tr_melis_cms_sites_tool_database_value' => 'Database value',
         'tr_melis_cms_sites_tool_general_no_data' => 'There is no general data to show.',
-        'tr_melis_cms_sites_tool_lang_no_data' => 'There is no data to show for this language',
+        'tr_melis_cms_sites_tool_lang_no_data' => 'There is no data to show for this language.',
 
         #SITES INTERFACES
         'tr_melis_cms_sites_tool_add_site_button' => 'Add site button',
