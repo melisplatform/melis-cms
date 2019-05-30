@@ -133,12 +133,15 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
         }
 
         $filePath = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/'.$siteModuleName.'/config/';
+        if(is_writable($filePath)) {
+            if (!file_exists($filePath)) {
+                $filePath = $_SERVER['DOCUMENT_ROOT'] . '/../vendor/melisplatform/melis-demo-cms/config/';
+            }
 
-        if (!file_exists($filePath)) {
-            $filePath  = $_SERVER['DOCUMENT_ROOT'] . '/../vendor/melisplatform/melis-demo-cms/config/';
+            $status = $this->createModuleLoader($filePath, $moduleList);
+        }else{
+            $status = 0;
         }
-
-        $status = $this->createModuleLoader($filePath, $moduleList);
 
         // Service implementation end
 
@@ -183,26 +186,28 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
 
         if ($this->checkDir($pathToStore)) {
 
-            $config = new Config($modules, true);
+            if(is_writable($pathToStore)) {
+                $config = new Config($modules, true);
 
-            $writer = new PhpArray();
+                $writer = new PhpArray();
 
-            $conf = $writer->toString($config);
-            $conf = preg_replace('/    \d+/u', '', $conf); // remove the number index
-            $conf = str_replace('=>', '', $conf); // remove the => characters.
-            file_put_contents($pathToStore . '/' . $tmpFileName, $conf);
+                $conf = $writer->toString($config);
+                $conf = preg_replace('/    \d+/u', '', $conf); // remove the number index
+                $conf = str_replace('=>', '', $conf); // remove the => characters.
+                file_put_contents($pathToStore . '/' . $tmpFileName, $conf);
 
-            if (file_exists($pathToStore . '/' . $tmpFileName)) {
-                // check if the array is not empty
-                $checkConfig = include($pathToStore . '/' . $tmpFileName);
+                if (file_exists($pathToStore . '/' . $tmpFileName)) {
+                    // check if the array is not empty
+                    $checkConfig = include($pathToStore . '/' . $tmpFileName);
 
-                if (count($checkConfig) > 0) {
-                    // delete the current module loader file
-                    unlink($pathToStore . '/' . $fileName);
-                    // rename the module loader tmp file into module.load.php
-                    rename($pathToStore . '/' . $tmpFileName, $pathToStore . '/' . $fileName);
-                    // if everything went well
-                    return true;
+                    if (count($checkConfig) > 0) {
+                        // delete the current module loader file
+                        unlink($pathToStore . '/' . $fileName);
+                        // rename the module loader tmp file into module.load.php
+                        rename($pathToStore . '/' . $tmpFileName, $pathToStore . '/' . $fileName);
+                        // if everything went well
+                        return 1;
+                    }
                 }
             }
 
