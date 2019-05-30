@@ -26,6 +26,13 @@ var melisCms = (function(){
 	window.scrollOffsetTinyMCE = function(){
 		return windowOffset;
 	}
+    $(".sub-section").on("click", function() {
+        if ($(this).next(".cms-next").is(":visible")) {
+            $(this).next(".cms-next").hide();
+        } else {
+            $(this).next(".cms-next").show();
+        }
+    });
 
 	$body.on("click", ".tox-tbtn", function(){
 		var mcePopUp = $("#mce-modal-block").length;
