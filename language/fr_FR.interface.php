@@ -623,7 +623,7 @@
         'tr_melis_cms_sites_tool_content_edit_tab_list' => 'Onglet éditer site',
         'tr_melis_cms_sites_tool_content_edit_properties_tab' => 'Propriétés',
         'tr_melis_cms_sites_tool_content_edit_properties_tab_content' => 'Contenu de Propriétés',
-        'tr_melis_cms_sites_tool_content_edit_module_loading_tab' => 'Chargement des modules',
+        'tr_melis_cms_sites_tool_content_edit_module_loading_tab' => 'Modules',
         'tr_melis_cms_sites_tool_content_edit_module_loading_tab_content' => 'Contenu de chargement des modules',
         'tr_melis_cms_sites_tool_content_edit_languages_tab' => 'Langages',
         'tr_melis_cms_sites_tool_content_edit_languages_tab_content' => 'Contenu de Langages',
