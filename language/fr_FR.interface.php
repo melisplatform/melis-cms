@@ -539,7 +539,7 @@
         'tr_melis_cms_sites_tool_add_step4_is_new_module tooltip' => 'Sélectionnez si vous souhaitez utiliser un module existant ou non, si non vous devrez en créer un nouveau.',
 
         #MODULE LOAD TAB
-        'tr_melis_cms_sites_module_loading' => 'Chargement des modules',
+        'tr_melis_cms_sites_module_loading' => 'Modules',
         'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice' => '<i class="fa fa-warning"></i>Ci-dessous est la liste des modules requis par <strong>%s</strong>, êtes-vous sûr de vouloir activer <strong>%s</strong>? ',
         'tr_melis_cms_sites_module_load_no_access' => 'Vous avez besoin d\'un niveau de droits d\'administrateur pour modifier cette section.',
         'tr_melis_cms_sites_module_no_module_to_load' => 'Ce site n\'a pas de module à charger.',
