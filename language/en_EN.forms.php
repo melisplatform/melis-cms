@@ -162,7 +162,7 @@
 	    'tr_meliscms_tool_site_site_name_error_empty' => 'Please enter the site name',
 	    'tr_meliscms_tool_site_no_platform_ids' => 'No platform id avialable, please add first platform id\'s before adding site',
 	    'tr_meliscms_tool_site_directory_exist' => 'The site directory already exist, would you like to proceed without creating the site module on MelisSites directory?',
-	    'tr_meliscms_tool_site_directory_not_writable' => 'Access permission denied, please make /module/MelisSites writable',
+	    'tr_meliscms_tool_site_directory_not_writable' => 'Impossible to create site\'s files. Rights problem.',
 	    'tr_meliscms_tool_site_melissites_directory_not_exist' => 'Target directory not exist, please create the /module/MelisSites directory',
 	    'tr_meliscms_tool_site_site_created_title' => 'has been created successfully',
 	    'tr_meliscms_tool_site_site_created_message' => 'Your new site has been created with <b>Site module</b>, <b>Pages</b> and <b>Templates</b> generated.',
