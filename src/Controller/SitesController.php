@@ -788,7 +788,7 @@ class SitesController extends AbstractActionController
              * Try to save the site data's
              */
             $this->saveSiteDomains($domainData, $errors, $status);
-            $this->saveSiteHomePages($siteHomeData, $errors, $status);
+            $this->saveSiteHomePages($siteHomeData, $data, $errors, $status);
             $this->saveSiteConfig($siteId,$siteConfigTabData);
             $this->saveSiteProperties($siteId, $sitePropData, $errors, $status);
             $this->saveSiteLanguagesTab($siteId, $data);
@@ -1063,7 +1063,7 @@ class SitesController extends AbstractActionController
      * @param $errors
      * @param $status
      */
-    private function saveSiteHomePages($siteHomeData, &$errors, &$status)
+    private function saveSiteHomePages($siteHomeData, $data, &$errors, &$status)
     {
         /**
          * Check if there is data to be process
@@ -1075,17 +1075,19 @@ class SitesController extends AbstractActionController
                 $form = $this->getTool()->getForm('meliscms_tool_sites_properties_homepage_form');
                 $form->setData($siteHomeDatum);
 
-                if ($form->isValid()) {
-                    $sitePropSvc->saveSiteLangHome($siteHomeDatum);
-                } else {
-                    $currErr = [];
+                if (in_array($siteHomeDatum['shome_lang_id'], $data['slang_lang_id'])) {
+                    if ($form->isValid()) {
+                        $sitePropSvc->saveSiteLangHome($siteHomeDatum);
+                    } else {
+                        $currErr = [];
 
-                    foreach ($form->getMessages() as $key => $err) {
-                        $currErr[$siteHomeDatum["shome_lang_id"]."_".$key] = $err;
+                        foreach ($form->getMessages() as $key => $err) {
+                            $currErr[$siteHomeDatum["shome_lang_id"] . "_" . $key] = $err;
+                        }
+
+                        $errors = array_merge($errors, $currErr);
+                        $status = 0;
                     }
-
-                    $errors = array_merge($errors, $currErr);
-                    $status = 0;
                 }
             }
         }
