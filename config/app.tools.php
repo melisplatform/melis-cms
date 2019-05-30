@@ -779,6 +779,8 @@ return array(
                         'searchables' => array(
                             'melis_cms_style.style_id',
                             'melis_cms_style.style_path',
+                            'melis_cms_style.style_name',
+                            'site_label',
                         ),
                         'actionButtons' => array(
                             'edit' => array(
