@@ -94,7 +94,9 @@ class PageDuplicationController extends AbstractActionController
             $iconTypes = array(
                 'SITE'   => 'fa-home',
                 'FOLDER' => 'fa-folder-open-o',
-                'PAGE'   => 'fa-file-o'
+                'PAGE'   => 'fa-file-o',
+                'NEWSLETTER' => 'fa fa-newspaper-o',
+                'NEWS_DETAIL'   => 'fa-file-o',
             );
 
             $duplicatePageData = array(

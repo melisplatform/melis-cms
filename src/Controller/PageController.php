@@ -986,6 +986,7 @@ class PageController extends AbstractActionController
             $melisPage = $this->serviceLocator->get('MelisEnginePage');
             $page = $melisPage->getDatasPage($idPage, 'saved');
 
+            $pageName = '';
             if ($page && !empty($page->getMelisPageTree()))
             {
                 $page = $page->getMelisPageTree();
