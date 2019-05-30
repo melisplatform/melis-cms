@@ -723,7 +723,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
              */
             $config = new Config(array(), true);
             $phpArray = new PhpArray();
-            $config->{$siteModuleName . '_trans_key_test'} = 'Test translation ' . $localeExp[0];
+            $config->{$siteModuleName . '_trans_key_example'} = 'translation example ' . $localeExp[0];
             $languagePath = $modulePath . '/language';
             /**
              * make sure language folder is exist
