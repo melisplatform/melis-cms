@@ -126,7 +126,7 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
         $siteData = $this->getMelisSitesTbl()->getEntryById($siteId)->current();
         $siteModuleName = $this->generateModuleNameCase($siteData->site_name);
 
-        $moduleList = array('MelisAssetManager');
+        $moduleList = array('MelisAssetManager', 'MelisEngine', 'MelisFront');
 
         foreach ($modules as $module) {
             array_push($moduleList,$module);
