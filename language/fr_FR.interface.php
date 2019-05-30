@@ -611,6 +611,8 @@
         'tr_melis_cms_sites_tool_general' => 'Général',
         'tr_melis_cms_sites_tool_default_value' => 'Valeur par défaut du fichier de configuration',
         'tr_melis_cms_sites_tool_database_value' => 'Valeur dans la base de données',
+        'tr_melis_cms_sites_tool_general_no_data' => 'Il n\'y a aucune configuration générale.',
+        'tr_melis_cms_sites_tool_lang_no_data' => 'Il n\'y a aucune configuration pour cette langue.',
 
         #SITES INTERFACES
         'tr_melis_cms_sites_tool_add_site_button' => 'Bouton ajouter un site',

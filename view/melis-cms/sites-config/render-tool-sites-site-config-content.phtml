@@ -119,6 +119,10 @@ $data_melisKey = $this->melisKey;
                                         <?php endforeach; ?>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
+                            <?php else : ?>
+                                <div class="alert alert-warning" role="alert">
+                                    <?= $this->translate('tr_melis_cms_sites_tool_general_no_data'); ?>
+                                </div>
                             <?php endif; ?>
                             <!-- ADDITIONAL INPUTS END -->
                             <?php
@@ -198,6 +202,10 @@ $data_melisKey = $this->melisKey;
                                             <?php endforeach; ?>
                                         <?php endif; ?>
                                     <?php endforeach; ?>
+                                <?php else : ?>
+                                    <div class="alert alert-warning" role="alert">
+                                        <?= $this->translate('tr_melis_cms_sites_tool_lang_no_data'); ?>
+                                    </div>
                                 <?php endif; ?>
                                 <!-- ADDITIONAL INPUTS END -->
                                 <?php
@@ -207,7 +215,7 @@ $data_melisKey = $this->melisKey;
                         </div>
                     <?php endforeach; ?>
                     <!-- OTHER LANGUAGES END -->
-                </div>
+                </div>  
             </div>
         </div>
     </div>
