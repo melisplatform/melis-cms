@@ -606,8 +606,8 @@
         'tr_melis_cms_sites_tool_languages_prompt_delete_data' => 'Souhaitez-vous supprimer toutes les données de la base de données avec cette langue? (ID page d\'accueil, configurations et traductions du site)',
 
         #SITES CONFIG TAB
-        'tr_melis_cms_sites_tool_config_title' => 'Configuration sites',
-        'tr_melis_cms_sites_tool_config_array_warning' => 'Les tableaux imbriqués avec une profondeur de 2 ou plus ne sont pas affichés. Vous pouvez les éditer manuellement sur le fichier.',
+        'tr_melis_cms_sites_tool_config_title' => 'Configuration',
+        'tr_melis_cms_sites_tool_config_array_warning' => 'Les tableaux imbriqués avec une profondeur de plus de 2 ne sont pas affichés. Vous pouvez les éditer manuellement dans le fichier.',
         'tr_melis_cms_sites_tool_general' => 'Général',
         'tr_melis_cms_sites_tool_default_value' => 'Valeur par défaut du fichier de configuration',
         'tr_melis_cms_sites_tool_database_value' => 'Valeur dans la base de données',
@@ -625,7 +625,7 @@
         'tr_melis_cms_sites_tool_content_edit_module_loading_tab_content' => 'Contenu de chargement des modules',
         'tr_melis_cms_sites_tool_content_edit_languages_tab' => 'Langages',
         'tr_melis_cms_sites_tool_content_edit_languages_tab_content' => 'Contenu de Langages',
-        'tr_melis_cms_sites_tool_content_edit_site_config_tab' => 'Configuration sites',
+        'tr_melis_cms_sites_tool_content_edit_site_config_tab' => 'Configuration',
         'tr_melis_cms_sites_tool_content_edit_site_config_tab_content' => 'Contenu de configuration site',
         'tr_melis_cms_sites_tool_content_edit_site_translations_tab' => 'Traductions',
         'tr_melis_cms_sites_tool_content_edit_site_translations_tab_content' => 'Contenu de traductions de site',
