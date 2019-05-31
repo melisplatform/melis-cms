@@ -803,7 +803,7 @@ class SitesController extends AbstractActionController
                  * on db saving, we can now process
                  * the module saving
                  */
-                $this->saveSiteModules($isAdmin, $siteId, $moduleList,$status);
+                $this->saveSiteModules($isAdmin, $siteId, $moduleList,$status, $path);
                 if($status) {
                     /**
                      * remove languages from other tabs
@@ -827,7 +827,7 @@ class SitesController extends AbstractActionController
                     $con->commit();
                 }else{
                     $status = false;
-                    $textMessage = "tr_meliscms_tool_site_module_load_no_rights";
+                    $textMessage = wordwrap(str_replace(' ', '', sprintf($translator->translate("tr_meliscms_tool_site_module_load_no_rights"), $path)), 25, "\n", true);
                     $con->rollback();
                 }
             }else{
@@ -1014,16 +1014,20 @@ class SitesController extends AbstractActionController
      * @param $siteId
      * @param $moduleList
      * @param $status
+     * @param $path
      */
-    private function saveSiteModules($isAdmin, $siteId, $moduleList, &$status)
+    private function saveSiteModules($isAdmin, $siteId, $moduleList, &$status, &$path)
     {
         $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
 
         if ($isAdmin) {
             if(!empty($moduleList)) {
-                $status = $siteModuleLoadSvc->saveModuleLoad($siteId, $moduleList);
+                $data = $siteModuleLoadSvc->saveModuleLoad($siteId, $moduleList);
+                $status = $data['status'];
+                $path = $data['folder_path'];
             }else{
                 $status = 1;
+                $path = '';
             }
         }
     }

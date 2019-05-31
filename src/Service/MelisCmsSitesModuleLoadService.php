@@ -132,12 +132,21 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
             array_push($moduleList,$module);
         }
 
-        $filePath = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/'.$siteModuleName.'/config/';
-        if(is_writable($filePath)) {
-            if (!file_exists($filePath)) {
-                $filePath = $_SERVER['DOCUMENT_ROOT'] . '/../vendor/melisplatform/melis-demo-cms/config/';
-            }
+        $moduleSrv = $this->getServiceLocator()->get('ModulesService');
+        /**
+         * get the module path
+         *
+         * This will check also if the module is came
+         * from the vendor or from the MelisSites
+         */
+        if(!empty($moduleSrv->getComposerModulePath($siteModuleName))){
+            $modulePath = $moduleSrv->getComposerModulePath($siteModuleName);
+        }else {
+            $modulePath = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/' . $siteModuleName;
+        }
 
+        $filePath = $modulePath.'/config/';
+        if(is_writable($filePath)) {
             $status = $this->createModuleLoader($filePath, $moduleList);
         }else{
             $status = 0;
@@ -146,7 +155,8 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
         // Service implementation end
 
         // Adding results to parameters for events treatment if needed
-        $arrayParameters['results'] = $status;
+        $arrayParameters['results']['status'] = $status;
+        $arrayParameters['results']['folder_path'] = $filePath;
         // Sending service end event
         $arrayParameters = $this->sendEvent('meliscmssite_service_module_load_end', $arrayParameters);
 
