@@ -855,6 +855,7 @@ return array(
                             'melis_cms_site.site_id',
                             'melis_cms_site.site_name',
                             'melis_cms_site.site_label',
+                            'site_langs'
 
                         ),
                         'actionButtons' => array(
