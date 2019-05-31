@@ -497,6 +497,8 @@
         'tr_melis_cms_sites_tool_add_step3_multi_domain_name' => 'What are the domains of these sites?',
         'tr_melis_cms_sites_tool_add_step3_invalid_domain_name' => 'Invalid domain name',
         'tr_melis_cms_sites_tool_add_step4_is_new_module' => 'Do you want to use an existing module?',
+        'tr_melis_cms_sites_tool_add_step3_domain_error1' => 'This domain is already used by the site ',
+        'tr_melis_cms_sites_tool_add_step3_domain_error2' => '. It can\'t be used for another site.',
         'tr_melis_cms_sites_tool_add_step4_select_module_option_err' => 'Please select if you want to use an existing module',
         'tr_melis_cms_sites_tool_add_step4_select_module' => 'Please choose the module attached to the site in the list:',
         'tr_melis_cms_sites_tool_add_step4_select_module_placeholder' => 'Choose a module',
