@@ -542,12 +542,14 @@
 
         #MODULE LOAD TAB
         'tr_melis_cms_sites_module_loading' => 'Modules',
-        'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice' => '<i class="fa fa-warning"></i>Ci-dessous est la liste des modules requis par <strong>%s</strong>, êtes-vous sûr de vouloir activer <strong>%s</strong>? ',
+        'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice' => '<i class="fa fa-warning"></i>   <strong>[%s]</strong> requiert des modules supplémentaires pour fonctionner : ',
         'tr_melis_cms_sites_module_load_no_access' => 'Vous avez besoin d\'un niveau de droits d\'administrateur pour modifier cette section.',
         'tr_melis_cms_sites_module_no_module_to_load' => 'Ce site n\'a pas de module à charger.',
         'tr_meliscms_tool_site_module_load_update_title' => "Activation/Désactivation des modules des sites",
         'tr_meliscms_tool_site_module_load_update_confirm' => "Attention aux changements des modules à charger ou leur ordre, celà impactera tous les sites qui utilisent ces modules. <br><br> Les sites utilisant ces modules sont les suivants : <br> %s <br> <br>Etes-vous sûr de vouloir modifier le chargement des modules pour tous les sites utilisant ces modules ?",
-        'tr_meliscms_tool_site_module_load_no_rights' => "Les droits sur votre système de fichiers (%s) ne vous autorisent pas à modifier les fichiers.",
+        'tr_meliscms_tool_site_module_load_no_rights' => "Les droits sur votre système de fichiers (<small><br>%s</br></small>) ne vous autorisent pas à modifier les fichiers.",
+        'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice_confirmation' => "<br/>Voulez-vous activer ces modules aussi ?",
+        'tr_meliscms_tool_site_module_load_activation_title' => "Activation des modules",
 
         #DOMAINS TAB
         'tr_melis_cms_sites_domains' => 'Domaines',

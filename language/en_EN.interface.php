@@ -539,12 +539,14 @@
 
         #MODULE LOAD TAB
         'tr_melis_cms_sites_module_loading' => 'Modules',
-        'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice' => '<i class="fa fa-warning"></i>Below is the list of modules required by <strong>%s</strong>, are you sure you want to activate <strong>%s</strong>? ',
+        'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice' => '<i class="fa fa-warning"></i>   <strong>[%s]</strong> needs complementary modules to be activated:',
         'tr_melis_cms_sites_module_load_no_access' => 'You need to have an admin level of rights to modify this section.',
         'tr_melis_cms_sites_module_no_module_to_load' => 'This site has no module to load.',
         'tr_meliscms_tool_site_module_load_update_title' => "Activation/Deactivation of Sites' module",
         'tr_meliscms_tool_site_module_load_update_confirm' => "Please, be careful when changing modules to be loaded, or their order, as it can impact all sites using this module. <br><br> Sites using this module are the following ones: <br> %s <br> <br>Are you sure you want to modify the loading of modules for all sites using this module?",
-        'tr_meliscms_tool_site_module_load_no_rights' => "The rights on your filesystem (%s) don't allow modification on the files.",
+        'tr_meliscms_tool_site_module_load_no_rights' => "The rights on your filesystem (<small><br>%s</br></small>) don't allow modification on the files.",
+        'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice_confirmation' => "<br/>Do you want to activate this modules too?",
+        'tr_meliscms_tool_site_module_load_activation_title' => "Module activation",
 
         #DOMAINS TAB
         'tr_melis_cms_sites_domains' => 'Domains',

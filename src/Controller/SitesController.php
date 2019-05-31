@@ -827,7 +827,7 @@ class SitesController extends AbstractActionController
                     $con->commit();
                 }else{
                     $status = false;
-                    $textMessage = wordwrap(str_replace(' ', '', sprintf($translator->translate("tr_meliscms_tool_site_module_load_no_rights"), $path)), 25, "\n", true);
+                    $textMessage = wordwrap(sprintf($translator->translate("tr_meliscms_tool_site_module_load_no_rights"), str_replace(' ', '', $path)), 25, "\n", true);
                     $con->rollback();
                 }
             }else{
