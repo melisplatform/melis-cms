@@ -73,7 +73,7 @@ class SitesModuleLoaderController extends AbstractActionController
                     }
                 }
                 if($requiredModules) {
-                    $message = $tool->getTranslation('tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice', array($module, $module));
+                    $message = $tool->getTranslation('tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice', array($module));
                     $success = 1;
                 }
             }
