@@ -316,7 +316,7 @@ $(document).ready(function() {
             if(currentStepForm != "" && currentStepForm != "skip") {
                 var form = getSerializedForm(currentStepForm);
                 if (isFormEmpty(form, currentStepForm)) {
-                    // $("#siteAddAlert").removeClass("hidden");
+                    $("#siteAddAlert").removeClass("hidden");
                 } else {
                     $("#siteAddAlert").addClass("hidden");
                     removeFormError(currentStepForm);
@@ -557,7 +557,7 @@ $(document).ready(function() {
                 }
                 var siteSumText = text.replace(/%siteModule/g, siteName).replace(/%siteName/g, siteLabel);
                 $(".site_creation_info").empty().append(selectedLanguages, "<br />",domainType,
-                                                        "<br/><p class='step5-message'>"+siteSumText+"</p>");
+                    "<br/><p class='step5-message'>"+siteSumText+"</p>");
                 break;
             default:
                 break;
@@ -751,9 +751,9 @@ $(document).ready(function() {
     function isFormEmpty(form, currentStepForm){
         var fromInputNames = [];
         $.each(form, function(i, v){
-           if(v.value != ""){
-               fromInputNames.push(v.name)
-           }
+            if(v.value != ""){
+                fromInputNames.push(v.name)
+            }
         });
         return showFormError(currentStepForm, fromInputNames);
     }
@@ -772,14 +772,11 @@ $(document).ready(function() {
         var multiDomainErr = {};
         var errCtr = 0;
         var curForm = $(form+" input, "+form+" select");
-        var domains = {};
-        var domainsArr = [];
-        var duplicates = [];
 
         /**
          * Bring back the original message
          */
-        $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_create_site_required_field).addClass('hidden');
+        $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_create_site_required_field);
 
         /**
          * if user didn't select the module option
@@ -820,10 +817,8 @@ $(document).ready(function() {
             }
         });
 
-        if(errCtr > 0) {
-            $("#siteAddAlert").removeClass("hidden");
+        if(errCtr > 0)
             return true;
-        }
 
         /**
          * This will avoid the user to input
@@ -855,104 +850,11 @@ $(document).ready(function() {
             if(validatedDomainName(sdomMultiLbl, value)){
                 domainNameErrCtr++;
             }
-
-            // check if there are duplicate domains
-            if ($.inArray(value, domainsArr) === -1) {
-                domains[lbl] = value;
-                domainsArr.push(value);
-            } else {
-                duplicates.push(lbl);
-            }
         });
 
         if(domainNameErrCtr > 0) {
             $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_step3_invalid_domain_name).removeClass("hidden");
             return true;
-        } else {
-            // multi domain
-            if (!$.isEmptyObject(domains)) {
-                console.log(duplicates.length);
-                if (duplicates.length !== 0) {
-                    $.each(duplicates, function (key, lbl) {
-                        var sdomMultiLbl = $("#step3form-multi_domain").find("label.err_" + lbl).not(":has(input)");
-                        sdomMultiLbl.addClass("fieldErrorColor");
-                    });
-
-                    $("#siteAddAlert").text('Domains must be unique').removeClass("hidden");
-                    return true;
-                } else {
-                    $.ajax({
-                        type : 'POST',
-                        url : '/melis/MelisCms/SitesDomains/checkDomain',
-                        data : {domain : domains},
-                        beforeSend : function () {
-                            melisCoreTool.pending("#btn-next-step");
-                        }
-                    }).success(function (data) {
-                        if (!$.isEmptyObject(data.result)) {
-                            $("#siteAddAlert").text('');
-                            var length = data.result.length;
-                            var counter = 1;
-
-                            $.when(
-                                $.each(data.result, function (id, val) {
-                                    var sdomMultiLbl = $("#step3form-multi_domain").find("label.err_" + id).not(":has(input)");
-                                    sdomMultiLbl.addClass("fieldErrorColor");
-                                    var lang = sdomMultiLbl.text().slice(0, -1);
-
-                                    $("#siteAddAlert").append(lang + translations.tr_melis_cms_sites_tool_add_step3_domain_error1 + val + translations.tr_melis_cms_sites_tool_add_step3_domain_error2);
-
-                                    if (counter != length) {
-                                        $("#siteAddAlert").append('</br>');
-                                    }
-
-                                    counter++;
-                                })
-                            ).then(function () {
-                                melisCoreTool.done("#btn-next-step");
-                                $("#siteAddAlert").removeClass('hidden');
-                                return true;
-                            });
-                        } else {
-                            owlStep.trigger('owl.next');
-                            return false;
-                        }
-                    }).error(function () {
-                        console.log('error on checking domain');
-                        melisCoreTool.done("#btn-next-step");
-                    });
-
-                    return true;
-                }
-            }
-
-            // single domain
-            if (newSDOmValue != "") {
-                $.ajax({
-                    type : 'POST',
-                    url : '/melis/MelisCms/SitesDomains/checkDomain',
-                    data : {domain : newSDOmValue},
-                    beforeSend : function () {
-                        melisCoreTool.pending("#btn-next-step");
-                    }
-                }).success(function (data) {
-                    if (!$.isEmptyObject(data.result)) {
-                        newSDOmLabel.addClass("fieldErrorColor");
-                        $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_step3_domain_error1 + data.result[0] + translations.tr_melis_cms_sites_tool_add_step3_domain_error2);
-                        $("#siteAddAlert").removeClass('hidden');
-                        melisCoreTool.done("#btn-next-step");
-                        return true;
-                    } else {
-                        owlStep.trigger('owl.next');
-                        melisCoreTool.done("#btn-next-step");
-                        return false;
-                    }
-                }).error(function () {
-                    melisCoreTool.done("#btn-next-step");
-                });
-
-                return true;
-            }
         }
 
         return false;
@@ -1012,7 +914,7 @@ $(document).ready(function() {
 
         //remove all active tab
         ul.each(function(){
-           $(this).find("li").removeClass("active");
+            $(this).find("li").removeClass("active");
         });
 
         //set active tab
