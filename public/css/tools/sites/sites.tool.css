@@ -266,6 +266,10 @@ ul.meliscms-site-language-homepage-list > li:hover {
     margin-bottom: 20px;
 }
 
+.melis-modal-cont .module-rights-err{
+    word-break: break-word !important;
+}
+
 /*Mobile Tool Sites*/
 
 @media only screen and (min-width: 992px) {
