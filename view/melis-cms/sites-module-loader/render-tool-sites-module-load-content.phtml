@@ -53,12 +53,14 @@ $status = '';
                         <div class="pull-right">
                             <div class="clearfix ms-cont">
                                 <div class="row ">
-                                    <div class="col-md-6 col-sm-6 col-xs-6"><!--  module-version-display -->
-                                        <h4 id="header-version" class="module-display-indicator hidden-xs">Version </h4>
-                                    </div>
-                                    <div>
-                                        <div class="icon-cont clearfix">
-                                            <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="<?=$this->translate('tr_meliscore_module_management_notification_tip'); ?>"></i>
+                                    <div class="module-version-status">
+                                        <div class="col-md-6 col-sm-6 col-xs-6"><!--  module-version-display -->
+                                            <h4 id="header-version" class="module-display-indicator hidden-xs">Version </h4>
+                                        </div>
+                                        <div>
+                                            <div class="icon-cont clearfix">
+                                                <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="<?=$this->translate('tr_meliscore_module_management_notification_tip'); ?>"></i>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -83,15 +85,17 @@ $status = '';
                                     </div>
                                     <div class="pull-right">
                                         <div class="row">
-                                            <div class="col-md-6 col-sm-6 col-xs-6 ">
-                                                <h4 class="module-display-indicator hidden-xs"><?= isset($this->modulesInfo[$moduleName]['version']) ? $this->modulesInfo[$moduleName]['version'] : 'v1.0'; ?> </h4>
-                                            </div>
-                                            <div class="col-md-6 col-sm-6 col-xs-6 ">
-                                                <div data-siteModule-name="<?= $moduleName; ?>" class="make-switch <?= $this->siteId ?>_module_switch module-switch" data-on-label="<?= $this->translate('tr_meliscore_common_active'); ?>" data-off-label="<?= $this->translate('tr_meliscore_common_inactive'); ?>" data-text-label="<?= $this->translate('tr_meliscore_tool_user_col_status'); ?>">
-                                                    <?php
-                                                    $status = $moduleStatus > 0 ? 'checked' : '';
-                                                    ?>
-                                                    <input name="moduleLoad<?= $moduleName; ?>" data-siteModule-name="<?= $moduleName; ?>" type="checkbox" <?= $status; ?>/>
+                                            <div class="module-version-status">
+                                                <div class="col-md-6 col-sm-6 col-xs-6 ">
+                                                    <h4 class="module-display-indicator hidden-xs"><?= isset($this->modulesInfo[$moduleName]['version']) ? $this->modulesInfo[$moduleName]['version'] : 'v1.0'; ?> </h4>
+                                                </div>
+                                                <div class="col-md-6 col-sm-6 col-xs-6 ">
+                                                    <div data-siteModule-name="<?= $moduleName; ?>" class="make-switch <?= $this->siteId ?>_module_switch module-switch" data-on-label="<?= $this->translate('tr_meliscore_common_active'); ?>" data-off-label="<?= $this->translate('tr_meliscore_common_inactive'); ?>" data-text-label="<?= $this->translate('tr_meliscore_tool_user_col_status'); ?>">
+                                                        <?php
+                                                        $status = $moduleStatus > 0 ? 'checked' : '';
+                                                        ?>
+                                                        <input name="moduleLoad<?= $moduleName; ?>" data-siteModule-name="<?= $moduleName; ?>" type="checkbox" <?= $status; ?>/>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

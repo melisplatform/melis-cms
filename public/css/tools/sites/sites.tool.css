@@ -272,6 +272,10 @@ ul.meliscms-site-language-homepage-list > li:hover {
     .switch-all-container .module-loading-title{
         margin-bottom: -25px !important;
     }
+
+    .module-version-status{
+        width: 500px;
+    }
 }
 
 @media only screen and (max-width: 991px) {
