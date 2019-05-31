@@ -11,6 +11,7 @@ namespace MelisCms\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
+use Zend\View\Model\JsonModel;
 
 /**
  * Site Tool Plugin
@@ -65,6 +66,41 @@ class SitesDomainsController extends AbstractActionController
         $view->domainsForm = $domainsForm;
         $view->siteDomains = $siteDomains;
         return $view;
+    }
+
+    public function checkDomainAction()
+    {
+        $domain = $this->params()->fromPost('domain', null);
+        $domainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $siteName = null;
+        $result = [];
+
+        if (!is_null($domain)) {
+            if (is_array($domain)) {
+                $domains = $domain;
+
+                foreach ($domains as $key => $domain) {
+                    $dom = $domainTable->getEntryByField('sdom_domain', $domain)->toArray();
+
+                    if (!empty($dom)) {
+                        $site = $siteTable->getEntryById($dom[0]['sdom_site_id'])->toArray()[0];
+                        $result[$key] = $site['site_label'];
+                    }
+                }
+            } else {
+                $dom = $domainTable->getEntryByField('sdom_domain', $domain)->toArray();
+
+                if (!empty($dom)) {
+                    $site = $siteTable->getEntryById($dom[0]['sdom_site_id'])->toArray()[0];
+                    $result[] = $site['site_label'];
+                }
+            }
+        }
+
+        return new JsonModel([
+            'result' => $result
+        ]);
     }
 
     private function getMelisKey()
