@@ -170,14 +170,27 @@ class SitesTranslationController extends AbstractActionController
         $success = false;
         //get the request
         $request = $this->getRequest();
-        $data = get_object_vars($request->getPost());
+        $postData = get_object_vars($request->getPost());
 
         $melisSiteTranslationService = $this->getServiceLocator()->get('MelisSiteTranslationService');
-        $res = $melisSiteTranslationService->deleteTranslation($data);
+        $mstTable = $this->getServiceLocator()->get('MelisSiteTranslationTable');
 
-        if($res)
+        $db = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');//get db adapter
+        $con = $db->getDriver()->getConnection();//get db driver connection
+        $con->beginTransaction();//begin transaction
+        try {
+            $data = $mstTable->getTranslationsBySiteId($postData['siteId'])->toArray();
+            foreach ($data as $key => $val) {
+                $idToDelete = $val['mst_id'];
+                $melisSiteTranslationService->deleteTranslationKeyById($idToDelete);
+                $melisSiteTranslationService->deleteTranslationTextByMstId($idToDelete);
+            }
             $success = true;
-
+            $con->commit();
+        }catch(\Exception $ex){
+            $success = false;
+            $con->rollback();
+        }
         //prepare the data to return
         $response = array(
             'success'  =>  $success,

@@ -50,9 +50,9 @@ $(document).ready(function(){
         var siteId = activeTabId.split("_")[0];
         var t_id = $(this).closest("tr").attr('data-mst-id');
         var tt_id = $(this).closest("tr").attr('data-mstt-id');
+        var id = $(this).closest("tr").attr('data-site-id');
         var obj = {};
-        obj.mst_id = t_id;
-        obj.mstt_id = tt_id;
+        obj.siteId = id;
 
         if(t_id != 0 && t_id != "") {
             melisCoreTool.confirm(
