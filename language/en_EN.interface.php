@@ -544,7 +544,7 @@
         'tr_melis_cms_sites_module_no_module_to_load' => 'This site has no module to load.',
         'tr_meliscms_tool_site_module_load_update_title' => "Activation/Deactivation of Sites' module",
         'tr_meliscms_tool_site_module_load_update_confirm' => "Please, be careful when changing modules to be loaded, or their order, as it can impact all sites using this module. <br><br> Sites using this module are the following ones: <br> %s <br> <br>Are you sure you want to modify the loading of modules for all sites using this module?",
-        'tr_meliscms_tool_site_module_load_no_rights' => 'The rights on your filesystem (<small class="module-rights-err"><b>%s</b></small>) don\'t allow modification on the files.',
+        'tr_meliscms_tool_site_module_load_no_rights' => 'The rights on your filesystem (<p class="module-rights-err"><b>%s</b></p>) don\'t allow modification on the files.',
         'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice_confirmation' => "<br/>Do you want to activate this modules too?",
         'tr_meliscms_tool_site_module_load_activation_title' => "Module activation",
 
