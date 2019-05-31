@@ -145,31 +145,31 @@ return array(
                                         'attributes' => array(
                                             'id' => 'mstt_text',
                                             'value' => '',
-                                            'required' => 'required',
+//                                            'required' => 'required',
                                             'class' => 'form-control tiny-mce-init',
                                         ),
                                     ),
                                 ),
                             ),
-                            'input_filter' => array(
-                                'mstt_text' => array(
-                                    'name'     => 'mstt_text',
-                                    'required' => true,
-                                    'validators' => array(
-                                        array(
-                                            'name' => 'NotEmpty',
-                                            'options' => array(
-                                                'messages' => array(
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_site_translation_empty_text',
-                                                ),
-                                            ),
-                                        ),
-                                    ),
-                                    'filters'  => array(
-                                        array('name' => 'StringTrim'),
-                                    ),
-                                ),
-                            ),
+//                            'input_filter' => array(
+//                                'mstt_text' => array(
+//                                    'name'     => 'mstt_text',
+//                                    'required' => true,
+//                                    'validators' => array(
+//                                        array(
+//                                            'name' => 'NotEmpty',
+//                                            'options' => array(
+//                                                'messages' => array(
+//                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_site_translation_empty_text',
+//                                                ),
+//                                            ),
+//                                        ),
+//                                    ),
+//                                    'filters'  => array(
+//                                        array('name' => 'StringTrim'),
+//                                    ),
+//                                ),
+//                            ),
                         ),
                     ),
 

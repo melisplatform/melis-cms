@@ -199,8 +199,9 @@ class SitesTranslationController extends AbstractActionController
         $success = false;
         $errors = array();
         $langError = array();
+        $needToDelete = array();
 
-        $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+//        $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
 
         $factory = new \Zend\Form\Factory();
@@ -251,6 +252,13 @@ class SitesTranslationController extends AbstractActionController
              * validate translation form
              */
             foreach($siteTranslationData as $key => $transData){
+                //make sure that the id is an integer
+                $siteTranslationData[$key]['mst_id'] = (int) $siteTranslationData[$key]['mst_id'];
+                $siteTranslationData[$key]['mstt_id'] = (int) $siteTranslationData[$key]['mstt_id'];
+                $siteTranslationData[$key]['mst_data']['mst_site_id'] = (int) $siteTranslationData[$key]['mst_data']['mst_site_id'];
+                $siteTranslationData[$key]['mstt_data']['mstt_lang_id'] = (int) $siteTranslationData[$key]['mstt_data']['mstt_lang_id'];
+
+
                 /**
                  * unset the mst and mstt id
                  * set the mstt_mst_id if not empty
@@ -263,30 +271,46 @@ class SitesTranslationController extends AbstractActionController
                     unset($siteTranslationData[$key]['mst_data']['mst_id']);
                     unset($siteTranslationData[$key]['mstt_data']['mstt_id']);
                 }
-                $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered('meliscms/tools/site_translation_tool/forms/sitestranslation_form','sitestranslation_form');
-                $propertyForm = $factory->createForm($appConfigForm);
-                //we need to merge the data from mst_data and mstt_data array to validate the form
-                $tempFormValidationData = array_merge($transData['mst_data'], $transData['mstt_data']);
-                //assign the data to the form
-                $propertyForm->setData($tempFormValidationData);
-                //check if form is valid(if all the form field are match with the value that we pass from routes)
-                if(!$propertyForm->isValid()) {
-                    $appConfigForm = $appConfigForm['elements'];
-                    $formErrors = $propertyForm->getMessages();
-                    $errors = array_merge($errors, $this->processErrors($formErrors, $appConfigForm, $key));
-                    array_push($langError, $key);
-                }
-            }
 
-            if(empty($errors)){
+                //ignore the translation that is empty and came from file
+                if(empty($transData['mst_id']) && empty($transData['mstt_data']['mstt_text'])){
+                    unset($siteTranslationData[$key]);
+                }
+
+                /**
+                 * check if there is some translations that need to delete
+                 */
+                if(empty($transData['mstt_data']['mstt_text']) && !empty($transData['mst_id'])){
+                    unset($siteTranslationData[$key]);
+                    array_push($needToDelete, array('mst_id' => $transData['mst_id'], 'mstt_id' => $transData['mstt_id']));
+                }
+//                $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered('meliscms/tools/site_translation_tool/forms/sitestranslation_form','sitestranslation_form');
+//                $propertyForm = $factory->createForm($appConfigForm);
+//                //we need to merge the data from mst_data and mstt_data array to validate the form
+//                $tempFormValidationData = array_merge($transData['mst_data'], $transData['mstt_data']);
+//                //assign the data to the form
+//                $propertyForm->setData($tempFormValidationData);
+//                //check if form is valid(if all the form field are match with the value that we pass from routes)
+//                if(!$propertyForm->isValid()) {
+//                    $appConfigForm = $appConfigForm['elements'];
+//                    $formErrors = $propertyForm->getMessages();
+//                    $errors = array_merge($errors, $this->processErrors($formErrors, $appConfigForm, $key));
+//                    array_push($langError, $key);
+//                }
+
+
+            }
+            if(!empty($siteTranslationData) || !empty($needToDelete)){
                 /**
                  * if form is valid, save the data
                  */
                 //get and sanitize the data
                 $postValues = $melisTool->sanitizeRecursive($siteTranslationData, array('mstt_text'), false, true);
                 $melisSiteTranslationService = $this->getServiceLocator()->get('MelisSiteTranslationService');
-                $res = $melisSiteTranslationService->saveTranslation($postValues);
+                $res = $melisSiteTranslationService->saveTranslation($postValues, $needToDelete);
                 $success = $res['success'];
+            }else{
+                $success = true;
             }
         }
 
