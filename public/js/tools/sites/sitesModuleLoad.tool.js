@@ -38,8 +38,9 @@ $(document).ready(function() {
      * stated detection
      */
     var selectedModule = "";
-    var switchState = true;
+    var moduleOrigState = false;
     var isCallBackTriggered = false;
+    var flag = false;
 
     $("body").on('switch-change', 'div[data-siteModule-name]', function (e, data) {
         var currentTabId = activeTabId.split("_")[0];
@@ -50,8 +51,9 @@ $(document).ready(function() {
         selectedModule = moduleName;
 
         if(value === isInactive) {
-
-            switchState = false;
+            if(flag === false) {
+                moduleOrigState = true;
+            }
 
             $("h4#meliscore-tool-module-content-title").html(translations.tr_meliscore_module_management_checking_dependencies);
             $('.'+currentTabId+'_module_switch').bootstrapSwitch('setActive', false);
@@ -109,8 +111,9 @@ $(document).ready(function() {
 
 
         if(value === isActive) {
-
-            switchState = true;
+            if(flag === false) {
+                moduleOrigState = false;
+            }
 
             $("h4#meliscore-tool-module-content-title").html(translations.tr_meliscore_module_management_checking_dependencies);
             $('.'+currentTabId+'_module_switch').bootstrapSwitch('setActive', false);
@@ -166,21 +169,25 @@ $(document).ready(function() {
                 },200);
             });
         }
+
+        flag = true;
     });
 
     //hide the selected module on modal close
     $(document).on("hidden.bs.modal", ".module-modal-dependency-checker", function(){
         if(isCallBackTriggered === false) {
-            if (switchState === true) {
-                switchButtonWithoutEvent(selectedModule, "off");
-            } else {
+            //sends back the original state of the module
+            if (moduleOrigState === true) {
                 switchButtonWithoutEvent(selectedModule, "on");
+            } else {
+                switchButtonWithoutEvent(selectedModule, "off");
             }
         }
 
         isCallBackTriggered = false;
-        switchState = false;
+        moduleOrigState = false;
         selectedModule = "";
+        flag = false;
     });
 
     window.moduleLoadJsCallback = function () {
