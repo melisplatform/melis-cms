@@ -828,6 +828,7 @@ class SitesController extends AbstractActionController
                 }else{
                     $status = false;
                     $textMessage = sprintf($translator->translate("tr_meliscms_tool_site_module_load_no_rights"), $path);
+                    $tmpModuleErrorMsg = $translator->translate('tr_melis_cms_site_save_ko');
                     $con->rollback();
                 }
             }else{
@@ -857,6 +858,10 @@ class SitesController extends AbstractActionController
         if ($siteId)
         {
             $response['siteId'] = $siteId;
+        }
+
+        if (isset($tmpModuleErrorMsg)) {
+            $response['tmpModuleErrorMsg'] = $tmpModuleErrorMsg;
         }
 
         $this->getEventManager()->trigger('meliscms_site_save_end', $this, array_merge($response, array('typeCode' => $logTypeCode, 'itemId' => $siteId)));
