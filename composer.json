@@ -35,10 +35,10 @@
     "ext-openssl": "*",
     "ext-json": "*",
     "ext-pdo_mysql": "*",
-    "melisplatform/melis-core": "^2.3",
-    "melisplatform/melis-engine": "^2.3",
-    "melisplatform/melis-front": "^2.3",
-    "justinrainbow/json-schema": "5.2.1"
+    "justinrainbow/json-schema": "5.2.1",
+    "melisplatform/melis-core": "*",
+    "melisplatform/melis-engine": "*",
+    "melisplatform/melis-front": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.8"
