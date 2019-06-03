@@ -29,14 +29,6 @@ class BaseController extends MelisSiteActionController
         $sm = $event->getApplication()->getServiceManager();
         $pageId = $this->params()->fromRoute('idpage');
 
-        /**
-         * Add site config in the layout
-         */
-        /** @var MelisSiteConfigService $siteConfigSrv */
-        $siteConfigSrv = $sm->get('MelisSiteConfigService');
-        $siteConfig = $siteConfigSrv->getSiteConfigByPageId($pageId);
-        $this->layout()->setVariable('siteConfig', $siteConfig['siteConfig']);
-        $this->layout()->setVariable('allSites', $siteConfig['allSites']);
 
         return parent::onDispatch($event);
     }
