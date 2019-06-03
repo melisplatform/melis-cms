@@ -78,9 +78,9 @@ $(document).ready(function() {
                 if(data.success) {
                     melisCoreTool.confirm(
                         translations.tr_meliscore_common_yes,
-                        translations.tr_meliscore_common_no,
-                        translations.tr_meliscms_tool_site_module_load_activation_title,
-                        data.message+modules,
+                        translations.tr_meliscore_common_nope,
+                        translations.tr_meliscms_tool_site_module_load_deactivation_title,
+                        data.message+modules+translations.tr_melis_cms_sites_module_loading_deactivate_module_with_prerequisites_notice_confirmation,
                         function() {
                             $.each(data.modules, function(i, v) {
                                 // this will trigger a switch-change event
@@ -92,7 +92,7 @@ $(document).ready(function() {
                             isCallBackTriggered = true;
                         },
                         function() {
-                            switchButtonWithoutEvent(moduleName, "on");
+                            switchButtonWithoutEvent(moduleName, "off");
                             isCallBackTriggered = true;
                         }
                     );
