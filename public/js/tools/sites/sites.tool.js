@@ -925,6 +925,7 @@ $(document).ready(function() {
                                 return true;
                             });
                         } else {
+                            melisCoreTool.done("#btn-next-step");
                             owlStep.trigger('owl.next');
                             return false;
                         }

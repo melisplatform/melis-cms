@@ -58,6 +58,11 @@ class MelisCmsFlashMessengerListener extends MelisCoreGeneralListener implements
             ),
             function ($e) {
                 $params = $e->getParams();
+
+                if (isset($params['tmpModuleErrorMsg'])) {
+                    $params['textMessage'] = $params['tmpModuleErrorMsg'];
+                }
+
                 $e->getTarget()->forward()->dispatch(
                     'MelisCore\Controller\MelisFlashMessenger',
                     array_merge(
