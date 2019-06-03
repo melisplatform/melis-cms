@@ -512,6 +512,7 @@
         'tr_melis_cms_sites_tool_add_step5_single_dom_opt_1_msg' => 'Language in URL',
         'tr_melis_cms_sites_tool_add_step5_single_dom_opt_3_msg' => 'Only page URL',
         'tr_melis_cms_sites_tool_add_site_module_already_exist' => 'Module name already exists, please choose another',
+        'tr_melis_cms_sites_tool_add_site_error' => 'Error',
 
         'tr_melis_cms_sites_tool_add_unable_to_create_site' => 'Unable to create the site',
         'tr_melis_cms_sites_tool_add_site_language_already_created' => '%s version of the site is already created',

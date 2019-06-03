@@ -645,7 +645,7 @@ class SitesController extends AbstractActionController
                     {
                         $textMessage = 'tr_melis_cms_sites_tool_add_unable_to_create_site';
                         $errors = array(
-                            'Error' => array(
+                            $translator->translate('tr_melis_cms_sites_tool_add_site_error') => array(
                                 'error' => $translator->translate($saveSiteResult['message'])
                             ),
                         );
