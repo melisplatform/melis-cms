@@ -1046,28 +1046,106 @@ class SitesController extends AbstractActionController
          */
         if(!empty($siteDomainData)) {
             $siteDomainsSvc = $this->getServiceLocator()->get("MelisCmsSitesDomainsService");
+            $err = false;
+            $domains = [];
+            $translator = $this->getServiceLocator()->get('translator');
 
+            // First check if forms are valid for every environment
             foreach ($siteDomainData as $domainDatum) {
                 $form = $this->getTool()->getForm('meliscms_tool_sites_domain_form');
                 $form->setData($domainDatum);
 
                 if ($domainDatum['sdom_env'] == getenv('MELIS_PLATFORM')) {
-                    if ($form->isValid()) {
-                        $siteDomainsSvc->saveSiteDomain($domainDatum);
-                    } else {
+                    if (!$form->isValid()) {
+                        $err = true;
                         $currErr = array();
+
                         foreach ($form->getMessages() as $key => $err) {
                             $currErr[$domainDatum["sdom_env"] . "_" . $key] = $err;
                         }
+
                         $errors = array_merge($errors, $currErr);
                         $status = 0;
                     }
-                } else {
-                    if (!empty($domainDatum['sdom_scheme']) && !empty($domainDatum['sdom_domain'])) {
-                        $siteDomainsSvc->saveSiteDomain($domainDatum);
+                }
+            }
+
+            // Second check if there are duplicates
+            if (!$err) {
+                foreach ($siteDomainData as $domainDatum) {
+                    if (in_array($domainDatum['sdom_domain'], $domains)) {
+                        $err = true;
+                        $currErr = array();
+                        $currErr[$domainDatum["sdom_env"] . "_" . 'sdom_domain'] = $translator->translate('tr_melis_cms_sites_tool_add_step3_domain_unique_error');
+                        $errors = array_merge($errors, $currErr);
+                        $status = 0;
+                    } else {
+                        $domains[$domainDatum['sdom_env']] = $domainDatum['sdom_domain'];
                     }
                 }
             }
+
+            // Third check if domain is already used by another site & save
+            if (!$err) {
+                foreach ($siteDomainData as $domainDatum) {
+                    $form = $this->getTool()->getForm('meliscms_tool_sites_domain_form');
+                    $form->setData($domainDatum);
+
+                    if ($domainDatum['sdom_env'] == getenv('MELIS_PLATFORM')) {
+                        $siteData = [];
+                        $isDomainAvailable = $this->checkDomain($domainDatum, $siteData);
+
+                        if ($isDomainAvailable) {
+                            $siteDomainsSvc->saveSiteDomain($domainDatum);
+                        } else {
+                            $currErr = array();
+                            $currErr[$domainDatum["sdom_env"] . '_' . 'sdom_domain'] = $translator->translate('tr_melis_cms_sites_tool_add_step3_domain_error1') . $siteData['site_label'] . $translator->translate('tr_melis_cms_sites_tool_add_step3_domain_error2');
+                            $errors = array_merge($errors, $currErr);
+                            $status = 0;
+                        }
+                    } else {
+                        if (!empty($domainDatum['sdom_scheme']) && !empty($domainDatum['sdom_domain'])) {
+                            $siteData = [];
+                            $isDomainAvailable = $this->checkDomain($domainDatum, $siteData);
+
+                            if ($isDomainAvailable) {
+                                $siteDomainsSvc->saveSiteDomain($domainDatum);
+                            } else {
+                                $currErr = array();
+                                $currErr[$domainDatum["sdom_env"] . '_' . 'sdom_domain'] = $translator->translate('tr_melis_cms_sites_tool_add_step3_domain_error1') . $siteData['site_label'] . $translator->translate('tr_melis_cms_sites_tool_add_step3_domain_error2');
+                                $errors = array_merge($errors, $currErr);
+                                $status = 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks if the domain is available or not
+     * @param $domainDatum
+     * @param $siteData
+     * @return bool
+     */
+    public function checkDomain($domainDatum, &$siteData) {
+        $domainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+
+        $dom = $domainTable->getEntryByField('sdom_domain', $domainDatum['sdom_domain'])->toArray();
+
+        if (!empty($dom)) {
+            $site = $siteTable->getEntryById($dom[0]['sdom_site_id'])->toArray()[0];
+
+            if ($site['site_id'] == $domainDatum['sdom_site_id']) {
+                return true;
+            } else {
+                $siteData = $site;
+                return false;
+            }
+        } else {
+            return true;
         }
     }
 

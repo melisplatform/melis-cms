@@ -503,6 +503,7 @@
         'tr_melis_cms_sites_tool_add_step3_invalid_domain_name' => 'Nom de domaine invalide',
         'tr_melis_cms_sites_tool_add_step3_domain_error1' => 'Ce domaine est déjà utilisé par le site ',
         'tr_melis_cms_sites_tool_add_step3_domain_error2' => '. Il ne peut pas être utilisé pour un autre site.',
+        'tr_melis_cms_sites_tool_add_step3_domain_unique_error' => 'Les noms de domaine doivent être uniques',
         'tr_melis_cms_sites_tool_add_step4_select_module' => 'Veuillez choisir le module lié à ce site dans la liste :',
         'tr_melis_cms_sites_tool_add_step4_select_module_placeholder' => 'Choisissez un module',
         'tr_melis_cms_sites_tool_add_step4_create_module' => 'Nom du nouveau module :',
