@@ -552,7 +552,7 @@
         'tr_meliscms_tool_site_module_load_update_confirm' => "Attention aux changements des modules à charger ou leur ordre, celà impactera tous les sites qui utilisent ces modules. <br><br> Les sites utilisant ces modules sont les suivants : <br> %s <br> <br>Etes-vous sûr de vouloir modifier le chargement des modules pour tous les sites utilisant ces modules ?",
         'tr_meliscms_tool_site_module_load_no_rights' => 'Les droits sur votre système de fichiers (<p class="module-rights-err"><b>%s</b></p>) ne vous autorisent pas à modifier les fichiers.',
         'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice_confirmation' => "<br/>Voulez-vous activer ces modules aussi ?",
-        'tr_melis_cms_sites_module_loading_deactivate_module_with_prerequisites_notice_confirmation' => "<br/>DVoulez-vous désactiver ces modules aussi ?",
+        'tr_melis_cms_sites_module_loading_deactivate_module_with_prerequisites_notice_confirmation' => "<br/>Voulez-vous désactiver ces modules aussi ?",
         'tr_meliscms_tool_site_module_load_activation_title' => "Activation des modules",
         'tr_meliscms_tool_site_module_load_deactivation_title' => "Désactivation des modules",
 
