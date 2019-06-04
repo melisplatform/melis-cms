@@ -34,11 +34,25 @@ class FrontPluginsController extends AbstractActionController
         $siteModule = $this->params()->fromRoute('siteModule');
         $pluginList_ = $this->putSectionOnPlugins($config['plugins'], $siteModule);
         $newPluginList = $this->organizedPluginsBySection($pluginList_);
-
+        // remove section that has no child under on it
+        $newPluginList = array_filter($newPluginList);
+        // melis plugin service
+        $pluginSvc = $this->getServiceLocator()->get('MelisCorePluginsService');
+        // check for new plugins or manually installed and insert in db
+        $pluginSvc->checkTemplatingPlugins();
+        // get the latest plugin installed
+        $latesPlugin = $pluginSvc->getLatestPlugin($pluginSvc::TEMPLATING_PLUGIN_TYPE);
+        // for new plugin notifications
+        $pluginMenuHandler = $pluginSvc->getNewPluginMenuHandlerNotifDuration();
         $view = new ViewModel();
        // $view->pluginsConfig = $finalPluginList;
         $view->siteModule              = $siteModule;
         $view->newPluginList           = $newPluginList;
+        $view->latestPlugin            = $latesPlugin;
+        $view->sectionNewPlugins       = array_unique($this->sectionHasNewPlugins);
+        $view->modulesHasNewPlugins    = array_unique($this->modulesHasNewPlugins);
+        $view->subsectionHasNewPlugins = $this->subsectionHasNewPlugins;
+        $view->newPluginNotification   = $pluginMenuHandler;
 
         return $view;
     }
@@ -57,24 +71,24 @@ class FrontPluginsController extends AbstractActionController
 
         return $data;
     }
-
+    
     public function renderPluginModalAction()
     {
         $translator = $this->getServiceLocator()->get('translator');
-
+        
         $parameters = $this->getRequest()->getQuery('parameters', array());
-
+        
         $module = (!empty($parameters['module'])) ? $parameters['module'] : '';
         $pluginName = (!empty($parameters['pluginName'])) ? $parameters['pluginName'] : '';
         $pluginId = (!empty($parameters['pluginId'])) ? $parameters['pluginId'] : 1;
         $pageId = (!empty($parameters['melisActivePageId'])) ? $parameters['melisActivePageId'] : 1;
         $siteModule = (!empty($parameters['siteModule'])) ? $parameters['siteModule'] : '';
         $pluginHardcodedConfig = (!empty($parameters['pluginFrontConfig'])) ? $parameters['pluginFrontConfig'] : '';
-
+        
         $pluginHardcodedConfig = html_entity_decode($pluginHardcodedConfig, ENT_QUOTES);
         $pluginHardcodedConfig = html_entity_decode($pluginHardcodedConfig, ENT_QUOTES);
         $pluginHardcodedConfig = unserialize($pluginHardcodedConfig);
-
+        
         $errors = '';
         $tag = '';
         $tabs = array();
@@ -92,7 +106,7 @@ class FrontPluginsController extends AbstractActionController
             else
             {
                 $pluginConf = $config['plugins'][$module]['plugins'][$pluginName];
-
+                
                 try
                 {
                     $pluginHardcodedConfig['id'] = $pluginId;
@@ -109,10 +123,10 @@ class FrontPluginsController extends AbstractActionController
                 }
             }
         }
-
+        
         if ($errors != '' || count($tabs) == 0)
             $tabs[] = array('tabName' => 'Error', 'html' => $errors);
-
+            
         $view = new ViewModel();
         $view->setTerminal(true);
         $view->tabs = $tabs;
@@ -125,19 +139,19 @@ class FrontPluginsController extends AbstractActionController
         $view->siteModule = $siteModule;
         return $view;
     }
-
-
+    
+    
     public function validatePluginModalAction()
     {
         $translator = $this->getServiceLocator()->get('translator');
-
+        
         $parameters = get_object_vars($this->getRequest()->getPost());
-
+        
         $module = (!empty($parameters['melisModule'])) ? $parameters['melisModule'] : '';
         $pluginName = (!empty($parameters['melisPluginName'])) ? $parameters['melisPluginName'] : '';
         $pluginId = (!empty($parameters['melisPluginId'])) ? $parameters['melisPluginId'] : 1;
         $pageId = (!empty($parameters['melisIdPage'])) ? $parameters['melisIdPage'] : 1;
-
+        
         $errors = '';
         $tag = '';
         $tabs = array();
@@ -155,7 +169,7 @@ class FrontPluginsController extends AbstractActionController
             else
             {
                 $pluginConf = $config['plugins'][$module]['plugins'][$pluginName];
-
+                
                 try
                 {
                     $pluginHardcodedConfig['id'] = $pluginId;
@@ -171,16 +185,16 @@ class FrontPluginsController extends AbstractActionController
                 }
             }
         }
-
+        
         $success = 1;
         $finalErrors = array();
-
+        
         if ($errors != '')
         {
             $success = 0;
             $finalErrors = array('general' => $errors);
         }
-
+        
         foreach($errorsTabs as $response) {
             if(!$response['success']) {
                 $success = 0;
@@ -190,16 +204,16 @@ class FrontPluginsController extends AbstractActionController
 
         }
         $finalErrors = $errorsTabs;
-
-
+        
+        
         $result = array(
             'success' => $success,
             'errors' => $finalErrors,
         );
-
+        
         return new JsonModel($result);
     }
-
+    
     public function checkSessionPageAction()
     {
         $container = new Container('meliscms');
@@ -245,7 +259,7 @@ class FrontPluginsController extends AbstractActionController
             // melis plugins configrations
             // this means the module has a templating plugins or plugins
             if (isset($melisPluginsConfig['plugins']) && ! empty($melisPluginsConfig['plugins'])) {
-                if (in_array((strtolower($moduleName)),$activeModules)) {
+                if (in_array((strtolower($moduleName)),$activeModules) || $moduleName == "MelisMiniTemplate" ) {
                     foreach ($melisPluginsConfig['plugins'] as $pluginName =>  $pluginConfig) {
                         // list of excluded plugins
                         $excludedPlugins = [
@@ -269,6 +283,7 @@ class FrontPluginsController extends AbstractActionController
                         }
                     }
                 }
+
             }
         }
 
@@ -282,6 +297,7 @@ class FrontPluginsController extends AbstractActionController
         $engineComposer  = $this->getServiceLocator()->get('MelisEngineComposer');
         $melisPuginsSvc = $this->getServiceLocator()->get('MelisCorePluginsService');
         $marketPlaceModuleSection = $melisPuginsSvc->getPackagistCategories();
+
         /*
          * In case there is no internet or cant connect to the markeplace domain
          * we put a predefined section just not destroy the plugins menu
@@ -353,7 +369,7 @@ class FrontPluginsController extends AbstractActionController
                                     // label of sub category
                                     $newPluginList[$pluginSection][$module][$subsectionId]['title'] = $subsectionText;
                                     // indication that the plugin is newly installed
-                                    $isNew = false;//;$melisPuginsSvc->pluginIsNew($pluginName);
+                                    $isNew = $melisPuginsSvc->pluginIsNew($pluginName);
                                     $newPluginList[$pluginSection][$module][$subsectionId][$pluginName]['isNew'] = $isNew;
                                     if ($isNew) {
                                         $this->sectionHasNewPlugins[] = $pluginSection;
@@ -364,7 +380,7 @@ class FrontPluginsController extends AbstractActionController
                                     // no subsection
                                     $newPluginList[$pluginSection][$module][$pluginName] = $pluginConfig;
                                     // indication that the plugin is newly installed
-                                    $isNew = false;//$melisPuginsSvc->pluginIsNew($pluginName);
+                                    $isNew = $melisPuginsSvc->pluginIsNew($pluginName);
                                     $newPluginList[$pluginSection][$module][$pluginName]['isNew'] = $isNew;
                                     if ($isNew) {
                                         $this->sectionHasNewPlugins[] = $pluginSection;
