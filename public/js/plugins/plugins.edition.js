@@ -16,19 +16,15 @@ var melisPluginEdition = (function($, window) {
     $("body").on("click", ".m-trash-handle", removePlugins);
 
     // Checking parent body events handler to avoid multiple events of the button
-    // var cerateEventHalder = true;
     $.each($body.data("events").click, function(i, val){
         try {
             if (val.selector == "#pluginModalBtnApply") {
                 $body.off("click", "#pluginModalBtnApply");
             }
-        }
-        catch(error) {}
+        } catch(error) {}
     });
 
-    // if (cerateEventHalder) {
-        $body.on("click", "#pluginModalBtnApply", submitPluginForms); // $body because it is modal and it's located in parent
-    // }
+    $body.on("click", "button[id='pluginModalBtnApply'][data-page-id='"+melisActivePageId+"']", submitPluginForms); // $body because it is modal and it's located in parent
 
     $("body").on("focus", ".melis-ui-outlined .melis-editable", function() {
         $(this).closest(".melis-ui-outlined").addClass("melis-focus");
@@ -485,7 +481,7 @@ var melisPluginEdition = (function($, window) {
     }
 
     function removePlugins() {
-        var pluginluginContainer = $(this).closest(".melis-ui-outlined");
+        var pluginContainer = $(this).closest(".melis-ui-outlined");
         var dragndropContainer = pluginContainer.closest(".melis-dragdropzone");
         var dropzone = dragndropContainer.data("plugin-id");
         var pluginsToolsBox = pluginContainer.find('.melis-plugin-tools-box');
