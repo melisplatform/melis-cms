@@ -3,7 +3,8 @@ var melisCms = (function(){
 	
 	// CACHE SELECTORS
 	var $body 	  = $("body"),
-		$document = $("document");
+		$document = $("document"),
+		$openedPageIds = [];
 	
 	// ---=[ BUG FIX ] =---  TINYMCE POPUP MODAL FOCUS 
 	var windowOffset;
@@ -58,7 +59,7 @@ var melisCms = (function(){
 				
 				//console.log("bodyOffsetTop = " + bodyOffsetTop);
 				//console.log("windowHeight = " + windowHeight);
-				//console.log("dialogHeight = " + dialogHeight);		
+				//console.log("dialogHeight = " + dialogHeight);
 				//console.log("has popup = "+ dialogTop);
 				$(".mce-floatpanel.mce-window").css("top", dialogTop);
 				$("html, body").animate({scrollTop: dialogTop }, 300);
@@ -70,7 +71,7 @@ var melisCms = (function(){
 		}
 		else{
 			//console.log("no popup");
-		}	
+		}
 	});
 	
     // HIGHLIGHT ERROR COLORS
@@ -93,7 +94,7 @@ var melisCms = (function(){
    	  	//close page creation tab and open new one (in case if its already open - updated parent ID)
 		var pageID = $(this).data('pagenumber');
    	  	melisHelper.tabClose('0_id_meliscms_page');
-   	  	melisHelper.tabOpen( translations.tr_meliscms_page_creation, 'fa-file-text-o', '0_id_meliscms_page', 'meliscms_page_creation',  { idPage: 0, idFatherPage: pageID } ); 	
+   	  	melisHelper.tabOpen( translations.tr_meliscms_page_creation, 'fa-file-text-o', '0_id_meliscms_page', 'meliscms_page_creation',  { idPage: 0, idFatherPage: pageID } );
 	}
 	
 	// SAVE PAGE
@@ -170,7 +171,7 @@ var melisCms = (function(){
 	    	
 		}).error(function(xhr, textStatus, errorThrown){
 			alert( translations.tr_meliscore_error_message );
-		});	
+		});
 	}
 	
 	// PUBLISH PAGE 
@@ -226,6 +227,8 @@ var melisCms = (function(){
 		    	
 		    	// reload the preview in edition tab 
 		    	melisHelper.zoneReload(pageNumber+'_id_meliscms_page','meliscms_page', {idPage:pageNumber});
+
+				$openedPageIds.push(data.datas.idPage);
 			}
 			else
 			{
@@ -241,7 +244,7 @@ var melisCms = (function(){
 	    	
 		}).error(function(xhr, textStatus, errorThrown){
 			alert( translations.tr_meliscore_error_message );
-		});	
+		});
 	}
 		
 	// UNPUBLISH PAGE
@@ -263,6 +266,8 @@ var melisCms = (function(){
 	    		
 	    		// update flash messenger values
 		    	melisCore.flashMessenger();
+
+				$openedPageIds.push(pageNumber);
 			}
 			else{
 				// show error modal
@@ -526,7 +531,7 @@ var melisCms = (function(){
 		var iHeight = $("#"+ activeTabId + " .melis-iframe").contents().height()+20;  
 		$("#"+ activeTabId + " .melis-iframe").css("height", iHeight);
 	}
-	
+
 	// REFRESH PAGE TAB (historic, versionining etc)
     function refreshPageTable() {
     	var zoneParent = $(this).parents(".melis-page-table-cont");
@@ -553,12 +558,12 @@ var melisCms = (function(){
     // IFRAME HEIGHT CONTROLS (for onload, displaySettings & sidebar collapse)
     function iframeLoad() {
     	var height = $("#"+ activeTabId + " .melis-iframe").contents().height();
-    		//width  = $("#"+ activeTabId + " .melis-iframe").contents().find("body").width();	
+    		//width  = $("#"+ activeTabId + " .melis-iframe").contents().find("body").width();
 
     	$("#"+ activeTabId + " .melis-iframe").css("height", height);
     	$("#"+ activeTabId + " .melis-iframe").css("min-height", "700px");  
     	//$("#"+ activeTabId + " .melis-iframe").css("width", width);
-   	
+
 		// Check and Get all Editable Value and dataTags from Editor TinyMCE
 		// $.ajax({
 		// 	type        : 'POST',
@@ -566,9 +571,30 @@ var melisCms = (function(){
 		// 	dataType    : 'json',
 		// 	encode		: true
 		// });
-		
+
 		// Activating page edition button action
-		melisCms.enableCmsButtons(activeTabId);
+		/**
+		 * we need to loop every opened pages
+		 * so that we can enable the tab buttons
+		 *
+		 * We must not use the activeTabId here except
+		 * when the user publish or unpublish the page
+		 * because it will just enable the active tab
+		 * button, but the non active tab button will still
+		 * remain disabled
+		 */
+		if($openedPageIds.length > 0) {
+			$.each($openedPageIds, function (i, v) {
+				var newTabId = activeTabId.replace(/[0-9]+/, v);
+				melisCms.enableCmsButtons(newTabId);
+			});
+		}else{
+			//activate what's the active page
+			melisCms.enableCmsButtons(activeTabId);
+		}
+
+		//clear the opened tab pages id
+		$openedPageIds = [];
 
         // PAGE ACCESS user rights checking
         $.ajax({
@@ -628,6 +654,21 @@ var melisCms = (function(){
         	alert( translations.tr_meliscore_error_message );
         });
     }
+
+
+	/**
+	 * Callback function when opening a page
+	 *
+	 * Add another parameter if needed
+	 * @param pageId
+	 */
+	function pageTabOpenCallback(pageId)
+	{
+		//store the opened pages id
+		$openedPageIds.push(pageId);
+
+		//add another statement below if needed
+	}
 
 	// WINDOW SCROLL FUNCTIONALITIES ========================================================================================================
 	if( melisCore.screenSize >= 768) {
@@ -692,6 +733,7 @@ var melisCms = (function(){
 	           $("#"+ activeTabId + " .page-head-container > .innerAll").removeAttr("style");
 	        }
 	    });
+
 	}
 
 	
@@ -760,6 +802,8 @@ var melisCms = (function(){
 		enableCmsButtons								: 			enableCmsbuttons,
 		
 		iframeLoad										:			iframeLoad,
+
+		pageTabOpenCallback								:			pageTabOpenCallback,
 	};
 
 })();

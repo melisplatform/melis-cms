@@ -1,0 +1,113 @@
+<?php
+$name = '';
+$id = '';
+if (!empty($this->zoneconfig['conf']['name']))
+    $name = $this->zoneconfig['conf']['name'];
+if (!empty($this->zoneconfig['conf']['id']))
+    $id = ' id="' . $this->zoneconfig['conf']['id'] . '"';
+$data_melisKey = $this->melisKey;
+
+?>
+<div id="<?= $id; ?>" data-melisKey="<?= $data_melisKey; ?>">
+    <div class="modal-content">
+        <div class="modal-body padding-none">
+            <div class="wizard">
+                <div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none">
+                    <div class="widget-head">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#" class="glyphicons pencil" data-toggle="tab" aria-expanded="true"><i></i> <?php echo $this->translate('tr_melis_site_translation_edit_translation') ?></a></li>
+                        </ul>
+                    </div>
+                    <div class="widget-body innerAll inner-2x">
+                        <div class="tab-content">
+                            <div class="tab-pane active" <?php echo $id ?>>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h4>Key : <?= $this->transKey; ?></h4>
+                                        <br/>
+                                    </div>
+                                    <div class="col-xs-12 col-md-4">
+                                        <div class="product-text-tab-container" >
+                                            <ul class="nav-tabs product-text-tab">
+                                                <?php foreach($this->siteLangs as $key => $transLang) { ?>
+                                                    <li class="">
+                                                        <a class="clearfix" data-toggle="tab" id="sites_translation_lang_<?= $transLang['lang_cms_id'] ?>" href="#<?= $transLang['lang_cms_locale']; ?>-log-type-details-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $transLang['lang_cms_id'] ?>">
+                                                            <span class="pull-right">
+                                                                <img src="<?= $this->serverUrl() . '/MelisCms/images/lang-flags/' . $transLang['lang_cms_locale'] . '.png' ?>" class="pull-right">
+                                                            </span>
+                                                            <span><?= $transLang['lang_cms_name'] ?></span>
+                                                        </a>
+                                                    </li>
+                                                <?php } ?>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 col-md-8">
+                                        <div class="tab-content">
+                                            <?php foreach ($this->siteLangs as $key => $transLang) { ?>
+                                                <div id="<?= $transLang['lang_cms_locale']; ?>-log-type-details-<?= $this->siteId; ?>" class="tab-pane product-text-tab-content">
+                                                    <div class="bg-white">
+                                                        <h4 class=""><i class="fa fa-language"></i>  <?= $transLang['lang_cms_name']; ?></h4>
+                                                    </div>
+                                                    <div id="site_translation_<?= $transLang['lang_cms_locale']; ?>">
+                                                        <?php
+                                                        $form = clone $this->sitestranslation_form;
+                                                        $form->setAttribute('id', $transLang['lang_cms_id'].'_sites-translation-form');
+                                                        $siteId = 0;
+                                                        foreach($form->getElements() as $name => $input) {
+                                                            foreach ($this->transData as $siteTransData) {
+                                                                $siteId = $siteTransData['mst_site_id'];
+                                                                if ($siteTransData['mstt_lang_id'] == $transLang['lang_cms_id']) {
+                                                                    if (isset($siteTransData[$name])) {
+                                                                        $input->setValue($siteTransData[$name]);
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            $input->setName($transLang['lang_cms_id'] . "-" . $name);
+                                                            /**
+                                                             * set the site id, lang id and key if it is still empty
+                                                             */
+                                                            if($name == 'mstt_lang_id' && empty($input->getValue())){
+                                                                $input->setValue($transLang['lang_cms_id']);
+                                                            }
+
+                                                            if($name == 'mst_site_id' && empty($input->getValue())){
+                                                                $input->setValue($siteId);
+                                                            }
+
+                                                            if($name == 'mst_key' && empty($input->getValue())){
+                                                                $input->setValue($this->transKey);
+                                                            }
+                                                            $input->setAttribute('id', $transLang['lang_cms_id'] . "-" . $name);
+                                                        }
+                                                        echo $this->form()->openTag($form);
+                                                        echo $this->melisFieldCollection($form);
+                                                        echo $this->form()->closeTag();
+                                                        ?>
+                                                    </div>
+                                                </div>
+                                            <?php } ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div align="right">
+                                    <a data-dismiss="modal" class="btn btn-danger pull-left"><i class="fa fa-times"></i> <?= $this->translate('tr_melis_site_translation_close_btn')?></a>
+                                    <a class="btn btn-success btnSaveSiteTranslation"><i class="fa fa-save"></i>  <?= $this->translate('tr_melis_site_translation_save_btn'); ?></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            //we prepare the tinyMce init here to make sure that the form are already loaded
+            melisTinyMCE.createTinyMCE("tool", "textarea.tiny-mce-init", {
+                toolbar : 'undo redo | styleselect | bold italic | alignleft aligncenter alignright | link'
+            });
+        });
+    </script>
+</div>

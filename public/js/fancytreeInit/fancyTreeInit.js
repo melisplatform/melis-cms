@@ -152,7 +152,7 @@
 	        			// open page on click on mobile . desktop is double click
 	        			if( melisCore.screenSize <= 1024 ){
 	        				var data = data.node.data;
-	                		melisHelper.tabOpen( data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,  { idPage: data.melisData.page_id } );
+	                		melisHelper.tabOpen( data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,  { idPage: data.melisData.page_id }, null, melisCms.pageTabOpenCallback(data.melisData.page_id) );
 	        			}
 	        		}	
 	        		$('.hasNiceScroll').getNiceScroll().resize();
@@ -163,7 +163,7 @@
 	        		
 	        		// open tab and page
 	    			var data = data.node.data;
-	        		melisHelper.tabOpen( data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,  { idPage: data.melisData.page_id } );
+	        		melisHelper.tabOpen( data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,  { idPage: data.melisData.page_id }, null, melisCms.pageTabOpenCallback(data.melisData.page_id) );
 	        	
 	        		$('.hasNiceScroll').getNiceScroll().resize();
 	        		 

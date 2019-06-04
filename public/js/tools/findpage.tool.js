@@ -17,7 +17,7 @@
         var keycode = (event.keyCode ? event.keyCode : event.which);
         if(keycode == '13'){
             startTreeSearch();
-        }   
+        }
     }).focus();
     
     $body.on("click", "#searchTreeView", function(e){
@@ -54,6 +54,7 @@
              console.log('failed');
          });
         melisCoreTool.done('#generateTreePageLink');
+
     });
     
     $body.on("click", "#generateTreePageId", function(){
@@ -61,9 +62,9 @@
         var id = $('#find-page-dynatree .fancytree-active').parent('li'). attr('id').split("_")[1];
         var inputId = $('#generateTreePageId').data('inputid');
         $(inputId).val(id);
-        
+
         $('#id_meliscms_input_page_tree_container').modal("hide");
-        
+
         melisCoreTool.done('#generateTreePageLink');
     });
     
@@ -71,9 +72,9 @@
         var match = $("input[name=tree_search]").val();
         var tree = $("#find-page-dynatree").fancytree("getTree");
         var filterFunc = tree.filterNodes;
-        var opts = {};      
+        var opts = {};
         var tmp = '';
-         
+
          tree.clearFilter();
          $("#find-page-dynatree").fancytree("getRootNode").visit(function(node){
             node.resetLazy();
@@ -83,7 +84,7 @@
          searchContainer.addClass("searching");
 
          $.ajax({
-            type        : 'POST', 
+            type        : 'POST',
             url         : 'melis/MelisCms/Page/searchTreePages',
             data        : {name: 'value', value: match},
             dataType    : 'json',
@@ -104,8 +105,8 @@
                 tree.loadKeyPath(arr, function(node, status){
                     if(!node.isVisible()) {
                         switch( status ) {
-                        case "loaded":                          
-                            node.makeVisible();     
+                        case "loaded":
+                            node.makeVisible();
                             break;
                         case "ok":
                             node.makeVisible();
@@ -113,14 +114,14 @@
                         }
 
                     }
-                    filterFunc.call(tree, match, opts);                 
+                    filterFunc.call(tree, match, opts);
                 }).done(function(){
                     $("input[name=tree_search]").prop('disabled', false);
                     searchContainer.removeClass("searching");
-                });                 
+                });
             }
-            
-        
+
+
          }).error(function(){
              console.log('failed');
          });
@@ -134,7 +135,7 @@
             $iframe         = window.parent.$(".melis-iframe"),
             $idialog        = $iframe.contents().find(".tox-dialog"),
             $imceLinkTree   = $iframe.contents().find("#mce-link-tree");
-        
+
             if ( $idialog.length ) {
                 $imceLinkTree.parent().find("input").val(dataUrl);
             }
@@ -203,17 +204,17 @@
     
     // used in regular form buttons
     function createInputTreeModal(id) {
-        
+
         // initialation of local variable
         zoneId = 'id_meliscms_input_page_tree';
         melisKey = 'meliscms_input_page_tree';
         modalUrl = 'melis/MelisCms/Page/renderPageModal';
-        
+
         // requesitng to create modal and display after
         if($('#id_meliscms_input_page_tree_container').length){
             $('#id_meliscms_input_page_tree_container').parent().remove();
         }
-        
+
         window.parent.melisHelper.createModal(zoneId, melisKey, false, {'pageTreeInputId' : id}, modalUrl, function() {
         });
     }
@@ -276,6 +277,8 @@
                 mode: "hide"       // Grayout unmatched nodes (pass "hide" to remove unmatched node instead)
               },
         });
+        
+
     }
 
     return {
