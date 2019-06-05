@@ -207,7 +207,7 @@ var melisCms = (function(){
 	    		refreshTreeview(data.datas.idPage);
 	    		
 	    		// set the online/offline button to 'online'
-	    		$('.page-publishunpublish').bootstrapSwitch('setState', true, true);
+	    		$('.page-publishunpublish[data-pagenumber="'+pageNumber+'"]').bootstrapSwitch('setState', true, true);
 	
 	    		// call melisOkNotification 
 	    		melisHelper.melisOkNotification( data.textTitle, data.textMessage, '#72af46' );
