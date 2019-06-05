@@ -765,7 +765,11 @@ body.modal-open {
 	 content: "\f12e";
 }
 
-
+/* Site selector inside GDPR Banner tab */
+ul#select2-id_mcgdprbanner_site_id-results {
+	max-height: 125px;
+	overflow-y: auto !important;
+}
 
 .cms_gdpr_banner_site_filter_form {
 	display: inline;
