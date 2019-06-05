@@ -1114,6 +1114,11 @@ $(document).ready(function() {
         elem.removeAttr(attr);
     }
 
+    // Disable enter on step 3 domains
+    $body.on('keypress', '#step3form-single_domain  #sdom_domain', function(e) {
+        return e.which !== 13;
+    });
+
     /**
      * ================================================================================
      * ============================== END SITE CREATION ===============================
