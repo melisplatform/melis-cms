@@ -80,7 +80,7 @@ return array(
     ),
     'controllers' => array(
         'invokables' => array(
-            'SiteSample\Controller\Index' => 'SiteSample\Controller\IndexController',
+            'SiteSample\Controller\Home' => 'SiteSample\Controller\HomeController',
             'SiteSample\Controller\Page404' => 'SiteSample\Controller\Page404Controller'
         ),
     ),

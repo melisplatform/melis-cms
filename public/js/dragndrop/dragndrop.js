@@ -236,6 +236,34 @@ var melisDragnDrop = (function($, window) {
         $(this).children(".melis-plugin-tooltip").fadeIn();
     });
 
+    $("body").on('click', ".melis-cms-filter-btn-sub-category", function(){
+        var elem = $(this);
+        var next = elem.next();
+        var textVal = elem.text();
+        var activeMenu =  elem.parent().find('.active');
+        if (activeMenu.length > 0) {
+            activeMenu.next().slideUp();
+            activeMenu.removeClass('active');
+            //activeMenu.find('.melis-plugins-icon-new-sub-child').removeClass('reverse-color');
+            if (activeMenu.text() !== textVal) {
+                next.slideDown();
+                elem.addClass('active');
+                //elem.find('.melis-plugins-icon-new-sub-child').addClass('reverse-color');
+            }
+        } else {
+            // show menu
+            if (elem.hasClass('active')) {
+                next.slideUp();
+                elem.removeClass('active');
+                //elem.find('.melis-plugins-icon-new-sub-child').removeClass('reverse-color');
+            } else {
+                elem.addClass('active');
+                //elem.find('.melis-plugins-icon-new-sub-child').addClass('reverse-color');
+                next.slideDown();
+            }
+        }
+    });
+
     // $( ".melis-editable" ).resizable({ disabled: true, handles: 'e' });
 
     function requestPlugin(module, plugin, dropzone, pageId, dropLocation, siteModule) {
@@ -373,11 +401,15 @@ var melisDragnDrop = (function($, window) {
 
     function showPlugLists() {
         if($(this).hasClass("active")) {
+            $(this).siblings('.melis-cms-plugin-snippets-box').find(".melis-cms-category-btn.active");
+           // $(this).find('.melis-plugins-icon-new-parent').removeClass('reverse-color');
             $(this).removeClass("active").siblings(".melis-cms-plugin-snippets-box").slideUp();
             $(this).siblings(".melis-cms-plugin-snippets-box").find(".melis-cms-category-btn.active").removeClass("active").siblings(".melis-cms-category-plugins-box").slideUp();
         } else {
+            //$(".melis-cms-filter-btn.active").find('.melis-plugins-icon-new-parent').removeClass('reverse-color');
             $(".melis-cms-filter-btn.active").removeClass("active").siblings(".melis-cms-plugin-snippets-box").slideUp();
             $(this).addClass("active");
+            //$(this).find('.melis-plugins-icon-new-parent').addClass('reverse-color');
             $(".melis-cms-filter-btn.active").siblings(".melis-cms-plugin-snippets-box").slideDown();
         }
     }
@@ -385,9 +417,12 @@ var melisDragnDrop = (function($, window) {
     function showCatPlugLists() {
         if($(this).hasClass("active")) {
             $(this).removeClass("active").siblings(".melis-cms-category-plugins-box").slideUp();
+            //$(this).find('.melis-plugins-icon-new-child').removeClass('reverse-color');
         } else {
+            //$(".melis-cms-category-btn.active").find('.melis-plugins-icon-new-child').removeClass('reverse-color');
             $(".melis-cms-category-btn.active").removeClass("active").siblings(".melis-cms-category-plugins-box").slideUp();
             $(this).addClass("active");
+            //$(this).find('.melis-plugins-icon-new-child').addClass('reverse-color');
             $(".melis-cms-category-btn.active").siblings(".melis-cms-category-plugins-box").slideDown();
         }
     }
