@@ -475,13 +475,7 @@ var melisDragnDrop = (function($, window) {
             $(".melis-cms-dnd-box").height(dndHeight);
     }
 
-    console.log("Paage id: "+ melisActivePageId);
-    console.log(currentFrame);
-    console.log($(currentFrame));
-    console.log($(currentFrame).length);
-
     if( $(currentFrame).length ) {
-        console.log("sud mn");
         pluginScrollPos();
     }
 
