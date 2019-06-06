@@ -2,7 +2,7 @@ var melisDragnDrop = (function($, window) {
     var scrollBool = true;
     var centerWindow;
     var scrollH = window.parent.$("body")[0].scrollHeight;
-    var currentFrame = window.parent.$("#"+parent.activeTabId).find(".melis-iframe");
+    var currentFrame = window.parent.$("iframe[data-iframe-id='"+melisActivePageId+"']");
     var placeholderWidth;
     /* ==================================
      Binding Events
@@ -429,8 +429,8 @@ var melisDragnDrop = (function($, window) {
     function pluginScrollPos() {
         // if( $(currentFrame).length ) {
             var dndHeight = $(window.parent).height() - currentFrame.offset().top - 5;
-            var stickyHead = window.parent.$("#"+parent.activeTabId).find(".bg-white.innerAll");
-            var widgetHeight = window.parent.$("#"+parent.activeTabId).find(".widget-head.nav");
+            var stickyHead = window.parent.$("#"+melisActivePageId+"_id_meliscms_page").find(".bg-white.innerAll");
+            var widgetHeight = window.parent.$("#"+melisActivePageId+"_id_meliscms_page").find(".widget-head.nav");
             $(".melis-cms-dnd-box").css("height", "100vh" ); // default height
 
             // Chrome, Firefox etc browser
@@ -474,7 +474,14 @@ var melisDragnDrop = (function($, window) {
 
             $(".melis-cms-dnd-box").height(dndHeight);
     }
+
+    console.log("Paage id: "+ melisActivePageId);
+    console.log(currentFrame);
+    console.log($(currentFrame));
+    console.log($(currentFrame).length);
+
     if( $(currentFrame).length ) {
+        console.log("sud mn");
         pluginScrollPos();
     }
 
