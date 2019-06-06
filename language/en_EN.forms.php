@@ -162,7 +162,7 @@
 	    'tr_meliscms_tool_site_site_name_error_empty' => 'Please enter the site name',
 	    'tr_meliscms_tool_site_no_platform_ids' => 'No platform id avialable, please add first platform id\'s before adding site',
 	    'tr_meliscms_tool_site_directory_exist' => 'The site directory already exist, would you like to proceed without creating the site module on MelisSites directory?',
-	    'tr_meliscms_tool_site_directory_not_writable' => 'Access permission denied, please make /module/MelisSites writable',
+	    'tr_meliscms_tool_site_directory_not_writable' => 'Impossible to create site\'s files. Rights problem.',
 	    'tr_meliscms_tool_site_melissites_directory_not_exist' => 'Target directory not exist, please create the /module/MelisSites directory',
 	    'tr_meliscms_tool_site_site_created_title' => 'has been created successfully',
 	    'tr_meliscms_tool_site_site_created_message' => 'Your new site has been created with <b>Site module</b>, <b>Pages</b> and <b>Templates</b> generated.',
@@ -228,5 +228,16 @@
         'tr_melis_cms_tool_template_layout_invalid'     => 'Invalid template layout',
         'tr_melis_cms_tool_template_controller_invalid' => 'Invalid template controller',
         'tr_melis_cms_tool_template_action_invalid'     => 'Invalid template action',
+
+        #New sites tools
+        'tr_melis_cms_site_save_ko' => "Unable to save the site.",
+        'tr_melis_cms_site_save_ok' => "Site has been saved successfully.",
+        'tr_melis_cms_sites_domain_scheme' => "Scheme",
+        'tr_melis_cms_sites_domain_scheme tooltip' => "http or https protocol",
+        'tr_melis_cms_sites_domain' => "Domain",
+        'tr_melis_cms_sites_domain tooltip' => "Domain on which the site is accessible (ex: www.mysite.com)",
+        'tr_melis_cms_sites_field_empty' => 'Value is required and can\'t be empty',
+        'tr_melis_cms_sites_field_digits' => 'The input must contain only digits',
+        'tr_melis_cms_sites_domain_field_empty' => 'The field cannot be empty, a value is required for the current platform'
 	);
 ?>

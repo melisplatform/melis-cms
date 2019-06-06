@@ -9,10 +9,9 @@
 
 namespace SiteSample\Controller;
 
-use MelisFront\Controller\MelisSiteActionController;
 use Zend\View\Model\ViewModel;
 
-class Page404Controller extends MelisSiteActionController
+class Page404Controller extends BaseController
 {
     public function indexAction()
     {

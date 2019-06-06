@@ -1,0 +1,349 @@
+.tool-sites_container_fixed_width{
+    /*max-width: 540px;*/
+    margin-bottom:10px;
+    margin-top: 6px;
+}
+.tool-sites_container_fixed_width #createSiteFiles input[value="no"]{
+    margin-left:10px;
+}
+
+.tab-header-title-container {
+    width: 100%;
+    text-align: right;
+    margin-top: -15px;
+    margin-bottom: 20px;
+}
+
+#modal-site-creation .sites-steps-owl sup{
+    margin-left: 3px;
+}
+
+#modal-site-creation #siteAddAlert{
+    padding: 7px;
+}
+
+div[data-meliskey="meliscms_tool_sites_edit_site_tabs"] .widget-head.nav {
+    z-index: 1;
+}
+
+/**STEP FORM**/
+.sites_step2-multi-language, .sites_step2-single-language,
+#btn-prev-step, #btn-finish-step{
+    display: none;
+}
+
+.step5-message{
+    margin-top: 30px !important;
+}
+
+.fieldErrorColor{
+    color: #FF0000;
+}
+
+.widget.widget-tabs>.widget-head ul.create-site-step{
+    padding: 10px;
+}
+
+.sites-steps-owl input[type="radio"],
+.sites-steps-owl input[type="checkbox"]{
+    margin-right: 4px;
+}
+
+/** Site V2 MODULE LOAD TAB **/
+#site-select-deselect-all-module.has-switch {
+    right: -5px;
+    margin-bottom: 8px;
+}
+div[data-meliskey="meliscms_tool_sites_module_load_content"] .switch-all-noti {
+    z-index: 5;
+    top: -8px;
+    right: 0;
+}
+
+div[data-meliskey="meliscms_tool_sites_module_load_content"] #header-version {
+    padding: 15px 0px;
+    margin-right: 200px;
+}
+
+/** SITE V2 DOMAIN TAB **/
+ul.meliscms-site-domains-list > li,
+ul.meliscms-site-domains-list > li:hover {
+    border: 0 solid #e61c23 !important;
+}
+.page-content-container .nav-tabs.meliscms-site-domains-list li.active > a,
+.page-content-container .nav-tabs.meliscms-site-domains-list > li.active:focus > a,
+.page-content-container .nav-tabs.meliscms-site-domains-list > li.active:active > a {
+    border: 0 solid #e61c23 !important;
+}
+
+/** SITE V2 PROPERTIES **/
+/** SITE V2 DOMAIN TAB **/
+ul.meliscms-site-language-homepage-list > li,
+ul.meliscms-site-language-homepage-list > li:hover {
+    border: 0 solid #e61c23 !important;
+}
+.page-content-container .nav-tabs.meliscms-site-language-homepage-list li.active > a,
+.page-content-container .nav-tabs.meliscms-site-language-homepage-list > li.active:focus > a,
+.page-content-container .nav-tabs.meliscms-site-language-homepage-list > li.active:active > a {
+    border: 0 solid #e61c23 !important;
+}
+
+.no-box-shadow {
+    box-shadow: none;
+}
+
+.padding-10 {
+    padding: 0px 10px 10px 10px;
+}
+
+#not-admin-notice h5{
+    color: #e61c23;
+    margin-bottom: 13px;
+    text-align: left;
+    margin-left: -8px;
+}
+
+.switch-all-container{
+    margin-bottom: 0;
+}
+
+/** SITE V2 LANGUAGES TAB CHECKBOX & RADIO BUTTON **/
+.melis-radio-button:checked,
+.melis-radio-button:not(:checked) {
+    position: absolute;
+    left: -9999px;
+}
+.melis-radio-button:checked + label,
+.melis-radio-button:not(:checked) + label
+{
+    position: relative;
+    padding-left: 28px;
+    cursor: pointer;
+    line-height: 20px;
+    display: inline-block;
+    color: #666;
+}
+.melis-radio-button:checked + label:before,
+.melis-radio-button:not(:checked) + label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #e61c23;
+    border-radius: 100%;
+    background: #fff;
+}
+.melis-radio-button:checked + label:after,
+.melis-radio-button:not(:checked) + label:after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: #e61c23;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    border-radius: 100%;
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+.melis-radio-button:not(:checked) + label:after {
+    opacity: 0;
+    -webkit-transform: scale(0);
+    transform: scale(0);
+}
+.melis-radio-button:checked + label:after {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+}
+
+.melis-checkbox-label-right {
+    position: absolute;
+    top: 5px;
+    left: 35px;
+}
+
+.form-modules {
+    padding: 30px 0 30px;
+    margin-top: 15px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.checkbox, .radio {
+    display: block;
+    min-height: 20px;
+    padding-left: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    vertical-align: middle;
+}
+
+.radio, .checkbox {
+    padding: 10px 10px 0 0;
+    margin: 0;
+    position: relative;
+}
+
+.cb-cont label {
+    padding-left: 25px;
+}
+
+.checkbox label, .radio label {
+    display: inline;
+    margin-bottom: 0;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.sites-language .cb-cont .cbmask-outer {
+    top: 12px;
+}
+
+.cb-cont .cbmask-outer {
+    height: 18px;
+    width: 18px;
+    display: block;
+    position: absolute;
+    left: 3px;
+    top: 2px;
+    border: 2px solid #e61c23 !important;
+    text-align: center;
+    padding: 2px;
+}
+
+.clearfix:after {
+    content: '';
+    clear: both;
+    display: block;
+}
+
+.clearfix:after, .clearfix:before {
+    display: table;
+    content: " ";
+}
+
+.cb-cont .cbmask-inner.cb-active {
+    background: #e61c23;
+}
+
+.cb-cont .cbmask-inner {
+    padding: 5px;
+    background: #fff;
+    display: block;
+}
+
+/** SITE V2 LANGUAGES TAB CHECKBOX & RADIO BUTTON END **/
+
+.sites-tool-lang-tab-checkbox input[type=checkbox] {
+    margin-left: -15px;
+}
+
+.cb-cont input[type=checkbox] {
+    opacity: 0;
+    cursor: pointer;
+}
+
+#step2form-multi_language .checkbox{
+    padding: 0;
+}
+
+.sites_step2-single-language .form-group .row{
+    margin: 0px -6.5px !important;
+}
+
+#is_create_new_module_for_site .row{
+    margin: 0 -5.5px !important;
+}
+
+.create-site-step li.steps_number_indicator, .module-display-indicator{
+    display: block;
+}
+
+#modal-site-creation .owl-carousel{
+    margin-bottom: 20px;
+}
+
+.melis-modal-cont .module-rights-err{
+    word-break: break-word !important;
+    font-size: 11pt;
+}
+
+/*Mobile Tool Sites*/
+
+@media only screen and (min-width: 992px) {
+    .switch-all-container .module-loading-title{
+        margin-bottom: -25px !important;
+    }
+
+    .module-version-status{
+        width: 500px;
+    }
+}
+
+@media only screen and (max-width: 991px) {
+    div[data-meliskey="meliscms_tool_sites_module_load_content"] .switch-all-noti{
+        top: 6px;
+    }
+
+    .switch-all-container .module-loading-title{
+        margin-bottom: -25px;
+    }
+
+    .widget.widget-wizard-pills .widget-head ul li a,
+    .widget.widget-wizard-pills .widget-head ul li.active a{
+        width: 60px;
+    }
+    .widget.widget-wizard-pills .widget-head ul li.active a{
+        background: #fff;
+        color: #505050;
+    }
+
+    .widget.widget-tabs>.widget-head ul.create-site-step{
+        padding: 0;
+    }
+
+    .container-level-a .widget.widget-tabs.widget-tabs-responsive > .widget-head ul li {
+        display: block;
+        border: none;
+        float: none;
+    }
+}
+
+@media only screen and (max-width: 534px) {
+    .widget.widget-wizard-pills .widget-head ul li a,
+    .widget.widget-wizard-pills .widget-head ul li.active a{
+        width: 50px;
+    }
+}
+
+@media only screen and (max-width: 510px) {
+    .container-level-a .widget.widget-tabs.widget-tabs-responsive > .widget-head ul li {
+        display: block;
+        border-bottom: 1px solid #e5e5e5;
+        float: none;
+    }
+}
+
+@media only screen and (max-width: 484px) {
+    .create-site-step li.steps_number_indicator{
+        display: none !important;
+    }
+
+    .widget.widget-tabs>.widget-head ul.create-site-step{
+        padding: 10px;
+    }
+}
+
+@media only screen and (max-width: 420px) {
+
+}
+
+@media only screen and (max-width: 360px) {
+    .module-cont h4 {
+        font-size: 13px;
+    }
+}
+

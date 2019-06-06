@@ -1,0 +1,15 @@
+<?php
+$id = '';
+if (!empty($this->zoneconfig['conf']['id']))
+    $id = ' id="' .$this->zoneconfig['conf']['id'] . '"';
+?>
+<div<?= $id; ?>  class="tab-pane container-level-a" data-melisKey='<?= $this->melisKey; ?>'>
+    <?php
+    if(!empty($this->zoneconfig['interface'])) {
+        foreach($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
+            if($keyConfig == 'meliscms_tool_sites_contents' || $keyConfig == 'meliscms_tool_sites_header')
+                echo $this->$keyConfig;
+        }
+    }
+    ?>
+</div>
