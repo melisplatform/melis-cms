@@ -1158,6 +1158,7 @@ class SitesController extends AbstractActionController
      * Save site home page ids
      *
      * @param $siteHomeData
+     * @param $data
      * @param $errors
      * @param $status
      */
@@ -1172,19 +1173,20 @@ class SitesController extends AbstractActionController
             foreach ($siteHomeData as $siteHomeDatum) {
                 $form = $this->getTool()->getForm('meliscms_tool_sites_properties_homepage_form');
                 $form->setData($siteHomeDatum);
+                if(!empty($data['slang_lang_id'])) {
+                    if (in_array($siteHomeDatum['shome_lang_id'], $data['slang_lang_id'])) {
+                        if ($form->isValid()) {
+                            $sitePropSvc->saveSiteLangHome($siteHomeDatum);
+                        } else {
+                            $currErr = [];
 
-                if (in_array($siteHomeDatum['shome_lang_id'], $data['slang_lang_id'])) {
-                    if ($form->isValid()) {
-                        $sitePropSvc->saveSiteLangHome($siteHomeDatum);
-                    } else {
-                        $currErr = [];
+                            foreach ($form->getMessages() as $key => $err) {
+                                $currErr[$siteHomeDatum["shome_lang_id"] . "_" . $key] = $err;
+                            }
 
-                        foreach ($form->getMessages() as $key => $err) {
-                            $currErr[$siteHomeDatum["shome_lang_id"] . "_" . $key] = $err;
+                            $errors = array_merge($errors, $currErr);
+                            $status = 0;
                         }
-
-                        $errors = array_merge($errors, $currErr);
-                        $status = 0;
                     }
                 }
             }

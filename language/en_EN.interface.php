@@ -122,7 +122,7 @@
 	    'tr_meliscms_tool_templates_tpl_php_path' => 'Path',
 	    'tr_meliscms_tool_templates_tpl_creation_date' => 'Creation date',
 	    'tr_meliscms_tool_templates_tpl_last_user_id' => 'User ID',
-	    'tr_meliscms_tool_templates_tpl_label_choose' => 'Choose',
+	    'tr_meliscms_tool_templates_tpl_label_choose' => 'All ',
 	    
 	    'tr_tool_templates_modal_tab_header' => 'Template manager',
 	    'tr_tool_templates_modal_tab_text_add' => 'Add new template',
