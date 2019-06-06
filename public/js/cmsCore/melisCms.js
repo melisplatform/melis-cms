@@ -373,18 +373,18 @@ var melisCms = (function(){
 	}
 	
 	// Deactivating page edition action buttons
-    function disableCmsButtons(id) {
-        $("div.make-switch label on, off").parent().css("z-index", -1).parents("div.make-switch").css("opacity", 0.5);
-        $("#"+id+"_id_meliscms_page_action_tabs").addClass('relative').prepend("<li class='btn-disabled'></li>");
-    }
+    // function disableCmsButtons(id) {
+    //     $("div.make-switch label on, off").parent().css("z-index", -1).parents("div.make-switch").css("opacity", 0.5);
+    //     $("#"+id+"_id_meliscms_page_action_tabs").addClass('relative').prepend("<li class='btn-disabled'></li>");
+    // }
     
     // Activating page edition action buttons
-    function enableCmsbuttons(id) {
-        $("#"+id+"_action_tabs").removeClass('relative');
-        $("#"+id+"_action_tabs li.btn-disabled").remove();
+    // function enableCmsbuttons(id) {
+    //     $("#"+id+"_action_tabs").removeClass('relative');
+    //     $("#"+id+"_action_tabs li.btn-disabled").remove();
         
-        $("div.make-switch label on, off").parent().css("z-index", 1).parents("div.make-switch").css("opacity", 1);
-    }
+    //     $("div.make-switch label on, off").parent().css("z-index", 1).parents("div.make-switch").css("opacity", 1);
+    // }
 	
 	// RELOAD THE TREEVIEW AND SET A NODE PAGE ACTIVE
 	function refreshTreeview(pageNumber, self) {
@@ -542,56 +542,28 @@ var melisCms = (function(){
     }
     
     function disableCmsButtons(id) {
-        $("#" + activeTabId + " .page-publishunpublish").append("<div class='overlay-switch' style='width: 100%;height: 100%;" +
+        $("#"+id+"_id_meliscms_page .page-publishunpublish").append("<div class='overlay-switch' style='width: 100%;height: 100%;" +
             "position: absolute;top: 0;" +
             "left: 0;z-index: 99999999;" +
             "cursor: wait; '></div>");
         $("#"+id+"_id_meliscms_page_action_tabs").addClass('relative').prepend("<li class='btn-disabled'></li>");
     }
     
-    function enableCmsbuttons(id) {
-        $("#"+id+"_action_tabs").removeClass('relative');
-        $("#"+id+"_action_tabs li.btn-disabled").remove();
-        $("#" + activeTabId + " .overlay-switch").remove();
+    function enableCmsButtons(id) {
+        $("#"+id+"_id_meliscms_page_action_tabs").removeClass('relative');
+        $("#"+id+"_id_meliscms_page_action_tabs li.btn-disabled").remove();
+        $("#"+id+"_id_meliscms_page .overlay-switch").remove();
     }
 	
     // IFRAME HEIGHT CONTROLS (for onload, displaySettings & sidebar collapse)
-    function iframeLoad() {
-    	var height = $("#"+ activeTabId + " .melis-iframe").contents().height();
-    		//width  = $("#"+ activeTabId + " .melis-iframe").contents().find("body").width();
+    function iframeLoad(id) {
+    	var height = $("#"+ id + "_id_meliscms_page .melis-iframe").contents().height();
 
-    	$("#"+ activeTabId + " .melis-iframe").css("height", height);
-    	$("#"+ activeTabId + " .melis-iframe").css("min-height", "700px");  
-    	//$("#"+ activeTabId + " .melis-iframe").css("width", width);
-
-		// Check and Get all Editable Value and dataTags from Editor TinyMCE
-		// $.ajax({
-		// 	type        : 'POST',
-		// 	url         : '/melis/MelisCms/PageEdition/savePageSessionPlugin?idPage='+$("#"+ activeTabId + " iframe").attr('data-iframe-id'),
-		// 	dataType    : 'json',
-		// 	encode		: true
-		// });
+    	$("#"+ id + "_id_meliscms_page .melis-iframe").css("height", height);
+    	$("#"+ id + "_id_meliscms_page .melis-iframe").css("min-height", "700px");  
 
 		// Activating page edition button action
-		/**
-		 * we need to loop every opened pages
-		 * so that we can enable the tab buttons
-		 *
-		 * We must not use the activeTabId here except
-		 * when the user publish or unpublish the page
-		 * because it will just enable the active tab
-		 * button, but the non active tab button will still
-		 * remain disabled
-		 */
-		if($openedPageIds.length > 0) {
-			$.each($openedPageIds, function (i, v) {
-				var newTabId = activeTabId.replace(/[0-9]+/, v);
-				melisCms.enableCmsButtons(newTabId);
-			});
-		}else{
-			//activate what's the active page
-			melisCms.enableCmsButtons(activeTabId);
-		}
+		enableCmsButtons(id);
 
 		//clear the opened tab pages id
 		$openedPageIds = [];
@@ -799,7 +771,7 @@ var melisCms = (function(){
 		//refresh treeview
 		refreshTreeview									:			refreshTreeview,
         disableCmsButtons								: 			disableCmsButtons,
-		enableCmsButtons								: 			enableCmsbuttons,
+		enableCmsButtons								: 			enableCmsButtons,
 		
 		iframeLoad										:			iframeLoad,
 
