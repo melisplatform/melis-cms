@@ -134,8 +134,10 @@ body {
 
 .melis-cms-ps-box .module-name{
     display: block;
-    /* max-width: 78%; */
-    padding-right: 45px;
+    max-width: 78%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .melis-cms-plugin-filter-box .melis-cms-ps-box:first-child {
@@ -264,8 +266,8 @@ body {
 }
 
 .melis-cms-category-btn {
-    padding: 4px 15px 4px 30px;
-    font-size: 10px;
+    padding: 4px 15px 4px 11px;
+    font-size: 11px;
 }
 .melis-cms-category-btn:hover {
     border-color: #373737;
@@ -783,13 +785,10 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 .melis-cms-category-plugins-box-sub {
     display:none;
 }
-.melis-cms-filter-btn-sub-category {
-    text-indent:30px;
-}
 .melis-cms-filter-btn-sub-category i {
     right:15px;
     font-size:13px;
-    top:10px;
+    top: 7px;
     position:absolute;
 }
 span.melis-cms-filter-btn-sub-category.active {
@@ -817,8 +816,7 @@ span.melis-cms-filter-btn-sub-category.active i {
  * Plugin Menus
  */
 .melis-cms-filter-btn-sub-category {
-    padding-top:2px !important;
-    padding-bottom:2px !important;
+    padding: 2px 0 2px 21px !important;
 }
 
 .border-new-plugin {
@@ -847,8 +845,8 @@ span.melis-cms-filter-btn-sub-category.active i {
     position: absolute;
     color: #72af46;
     z-index: 100;
-    right: 110px;
-    top: 4px;
+    right: 55px;
+    top: 1px;
     font-size: 12px;
 }
 
