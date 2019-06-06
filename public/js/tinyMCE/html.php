@@ -12,7 +12,7 @@
        'verify_html' => false,
        'plugins' => array(
             //[contextmenu, textcolor, colorpicker] this plugin is already built in the core editor as of TinyMCE v. 5
-           'advlist autolink lists link paste image charmap preview anchor emoticons help hr nonbreaking',
+           'lists advlist autolink link paste image charmap preview anchor emoticons help hr nonbreaking',
            'searchreplace visualblocks code fullscreen',
            'insertdatetime media table template'
        ),
