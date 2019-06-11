@@ -1,0 +1,61 @@
+<?php
+$id = '';
+if (!empty($this->zoneconfig['conf']['id'])) {
+    $id = $this->zoneconfig['conf']['id'];
+}
+$data_melisKey = $this->melisKey;
+?>
+<div class="mcms-gdpr-banner-details" id="<?= $id ?>" data-melisKey="<?= $this->melisKey; ?>">
+    <?php if (!empty($this->languages)): ?>
+    <div class="row">
+        <div class="col-xs-12 col-md-2">
+            <div class="product-text-tab-container">
+                <ul class="nav-tabs product-text-tab">
+                    <?php foreach($this->languages as $idx => $lang) :?>
+                        <li class="mcms-gdpr-banner-lang">
+                            <a class="clearfix mcms-gdpr-banner-language" data-toggle="tab" id="cms-gdpr-lang-<?= $lang['lang_cms_id']; ?>" href="#<?= $lang['lang_cms_name']; ?>-banner-details" aria-expanded="true" data-lang-id="<?= $lang['lang_cms_id'] ?>">
+                                <span><?= $lang['lang_cms_name'] ?></span>
+
+                                <span class="pull-right"><img src="/MelisCms/images/lang-flags/<?= $lang['lang_cms_locale']; ?>.png" class="imgDisplay pull-right"/></span>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-10">
+            <div class="tab-content">
+                <?php foreach ($this->languages as $idx => $lang) : ?>
+                    <div id="<?= $lang['lang_cms_name']; ?>-banner-details" class="tab-pane product-text-tab-content">
+                        <div class="bg-white">
+                            <h4><i class="fa fa-language" aria-hidden="true"></i> <?= $lang['lang_cms_name']; ?></h4>
+                        </div>
+                        <div id="cms-gdpr-content-<?= $lang['lang_cms_id']; ?>">
+                            <?php
+                            /**
+                             * Set the form's attributes & data
+                             * @var \Zend\Form\Form $form
+                             */
+                            $form = clone $this->bannerContentform;
+
+                            $form->setAttribute('id', $form->getAttribute('id') . '-' . $lang['lang_cms_id']);
+                            $form->setAttribute('name', $form->getAttribute('name') . '-' . $lang['lang_cms_id']);
+                            $form->setData(empty($this->bannerContents[$lang['lang_cms_id']]) ? [] : $this->bannerContents[$lang['lang_cms_id']]);
+
+                            echo $this->form()->openTag($form);
+                            echo $this->melisFieldCollection($form);
+                            echo $this->form()->closeTag();
+                            ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        (function () {
+            melisTinyMCE.createTinyMCE("tool", ".mcgdpr_text_value", {height: 450});
+        })();
+    </script>
+    <?php endif; ?>
+</div>

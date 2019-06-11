@@ -1,48 +1,54 @@
+<?php if($this->toolIsAccessible) { ?>
 <div class="row row-merge cms-page-indicators-plugin">
-	<div class="col-sm-12 bg-white">
-		<div class="innerAll text-center">
-			<div class="row">
-				<div class="col-md-6">
-					<div class="innerAll bg-inverse">
-						<p class="lead strong margin-none text-white">
-							<i class="icon-earth animated fadeInDown" style="visibility: visible;"></i>
-							<?php $temp = ($this->data['numSite']>1) ? 's' : ''; ?>
-							<br><?php echo number_format( $this->data['numSite'] ).' '.$this->translate('tr_meliscms_dashboard_pages_indicators_site').''.$temp ?>
-						</p>
-					</div>
-				</div>
-				<div class="col-md-6">
-					<div class="innerAll bg-info">
-						<p class="lead strong margin-none text-white">
-							<i class="icon-paper-documents-image animated fadeInDown" style="visibility: visible;"></i>
-							<?php $temp = ($this->data['numPages']>1) ? 's' : ''; ?>
-							<br><?php echo number_format( $this->data['numPages'] ).' '.$this->translate('tr_meliscms_dashboard_pages_indicators_pages').''.$temp?>
-						</p>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-6">
-					<div class="innerAll bg-success">
-						<p class="lead strong margin-none text-white">
-							<i class="icon-task-check animated fadeInDown" style="visibility: visible;"></i>
-							<?php $temp = ($this->data['numPublished']>1&&$this->data['locale']!='en_EN') ? 's' : ''; ?>
-							<?php $temp_2 = ($this->data['numPublished']>1) ? 's' : ''; ?>
-							<br><?php echo number_format( $this->data['numPublished'] ).' '.$this->translate('tr_meliscms_dashboard_pages_indicators_pages').''.$temp_2.' '.$this->translate('tr_meliscms_dashboard_pages_indicators_published').$temp?>
-						</p>
-					</div>
-				</div>
-				<div class="col-md-6">
-					<div class="innerAll bg-primary">
-						<p class="lead strong margin-none">
-							<i class="icon-circle-delete animated fadeInDown" style="visibility: visible;"></i>
-							<?php $temp = ($this->data['numUnpublished']>1&&$this->data['locale']!='en_EN') ? 's' : ''; ?>
-							<?php $temp_2 = ($this->data['numUnpublished']>1) ? 's' : ''; ?>
-							<br><?php echo number_format( $this->data['numUnpublished'] ).' '.$this->translate('tr_meliscms_dashboard_pages_indicators_pages').''.$temp_2.' '.$this->translate('tr_meliscms_dashboard_pages_indicators_unpublished').$temp?>
-						</p>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+    <div class="col-sm-12 bg-white">
+        <div class="innerAll text-center">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="innerAll bg-inverse">
+                        <p class="lead strong margin-none text-white">
+                            <i class="icon-earth animated fadeInDown" style="visibility: visible;"></i>
+                            <?php $temp = ($this->data['numSite']>1) ? 's' : ''; ?>
+                            <br><?php echo number_format( $this->data['numSite'] ).' '.$this->translate('tr_meliscms_dashboard_pages_indicators_site').''.$temp ?>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="innerAll bg-info">
+                        <p class="lead strong margin-none text-white">
+                            <i class="icon-paper-documents-image animated fadeInDown" style="visibility: visible;"></i>
+                            <?php $temp = ($this->data['numPages']>1) ? 's' : ''; ?>
+                            <br><?php echo number_format( $this->data['numPages'] ).' '.$this->translate('tr_meliscms_dashboard_pages_indicators_pages').''.$temp?>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="innerAll bg-success">
+                        <p class="lead strong margin-none text-white">
+                            <i class="icon-task-check animated fadeInDown" style="visibility: visible;"></i>
+                            <?php $temp = ($this->data['numPublished']>1&&$this->data['locale']!='en_EN') ? 's' : ''; ?>
+                            <?php $temp_2 = ($this->data['numPublished']>1) ? 's' : ''; ?>
+                            <br><?php echo number_format( $this->data['numPublished'] ).' '.$this->translate('tr_meliscms_dashboard_pages_indicators_pages').''.$temp_2.' '.$this->translate('tr_meliscms_dashboard_pages_indicators_published').$temp?>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="innerAll bg-primary">
+                        <p class="lead strong margin-none">
+                            <i class="icon-circle-delete animated fadeInDown" style="visibility: visible;"></i>
+                            <?php $temp = ($this->data['numUnpublished']>1&&$this->data['locale']!='en_EN') ? 's' : ''; ?>
+                            <?php $temp_2 = ($this->data['numUnpublished']>1) ? 's' : ''; ?>
+                            <br><?php echo number_format( $this->data['numUnpublished'] ).' '.$this->translate('tr_meliscms_dashboard_pages_indicators_pages').''.$temp_2.' '.$this->translate('tr_meliscms_dashboard_pages_indicators_unpublished').$temp?>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+<?php } else { ?>
+    <div class="no-rights-container">
+        <span><?= $this->translate('tr_melisdashboardplugin_plugin_no_rights'); ?></span>
+    </div>
+<?php } ?>

@@ -6,7 +6,7 @@
 	
 ?>
 <div<?= $id; ?> data-melisKey='<?= $data_melisKey; ?>' class="tab-pane widget-body-regular meliscms_center_tabs">
-	<iframe scrolling="no" data-iframe-id="<?= $this->idPage; ?>" onload="melisCms.iframeLoad();" class="melis-iframe" src="/id/<?= $this->idPage; ?>/renderMode/melis?melisSite=<?= $this->namespace; ?>"></iframe>
+	<iframe scrolling="no" data-iframe-id="<?= $this->idPage; ?>" onload="melisCms.iframeLoad(<?php echo $this->idPage ?>);" class="melis-iframe" src="/id/<?= $this->idPage; ?>/renderMode/melis?melisSite=<?= $this->namespace; ?>"></iframe>
 </div>
 <?php
 if (!empty($this->resizablePlugin)){?>

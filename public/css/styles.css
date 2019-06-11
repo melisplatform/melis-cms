@@ -656,34 +656,28 @@ body.modal-open {
 	cursor: pointer;
 }
 
-.form-group .cls-checkbox-label:before {
-	content:'';
-	-webkit-appearance: none;
-	background-color: transparent;
-	border: 1px solid red;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0px -15px 10px -12px rgba(0, 0, 0, 0.05);
-	padding: 8px;
+.form-group .cls-checkbox-label::before {
+	content: '';
+	border: 0.1em solid red;
+	padding: 0.65em;
 	display: inline-block;
-	position: relative;
+	position: absolute;
 	vertical-align: middle;
 	cursor: pointer;
 	margin-right: 5px;
+	top: -0.5em;
 }
 
-.form-group .melis-check-box:checked + .cls-checkbox-label:after {
+.form-group .melis-check-box:checked + .cls-checkbox-label::after {
 	content: '';
 	background: red;
-	border: 1px solid red;
-	width: 12px;
-	height: 12px;
-	display: block;
+	border: 0.1em solid red;
+	width: 1em;
+	height: 1em;
+	display: inline-block;
 	position: absolute;
-	top: 4px;
-	left: 3px;
-}
-
-.form-group .melis-check-box:checked + label[for="use_root"].cls-checkbox-label:after {
-	top: 5px;
+	top: -0.25em;
+	left: 0.2em;
 }
 
 /* ===============================================================[ -= RESPONSIVE =- ]==================================================================== */
@@ -757,15 +751,53 @@ body.modal-open {
 	border-color: #ccc;
 }
 
+/** GDPR Banner */
+.mcms-gdpr-banner-header {
+	margin: 10px 0 25px 0;
+}
+/*Adding icons for site tabs*/
+.glyphicons.language i:before {
+	font-family: "Fontawesome";
+	content: "\f1ab";
+}
+.glyphicons.puzzle-piece i:before {
+	 font-family: "Fontawesome";
+	 content: "\f12e";
+}
 
+/* Site selector inside GDPR Banner tab */
+ul#select2-id_mcgdprbanner_site_id-results {
+	max-height: 125px;
+	overflow-y: auto !important;
+}
 
+.cms_gdpr_banner_site_filter_form {
+	display: inline;
+}
 
+.cms_gdpr_banner_site_filter_form .form-group {
+	display: inline;
+}
 
+.cms_gdpr_banner_site_filter_form label {
+	display: inline-block !important;
+	font-size: 1em;
+	margin: 0 10px 5px 0;
+}
 
+.cms_gdpr_banner_site_filter_form select {
+	display: inline-block !important;
+	font-size: 1em;
+}
 
+#id_melis_core_gdpr_tabs .page-content-container .nav-tabs > li.active, .page-content-container .nav-tabs > li:hover {
+	border-bottom: none;
+}
 
+#id_melis_core_gdpr_tabs.page-content-container .nav-tabs > li.active > a, .page-content-container .nav-tabs > li.active:focus > a, .page-content-container .nav-tabs > li.active:active > a {
+	border: none;
+}
 
-
-
-
-
+.mcms-gdpr-banner-details .mce-branding {
+	display: none;
+}

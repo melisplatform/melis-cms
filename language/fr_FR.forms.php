@@ -167,7 +167,7 @@
         'tr_meliscms_tool_site_site_name_error_empty' => 'Veuillez saisir le nom du site',
 	    'tr_meliscms_tool_site_no_platform_ids' => 'Aucune ID de plateforme disponible, Veuillez ajouter la première ID de la plateforme avant d\'ajouter le site.',
 	    'tr_meliscms_tool_site_directory_exist' => 'Le dossier du site existe déjà, souhaitez-vous continuer sans créer le module du site dans le dossier MelisSites',
-	    'tr_meliscms_tool_site_directory_not_writable' => 'Autorisation d\'accès refusée, veuillez configurer /module/MelisSites inscriptible',
+	    'tr_meliscms_tool_site_directory_not_writable' => 'Impossible de créer les fichiers du site. Problème de droits.',
 	    'tr_meliscms_tool_site_melissites_directory_not_exist' => 'Le dossier de destination n\'existe pas, veuillez créer le dossier /module/MelisSites',
 	    'tr_meliscms_tool_site_site_created_title' => 'a été créé avec succès',
 	    'tr_meliscms_tool_site_site_created_message' => 'Votre nouveau site a été créé avec <b>Site module</b>, <b>Pages</b> et <b>Templates</b> générés.',
@@ -232,5 +232,16 @@
         'tr_melis_cms_tool_template_layout_invalid'     => 'Layout du template invalide',
         'tr_melis_cms_tool_template_controller_invalid' => 'Controlleur du template invalide',
         'tr_melis_cms_tool_template_action_invalid'     => 'Action du template invalide',
+
+        #New sites tools
+        'tr_melis_cms_site_save_ko' => "Impossible d'enregistrer le site.",
+        'tr_melis_cms_site_save_ok' => "Le site a été enregistré avec succès.",
+        'tr_melis_cms_sites_domain_scheme' => "Scheme",
+        'tr_melis_cms_sites_domain_scheme tooltip' => "Protocole http ou https",
+        'tr_melis_cms_sites_domain' => "Domaine",
+        'tr_melis_cms_sites_domain tooltip' => "Domaine sur lequel le site est accessible (ex: www.monsite.com)",
+        'tr_melis_cms_sites_field_empty' => 'Le champ ne peut être vide',
+        'tr_melis_cms_sites_field_digits' => 'La saisie ne doit contenir que des chiffres',
+        'tr_melis_cms_sites_domain_field_empty' => 'Le champ ne peut être vide, une valeur est requise pour la plateforme actuelle'
     );
 ?>

@@ -28,7 +28,7 @@ class MelisCmsSiteDomainDeleteListener extends MelisCoreGeneralListener implemen
         		$sm = $e->getTarget()->getServiceLocator();
         		$params = $e->getParams();
         		$results = $e->getTarget()->forward()->dispatch(
-        		    'MelisCms\Controller\Site',
+        		    'MelisCms\Controller\Sites',
         		    array_merge(array('action' => 'deleteSiteDomainPlatform'), $params))->getVariables();
         	},
         100);

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Melis Technology (http://www.melistechnology.com)
@@ -9,22 +9,25 @@
 
 namespace MelisCms\Listener;
 
+
+use MelisCore\Listener\MelisCoreGeneralListener;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
-use MelisCore\Listener\MelisCoreGeneralListener;
 
 /**
  * The flash messenger will add logs by
  * listening to a lot of events
- * 
+ *
  */
 class MelisCmsFlashMessengerListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
 {
-	
+    /**
+     * @param EventManagerInterface $events
+     */
     public function attach(EventManagerInterface $events)
     {
-        $sharedEvents      = $events->getSharedManager();
-        
+        $sharedEvents = $events->getSharedManager();
+
         $callBackHandler = $sharedEvents->attach(
         	'MelisCms',
         	array(
@@ -48,24 +51,28 @@ class MelisCmsFlashMessengerListener extends MelisCoreGeneralListener implements
         	    'meliscalendar_save_site_redirect_end',
         	    'meliscalendar_delete_site_redirect_end',
                 'meliscms_page_duplicate_end',
-        	    'meliscms_style_save_details_end',
-        	    'meliscms_style_delete_end',
-        	    'meliscms_create_new_page_lang_end',
-                'meliscms_tree_duplicate_page_trees_end'
-        	),
-        	function($e){
+                'meliscms_style_save_details_end',
+                'meliscms_style_delete_end',
+                'meliscms_create_new_page_lang_end',
+                'meliscms_tree_duplicate_page_trees_end',
+                'meliscms_gdpr_save_banner_end'
+            ),
+            function ($e) {
+                $params = $e->getParams();
 
-        		$sm = $e->getTarget()->getServiceLocator();
-        		
-        		$flashMessenger = $sm->get('MelisCoreFlashMessenger');
-        		$params = $e->getParams();
-        		$results = $e->getTarget()->forward()->dispatch(
-        		    'MelisCore\Controller\MelisFlashMessenger',
-        		    array_merge(array('action' => 'log'), $params))->getVariables();
+                if (isset($params['tmpModuleErrorMsg'])) {
+                    $params['textMessage'] = $params['tmpModuleErrorMsg'];
+                }
 
-        	},
-        -1000);
-        
+                $e->getTarget()->forward()->dispatch(
+                    'MelisCore\Controller\MelisFlashMessenger',
+                    array_merge(
+                        ['action' => 'log'],
+                        $params
+                    ))->getVariables();
+            },
+            -1000
+        );
         $this->listeners[] = $callBackHandler;
     }
 }

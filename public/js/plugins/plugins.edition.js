@@ -16,19 +16,15 @@ var melisPluginEdition = (function($, window) {
     $("body").on("click", ".m-trash-handle", removePlugins);
 
     // Checking parent body events handler to avoid multiple events of the button
-    // var cerateEventHalder = true;
     $.each($body.data("events").click, function(i, val){
         try {
             if (val.selector == "#pluginModalBtnApply") {
                 $body.off("click", "#pluginModalBtnApply");
             }
-        }
-        catch(error) {}
+        } catch(error) {}
     });
 
-    // if (cerateEventHalder) {
-        $body.on("click", "#pluginModalBtnApply", submitPluginForms); // $body because it is modal and it's located in parent
-    // }
+    $body.on("click", "button[id='pluginModalBtnApply'][data-page-id='"+melisActivePageId+"']", submitPluginForms); // $body because it is modal and it's located in parent
 
     $("body").on("focus", ".melis-ui-outlined .melis-editable", function() {
         $(this).closest(".melis-ui-outlined").addClass("melis-focus");
@@ -69,7 +65,6 @@ var melisPluginEdition = (function($, window) {
         catch (e) {
            console.log(e);
         }
-
     }
 
     // Validate form in modal
@@ -467,8 +462,8 @@ var melisPluginEdition = (function($, window) {
         if(generate) {
             generateScript(url);
         }
-
     }
+
     function generateLink(url) {
         var el = document.createElement('link');
         el.href = url;
@@ -519,8 +514,6 @@ var melisPluginEdition = (function($, window) {
                 console.log("Something went wrong");
             }
         });
-
-
     }
 
     function pluginDetector() {
@@ -547,7 +540,13 @@ var melisPluginEdition = (function($, window) {
         // recalculate frame height
         var frameHeight = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe").contents().find("body").height();
         var frame = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe");
-        frame.height(frameHeight);
+            /*
+             * Added iframe.length for fixing issue: Uncaught TypeError: Cannot read property 'calcFrameHeight' of undefined
+             * Added by: Junry 22/05/2019
+             */
+            if ( frame.length ) {
+                frame.height(frameHeight);
+            }
     }
 
     function disableLinks(e) {
@@ -733,7 +732,7 @@ var melisPluginEdition = (function($, window) {
             pluginList['melisPluginMobileWidth'] = mobileWidth;
             pluginList['melisPluginTabletWidth'] = tabletWidth;
             pluginList['melisPluginDesktopWidth'] = desktopWidth;
-
+            pluginList['resize'] = true;
             // pass is to savePageSession
             savePluginUpdate(pluginList, toolBox.data("site-module"));
 
@@ -791,11 +790,11 @@ var melisPluginEdition = (function($, window) {
     }
 
     // remove inline width when changing viewport
-    window.parent.$("#"+ parent.activeTabId).find('iframe').on("resize", function() {
-        $(this).contents().find(".melis-dragdropzone .melis-ui-outlined").each(function() {
-            $(this).css("width", "");
-        });
-    });
+    // window.parent.$("#"+ parent.activeTabId).find('iframe').on("resize", function() {
+    //     $(this).contents().find(".melis-dragdropzone .melis-ui-outlined").each(function() {
+    //         $(this).css("width", "");
+    //     });
+    // });
 
     // init resize
     if (parent.pluginResizable == 1) {

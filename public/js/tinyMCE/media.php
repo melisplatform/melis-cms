@@ -9,9 +9,10 @@
         'cleanup' => false,
         'verify_html' => false,
         'plugins' => array(
-            'advlist autolink lists link image charmap print preview anchor',
+            //[contextmenu, textcolor, colorpicker] this plugin is already built in the core editor as of TinyMCE v. 5
+            'lists advlist autolink link image charmap print preview anchor',
             'searchreplace visualblocks code fullscreen',
-            'insertdatetime media table contextmenu paste'
+            'insertdatetime media table paste'
         ),
         'image_advtab' => true,
         'toolbar' => 'insertfile undo redo link image media | code',
