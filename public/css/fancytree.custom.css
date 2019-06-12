@@ -226,6 +226,24 @@ span.fancytree-active span.fancytree-title,
     color: #fff;
 }
 
+#id-mod-menu-dynatree .fancytree-node.fancytree-has-children .fancytree-expander.fa-spinner {
+    margin-left: 0;
+}
+
+.fancytree-node.fancytree-has-children .fancytree-expander.fa-spinner:before {
+    content: "\f110";
+    position: absolute;
+    top: 1px;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    font-family: 'FontAwesome';
+    font-size: 14px;
+    line-height: 16px;
+    text-align: center;
+    color: #686868;
+}
+
 
 /* ------------------------=[ RESPONSIVE ]=-------------------------*/
 @media ( min-width: 768px ) {
