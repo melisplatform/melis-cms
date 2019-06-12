@@ -37,6 +37,7 @@ $data_melisKey = $this->melisKey;
                             $el->setName("siteprop_".$el->getName());
                             $el->setAttribute('id', $el->getName());
                         }
+                        $form->setAttribute('id', $form->getAttribute('id') . '_' . $this->siteId);
                         echo $this->form()->openTag($form);
                         echo $this->melisFieldCollection($form);
                         echo $this->form()->closeTag();
@@ -110,6 +111,7 @@ $data_melisKey = $this->melisKey;
                                             $el->setAttribute('id', $el->getName());
                                         }
 
+                                        $form->setAttribute('id', $form->getAttribute('id') . '_' . $this->siteId);
                                         echo $this->form()->openTag($form);
                                         echo $this->melisFieldCollection($form);
                                         echo $this->form()->closeTag();

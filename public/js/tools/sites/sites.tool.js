@@ -1131,16 +1131,20 @@ $(document).ready(function() {
      * ================================================================================
      */
     $body.on("click", "#s404_page_id_button span", function() {
-        melisLinkTree.createInputTreeModal('#s404_page_id');
+        var formId = $(this).closest('form').attr('id');
+        melisLinkTree.createInputTreeModal('#' + formId + ' ' + '#siteprop_s404_page_id');
     });
 
     $body.on("click", "#site_main_page_id_button span", function() {
-        melisLinkTree.createInputTreeModal('#site_main_page_id');
+        var formId = $(this).closest('form').attr('id');
+        melisLinkTree.createInputTreeModal('#' + formId + ' ' + '#siteprop_site_main_page_id');
     });
 
-    $body.on("click", ".pageSelect span", function() {
+    $body.on("click", ".pageSelect span.input-group-addon", function() {
         var id = $(this).siblings('input').attr('id');
-        melisLinkTree.createInputTreeModal('#' + id);
+        var formId = $(this).closest('form').attr('id');
+
+        melisLinkTree.createInputTreeModal('#' + formId + ' ' + '#' + id);
     });
     /**
      * ================================================================================
