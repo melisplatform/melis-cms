@@ -7,13 +7,19 @@
 					var $tabArrowTop = $("#tab-arrow-top");
 
 					if (melisCore.screenSize <= 767) {
-							melisExtensions = ['contextMenu', 'filter'];
+							melisExtensions = ['contextMenu', 'filter', 'glyph'];
 					} else {
-							melisExtensions = ['contextMenu', 'dnd', 'filter'];
+							melisExtensions = ['contextMenu', 'dnd', 'filter', 'glyph'];
 					}
 
 					$('#id-mod-menu-dynatree').fancytree({
 							extensions: melisExtensions,
+							glyph: {
+								map: {
+									loading: "fa fa-spinner fa-pulse"
+									//loading: "glyphicon-refresh fancytree-helper-spin" // edited by junry
+								}
+							},
 							activeVisible: false,
 							debugLevel: 0,
 							autoScroll: true,
