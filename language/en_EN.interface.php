@@ -311,6 +311,7 @@
 	    'tr_meliscms_tool_platform_ids_modal_content' => 'Add and update modal',
 	    'tr_meliscms_tool_platform_modal_info' => 'Declare here the range of identifiers of a specific platform',
         'tr_meliscms_tool_platform_modal_info_assigned_page_ids' => 'All platforms have already been assigned with page IDs.',
+        'tr_meliscms_platform_id_save' => 'Save',
 
 	    //Platform Success messages
 	    'tr_meliscms_tool_platform_add_success' => 'New platform IDs added successfully',
