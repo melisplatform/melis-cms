@@ -210,6 +210,7 @@
 	    'tr_meliscms_common_refresh' => 'Rafraichir',
 	    'tr_meliscms_common_close' => 'Annuler',
 	    'tr_meliscms_common_save' => 'Sauvegarder',
+	    'tr_meliscms_page_tree_save' => 'Enregistrer',
 	    'tr_meliscms_common_yes' => 'Oui',
 	    'tr_meliscms_common_no' => 'Non',
 	    
