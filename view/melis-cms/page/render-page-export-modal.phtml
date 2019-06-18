@@ -1,0 +1,42 @@
+<?php
+$id = '';
+if (!empty($this->zoneconfig['conf']['id']))
+    $id = ' id="' .$this->zoneconfig['conf']['id'] . '"';
+
+?>
+<div class="modal-content" <?= $id; ?> data-melisKey="<?= $this->melisKey; ?>">
+    <div class="modal-body padding-none">
+        <div class="wizard">
+            <div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none">
+                <div class="widget-head">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#<?php echo $this->zoneconfig['conf']['id'] ?>" class="glyphicons notes" data-toggle="tab" aria-expanded="true"><i></i>
+                                Export Pages
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="widget-body innerAll inner-2x">
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="<?= $id ?>">
+                            <div>
+                                <?php
+                                $form = $this->exportForm;
+                                $form->prepare();
+                                echo $this->form()->openTag($form);
+                                echo $this->melisFieldCollection($form);
+                                echo $this->form()->closeTag();
+                                ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div align="right">
+                        <button type="button" data-dismiss="modal" class="btn btn-danger pull-left"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
+                        <button type="button" class="btn btn-success">Export</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

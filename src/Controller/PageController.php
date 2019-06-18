@@ -21,6 +21,65 @@ use MelisCms\Service\MelisCmsRightsService;
 class PageController extends AbstractActionController
 {
     const NEW_PAGE = '0';
+
+    /**
+     * @return ViewModel
+     */
+    public function renderPageExportImportModalHandlerAction()
+    {
+        $melisKey = $this->params()->fromRoute('melisKey', $this->params()->fromQuery('melisKey'), null);
+        $id = $this->params()->fromRoute('id', $this->params()->fromQuery('id', ''));
+
+        $view = new ViewModel();
+        $view->setTerminal(false);
+        $view->melisKey = $melisKey;
+        $view->id = $id;
+
+        return $view;
+    }
+
+    /**
+     * @return ViewModel
+     */
+    public function renderPageExportModalAction()
+    {
+        // declare the Tool service that we will be using to completely create our tool.
+        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+
+        // tell the Tool what configuration in the app.tools.php that will be used.
+        $melisTool->setMelisToolKey('meliscms', 'meliscms_tree_sites_tool');
+        //prepare the user profile form
+        $form = $melisTool->getForm('meliscms_tree_sites_export_page_form');
+
+        $melisKey = $this->params()->fromRoute('melisKey', $this->params()->fromQuery('melisKey'), null);
+        $view = new ViewModel();
+        $view->setTerminal(false);
+        $view->melisKey  = $melisKey;
+        $view->exportForm = $form;
+        return $view;
+    }
+
+    /**
+     * @return ViewModel
+     */
+    public function renderPageImportModalAction()
+    {
+        // declare the Tool service that we will be using to completely create our tool.
+        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+
+        // tell the Tool what configuration in the app.tools.php that will be used.
+        $melisTool->setMelisToolKey('meliscms', 'meliscms_tree_sites_tool');
+        //prepare the user profile form
+        $form = $melisTool->getForm('meliscms_tree_sites_import_page_form');
+
+        $melisKey = $this->params()->fromRoute('melisKey', $this->params()->fromQuery('melisKey'), null);
+        $view = new ViewModel();
+        $view->setTerminal(false);
+        $view->melisKey  = $melisKey;
+        $view->importForm = $form;
+        return $view;
+    }
+
     /**
      * Renders the page container
      * @return \Zend\View\Model\ViewModel

@@ -656,5 +656,10 @@
 
         #SITES NO ACCESS MESSAGE
         'tr_melis_cms_sites_tool_content_edit_tab_no_access' => 'Vous n\'avez pas les droits pour accéder à cet onglet',
+
+        #PAGE EXPORT/IMPORT
+        'tr_melis_cms_tree_export_page_and_children' => 'Export page and children pages <span class="melis-radio-box-circle"></span>',
+        'tr_melis_cms_tree_export_page_only' => 'Export only this page (no children pages) <span class="melis-radio-box-circle"></span>',
+        'tr_melis_cms_tree_export_page_resources' => 'Export resources used by the pages (images, ...) <span class="melis-radio-box-circle"></span>',
     );
 ?>

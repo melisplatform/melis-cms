@@ -2261,6 +2261,68 @@ return array(
                                 ),
                             ),
                         ),
+                        'meliscms_tree_sites_export_page_form' => array(
+                            'attributes' => array(
+                                'name' => 'meliscms_tree_sites_export_page_form',
+                                'id' => 'id_meliscms_tree_sites_export_page_form',
+                                'method' => 'POST',
+                                'action' => '',
+                            ),
+                            'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                            'elements' => array(
+                                array(
+                                    'spec' => array(
+                                        'type' => 'Zend\Form\Element\Radio',
+                                        'name' => 'page_tree_export',
+                                        'options' => array(
+                                            'label' => '',
+                                            'tooltip' => '',
+                                            'label_options' => array(
+                                                'disable_html_escape' => true,
+                                            ),
+                                            'label_attributes' => array(
+                                                'class' => 'melis-radio-box',
+                                            ),
+                                            'value_options' => array(
+                                                '1' => 'tr_melis_cms_tree_export_page_and_children',
+                                                '2' => 'tr_melis_cms_tree_export_page_only',
+                                                '3' => 'tr_melis_cms_tree_export_page_resources',
+                                            ),
+                                        ),
+                                        'attributes' => array(
+
+                                        ),
+                                    )
+                                ),
+                            ),
+                        ),
+                        'meliscms_tree_sites_import_page_form' => array(
+                            'attributes' => array(
+                                'name' => 'meliscms_tree_sites_import_page_form',
+                                'id' => 'id_meliscms_tree_sites_import_page_form',
+                                'method' => 'POST',
+                                'action' => '',
+                            ),
+                            'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                            'elements' => array(
+                                array(
+                                    'spec' => array(
+                                        'type' => 'File',
+                                        'name' => 'page_tree_import',
+                                        'options' => array(
+                                            'label' => 'Test',
+                                            'tooltip' => 'Test',
+                                            'label_options' => array(
+                                                'disable_html_escape' => true,
+                                            ),
+                                        ),
+                                        'attributes' => array(
+
+                                        ),
+                                    )
+                                ),
+                            ),
+                        ),
                     ),
                 ),
             ),
