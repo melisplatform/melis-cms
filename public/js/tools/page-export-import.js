@@ -6,6 +6,7 @@ $(document).ready(function(){
      */
     $body.on("click", "#btn-export-pages", function(){
         $(".page-export-form").addClass("hidden");
+        $(".page-export-progress prog_percent").text(20);
         updateProgressValue(20);
     });
 
@@ -18,6 +19,6 @@ $(document).ready(function(){
     function updateProgressValue(val) {
         $("div#exportImportProgressbar").attr("arial-valuenow", val)
             .css("width", val + "%")
-            .parent().removeClass("hidden");
+            .parent().parent().removeClass("hidden");
     }
 });
