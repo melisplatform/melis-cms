@@ -43,12 +43,16 @@ class PageController extends AbstractActionController
      */
     public function renderPageExportModalAction()
     {
+        //get user info
+        $auth = $this->getServiceLocator()->get('MelisCoreAuth');
+        $user = $auth->getIdentity();
+
         // declare the Tool service that we will be using to completely create our tool.
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tools.php that will be used.
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tree_sites_tool');
-        //prepare the user profile form
+        //prepare the page export form
         $form = $melisTool->getForm('meliscms_tree_sites_export_page_form');
 
         $melisKey = $this->params()->fromRoute('melisKey', $this->params()->fromQuery('melisKey'), null);
@@ -56,6 +60,7 @@ class PageController extends AbstractActionController
         $view->setTerminal(false);
         $view->melisKey  = $melisKey;
         $view->exportForm = $form;
+        $view->isAdmin = $user->usr_admin;
         return $view;
     }
 

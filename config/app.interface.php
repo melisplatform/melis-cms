@@ -120,6 +120,7 @@ return array(
                     '/MelisCms/js/tools/pagelang.js',
                     '/MelisCms/js/tools/style.tool.js',
                     '/MelisCms/js/tools/gdpr-banner.js',
+                    '/MelisCms/js/tools/page-export-import.js',
                 ),
                 'css' => array(
                     '/MelisCms/css/fancytree.custom.css',

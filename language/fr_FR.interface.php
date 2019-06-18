@@ -661,5 +661,6 @@
         'tr_melis_cms_tree_export_page_and_children' => 'Export page and children pages <span class="melis-radio-box-circle"></span>',
         'tr_melis_cms_tree_export_page_only' => 'Export only this page (no children pages) <span class="melis-radio-box-circle"></span>',
         'tr_melis_cms_tree_export_page_resources' => 'Export resources used by the pages (images, ...) <span class="melis-radio-box-circle"></span>',
+        'tr_melis_cms_tree_export_no_rights' => 'Votre compte ne vous permet pas de faire des exports sur cette plateforme.<br/>Merci de contacter votre administrateur.',
     );
 ?>
