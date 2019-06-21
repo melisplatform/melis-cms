@@ -201,7 +201,8 @@ var melisPluginEdition = (function($, window) {
                         disableLinks('a');
 
                         // re init resize
-                        $(".melis-dragdropzone .melis-ui-outlined").resizable("destroy"); // disable for now
+                        $(".melis-dragdropzone .melis-ui-outlined").resizable( "option", "disabled" ); // disable for now
+                        // $(".melis-dragdropzone .melis-ui-outlined").resizable("destroy"); // disable for now
                         if (parent.pluginResizable == 1){
                             initResizable();
                         }
