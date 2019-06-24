@@ -1431,7 +1431,6 @@ $(document).ready(function() {
 		var dataString = $(this).parent().find("#idformlang").serialize();
 		melisCoreTool.pending("#btnLangCmsAdd");
 		melisCoreTool.processing();
-		console.log($(this).parent().find("#idformlang").html());
 		$.ajax({
 	        type        : 'POST', 
 	        url         : '/melis/MelisCms/Language/addLanguage',
