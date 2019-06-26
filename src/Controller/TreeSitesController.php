@@ -49,6 +49,8 @@ class TreeSitesController extends AbstractActionController
 			$response = $this->formatTreeResponse($triggerResponse[0]);
 		else
 			$response = $this->formatTreeResponse($final);
+
+
 			
 
 		return $response;
@@ -59,22 +61,27 @@ class TreeSitesController extends AbstractActionController
 	{
 	    $idPage = $this->params()->fromQuery('idPage');
 	    
-	    $isAccessible = false;
-	    
-	    if ($idPage)
-	    {
-	        $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
-	        $melisCmsRights = $this->getServiceLocator()->get('MelisCmsRights');
-	        $xmlRights = $melisCoreAuth->getAuthRights();
-	        $isAccessible = $melisCmsRights->isAccessible($xmlRights, MelisCmsRightsService::MELISCMS_PREFIX_PAGES, $idPage);
-	    }
-	    
 	    $response = array(
-	        'isAccessible' => $isAccessible
+	        'isAccessible' => $this->siteTreeAccess($idPage)
         );
 	    
 	    return new JsonModel($response);
 	}
+
+	private function siteTreeAccess($idPage)
+    {
+        $isAccessible = false;
+
+        if ($idPage){
+            $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
+            $melisCmsRights = $this->getServiceLocator()->get('MelisCmsRights');
+            $xmlRights = $melisCoreAuth->getAuthRights();
+            $isAccessible = $melisCmsRights->isAccessible($xmlRights, MelisCmsRightsService::MELISCMS_PREFIX_PAGES, $idPage);
+        }
+
+        return $isAccessible;
+    }
+
 
 	/**
 	 * Gets the root page when showing the tree of pages in rights tool
@@ -277,6 +284,7 @@ class TreeSitesController extends AbstractActionController
 
 			$view = new ViewModel();
 			$view->pages = $final;
+			$view->hasSiteTreeAccess = $this->siteTreeAccess(-1); //  -1 page id root site tree
 			$view->melisKey = $melisKey;
 
 			return $view;
