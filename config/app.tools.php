@@ -2264,12 +2264,21 @@ return array(
                         'meliscms_tree_sites_export_page_form' => array(
                             'attributes' => array(
                                 'name' => 'meliscms_tree_sites_export_page_form',
-                                'id' => 'id_meliscms_tree_sites_export_page_form',
+                                'id' => 'pageExportForm',
                                 'method' => 'POST',
                                 'action' => '',
                             ),
                             'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
                             'elements' => array(
+                                array(
+                                    'spec' => array(
+                                        'type' => 'hidden',
+                                        'name' => 'selected_page_id',
+                                        'attributes' => array(
+                                            'id' => 'selected_page_id'
+                                        ),
+                                    )
+                                ),
                                 array(
                                     'spec' => array(
                                         'type' => 'Zend\Form\Element\Radio',

@@ -1382,7 +1382,7 @@ return array(
                     ),
                     'forward' => array(
                         'module' => 'MelisCms',
-                        'controller' => 'Page',
+                        'controller' => 'PageExport',
                         'action' => 'render-page-export-modal',
                         'jscallback' => '',
                         'jsdatas' => array()

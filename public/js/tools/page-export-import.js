@@ -7,7 +7,23 @@ $(document).ready(function(){
     $body.on("click", "#btn-export-pages", function(){
         $(".page-export-form").addClass("hidden");
         $(".page-export-progress prog_percent").text(20);
-        updateProgressValue(20);
+
+        var dataString = $("#pageExportForm").serializeArray();
+
+        //send ajax request to export pages
+        $.ajax({
+            url: '/melis/MelisCms/PageExport/exportPage',
+            data: dataString,
+            type: 'JSON',
+            beforeSend: function(){
+                updateProgressValue(20);
+            },
+        }).success(function(data){
+            updateProgressValue(100);
+            console.log(data);
+        }).error(function(data){
+
+        });
     });
 
     /**
