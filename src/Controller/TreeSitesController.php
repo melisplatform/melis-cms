@@ -50,8 +50,19 @@ class TreeSitesController extends AbstractActionController
 		else
 			$response = $this->formatTreeResponse($final);
 
-		return $response;
+        // Site page tree access rights
+        $checkAccess = false;
+        if ($this->getRequest()->isXmlHttpRequest()){
+            if (!empty($this->params()->fromQuery('cpath')))
+                $checkAccess = true;
+        }else{
+            $checkAccess = true;
+        }
 
+        if ($checkAccess)
+            $response->hasSiteTreeAccess = $this->siteTreeAccess($idPage);
+
+		return $response;
 	}
 	
 	public function checkUserPageTreeAccressAction()
@@ -281,14 +292,12 @@ class TreeSitesController extends AbstractActionController
 
 			$view = new ViewModel();
 			$view->pages = $final;
-			$view->hasSiteTreeAccess = $this->siteTreeAccess(-1); //  -1 page id root site tree
-			$view->melisKey = $melisKey;
+            $view->melisKey = $melisKey;
 
-			return $view;
+            return $view;
 		}
 		else
 		{
-
 			$jsonresult = array();
 			foreach ($final as $page)
 			{
@@ -357,6 +366,8 @@ class TreeSitesController extends AbstractActionController
 
 				array_push($jsonresult, $jsonpage);
 			}
+
+//			print_r($jsonresult);
 
 			$jsonModel = new JsonModel();
 			$jsonModel->setVariables($jsonresult);
