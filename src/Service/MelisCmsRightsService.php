@@ -34,15 +34,13 @@ class MelisCmsRightsService implements MelisCoreRightsServiceInterface, ServiceL
 
         if ($sectionId == self::MELISCMS_PREFIX_PAGES)
         {
-            if (in_array($itemId, array(0, -1)))
-            {
-                foreach ($rightsObj->$sectionId->id as $pageId)
-                {
-                    if ($pageId == -1)
-                    {
-                        return true;
-                    }
-                }
+            if (in_array($itemId, array(0, -1))){
+                return true;
+//                foreach ($rightsObj->$sectionId->id as $pageId){
+//                    if ($pageId == -1){
+//                        return true;
+//                    }
+//                }
             }
 
             // $itemId contains the pageId which is asked to be retrieved

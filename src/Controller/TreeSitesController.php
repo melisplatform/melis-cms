@@ -50,9 +50,6 @@ class TreeSitesController extends AbstractActionController
 		else
 			$response = $this->formatTreeResponse($final);
 
-
-			
-
 		return $response;
 
 	}
