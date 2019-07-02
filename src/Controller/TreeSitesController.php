@@ -49,32 +49,47 @@ class TreeSitesController extends AbstractActionController
 			$response = $this->formatTreeResponse($triggerResponse[0]);
 		else
 			$response = $this->formatTreeResponse($final);
-			
+
+        // Site page tree access rights
+        $checkAccess = false;
+        if ($this->getRequest()->isXmlHttpRequest()){
+            if (!empty($this->params()->fromQuery('cpath')))
+                $checkAccess = true;
+        }else{
+            $checkAccess = true;
+        }
+
+        if ($checkAccess)
+            $response->hasSiteTreeAccess = $this->siteTreeAccess($idPage);
 
 		return $response;
-
 	}
 	
 	public function checkUserPageTreeAccressAction()
 	{
 	    $idPage = $this->params()->fromQuery('idPage');
 	    
-	    $isAccessible = false;
-	    
-	    if ($idPage)
-	    {
-	        $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
-	        $melisCmsRights = $this->getServiceLocator()->get('MelisCmsRights');
-	        $xmlRights = $melisCoreAuth->getAuthRights();
-	        $isAccessible = $melisCmsRights->isAccessible($xmlRights, MelisCmsRightsService::MELISCMS_PREFIX_PAGES, $idPage);
-	    }
-	    
 	    $response = array(
-	        'isAccessible' => $isAccessible
+	        'isAccessible' => $this->siteTreeAccess($idPage)
         );
 	    
 	    return new JsonModel($response);
 	}
+
+	private function siteTreeAccess($idPage)
+    {
+        $isAccessible = false;
+
+        if ($idPage){
+            $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
+            $melisCmsRights = $this->getServiceLocator()->get('MelisCmsRights');
+            $xmlRights = $melisCoreAuth->getAuthRights();
+            $isAccessible = $melisCmsRights->isAccessible($xmlRights, MelisCmsRightsService::MELISCMS_PREFIX_PAGES, $idPage);
+        }
+
+        return $isAccessible;
+    }
+
 
 	/**
 	 * Gets the root page when showing the tree of pages in rights tool
@@ -277,13 +292,12 @@ class TreeSitesController extends AbstractActionController
 
 			$view = new ViewModel();
 			$view->pages = $final;
-			$view->melisKey = $melisKey;
+            $view->melisKey = $melisKey;
 
-			return $view;
+            return $view;
 		}
 		else
 		{
-
 			$jsonresult = array();
 			foreach ($final as $page)
 			{
@@ -352,6 +366,8 @@ class TreeSitesController extends AbstractActionController
 
 				array_push($jsonresult, $jsonpage);
 			}
+
+//			print_r($jsonresult);
 
 			$jsonModel = new JsonModel();
 			$jsonModel->setVariables($jsonresult);

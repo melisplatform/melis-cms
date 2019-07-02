@@ -210,6 +210,7 @@
 	    'tr_meliscms_common_refresh' => 'Rafraichir',
 	    'tr_meliscms_common_close' => 'Annuler',
 	    'tr_meliscms_common_save' => 'Sauvegarder',
+	    'tr_meliscms_page_tree_save' => 'Enregistrer',
 	    'tr_meliscms_common_yes' => 'Oui',
 	    'tr_meliscms_common_no' => 'Non',
 	    
@@ -313,6 +314,7 @@
 	    'tr_meliscms_tool_platform_ids_modal_content' => 'Add and update modal',
 	    'tr_meliscms_tool_platform_modal_info' => 'Déclarez ici la plage d\'identifiants d\'une plateforme spécifique',
         'tr_meliscms_tool_platform_modal_info_assigned_page_ids' => 'Toutes les plateformes ont déjà des plages d\'identifiants assigné.',
+        'tr_meliscms_platform_id_save' => 'Enregistrer',
 
 	    //Platform Success messages
 	    'tr_meliscms_tool_platform_add_success' => 'Nouvelle plage d\'IDs de la plateforme ajoutée avec succès',

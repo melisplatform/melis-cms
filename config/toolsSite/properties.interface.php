@@ -1,31 +1,6 @@
 <?php
 return array(
     'plugins' => array(
-        'meliscore' => array(
-            'interface' => array(
-                'meliscore_leftmenu' => array(
-                    'interface' => array(
-                        'meliscms_toolstree_section' => array(
-                            'interface' => array(
-                                'meliscms_site_tools' => array(
-                                    'interface' => array(
-                                        'meliscms_tool_sites' => array(
-                                            'interface' => array(
-                                                'meliscms_tool_sites_edit_site_tabs_properties' => array(
-                                                    'conf' => array(
-                                                        'type' => 'melistoolsitesproperties/interface/meliscms_tool_sites_properties'
-                                                    )
-                                                ),
-                                            )
-                                        ),
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        ),
         'meliscms' => array(
             'interface' => array(
                 'meliscms_toolstree' => array(
@@ -43,15 +18,6 @@ return array(
                                 ),
                             ),
                         ),
-//                        'meliscms_tool_sites' => array(
-//                            'interface' => array(
-//                                'meliscms_tool_sites_edit_site_tabs_properties' => array(
-//                                    'conf' => array(
-//                                        'type' => 'melistoolsitesproperties/interface/meliscms_tool_sites_properties'
-//                                    )
-//                                ),
-//                            )
-//                        ),
                     ),
                 ),
             ),
