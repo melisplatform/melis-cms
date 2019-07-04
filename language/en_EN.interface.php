@@ -654,5 +654,7 @@
 
         #SITES NO ACCESS MESSAGE
         'tr_melis_cms_sites_tool_content_edit_tab_no_access' => 'You have no rights to access this tab',
+        'tr_meliscms_pages_Page_header' => 'Page header',
+        'tr_meliscms_pages_Page_status_container' => 'Status container'
     );
 ?>

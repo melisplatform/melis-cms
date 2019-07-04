@@ -657,5 +657,7 @@
 
         #SITES NO ACCESS MESSAGE
         'tr_melis_cms_sites_tool_content_edit_tab_no_access' => 'Vous n\'avez pas les droits pour accéder à cet onglet',
+        'tr_meliscms_pages_Page_header' => 'En-tête page',
+        'tr_meliscms_pages_Page_status_container' => 'Container statut'
     );
 ?>
