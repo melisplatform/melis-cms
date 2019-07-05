@@ -2319,16 +2319,43 @@ return array(
                                         'type' => 'File',
                                         'name' => 'page_tree_import',
                                         'options' => array(
-                                            'label' => 'Test',
-                                            'tooltip' => 'Test',
+                                            'label' => '',
+                                            'tooltip' => '',
                                             'label_options' => array(
                                                 'disable_html_escape' => true,
                                             ),
+                                            'filestyle_options' => array(
+                                                'buttonBefore' => true,
+                                                'buttonText' => 'Zip File',
+                                            )
                                         ),
                                         'attributes' => array(
-
+                                            'id' => 'pageImportFileUpload'
                                         ),
                                     )
+                                ),
+                            ),
+                            'input_filter' => array(
+                                'page_tree_import' => array(
+                                    'name'     => 'page_tree_import',
+                                    'required' => true,
+                                    'validators' => array(
+                                        array(
+                                            'name' => 'FileExtension',
+                                            'break_chain_on_failure' => true,
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\Validator\File\Extension::FALSE_EXTENSION => 'tr_melis_cms_page_tree_import_wrong_extension',
+                                                ),
+                                                'case' => true,
+                                                'extension' => [
+                                                    'zip'
+                                                ]
+                                            ),
+                                        ),
+                                    ),
+                                    'filters' => array(
+                                    ),
                                 ),
                             ),
                         ),

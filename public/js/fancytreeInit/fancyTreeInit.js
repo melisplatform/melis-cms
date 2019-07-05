@@ -57,7 +57,7 @@
 													'icon': 'copy'
 											},
 										    'import': {
-													'name': 'Import pages',
+													'name': translations.tr_melis_cms_page_tree_import,
 													'icon': 'copy'
 											}
 									},

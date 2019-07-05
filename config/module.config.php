@@ -117,6 +117,7 @@ return array(
             'MelisCms\Listener\MelisCmsPluginSaveEditionSessionListener' => 'MelisCms\Listener\Factory\MelisCmsPluginSaveEditionSessionListenerFactory',
             'MelisCmsPageService' => 'MelisCms\Service\Factory\MelisCmsPageServiceFactory',
             'MelisCmsPageExportService' => 'MelisCms\Service\Factory\MelisCmsPageExportServiceFactory',
+            'MelisCmsPageImportService' => 'MelisCms\Service\Factory\MelisCmsPageImportServiceFactory',
         ),
     ),
     'controllers' => array(
@@ -146,6 +147,7 @@ return array(
             'MelisCms\Controller\SitesConfig' => 'MelisCms\Controller\SitesConfigController',
             'MelisCms\Controller\GdprBanner' => 'MelisCms\Controller\GdprBannerController',
             'MelisCms\Controller\PageExport' => 'MelisCms\Controller\PageExportController',
+            'MelisCms\Controller\PageImport' => 'MelisCms\Controller\PageImportController',
         ),
     ),
     'controller_plugins' => array(

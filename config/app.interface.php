@@ -1396,7 +1396,7 @@ return array(
                     ),
                     'forward' => array(
                         'module' => 'MelisCms',
-                        'controller' => 'Page',
+                        'controller' => 'PageImport',
                         'action' => 'render-page-import-modal',
                         'jscallback' => '',
                         'jsdatas' => array()
