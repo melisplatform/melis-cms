@@ -2282,10 +2282,10 @@ return array(
                                 array(
                                     'spec' => array(
                                         'type' => 'Zend\Form\Element\Radio',
-                                        'name' => 'page_tree_export',
+                                        'name' => 'page_export_type',
                                         'options' => array(
-                                            'label' => '',
-                                            'tooltip' => '',
+                                            'label' => 'Select page export option',
+                                            'tooltip' => 'Page export option',
                                             'label_options' => array(
                                                 'disable_html_escape' => true,
                                             ),
@@ -2295,13 +2295,33 @@ return array(
                                             'value_options' => array(
                                                 '1' => 'tr_melis_cms_tree_export_page_and_children',
                                                 '2' => 'tr_melis_cms_tree_export_page_only',
-                                                '3' => 'tr_melis_cms_tree_export_page_resources',
                                             ),
                                         ),
                                         'attributes' => array(
 
                                         ),
                                     )
+                                ),
+                                array(
+                                    'spec' => array(
+                                        'name' => 'export_page_resources',
+                                        'type' => 'Select',
+                                        'options' => array(
+                                            'label' => 'tr_melis_cms_tree_export_page_resources',
+                                            'tooltip' => 'tr_melis_cms_tree_export_page_resources',
+                                            'checked_value' => true,
+                                            'unchecked_value' => false,
+                                            'switchOptions' => array(
+                                                'label-on' => 'tr_meliscms_common_yes',
+                                                'label-off' => 'tr_meliscms_common_no',
+                                                'label' => "<i class='glyphicon glyphicon-resize-horizontal'></i>",
+                                            ),
+                                            'disable_inarray_validator' => true,
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'export_page_resources',
+                                        ),
+                                    ),
                                 ),
                             ),
                         ),

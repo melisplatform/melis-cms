@@ -50,7 +50,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                     </div>
                     <div align="right">
                         <button type="button" data-dismiss="modal" class="btn btn-danger pull-left"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
-                        <button type="button" class="btn btn-success" id="btn-export-pages">Export</button>
+                        <button type="button" class="btn btn-success" id="btn-export-pages" <?= (!$this->isAdmin) ? 'disabled="true"' : ''?>>Export</button>
                     </div>
                 </div>
             </div>
