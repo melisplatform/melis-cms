@@ -35,7 +35,7 @@ return array(
             'conf' => array(
                 'id' => '',
                 'name' => 'Properties',
-                'rightsDisplay' => 'referenceonly',
+                'rightsDisplay' => 'none',
             ),
             'ressources' => array(
                 'js' => array(

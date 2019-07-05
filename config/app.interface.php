@@ -1057,7 +1057,7 @@ return array(
                         'meliscms_pagehead' => array(
                             'conf' => array(
                                 'id' => 'id_meliscms_pagehead',
-                                'name' => 'tr_meliscms_pages_Page',
+                                'name' => 'tr_meliscms_pages_Page_header',
                                 'melisKey' => 'meliscms_pagehead'
                             ),
                             'forward' => array(
@@ -1071,7 +1071,7 @@ return array(
                                 'meliscms_pagehead_title' => array(
                                     'conf' => array(
                                         'id' => 'id_meliscms_pagehead_title',
-                                        'name' => 'tr_meliscms_pages_Page',
+                                        'name' => 'tr_meliscms_pages_Page_status_container',
                                         'melisKey' => 'meliscms_pagehead_title'
                                     ),
                                     'forward' => array(

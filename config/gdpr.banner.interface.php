@@ -68,6 +68,9 @@ return [
 
         /** Forms */
         'MelisCmsGdprBanner' => [
+            'conf' => [
+                'rightsDisplay' => 'none'
+            ],
             'forms' => [
                 /** Site filter */
                 'site_filter_form' => [
