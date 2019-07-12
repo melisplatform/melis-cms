@@ -139,21 +139,22 @@ class PageExportController extends AbstractActionController
                                     ->addHeaderLine('fileName', $zipFileName);
                                 $response->setHeaders($headers);
 
-                                $response['message'] = 'tr_melis_cms_tree_export_success';
-                                $response['success'] = true;
-
                                 return $response;
                             }else{
                                 //problem on deleting the temporary folder
+                                print_r('1');
                             }
                         }else{
                             //cannot convert the folder to zip
+                            print_r('2');
                         }
                     }else{
                         //temporary folder is not writable
+                        print_r('3');
                     }
                 }else{
                     //failed exporting page
+                    print_r('4');
                 }
             }
         }

@@ -23,14 +23,8 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         $success = true;
         $xmlArray = $this->xmlToArray($arrayParameters['xmlString'], $errors);
 
-//        $test = simplexml_load_string($xmlString);
-//        $arrr = [];
-//        print_r($test->page->tables->melis_cms_page_published->page_content->asXML());
-//        $this->checkAll($test, $arrr);
-
         if ($xmlArray) {
             $this->checkTables($xmlArray, $errors);
-            $this->checkExternalTables();
 
             if ($keepPrimaryId) {
                 $pages = [];
@@ -51,14 +45,60 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         return $arrayParameters['result'];
     }
 
-    public function importPageTree()
+    /**
+     * Iterates all pages of the tree (Main Function)
+     * @param $pageid
+     * @param $xml
+     */
+    public function importPageTree($pageid, $xmlString)
     {
+        $externalTableMap = $this->getExternalTableMap();
+        $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
+        $arrayParameters = $this->sendEvent('melis_cms_page_tree_import_import_page_tree_start', array_merge($arrayParameters, [ 'externalTableMap' => $externalTableMap ]));
 
+        $simpleXml = simplexml_load_string($xmlString);
+        $pages = [];
+        $errors = [];
+        $externalIdsMap = [];
+        $this->getAllPagesRecursivelyAsSimpleXml($simpleXml, $pages);
+        $externalTables = $this->simpleXmlToArray($simpleXml->external->tables);
+        $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
+
+        foreach ($externalTables as $tableName => $tableRows) {
+            foreach ($tableRows as $rowKey => $row) {
+                if ($tableName == 'melis_cms_template') {
+                    $queryString = 'SELECT * FROM `melis_cms_template` WHERE `tpl_site_id` = ? AND `tpl_zf2_layout` = ? AND `tpl_zf2_controller` = ? AND `tpl_zf2_action` = ?';
+                    $result = $adapter->query($queryString, [$row['tpl_site_id'], $row['tpl_zf2_layout'], $row['tpl_zf2_controller'], $row['tpl_zf2_action']])->toArray();
+
+                    if (!empty($result)) {
+                        // Update array map
+                        $externalIdsMap[$tableName][$row['tpl_id']] = $result[0]['tpl_id'];
+                    } else {
+                        // Insert and update array map
+                        $queryString = 'INSERT INTO `melis_cms_template` () VALUES()';
+                    }
+                } else if ($tableName == 'melis_cms_style') {
+                    $queryString = 'SELECT * FROM';
+                } else if ($tableName == 'melis_cms_lang') {
+                    $queryString = 'SELECT * FROM';
+                }
+            }
+        }
+
+        $arrayParameters = $this->sendEvent('melis_cms_page_tree_import_import_page_tree_end', $arrayParameters);
     }
 
-    public function importPage()
+    /**
+     * Imports a page
+     * @param $xml
+     */
+    public function importPage($xml)
     {
+        $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
+        $arrayParameters = $this->sendEvent('melis_cms_page_tree_import_import_page_start', $arrayParameters);
 
+
+        $arrayParameters = $this->sendEvent('melis_cms_page_tree_import_import_page_end', $arrayParameters);
     }
 
     public function importPageRessources()
@@ -66,32 +106,55 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
 
     }
 
+    private function getExternalTableMap() {
+        return [
+            'melis_cms_template' => [
+                'tpl_site_id', 'tpl_zf2_layout', 'tpl_zf2_controller', 'tpl_zf2_action'
+            ],
+            'melis_cms_style' => [
+                'style_path'
+            ],
+            'melis_cms_lang' => [
+                'lang_cms_locale'
+            ],
+        ];
+    }
+
+    private function  importExternal()
+    {
+
+    }
+
     private function checkTables($xml, &$errors)
     {
-        $tableNames = $this->getDbTableNames();
-        $tables = $xml['page']['tables'];
+        $dbTables = $this->getDbTableNames();
+        $pageTables = $xml['page']['tables'];
         $externalTables = $xml['external']['tables'];
 
-        foreach ($tables as $tableName => $tableColumns) {
-            if (in_array($tableName, $tableNames)) {
+        $this->checkPageTables($pageTables, $dbTables, $errors);
+        $this->checkExternalTables($externalTables, $dbTables, $errors);
+    }
+
+    private function checkPageTables($pageTables, $dbTables, &$errors)
+    {
+        foreach ($pageTables as $tableName => $tableColumns) {
+            if (in_array($tableName, $dbTables)) {
                 $this->checkTableColumns($tableName, $tableColumns, $errors);
             } else {
                 $errors[] = $tableName . ' does not exist on your db';
             }
         }
+    }
 
+    private function checkExternalTables($externalTables, $dbTables, &$errors)
+    {
         foreach ($externalTables as $externalTableName => $externalTableColumns) {
-            if (in_array($externalTableName, $tableNames)) {
+            if (in_array($externalTableName, $dbTables)) {
                 $this->checkTableColumns($externalTableName, $externalTableColumns['row_0'], $errors);
             } else {
                 $errors[] = $externalTableName . ' does not exist on your db';
             }
         }
-    }
-
-    private function checkExternalTables()
-    {
-
     }
 
     private function checkTableColumns($tableName, $tableColumns, &$errors)
@@ -151,55 +214,88 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         }
     }
 
-    private function getAllPagesRecursively($array, &$pages)
+    private function simpleXmlToArray($simpleXml)
     {
-        if (isset($array['page'])) {
-            $array = $array['page'];
+        return json_decode(json_encode($simpleXml), TRUE);
+    }
+
+    // TODO: separate function for preparing the xml
+    private function getAllPagesRecursively($xmlArray, &$pages, $fatherId = null)
+    {
+        if (isset($xmlArray['page'])) {
+            $xmlArray = $xmlArray['page'];
         }
 
-        if (isset($array[0]))
-            $array = $array[0];
+        if (isset($xmlArray[0]))
+            $xmlArray = $xmlArray[0];
 
-        if (!empty($array['children'])) {
-            $children = $array['children'];
-            unset($array['children']);
+        if (isset($xmlArray['children'])) {
+            $children = $xmlArray['children'];
+            unset($xmlArray['children']);
         }
 
-        if (isset($array['tables']))
-            $array = $array['tables'];
+        $xmlArray['fatherId'] = !empty($fatherId) ? $fatherId : -1;
+        $pages[] = $xmlArray;
 
-
-//        if (isset($array['page'])) {
-//            if (!empty($array['page']['children'])) {
-//                $children = $array['page']['children'];
-//                unset($array['page']['children']);
-//            }
-//
-//            if (isset($array['external']))
-//                unset($array['external']);
-//        }
-
-//        if (isset($array[0])) {
-//            $children = $array[0]['children'];
-//            unset($array[0]['children']);
-//        }
-
-//        if (isset($array['children'])) {
-//            $children = $array['children'];
-//            unset($array['children']);
-//        }
-
-        $pages[] = $array;
+        $pageId = !empty($xmlArray['tables']['melis_cms_page_published']['page_id'])
+            ? $xmlArray['tables']['melis_cms_page_published']['page_id']
+            : $xmlArray['tables']['melis_cms_page_saved']['page_id'];
 
         if (!empty($children)) {
             foreach ($children as $key => $child) {
-                if (count($child) > 1) {
-                    foreach ($child as $x => $y) {
-                        $this->getAllPagesRecursively($y, $pages);
+                if (count($children['page']) > 1) {
+                    foreach ($child as $childKey => $childContent) {
+                        $this->getAllPagesRecursively($childContent, $pages, $pageId);
                     }
                 } else {
-                    $this->getAllPagesRecursively($child, $pages);
+                    $this->getAllPagesRecursively($child, $pages, $pageId);
                 }
+            }
+        }
+    }
+
+    private function getAllPagesRecursivelyAsSimpleXml($xmlArray, &$pages, $fatherId = null)
+    {
+        if (isset($xmlArray->page)) {
+            $xmlArray = $xmlArray->page;
+        }
+
+        if (isset($xmlArray[0])) {
+            $xmlArray = $xmlArray[0];
+        }
+
+        if (isset($xmlArray->children)) {
+            $children = $xmlArray->children;
+//            unset($clone->children);
+        }
+
+        $xmlArray->fatherId = !empty($fatherId) ? $fatherId : -1;
+        $pages[] = $xmlArray;
+        $pageId = !empty($xmlArray->tables->melis_cms_page_published->page_id)
+            ? $xmlArray->tables->melis_cms_page_published->page_id
+            : $xmlArray->tables->melis_cms_page_saved->page_id;
+
+        if (!empty($children)) {
+            foreach ($children as $key => $child) {
+                if (count($children->page) > 1) {
+                    foreach ($child as $x => $y) {
+                        $this->getAllPagesRecursivelyAsSimpleXml($y, $pages, $pageId);
+                    }
+                } else {
+                    $this->getAllPagesRecursivelyAsSimpleXml($child, $pages, $pageId);
+                }
+            }
+        }
+    }
+
+    private function cleanPages(&$pages, &$cleanedPages)
+    {
+        foreach ($pages as $page) {
+            $clone = clone $page;
+
+            if (!empty($clone->children)) {
+                unset($clone->children);
+                $cleanedPages[] = $clone;
             }
         }
     }
@@ -207,32 +303,22 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
     private function checkPageIds($pages, &$errors)
     {
         foreach ($pages as $page) {
-            $tables = $this->getPageTables($page);
+            $tables = !empty($page['tables']) ? $page['tables'] : [];
 
             foreach ($tables as $tableName => $tableColumns) {
-                $primaryColumn = $this->getTablePrimaryColumn($tableName);
-                $columnData = $tableColumns[$primaryColumn];
+                if (is_array($tableColumns) && !empty($tableColumns)) {
+                    $primaryColumn = $this->getTablePrimaryColumn($tableName);
+                    $columnData = $tableColumns[$primaryColumn];
 
-                $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
-                $result = $adapter->query('SELECT * FROM `' . $tableName . '` WHERE `' . $primaryColumn . '` = ?', [$columnData])->toArray();
+                    $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
+                    $result = $adapter->query('SELECT * FROM `' . $tableName . '` WHERE `' . $primaryColumn . '` = ?', [$columnData])->toArray();
 
-                if (!empty($result)) {
-                    $errors[] = 'Primary ID ' . $columnData . ' of table ' . $tableName . ' is already used.';
+                    if (!empty($result)) {
+                        $errors[] = 'Primary ID ' . $columnData . ' of table ' . $tableName . ' is already used.';
+                    }
                 }
             }
         }
-    }
-
-    private function getPageTables($page)
-    {
-        if (isset($page['page']['tables']))
-            $tables = $page['page']['tables'];
-        if (isset($page['tables']))
-            $tables = $page['tables'];
-        if (!isset($page['page']['tables']) && !isset($page['tables']))
-            $tables = $page;
-
-        return $tables;
     }
 
     private function getTablePrimaryColumn($tableName)
@@ -251,11 +337,6 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
 
         return !empty($primaryColumn) ? $primaryColumn : null;
     }
-
-
-
-
-
 
     private function checkAll($xml, &$arrr)
     {

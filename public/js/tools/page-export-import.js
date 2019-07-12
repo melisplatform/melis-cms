@@ -1,5 +1,6 @@
 $(document).ready(function(){
     var $body = $("body");
+    var importFormData;
 
     /**
      * Process the pages export
@@ -65,6 +66,17 @@ $(document).ready(function(){
         submitImportForm($('#id_meliscms_tree_sites_import_page_form'));
     });
 
+    function request(url, type, data, success, error) {
+        $.ajax({
+            type: type,
+            url: url,
+            data: data,
+            cache: false,
+            contentType: false,
+            processData: false
+        }).success(success(data)).error(error);
+    }
+
     function submitImportForm (form) {
         form.unbind("submit");
         form.on("submit", function(e) {
@@ -81,6 +93,7 @@ $(document).ready(function(){
             }).success(function (data) {
                 if (data.success) {
                     importTest(data.result);
+                    importFormData = data.result;
                 } else {
                     melisHelper.melisKoNotification('test tittle', 'test message', data.errors);
                 }
@@ -129,8 +142,31 @@ $(document).ready(function(){
     }
 
     $body.on('click', '#page-tree-import', function () {
-        melisCoreTool.confirm('Continue & Import file', 'cancel', 'Are you sure to import?', 'It is always a good idea to make a back-up of the database before doing such actions.', function () {
+        var pageid = $(this).closest('#id_meliscms_page_import_modal').data('pageid');
 
+        melisCoreTool.confirm(
+            'Continue & Import file',
+            'cancel', 'Are you sure to import?',
+            'It is always a good idea to make a back-up of the database before doing such actions.',
+            function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '/melis/MelisCms/PageImport/importPage',
+                    data: {
+                        formData: JSON.stringify(importFormData),
+                        pageid: pageid
+                    },
+                    beforeSend: function () {
+                        $body.find('#pageImportConsole').css('display', '');
+                        $body.find('#pageImportConsole').append('<p>Name of file: ' + importFormData.page_tree_import.name + '</p>');
+                        $body.find('#pageImportConsole').append('<p>Validated: <span style="color: red;">No</span></p>');
+                        $body.find('#pageImportConsole').append('<div id="pageImportProcessing"><p>Processing file <i class="fa fa-spinner fa-spin"></i></p></div>');
+                    }
+                }).success(function () {
+
+                }). error(function() {
+
+                });
         });
     });
 });

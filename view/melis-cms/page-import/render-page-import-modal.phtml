@@ -4,7 +4,7 @@ if (!empty($this->zoneconfig['conf']['id']))
     $id = ' id="' .$this->zoneconfig['conf']['id'] . '"';
 
 ?>
-<div class="modal-content" <?= $id; ?> data-melisKey="<?= $this->melisKey; ?>">
+<div class="modal-content" <?= $id; ?> data-melisKey="<?= $this->melisKey; ?>" data-pageid="<?= $this->pageId ?>">
     <div class="modal-body padding-none">
         <div class="wizard">
             <div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none">

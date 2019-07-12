@@ -29,9 +29,10 @@ class PageImportController extends AbstractActionController
     {
         $view = new ViewModel();
         $view->setTerminal(false);
-        $view->melisKey  = $this->params()->fromRoute('melisKey', $this->params()->fromQuery('melisKey'), null);;
+        $view->melisKey  = $this->params()->fromQuery('melisKey', null);;
         $view->importForm = $this->getImportForm();
         $view->isAdmin = $this->getUser()->usr_admin;
+        $view->pageId = $this->params()->fromQuery('pageId', null);
         return $view;
     }
 
@@ -98,9 +99,27 @@ class PageImportController extends AbstractActionController
         ]);
     }
 
+    /**
+     *
+     */
     public function importPageAction()
     {
+        $pageImportSvc = $this->getServiceLocator()->get('MelisCmsPageImportService');
+        $data = get_object_vars($this->getRequest()->getPost());
+        $formData = json_decode($data['formData'], true);
+        $pageId = $data['pageid'];
+        $zip = $this->openZip($formData['page_tree_import']['tmp_name']);
 
+        if (!empty($zip)) {
+            $xml = $zip->getFromName('PageExport.xml');
+            $zip->close();
+
+            $response = $pageImportSvc->importPageTree($pageId, $xml);
+        } else {
+
+        }
+
+        exit;
     }
 
     /**
@@ -119,7 +138,7 @@ class PageImportController extends AbstractActionController
         $fileInput->getFilterChain()->attachByName(
             'filerenameupload',
             [
-                'target'    => $target, // File name prefix
+                'target'    => $target,
                 'randomize' => false,
                 'use_upload_extension' => true,
             ]

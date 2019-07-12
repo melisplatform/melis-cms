@@ -143,9 +143,17 @@
 												if(action === 'export') {
 													melisHelper.createModal('id_meliscms_page_export_modal', 'meliscms_page_export_modal', true, {'pageId':data.melisData.page_id}, modalUrl, function () {});
 												}else{
-													melisHelper.createModal('id_meliscms_page_import_modal','meliscms_page_import_modal',true,[],modalUrl,function () {
-
-													});
+													melisHelper.createModal(
+														'id_meliscms_page_import_modal',
+														'meliscms_page_import_modal',
+														true,
+														{
+															'pageId':data.melisData.page_id
+														},
+														modalUrl,
+														function () {
+														}
+													);
 												}
 											}
 									}
