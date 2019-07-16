@@ -209,6 +209,7 @@
 	    'tr_meliscms_common_close' => 'Close',
 	    'tr_meliscms_common_save' => 'Save',
 	    'tr_meliscms_common_yes' => 'Yes',
+            'tr_meliscms_page_tree_save' => 'Save',
 	    'tr_meliscms_common_no' => 'No',
 	    
 	    'tr_meliscms_common_add' => 'Add',
