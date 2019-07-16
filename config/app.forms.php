@@ -243,7 +243,7 @@ return array(
 									array(
 										'name'    => 'InArray',
 										'options' => array(
-											'haystack' => array('SITE', 'FOLDER', 'PAGE', 'NEWSLETTER', 'NEWS_DETAIL'),
+											'haystack' => array('SITE', 'FOLDER', 'PAGE', 'NEWSLETTER', 'NEWS_DETAIL', 'BLOG_DETAIL'),
 										    'messages' => array(
 										        \Zend\Validator\InArray::NOT_IN_ARRAY => 'tr_meliscms_page_form_page_type_invalid',
 										    ),
