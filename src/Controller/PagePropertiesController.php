@@ -290,16 +290,14 @@ class PagePropertiesController extends AbstractActionController
     }
 
     /**
-     * This function creates the Page Property Form and sends it back
+     * Returns the Page Property Form
      *
-     * @param int $idPage
-     * @param bool $isNew
-     * @return \Zend\Form\Form
+     * @param $idPage
+     * @param $isNew
+     * @return \Zend\Form\ElementInterface
      */
     public function getPropertyPageForm($idPage, $isNew)
     {
-        $pathAppConfigForm = self::PagePropertiesAppConfigPath;
-
         /**
          * Get the config for this form
          */
@@ -339,10 +337,6 @@ class PagePropertiesController extends AbstractActionController
                 }
                 $modifiedForm->next();
             }
-        }
-
-        if (!empty($modifiedForm)) {
-            $appConfigForm = $modifiedForm;
         }
 
         if ($isNew == false) {
