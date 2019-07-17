@@ -54,8 +54,9 @@ class PagePropertiesController extends AbstractActionController
         );
 
         /**
-         * Iterate through the Doubly Linked list to merge the updated configurations.
-         * Fixed issue: Only displays the result of one of the multiple listeners editing the same form element.
+         * Fixed issue: Only returns the result of one of the multiple listeners editing the same form element.
+         * Solution: Iterate through the configurations from different listeners (Doubly Linked list)
+         *  & merge said configurations
          */
         $pageTypeOptions = [];
         if (!empty($modifiedForm)) {
@@ -317,8 +318,9 @@ class PagePropertiesController extends AbstractActionController
         );
 
         /**
-         * Iterate through the Doubly Linked list to merge the updated configurations.
-         * Fixed issue: Only displays the result of one of the multiple listeners editing the same form element.
+         * Fixed issue: Only returns the result of one of the multiple listeners editing the same form element.
+         * Solution: Iterate through the configurations from different listeners (Doubly Linked list)
+         *  & merge said configurations
          */
         $pageTypeOptions = [];
         if (!empty($modifiedForm)) {
@@ -357,6 +359,10 @@ class PagePropertiesController extends AbstractActionController
         $formElements = $this->serviceLocator->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $propertyForm = $factory->createForm($appConfigForm);
+
+        if (!empty($pageTypeOptions)) {
+            $propertyForm->get('page_type')->setValueOptions($pageTypeOptions);
+        }
 
         return $propertyForm;
     }
