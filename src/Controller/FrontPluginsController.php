@@ -30,16 +30,15 @@ class FrontPluginsController extends AbstractActionController
         
         $config = $this->serviceLocator->get('config');
         $pluginsConfig = array();
-        
         $siteModule = $this->params()->fromRoute('siteModule');
+        // melis plugin service
+        $pluginSvc = $this->getServiceLocator()->get('MelisCorePluginsService');
+        // check for new plugins or manually installed and insert in db or fresh plugins
+        $pluginSvc->checkTemplatingPlugins();
         $pluginList_ = $this->putSectionOnPlugins($config['plugins'], $siteModule);
         $newPluginList = $this->organizedPluginsBySection($pluginList_);
         // remove section that has no child under on it
         $newPluginList = array_filter($newPluginList);
-        // melis plugin service
-        $pluginSvc = $this->getServiceLocator()->get('MelisCorePluginsService');
-        // check for new plugins or manually installed and insert in db
-        $pluginSvc->checkTemplatingPlugins();
         // get the latest plugin installed
         $latesPlugin = $pluginSvc->getLatestPlugin($pluginSvc::TEMPLATING_PLUGIN_TYPE);
         // for new plugin notifications

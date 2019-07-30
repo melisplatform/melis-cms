@@ -384,6 +384,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
             'PAGE'   => 'fa-file-o',
             'NEWSLETTER' => 'fa fa-newspaper-o',
             'NEWS_DETAIL'   => 'fa-file-o',
+            'BLOG_DETAIL'   => 'fa-file-o',
         );
 
 

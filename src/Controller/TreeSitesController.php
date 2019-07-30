@@ -235,6 +235,9 @@ class TreeSitesController extends AbstractActionController
                 case 'NEWS_DETAIL':
                     $data_icon = 'fa fa-file-o';
                     break;
+                case 'BLOG_DETAIL':
+                    $data_icon = 'fa fa-file-o';
+                    break;
 				default: 
 					$data_icon = '';
 					break;
