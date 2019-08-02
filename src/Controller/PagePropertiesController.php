@@ -303,10 +303,11 @@ class PagePropertiesController extends AbstractActionController
          * Generate the form through factory and change ElementManager to
          * have access to our custom Melis Elements
          */
+
         $factory = new Factory();
         $formElements = $this->serviceLocator->get('FormElementManager');
-        $propertyForm = $factory->createForm($appConfigForm);
         $factory->setFormElementManager($formElements);
+        $propertyForm = $factory->createForm($appConfigForm);
 
         return $propertyForm;
     }
