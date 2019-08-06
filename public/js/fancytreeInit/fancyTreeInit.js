@@ -16,8 +16,8 @@
 							extensions: melisExtensions,
 							glyph: {
 								map: {
-									loading: "fa fa-spinner fa-pulse"
-									//loading: "glyphicon-refresh fancytree-helper-spin" // edited by junry
+									//loading: "fa fa-spinner fa-pulse"
+									loading: "glyphicon-refresh fancytree-helper-spin" // edited by junry
 								}
 							},
 							activeVisible: false,
@@ -270,6 +270,7 @@
 							renderNode: function(event, data) {
 									// removed .fancytree-icon class and replace it with font-awesome icons
 									$(data.node.span).find('.fancytree-icon').addClass(data.node.data.iconTab).removeClass('fancytree-icon');
+									//console.log({data});
 
 									if (data.node.statusNodeType !== 'loading') {
 
