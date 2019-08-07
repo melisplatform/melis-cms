@@ -32,7 +32,6 @@ class PagePropertiesController extends AbstractActionController
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $pageStyle = null;
-        $pathAppConfigForm = self::PagePropertiesAppConfigPath;
 
         /**
          * Get the config for this form
@@ -53,29 +52,8 @@ class PagePropertiesController extends AbstractActionController
             ['appConfigForm' => $appConfigForm]
         );
 
-        /**
-         * Fixed issue: Only returns the result of one of the multiple listeners editing the same form element.
-         * Solution: Iterate through the configurations from different listeners (Doubly Linked list)
-         *  & merge said configurations
-         */
-        $pageTypeOptions = [];
-        if (!empty($modifiedForm)) {
-            $pageTypeIndex = 0;
-            foreach ($appConfigForm['elements'] as $index => $element) {
-                if ($element['spec']['name'] === 'page_type') {
-                    $pageTypeIndex = $index;
-                    break;
-                }
-            }
-
-            $modifiedForm->rewind();
-            while ($modifiedForm->valid()) {
-                if (!empty($modifiedForm->current())) {
-                    $pageTypeOptions = array_merge($pageTypeOptions, $modifiedForm->current()['elements'][$pageTypeIndex]['spec']['options']['value_options']);
-                }
-                $modifiedForm->next();
-            }
-        }
+        /** Override appConfigForm with the modified value from the last-touch listener */
+        $appConfigForm = empty($modifiedForm->last()) ? $appConfigForm : $modifiedForm->last();
 
         if (!empty($idPage)) {
             // Lang not changeable after creation, config array defines the form in "new" state
@@ -119,10 +97,6 @@ class PagePropertiesController extends AbstractActionController
 
         if (!empty($pageStyle)) {
             $propertyForm->setData(array('style_id' => $pageStyle->pstyle_style_id));
-        }
-
-        if (!empty($pageTypeOptions)) {
-            $propertyForm->get('page_type')->setValueOptions($pageTypeOptions);
         }
 
         /**
@@ -308,6 +282,7 @@ class PagePropertiesController extends AbstractActionController
             'meliscms_page_properties',
             $idPage . '_'
         );
+
         /** Overriding the Page properties form by calling listener */
         $modifiedForm = $this->getEventManager()->trigger(
             'modify_page_properties_form_config',
@@ -315,29 +290,8 @@ class PagePropertiesController extends AbstractActionController
             ['appConfigForm' => $appConfigForm]
         );
 
-        /**
-         * Fixed issue: Only returns the result of one of the multiple listeners editing the same form element.
-         * Solution: Iterate through the configurations from different listeners (Doubly Linked list)
-         *  & merge said configurations
-         */
-        $pageTypeOptions = [];
-        if (!empty($modifiedForm)) {
-            $pageTypeIndex = 0;
-            foreach ($appConfigForm['elements'] as $index => $element) {
-                if ($element['spec']['name'] === 'page_type') {
-                    $pageTypeIndex = $index;
-                    break;
-                }
-            }
-
-            $modifiedForm->rewind();
-            while ($modifiedForm->valid()) {
-                if (!empty($modifiedForm->current())) {
-                    $pageTypeOptions = array_merge($pageTypeOptions, $modifiedForm->current()['elements'][$pageTypeIndex]['spec']['options']['value_options']);
-                }
-                $modifiedForm->next();
-            }
-        }
+        /** Override appConfigForm with the modified value from the last-touch listener */
+        $appConfigForm = empty($modifiedForm->last()) ? $appConfigForm : $modifiedForm->last();
 
         if ($isNew == false) {
             // Lang not changeable after creation
@@ -349,14 +303,11 @@ class PagePropertiesController extends AbstractActionController
          * Generate the form through factory and change ElementManager to
          * have access to our custom Melis Elements
          */
+
         $factory = new Factory();
         $formElements = $this->serviceLocator->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $propertyForm = $factory->createForm($appConfigForm);
-
-        if (!empty($pageTypeOptions)) {
-            $propertyForm->get('page_type')->setValueOptions($pageTypeOptions);
-        }
 
         return $propertyForm;
     }
