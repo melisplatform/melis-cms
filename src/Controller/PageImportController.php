@@ -38,8 +38,6 @@ class PageImportController extends AbstractActionController
 
     public function checkImportFormAction()
     {
-        /** @var \MelisCms\Service\MelisCmsPageImportService $pageImportSvc */
-        $pageImportSvc = $this->getServiceLocator()->get('MelisCmsPageImportService');
         $data = array_merge(get_object_vars($this->getRequest()->getPost()), $this->params()->fromFiles());
         $form = $this->getImportForm();
         $formConfig = $this->getFormConfig(self::FORM_CONFIG_PATH, self::FORM_KEY);
@@ -70,14 +68,13 @@ class PageImportController extends AbstractActionController
      */
     public function importTestAction()
     {
-        /** @var \MelisCms\Service\MelisCmsPageImportService $pageImportSvc */
         $pageImportSvc = $this->getServiceLocator()->get('MelisCmsPageImportService');
         $data = get_object_vars($this->getRequest()->getPost());
         $formData = json_decode($data['formData'], true);
         $success = true;
 
         $zip = $this->openZip($formData['page_tree_import']['tmp_name']);
-
+    
         if (!empty($zip)) {
             $xml = $zip->getFromName('PageExport.xml');
             $zip->close();
@@ -114,7 +111,7 @@ class PageImportController extends AbstractActionController
             $xml = $zip->getFromName('PageExport.xml');
             $zip->close();
 
-            $response = $pageImportSvc->importPageTree($pageId, $xml);
+            $response = $pageImportSvc->importPageTree($pageId, $xml, $formData['keepIds']);
         } else {
 
         }
