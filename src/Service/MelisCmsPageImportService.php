@@ -131,9 +131,12 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
             }
         }
 
-        // update external ids on page
+        // re order pages columns
+
+        // loop pages
         foreach ($pages as $page) {
-            // update page lang
+
+            // check and update page ids
             if (! empty($page->melis_cms_page_lang->plang_id)) {
                 if (array_key_exists($page->melis_cms_page_lang->plang_id, $externalIdsMap['melis_cms_lang'])) {
                     $page->melis_cms_page_lang->plang_id = $externalIdsMap['melis_cms_lang'][$page->melis_cms_page_lang->plang_id];
@@ -163,11 +166,13 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
 
             //update page seo
 
+
+
             // UPDATE EVERYTHING HERE
             $page->fatherId = $pageid;
             $page->order = 2;
 
-            $this->importPage($page->asXml());
+            $pageId = $this->importPage($page->asXml());
         }
 
         $arrayParameters = $this->sendEvent('melis_cms_page_tree_import_import_page_tree_end', $arrayParameters);
@@ -187,7 +192,9 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         $tables = $simpleXml->tables;
         $tablesArray = $this->simpleXmlToArray($tables);
         $fatherId = $simpleXml->fatherId;
+        $pageId = 0;
 
+        // restructure data
         foreach ($tablesArray as $tableName => $tableValue) {
             $tablesArray[$tableName] = $tables->$tableName;
 
@@ -198,33 +205,90 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
             $tablesArray[$tableName] = $this->simpleXmlToArray($tablesArray[$tableName]);
         }
 
+        $tablesArrayTmp = [];
+        if (! empty($tablesArray['melis_cms_page_published'])) {
+            $tablesArrayTmp['melis_cms_page_published'] = $tablesArray['melis_cms_page_published'];
+        } if (! empty($tablesArray['melis_cms_page_saved'])) {
+            $tablesArrayTmp['melis_cms_page_saved'] = $tablesArray['melis_cms_page_saved'];
+        } if (! empty($tablesArray['melis_cms_page_lang'])) {
+            $tablesArrayTmp['melis_cms_page_lang'] = $tablesArray['melis_cms_page_lang'];
+        } if (! empty($tablesArray['melis_cms_page_style'])) {
+            $tablesArrayTmp['melis_cms_page_style'] = $tablesArray['melis_cms_page_style'];
+        } if (! empty($tablesArray['melis_cms_page_seo'])) {
+            $tablesArrayTmp['melis_cms_page_seo'] = $tablesArray['melis_cms_page_seo'];
+        }
+
+        // add other tables
+        foreach ($tablesArray as $tableName => $tableValue) {
+            if (! array_key_exists($tableName, $tablesArrayTmp)) {
+                $tablesArrayTmp[$tableName] = $tableValue;
+            }
+        }
+
+        // save each table
         foreach ($tablesArray as $tableName => $tableValue) {
             $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
             $tableGateway = new TableGateway($tableName, $adapter);
             $primaryCol = $this->getTablePrimaryColumn($tableName);
-            $entry = $tableGateway->select([$primaryCol => $tableValue[$primaryCol]])->toArray();
+
+            // select latest entry
+            $select = $tableGateway->getSql()->select();
+            $select->columns(['*']);
+            $select->order($primaryCol . ' DESC');
+            $select->limit(1);
+
+            $latestEntry = $tableGateway->selectWith($select)->current();
 
             if ($tableName == 'melis_cms_page_published') {
+                // NOT AI
+                $tableGateway = new TableGateway('melis_cms_page_saved', $adapter);
+                $primaryCol = $this->getTablePrimaryColumn('melis_cms_page_saved');
 
+                // select latest entry
+                $select = $tableGateway->getSql()->select();
+                $select->columns(['*']);
+                $select->order($primaryCol . ' DESC');
+                $select->limit(1);
+
+                $latestPageSavedEntry = $tableGateway->selectWith($select)->current();
+
+                if (! empty($latestEntry)) {
+                    $latestId = $latestEntry->page_id;
+                }
+
+                if (! empty($latestPageSavedEntry)) {
+                    if (isset ($latestId)) {
+                        if ($latestId < $latestPageSavedEntry->page_id) {
+                            $latestId = $latestPageSavedEntry->page_id;
+                        }
+                    } else {
+                        $latestId = $latestPageSavedEntry->page_id;
+                    }
+                }
+
+                $tableValue['page_id'] = $latestId + 1;
+                $pageId = $latestId + 1;
+
+                print_r($tableValue);
+                exit;
             } else if ($tableName == 'melis_cms_page_saved') {
+                // NOT AI
 
             } else if ($tableName == 'melis_cms_page_lang') {
 
             } else if ($tableName == 'melis_cms_page_seo') {
+                // NOT AI
 
             } else if ($tableName == 'melis_cms_page_style') {
 
             }
 
-            print_r($tableValue[$primaryCol]);
-            exit;
-
-            try {
-                $tableGateway->insert($tableValue);
-            } catch (\Exception $ex) {
-                print_r($ex->getMessage());
-                exit;
-            }
+//            try {
+//                $tableGateway->insert($tableValue);
+//            } catch (\Exception $ex) {
+//                print_r($ex->getMessage());
+//                exit;
+//            }
         }
 
         // save page tree
@@ -247,7 +311,9 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
 //            exit;
 //        }
 
-        $arrayParameters = $this->sendEvent('melis_cms_page_tree_import_import_page_end', $arrayParameters);
+//        $arrayParameters = $this->sendEvent('melis_cms_page_tree_import_import_page_end', $arrayParameters);
+        exit;
+        return '';
     }
 
     public function importPageResources()
