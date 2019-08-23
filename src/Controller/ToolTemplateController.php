@@ -349,15 +349,32 @@ class ToolTemplateController extends AbstractActionController
      */
     public function modalTabToolTemplateEditAction()
     {
-        // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        /**
+         * Template form creation
+         * @var Form $form
+         */
+        $melisConfig = $this->getServiceLocator()->get('MelisCoreConfig');
+        $factory = new Factory();
+        $formElementMgr = $this->getServiceLocator()->get('FormElementManager');
+        $factory->setFormElementManager($formElementMgr);
+        $formConfig = $melisConfig->getItem(self::TEMPLATE_FORM);
 
-        // tell the Tool what configuration in the app.tool.php that will be used.
-        $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_templates');
+        /**
+         * Trigger listeners trying to modify the form config before form creation
+         *  @var \Zend\EventManager\ResponseCollection $result
+         */
+        $result = $this->getEventManager()->trigger(self::TEMPLATE_FORM_CONFIG_MODIFY, $this, ['formConfig' => $formConfig]);
+        $formConfig = $result instanceof ResponseCollection && $result->count() > 0 ? $result->last() : $formConfig;
+
+        $form = $factory->createForm($formConfig);
+
+        if ($form->get('tpl_type') instanceof Select) {
+            /** Set default template type */
+            $form->get('tpl_type')->setValue('ZF2');
+        }
 
         $view = new ViewModel();
-
-        $view->setVariable('meliscms_tool_template_edit', $melisTool->getForm('meliscms_tool_template_generic_form'));
+        $view->setVariable('meliscms_tool_template_edit', $form);
 
         return $view;
     }
@@ -492,7 +509,7 @@ class ToolTemplateController extends AbstractActionController
                             $status = 1;
                         }
                     }
-                    elseif($data['tpl_type'] == 'ZF2') {
+                    elseif($data['tpl_type'] == 'ZF2' || $data['tpl_type'] == 'TWG') {
                         $tmpError = array();
 
                         $tplLayout = $data['tpl_zf2_layout'];
@@ -601,7 +618,7 @@ class ToolTemplateController extends AbstractActionController
 
             // insert labels and error messages in error array
             $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
-            $appConfigForm = $melisMelisCoreConfig->getItem('meliscms/tools/meliscms_tool_templates/forms/meliscms_tool_template_generic_form');
+            $appConfigForm = $melisMelisCoreConfig->getItem(self::TEMPLATE_FORM);
             $appConfigForm = $appConfigForm['elements'];
 
             foreach ($errors as $keyError => $valueError)
@@ -922,7 +939,7 @@ class ToolTemplateController extends AbstractActionController
                         $status = 1;
                     }
                 }
-                elseif($data['tpl_type'] == 'ZF2') {
+                elseif($data['tpl_type'] == 'ZF2' || $data['tpl_type'] == 'TWG') {
                     $tmpError = array();
 
                     $tplLayout = $data['tpl_zf2_layout'];
@@ -1013,7 +1030,7 @@ class ToolTemplateController extends AbstractActionController
 
             // insert labels and error messages in error array
             $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
-            $appConfigForm = $melisMelisCoreConfig->getItem('meliscms/tools/meliscms_tool_templates/forms/meliscms_tool_template_generic_form');
+            $appConfigForm = $melisMelisCoreConfig->getItem(self::TEMPLATE_FORM);
             $appConfigForm = $appConfigForm['elements'];
 
             foreach ($errors as $keyError => $valueError)
