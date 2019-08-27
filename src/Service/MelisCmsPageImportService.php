@@ -97,9 +97,6 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
             }
         }
 
-        print_r($fatherIdsMap);
-        exit;
-
         $arrayParameters = $this->sendEvent('melis_cms_page_tree_import_import_page_tree_end', $arrayParameters);
         // RETURN WILL BE ERRORS & STATUS
     }
@@ -109,7 +106,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
      * @param $xml
      * @return page id
      */
-    public function importPage($xmlString)
+    public function importPage($xmlString, $keepIds = null)
     {
         $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
         $arrayParameters = $this->sendEvent('melis_cms_page_tree_import_import_page_start', $arrayParameters);
@@ -152,7 +149,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         return !empty($pagePlatformIds->pids_page_id_current) ? $pagePlatformIds->pids_page_id_current : null;
     }
 
-    private function savePage($tablesArray, $fatherId)
+    private function savePage($tablesArray, $fatherId, $keepIds = null)
     {
         $pageId = null;
         $pageCurrentId = $this->getCurrentPageId();
@@ -161,49 +158,22 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
             'tree_father_page_id' => $fatherId
         );
 
-        foreach ($tablesArray as $tableName => &$tableValue) {
+        foreach ($tablesArray as $tableName => $tableValue) {
             if ($tableName === 'melis_cms_page_published') {
-                if ($pageCurrentId != $tableValue['page_id']) {
+                if ($pageCurrentId != $tablesArray[$tableName]['page_id']) {
                     $pageId = $pageCurrentId;
-                    $tableValue['page_id'] = $pageId;
+                    $tablesArray[$tableName]['page_id'] = $pageId;
                 }
-            } else if ($tableName === 'melis_cms_page_saved') {
-                if (!empty($pageId)) {
-                    $tableValue['page_id'] = $pageId;
-                }
-            } else if ($tableName === 'melis_cms_page_lang') {
-                if (!empty($pageId)) {
-                    unset($tableValue['plang_id']);
-                    $tableValue['plang_page_id'] = $pageId;
-                    $tableValue['plang_page_id_initial'] = $pageId;
-                }
-            } else if ($tableName === 'melis_cms_page_style') {
-                if (!empty($pageId)) {
-                    $tableValue['pstyle_page_id'] = $pageId;
-                }
-            } else if ($tableName === 'melis_cms_page_seo') {
-
             }
         }
 
-        if (!isset($tablesArray['melis_cms_page_saved'])) {
-            $tablesArray['melis_cms_page_saved'] = [];
+        if (!empty($pageId)) {
+            unset($tablesArray['melis_cms_page_lang']['plang_id']);
+            $tablesArray['melis_cms_page_lang']['plang_page_id'] = $pageId;
+            $tablesArray['melis_cms_page_lang']['plang_page_id_initial'] = $pageId;
         }
 
-        if (!isset($tablesArray['melis_cms_page_lang'])) {
-            $tablesArray['melis_cms_page_lang'] = [];
-        }
-
-        if (!isset($tablesArray['melis_cms_page_style'])) {
-            $tablesArray['melis_cms_page_style'] = [];
-        }
-
-        if (!isset($tablesArray['melis_cms_page_seo'])) {
-            $tablesArray['melis_cms_page_seo'] = [];
-        }
-
-        // clean
-
+        // clean empty values
         foreach ($tablesArray as $tableName => $tableValue) {
             foreach ($tableValue as $column => $value) {
                 if (empty($value)) {
@@ -215,12 +185,12 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         $pageSrv = $this->getServiceLocator()->get('MelisCmsPageService');
         $newPageId = $pageSrv->savePage(
             $pageTree,
-            $tablesArray['melis_cms_page_published'],
-            $tablesArray['melis_cms_page_saved'],
-            $tablesArray['melis_cms_page_seo'],
-            $tablesArray['melis_cms_page_lang'],
-            $tablesArray['melis_cms_page_style'],
-            null
+            $tablesArray['melis_cms_page_published'] ?? [],
+            $tablesArray['melis_cms_page_saved'] ?? [],
+            $tablesArray['melis_cms_page_seo'] ?? [],
+            $tablesArray['melis_cms_page_lang'] ?? [],
+            $tablesArray['melis_cms_page_style'] ?? [],
+            $pageId
         );
 
         return $newPageId;

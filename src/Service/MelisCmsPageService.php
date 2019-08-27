@@ -39,7 +39,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
                 
                 if (!empty($pageTreeData['tree_father_page_id']))
                 {
-                    $pageParentPages = $pageTreeTbl->getEntryByField('tree_father_page_id', $pageTreeData['tree_father_page_id'])->count();
+                    $pageParentPages = $pageTreeTbl->getEntryByField('tree_father_page_id', $pageTreeData['tree_father_page_id'])->count() + 1;
                     $pageTreeData['tree_page_order'] = ($pageParentPages) ? $pageParentPages : 1;
                 }
                 else 
@@ -181,7 +181,10 @@ class MelisCmsPageService extends MelisCoreGeneralService
         {
             $results = $pagePublishedTbl->save($pageData, $arrayParameters['pageId']);
         }
-        catch (\Exception $e){}
+        catch (\Exception $e){
+            print_r('1' . $e->getMessage());
+            exit;
+        }
         
         // Service implementation end
         
@@ -228,7 +231,10 @@ class MelisCmsPageService extends MelisCoreGeneralService
         {
             $results = $pageSavedTbl->save($pageData, $arrayParameters['pageId']);
         }
-        catch (\Exception $e){}
+        catch (\Exception $e){
+            print_r('2' .$e->getMessage());
+            exit;
+        }
         
         // Service implementation end
         
@@ -258,7 +264,10 @@ class MelisCmsPageService extends MelisCoreGeneralService
         {
             $results = $pageSeoTbl->save($arrayParameters['pageSeo'], $arrayParameters['pageSeoId']);
         }
-        catch (\Exception $e){}
+        catch (\Exception $e){
+            print_r('3' .$e->getMessage());
+            exit;
+        }
         
         // Service implementation end
         
@@ -288,7 +297,10 @@ class MelisCmsPageService extends MelisCoreGeneralService
         {
             $results = $pageLangTbl->savePageLang($arrayParameters['pageLang'], $arrayParameters['pageId']);
         }
-        catch(\Exception $e){}
+        catch(\Exception $e){
+            print_r('4' .$e->getMessage());
+            exit;
+        }
         
         // Service implementation end
         
@@ -318,7 +330,10 @@ class MelisCmsPageService extends MelisCoreGeneralService
         {
             $results = $pageStyleTbl->savePageStyle($arrayParameters['pageStyle'], $arrayParameters['pageId']);
         }
-        catch (\Exception $e){}
+        catch (\Exception $e){
+            print_r('5' .$e->getMessage());
+            exit;
+        }
         
         // Service implementation end
         
