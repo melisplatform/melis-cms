@@ -13,7 +13,6 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 use ZipArchive;
-use DOMDocument;
 
 class PageImportController extends AbstractActionController
 {
@@ -76,6 +75,8 @@ class PageImportController extends AbstractActionController
         $zip = $this->openZip($formData['page_tree_import']['tmp_name']);
     
         if (!empty($zip)) {
+            $zip->extractTo($_SERVER["DOCUMENT_ROOT"] . '/xml');
+            exit;
             $xml = $zip->getFromName('PageExport.xml');
             $zip->close();
             $res = $pageImportSvc->importTest($xml, $formData['keepIds']);
@@ -106,17 +107,26 @@ class PageImportController extends AbstractActionController
         $formData = json_decode($data['formData'], true);
         $pageId = $data['pageid'];
         $zip = $this->openZip($formData['page_tree_import']['tmp_name']);
+        $success = true;
 
         if (!empty($zip)) {
             $xml = $zip->getFromName('PageExport.xml');
             $zip->close();
 
-            $response = $pageImportSvc->importPageTree($pageId, $xml, $formData['keepIds']);
-        } else {
+            $res = $pageImportSvc->importPageTree($pageId, $xml, $formData['keepIds']);
 
+            if (!empty($res['errors'])) {
+                $errors = $res['errors'];
+            }
+        } else {
+            $errors[] = 'Unexpected error';
         }
 
-        exit;
+        return new JsonModel([
+            'success' => $success,
+            'errors' => !empty($errors) ? $errors : [],
+            'pagesCount' => $res['pagesCount'] ?? 0
+        ]);
     }
 
     /**

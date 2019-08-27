@@ -806,3 +806,8 @@ ul#select2-id_mcgdprbanner_site_id-results {
 .page-export-container{
 	margin-bottom:30px;
 }
+
+#page-import-checkbox-span {
+	position: absolute;
+	margin-top: -9px;
+}
