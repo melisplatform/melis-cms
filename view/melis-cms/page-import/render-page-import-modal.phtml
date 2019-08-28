@@ -54,6 +54,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                                 <div>
                                     <p><?= $this->translate('tr_melis_cms_tree_import_import_not_admin1') ?></p>
                                     <p><?= $this->translate('tr_melis_cms_tree_import_import_not_admin2') ?></p>
+                                    </br>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -63,8 +64,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                             <button type="button" data-dismiss="modal" class="btn btn-danger pull-left"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
                             <button type="button" class="btn btn-success" id="page-tree-import-test">Test File</button>
                         <?php else : ?>
-                            <button type="button" data-dismiss="modal" class="btn btn-danger pull-left"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
-                            <button type="button" class="btn btn-success" disabled="disabled">Import File</button>
+                            <button type="button" data-dismiss="modal" class="btn btn-danger pull-left" style="margin-top: -20px;"><?php echo $this->translate('tr_melis_cms_page_tree_import_close')?></button>
                         <?php endif; ?>
                     </div>
                 </div>
