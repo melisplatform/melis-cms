@@ -112,16 +112,16 @@ $(document).ready(function(){
             data: {formData: JSON.stringify(formData)},
             beforeSend: function () {
                 $body.find('#pageImportConsole').css('display', '');
-                $body.find('#pageImportConsole').append('<p>Name of file: ' + formData.page_tree_import.name + '</p>');
-                $body.find('#pageImportConsole').append('<p>Validated: <span style="color: red;">No</span></p>');
+                $body.find('#pageImportConsole').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + formData.page_tree_import.name + '</p>');
+                $body.find('#pageImportConsole').append('<p>' + translations.tr_melis_cms_page_tree_import_validated + ': <span style="color: red;">No</span></p>');
                 $body.find('#pageImportConsole').append('<div id="pageImportProcessing"><p>Processing file <i class="fa fa-spinner fa-spin"></i></p></div>');
             }
         }).success(function (data) {
             if (data.success) {
                 $body.find('#importPageForm').css('display', 'none');
                 $body.find('#importPageValidated').css('display', '');
-                $body.find('#importPageValidated .tab-content .tab-pane').append('<p>File name: ' + formData.page_tree_import.name + '</p>');
-                $body.find('#importPageValidated .tab-content .tab-pane').append('<p>Validated: <span style="color: green;">Yes</span></p>');
+                $body.find('#importPageValidated .tab-content .tab-pane').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + formData.page_tree_import.name + '</p>');
+                $body.find('#importPageValidated .tab-content .tab-pane').append('<p>' + translations.tr_melis_cms_page_tree_import_validated +': <span style="color: green;">Yes</span></p>');
 
                 var btnCancel = '<button type="button" data-dismiss="modal" class="btn btn-danger pull-left">' + translations.tr_meliscms_tool_sites_cancel + '</button>';
                 var btnImport = '<button type="button" class="btn btn-success" id="page-tree-import">Import File</button>';
@@ -159,37 +159,33 @@ $(document).ready(function(){
                     },
                     beforeSend: function () {
                         $body.find('#pageImportConsole').css('display', '');
-                        $body.find('#pageImportConsole').append('<p>Name of file: ' + importFormData.page_tree_import.name + '</p>');
-                        $body.find('#pageImportConsole').append('<p>Validated: <span style="color: red;">No</span></p>');
+                        $body.find('#pageImportConsole').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + importFormData.page_tree_import.name + '</p>');
+                        $body.find('#pageImportConsole').append('<p>' + translations.tr_melis_cms_page_tree_import_validated + ': <span style="color: red;">No</span></p>');
                         $body.find('#pageImportConsole').append('<div id="pageImportProcessing"><p>Processing file <i class="fa fa-spinner fa-spin"></i></p></div>');
                     }
                 }).success(function (data) {
-                    var btnClose = '<button type="button" data-dismiss="modal" class="btn btn-danger pull-right">' + translations.tr_meliscms_tool_sites_cancel + '</button>';
-                    var btnDummy = '<button type="button" class="btn btn-success" id="" style="display: none;"></button>';
+                    var btnClose = '<button type="button" data-dismiss="modal" class="btn btn-danger pull-left">' + translations.tr_melis_cms_page_tree_import_close + '</button>';
 
                     $body.find('#importPageValidated').css('display', 'none');
                     $body.find('#importPageDone').css('display', '');
 
                     if (data.success) {
-                        $body.find('#importPageDone .tab-content .tab-pane').append('<p>File name: ' + importFormData.page_tree_import.name + '</p>');
-                        $body.find('#importPageDone .tab-content .tab-pane').append('<p>Result: <span style="color: green;">Success</span></p>');
+                        $body.find('#importPageDone .tab-content .tab-pane').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + importFormData.page_tree_import.name + '</p>');
+                        $body.find('#importPageDone .tab-content .tab-pane').append('<p>' + translations.tr_melis_cms_page_tree_import_result + ': <span style="color: green;">Success</span></p>');
                         $body.find('#importPageDone .tab-content .tab-pane').append('</br>');
                         $body.find('#importPageDone .tab-content .tab-pane').append('Import has been done successfully. ' + data.pagesCount + ' pages have been inserted and can be edited right now.');
 
                         $body.find('#importPageDone .btn-container').append(btnClose);
-                        $body.find('#importPageDone .btn-container').append(btnDummy);
-
 
                         $("#id-mod-menu-dynatree").fancytree("destroy");
                         mainTree();
                     } else {
-                        $body.find('#importPageDone .tab-content .tab-pane').append('<p>File name: ' + importFormData.page_tree_import.name + '</p>');
-                        $body.find('#importPageDone .tab-content .tab-pane').append('<p>Result: <span style="color: red;">Failed</span></p>');
+                        $body.find('#importPageDone .tab-content .tab-pane').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + importFormData.page_tree_import.name + '</p>');
+                        $body.find('#importPageDone .tab-content .tab-pane').append('<p>' + translations.tr_melis_cms_page_tree_import_result + ': <span style="color: red;">Failed</span></p>');
                         $body.find('#importPageDone .tab-content .tab-pane').append('</br>');
                         $body.find('#importPageDone .tab-content .tab-pane').append('Import failed');
 
                         $body.find('#importPageDone .btn-container').append(btnClose);
-                        $body.find('#importPageDone .btn-container').append(btnDummy);
                     }
                 }). error(function() {
 
