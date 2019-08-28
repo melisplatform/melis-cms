@@ -86,11 +86,11 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
             $fatherIdsMap[$fatherId] = $fatherId;
         }
 
-//        $db = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');//get db adapter
-//        $con = $db->getDriver()->getConnection();//get db driver connection
-//        $con->beginTransaction();//begin transaction
+        $db = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');//get db adapter
+        $con = $db->getDriver()->getConnection();//get db driver connection
+        $con->beginTransaction();//begin transaction
 
-//        try {
+        try {
             foreach ($pages as &$page) {
                 $id = (string)$page->tables->melis_cms_page_published->page_id ?? (string)$page->tables->melis_cms_page_saved->page_id;
                 $page->fatherId = $fatherIdsMap[(string)$page->fatherId];
@@ -103,13 +103,14 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                 if (empty($pageId)) {
                     $success = false;
                 }
-
             }
-//        } catch (\Exception $ex) {
-//            $success = false;
-//            $errors[] = $ex->getMessage();
-//            $con->rollback();
-//        }
+
+            $con->commit();
+        } catch (\Exception $ex) {
+            $success = false;
+            $errors[] = $ex->getMessage();
+            $con->rollback();
+        }
 
         $arrayParameters['result'] = [
             'success' => $success,
