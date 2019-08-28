@@ -812,6 +812,7 @@ var melisPluginEdition = (function($, window) {
     $(window).load(function() {
         calcFrameHeight();
     });
+    
     return {
         submitPluginForms       :       submitPluginForms,
         pluginRenderer          :       pluginRenderer,
