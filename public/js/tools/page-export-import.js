@@ -63,6 +63,7 @@ $(document).ready(function(){
      * Test File
      */
     $body.on('click', '#page-tree-import-test', function () {
+        melisCoreTool.pending('#page-tree-import-test');
         submitImportForm($('#id_meliscms_tree_sites_import_page_form'));
     });
 
@@ -136,8 +137,9 @@ $(document).ready(function(){
                     $body.find('#pageImportConsole').append('<p style="color: red;"> - ' + error + '</p>');
                 });
             }
+            melisCoreTool.done('#page-tree-import-test');
         }).error(function (data) {
-
+            melisCoreTool.done('#page-tree-import-test');
         });
     }
 
@@ -150,6 +152,7 @@ $(document).ready(function(){
             'Are you sure to import?',
             'It is always a good idea to make a back-up of the database before doing such actions.',
             function () {
+                melisCoreTool.pending('#page-tree-import');
                 $.ajax({
                     type: 'POST',
                     url: '/melis/MelisCms/PageImport/importPage',
@@ -164,7 +167,7 @@ $(document).ready(function(){
                         $body.find('#pageImportConsole').append('<div id="pageImportProcessing"><p>Processing file <i class="fa fa-spinner fa-spin"></i></p></div>');
                     }
                 }).success(function (data) {
-                    var btnClose = '<button type="button" data-dismiss="modal" class="btn btn-danger pull-left">' + translations.tr_melis_cms_page_tree_import_close + '</button>';
+                    var btnClose = '<button type="button" data-dismiss="modal" class="btn btn-danger pull-left" style="margin-top: -15px; margin-left: -15px;">' + translations.tr_melis_cms_page_tree_import_close + '</button>';
 
                     $body.find('#importPageValidated').css('display', 'none');
                     $body.find('#importPageDone').css('display', '');
@@ -187,8 +190,9 @@ $(document).ready(function(){
 
                         $body.find('#importPageDone .btn-container').append(btnClose);
                     }
+                    melisCoreTool.done('#page-tree-import');
                 }). error(function() {
-
+                    melisCoreTool.done('#page-tree-import');
                 });
             }
         );
