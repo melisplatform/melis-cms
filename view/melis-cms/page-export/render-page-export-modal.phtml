@@ -26,6 +26,15 @@ if (!empty($this->zoneconfig['conf']['id']))
                                         <?php
                                         $form = $this->exportForm;
                                         $form->prepare();
+
+                                        foreach ($form->getElements() as $element => $attributes) {
+                                            $el = $form->get((string) $element);
+
+                                            if ($el->getName() == 'page_export_type') {
+                                                $el->setValue('1');
+                                            }
+                                        }
+
                                         echo $this->form()->openTag($form);
                                         echo $this->melisFieldCollection($form);
                                         echo $this->form()->closeTag();
