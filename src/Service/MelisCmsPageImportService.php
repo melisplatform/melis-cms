@@ -517,11 +517,11 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         libxml_use_internal_errors(true);
 
         $xml = simplexml_load_string($xmlString);
-        if ($xml) {
+        if ($xml !== FALSE) {
             $json = json_encode($xml);
             return json_decode($json, TRUE);
         } else {
-            $errors = 'Invalid XML file';
+            $errors[] = 'Invalid XML structure';
             return false;
         }
     }
