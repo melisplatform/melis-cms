@@ -86,11 +86,11 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
             $fatherIdsMap[$fatherId] = $fatherId;
         }
 
-        $db = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');//get db adapter
-        $con = $db->getDriver()->getConnection();//get db driver connection
-        $con->beginTransaction();//begin transaction
+//        $db = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');//get db adapter
+//        $con = $db->getDriver()->getConnection();//get db driver connection
+//        $con->beginTransaction();//begin transaction
 
-        try {
+//        try {
             foreach ($pages as &$page) {
                 $id = (string)$page->tables->melis_cms_page_published->page_id ?? (string)$page->tables->melis_cms_page_saved->page_id;
                 $page->fatherId = $fatherIdsMap[(string)$page->fatherId];
@@ -105,11 +105,11 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                 }
 
             }
-        } catch (\Exception $ex) {
-            $success = false;
-            $errors[] = $ex->getMessage();
-            $con->rollback();
-        }
+//        } catch (\Exception $ex) {
+//            $success = false;
+//            $errors[] = $ex->getMessage();
+//            $con->rollback();
+//        }
 
         $arrayParameters['result'] = [
             'success' => $success,
@@ -162,12 +162,17 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
 
     private function savePage($tablesArray, $fatherId, $keepIds = null)
     {
+        $pageTreeTbl = $this->getServiceLocator()->get('MelisEngineTablePageTree');
         $pageTree = array(
             'tree_father_page_id' => $fatherId
         );
 
         if ($keepIds) {
-            $pageTreeTbl = $this->getServiceLocator()->get('MelisEngineTablePageTree');
+            $corePlatformTbl = $this->getServiceLocator()->get('MelisCoreTablePlatform');
+            $corePlatform = $corePlatformTbl->getEntryByField('plf_name', getenv('MELIS_PLATFORM'))->current();
+            $corePlatformId = $corePlatform->plf_id;
+            $cmsPlatformIdsTbl = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+
             $pageId = $tablesArray['melis_cms_page_published']['page_id'] ?? $tablesArray['melis_cms_page_saved']['page_id'];
 
             if ($fatherId != -1)
@@ -192,6 +197,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
 
             $pageSrv = $this->getServiceLocator()->get('MelisCmsPageService');
             $pageTreeTbl->save($pageTree);
+            $cmsPlatformIdsTbl->save(array('pids_page_id_current' => ++$pageId), $corePlatformId);
 
             if (!empty($tablesArray['melis_cms_page_published']))
                 $pageSrv->savePagePublished($tablesArray['melis_cms_page_published']);
@@ -208,29 +214,40 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
             if (!empty($tablesArray['melis_cms_page_style']))
                 $pageSrv->savePageStyle($tablesArray['melis_cms_page_style']);
 
-
-//            $newPageId = $pageSrv->savePage(
-//                $pageTree,
-//                $tablesArray['melis_cms_page_published'] ?? [],
-//                $tablesArray['melis_cms_page_saved'] ?? [],
-//                $tablesArray['melis_cms_page_seo'] ?? [],
-//                $tablesArray['melis_cms_page_lang'] ?? [],
-//                $tablesArray['melis_cms_page_style'] ?? [],
-//                $pageId
-//            );
-
             return $pageId;
         } else {
-            $pageId = null;
-            $pageCurrentId = $this->getCurrentPageId();
 
-            foreach ($tablesArray as $tableName => $tableValue) {
-                if ($tableName === 'melis_cms_page_published') {
-                    if ($pageCurrentId != $tablesArray[$tableName]['page_id']) {
-                        $pageId = $pageCurrentId;
-                        $tablesArray[$tableName]['page_id'] = $pageId;
-                    }
-                }
+            $corePlatformTbl = $this->getServiceLocator()->get('MelisCoreTablePlatform');
+            $corePlatform = $corePlatformTbl->getEntryByField('plf_name', getenv('MELIS_PLATFORM'))->current();
+            $corePlatformId = $corePlatform->plf_id;
+
+            $cmsPlatformIdsTbl = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+            $pagePlatformIds = $cmsPlatformIdsTbl->getEntryById($corePlatformId)->current();
+            $pageCurrentId = $pagePlatformIds->pids_page_id_current;
+
+            $pageId = $pageCurrentId;
+
+//            if ($fatherId != -1)
+//            {
+//                $pageParentPages = $pageTreeTbl->getEntryByField('tree_father_page_id', $pageTree['tree_father_page_id'])->count() + 1;
+//                $pageTree['tree_page_order'] = ($pageParentPages) ? $pageParentPages : 1;
+//            } else {
+//                $pageTree['tree_father_page_id'] = -1;
+//                $pageTree['tree_page_order'] = 1;
+//            }
+//
+//            $pageTree['tree_page_id'] = $pageId;
+
+            if (!empty ($tablesArray['melis_cms_page_published'])) {
+                $tablesArray['melis_cms_page_published']['page_id'] = $pageId;
+            }
+
+            if (!empty ($tablesArray['melis_cms_page_saved'])) {
+                $tablesArray['melis_cms_page_saved']['page_id'] = $pageId;
+            }
+
+            if (!empty ($tablesArray['melis_cms_page_seo'])) {
+                $tablesArray['melis_cms_page_seo']['pseo_id'] = $pageId;
             }
 
             if (!empty($pageId)) {
@@ -248,8 +265,11 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                 }
             }
 
+//            $pageTreeTbl->save($pageTree);
+//            $cmsPlatformIdsTbl->save(array('pids_page_id_current' => ++$pageCurrentId), $corePlatformId);
+
             $pageSrv = $this->getServiceLocator()->get('MelisCmsPageService');
-            $newPageId = $pageSrv->savePage(
+            $pageSrv->savePage(
                 $pageTree,
                 $tablesArray['melis_cms_page_published'] ?? [],
                 $tablesArray['melis_cms_page_saved'] ?? [],
@@ -258,8 +278,22 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                 $tablesArray['melis_cms_page_style'] ?? [],
                 null
             );
+//            if (!empty($tablesArray['melis_cms_page_published']))
+//                $pageSrv->savePagePublished($tablesArray['melis_cms_page_published']);
+//
+//            if (!empty($tablesArray['melis_cms_page_saved']))
+//                $pageSrv->savePageSaved($tablesArray['melis_cms_page_saved']);
+//
+//            if (!empty($tablesArray['melis_cms_page_seo']))
+//                $pageSrv->savePageSeo($tablesArray['melis_cms_page_seo']);
+//
+//            if (!empty($tablesArray['melis_cms_page_lang']))
+//                $pageSrv->savePageLang($tablesArray['melis_cms_page_lang']);
+//
+//            if (!empty($tablesArray['melis_cms_page_style']))
+//                $pageSrv->savePageStyle($tablesArray['melis_cms_page_style']);
 
-            return $newPageId;
+            return $pageId;
         }
     }
 
@@ -520,9 +554,15 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         $xmlArray['fatherId'] = !empty($fatherId) ? $fatherId : -1;
         $pages[] = $xmlArray;
 
-        $pageId = !empty($xmlArray['tables']['melis_cms_page_published']['page_id'])
-            ? $xmlArray['tables']['melis_cms_page_published']['page_id']
-            : $xmlArray['tables']['melis_cms_page_saved']['page_id'];
+        if (!empty ($xmlArray['tables'])) {
+            $pageId = !empty($xmlArray['tables']['melis_cms_page_published']['page_id'])
+                ? $xmlArray['tables']['melis_cms_page_published']['page_id']
+                : $xmlArray['tables']['melis_cms_page_saved']['page_id'];
+        } else {
+            $pageId = !empty($xmlArray['melis_cms_page_published']['page_id'])
+                ? $xmlArray['melis_cms_page_published']['page_id']
+                : $xmlArray['melis_cms_page_saved']['page_id'];
+        }
 
         if (!empty($children)) {
             foreach ($children as $key => $child) {
@@ -553,9 +593,16 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
 
         $xmlArray->fatherId = !empty($fatherId) ? $fatherId : -1;
         $pages[] = $xmlArray;
-        $pageId = !empty($xmlArray->tables->melis_cms_page_published->page_id)
-            ? $xmlArray->tables->melis_cms_page_published->page_id
-            : $xmlArray->tables->melis_cms_page_saved->page_id;
+
+        if (!empty ($xmlArray->tables)) {
+            $pageId = !empty($xmlArray->tables->melis_cms_page_published->page_id)
+                ? $xmlArray->tables->melis_cms_page_published->page_id
+                : $xmlArray->tables->melis_cms_page_saved->page_id;
+        } else {
+            $pageId = !empty($xmlArray->melis_cms_page_published->page_id)
+                ? $xmlArray->melis_cms_page_published->page_id
+                : $xmlArray->melis_cms_page_saved->page_id;
+        }
 
         if (!empty($children)) {
             foreach ($children as $key => $child) {

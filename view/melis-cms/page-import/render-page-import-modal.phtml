@@ -37,7 +37,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                                                 </span>
                                                 <input type="checkbox" name="keepIds" value="1" checked>
                                             </label>
-                                            <span id="page-import-checkbox-span">Keep primary ids as exported</span>
+                                            <span id="page-import-checkbox-span"><?= $this->translate('tr_melis_cms_page_tree_import_keep_ids') ?></span>
                                         </div>
                                     </div>
                                     <!-- End Checkbox -->
@@ -52,8 +52,8 @@ if (!empty($this->zoneconfig['conf']['id']))
                                 </div>
                             <?php else : ?>
                                 <div>
-                                    <h4>Your account doesn't entitle you to make imports on this platform.</h4>
-                                    <h4>Please contact the administrator instead.</h4>
+                                    <h4><?= $this->translate('tr_melis_cms_tree_import_import_not_admin1') ?></h4>
+                                    <h4><?= $this->translate('tr_melis_cms_tree_import_import_not_admin2') ?></h4>
                                 </div>
                             <?php endif; ?>
                         </div>

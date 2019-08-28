@@ -75,8 +75,6 @@ class PageImportController extends AbstractActionController
         $zip = $this->openZip($formData['page_tree_import']['tmp_name']);
     
         if (!empty($zip)) {
-            $zip->extractTo($_SERVER["DOCUMENT_ROOT"] . '/xml');
-            exit;
             $xml = $zip->getFromName('PageExport.xml');
             $zip->close();
             $res = $pageImportSvc->importTest($xml, $formData['keepIds']);
@@ -98,7 +96,8 @@ class PageImportController extends AbstractActionController
     }
 
     /**
-     *
+     * Imports the tree
+     * @return JsonModel
      */
     public function importPageAction()
     {
@@ -111,12 +110,18 @@ class PageImportController extends AbstractActionController
 
         if (!empty($zip)) {
             $xml = $zip->getFromName('PageExport.xml');
-            $zip->close();
-
             $res = $pageImportSvc->importPageTree($pageId, $xml, $formData['keepIds']);
 
             if (!empty($res['errors'])) {
+                $success = $res['success'];
                 $errors = $res['errors'];
+            } else {
+                $zip->extractTo($_SERVER["DOCUMENT_ROOT"] . '/xml');
+                $zip->close();
+                if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/xml/media')) {
+                    $this->recurse_copy($_SERVER['DOCUMENT_ROOT'] . '/xml/media', $_SERVER['DOCUMENT_ROOT'] . '/media');
+                    $this->deleteDirectory($_SERVER['DOCUMENT_ROOT'] . '/xml');
+                }
             }
         } else {
             $errors[] = 'Unexpected error';
@@ -228,5 +233,53 @@ class PageImportController extends AbstractActionController
     {
         $zip = new ZipArchive;
         return $zip->open($path) ? $zip : null;
+    }
+
+    public function recurse_copy($src,$dst) {
+        $dir = opendir($src);
+
+        if (!file_exists($dst))
+            mkdir($dst);
+
+        while(false !== ( $file = readdir($dir)) ) {
+            if (( $file != '.' ) && ( $file != '..' )) {
+                if ( is_dir($src . '/' . $file) ) {
+                    $this->recurse_copy($src . '/' . $file,$dst . '/' . $file);
+                }
+                else {
+                    copy($src . '/' . $file,$dst . '/' . $file);
+                }
+            }
+        }
+        closedir($dir);
+    }
+
+    /**
+     * Function to delete directory/file
+     *
+     * @param $dir
+     * @return bool
+     */
+    public function deleteDirectory($dir) {
+        if (!file_exists($dir)) {
+            return true;
+        }
+
+        if (!is_dir($dir)) {
+            return unlink($dir);
+        }
+
+        foreach (scandir($dir) as $item) {
+            if ($item == '.' || $item == '..') {
+                continue;
+            }
+
+            if (!$this->deleteDirectory($dir . DIRECTORY_SEPARATOR . $item)) {
+                return false;
+            }
+
+        }
+
+        return rmdir($dir);
     }
 }
