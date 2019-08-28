@@ -664,7 +664,18 @@
         'tr_melis_cms_tree_export_no_rights' => 'Votre compte ne vous permet pas de faire des exports sur cette plateforme.<br/>Merci de contacter votre administrateur.',
         'tr_melis_cms_tree_export_in_progress' => 'Page exporting in progress',
 
+        'tr_melis_cms_tree_import_import_not_admin1' => 'Vous ne disposez pas des droits pour effectuer des exports.',
+        'tr_melis_cms_tree_import_import_not_admin2' => 'Veuillez contacter votre administrateur.',
+
         'tr_melis_cms_page_tree_import' => 'Importer des pages',
         'tr_melis_cms_page_tree_import_wrong_extension' => '(french) File has an incorrect extension',
+        'tr_melis_cms_page_tree_import_keep_ids' => 'Keep the primary ids as exported',
+        'tr_melis_cms_page_tree_import_zip_file' => 'Fichier zip',
+        'tr_melis_cms_page_tree_import_name_of_file' => 'Nom du fichier',
+        'tr_melis_cms_page_tree_import_validated' => 'Validé',
+        'tr_melis_cms_page_tree_import_continue_and_import' => 'Continuer et importer',
+        'tr_melis_cms_page_tree_import_file' => 'Importer le fichier',
+        'tr_melis_cms_page_tree_import_result' => 'Resultat',
+
     );
 ?>

@@ -661,10 +661,25 @@
         'tr_melis_cms_tree_export_page_resources' => 'Export resources used by the pages (images, ...)',
         'tr_melis_cms_tree_export_no_rights' => 'Your account doesn’t entitle you to make exports on this platform.<br/>Please contact on administrator.',
         'tr_melis_cms_tree_export_in_progress' => 'Page exporting in progress',
+        'tr_melis_cms_tree_export_failed' => 'Problem occurred while exporting the page',
+        'tr_melis_cms_tree_export_success' => 'Page successfully exported',
+
+        'tr_melis_cms_tree_import_import_not_admin1' => 'Your account doesn\'t entitle you to make exports on this platform.',
+        'tr_melis_cms_tree_import_import_not_admin2' => 'Please contact the administrator.',
 
         'tr_melis_cms_page_tree_import' => 'Import pages',
         'tr_melis_cms_page_tree_import_wrong_extension' => 'File has an incorrect extension',
-        'tr_melis_cms_tree_export_failed' => 'Problem occurred while exporting the page',
-        'tr_melis_cms_tree_export_success' => 'Page successfully exported',
+        'tr_melis_cms_page_tree_import_keep_ids' => 'Keep the primary ids as exported',
+        'tr_melis_cms_page_tree_import_zip_file' => 'Zip file',
+        'tr_melis_cms_page_tree_import_name_of_file' => 'File Name',
+        'tr_melis_cms_page_tree_import_validated' => 'Validated',
+        'tr_melis_cms_page_tree_import_continue_and_import' => 'Continue & Import',
+        'tr_melis_cms_page_tree_import_file' => 'Import File',
+        'tr_melis_cms_page_tree_import_result' => 'Result',
+        'tr_melis_cms_page_tree_import_table_does_not_exist' => '%s does not exist on your database.',
+        'tr_melis_cms_page_tree_import_column_does_not_exist' => '%s does not exist on table %s.',
+        'tr_melis_cms_page_tree_import_primary_already_used' => 'Primary ID %u from table %s is already used',
+
+        'tr_melis_cms_page_tree_import_close' => 'Close',
     );
 ?>
