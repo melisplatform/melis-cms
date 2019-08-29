@@ -96,8 +96,10 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                 $page->fatherId = $fatherIdsMap[(string)$page->fatherId];
                 $pageId = $this->importPage($page->asXml(), $keepIds);
 
-                if (array_key_exists($id, $fatherIdsMap)) {
-                    $fatherIdsMap[$id] = $pageId;
+                if (!$keepIds) {
+                    if (array_key_exists($id, $fatherIdsMap)) {
+                        $fatherIdsMap[$id] = $pageId;
+                    }
                 }
 
                 if (empty($pageId)) {
