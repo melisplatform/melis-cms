@@ -142,19 +142,19 @@ class PageExportController extends AbstractActionController
                                 return $response;
                             }else{
                                 //problem on deleting the temporary folder
-                                print_r('1');
+
                             }
                         }else{
                             //cannot convert the folder to zip
-                            print_r('2');
+
                         }
                     }else{
                         //temporary folder is not writable
-                        print_r('3');
+
                     }
                 }else{
                     //failed exporting page
-                    print_r('4');
+
                 }
             }
         }
