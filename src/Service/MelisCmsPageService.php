@@ -144,7 +144,13 @@ class MelisCmsPageService extends MelisCoreGeneralService
         
         return $arrayParameters['results'];
     }
-    
+
+    /**
+     * @param $page
+     * @param null $pageId
+     * @return mixed
+     * @throws \Exception
+     */
     public function savePagePublished($page, $pageId = null)
     {
         $results = null;
@@ -176,12 +182,13 @@ class MelisCmsPageService extends MelisCoreGeneralService
         $userId = !empty($userAuthDatas) ? (int) $userAuthDatas->usr_id : null;
         
         $pageData['page_last_user_id'] = $userId;
-        
-        try 
+
+        try
         {
             $results = $pagePublishedTbl->save($pageData, $arrayParameters['pageId']);
         }
         catch (\Exception $e){
+            throw new \Exception('[page published] ' . $e->getMessage());
         }
         
         // Service implementation end
@@ -193,7 +200,13 @@ class MelisCmsPageService extends MelisCoreGeneralService
         
         return $arrayParameters['results'];
     }
-    
+
+    /**
+     * @param $page
+     * @param null $pageId
+     * @return mixed
+     * @throws \Exception
+     */
     public function savePageSaved($page, $pageId = null)
     {
         $results = null;
@@ -230,6 +243,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
             $results = $pageSavedTbl->save($pageData, $arrayParameters['pageId']);
         }
         catch (\Exception $e){
+            throw new \Exception('[page saved] ' . $e->getMessage());
         }
         
         // Service implementation end
@@ -241,7 +255,13 @@ class MelisCmsPageService extends MelisCoreGeneralService
         
         return $arrayParameters['results'];
     }
-    
+
+    /**
+     * @param $pageSeo
+     * @param null $pageSeoId
+     * @return mixed
+     * @throws \Exception
+     */
     public function savePageSeo($pageSeo, $pageSeoId = null)
     {
         $results = null;
@@ -261,6 +281,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
             $results = $pageSeoTbl->save($arrayParameters['pageSeo'], $arrayParameters['pageSeoId']);
         }
         catch (\Exception $e){
+            throw new \Exception('[page seo] ' . $e->getMessage());
         }
         
         // Service implementation end
@@ -272,7 +293,13 @@ class MelisCmsPageService extends MelisCoreGeneralService
         
         return $arrayParameters['results'];
     }
-    
+
+    /**
+     * @param $pageLang
+     * @param null $pageId
+     * @return mixed
+     * @throws \Exception
+     */
     public function savePageLang($pageLang, $pageId = null)
     {
         $results = null;
@@ -292,6 +319,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
             $results = $pageLangTbl->savePageLang($arrayParameters['pageLang'], $arrayParameters['pageId']);
         }
         catch(\Exception $e){
+            throw new \Exception('[page lang] ' . $e->getMessage());
         }
         
         // Service implementation end
@@ -303,7 +331,13 @@ class MelisCmsPageService extends MelisCoreGeneralService
         
         return $arrayParameters['results'];
     }
-    
+
+    /**
+     * @param $pageStyle
+     * @param null $pageId
+     * @return mixed
+     * @throws \Exception
+     */
     public function savePageStyle($pageStyle, $pageId = null)
     {
         $results = null;
@@ -323,6 +357,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
             $results = $pageStyleTbl->savePageStyle($arrayParameters['pageStyle'], $arrayParameters['pageId']);
         }
         catch (\Exception $e){
+            throw new \Exception('[page lang] ' . $e->getMessage());
         }
         
         // Service implementation end
