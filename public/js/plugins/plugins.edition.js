@@ -16,13 +16,15 @@ var melisPluginEdition = (function($, window) {
     $("body").on("click", ".m-trash-handle", removePlugins);
 
     // Checking parent body events handler to avoid multiple events of the button
-    $.each($body.data("events").click, function(i, val){
-        try {
-            if (val.selector == "#pluginModalBtnApply") {
-                $body.off("click", "#pluginModalBtnApply");
-            }
-        } catch(error) {}
-    });
+    if ( typeof $body.data("events") !== "undefined" ) {
+        $.each( $body.data("events").click, function(i, val){
+            try {
+                if (val.selector == "#pluginModalBtnApply") {
+                    $body.off("click", "#pluginModalBtnApply");
+                }
+            } catch(error) {}
+        });
+    }
 
     $body.on("click", "button[id='pluginModalBtnApply'][data-page-id='"+melisActivePageId+"']", submitPluginForms); // $body because it is modal and it's located in parent
 
@@ -546,13 +548,15 @@ var melisPluginEdition = (function($, window) {
         // recalculate frame height
         var frameHeight = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe").contents().find("body").height();
         var frame = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe");
+            frame.height(frameHeight);
+
             /*
              * Added iframe.length for fixing issue: Uncaught TypeError: Cannot read property 'calcFrameHeight' of undefined
              * Added by: Junry 22/05/2019
              */
-            if ( frame.length ) {
+            /* if ( frame.length ) {
                 frame.height(frameHeight);
-            }
+            } */
     }
 
     function disableLinks(e) {
@@ -809,7 +813,7 @@ var melisPluginEdition = (function($, window) {
     moveResponsiveClass();
     pluginDetector();
 
-    $(window).load(function() {
+    $(window).on("load", function() {
         calcFrameHeight();
     });
     

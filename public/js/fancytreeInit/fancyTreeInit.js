@@ -88,32 +88,34 @@
 															translations.tr_meliscms_delete_confirmation,
 															translations.tr_meliscms_delete_confirmation_msg,
 															function() {
-																	// reload and expand the treeview
-																	melisCms.refreshTreeview(parentNode, 1);
+																// reload and expand the treeview
+																melisCms.refreshTreeview(parentNode, 1);
 
-																	// check if node has children if TRUE then cannot be deleted
-																	$.ajax({
-																			url: '/melis/MelisCms/Page/deletePage?idPage=' + idPage,
-																			encode: true
-																	}).success(function(data) {
-																			if (data.success === 1) {
-																					//close the page if its open. do nothing if its not open
-																					if (openedOrNot.length === 1) {
-																							melisHelper.tabClose(zoneId);
-																					}
+																// check if node has children if TRUE then cannot be deleted
+																$.ajax({
+																	url: '/melis/MelisCms/Page/deletePage?idPage=' + idPage,
+																	encode: true,
+																	success: function(data) {
+																		if (data.success === 1) {
+																				//close the page if its open. do nothing if its not open
+																				if (openedOrNot.length === 1) {
+																						melisHelper.tabClose(zoneId);
+																				}
 
-																					// notify deleted page
-																					melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
+																				// notify deleted page
+																				melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
 
-																					// update flash messenger values
-																					melisCore.flashMessenger();
+																				// update flash messenger values
+																				melisCore.flashMessenger();
 
-																			} else {
-																					melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, '#000');
-																			}
-																	}).error(function(xhr, textStatus, errorThrown) {
-																			alert(translations.tr_meliscore_error_message);
-																	});
+																		} else {
+																				melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, '#000');
+																		}
+																	},
+																	error: function(xhr, textStatus, errorThrown) {
+																		alert(translations.tr_meliscore_error_message);
+																	}
+																});
 															});
 											}
 											if (action === 'dupe') {
@@ -357,11 +359,12 @@
 													};
 
 													$.ajax({
-															url: '/melis/MelisCms/Page/movePage',
-															data: datastring,
-															encode: true
-													}).success(function(data) {}).error(function(xhr, textStatus, errorThrown) {
+														url: '/melis/MelisCms/Page/movePage',
+														data: datastring,
+														encode: true,
+														error: function(xhr, textStatus, errorThrown) {
 															alert(translations.tr_meliscore_error_message);
+														}
 													});
 											});
 											// end
@@ -426,28 +429,27 @@
 			$("#duplicatePageTree").find('i').removeClass();
 			$("#duplicatePageTree").find('i').addClass('fa fa-spinner fa-spin');
 			$.ajax({
-					type: 'POST',
-					url: '/melis/MelisCms/TreeSites/duplicateTreePage',
-					data: dataString,
-					dataType: 'json',
-					encode: true
+				type: 'POST',
+				url: '/melis/MelisCms/TreeSites/duplicateTreePage',
+				data: dataString,
+				dataType: 'json',
+				encode: true
 			}).done(function(data) {
-
-					if (data.success) {
-							$('#id_meliscms_tools_tree_modal_form_handler_container').modal('hide');
-							melisCms.refreshTreeview(parentNode, 1);
-							// clear Add Form
-							melisHelper.melisOkNotification(data.textTitle, data.textMessage);
-					} else {
-							melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
-							melisCoreTool.highlightErrors(data.success, data.errors, "stylesForm");
-					}
-					melisCore.flashMessenger();
-					melisCoreTool.done("#duplicatePageTree");
-					$("#duplicatePageTree").find('i').removeClass();
-					$("#duplicatePageTree").find('i').addClass('fa fa-save');
+				if (data.success) {
+						$('#id_meliscms_tools_tree_modal_form_handler_container').modal('hide');
+						melisCms.refreshTreeview(parentNode, 1);
+						// clear Add Form
+						melisHelper.melisOkNotification(data.textTitle, data.textMessage);
+				} else {
+						melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
+						melisCoreTool.highlightErrors(data.success, data.errors, "stylesForm");
+				}
+				melisCore.flashMessenger();
+				melisCoreTool.done("#duplicatePageTree");
+				$("#duplicatePageTree").find('i').removeClass();
+				$("#duplicatePageTree").find('i').addClass('fa fa-save');
 			}).fail(function() {
-					alert(translations.tr_meliscore_error_message);
+				alert(translations.tr_meliscore_error_message);
 			});
 	})
 

@@ -64,48 +64,52 @@ $(document).ready(function() {
                 data		: {module : moduleName},
                 dataType    : 'json',
                 encode		: true,
-            }).success(function(data){
-                var modules    = "<br/><br/><div class='container'><div class='row'><div class='col-lg-12'><ul>%s</ul></div></div></div>";
-                var moduleList = '';
+                success: function(data) {
+                    var modules    = "<br/><br/><div class='container'><div class='row'><div class='col-lg-12'><ul>%s</ul></div></div></div>";
+                    var moduleList = '';
 
-                $.each(data.modules, function(i, v) {
-                    moduleList += "<li>"+v+"</li>";
+                    $.each(data.modules, function(i, v) {
+                        moduleList += "<li>"+v+"</li>";
 
-                });
+                    });
 
-                modules = modules.replace("%s", moduleList);
+                    modules = modules.replace("%s", moduleList);
 
-                if(data.success) {
-                    melisCoreTool.confirm(
-                        translations.tr_meliscore_common_yes,
-                        translations.tr_meliscore_common_nope,
-                        translations.tr_meliscms_tool_site_module_load_deactivation_title,
-                        data.message+modules+translations.tr_melis_cms_sites_module_loading_deactivate_module_with_prerequisites_notice_confirmation,
-                        function() {
-                            $.each(data.modules, function(i, v) {
-                                // this will trigger a switch-change event
-                                // $('div[data-siteModule-name="'+v+'"]').bootstrapSwitch('setState', false, false);
-                                // this will just trigger an animate switch
-                                switchButtonWithoutEvent(v, "off");
-                            });
+                    if(data.success) {
+                        melisCoreTool.confirm(
+                            translations.tr_meliscore_common_yes,
+                            translations.tr_meliscore_common_nope,
+                            translations.tr_meliscms_tool_site_module_load_deactivation_title,
+                            data.message+modules+translations.tr_melis_cms_sites_module_loading_deactivate_module_with_prerequisites_notice_confirmation,
+                            function() {
+                                $.each(data.modules, function(i, v) {
+                                    // this will trigger a switch-change event
+                                    // $('div[data-siteModule-name="'+v+'"]').bootstrapSwitch('setState', false, false);
+                                    // this will just trigger an animate switch
+                                    switchButtonWithoutEvent(v, "off");
+                                });
 
-                            isCallBackTriggered = true;
-                        },
-                        function() {
-                            switchButtonWithoutEvent(moduleName, "off");
-                            isCallBackTriggered = true;
-                        }
-                    );
-                }else{
-                    switchButtonWithoutEvent(moduleName, "off");
-                    // $('div[data-siteModule-name='+moduleName+']').find("div.switch-animate").removeClass("switch-on switch-off").addClass("switch-off");
+                                isCallBackTriggered = true;
+                            },
+                            function() {
+                                switchButtonWithoutEvent(moduleName, "off");
+                                isCallBackTriggered = true;
+                            }
+                        );
+                    }else{
+                        switchButtonWithoutEvent(moduleName, "off");
+                        // $('div[data-siteModule-name='+moduleName+']').find("div.switch-animate").removeClass("switch-on switch-off").addClass("switch-off");
+                    }
+                    $('.'+currentTabId+'_module_switch').bootstrapSwitch('setActive', true);
+                    $("h4#meliscore-tool-module-content-title").html(translations.tr_meliscore_module_management_modules);
+
+                    setTimeout(function(){
+                        $("body").find(".confirm-modal-header").addClass("module-modal-dependency-checker");
+                    },200);
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    alert( translations.tr_meliscore_error_message );
                 }
-                $('.'+currentTabId+'_module_switch').bootstrapSwitch('setActive', true);
-                $("h4#meliscore-tool-module-content-title").html(translations.tr_meliscore_module_management_modules);
-
-                setTimeout(function(){
-                    $("body").find(".confirm-modal-header").addClass("module-modal-dependency-checker");
-                },200);
             });
         }
 
@@ -124,49 +128,53 @@ $(document).ready(function() {
                 data		: {module : moduleName},
                 dataType    : 'json',
                 encode		: true,
-            }).success(function(data){
-                var modules    = "<br/><br/><div class='container'><div class='row'><div class='col-lg-12'><ul>%s</ul></div></div></div>";
-                var moduleList = '';
+                success: function(data) {
+                    var modules    = "<br/><br/><div class='container'><div class='row'><div class='col-lg-12'><ul>%s</ul></div></div></div>";
+                    var moduleList = '';
 
-                $.each(data.modules, function(i, v) {
-                    moduleList += "<li>"+v+"</li>";
+                    $.each(data.modules, function(i, v) {
+                        moduleList += "<li>"+v+"</li>";
 
-                });
+                    });
 
-                modules = modules.replace("%s", moduleList);
-                if(data.success) {
-                    melisCoreTool.confirm(
-                        translations.tr_meliscore_common_yes,
-                        translations.tr_meliscore_common_nope,
-                        translations.tr_meliscms_tool_site_module_load_activation_title,
-                        data.message+modules+translations.tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice_confirmation,
-                        function() {
-                            $.each(data.modules, function(i, v) {
-                                // this will trigger a switch-change event
-                                // $('div[data-siteModule-name="'+v+'"]').bootstrapSwitch('setState', false, false);
-                                // this will just trigger an animate switch
-                                switchButtonWithoutEvent(v, "on");
+                    modules = modules.replace("%s", moduleList);
+                    if(data.success) {
+                        melisCoreTool.confirm(
+                            translations.tr_meliscore_common_yes,
+                            translations.tr_meliscore_common_nope,
+                            translations.tr_meliscms_tool_site_module_load_activation_title,
+                            data.message+modules+translations.tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice_confirmation,
+                            function() {
+                                $.each(data.modules, function(i, v) {
+                                    // this will trigger a switch-change event
+                                    // $('div[data-siteModule-name="'+v+'"]').bootstrapSwitch('setState', false, false);
+                                    // this will just trigger an animate switch
+                                    switchButtonWithoutEvent(v, "on");
+                                    isCallBackTriggered = true;
+                                });
+                                switchButtonWithoutEvent(moduleName, "on");
+                            },
+                            function() {
+                                switchButtonWithoutEvent(moduleName, "on");
                                 isCallBackTriggered = true;
-                            });
-                            switchButtonWithoutEvent(moduleName, "on");
-                        },
-                        function() {
-                            switchButtonWithoutEvent(moduleName, "on");
-                            isCallBackTriggered = true;
-                        }
-                    );
+                            }
+                        );
 
 
-                }else{
-                    switchButtonWithoutEvent(moduleName, "on");
-                    // $('div[data-siteModule-name='+moduleName+']').find("div.switch-animate").removeClass("switch-on switch-off").addClass("switch-off");
+                    }else{
+                        switchButtonWithoutEvent(moduleName, "on");
+                        // $('div[data-siteModule-name='+moduleName+']').find("div.switch-animate").removeClass("switch-on switch-off").addClass("switch-off");
+                    }
+                    $('.'+currentTabId+'_module_switch').bootstrapSwitch('setActive', true);
+                    $("h4#meliscore-tool-module-content-title").html(translations.tr_meliscore_module_management_modules);
+
+                    setTimeout(function(){
+                        $("body").find(".confirm-modal-header").addClass("module-modal-dependency-checker");
+                    },200);
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    alert( translations.tr_meliscore_error_message );
                 }
-                $('.'+currentTabId+'_module_switch').bootstrapSwitch('setActive', true);
-                $("h4#meliscore-tool-module-content-title").html(translations.tr_meliscore_module_management_modules);
-
-                setTimeout(function(){
-                    $("body").find(".confirm-modal-header").addClass("module-modal-dependency-checker");
-                },200);
             });
         }
 

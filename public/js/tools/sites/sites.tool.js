@@ -65,48 +65,50 @@ $(document).ready(function() {
             beforeSend  : function(){
                 melisCoreTool.pending("#btn-save-meliscms-tool-sites");
             },
-        }).success(function (data) {
-            if (data.success === 1) {
-                // call melisOkNotification
-                melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46' );
+            success: function(data) {
+                if (data.success === 1) {
+                    // call melisOkNotification
+                    melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46' );
+                    // update flash messenger values
+                    melisCore.flashMessenger();
+    
+                    melisCoreTool.done("#btn-save-meliscms-tool-sites");
+    
+                    melisHelper.zoneReload(
+                        currentTabId + '_id_meliscms_tool_sites_edit_site',
+                        'meliscms_tool_sites_edit_site',
+                        {
+                            siteId: currentTabId,
+                            moduleName: siteModuleName,
+                            cpath: 'meliscms_tool_sites_edit_site'
+                        }
+                    );
+    
+                    //refresh table tool sites
+                    $("#tableToolSites").DataTable().ajax.reload();
+    
+                    //refresh site tree view
+                    $("input[name=left_tree_search]").val('');
+                    $("#id-mod-menu-dynatree").fancytree("destroy");
+                    mainTree();
+                } else {
+                    var container = currentTabId + "_id_meliscms_tool_sites_edit_site";
+                    var errors = prepareErrs(data.errors, container);
+    
+                    highlightErrs(data.success, data.errors, container);
+    
+                    // error modal
+                    melisHelper.melisKoNotification(data.textTitle, data.textMessage, errors);
+                    melisCoreTool.done("#btn-save-meliscms-tool-sites");
+                }
+    
                 // update flash messenger values
                 melisCore.flashMessenger();
-
                 melisCoreTool.done("#btn-save-meliscms-tool-sites");
-
-                melisHelper.zoneReload(
-                    currentTabId + '_id_meliscms_tool_sites_edit_site',
-                    'meliscms_tool_sites_edit_site',
-                    {
-                        siteId: currentTabId,
-                        moduleName: siteModuleName,
-                        cpath: 'meliscms_tool_sites_edit_site'
-                    }
-                );
-
-                //refresh table tool sites
-                $("#tableToolSites").DataTable().ajax.reload();
-
-                //refresh site tree view
-                $("input[name=left_tree_search]").val('');
-                $("#id-mod-menu-dynatree").fancytree("destroy");
-                mainTree();
-            } else {
-                var container = currentTabId + "_id_meliscms_tool_sites_edit_site";
-                var errors = prepareErrs(data.errors, container);
-
-                highlightErrs(data.success, data.errors, container);
-
-                // error modal
-                melisHelper.melisKoNotification(data.textTitle, data.textMessage, errors);
-                melisCoreTool.done("#btn-save-meliscms-tool-sites");
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                alert( translations.tr_meliscore_error_message );
             }
-
-            // update flash messenger values
-            melisCore.flashMessenger();
-            melisCoreTool.done("#btn-save-meliscms-tool-sites");
-        }).error(function(xhr, textStatus, errorThrown) {
-            alert( translations.tr_meliscore_error_message );
         });
     }
 
@@ -898,40 +900,42 @@ $(document).ready(function() {
                         data: {domain: domains},
                         beforeSend: function () {
                             melisCoreTool.pending("#btn-next-step");
-                        }
-                    }).success(function (data) {
-                        if (!$.isEmptyObject(data.result)) {
-                            $("#siteAddAlert").text('');
-                            var length = data.result.length;
-                            var counter = 1;
-
-                            $.when(
-                                $.each(data.result, function (id, val) {
-                                    var sdomMultiLbl = $("#step3form-multi_domain").find("label.err_" + id).not(":has(input)");
-                                    sdomMultiLbl.addClass("fieldErrorColor");
-                                    var lang = sdomMultiLbl.text().slice(0, -1);
-
-                                    $("#siteAddAlert").append(lang + ' - ' + translations.tr_melis_cms_sites_tool_add_step3_domain_error1 + val + translations.tr_melis_cms_sites_tool_add_step3_domain_error2);
-
-                                    if (counter != length) {
-                                        $("#siteAddAlert").append('</br>');
-                                    }
-
-                                    counter++;
-                                })
-                            ).then(function () {
+                        },
+                        success: function(data) {
+                            if (!$.isEmptyObject(data.result)) {
+                                $("#siteAddAlert").text('');
+                                var length = data.result.length;
+                                var counter = 1;
+    
+                                $.when(
+                                    $.each(data.result, function (id, val) {
+                                        var sdomMultiLbl = $("#step3form-multi_domain").find("label.err_" + id).not(":has(input)");
+                                        sdomMultiLbl.addClass("fieldErrorColor");
+                                        var lang = sdomMultiLbl.text().slice(0, -1);
+    
+                                        $("#siteAddAlert").append(lang + ' - ' + translations.tr_melis_cms_sites_tool_add_step3_domain_error1 + val + translations.tr_melis_cms_sites_tool_add_step3_domain_error2);
+    
+                                        if (counter != length) {
+                                            $("#siteAddAlert").append('</br>');
+                                        }
+    
+                                        counter++;
+                                    })
+                                ).then(function () {
+                                    melisCoreTool.done("#btn-next-step");
+                                    $("#siteAddAlert").removeClass('hidden');
+                                    return true;
+                                });
+                            } else {
                                 melisCoreTool.done("#btn-next-step");
-                                $("#siteAddAlert").removeClass('hidden');
-                                return true;
-                            });
-                        } else {
+                                owlStep.trigger('owl.next');
+                                return false;
+                            }
+                        },
+                        error: function(xhr, textStatus, errorThrown) {
+                            console.log('error on checking domain');
                             melisCoreTool.done("#btn-next-step");
-                            owlStep.trigger('owl.next');
-                            return false;
                         }
-                    }).error(function () {
-                        console.log('error on checking domain');
-                        melisCoreTool.done("#btn-next-step");
                     });
 
                     return true;
@@ -946,21 +950,23 @@ $(document).ready(function() {
                     data : {domain : newSDOmValue},
                     beforeSend : function () {
                         melisCoreTool.pending("#btn-next-step");
-                    }
-                }).success(function (data) {
-                    if (!$.isEmptyObject(data.result)) {
-                        newSDOmLabel.addClass("fieldErrorColor");
-                        $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_step3_domain_error1 + data.result[0] + translations.tr_melis_cms_sites_tool_add_step3_domain_error2);
-                        $("#siteAddAlert").removeClass('hidden');
+                    },
+                    success: function(data) {
+                        if (!$.isEmptyObject(data.result)) {
+                            newSDOmLabel.addClass("fieldErrorColor");
+                            $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_step3_domain_error1 + data.result[0] + translations.tr_melis_cms_sites_tool_add_step3_domain_error2);
+                            $("#siteAddAlert").removeClass('hidden');
+                            melisCoreTool.done("#btn-next-step");
+                            return true;
+                        } else {
+                            owlStep.trigger('owl.next');
+                            melisCoreTool.done("#btn-next-step");
+                            return false;
+                        }
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
                         melisCoreTool.done("#btn-next-step");
-                        return true;
-                    } else {
-                        owlStep.trigger('owl.next');
-                        melisCoreTool.done("#btn-next-step");
-                        return false;
                     }
-                }).error(function () {
-                    melisCoreTool.done("#btn-next-step");
                 });
 
                 return true;

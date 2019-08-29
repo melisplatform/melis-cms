@@ -88,30 +88,30 @@ var melisStyleTool = (function($, window){
 			        url         : '/melis/MelisCms/ToolStyle/deleteStyle',
 			        data		: dataString,
 			        dataType    : 'json',
-			        encode		: true,
-			     }).success(function(data){
-			    	 melisCoreTool.done(".btnDelStyle");
-			    	if(data.success){				
-							melisHelper.melisOkNotification( data.textTitle, data.textMessage );
-							melisStyleTool.refreshTable();
-					}else{
-						melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);				
-					}		
-					melisCore.flashMessenger();	
-			     }).error(function(){
-			    	 console.log('failed');
-			     });
+					encode		: true,
+					success: function(data) {
+						melisCoreTool.done(".btnDelStyle");
+						if(data.success){				
+								melisHelper.melisOkNotification( data.textTitle, data.textMessage );
+								melisStyleTool.refreshTable();
+						}else{
+							melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);				
+						}		
+						melisCore.flashMessenger();	
+					},
+					error: function(xhr, textStatus, errorThrown) {
+						alert( translations.tr_meliscore_error_message );
+					}
+			    });
 			}
 		);
 	}
 	
-	function refreshTable()
-	{
+	function refreshTable() {
 		melisHelper.zoneReload("id_meliscms_tool_styles_content", "meliscms_tool_styles_content");
 	}
 	
 	return {
-		
 		openToolModal : openToolModal,
 		saveStyleDetails : saveStyleDetails,
 		deleteStyle : deleteStyle,

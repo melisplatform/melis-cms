@@ -45,13 +45,15 @@
             url         : 'melis/MelisCms/Page/getPageLink',
             data        : {'idPage': id},
             dataType    : 'json',
-            encode      : true
-         }).success(function(data){
-            dataUrl = data.link;
-            showUrl(dataUrl);
-            $("#id_meliscms_find_page_tree_container").modal("hide");
-         }).error(function(){
-             console.log('failed');
+            encode      : true,
+            success     : function(data) {
+                dataUrl = data.link;
+                showUrl(dataUrl);
+                $("#id_meliscms_find_page_tree_container").modal("hide");
+            },
+            error       : function(xhr, textStatus, errorThrown) {
+                alert( translations.tr_meliscore_error_message );
+            }
          });
         melisCoreTool.done('#generateTreePageLink');
 
@@ -88,42 +90,42 @@
             url         : 'melis/MelisCms/Page/searchTreePages',
             data        : {name: 'value', value: match},
             dataType    : 'json',
-            encode      : true
-         }).success(function(data){
-            if(!$.trim(data)) {
-                searchContainer.append("<div class='melis-search-overlay'>Not Found</div>").hide().fadeIn(600);
-                setTimeout(function() {
-                    $(".melis-search-overlay").fadeOut(600, function() {
-                        $(this).remove();
-                    });
-                    $("input[name=tree_search]").prop('disabled', false);
-                    $("input[name=tree_search]").focus();
-                }, 1000);
-            } else {
-                var arr = $.map(data, function(el) { return el });
-
-                tree.loadKeyPath(arr, function(node, status){
-                    if(!node.isVisible()) {
-                        switch( status ) {
-                        case "loaded":
-                            node.makeVisible();
-                            break;
-                        case "ok":
-                            node.makeVisible();
-                            break;
+            encode      : true,
+            success     : function(data) {
+                if(!$.trim(data)) {
+                    searchContainer.append("<div class='melis-search-overlay'>Not Found</div>").hide().fadeIn(600);
+                    setTimeout(function() {
+                        $(".melis-search-overlay").fadeOut(600, function() {
+                            $(this).remove();
+                        });
+                        $("input[name=tree_search]").prop('disabled', false);
+                        $("input[name=tree_search]").focus();
+                    }, 1000);
+                } else {
+                    var arr = $.map(data, function(el) { return el });
+    
+                    tree.loadKeyPath(arr, function(node, status){
+                        if(!node.isVisible()) {
+                            switch( status ) {
+                            case "loaded":
+                                node.makeVisible();
+                                break;
+                            case "ok":
+                                node.makeVisible();
+                                break;
+                            }
+    
                         }
-
-                    }
-                    filterFunc.call(tree, match, opts);
-                }).done(function(){
-                    $("input[name=tree_search]").prop('disabled', false);
-                    searchContainer.removeClass("searching");
-                });
+                        filterFunc.call(tree, match, opts);
+                    }).done(function(){
+                        $("input[name=tree_search]").prop('disabled', false);
+                        searchContainer.removeClass("searching");
+                    });
+                }
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                alert( translations.tr_meliscore_error_message );
             }
-
-
-         }).error(function(){
-             console.log('failed');
          });
     }
     

@@ -17,25 +17,27 @@ $(document).ready(function() {
 	        url         : '/melis/MelisCms/Language/addLanguage',
 	        data		: dataString,
 	        dataType    : 'json',
-	        encode		: true,
-	     }).success(function(data){
-			if(data.success) {
-				$('#modal-language-cms').modal('hide');
-				melisHelper.zoneReload("id_meliscms_tool_language", "meliscms_tool_language");
-				melisHelper.melisOkNotification(data.textTitle, data.textMessage);
-			}
-			else {
-				melisCoreTool.alertDanger("#languagealert", '', data.textMessage);
-				melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
-				melisCoreTool.highlightErrors(data.success, data.errors, "idformlang");
-			}
-			
-			melisCoreTool.done("#btnLangCmsAdd");
-    		melisCore.flashMessenger();	
-    		melisCoreTool.processDone();
-	     }).fail(function(){
+			encode		: true,
+			success		: function(data) {
+				if(data.success) {
+					$('#modal-language-cms').modal('hide');
+					melisHelper.zoneReload("id_meliscms_tool_language", "meliscms_tool_language");
+					melisHelper.melisOkNotification(data.textTitle, data.textMessage);
+				}
+				else {
+					melisCoreTool.alertDanger("#languagealert", '', data.textMessage);
+					melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
+					melisCoreTool.highlightErrors(data.success, data.errors, "idformlang");
+				}
+				
+				melisCoreTool.done("#btnLangCmsAdd");
+				melisCore.flashMessenger();	
+				melisCoreTool.processDone();
+			},
+			error		: function(xhr, textStatus, errorThrown) {
 				alert( translations.tr_meliscore_error_message );
-		});
+			}
+	    });
 	});
 
 	addEvent("#btnLangCmsEdit", function() {
@@ -47,9 +49,9 @@ $(document).ready(function() {
 	        url         : '/melis/MelisCms/Language/getLanguageById',
 	        data		: {id : getId},
 	        dataType    : 'json',
-	        encode		: true,
-	     }).success(function(data){
-	    	 	melisCoreTool.pending(".btn");
+			encode		: true,
+			success 	: function(data) {
+				melisCoreTool.pending(".btn");
  	    		$(formEdit + " input[type='text']").each(function(index) {
  	    			var name = $(this).attr('name');
  	    			$("input#" + $(this).attr('id')).val(data.language[name]);
@@ -57,8 +59,10 @@ $(document).ready(function() {
 
  	    		});
  	    		melisCoreTool.done(".btn");
-	     }).error(function(){
-	    	 alert( translations.tr_meliscore_error_message );
+			},
+			error		: function(xhr, textStatus, errorThrown) {
+				alert( translations.tr_meliscore_error_message );
+			}
 	     });
 	});
 	
@@ -110,9 +114,9 @@ $(document).ready(function() {
 	    	        url         : '/melis/MelisCms/Language/deleteLanguage',
 	    	        data		: {id : getId},
 	    	        dataType    : 'json',
-	    	        encode		: true,
-	    	     }).success(function(data){
-	    	    	 	melisCoreTool.pending(".btn-danger");
+					encode		: true,
+					success: function(data) {
+						melisCoreTool.pending(".btn-danger");
 		    	    	if(data.success) {
 		    	    		melisHelper.zoneReload("id_meliscms_tool_language_content", "meliscms_tool_language_content");
 		    	    		melisHelper.zoneReload("id_meliscms_header_language", "meliscms_header_language");
@@ -123,8 +127,10 @@ $(document).ready(function() {
 		    	    	}
 		    	    	melisCore.flashMessenger();
 		    	    	melisCoreTool.done(".btn-danger");
-	    	     }).error(function(){
-	    	    	 alert( translations.tr_meliscore_error_message );
+					},
+					error: function(xhr, textStatus, errorThrown) {
+						alert( translations.tr_meliscore_error_message );
+					}
 	    	     });
 		});
 	});
