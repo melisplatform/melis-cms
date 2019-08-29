@@ -191,7 +191,7 @@ $(document).ready(function(){
                         $body.find('#pageImportDoneConsole').css('display', '');
 
                         $.each(data.errors, function (key, error) {
-                            $body.find('#pageImportDoneConsole').append('<p style="color: red;"> - ' + error + '</p>');
+                            $body.find('#importPageDone #pageImportDoneConsole').append('<p style="color: red;"> - ' + error + '</p>');
                         });
 
                         $body.find('#importPageDone .btn-container').append(btnClose);
