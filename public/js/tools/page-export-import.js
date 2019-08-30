@@ -147,10 +147,10 @@ $(document).ready(function(){
         var pageid = $(this).closest('#id_meliscms_page_import_modal').data('pageid');
 
         melisCoreTool.confirm(
-            'Continue & Import',
-            'cancel',
-            'Are you sure to import?',
-            'It is always a good idea to make a back-up of the database before doing such actions.',
+            translations.tr_melis_cms_page_tree_import_continue_and_import,
+            translations.tr_meliscms_tool_sites_cancel,
+            translations.tr_melis_cms_page_tree_import_modal_are_you_sure,
+            translations.tr_melis_cms_page_tree_import_modal_are_you_sure_content,
             function () {
                 melisCoreTool.pending('#page-tree-import');
                 $.ajax({
