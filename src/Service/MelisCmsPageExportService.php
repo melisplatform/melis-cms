@@ -355,6 +355,7 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
         // Initialize archive object
         $zip = new \ZipArchive();
         $zip->open($zipFileName, $zip::CREATE | $zip::OVERWRITE);
+
         // Create recursive directory iterator
         $files = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($folderPath),
@@ -365,7 +366,9 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
         {
             $filePath = $file->getRealPath();
             $relativePath = substr($file,strrpos($file,'/') + 1);
-            $relativePath = substr($relativePath,strpos($relativePath, DIRECTORY_SEPARATOR) + 1);
+            $relativePath = str_replace("\\", '/', $relativePath);
+            $relativePath = substr($relativePath,strpos($relativePath, '/') + 1);
+            $filePath = str_replace("\\", '/', $filePath);
             // Skip directories (they would be added automatically)
             if (!$file->isDir())
             {
@@ -399,10 +402,9 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
                 continue;
             }
 
-            if (!$this->deleteDirectory($dir . DIRECTORY_SEPARATOR . $item)) {
+            if (!$this->deleteDirectory($dir . '/' . $item)) {
                 return false;
             }
-
         }
 
         return rmdir($dir);

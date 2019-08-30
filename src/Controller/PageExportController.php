@@ -122,7 +122,7 @@ class PageExportController extends AbstractActionController
                          */
                         $zipFileName = date('Y_m_d').'_PageExport.zip';
                         if($pageExportService->zipFolder($folderPath, $zipFileName)){
-                            $zipPath = $folderPath.'/../'.$zipFileName;
+                            $zipPath = $_SERVER['DOCUMENT_ROOT'].'/'.$zipFileName;
                             //after we zip the folder, remove the folder
                             if($pageExportService->deleteDirectory($folderPath)){
                                 /**
@@ -142,19 +142,23 @@ class PageExportController extends AbstractActionController
                                 return $response;
                             }else{
                                 //problem on deleting the temporary folder
-
+                                print_r('problem on deleting the temp folder');
+                                exit;
                             }
                         }else{
                             //cannot convert the folder to zip
-
+                            print_r('error converting folder to zip');
+                            exit;
                         }
                     }else{
                         //temporary folder is not writable
-
+                        print_r('temp folder is not writable');
+                        exit;
                     }
                 }else{
                     //failed exporting page
-
+                    print_r('failed exporting page');
+                    exit;
                 }
             }
         }
