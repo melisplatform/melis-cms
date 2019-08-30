@@ -689,7 +689,7 @@
         'tr_melis_cms_page_tree_import_modal_processing' => 'Processing file',
         'tr_melis_cms_page_tree_import_modal_are_you_sure' => 'Are you sure to import?',
         'tr_melis_cms_page_tree_import_modal_are_you_sure_content' => 'It is always a good idea to make a back-up of the database before doing such actions.',
-        'tr_melis_cms_page_tree_import_modal_done' => 'Import has been done successfully.',
+        'tr_melis_cms_page_tree_import_modal_done' => 'Import has been done successfully. ',
         'tr_melis_cms_page_tree_import_modal_done2' => ' pages have been inserted and can be edited right now.',
         'tr_melis_cms_page_tree_import_bad_xml_structure' => 'Invalid XML structure',
         'tr_melis_cms_page_tree_import_modal_processing_done' => 'Processing file done',
