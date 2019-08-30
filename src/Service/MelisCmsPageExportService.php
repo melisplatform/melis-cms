@@ -351,38 +351,13 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
      */
     public function zipFolder($folderPath, $zipFolderName)
     {
-        $zipFileName = $folderPath.'/../'.$zipFolderName;
+        $zipFileName = $_SERVER["DOCUMENT_ROOT"] . '/' . $zipFolderName;
         // Initialize archive object
+
         $zip = new \ZipArchive();
         $zip->open($zipFileName, $zip::CREATE | $zip::OVERWRITE);
 
-        // Create recursive directory iterator
-        $files = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($folderPath),
-            \RecursiveIteratorIterator::LEAVES_ONLY
-        );
-
-        foreach ($files as $name => $file)
-        {
-            $filePath = $file->getRealPath();
-            $relativePath = substr($file,strrpos($file,'/') + 1);
-            $relativePath = str_replace("\\", '/', $relativePath);
-            $relativePath = substr($relativePath,strpos($relativePath, '/') + 1);
-            $filePath = str_replace("\\", '/', $filePath);
-            // Skip directories (they would be added automatically)
-            if (!$file->isDir())
-            {
-                if(!in_array($relativePath, ['.', '..'])) {
-                    // Add current file to archive
-                    $zip->addFile($filePath, $relativePath);
-                }
-            } else {
-                if(!in_array($relativePath, ['.', '..'])) {
-                    $relativePath = substr($relativePath, 0, strpos($relativePath, '/'));
-                    $zip->addEmptyDir($relativePath);
-                }
-            }
-        }
+        $this->addFolderToZip($folderPath.'/', $zip, '');
         // Zip archive will be created only after closing object
         return $zip->close();
     }
@@ -533,5 +508,30 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
     private function removeXmlDeclaration($xml){
         $xml = preg_replace( "/<\?xml.+?\?>/", "", $xml);
         return $xml;
+    }
+
+    private function addFolderToZip($dir, $zipArchive, $zipdir = '')
+    {
+        if (is_dir($dir)) {
+            if ($dh = opendir($dir)) {
+                //Add the directory
+                if (!empty($zipdir))
+                    $zipArchive->addEmptyDir($zipdir);
+
+                // Loop through all the files
+                while (($file = readdir($dh)) !== false) {
+                    //If it's a folder, run the function again!
+                    if (!is_file($dir . $file)) {
+                        // Skip parent and root directories
+                        if (($file !== ".") && ($file !== "..")) {
+                            $this->addFolderToZip($dir . $file . "/", $zipArchive, $zipdir . $file . "/");
+                        }
+                    } else {
+                        // Add the files
+                        $zipArchive->addFile($dir . $file, $zipdir . $file);
+                    }
+                }
+            }
+        }
     }
 }
