@@ -376,6 +376,11 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
                     // Add current file to archive
                     $zip->addFile($filePath, $relativePath);
                 }
+            } else {
+                if(!in_array($relativePath, ['.', '..'])) {
+                    $relativePath = substr($relativePath, 0, strpos($relativePath, '/'));
+                    $zip->addEmptyDir($relativePath);
+                }
             }
         }
         // Zip archive will be created only after closing object
