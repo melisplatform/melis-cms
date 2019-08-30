@@ -54,11 +54,11 @@
 											},
 											'export': {
 													'name': 'Export pages',
-													'icon': 'copy'
+													'icon': 'export'
 											},
 										    'import': {
 													'name': translations.tr_melis_cms_page_tree_import,
-													'icon': 'copy'
+													'icon': 'import'
 											}
 									},
 									actions: function(node, action, options) {
