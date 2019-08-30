@@ -15,16 +15,20 @@ var melisPluginEdition = (function($, window) {
 
     $("body").on("click", ".m-trash-handle", removePlugins);
 
-    // Checking parent body events handler to avoid multiple events of the button
-    if ( typeof $body.data("events") !== "undefined" ) {
-        $.each( $body.data("events").click, function(i, val){
-            try {
-                if (val.selector == "#pluginModalBtnApply") {
-                    $body.off("click", "#pluginModalBtnApply");
-                }
-            } catch(error) {}
-        });
-    }
+    
+    /* 
+     * Checking parent body events handler to avoid multiple events of the button
+     * $body.data("events").click,
+     * In jQuery 1.8, it is no longer possible to access the element's events using .data('events') http://bugs.jquery.com/ticket/10589.
+     */
+
+    $.each( $._data($body.get(0), "events"), function( i, val ) {
+        try {
+            if (val.selector == "#pluginModalBtnApply") {
+                $body.off("click", "#pluginModalBtnApply");
+            }
+        } catch(error) {}
+    });
 
     $body.on("click", "button[id='pluginModalBtnApply'][data-page-id='"+melisActivePageId+"']", submitPluginForms); // $body because it is modal and it's located in parent
 
