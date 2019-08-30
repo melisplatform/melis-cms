@@ -665,8 +665,8 @@
         'tr_melis_cms_tree_export_failed' => 'A problem occurred during the export, please try again',
         'tr_melis_cms_tree_export_success' => 'Page successfully exported',
         'tr_melis_cms_tree_export' => 'Export',
-        'tr_melis_cms_tree_export_select_export_option' => 'Select page export option',
-        'tr_melis_cms_tree_export_select_export_option_tooltip' => 'Choose if you want to export only the selected page or also it\'s child',
+        'tr_melis_cms_tree_export_select_export_option' => 'Select an export option',
+        'tr_melis_cms_tree_export_select_export_option_tooltip' => 'Choose if you want to export only the selected page or to include its child pages',
 
         'tr_melis_cms_tree_import_import_not_admin1' => 'Your account doesn\'t entitle you to make exports on this platform.',
         'tr_melis_cms_tree_import_import_not_admin2' => 'Please contact the administrator.',
