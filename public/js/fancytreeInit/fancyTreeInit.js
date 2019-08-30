@@ -53,7 +53,7 @@
 													'icon': 'copy'
 											},
 											'export': {
-													'name': 'Export pages',
+													'name': translations.tr_melis_cms_tree_export_page,
 													'icon': 'export'
 											},
 										    'import': {

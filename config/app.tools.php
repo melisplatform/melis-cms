@@ -2284,8 +2284,8 @@ return array(
                                         'type' => 'Zend\Form\Element\Radio',
                                         'name' => 'page_export_type',
                                         'options' => array(
-                                            'label' => 'Select page export option',
-                                            'tooltip' => 'Page export option',
+                                            'label' => 'tr_melis_cms_tree_export_select_export_option',
+                                            'tooltip' => 'tr_melis_cms_tree_export_select_export_option_tooltip',
                                             'label_options' => array(
                                                 'disable_html_escape' => true,
                                             ),
@@ -2340,13 +2340,13 @@ return array(
                                         'name' => 'page_tree_import',
                                         'options' => array(
                                             'label' => '',
-                                            'tooltip' => '',
+                                            'tooltip' => 'tr_melis_cms_page_tree_import_modal_zip_tooltip',
                                             'label_options' => array(
                                                 'disable_html_escape' => true,
                                             ),
                                             'filestyle_options' => array(
                                                 'buttonBefore' => true,
-                                                'buttonText' => 'Zip File',
+                                                'buttonText' => 'tr_melis_cms_page_tree_import_zip_file',
                                             )
                                         ),
                                         'attributes' => array(

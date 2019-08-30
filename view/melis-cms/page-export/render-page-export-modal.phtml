@@ -12,7 +12,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                     <ul class="nav nav-tabs">
                         <li class="active">
                             <a href="#<?php echo $this->zoneconfig['conf']['id'] ?>" class="glyphicons notes" data-toggle="tab" aria-expanded="true"><i></i>
-                                Export Pages
+                                <?= $this->translate('tr_melis_cms_tree_export_page'); ?>
                             </a>
                         </li>
                     </ul>
@@ -59,7 +59,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                     </div>
                     <div align="right">
                         <button type="button" data-dismiss="modal" class="btn btn-danger pull-left"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
-                        <button type="button" class="btn btn-success" id="btn-export-pages" <?= (!$this->isAdmin) ? 'disabled="true"' : ''?>>Export</button>
+                        <button type="button" class="btn btn-success" id="btn-export-pages" <?= (!$this->isAdmin) ? 'disabled="true"' : ''?>><?= $this->translate('tr_melis_cms_tree_export'); ?></button>
                     </div>
                 </div>
             </div>

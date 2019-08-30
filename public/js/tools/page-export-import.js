@@ -115,7 +115,7 @@ $(document).ready(function(){
                 $body.find('#pageImportConsole').css('display', '');
                 $body.find('#pageImportConsole').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + formData.page_tree_import.name + '</p>');
                 $body.find('#pageImportConsole').append('<p>' + translations.tr_melis_cms_page_tree_import_validated + ': <span style="color: red;">No</span></p>');
-                $body.find('#pageImportConsole').append('<div id="pageImportProcessing"><p>Processing file <i class="fa fa-spinner fa-spin"></i></p></div>');
+                $body.find('#pageImportConsole').append('<div id="pageImportProcessing"><p>' + translations.tr_melis_cms_page_tree_import_modal_processing + ' <i class="fa fa-spinner fa-spin"></i></p></div>');
             }
         }).success(function (data) {
             if (data.success) {
@@ -125,14 +125,14 @@ $(document).ready(function(){
                 $body.find('#importPageValidated .tab-content .tab-pane').append('<p>' + translations.tr_melis_cms_page_tree_import_validated +': <span style="color: green;">Yes</span></p>');
 
                 var btnCancel = '<button type="button" data-dismiss="modal" class="btn btn-danger pull-left">' + translations.tr_meliscms_tool_sites_cancel + '</button>';
-                var btnImport = '<button type="button" class="btn btn-success" id="page-tree-import">Import File</button>';
+                var btnImport = '<button type="button" class="btn btn-success" id="page-tree-import">' + translations.tr_melis_cms_page_tree_import_file + '</button>';
 
                 $body.find('#importPageValidated .btn-container').append(btnCancel);
                 $body.find('#importPageValidated .btn-container').append(btnImport);
             } else {
                 $body.find('#pageImportConsole #pageImportProcessing').text('');
-                $body.find('#pageImportConsole #pageImportProcessing').append('<p>Processing File Done <i style="color: green;" class="fa fa-check-circle"></i></p>');
-                body.find('#pageImportConsole').append('<p style="color: red;">The file cannot be imported because of the following errors:</p>');
+                $body.find('#pageImportConsole #pageImportProcessing').append('<p>' + translations.tr_melis_cms_page_tree_import_modal_processing_done + ' <i style="color: green;" class="fa fa-check-circle"></i></p>');
+                body.find('#pageImportConsole').append('<p style="color: red;">' + translations.tr_melis_cms_page_tree_import_modal_errors + ':</p>');
                 $.each(data.errors, function (key, error) {
                     $body.find('#pageImportConsole').append('<p style="color: red;"> - ' + error + '</p>');
                 });
@@ -164,7 +164,7 @@ $(document).ready(function(){
                         $body.find('#pageImportConsole').css('display', '');
                         $body.find('#pageImportConsole').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + importFormData.page_tree_import.name + '</p>');
                         $body.find('#pageImportConsole').append('<p>' + translations.tr_melis_cms_page_tree_import_validated + ': <span style="color: red;">No</span></p>');
-                        $body.find('#pageImportConsole').append('<div id="pageImportProcessing"><p>Processing file <i class="fa fa-spinner fa-spin"></i></p></div>');
+                        $body.find('#pageImportConsole').append('<div id="pageImportProcessing"><p>' + translations.tr_melis_cms_page_tree_import_modal_processing + ' <i class="fa fa-spinner fa-spin"></i></p></div>');
                     }
                 }).success(function (data) {
                     var btnClose = '<button type="button" data-dismiss="modal" class="btn btn-danger pull-left" style="margin-top: -15px; margin-left: -15px;">' + translations.tr_melis_cms_page_tree_import_close + '</button>';
@@ -176,7 +176,7 @@ $(document).ready(function(){
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + importFormData.page_tree_import.name + '</p>');
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p>' + translations.tr_melis_cms_page_tree_import_result + ': <span style="color: green;">Success</span></p>');
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('</br>');
-                        $body.find('#importPageDone .tab-content .tab-pane .main-error').append('Import has been done successfully. ' + data.pagesCount + ' pages have been inserted and can be edited right now.');
+                        $body.find('#importPageDone .tab-content .tab-pane .main-error').append(translations.tr_melis_cms_page_tree_import_modal_done + data.pagesCount + translations.tr_melis_cms_page_tree_import_modal_done2);
 
                         $body.find('#importPageDone .btn-container').append(btnClose);
 
@@ -184,9 +184,9 @@ $(document).ready(function(){
                         mainTree();
                     } else {
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + importFormData.page_tree_import.name + '</p>');
-                        $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p>' + translations.tr_melis_cms_page_tree_import_result + ': <span style="color: red;">Failed</span></p>');
+                        $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p>' + translations.tr_melis_cms_page_tree_import_result + ': <span style="color: red;">' + translations.tr_melis_cms_page_tree_import_failed + '</span></p>');
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('</br>');
-                        $body.find('#importPageDone .tab-content .tab-pane .main-error').append("Some unpredictable errors happened during the import and it wasn't completed</br> Details of errors: </br>");
+                        $body.find('#importPageDone .tab-content .tab-pane .main-error').append(translations.tr_melis_cms_page_tree_import_modal_unexpected_errors + translations.tr_melis_cms_page_tree_import_modal_unexpected_errors2 + '</br>' + translations.tr_melis_cms_page_tree_import_modal_unexpected_error_detail + '</br>');
 
                         $body.find('#pageImportDoneConsole').css('display', '');
 

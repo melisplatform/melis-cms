@@ -441,33 +441,38 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
 
     private function checkPageTables($pageTables, $dbTables, &$errors)
     {
+        $translator = $this->getServiceLocator()->get('translator');
+
         foreach ($pageTables as $tableName => $tableColumns) {
             if (in_array($tableName, $dbTables)) {
                 $this->checkTableColumns($tableName, $tableColumns, $errors);
             } else {
-                $errors[] = $tableName . ' does not exist on your db';
+                $errors[] = sprintf($translator->translate('tr_melis_cms_page_tree_import_table_does_not_exist'), $tableName);
             }
         }
     }
 
     private function checkExternalTables($externalTables, $dbTables, &$errors)
     {
+        $translator = $this->getServiceLocator()->get('translator');
+
         foreach ($externalTables as $externalTableName => $externalTableColumns) {
             if (in_array($externalTableName, $dbTables)) {
                 $this->checkTableColumns($externalTableName, $externalTableColumns['row_0'], $errors);
             } else {
-                $errors[] = $externalTableName . ' does not exist on your db';
+                $errors[] = sprintf($translator->translate('tr_melis_cms_page_tree_import_table_does_not_exist'), $externalTableName);
             }
         }
     }
 
     private function checkTableColumns($tableName, $tableColumns, &$errors)
     {
+        $translator = $this->getServiceLocator()->get('translator');
         $columns = $this->getTableColumns($tableName);
 
         foreach ($tableColumns as $columnName => $columnValue) {
             if (!in_array($columnName, $columns)) {
-                $errors[] = $columnName . ' does not exist on table ' . $tableName;
+                $errors[] = sprintf($translator->translate('tr_melis_cms_page_tree_import_column_does_not_exist'), $columnName, $tableName);
             }
         }
     }
@@ -627,6 +632,8 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
      */
     private function checkPageIds($pages, &$errors)
     {
+        $translator = $this->getServiceLocator()->get('translator');
+
         foreach ($pages as $page) {
             $tables = !empty($page['tables']) ? $page['tables'] : [];
 
@@ -639,7 +646,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                     $result = $adapter->query('SELECT * FROM `' . $tableName . '` WHERE `' . $primaryColumn . '` = ?', [$columnData])->toArray();
 
                     if (!empty($result)) {
-                        $errors[] = 'Primary ID ' . $columnData . ' for table ' . $tableName . ' is already used.';
+                        $errors[] = sprintf($translator->translate('tr_melis_cms_page_tree_import_primary_already_used'), $columnData, $tableName);
                     }
                 }
             }

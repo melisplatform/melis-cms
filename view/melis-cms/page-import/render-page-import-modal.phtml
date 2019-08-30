@@ -38,8 +38,11 @@ if (!empty($this->zoneconfig['conf']['id']))
                                                 <input type="checkbox" name="keepIds" value="1" checked>
                                             </label>
                                             <span id="page-import-checkbox-span"><?= $this->translate('tr_melis_cms_page_tree_import_keep_ids') ?></span>
+                                            <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="<?= $this->translate('tr_melis_cms_page_tree_import_modal_keep_ids_tooltop'); ?>" aria-describedby="tooltip422018" style="margin-top: -3px; margin-right: -18px; width: 14.859px; height: 13px;"></i>
                                         </div>
                                     </div>
+                                    </br>
+
                                     <!-- End Checkbox -->
 
                                     <?php
@@ -62,7 +65,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                     <div align="right">
                         <?php if ($this->isAdmin) : ?>
                             <button type="button" data-dismiss="modal" class="btn btn-danger pull-left"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
-                            <button type="button" class="btn btn-success" id="page-tree-import-test">Test File</button>
+                            <button type="button" class="btn btn-success" id="page-tree-import-test"><?= $this->translate('tr_melis_cms_page_tree_import_modal_test_file'); ?></button>
                         <?php else : ?>
                             <button type="button" data-dismiss="modal" class="btn btn-danger pull-left" style="margin-top: -20px;"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
                         <?php endif; ?>
