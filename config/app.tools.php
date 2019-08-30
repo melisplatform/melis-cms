@@ -2305,21 +2305,15 @@ return array(
                                 array(
                                     'spec' => array(
                                         'name' => 'export_page_resources',
-                                        'type' => 'Select',
+                                        'type' => 'MelisText',
                                         'options' => array(
-                                            'label' => 'tr_melis_cms_tree_export_page_resources',
-                                            'tooltip' => 'tr_melis_cms_tree_export_page_resources',
-                                            'checked_value' => true,
-                                            'unchecked_value' => false,
-                                            'switchOptions' => array(
-                                                'label-on' => 'tr_meliscms_common_yes',
-                                                'label-off' => 'tr_meliscms_common_no',
-                                                'label' => "<i class='glyphicon glyphicon-resize-horizontal'></i>",
-                                            ),
-                                            'disable_inarray_validator' => true,
                                         ),
                                         'attributes' => array(
                                             'id' => 'export_page_resources',
+                                            'class' => 'export_page_resources',
+                                            'value' => '',
+                                            'data-label' => 'tr_melis_cms_tree_export_page_resources',
+                                            'data-tooltip' => 'tr_melis_cms_tree_export_page_resources'
                                         ),
                                     ),
                                 ),

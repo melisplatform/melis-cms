@@ -36,7 +36,59 @@ if (!empty($this->zoneconfig['conf']['id']))
                                         }
 
                                         echo $this->form()->openTag($form);
-                                        echo $this->melisFieldCollection($form);
+                                        ?>
+                                        <?php
+                                        $moduleField = $form->get('selected_page_id');
+                                        echo $this->formElement($moduleField);
+                                        ?>
+                                        <div class="form-group">
+                                            <?php
+                                            $typeField = $form->get('page_export_type');
+                                            $inputLabel = $typeField->getLabelAttributes();
+                                            $typeField->setLabelAttributes(array('class', null));
+                                            $label = $typeField->getLabel().'<i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
+                                            $typeField->setLabel($label);
+                                            echo $this->formLabel($typeField);
+                                            $typeField->setLabelAttributes($inputLabel);
+                                            echo $this->formElement($typeField);
+                                            ?>
+                                        </div>
+                                        <div class="form-group">
+                                            <?php
+                                            $typeField = $form->get('export_page_resources');
+                                            $inputLabel = $typeField->getLabelAttributes();
+                                            $typeField->setLabelAttributes(array('class', null));
+                                            $label = $typeField->getLabel().'<i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
+                                            $typeField->setLabel($label);
+                                            echo $this->formLabel($typeField);
+                                            $typeField->setLabelAttributes($inputLabel);
+                                            echo $this->formElement($typeField);
+                                            ?>
+                                            <script type="text/javascript">
+                                                var targetInput = $('.export_page_resources');
+                                                if(targetInput.length) {
+                                                    targetInput.each(function () {
+                                                        var parentDiv = $(this).parent("div.form-group");
+                                                        var attribRequired = '';
+                                                        if (typeof $(this).data("required") != 'undefined') {
+                                                            attribRequired = ' *';
+                                                        }
+                                                        var attribTooltip = '';
+                                                        if (typeof $(this).data("tooltip") != 'undefined') {
+                                                            attribTooltip = '<i class="fa fa-info-circle fa-lg" data-toggle="tooltip" data-placement="left" title="" data-original-title="' + $(this).data("tooltip") + '"></i>';
+                                                        }
+                                                        var switchBtn = '<label for="' + $(this).attr("name") + '">' + $(this).data("label") + attribRequired + attribTooltip + '</label>'
+                                                            + '<div class="make-switch export_page_resources_switch" data-label-icon="glyphicon glyphicon-resize-horizontal" data-on-label="' + translations.tr_meliscore_common_yes + '" data-off-label="' + translations.tr_meliscore_common_nope + '" style="display: block;">'
+                                                            + '<input type="checkbox" name="' + $(this).attr("name") + '" id="' + $(this).attr("id") + '">'
+                                                            + '</div>';
+                                                        parentDiv.html(switchBtn);
+                                                    });
+                                                    $('.export_page_resources_switch').bootstrapSwitch('destroy', true);
+                                                    $('.export_page_resources_switch').bootstrapSwitch();
+                                                }
+                                            </script>
+                                        </div>
+                                        <?php
                                         echo $this->form()->closeTag();
                                         ?>
                                     </div>
