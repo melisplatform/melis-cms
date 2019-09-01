@@ -79,32 +79,25 @@ var melisPluginEdition = (function($, window) {
             type: 'POST',
             url: "/melis/MelisCms/FrontPlugins/validatePluginModal?validate&melisSite="+siteModule,
             data: datastring,
-            dataType: 'json',
-            success: function(data) {
+            dataType: 'json'
+        }).done(function(data) {
+            if(data.success) {
+                savePluginUpdate(datastring, siteModule);
 
-                if(data.success) {
-                    savePluginUpdate(datastring, siteModule);
+                setTimeout(function() {
 
-                    setTimeout(function() {
-
-                        pluginRenderer(melisPluginModule, melisPluginName, melisIdPage, melisPluginId, false, window.fromdragdropzone, siteModule);
-                        setTimeout(function(){
-                            checkToolSize();
-                        }, 300);
-                        window.parent.$("#id_meliscms_plugin_modal_container").modal('hide');
-
+                    pluginRenderer(melisPluginModule, melisPluginName, melisIdPage, melisPluginId, false, window.fromdragdropzone, siteModule);
+                    setTimeout(function(){
+                        checkToolSize();
                     }, 300);
+                    window.parent.$("#id_meliscms_plugin_modal_container").modal('hide');
 
-
-                } else {
-                    melisCmsFormHelper.melisMultiKoNotification(data.errors);
-                }
-
-
-            },
-            error: function() {
-                console.log("Something went wrong");
+                }, 300);
+            } else {
+                melisCmsFormHelper.melisMultiKoNotification(data.errors);
             }
+        }).fail(function(xhr, textStatus, errorThrown) {
+            alert( translations.tr_meliscore_error_message );
         });
     }
 
@@ -160,73 +153,70 @@ var melisPluginEdition = (function($, window) {
             type: 'POST',
             url: "/melispluginrenderer?module="+module+"&pluginName="+plugin+"&pageId="+pageId+"&pluginId="+pluginId+"&encapsulatedPlugin="+encapsulatedPlugin+"&fromDragDropZone="+fromdragdropzone+"&melisSite="+siteModule,
             data: {pluginHardcodedConfig : pluginHardcodedConfig},
-            dataType: 'json',
-            success: function(data) {
+            dataType: 'json'
+        }).done(function(data) {
+            setTimeout(function() {
+                if(data.success) {
+                    var elType;
+                    var jsUrl;
+                    var idPlugin;
 
-                setTimeout(function() {
+                    var plugin = data.datas;
 
-                    if(data.success) {
-                        var elType;
-                        var jsUrl;
-                        var idPlugin;
+                    // remove old plugin
+                    $(layoutId).children().not("#loader.overlay-loader").remove();
 
-                        var plugin = data.datas;
+                    // add new plugin
+                    $(layout).prepend(plugin.html);
 
-                        // remove old plugin
-                        $(layoutId).children().not("#loader.overlay-loader").remove();
+                    // get the html
+                    var pluginToolBox = $(layout).find(".melis-plugin-tools-box");
+                    var melisPluginID = typeof pluginToolBox.data("plugin-id") != "undefined" ? pluginToolBox.data("plugin-id") : '';
 
-                        // add new plugin
-                        $(layout).prepend(plugin.html);
+                    // dataPluginID = pluginToolBox.next().attr("id");
+                    var pluginOutlined = pluginToolBox.closest(".melis-ui-outlined");
+                    dataPluginID = pluginOutlined.find("[id*='"+melisPluginID+"']").attr("id");
 
-                        // get the html
-                        var pluginToolBox = $(layout).find(".melis-plugin-tools-box");
-                        var melisPluginID = typeof pluginToolBox.data("plugin-id") != "undefined" ? pluginToolBox.data("plugin-id") : '';
+                    // remove plugin container width class
+                    $(pluginOutlined).children('[class^=plugin-width]').removeClass();
 
-                        // dataPluginID = pluginToolBox.next().attr("id");
-                        var pluginOutlined = pluginToolBox.closest(".melis-ui-outlined");
-                        dataPluginID = pluginOutlined.find("[id*='"+melisPluginID+"']").attr("id");
-
-                        // remove plugin container width class
-                        $(pluginOutlined).children('[class^=plugin-width]').removeClass();
-
-                        if(typeof dataPluginID !== "undefined") {
-                            // get plugin id
-                            idPlugin = dataPluginID;
-                        }
-
-                        // Processing the plugin resources and initialization
-                    	processPluginResources(plugin.init, idPlugin);
-
-                        // hide the loader
-                        $(layout).removeClass("melis-loader");
-                        $('.loader-icon').removeClass('spinning-cog').addClass('shrinking-cog');
-                        $("#loader.overlay-loader").remove();
-                        $(layout).height('auto');
-
-                        calcFrameHeight();
-                        disableLinks('a');
-
-                        // re init resize
-                        var uiOutlined = $(".melis-dragdropzone .melis-ui-outlined");
-                        try {
-                            uiOutlined.resizable("destroy"); // disable for now
-                        }catch(e){
-                            uiOutlined.resizable();
-                        }
-
-                        if (parent.pluginResizable == 1){
-                            initResizable();
-                        }
+                    if(typeof dataPluginID !== "undefined") {
+                        // get plugin id
+                        idPlugin = dataPluginID;
                     }
-                }, 300);
-            },
-            error: function(data) {
-                // hide the loader
-                $(layout).removeClass("melis-loader");
-                $('.loader-icon').removeClass('spinning-cog').addClass('shrinking-cog');
-                $("#loader.overlay-loader").remove();
-                alert("Error something went wrong");
-            }
+
+                    // Processing the plugin resources and initialization
+                    processPluginResources(plugin.init, idPlugin);
+
+                    // hide the loader
+                    $(layout).removeClass("melis-loader");
+                    $('.loader-icon').removeClass('spinning-cog').addClass('shrinking-cog');
+                    $("#loader.overlay-loader").remove();
+                    $(layout).height('auto');
+
+                    calcFrameHeight();
+                    disableLinks('a');
+
+                    // re init resize
+                    var uiOutlined = $(".melis-dragdropzone .melis-ui-outlined");
+                    try {
+                        uiOutlined.resizable("destroy"); // disable for now
+                    }catch(e){
+                        uiOutlined.resizable();
+                    }
+
+                    if (parent.pluginResizable == 1){
+                        initResizable();
+                    }
+                }
+            }, 300);
+        }).always(function() {
+            // hide the loader
+            $(layout).removeClass("melis-loader");
+            $('.loader-icon').removeClass('spinning-cog').addClass('shrinking-cog');
+            $("#loader.overlay-loader").remove();
+        }).fail(function(xhr, textStatus, errorThrown) {
+            alert( translations.tr_meliscore_error_message );
         });
     }
 
@@ -507,24 +497,19 @@ var melisPluginEdition = (function($, window) {
 
         $.ajax({
             type: 'GET',
-            url: "/melis/MelisCms/PageEdition/removePageSessionPlugin?module="+ melisPluginModuleName+"&pluginName="+ melisPluginName +"&pageId="+ melisIdPage +"&pluginId="+ melisPluginID +"&pluginTag="+ melisPluginTag,
-            success: function(data) {
-
-                    if(data.success) {
-                        pluginContainer.remove();
-                        calcFrameHeight();
-                        sendDragnDropList(dropzone, melisIdPage);
-                        pluginContainerChecker();
-                        pluginDetector();
-                    } else {
-                        melisCmsFormHelper.melisMultiKoNotification(data.errors);
-                    }
-
-
-            },
-            error: function() {
-                console.log("Something went wrong");
+            url: "/melis/MelisCms/PageEdition/removePageSessionPlugin?module="+ melisPluginModuleName+"&pluginName="+ melisPluginName +"&pageId="+ melisIdPage +"&pluginId="+ melisPluginID +"&pluginTag="+ melisPluginTag
+        }).done(function(data) {
+            if(data.success) {
+                pluginContainer.remove();
+                calcFrameHeight();
+                sendDragnDropList(dropzone, melisIdPage);
+                pluginContainerChecker();
+                pluginDetector();
+            } else {
+                melisCmsFormHelper.melisMultiKoNotification(data.errors);
             }
+        }).fail(function(xhr, textStatus, errorThrown) {
+            alert( translations.tr_meliscore_error_message );
         });
     }
 
@@ -769,9 +754,11 @@ var melisPluginEdition = (function($, window) {
         $.ajax({
             type: 'GET',
             async: false,
-            url: "/melis/MelisCms/PageEdition/getContainerUniqueId",
-            success: function(data) { pluginId = data.id; },
-            error: function(data) { console.log("Error", data); }
+            url: "/melis/MelisCms/PageEdition/getContainerUniqueId"
+        }).done(function(data) {
+            pluginId = data.id;
+        }).fail(function(xhr, textStatus, errorThrown) {
+            alert( translations.tr_meliscore_error_message );
         });
         return pluginId;
     }

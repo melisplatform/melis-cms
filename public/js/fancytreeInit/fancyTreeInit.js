@@ -94,27 +94,25 @@
 																// check if node has children if TRUE then cannot be deleted
 																$.ajax({
 																	url: '/melis/MelisCms/Page/deletePage?idPage=' + idPage,
-																	encode: true,
-																	success: function(data) {
-																		if (data.success === 1) {
-																				//close the page if its open. do nothing if its not open
-																				if (openedOrNot.length === 1) {
-																						melisHelper.tabClose(zoneId);
-																				}
-
-																				// notify deleted page
-																				melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
-
-																				// update flash messenger values
-																				melisCore.flashMessenger();
-
-																		} else {
-																				melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, '#000');
+																	encode: true
+																}).done(function(data) {
+																	if (data.success === 1) {
+																		//close the page if its open. do nothing if its not open
+																		if (openedOrNot.length === 1) {
+																				melisHelper.tabClose(zoneId);
 																		}
-																	},
-																	error: function(xhr, textStatus, errorThrown) {
-																		alert(translations.tr_meliscore_error_message);
+
+																		// notify deleted page
+																		melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
+
+																		// update flash messenger values
+																		melisCore.flashMessenger();
+
+																	} else {
+																			melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, '#000');
 																	}
+																}).fail(function(xhr, textStatus, errorThrown) {
+																	alert( translations.tr_meliscore_error_message );
 																});
 															});
 											}
@@ -361,10 +359,9 @@
 													$.ajax({
 														url: '/melis/MelisCms/Page/movePage',
 														data: datastring,
-														encode: true,
-														error: function(xhr, textStatus, errorThrown) {
-															alert(translations.tr_meliscore_error_message);
-														}
+														encode: true
+													}).fail(function(xhr, textStatus, errorThrown) {
+														alert( translations.tr_meliscore_error_message );
 													});
 											});
 											// end

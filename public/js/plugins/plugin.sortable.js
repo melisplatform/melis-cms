@@ -71,7 +71,7 @@ var melisPluginSortable = (function($, window) {
 	    });
 	    if(modalNavContainer > modalContainerWidth) {
 	    	modalTabs.width(minSize);
-			window.parent. $("body #id_meliscms_plugin_modal .melis-whead-box .nav.nav-tabs").width(tabSize);
+			window.parent.$("body #id_meliscms_plugin_modal .melis-whead-box .nav.nav-tabs").width(tabSize);
 			window.parent.$("body #id_meliscms_plugin_modal .melis-whead-box").width(modalContainerWidth - 50);
 			window.parent.$("body .widget-melis-tabprev").addClass("active");
 			window.parent.$("body .widget-melis-tabnext").addClass("active");
