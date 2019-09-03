@@ -97,9 +97,10 @@ $(document).ready(function(){
                     importFormData = data.result;
                 } else {
                     melisHelper.melisKoNotification('test tittle', 'test message', data.errors);
+                    melisCoreTool.done('#page-tree-import-test');
                 }
             }).error(function (data) {
-
+                melisCoreTool.done('#page-tree-import-test');
             });
         });
 
