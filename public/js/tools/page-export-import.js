@@ -181,7 +181,13 @@ $(document).ready(function(){
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + importFormData.page_tree_import.name + '</p>');
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p>' + translations.tr_melis_cms_page_tree_import_result + ': <span style="color: green;">' + translations.tr_melis_cms_page_tree_import_success + '</span></p>');
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('</br>');
-                        $body.find('#importPageDone .tab-content .tab-pane .main-error').append(translations.tr_melis_cms_page_tree_import_modal_done + data.pagesCount + translations.tr_melis_cms_page_tree_import_modal_done2);
+                        var text = translations.tr_melis_cms_page_tree_import_modal_done + data.pagesCount + translations.tr_melis_cms_page_tree_import_modal_done2_p;
+
+                        if (data.pagesCount == 1) {
+                            text = translations.tr_melis_cms_page_tree_import_modal_done + data.pagesCount + translations.tr_melis_cms_page_tree_import_modal_done2_s;
+                        }
+
+                        $body.find('#importPageDone .tab-content .tab-pane .main-error').append(text);
 
                         $body.find('#importPageDone .btn-container').append(btnClose);
 
