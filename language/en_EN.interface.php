@@ -677,7 +677,7 @@
         'tr_melis_cms_page_tree_import_zip_file' => 'Zip file',
         'tr_melis_cms_page_tree_import_name_of_file' => 'File name',
         'tr_melis_cms_page_tree_import_validated' => 'Validated',
-        'tr_melis_cms_page_tree_import_continue_and_import' => 'Continue & Import',
+        'tr_melis_cms_page_tree_import_continue_and_import' => 'Import',
         'tr_melis_cms_page_tree_import_file' => 'Import file',
         'tr_melis_cms_page_tree_import_result' => 'Result',
         'tr_melis_cms_page_tree_import_table_does_not_exist' => '%s does not exist on your database.',
