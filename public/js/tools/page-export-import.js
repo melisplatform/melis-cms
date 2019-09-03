@@ -6,6 +6,7 @@ $(document).ready(function(){
      * Process the pages export
      */
     $body.on("click", "#btn-export-pages", function(){
+        melisCoreTool.pending('#btn-export-pages');
         updateProgressValue(0);
 
         $(".page-export-form").addClass("hidden");
@@ -35,13 +36,16 @@ $(document).ready(function(){
                 newContent += String.fromCharCode(data.charCodeAt(i) & 0xFF);
             }
             var bytes = new Uint8Array(newContent.length);
-            for (var i=0; i<newContent.length; i++) {
+            for (var i = 0; i < newContent.length; i++) {
                 bytes[i] = newContent.charCodeAt(i);
             }
-            var blob = new Blob([bytes], {type: mime})
+            var blob = new Blob([bytes], {type: mime});
             saveAs(blob, fileName);
-        }).error(function(data){
 
+            $body.find('#btn-export-pages').siblings('button.btn.btn-danger.pull-left').trigger('click');
+            melisCoreTool.done('#btn-export-pages');
+        }).error(function(data){
+            melisCoreTool.done('#btn-export-pages');
         });
     });
 
