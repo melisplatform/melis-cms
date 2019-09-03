@@ -2313,7 +2313,7 @@ return array(
                                             'class' => 'export_page_resources',
                                             'value' => '',
                                             'data-label' => 'tr_melis_cms_tree_export_page_resources',
-                                            'data-tooltip' => 'tr_melis_cms_tree_export_page_resources'
+                                            'data-tooltip' => 'tr_melis_cms_tree_export_page_resources_tooltip'
                                         ),
                                     ),
                                 ),
