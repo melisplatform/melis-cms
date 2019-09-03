@@ -381,26 +381,22 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
      * @param $dir
      * @return bool
      */
-    public function deleteDirectory($dir) {
-        if (!file_exists($dir)) {
-            return true;
-        }
+    public function deleteDirectory($path) {
+        $dir = opendir($path);
 
-        if (!is_dir($dir)) {
-            return unlink($dir);
-        }
-
-        foreach (scandir($dir) as $item) {
-            if ($item == '.' || $item == '..') {
-                continue;
-            }
-
-            if (!$this->deleteDirectory($dir . '/' . $item)) {
-                return false;
+        while(false !== ( $file = readdir($dir)) ) {
+            if (( $file != '.' ) && ( $file != '..' )) {
+                $full = $path . '/' . $file;
+                if ( is_dir($full) ) {
+                    $this->deleteDirectory($full);
+                } else {
+                    unlink($full);
+                }
             }
         }
 
-        return rmdir($dir);
+        closedir($dir);
+        return rmdir($path);
     }
 
     /**
