@@ -670,8 +670,8 @@
         'tr_melis_cms_tree_export_select_export_option' => 'Sélectionnez une option d\'export',
         'tr_melis_cms_tree_export_select_export_option_tooltip' => 'Choisissez si vous souhaitez exporter uniquement la page sélectionnée ou inclure ses pages enfants',
 
-        'tr_melis_cms_tree_import_import_not_admin1' => 'Vous ne disposez pas des droits pour effectuer des exports.',
-        'tr_melis_cms_tree_import_import_not_admin2' => 'Veuillez contacter votre administrateur.',
+        'tr_melis_cms_tree_import_import_not_admin1' => 'Votre compte ne vous permet pas de faire des imports sur cette plateforme.',
+        'tr_melis_cms_tree_import_import_not_admin2' => 'Merci de contacter votre administrateur.',
 
         'tr_melis_cms_page_tree_import' => 'Importer des pages',
         'tr_melis_cms_page_tree_import_wrong_extension' => 'Type de fichier incorrect',

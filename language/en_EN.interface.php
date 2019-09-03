@@ -660,7 +660,7 @@
         'tr_melis_cms_tree_export_page_and_children' => 'Export page and children pages <span class="melis-radio-box-circle"></span>',
         'tr_melis_cms_tree_export_page_only' => 'Export only this page (no children pages) <span class="melis-radio-box-circle"></span>',
         'tr_melis_cms_tree_export_page_resources' => 'Export resources used by the pages (images, ...)',
-        'tr_melis_cms_tree_export_no_rights' => 'You do not have the rights to make exports.<br/>Please contact the administrator.',
+        'tr_melis_cms_tree_export_no_rights' => 'Your account doesn\'t entitle you to make exports on this platform.<br/>Please contact the administrator.',
         'tr_melis_cms_tree_export_in_progress' => 'Export in progress',
         'tr_melis_cms_tree_export_failed' => 'A problem occurred during the export, please try again',
         'tr_melis_cms_tree_export_success' => 'Page successfully exported',
@@ -668,7 +668,7 @@
         'tr_melis_cms_tree_export_select_export_option' => 'Select an export option',
         'tr_melis_cms_tree_export_select_export_option_tooltip' => 'Choose if you want to export only the selected page or to include its child pages',
 
-        'tr_melis_cms_tree_import_import_not_admin1' => 'Your account doesn\'t entitle you to make exports on this platform.',
+        'tr_melis_cms_tree_import_import_not_admin1' => 'Your account doesn\'t entitle you to make imports on this platform.',
         'tr_melis_cms_tree_import_import_not_admin2' => 'Please contact the administrator.',
 
         'tr_melis_cms_page_tree_import' => 'Import pages',
