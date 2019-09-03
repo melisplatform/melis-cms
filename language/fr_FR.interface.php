@@ -700,6 +700,8 @@
         'tr_melis_cms_page_tree_import_modal_unexpected_errors' => 'Des erreurs imprévues sont arrivées durant l’import et celui-ci ne s’est pas terminé correctement. ',
         'tr_melis_cms_page_tree_import_modal_unexpected_errors2' => 'Avant de réimporter, merci de bien vouloir verifier que des parties de votre imports n’ont pas été faite.',
         'tr_melis_cms_page_tree_import_modal_unexpected_error_detail' => 'Détails des erreurs',
+        'tr_melis_cms_page_tree_import_ko_no_file' => 'Aucun fichier uploadé',
+        'tr_melis_cms_page_tree_import_file_input' => 'File Input',
 
         'tr_melis_cms_page_tree_import_success' => 'Succès',
         'tr_melis_cms_page_tree_import_failed' => 'Echec',

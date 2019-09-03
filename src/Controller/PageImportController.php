@@ -223,10 +223,12 @@ class PageImportController extends AbstractActionController
      */
     private function getFormErrors($errors, $formConfig)
     {
+        $translator = $this->getServiceLocator()->get('translator');
+
         foreach ($errors as $errorKey => $errorValue) {
             foreach ($formConfig['elements'] as $elementKey => $elementValue) {
-                if ($elementValue['spec']['name'] == $errorKey && ! empty($elementValue['spec']['options']['label'])) {
-                    $errors[$elementValue['spec']['options']['label']] = reset($errorValue);
+                if ($elementValue['spec']['name'] == $errorKey && ! empty($elementValue['spec']['name'])) {
+                    $errors[$translator->translate('tr_melis_cms_page_tree_import_zip_file')] = reset($errorValue);
                     unset($errors[$errorKey]);
                 }
             }

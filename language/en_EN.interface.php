@@ -698,6 +698,8 @@
         'tr_melis_cms_page_tree_import_modal_unexpected_errors' => 'Some unpredictable errors happened during the import and it wasn\'t completed. ',
         'tr_melis_cms_page_tree_import_modal_unexpected_errors2' => 'Before reimporting, consider checking if parts of your import have been done.',
         'tr_melis_cms_page_tree_import_modal_unexpected_error_detail' => 'Details of errors',
+        'tr_melis_cms_page_tree_import_ko_no_file' => 'No file was uploaded',
+        'tr_melis_cms_page_tree_import_file_input' => 'File Input',
 
         'tr_melis_cms_page_tree_import_success' => 'Success',
         'tr_melis_cms_page_tree_import_failed' => 'Failed',

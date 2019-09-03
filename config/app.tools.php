@@ -2354,6 +2354,15 @@ return array(
                                     'name'     => 'page_tree_import',
                                     'required' => true,
                                     'validators' => array(
+                                        [
+                                            'name' => 'fileuploadfile',
+                                            'break_chain_on_failure' => true,
+                                            'options' => [
+                                                'messages' => [
+                                                    \Zend\Validator\File\UploadFile::NO_FILE => 'tr_melis_cms_page_tree_import_ko_no_file',
+                                                ],
+                                            ],
+                                        ],
                                         array(
                                             'name' => 'FileExtension',
                                             'break_chain_on_failure' => true,

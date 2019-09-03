@@ -100,7 +100,7 @@ $(document).ready(function(){
                     importTest(data.result);
                     importFormData = data.result;
                 } else {
-                    melisHelper.melisKoNotification('test tittle', 'test message', data.errors);
+                    melisHelper.melisKoNotification(translations.tr_melis_cms_page_tree_import, '', data.errors);
                     melisCoreTool.done('#page-tree-import-test');
                 }
             }).error(function (data) {
