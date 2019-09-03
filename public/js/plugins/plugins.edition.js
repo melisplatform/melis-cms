@@ -21,7 +21,6 @@ var melisPluginEdition = (function($, window) {
      * $body.data("events").click,
      * In jQuery 1.8, it is no longer possible to access the element's events using .data('events') http://bugs.jquery.com/ticket/10589.
      */
-
     $.each( $._data($body.get(0), "events"), function( i, val ) {
         try {
             if (val.selector == "#pluginModalBtnApply") {
@@ -553,7 +552,6 @@ var melisPluginEdition = (function($, window) {
     }
 
     function createPluginModal() {
-
         var toolBox = $(this).closest(".melis-plugin-tools-box");
         var pluginContainer = toolBox.parent(".melis-ui-outlined");
         var pluginFrontConfig = $.trim(pluginContainer.find(".plugin-hardcoded-conf").text());

@@ -178,8 +178,7 @@ var melisCms = (function(){
 		// convert the serialized form values into an array
 		var datastring = $("#" + pageNumber + "_id_meliscms_page form").serializeArray();
 		
-		if($("#" + pageNumber + "_id_page_taxonomy").length)
-		{
+		if ( $("#" + pageNumber + "_id_page_taxonomy").length ) {
 			var pageTags = $("#" + pageNumber + "_id_page_taxonomy").data('tags').toString();
 			
 			// push tags value into the array
@@ -498,7 +497,7 @@ var melisCms = (function(){
 		}
 		else{
 			if(charLength !== 0){
-				prevLabel.append("<span class='text-counter-indicator'><i class='fa fa-text-width'></i>(" + charLength + ")</span>");
+				prevLabel.find(".label-text").append("<span class='text-counter-indicator'><i class='fa fa-text-width'></i>(" + charLength + ")</span>");
 
                 /**
                  * Removed so that meta title & meta description has no limit

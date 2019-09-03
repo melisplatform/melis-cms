@@ -1859,7 +1859,7 @@ return array(
                         'target' => '#tableToolSite301',
                         'ajaxUrl' => '/melis/MelisCms/SiteRedirect/getSiteRedirect',
                         'dataFunction' => 'initRedirectTemplateList',
-                        'ajaxCallback' => '',
+                        'ajaxCallback' => 'paginateDataTables()',
                         'filters' => array(
                             'left' => array(
                                 'tool-site-redirect-limit' => array(

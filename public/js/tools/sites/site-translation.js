@@ -1,8 +1,8 @@
 //public variable for site translation loaded table detection
 var sitesTranslationLoadedTblLists = [];
 
-$(document).ready(function(){
-    var body = $("body");
+$(function(){
+    var $body = $("body");
     var mst_id = 0;
     var mstt_id = 0;
     var transZoneKey = "meliscms_tool_sites_site_translations";
@@ -10,7 +10,7 @@ $(document).ready(function(){
     /**
      * This will trigger the language filter
      */
-    body.on("change", ".transLangFilter", function(){
+    $body.on("change", ".transLangFilter", function(){
         var tableId = $(this).parents().eq(6).find('table').attr('id');
         $("#"+tableId).DataTable().ajax.reload();
     });
@@ -18,7 +18,7 @@ $(document).ready(function(){
     /**
      * This will refresh the table
      */
-    body.on("click", ".mt-tr-refresh", function(){
+    $body.on("click", ".mt-tr-refresh", function(){
         var siteId = activeTabId.split("_")[0];
         melisHelper.zoneReload(siteId+'_id_meliscms_tool_sites_site_translations', transZoneKey, {siteId:siteId}, function(){
             $("#"+siteId+'_id_meliscms_tool_sites_site_translations').addClass("active");
@@ -28,7 +28,7 @@ $(document).ready(function(){
     /**
      * This will edit the translation
      */
-    body.on("click", ".btnEditSiteTranslation", function(){
+    $body.on("click", ".btnEditSiteTranslation", function(){
         var zoneId = "id_meliscms_tool_sites_site_translations_modal_edit";
         var melisKey = "meliscms_tool_sites_site_translations_modal_edit";
         var modalUrl = "/melis/MelisCms/SitesTranslation/renderToolSitesSiteTranslationModal";
@@ -46,7 +46,7 @@ $(document).ready(function(){
     /**
      * This will delete the translation
      */
-    body.on("click", "#btnDeleteSiteTranslation", function(e){
+    $body.on("click", "#btnDeleteSiteTranslation", function(e){
         var siteId = activeTabId.split("_")[0];
         var t_id = $(this).closest("tr").attr('data-mst-id');
         var tt_id = $(this).closest("tr").attr('data-mstt-id');
@@ -82,7 +82,7 @@ $(document).ready(function(){
     /**
      * This will save the translation
      */
-    body.on("click", ".btnSaveSiteTranslation", function(e){
+    $body.on("click", ".btnSaveSiteTranslation", function(e){
         var siteId = activeTabId.split("_")[0];
         // var form = $("#site-translation-form");
         var form = $("form[name='sitestranslationform']").serializeArray();
@@ -123,7 +123,7 @@ $(document).ready(function(){
      * adjust table column to make it responsive on mobile
      * when the user click on sites translation tab
      */
-    body.on("shown.bs.tab", ".sites-tool-tabs a[data-toggle='tab']", function(){
+    $body.on("shown.bs.tab", ".sites-tool-tabs a[data-toggle='tab']", function(){
         if ($(window).width() <= 768) {
             var target = $(this).attr("href");
             target = target.replace("#", "");
@@ -152,6 +152,9 @@ window.siteTransTableCallBack = function(data, tblSetting){
      * translation is came from the file
      */
     $("#"+siteId+"_tableMelisSiteTranslation tbody tr[data-mst-id='0']").find("#btnDeleteSiteTranslation").remove();
+
+    // pagination of dataTables data
+    melisCore.paginateDataTables();
 };
 
 /**

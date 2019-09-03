@@ -106,5 +106,9 @@ window.initRedirectTemplateList = function(data, tblSettings){
 	if($('#redirectSiteSelect').length){
 		data.s301_site_id = $('#redirectSiteSelect').val();
 	}
-		
+}
+
+window.paginateDataTables = function() {
+	// pagination of dataTables data
+    melisCore.paginateDataTables();
 }

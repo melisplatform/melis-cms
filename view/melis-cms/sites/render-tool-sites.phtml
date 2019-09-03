@@ -3,7 +3,7 @@ $id = '';
 if (!empty($this->zoneconfig['conf']['id']))
     $id = ' id="' .$this->zoneconfig['conf']['id'] . '"';
 ?>
-<div<?= $id; ?>  class="tab-pane container-level-a" data-melisKey='<?= $this->melisKey; ?>'>
+<div <?= $id; ?>  class="tab-pane container-level-a" data-melisKey='<?= $this->melisKey; ?>'>
     <?php
     if(!empty($this->zoneconfig['interface'])) {
         foreach($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
