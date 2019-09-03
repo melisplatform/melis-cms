@@ -59,9 +59,11 @@ class PageExportController extends AbstractActionController
      */
     public function exportPageAction()
     {
+        $translator = $this->getServiceLocator()->get('translator');
+
         $result = [
-            'success' => false,
-            'message' => 'tr_melis_cms_tree_export_failed',
+            'success' => true,
+            'message' => $translator->translate('tr_melis_cms_tree_export_failed'),
             'error' => ''
         ];
         //get the request
@@ -71,8 +73,6 @@ class PageExportController extends AbstractActionController
         //prepare the services need for page export
         /** @var MelisCmsPageExportService $pageExportService */
         $pageExportService = $this->getServiceLocator()->get('MelisCmsPageExportService');
-
-        $translator = $this->getServiceLocator()->get('translator');
 
         if(!empty($data['selected_page_id']) && $request->isPost()){
             $pageId = $data['selected_page_id'];
@@ -142,27 +142,27 @@ class PageExportController extends AbstractActionController
                                 return $response;
                             }else{
                                 //problem on deleting the temporary folder
-                                print_r('problem on deleting the temp folder');
-                                exit;
+                                $result['success'] = false;
+                                $result['message'] = 'problem on deleting the temp folder';
                             }
                         }else{
                             //cannot convert the folder to zip
-                            print_r('error converting folder to zip');
-                            exit;
+                            $result['success'] = false;
+                            $result['message'] = 'error converting folder to zip';
                         }
                     }else{
                         //temporary folder is not writable
-                        print_r('temp folder is not writable');
-                        exit;
+                        $result['success'] = false;
+                        $result['message'] = 'temp folder is not writable';
                     }
                 }else{
                     //failed exporting page
-                    print_r('failed exporting page');
-                    exit;
+                    $result['success'] = false;
+                    $result['message'] = 'failed exporting page';
                 }
             }
         }
-        $result['message'] = $translator->translate($result['message']);
+        $result['success'] = false;
         return new JsonModel($result);
     }
 }
