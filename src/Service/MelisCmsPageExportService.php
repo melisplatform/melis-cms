@@ -327,13 +327,26 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
      */
     private function getResources($pageContent, &$resources)
     {
-        preg_match_all('/< *img[^>]*src *= *["\']?([^"\']*)/i', $pageContent, $matches);
+        $imageMatches = null;
+        preg_match_all('/< *img[^>]*src *= *["\']?([^"\']*)/i', $pageContent, $imageMatches);
+        if (!empty($imageMatches)) {
+            unset($imageMatches[0]);
+        }
+        $videoMatches = null;
+        preg_match_all('/< *source[^>]*src *= *["\']?([^"\']*)/i', $pageContent, $videoMatches);
+        if (!empty($videoMatches)) {
+            unset($videoMatches[0]);
+        }
+
+        $matches = array_merge($imageMatches, $videoMatches);
+
         foreach($matches as $list){
             foreach($list as $val) {
-                if (strpos($val, 'img') === false) {
+                if (strpos($val, 'img') === false || strpos($val, 'source') === false) {
                     //get only whats in the media folder
                     if (strpos($val, 'media') !== false) {
                         if (!in_array($val, $resources)) {
+                            $val = str_replace('%20', ' ', $val);
                             array_push($resources, $val);
                         }
                     }
@@ -414,8 +427,10 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
         if(is_writable($folderPath)){
             foreach($resources as $path){
                 $info = pathinfo($path);
+
                 if(!empty($info['dirname'])){
                     $fileNewPath = $folderPath.$info['dirname'];
+
                     /**
                      * create the folder path if not exist
                      */
