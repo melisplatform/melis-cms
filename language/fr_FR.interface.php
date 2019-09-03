@@ -661,7 +661,7 @@
         'tr_melis_cms_tree_export_page' => 'Exporter des pages',
         'tr_melis_cms_tree_export_page_and_children' => 'Exporter la page et les pages enfants <span class="melis-radio-box-circle"></span>',
         'tr_melis_cms_tree_export_page_only' => 'Exporter cette page uniquement (Pas les pages enfants) <span class="melis-radio-box-circle"></span>',
-        'tr_melis_cms_tree_export_page_resources' => 'Exporter les ressources utilisées par cette page (images, etc...)',
+        'tr_melis_cms_tree_export_page_resources' => 'Sélectionnez si vous souhaitez inclure les ressources des pages exportées (images, etc...)',
         'tr_melis_cms_tree_export_no_rights' => 'Votre compte ne vous permet pas de faire des exports sur cette plateforme.<br/>Merci de contacter votre administrateur.',
         'tr_melis_cms_tree_export_in_progress' => 'Export en cours',
         'tr_melis_cms_tree_export_failed' => 'Un problème est survenu pendant l\'export, veuillez réessayer',
