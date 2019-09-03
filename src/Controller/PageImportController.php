@@ -51,13 +51,13 @@ class PageImportController extends AbstractActionController
             $errors = $this->getFormErrors($form->getMessages(), $formConfig);
         }
 
-        if (!empty($errors))
+        if (! empty($errors))
             $success = false;
 
         return new JsonModel([
             'success' => $success,
-            'errors' => !empty($errors) ? $errors : [],
-            'result' => !empty($formData) ? $formData : null
+            'errors' => ! empty($errors) ? $errors : [],
+            'result' => ! empty($formData) ? $formData : null
         ]);
     }
 
@@ -72,26 +72,32 @@ class PageImportController extends AbstractActionController
         $formData = json_decode($data['formData'], true);
         $success = true;
 
-        $zip = $this->openZip($formData['page_tree_import']['tmp_name']);
+//        $zip = $this->openZip($formData['page_tree_import']['tmp_name']);
+        $zip = new ZipArchive();
+        $res = $zip->open($formData['page_tree_import']['tmp_name']);
     
-        if (!empty($zip)) {
+        if ($res === true) {
             $xml = $zip->getFromName('PageExport.xml');
             $zip->close();
-            $res = $pageImportSvc->importTest($xml, $formData['keepIds']);
 
-            if (!empty($res['errors'])) {
+            if (! empty($xml))
+                $res = $pageImportSvc->importTest($xml, $formData['keepIds']);
+            else
+                $errors[] = 'The zip does not contain PageExport.xml';
+
+            if (! empty($res['errors'])) {
                 $errors = $res['errors'];
             }
         } else {
             $errors[] = 'Invalid Zip File';
         }
 
-        if (!empty($errors))
+        if (! empty($errors))
             $success = false;
 
         return new JsonModel([
             'success' => $success,
-            'errors' => !empty($errors) ? $errors : [],
+            'errors' => ! empty($errors) ? $errors : [],
         ]);
     }
 
@@ -105,19 +111,24 @@ class PageImportController extends AbstractActionController
         $data = get_object_vars($this->getRequest()->getPost());
         $formData = json_decode($data['formData'], true);
         $pageId = $data['pageid'];
-        $zip = $this->openZip($formData['page_tree_import']['tmp_name']);
+        $zip = new ZipArchive;
+        $res = $zip->open($formData['page_tree_import']['tmp_name']);
         $success = true;
 
-        if (!empty($zip)) {
+        if ($res === true) {
             $xml = $zip->getFromName('PageExport.xml');
-            $res = $pageImportSvc->importPageTree($pageId, $xml, $formData['keepIds']);
+            if (! empty($xml))
+                $res = $pageImportSvc->importPageTree($pageId, $xml, $formData['keepIds']);
+            else
+                $errors[] = 'The zip does not contain PageExport.xml';
 
-            if (!empty($res['errors'])) {
+            if (! empty($res['errors'])) {
                 $success = $res['success'];
                 $errors = $res['errors'];
             } else {
                 $zip->extractTo($_SERVER["DOCUMENT_ROOT"] . '/xml');
                 $zip->close();
+
                 if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/xml/media')) {
                     $this->recurse_copy($_SERVER['DOCUMENT_ROOT'] . '/xml/media', $_SERVER['DOCUMENT_ROOT'] . '/media');
                     $this->deleteDirectory($_SERVER['DOCUMENT_ROOT'] . '/xml');
@@ -129,7 +140,7 @@ class PageImportController extends AbstractActionController
 
         return new JsonModel([
             'success' => $success,
-            'errors' => !empty($errors) ? $errors : [],
+            'errors' => ! empty($errors) ? $errors : [],
             'pagesCount' => $res['pagesCount'] ?? 0
         ]);
     }
@@ -142,7 +153,7 @@ class PageImportController extends AbstractActionController
     private function prepareFile($input, $form) {
         $target = $_SERVER['DOCUMENT_ROOT'] . '/xml';
 
-        if (!is_dir($target))
+        if (! is_dir($target))
             mkdir($target, 0777);
 
         $fileInput = new \Zend\InputFilter\FileInput($input);
@@ -214,7 +225,7 @@ class PageImportController extends AbstractActionController
     {
         foreach ($errors as $errorKey => $errorValue) {
             foreach ($formConfig['elements'] as $elementKey => $elementValue) {
-                if ($elementValue['spec']['name'] == $errorKey && !empty($elementValue['spec']['options']['label'])) {
+                if ($elementValue['spec']['name'] == $errorKey && ! empty($elementValue['spec']['options']['label'])) {
                     $errors[$elementValue['spec']['options']['label']] = reset($errorValue);
                     unset($errors[$errorKey]);
                 }
@@ -225,20 +236,14 @@ class PageImportController extends AbstractActionController
     }
 
     /**
-     * Returns Zip Object
-     * @param $path
-     * @return mixed
+     * Will copy a directory and it's contents
+     * @param $src
+     * @param $dst
      */
-    private function openZip($path)
-    {
-        $zip = new ZipArchive;
-        return $zip->open($path) ? $zip : null;
-    }
-
     public function recurse_copy($src,$dst) {
         $dir = opendir($src);
 
-        if (!file_exists($dst))
+        if (! file_exists($dst))
             mkdir($dst);
 
         while(false !== ( $file = readdir($dir)) ) {
@@ -256,28 +261,22 @@ class PageImportController extends AbstractActionController
 
     /**
      * Function to delete directory/file
-     *
      * @param $dir
      * @return bool
      */
     public function deleteDirectory($dir) {
-        if (!file_exists($dir)) {
+        if (! file_exists($dir))
             return true;
-        }
 
-        if (!is_dir($dir)) {
+        if (! is_dir($dir))
             return unlink($dir);
-        }
 
         foreach (scandir($dir) as $item) {
-            if ($item == '.' || $item == '..') {
+            if ($item == '.' || $item == '..')
                 continue;
-            }
 
-            if (!$this->deleteDirectory($dir . DIRECTORY_SEPARATOR . $item)) {
+            if (! $this->deleteDirectory($dir . DIRECTORY_SEPARATOR . $item))
                 return false;
-            }
-
         }
 
         return rmdir($dir);
