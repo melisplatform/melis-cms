@@ -14,7 +14,7 @@ return array(
                         'target' => '#tableToolTemplateManager',
                         'ajaxUrl' => '/melis/MelisCms/ToolTemplate/getToolTemplateData',
                         'dataFunction' => 'initTemplateList',
-                        'ajaxCallback' => '',
+                        'ajaxCallback' => 'paginateDataTables()',
                         'filters' => array(
                             'left' => array(
                                 'toolTemplates-limit' => array(
@@ -714,7 +714,7 @@ return array(
                         'target' => '#tableToolStyles',
                         'ajaxUrl' => '/melis/MelisCms/ToolStyle/getStyleData',
                         'dataFunction' => '',
-                        'ajaxCallback' => '',
+                        'ajaxCallback' => 'paginateDataTables()',
                         'filters' => array(
                             'left' => array(
                                 'style-tool-table-limit' => array(

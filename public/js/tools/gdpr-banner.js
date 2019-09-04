@@ -52,25 +52,23 @@ $(function () {
                 url: '/melis/MelisCms/GdprBanner/saveBanner',
                 data: data,
                 dataType: 'json',
-                encode: true,
-                success: function(data) {
-                    if (data.success) {
-                        melisHelper.melisOkNotification(data.textTitle, data.textMessage);
-                        $body.find("#id_mcgdprbanner_site_id").trigger("change");
-                    }
-                    else {
-                        melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
-                        //highlight errors
-                        melisCoreTool.highlightErrors(0, data.errors, "id_melis_cms_gdpr_banner");
-                    }
-    
-                    // update flash messenger component
-                    melisCore.flashMessenger();
-                    melisCoreTool.done(".cms-gdpr-save");
-                },
-                error: function() {
-                    melisCoreTool.done(".cms-gdpr-save");
+                encode: true
+            }).done(function(data) {
+                if (data.success) {
+                    melisHelper.melisOkNotification(data.textTitle, data.textMessage);
+                    $body.find("#id_mcgdprbanner_site_id").trigger("change");
                 }
+                else {
+                    melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
+                    //highlight errors
+                    melisCoreTool.highlightErrors(0, data.errors, "id_melis_cms_gdpr_banner");
+                }
+
+                // update flash messenger component
+                melisCore.flashMessenger();
+                melisCoreTool.done(".cms-gdpr-save");
+            }).fail(function(xhr, textStatus, errorThrown) {
+                melisCoreTool.done(".cms-gdpr-save");
             });
         }
     });
