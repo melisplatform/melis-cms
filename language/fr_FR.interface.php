@@ -686,7 +686,7 @@
         'tr_melis_cms_page_tree_import_table_does_not_exist' => 'La table %s n\'existe pas dans la base de données.',
         'tr_melis_cms_page_tree_import_column_does_not_exist' => 'La colonne %s n\'existe pas dans la table %s.',
         'tr_melis_cms_page_tree_import_primary_already_used' => 'l\'ID %u de la table %s est déjà utilisé.',
-        'tr_melis_cms_page_tree_import_modal_keep_ids_tooltop' => 'Cochez cette case si vous souhaitez conserver les mêmes IDs de pages quand celles-ci ont été Exportées.',
+        'tr_melis_cms_page_tree_import_modal_keep_ids_tooltop' => 'Cochez cette case si vous souhaitez conserver les mêmes IDs de pages quand celles-ci ont été exportées.',
         'tr_melis_cms_page_tree_import_modal_zip_tooltip' => 'Sélectionnez le fichier zip contenant les pages à importer.',
         'tr_melis_cms_page_tree_import_modal_test_file' => 'Tester le fichier',
         'tr_melis_cms_page_tree_import_modal_processing' => 'Traitement du fichier en cours',
