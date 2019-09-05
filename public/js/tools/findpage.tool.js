@@ -232,8 +232,9 @@
             source: {
                 url: '/melis/MelisCms/TreeSites/get-tree-pages-by-page-id',
                 cache: true
-            },         
-            lazyload: function(event, data) {
+            },
+            //lazyLoad    
+            load: function(event, data) {
               // get the page ID and pass it to lazyload
               var pageId = data.node.data.melisData.page_id;
               data.result = { 

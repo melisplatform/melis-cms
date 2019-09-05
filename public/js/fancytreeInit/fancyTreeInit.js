@@ -131,7 +131,8 @@
 										}
 								}
 						},
-						lazyLoad: function(event, data) {
+						//lazyLoad
+						load: function(event, data) {
 							// get the page ID and pass it to lazyload
 							var pageId = data.node.data.melisData.page_id;
 								data.result = {

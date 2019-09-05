@@ -61,31 +61,31 @@ $(function(){
 			var pid_id 		= $(this).parents("tr").attr("id"),
 				dataString 	= new Array;
 			
-			dataString.push({
-				name	: 'pid_id',
-				value	: pid_id,
-			});
-			
-			melisCoreTool.confirm(
-				translations.tr_meliscore_common_yes,
-				translations.tr_meliscore_common_no,
-				translations.tr_meliscms_tool_platform_ids, 
-				translations.tr_meliscms_tool_platform_ids_confirm_msg, 
-				function() {
-					$.ajax({
-				        type        : 'POST', 
-				        url         : '/melis/MelisCms/Platform/deletePlatformId',
-				        data		: dataString,
-				        dataType    : 'json',
-				        encode		: true
-					}).done(function(data) {
-						melisHelper.zoneReload("id_meliscms_tool_platform_ids", "meliscms_tool_platform_ids");
-						melisHelper.melisOkNotification(data.textTitle, data.textMessage);
-						melisCore.flashMessenger();
-					}).fail(function(){
-						alert( translations.tr_meliscore_error_message );
-					});
-			});
+				dataString.push({
+					name	: 'pid_id',
+					value	: pid_id,
+				});
+				
+				melisCoreTool.confirm(
+					translations.tr_meliscore_common_yes,
+					translations.tr_meliscore_common_no,
+					translations.tr_meliscms_tool_platform_ids, 
+					translations.tr_meliscms_tool_platform_ids_confirm_msg, 
+					function() {
+						$.ajax({
+							type        : 'POST', 
+							url         : '/melis/MelisCms/Platform/deletePlatformId',
+							data		: dataString,
+							dataType    : 'json',
+							encode		: true
+						}).done(function(data) {
+							melisHelper.zoneReload("id_meliscms_tool_platform_ids", "meliscms_tool_platform_ids");
+							melisHelper.melisOkNotification(data.textTitle, data.textMessage);
+							melisCore.flashMessenger();
+						}).fail(function(){
+							alert( translations.tr_meliscore_error_message );
+						});
+				});
 		});
 
 	    window.initPlatformIdTbl = function () {
@@ -95,7 +95,10 @@ $(function(){
 		        $(parent).find('.noPlatformIdDeleteBtn').each(function () {
 		            var rowId = '#' + $(this).attr('id');
 		            $(parent).find(rowId).find('.btnCmsPlatformIdsDelete').remove();
-		        });
+				});
+				
+				// paginateDataTables data
+				melisCore.paginateDataTables();
 	    }
 });
 
