@@ -10,6 +10,9 @@
 namespace MelisCms\Service;
 
 use MelisCore\Service\MelisCoreGeneralService;
+use Zend\Db\Sql\Where;
+use Zend\Db\TableGateway\TableGateway;
+use Zend\Db\Metadata\Metadata;
 
 class MelisCmsPageExportService extends MelisCoreGeneralService
 {
@@ -35,6 +38,12 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
                                             'MelisEngineTableCmsLang'
                                        ];
 
+    protected $defaultExternalTablesList = [
+        'melis_cms_template' => 'templates',
+        'melis_cms_style' => 'styles',
+        'melis_cms_lang' => 'langs'
+    ];
+
     /**
      * Function to export page
      *
@@ -56,6 +65,12 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
         $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
         // Sending service start event
         $arrayParameters = $this->sendEvent('melis_cms_page_tree_export_start', $arrayParameters);
+
+        $pages = [];
+        $templates = [];
+        $styles = [];
+        $langs = [];
+        $this->getAllPageIds($pageId, $pages, $templates, $styles, $langs);
 
         try {
 
@@ -89,7 +104,11 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
              */
             $externalNode = $this->createXmlNode('external');
             $externalSource = new \DOMDocument();
-            $externalSource->loadXml($this->exportPageExternalTables());
+            $externalSource->loadXml($this->exportPageExternalTables([
+                'templates' => $templates,
+                'styles' => $styles,
+                'langs' => $langs
+            ]));
             //include the page tables inside the page node
             $externalNode['domNode']->appendChild($externalNode['domInstance']->importNode($externalSource->documentElement, true));
             $rootNode['domNode']->appendChild($rootNode['domInstance']->importNode($externalNode['domInstance']->documentElement, true));
@@ -147,6 +166,7 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
              */
             $tblXmlDoc = new \DOMDocument();
             $tblXmlDoc->loadXML($this->removeXmlDeclaration(htmlspecialchars_decode($tblXml->asXML(), ENT_XML1)));
+
             //return results
             $arrayParameters['results'] = $tblXmlDoc->saveXML();
         }catch(\Exception $ex){
@@ -163,14 +183,14 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
      *
      * @return mixed - return xml (<tables>...</tables>)
      */
-    public function exportPageExternalTables()
+    public function exportPageExternalTables($externalIds = [])
     {
         // Event parameters prepare
         $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
         // Sending service start event
         $arrayParameters = $this->sendEvent('melis_cms_page_export_external_table_start', $arrayParameters);
         try{
-
+            $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
             /**
              * prepare the table tag
              */
@@ -179,11 +199,18 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
              * process the extracting of external tables
              * and put in xml
              */
-            foreach($this->getExternalTableServiceList() as $tblServiceName){
-                $tblGtWay = $this->getServiceLocator()->get($tblServiceName);
-                $tblData = $tblGtWay->fetchAll()->toArray();
-                if(!empty($tblData)){
-                    $this->arrayToXml($tblData, $tblXml, $tblGtWay->getTableGateway()->getTable());
+            foreach($this->defaultExternalTablesList as $tableName => $arrayKey) {
+                if (! empty($externalIds[$arrayKey])) {
+                    $tblGtWay = new TableGateway($tableName, $adapter);
+                    $primaryCol = $this->getTablePrimaryColumn($tableName);
+
+                    $where = new Where();
+                    $where->in($primaryCol, $externalIds[$arrayKey]);
+                    $results = $tblGtWay->select($where)->toArray();
+
+                    if (!empty($results)) {
+                        $this->arrayToXml($results, $tblXml, $tableName);
+                    }
                 }
             }
             /**
@@ -544,5 +571,79 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
                 }
             }
         }
+    }
+
+    private function getAllPageIds($pageId, &$pages, &$templates, &$styles, &$langs) {
+        $pageTreeTable = $this->getServiceLocator()->get('MelisEngineTablePageTree');
+
+        $pages[] = $pageId;
+
+        $pageData = $pageTreeTable->getFullDatasPage($pageId)->toArray();
+
+        if (!empty($pageData))
+            $pageData = $pageData[0];
+
+        if (! empty($pageData['page_tpl_id']))
+            if (! in_array($pageData['page_tpl_id'], $templates))
+                $templates[] = $pageData['page_tpl_id'];
+
+        if (! empty($pageData['style_id']))
+            if (! in_array($pageData['style_id'], $styles))
+                $styles[] = $pageData['style_id'];
+
+        if (! empty($pageData['lang_cms_id']))
+            if (! in_array($pageData['lang_cms_id'], $langs))
+                $langs[] = $pageData['lang_cms_id'];
+
+        $pageTreeService = $this->getServiceLocator()->get('MelisEngineTree');
+
+        if (empty($children))
+            $children = $pageTreeService->getPageChildren($pageId)->toArray();
+
+        foreach($children as $id => $child) {
+            $subChildren = $pageTreeService->getPageChildren($child['tree_page_id'])->toArray();
+
+            if (! empty($subChildren)){
+                $this->getAllPageIds($child['tree_page_id'], $pages, $templates, $styles, $langs);
+            } else {
+                $pages[] = $child['tree_page_id'];
+
+                if (! empty($child['page_tpl_id']))
+                    if (! in_array($child['page_tpl_id'], $templates))
+                        $templates[] = $child['page_tpl_id'];
+
+                if (! empty($child['style_id']))
+                    if (! in_array($child['style_id'], $styles))
+                        $styles[] = $child['style_id'];
+
+                if (! empty($child['lang_cms_id']))
+                    if (! in_array($child['lang_cms_id'], $langs))
+                        $langs[] = $child['lang_cms_id'];
+            }
+        }
+    }
+
+    private function getTableConstraints($tableName)
+    {
+        $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
+        $metadata = new Metadata($adapter);
+        return $metadata->getConstraints($tableName);
+    }
+
+    private function getTablePrimaryColumn($tableName)
+    {
+        $constraints = $this->getTableConstraints($tableName);
+
+        foreach ($constraints as $constraint) {
+            if ($constraint->isPrimaryKey()) {
+                $primaryColumn = $constraint->getColumns();
+
+                if (is_array($primaryColumn)) {
+                    $primaryColumn = $primaryColumn[0];
+                }
+            }
+        }
+
+        return !empty($primaryColumn) ? $primaryColumn : null;
     }
 }

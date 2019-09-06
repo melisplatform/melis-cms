@@ -72,7 +72,6 @@ class PageImportController extends AbstractActionController
         $formData = json_decode($data['formData'], true);
         $success = true;
 
-//        $zip = $this->openZip($formData['page_tree_import']['tmp_name']);
         $zip = new ZipArchive();
         $res = $zip->open($formData['page_tree_import']['tmp_name']);
     
@@ -114,25 +113,26 @@ class PageImportController extends AbstractActionController
         $zip = new ZipArchive;
         $res = $zip->open($formData['page_tree_import']['tmp_name']);
         $success = true;
+        $hasResources = false;
 
         if ($res === true) {
+            if ($zip->count() > 1)
+                $hasResources = true;
+
             $xml = $zip->getFromName('PageExport.xml');
-            if (! empty($xml))
-                $res = $pageImportSvc->importPageTree($pageId, $xml, $formData['keepIds']);
-            else
+            $zip->close();
+            if (! empty($xml)) {
+                if ($hasResources)
+                    $res = $pageImportSvc->importPageTree($pageId, $xml, $formData['keepIds'], $formData['page_tree_import']['tmp_name']);
+                else
+                    $res = $pageImportSvc->importPageTree($pageId, $xml, $formData['keepIds']);
+            } else {
                 $errors[] = 'The zip does not contain PageExport.xml';
+            }
 
             if (! empty($res['errors'])) {
                 $success = $res['success'];
                 $errors = $res['errors'];
-            } else {
-                $zip->extractTo($_SERVER["DOCUMENT_ROOT"] . '/xml');
-                $zip->close();
-
-                if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/xml/media')) {
-                    $this->recurse_copy($_SERVER['DOCUMENT_ROOT'] . '/xml/media', $_SERVER['DOCUMENT_ROOT'] . '/media');
-                    $this->deleteDirectory($_SERVER['DOCUMENT_ROOT'] . '/xml');
-                }
             }
         } else {
             $errors[] = 'Unexpected error';
@@ -235,52 +235,5 @@ class PageImportController extends AbstractActionController
         }
 
         return $errors;
-    }
-
-    /**
-     * Will copy a directory and it's contents
-     * @param $src
-     * @param $dst
-     */
-    public function recurse_copy($src,$dst) {
-        $dir = opendir($src);
-
-        if (! file_exists($dst))
-            mkdir($dst);
-
-        while(false !== ( $file = readdir($dir)) ) {
-            if (( $file != '.' ) && ( $file != '..' )) {
-                if ( is_dir($src . '/' . $file) ) {
-                    $this->recurse_copy($src . '/' . $file,$dst . '/' . $file);
-                }
-                else {
-                    copy($src . '/' . $file,$dst . '/' . $file);
-                }
-            }
-        }
-        closedir($dir);
-    }
-
-    /**
-     * Function to delete directory/file
-     * @param $dir
-     * @return bool
-     */
-    public function deleteDirectory($dir) {
-        if (! file_exists($dir))
-            return true;
-
-        if (! is_dir($dir))
-            return unlink($dir);
-
-        foreach (scandir($dir) as $item) {
-            if ($item == '.' || $item == '..')
-                continue;
-
-            if (! $this->deleteDirectory($dir . DIRECTORY_SEPARATOR . $item))
-                return false;
-        }
-
-        return rmdir($dir);
     }
 }

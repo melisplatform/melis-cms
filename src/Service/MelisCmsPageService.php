@@ -357,7 +357,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
             $results = $pageStyleTbl->savePageStyle($arrayParameters['pageStyle'], $arrayParameters['pageId']);
         }
         catch (\Exception $e){
-            throw new \Exception('[page lang] ' . $e->getMessage());
+            throw new \Exception('[page style] ' . $e->getMessage());
         }
         
         // Service implementation end
