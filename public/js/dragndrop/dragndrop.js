@@ -284,7 +284,7 @@ var melisDragnDrop = (function($, window) {
                 $.ajax({
                     type: 'GET',
                     url: "/melispluginrenderer?module="+module+"&pluginName="+plugin+"&pageId="+pageId+"&fromDragDropZone=1&melisSite="+siteModule
-                }).done(function(data) {
+                }).done(function(plugins) {
                     var loadedPlug  = false,
                         $link       = $("link"),
                         $script     = $("script"),

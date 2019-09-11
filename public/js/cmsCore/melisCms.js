@@ -125,7 +125,7 @@ var melisCms = (function(){
 		        data        : datastring, 
 		        dataType    : 'json',
 				encode		: true
-			}).done(function() {
+			}).done(function(data) {
 				if ( data.success === 1 ) {
 					// reload and expand the treeview
 					refreshTreeview(data.datas.idPage);
@@ -451,7 +451,7 @@ var melisCms = (function(){
 	    		$("#"+ activeTabId + " .melis-iframe").css('height','1000px');
 	    		
 	    		// give iframe the calculated height based from the content
-	    		var iHeight = $("#"+ activeTabId + " .melis-iframe").contents().height()+20;  
+	    		var iHeight = $("#"+ activeTabId + " .melis-iframe").contents().height()+50;  
 	    		$("#"+ activeTabId + " .melis-iframe").css("height", iHeight);
 	    	});
 	}
