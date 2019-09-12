@@ -1,11 +1,13 @@
 $(document).ready(function(){
     var $body = $("body");
     var importFormData;
+    var idsMap;
 
     /**
      * Process the pages export
      */
     $body.on("click", "#btn-export-pages", function(){
+        var flag = true;
         melisCoreTool.pending('#btn-export-pages');
         updateProgressValue(0);
 
@@ -26,23 +28,44 @@ $(document).ready(function(){
                 }, 100);
             }
         }).success(function(data, status, request){
-            updateProgressValue(100);
+            var oData;
 
-            var fileName = request.getResponseHeader("fileName");
-            var mime = request.getResponseHeader("Content-Type");
+            try {
+                oData = JSON.parse(data);
+            } catch (e) {
+                flag = false;
+                updateProgressValue(100);
 
-            var newContent = "";
-            for (var i = 0; i < data.length; i++) {
-                newContent += String.fromCharCode(data.charCodeAt(i) & 0xFF);
+                var fileName = request.getResponseHeader("fileName");
+                var mime = request.getResponseHeader("Content-Type");
+                var newContent = "";
+
+                for (var i = 0; i < data.length; i++) {
+                    newContent += String.fromCharCode(data.charCodeAt(i) & 0xFF);
+                }
+
+                var bytes = new Uint8Array(newContent.length);
+
+                for (var i = 0; i < newContent.length; i++) {
+                    bytes[i] = newContent.charCodeAt(i);
+                }
+
+                var blob = new Blob([bytes], {type: mime});
+                saveAs(blob, fileName);
+
+                melisCore.flashMessenger();
+                melisHelper.melisOkNotification(
+                    translations.tr_melis_cms_tree_export_title,
+                    translations.tr_melis_cms_tree_export_notification_message,
+                    '#72af46'
+                );
             }
-            var bytes = new Uint8Array(newContent.length);
-            for (var i = 0; i < newContent.length; i++) {
-                bytes[i] = newContent.charCodeAt(i);
-            }
-            var blob = new Blob([bytes], {type: mime});
-            saveAs(blob, fileName);
+
+            if (flag)
+                melisHelper.melisKoNotification(translations.tr_melis_cms_tree_export_page, '', [oData.message]);
 
             $body.find('#btn-export-pages').siblings('button.btn.btn-danger.pull-left').trigger('click');
+
             melisCoreTool.done('#btn-export-pages');
         }).error(function(data){
             melisCoreTool.done('#btn-export-pages');
@@ -172,12 +195,13 @@ $(document).ready(function(){
                         $body.find('#pageImportConsole').append('<div id="pageImportProcessing"><p>' + translations.tr_melis_cms_page_tree_import_modal_processing + ' <i class="fa fa-spinner fa-spin"></i></p></div>');
                     }
                 }).success(function (data) {
-                    var btnClose = '<button type="button" data-dismiss="modal" class="btn btn-danger pull-left" style="margin-top: -15px; margin-left: -15px;">' + translations.tr_melis_cms_page_tree_import_close + '</button>';
+                    var btnClose = '<button type="button" id="importPageDoneClose" data-dismiss="modal" class="btn btn-danger pull-left" style="margin-top: -15px; margin-left: -15px;">' + translations.tr_melis_cms_page_tree_import_close + '</button>';
 
                     $body.find('#importPageValidated').css('display', 'none');
                     $body.find('#importPageDone').css('display', '');
 
                     if (data.success) {
+                        idsMap = data.idsMap;
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + importFormData.page_tree_import.name + '</p>');
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p>' + translations.tr_melis_cms_page_tree_import_result + ': <span style="color: green;">' + translations.tr_melis_cms_page_tree_import_success + '</span></p>');
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('</br>');
@@ -189,10 +213,43 @@ $(document).ready(function(){
 
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append(text);
 
+                        $body.find('#importPageDone .tab-content .tab-pane .main-error').append('</br>');
+                        $body.find('#importPageDone .tab-content .tab-pane .main-error').append('</br>');
+
+                        if (!data.keepIds) {
+                            $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p><i style="color:red;">NOTE: </i>' + translations.tr_melis_cms_page_tree_import_file_final_message_csv + '</p>');
+                        } else {
+                            $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p><i style="color:red;">NOTE: </i>' + translations.tr_melis_cms_page_tree_import_file_final_message_csv_keep_ids + '</p>');
+                        }
+
                         $body.find('#importPageDone .btn-container').append(btnClose);
+
+                        melisCore.flashMessenger();
+                        melisHelper.melisOkNotification(
+                            translations.tr_melis_cms_page_tree_import_title,
+                            translations.tr_melis_cms_page_tree_import_notification_message,
+                            '#72af46'
+                        );
 
                         $("#id-mod-menu-dynatree").fancytree("destroy");
                         mainTree();
+
+                        // download for csv mapping array
+                        $.ajax({
+                            type: 'POST',
+                            url: '/melis/MelisCms/PageImport/exportCsv',
+                            data: {
+                                idsMap: idsMap
+                            },
+                            success: function (data, textStatus, request) {
+                                if (data) {
+                                    var fileName = request.getResponseHeader("fileName");
+                                    var mime = request.getResponseHeader("Content-Type");
+                                    var blob = new Blob([request.responseText], {type: mime});
+                                    saveAs(blob, fileName);
+                                }
+                            }
+                        });
                     } else {
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + importFormData.page_tree_import.name + '</p>');
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p>' + translations.tr_melis_cms_page_tree_import_result + ': <span style="color: red;">' + translations.tr_melis_cms_page_tree_import_failed + '</span></p>');

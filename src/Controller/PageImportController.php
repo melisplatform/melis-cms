@@ -13,6 +13,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 use ZipArchive;
+use Zend\Http\PhpEnvironment\Response as HttpResponse;
 
 class PageImportController extends AbstractActionController
 {
@@ -67,6 +68,7 @@ class PageImportController extends AbstractActionController
      */
     public function importTestAction()
     {
+        $translator = $this->getServiceLocator()->get('translator');
         $pageImportSvc = $this->getServiceLocator()->get('MelisCmsPageImportService');
         $data = get_object_vars($this->getRequest()->getPost());
         $formData = json_decode($data['formData'], true);
@@ -82,13 +84,13 @@ class PageImportController extends AbstractActionController
             if (! empty($xml))
                 $res = $pageImportSvc->importTest($xml, $formData['keepIds']);
             else
-                $errors[] = 'The zip does not contain PageExport.xml';
+                $errors[] = $translator->translate('tr_melis_cms_page_tree_error_no_page_export_xml');
 
             if (! empty($res['errors'])) {
                 $errors = $res['errors'];
             }
         } else {
-            $errors[] = 'Invalid Zip File';
+            $errors[] = $translator->translate('tr_melis_cms_page_tree_error_invalid_zip_file');
         }
 
         if (! empty($errors))
@@ -106,6 +108,7 @@ class PageImportController extends AbstractActionController
      */
     public function importPageAction()
     {
+        $translator = $this->getServiceLocator()->get('translator');
         $pageImportSvc = $this->getServiceLocator()->get('MelisCmsPageImportService');
         $data = get_object_vars($this->getRequest()->getPost());
         $formData = json_decode($data['formData'], true);
@@ -127,21 +130,31 @@ class PageImportController extends AbstractActionController
                 else
                     $res = $pageImportSvc->importPageTree($pageId, $xml, $formData['keepIds']);
             } else {
-                $errors[] = 'The zip does not contain PageExport.xml';
+                $errors[] = $translator->translate('tr_melis_cms_page_tree_error_no_page_export_xml');
             }
 
             if (! empty($res['errors'])) {
                 $success = $res['success'];
                 $errors = $res['errors'];
+            } else {
+                $this->getEventManager()->trigger('meliscms_page_tree_import_end', $this, [
+                    'success' => true,
+                    'textTitle' => $translator->translate('tr_melis_cms_page_tree_import_title'),
+                    'textMessage' => sprintf($translator->translate('tr_melis_cms_page_tree_log_message'), $res['pagesCount'], $pageId),
+                    'typeCode' => 'CMS_PAGE_IMPORT',
+                    'itemId' => $pageId
+                ]);
             }
         } else {
-            $errors[] = 'Unexpected error';
+            $errors[] = $translator->translate('tr_melis_cms_page_tree_error_unexpected');
         }
 
         return new JsonModel([
             'success' => $success,
             'errors' => ! empty($errors) ? $errors : [],
-            'pagesCount' => $res['pagesCount'] ?? 0
+            'pagesCount' => $res['pagesCount'] ?? 0,
+            'idsMap' => $res['idsMap'] ?? [],
+            'keepIds' => $formData['keepIds'] ?? false
         ]);
     }
 
@@ -235,5 +248,62 @@ class PageImportController extends AbstractActionController
         }
 
         return $errors;
+    }
+
+    public function exportCsvAction()
+    {
+        $translator = $this->getServiceLocator()->get('translator');
+        $fileName = 'import_new_ids.csv';
+        $postData = get_object_vars($this->getRequest()->getPost());
+        $data = $postData['idsMap'];
+        $separator = ',';
+
+        if ($data) {
+            $content = '';
+
+            // clean data. remove ids that were not updated
+            foreach ($data as $key => $value) {
+
+                foreach ($value as $oldId => $newId) {
+                    if ($oldId == $newId) {
+                        unset($data[$key][$oldId]);
+                    }
+                }
+
+                if (empty($data[$key])) {
+                    unset($data[$key]);
+                }
+            }
+
+            foreach ($data as $key => $value) {
+                $content .= $key . $separator;
+                $content .= "\r\n";
+
+                $content .= $translator->translate('tr_melis_cms_page_tree_csv_old_id') . $separator;
+                $content .= $translator->translate('tr_melis_cms_page_tree_csv_new_id') . $separator;
+                $content .= "\r\n";
+
+                foreach ($value as $oldId => $newId) {
+                    if ($oldId != $newId) {
+                        $content .= (string)$oldId . $separator . (string)$newId . $separator;
+                        $content .= "\r\n";
+                    }
+                }
+
+                $content .= "\r\n";
+            }
+
+            $response = new HttpResponse();
+            $headers = $response->getHeaders();
+            $headers->addHeaderLine('Content-Type', 'text/csv; charset=utf-8');
+            $headers->addHeaderLine('Content-Disposition', "attachment; filename=\"" . $fileName . "\"");
+            $headers->addHeaderLine('Accept-Ranges', 'bytes');
+            $headers->addHeaderLine('Content-Length', strlen($content));
+            $headers->addHeaderLine('fileName', $fileName);
+            $response->setContent($content);
+
+        }
+
+        return $response;
     }
 }

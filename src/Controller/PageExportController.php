@@ -63,7 +63,7 @@ class PageExportController extends AbstractActionController
 
         $result = [
             'success' => true,
-            'message' => $translator->translate('tr_melis_cms_tree_export_failed'),
+            'message' => '',
             'error' => ''
         ];
         //get the request
@@ -139,30 +139,56 @@ class PageExportController extends AbstractActionController
                                     ->addHeaderLine('fileName', $zipFileName);
                                 $response->setHeaders($headers);
 
+                                $this->getEventManager()->trigger('meliscms_page_tree_export_end', $this, [
+                                    'success' => true,
+                                    'textTitle' => $translator->translate('tr_melis_cms_tree_export_title'),
+                                    'textMessage' => sprintf($translator->translate('tr_melis_cms_tree_export_log_message'), $export['pageCount'], $pageId),
+                                    'typeCode' => 'CMS_PAGE_EXPORT',
+                                    'itemId' => $pageId
+                                ]);
+
                                 return $response;
                             }else{
                                 //problem on deleting the temporary folder
                                 $result['success'] = false;
-                                $result['message'] = 'problem on deleting the temp folder';
+                                $result['message'] = [
+                                    'error' => $translator->translate('tr_melis_cms_tree_export_error_problem_deleting_temp'),
+                                    'label' => $translator->translate('tr_melis_cms_tree_export_page')
+                                ];
                             }
                         }else{
                             //cannot convert the folder to zip
                             $result['success'] = false;
-                            $result['message'] = 'error converting folder to zip';
+                            $result['message'] = [
+                                'error' => $translator->translate('tr_melis_cms_tree_export_error_converting_zip'),
+                                'label' => $translator->translate('tr_melis_cms_tree_export_page')
+                            ];
                         }
                     }else{
                         //temporary folder is not writable
                         $result['success'] = false;
-                        $result['message'] = 'temp folder is not writable';
+                        $result['message'] = [
+                            'error' => $translator->translate('tr_melis_cms_tree_export_error_temp_not_writable'),
+                            'label' => $translator->translate('tr_melis_cms_tree_export_page')
+                        ];
                     }
                 }else{
                     //failed exporting page
                     $result['success'] = false;
-                    $result['message'] = 'failed exporting page';
+                    $result['message'] = [
+                        'error' => $translator->translate('tr_melis_cms_tree_export_error_failed'),
+                        'label' => $translator->translate('tr_melis_cms_tree_export_page')
+                    ];
                 }
             }
         }
+
         $result['success'] = false;
+        $result['message'] = [
+            'error' => $translator->translate('tr_melis_cms_tree_export_failed'),
+            'label' => $translator->translate('tr_melis_cms_tree_export_page')
+        ];
+
         return new JsonModel($result);
     }
 }

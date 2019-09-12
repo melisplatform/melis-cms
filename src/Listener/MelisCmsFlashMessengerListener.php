@@ -55,7 +55,9 @@ class MelisCmsFlashMessengerListener extends MelisCoreGeneralListener implements
                 'meliscms_style_delete_end',
                 'meliscms_create_new_page_lang_end',
                 'meliscms_tree_duplicate_page_trees_end',
-                'meliscms_gdpr_save_banner_end'
+                'meliscms_gdpr_save_banner_end',
+                'meliscms_page_tree_export_end',
+                'meliscms_page_tree_import_end'
             ),
             function ($e) {
                 $params = $e->getParams();

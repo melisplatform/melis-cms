@@ -49,6 +49,8 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                 $this->getAllPagesRecursively($xmlArray, $pages);
                 // TODO: check all page ids of pages for published and saved if there are no duplicate
                 $this->checkPageIds($pages,$errors);
+
+                // check for external
             }
         }
 
@@ -78,31 +80,40 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         $pages = [];
         $this->getAllPagesRecursivelyAsSimpleXml($simpleXml, $pages);
         $externalTables = $this->simpleXmlToArray($simpleXml->external->tables);
+        $idsMap = [];
         $externalIdsMap = [];
         $fatherIdsMap = [];
+        $pagesIdMap = [];
         $errors = [];
         $success = true;
-
-        $this->updateExternalTables($externalTables, $externalIdsMap);
-        $this->updatePageExternalIds($pages, $externalIdsMap);
-
-        $pages[0]->fatherId = $arrayParameters['pageid'];
-
-        // create fatherId map
-        foreach ($pages as $page) {
-            $fatherId = (string) $page->fatherId;
-            $fatherIdsMap[$fatherId] = $fatherId;
-        }
 
         $db = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
         $con = $db->getDriver()->getConnection();
         $con->beginTransaction();
 
         try {
+            $this->updateExternalTables($externalTables, $externalIdsMap);
+            $this->updatePageExternalIds($pages, $externalIdsMap);
+
+
+            $pages[0]->fatherId = $arrayParameters['pageid'];
+
+            // create fatherId map
+            foreach ($pages as $page) {
+                $fatherId = (string) $page->fatherId;
+                $fatherIdsMap[$fatherId] = $fatherId;
+            }
+
             foreach ($pages as &$page) {
-                $id = (string)$page->tables->melis_cms_page_published->page_id ?? (string)$page->tables->melis_cms_page_saved->page_id;
+                $id = (string) $page->tables->melis_cms_page_published->page_id;
+
+                if (empty ($id)) {
+                    $id = (string) $page->tables->melis_cms_page_saved->page_id;
+                }
+
                 $page->fatherId = $fatherIdsMap[(string)$page->fatherId];
                 $pageId = $this->importPage($page->asXml(), $arrayParameters['keepIds']);
+                $pagesIdMap[$id] = $pageId;
 
                 if (!$arrayParameters['keepIds']) {
                     if (array_key_exists($id, $fatherIdsMap)) {
@@ -114,6 +125,9 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                     $success = false;
                 }
             }
+
+            $idsMap = $externalIdsMap;
+            $idsMap['page_ids'] = $pagesIdMap;
 
             if ($arrayParameters['xmlPath']) {
                 $this->importPageResources($arrayParameters['xmlPath']);
@@ -129,7 +143,8 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         $arrayParameters['result'] = [
             'success' => $success,
             'errors' => $errors,
-            'pagesCount' => count($pages)
+            'pagesCount' => count($pages),
+            'idsMap' => $idsMap,
         ];
 
         $arrayParameters = $this->sendEvent('melis_cms_page_tree_import_import_page_tree_end', $arrayParameters);
@@ -325,7 +340,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
     private function updateExternalTables($externalTables, &$externalIdsMap)
     {
         $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
-
+        // TODO: use tablegateway for template and clean code no spag
         // update external table ids
         foreach ($externalTables as $tableName => $tableRows) {
             foreach ($tableRows as $rowKey => $row) {
@@ -336,6 +351,16 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                         }
                     }
 
+                    $corePlatformTbl = $this->getServiceLocator()->get('MelisCoreTablePlatform');
+                    $corePlatform = $corePlatformTbl->getEntryByField('plf_name', getenv('MELIS_PLATFORM'))->current();
+                    $corePlatformId = $corePlatform->plf_id;
+                    $cmsPlatformIdsTbl = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+                    $platformIds = $cmsPlatformIdsTbl->getEntryById($corePlatformId)->current();
+                    $currentTempId = $platformIds->pids_tpl_id_current;
+
+                    $data = $row;
+                    $data['tpl_id'] = $currentTempId;
+
                     $templateTbl = $this->getServiceLocator()->get('MelisEngineTableTemplate');
                     $queryString = 'SELECT * FROM `melis_cms_template` WHERE `tpl_site_id` = ? AND `tpl_zf2_layout` = ? AND `tpl_zf2_controller` = ? AND `tpl_zf2_action` = ?';
                     $result = $adapter->query($queryString, [$row['tpl_site_id'], $row['tpl_zf2_layout'], $row['tpl_zf2_controller'], $row['tpl_zf2_action']])->toArray();
@@ -343,10 +368,11 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                     if (!empty($result)) {
                         $externalIdsMap[$tableName][$row['tpl_id']] = $result[0]['tpl_id'];
                     } else {
-                        $templateId = $templateTbl->save($row);
-                        $externalIdsMap[$tableName][$row['tpl_id']] = $row['tpl_id'];
+                        $templateTbl->save($data);
+                        $cmsPlatformIdsTbl->save(array('pids_tpl_id_current' => ++$currentTempId), $corePlatformId);
+                        $externalIdsMap[$tableName][$row['tpl_id']] = $data['tpl_id'];
                     }
-                } if ($tableName === 'melis_cms_style') {
+                } else if ($tableName === 'melis_cms_style') {
                     $data = $row;
                     unset($data['style_id']);
                     $styleTbl = $this->getServiceLocator()->get('MelisEngineTableStyle');
@@ -355,10 +381,10 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                     if (!empty($style)) {
                         $externalIdsMap[$tableName][$row['style_id']] = $style->style_id;
                     } else {
-                        $styleId = $styleTbl->save($data, $row['style_id']);
+                        $styleId = $styleTbl->save($data);
                         $externalIdsMap[$tableName][$row['style_id']] = $styleId;
                     }
-                } if ($tableName === 'melis_cms_lang') {
+                } else if ($tableName === 'melis_cms_lang') {
                     $data = $row;
                     unset($data['lang_cms_id']);
                     $langTbl = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
@@ -367,13 +393,13 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                     if (! empty($lang)) {
                         $externalIdsMap[$tableName][$row['lang_cms_id']] = $lang->lang_cms_id;
                     } else {
-                        $langId = $langTbl->save($data, $row['lang_cms_id']);
+                        $langId = $langTbl->save($data);
                         $externalIdsMap[$tableName][$row['lang_cms_id']] = $langId;
                     }
                 } else {
                     $data = $row;
                     $table = new TableGateway($tableName, $adapter);
-                    $table->insert();
+                    $table->insert($data);
                 }
             }
         }
