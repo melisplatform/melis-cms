@@ -71,7 +71,16 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
         $styles = [];
         $langs = [];
         $pageCount = 0;
-        $this->getAllPageIds($pageId, $pages, $templates, $styles, $langs, $pageCount);
+
+        $this->getAllPageIds(
+            $arrayParameters['pageId'],
+            $pages,
+            $templates,
+            $styles,
+            $langs,
+            $pageCount,
+            $arrayParameters['includeSubPages']
+        );
 
         try {
 
@@ -575,7 +584,7 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
         }
     }
 
-    private function getAllPageIds($pageId, &$pages, &$templates, &$styles, &$langs, &$pageCount) {
+    private function getAllPageIds($pageId, &$pages, &$templates, &$styles, &$langs, &$pageCount, $includeSubPages) {
         $pageTreeTable = $this->getServiceLocator()->get('MelisEngineTablePageTree');
 
         $pages[] = $pageId;
@@ -597,34 +606,37 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
             if (! in_array($pageData['lang_cms_id'], $langs))
                 $langs[] = $pageData['lang_cms_id'];
 
-        $pageTreeService = $this->getServiceLocator()->get('MelisEngineTree');
-
-        if (empty($children))
-            $children = $pageTreeService->getPageChildren($pageId)->toArray();
-
         $pageCount++;
 
-        foreach($children as $id => $child) {
-            $subChildren = $pageTreeService->getPageChildren($child['tree_page_id'])->toArray();
+        if ($includeSubPages) {
 
-            if (! empty($subChildren)){
-                $this->getAllPageIds($child['tree_page_id'], $pages, $templates, $styles, $langs, $pageCount);
-            } else {
-                $pages[] = $child['tree_page_id'];
+            $pageTreeService = $this->getServiceLocator()->get('MelisEngineTree');
 
-                if (! empty($child['page_tpl_id']))
-                    if (! in_array($child['page_tpl_id'], $templates))
-                        $templates[] = $child['page_tpl_id'];
+            if (empty($children))
+                $children = $pageTreeService->getPageChildren($pageId)->toArray();
 
-                if (! empty($child['style_id']))
-                    if (! in_array($child['style_id'], $styles))
-                        $styles[] = $child['style_id'];
+            foreach ($children as $id => $child) {
+                $subChildren = $pageTreeService->getPageChildren($child['tree_page_id'])->toArray();
 
-                if (! empty($child['lang_cms_id']))
-                    if (! in_array($child['lang_cms_id'], $langs))
-                        $langs[] = $child['lang_cms_id'];
+                if (!empty($subChildren)) {
+                    $this->getAllPageIds($child['tree_page_id'], $pages, $templates, $styles, $langs, $pageCount, $includeSubPages);
+                } else {
+                    $pages[] = $child['tree_page_id'];
 
-                $pageCount++;
+                    if (!empty($child['page_tpl_id']))
+                        if (!in_array($child['page_tpl_id'], $templates))
+                            $templates[] = $child['page_tpl_id'];
+
+                    if (!empty($child['style_id']))
+                        if (!in_array($child['style_id'], $styles))
+                            $styles[] = $child['style_id'];
+
+                    if (!empty($child['lang_cms_id']))
+                        if (!in_array($child['lang_cms_id'], $langs))
+                            $langs[] = $child['lang_cms_id'];
+
+                    $pageCount++;
+                }
             }
         }
     }
