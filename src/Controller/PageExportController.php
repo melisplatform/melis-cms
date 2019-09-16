@@ -142,7 +142,7 @@ class PageExportController extends AbstractActionController
                                 $this->getEventManager()->trigger('meliscms_page_tree_export_end', $this, [
                                     'success' => true,
                                     'textTitle' => $translator->translate('tr_melis_cms_tree_export_title'),
-                                    'textMessage' => sprintf($translator->translate('tr_melis_cms_tree_export_log_message'), $export['pageCount'], $pageId),
+                                    'textMessage' => 'tr_melis_cms_tree_export_log_message',
                                     'typeCode' => 'CMS_PAGE_EXPORT',
                                     'itemId' => $pageId
                                 ]);

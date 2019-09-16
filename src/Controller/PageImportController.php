@@ -140,7 +140,7 @@ class PageImportController extends AbstractActionController
                 $this->getEventManager()->trigger('meliscms_page_tree_import_end', $this, [
                     'success' => true,
                     'textTitle' => $translator->translate('tr_melis_cms_page_tree_import_title'),
-                    'textMessage' => sprintf($translator->translate('tr_melis_cms_page_tree_log_message'), $res['pagesCount'], $pageId),
+                    'textMessage' => 'tr_melis_cms_page_tree_log_message',
                     'typeCode' => 'CMS_PAGE_IMPORT',
                     'itemId' => $pageId
                 ]);
