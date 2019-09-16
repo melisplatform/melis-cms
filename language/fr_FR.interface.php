@@ -676,7 +676,7 @@
         'tr_melis_cms_tree_export_error_temp_not_writable' => 'Le dossier temporaire n\'est pas inscriptible',
         'tr_melis_cms_tree_export_error_converting_zip' => 'Erreur de conversion du dossier en Zip',
         'tr_melis_cms_tree_export_error_problem_deleting_temp' => 'Problème lors de la suppression du fichier temporaire',
-        'tr_melis_cms_tree_export_log_message' => '%u pages ont été exportée à partir de la page id %u',
+        'tr_melis_cms_tree_export_log_message' => 'Pages ont été exportée à partir de la page id %u',
 
         'tr_melis_cms_tree_import_import_not_admin1' => 'Votre compte ne vous permet pas de faire des imports sur cette plateforme.',
         'tr_melis_cms_tree_import_import_not_admin2' => 'Merci de contacter votre administrateur.',
@@ -719,7 +719,7 @@
         'tr_melis_cms_page_tree_error_unexpected' => 'Erreur inattendue',
         'tr_melis_cms_page_tree_csv_old_id' => 'Ancien ID',
         'tr_melis_cms_page_tree_csv_new_id' => 'Nouvel ID',
-        'tr_melis_cms_page_tree_log_message' => '%u pages ont été importé à partir de la page id %u',
+        'tr_melis_cms_page_tree_log_message' => 'Pages ont été importé à partir de la page id %u',
 
         'tr_melis_cms_page_tree_import_success' => 'Succès',
         'tr_melis_cms_page_tree_import_failed' => 'Echec',
