@@ -775,9 +775,10 @@ class ToolTemplateController extends AbstractActionController
                 $actionPattern = '/function.*'.$template['action'].'Action/';
                 if (preg_match($actionPattern, $ctrlFileContent)) {
 
-                    $viewFile = $viewPath.'/'.$this->moduleNameToViewName($template['controller']).'/'.$this->moduleNameToViewName($template['action']).'.phtml';
+                    $viewFile = $viewPath . '/' . $this->moduleNameToViewName($template['controller']) . '/' . $this->moduleNameToViewName($template['action']);
 
-                    if (file_exists($viewFile)){
+                    // Template Manager can look for additional view file types that are added here
+                    if (file_exists($viewFile . '.phtml') || file_exists($viewFile . '.twig')) {
                         $status = true;
                     }
                 }
