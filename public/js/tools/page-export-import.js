@@ -263,21 +263,23 @@ $(document).ready(function(){
                         mainTree();
 
                         // download for csv mapping array
-                        $.ajax({
-                            type: 'POST',
-                            url: '/melis/MelisCms/PageImport/exportCsv',
-                            data: {
-                                idsMap: idsMap
-                            },
-                            success: function (data, textStatus, request) {
-                                if (data) {
-                                    var fileName = request.getResponseHeader("fileName");
-                                    var mime = request.getResponseHeader("Content-Type");
-                                    var blob = new Blob([request.responseText], {type: mime});
-                                    saveAs(blob, fileName);
+                        if (idsMap != false) {
+                            $.ajax({
+                                type: 'POST',
+                                url: '/melis/MelisCms/PageImport/exportCsv',
+                                data: {
+                                    idsMap: idsMap
+                                },
+                                success: function (data, textStatus, request) {
+                                    if (data) {
+                                        var fileName = request.getResponseHeader("fileName");
+                                        var mime = request.getResponseHeader("Content-Type");
+                                        var blob = new Blob([request.responseText], {type: mime});
+                                        saveAs(blob, fileName);
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     } else {
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + importFormData.page_tree_import.name + '</p>');
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p>' + translations.tr_melis_cms_page_tree_import_result + ': <span style="color: red;">' + translations.tr_melis_cms_page_tree_import_failed + '</span></p>');

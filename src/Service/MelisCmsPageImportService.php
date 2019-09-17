@@ -129,6 +129,19 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
             $idsMap = $externalIdsMap;
             $idsMap['page_ids'] = $pagesIdMap;
 
+            // clean data. remove ids that were not updated
+            foreach ($idsMap as $key => $value) {
+                foreach ($value as $oldId => $newId) {
+                    if ($oldId == $newId) {
+                        unset($idsMap[$key][$oldId]);
+                    }
+                }
+
+                if (empty($idsMap[$key])) {
+                    unset($idsMap[$key]);
+                }
+            }
+
             if ($arrayParameters['xmlPath']) {
                 $this->importPageResources($arrayParameters['xmlPath']);
             }

@@ -279,20 +279,6 @@ class PageImportController extends AbstractActionController
         if ($data) {
             $content = '';
 
-            // clean data. remove ids that were not updated
-            foreach ($data as $key => $value) {
-
-                foreach ($value as $oldId => $newId) {
-                    if ($oldId == $newId) {
-                        unset($data[$key][$oldId]);
-                    }
-                }
-
-                if (empty($data[$key])) {
-                    unset($data[$key]);
-                }
-            }
-
             foreach ($data as $key => $value) {
                 $content .= $key . $separator;
                 $content .= "\r\n";
