@@ -27,12 +27,30 @@ class PageImportController extends AbstractActionController
      */
     public function renderPageImportModalAction()
     {
+        $max_post = ini_get('post_max_size');
+        $max_upload = ini_get('upload_max_filesize');
+        $max_size = 0;
+
+        // get the smaller value
+        if ($max_post != $max_upload) {
+            if ($max_post > $max_upload) {
+                if ($max_upload != 0) {
+                    $max_size = $max_upload;
+                } else {
+                    $max_size = $max_post;
+                }
+            }
+        } else {
+            $max_size = $max_post;
+        }
+
         $view = new ViewModel();
         $view->setTerminal(false);
         $view->melisKey  = $this->params()->fromQuery('melisKey', null);;
         $view->importForm = $this->getImportForm();
         $view->isAdmin = $this->getUser()->usr_admin;
         $view->pageId = $this->params()->fromQuery('pageId', null);
+        $view->max_size = $this->asBytes($max_size);
         return $view;
     }
 
@@ -305,5 +323,12 @@ class PageImportController extends AbstractActionController
         }
 
         return $response;
+    }
+
+    // get bytes
+    function asBytes($size) {
+        $size = trim($size);
+        $s = [ 'g'=> 1<<30, 'm' => 1<<20, 'k' => 1<<10 ];
+        return intval($size) * ($s[strtolower(substr($size,-1))] ?: 1);
     }
 }

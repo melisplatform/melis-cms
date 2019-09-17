@@ -105,6 +105,34 @@ $(document).ready(function(){
         }).success(success(data)).error(error);
     }
 
+    $body.on('change', 'input[name=page_tree_import]', function() {
+        var max_size = $body.find('#page-import-max-file-size').val();
+        var file_size = this.files[0].size;
+
+        if (parseInt(file_size) > parseInt(max_size)) {
+            melisCoreTool.pending('#page-tree-import-test');
+            melisHelper.melisKoNotification(
+                translations.tr_melis_cms_page_tree_import,
+                translations.tr_melis_cms_page_tree_error_file_size_exceeded + formatBytes(max_size, 2),
+                []
+            );
+        } else {
+            melisCoreTool.done('#page-tree-import-test');
+        }
+    });
+
+    function formatBytes(bytes, decimals) {
+        if (bytes === 0) return '0 Bytes';
+
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
     function submitImportForm (form) {
         form.unbind("submit");
         form.on("submit", function(e) {
