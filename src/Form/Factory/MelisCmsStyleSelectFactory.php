@@ -49,27 +49,19 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
 
         if ($idPage) {
             $pageData = $pageSvc->getDatasPage($idPage)->getMelisPageTree();
-            if (!$pageData) {
+
+            if (! empty($pageData->page_id)) {
                 $pageData = $pageSvc->getDatasPage($idPage, 'saved')->getMelisPageTree();
             }
-    
-            if ($pageData->page_type == self::SITE || $pageData->page_type == self::NEW_SITE) {
-                $idPage = $this->getCorrespondingSiteId($serviceManager, $idPage);
-                $styles = $styleTable->getEntryByField('style_site_id', $idPage);
+
+            if ($pageData->page_type === self::SITE || $pageData->page_type === self::NEW_SITE) {
+
             } else {
-                $parentId = $pageTree->getPageFather($idPage)->current();
-                if (isset($parentId->tree_father_page_id)) {
-                    $parentId = $this->getCorrespondingSiteId($serviceManager, $parentId->tree_father_page_id);
-                    $styles = $styleTable->getEntryByField('style_site_id', $parentId);
-                } else {
-                    // try searching in the saved version
-                    $parentId = $pageTree->getPageFather($idPage, 'saved')->current();
-                    if (isset($parentId->tree_father_page_id)) {
-                        $parentId = $this->getCorrespondingSiteId($serviceManager, $parentId->tree_father_page_id);
-                        $styles = $styleTable->getEntryByField('style_site_id', $parentId);
-                    }
-                }
+                $idPage = $this->getRootPageId($serviceManager, $idPage);
             }
+
+            $idPage = $this->getCorrespondingSiteId($serviceManager, $idPage);
+            $styles = $styleTable->getEntryByField('style_site_id', $idPage);
         }
 
 		$valueoptions = array();
@@ -114,4 +106,19 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
         return 0;
     }
 
+    private function getRootPageId(ServiceLocatorInterface $sl, $pageId)
+    {
+        $treeService = $sl->get('MelisEngineTree');
+        $page = $treeService->getPageFather($pageId)->current();
+
+        if (! empty($page)) {
+            if ($page->page_type == self::SITE || $page->page_type == self::NEW_SITE) {
+                $rootPageId = $page->page_id;
+            } else {
+                $rootPageId = $this->getRootPageId($sl, $page->page_id);
+            }
+        }
+
+        return $rootPageId ?? null;
+    }
 }
