@@ -290,6 +290,10 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                 $tablesArray['melis_cms_page_seo']['pseo_id'] = $pageId;
             }
 
+            if (!empty($tablesArray['melis_cms_page_style'])) {
+                unset($tablesArray['melis_cms_page_style']['pstyle_id']);
+            }
+
             if (!empty($pageId)) {
                 unset($tablesArray['melis_cms_page_lang']['plang_id']);
                 $tablesArray['melis_cms_page_lang']['plang_page_id'] = $pageId;
