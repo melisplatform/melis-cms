@@ -290,7 +290,7 @@ class PageImportController extends AbstractActionController
                     }
                 }
 
-                $content .= "\r\n";
+                $content .= $separator . "\r\n";
             }
 
             $response = new HttpResponse();
