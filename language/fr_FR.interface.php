@@ -720,7 +720,7 @@
         'tr_melis_cms_page_tree_csv_old_id' => 'Ancien ID',
         'tr_melis_cms_page_tree_csv_new_id' => 'Nouvel ID',
         'tr_melis_cms_page_tree_log_message' => 'Import de pages à partir de l\'ID de page [itemId]',
-        'tr_melis_cms_page_tree_error_file_size_exceeded' => 'La taille maximum du fichier autorisé est de ',
+        'tr_melis_cms_page_tree_error_file_size_exceeded' => 'La taille maximum du fichier autorisée est de ',
 
         'tr_melis_cms_page_tree_import_success' => 'Succès',
         'tr_melis_cms_page_tree_import_failed' => 'Echec',
