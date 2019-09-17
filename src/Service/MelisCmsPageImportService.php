@@ -227,6 +227,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
             $cmsPlatformIdsTbl = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
 
             $pageId = $tablesArray['melis_cms_page_published']['page_id'] ?? $tablesArray['melis_cms_page_saved']['page_id'];
+            $nextPageId = $pageId + 1;
 
             if ($fatherId != -1)
             {
@@ -250,7 +251,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
 
             $pageSrv = $this->getServiceLocator()->get('MelisCmsPageService');
             $pageTreeTbl->save($pageTree);
-            $cmsPlatformIdsTbl->save(array('pids_page_id_current' => ++$pageId), $corePlatformId);
+            $cmsPlatformIdsTbl->save(array('pids_page_id_current' => $nextPageId), $corePlatformId);
 
             if (!empty($tablesArray['melis_cms_page_published']))
                 $pageSrv->savePagePublished($tablesArray['melis_cms_page_published']);
