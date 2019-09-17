@@ -375,12 +375,21 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
         if (!empty($videoMatches)) {
             unset($videoMatches[0]);
         }
+        $audioMatches = null;
+        preg_match_all('/< *audio[^>]*src *= *["\']?([^"\']*)/i', $pageContent, $audioMatches);
+        if (!empty($audioMatches)) {
+            unset($audioMatches[0]);
+        }
 
-        $matches = array_merge($imageMatches, $videoMatches);
+        $matches = array_merge($imageMatches, $videoMatches, $audioMatches);
 
         foreach($matches as $list){
             foreach($list as $val) {
-                if (strpos($val, 'img') === false || strpos($val, 'source') === false) {
+                if (
+                    strpos($val, 'img') === false ||
+                    strpos($val, 'source') === false ||
+                    strpos($val, 'audio')
+                ) {
                     //get only whats in the media folder
                     if (strpos($val, 'media') !== false) {
                         if (!in_array($val, $resources)) {
