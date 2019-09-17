@@ -493,7 +493,7 @@ var melisCms = (function(){
 				 * Removed so that meta title & meta description has no limit
 				 * cause it's data type on db is TEXT
                  */
-				// prevLabel.find('span').html('<i class="fa fa-text-width"></i>(' + charLength + ')');
+				prevLabel.find('span').html('<i class="fa fa-text-width"></i>(' + charLength + ')');
 				//
 				// if( charLength > limit ){
 				// 	prevLabel.addClass('limit');
