@@ -217,9 +217,9 @@ $(document).ready(function(){
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('</br>');
 
                         if (!data.keepIds) {
-                            $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p><i style="color:red;">NOTE: </i>' + translations.tr_melis_cms_page_tree_import_file_final_message_csv + '</p>');
+                            $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p><i style="color:red;">NOTE : </i>' + translations.tr_melis_cms_page_tree_import_file_final_message_csv + '</p>');
                         } else {
-                            $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p><i style="color:red;">NOTE: </i>' + translations.tr_melis_cms_page_tree_import_file_final_message_csv_keep_ids + '</p>');
+                            $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p><i style="color:red;">NOTE : </i>' + translations.tr_melis_cms_page_tree_import_file_final_message_csv_keep_ids + '</p>');
                         }
 
                         $body.find('#importPageDone .btn-container').append(btnClose);
