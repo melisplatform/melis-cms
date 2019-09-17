@@ -674,7 +674,7 @@
         'tr_melis_cms_tree_export_error_temp_not_writable' => 'Temporary folder is not writable',
         'tr_melis_cms_tree_export_error_converting_zip' => 'Error converting folder to zip',
         'tr_melis_cms_tree_export_error_problem_deleting_temp' => 'Problem on deleting the temporary folder',
-        'tr_melis_cms_tree_export_log_message' => 'Pages have been exported starting from page id [itemId]',
+        'tr_melis_cms_tree_export_log_message' => 'Export of pages from page ID [itemId]',
 
         'tr_melis_cms_tree_import_import_not_admin1' => 'Your account doesn\'t entitle you to make imports on this platform.',
         'tr_melis_cms_tree_import_import_not_admin2' => 'Please contact the administrator.',
@@ -717,7 +717,7 @@
         'tr_melis_cms_page_tree_error_unexpected' => 'Unexpected error',
         'tr_melis_cms_page_tree_csv_old_id' => 'Old ID',
         'tr_melis_cms_page_tree_csv_new_id' => 'New ID',
-        'tr_melis_cms_page_tree_log_message' => 'Pages have been imported starting from page id [itemId]',
+        'tr_melis_cms_page_tree_log_message' => 'Import of pages from page ID [itemId]',
 
         'tr_melis_cms_page_tree_import_success' => 'Success',
         'tr_melis_cms_page_tree_import_failed' => 'Failed',

@@ -676,7 +676,7 @@
         'tr_melis_cms_tree_export_error_temp_not_writable' => 'Le dossier temporaire n\'est pas inscriptible',
         'tr_melis_cms_tree_export_error_converting_zip' => 'Erreur de conversion du dossier en Zip',
         'tr_melis_cms_tree_export_error_problem_deleting_temp' => 'Problème lors de la suppression du fichier temporaire',
-        'tr_melis_cms_tree_export_log_message' => 'Pages ont été exportée à partir de la page id [itemId]',
+        'tr_melis_cms_tree_export_log_message' => 'Export de pages à partir de l\'ID de page [itemId]',
 
         'tr_melis_cms_tree_import_import_not_admin1' => 'Votre compte ne vous permet pas de faire des imports sur cette plateforme.',
         'tr_melis_cms_tree_import_import_not_admin2' => 'Merci de contacter votre administrateur.',
@@ -710,8 +710,8 @@
         'tr_melis_cms_page_tree_import_modal_unexpected_error_detail' => 'Détails des erreurs',
         'tr_melis_cms_page_tree_import_ko_no_file' => 'Aucun fichier uploadé',
         'tr_melis_cms_page_tree_import_file_input' => 'File Input',
-        'tr_melis_cms_page_tree_import_file_final_message_csv' => 'Lors d\'un import sans conserver les IDs, des IDs de pages, templates, styles et langages vont changer. Si vous avez d\'autres tables utilisant ces IDs, ils seront différents. Le système NE mettra PAS à jour automatiquement vos tables mais Melis Platform fournira un tableau de correspondance CSV avec les IDs originaux et les nouveaux. Le CSV contiendra uniquement la liste des IDs ayant été mis à jours. Le téléchargement du tableau de correspondance se lancera automatiquement après ce message.',
-        'tr_melis_cms_page_tree_import_file_final_message_csv_keep_ids' => 'Lors d\'un import en conservant les IDs, il est possible que certains IDs de pages, templates, styles et langages changent. Si vous avez d\'autres tables utilisant ces IDs, ils seront différents. Le système NE mettra PAS à jour automatiquement vos tables mais Melis Platform fournira un tableau de correspondance CSV avec les IDs originaux et les nouveaux. Le CSV contiendra uniquement la liste des IDs ayant été mis à jours. Le téléchargement du tableau de correspondance se lancera automatiquement après ce message.',
+        'tr_melis_cms_page_tree_import_file_final_message_csv' => ' Lors d\'un import sans conserver les IDs, des IDs de pages, templates, styles et langages vont changer. Si vous avez d\'autres tables utilisant ces IDs, ils seront différents. <br><br> Le système NE mettra PAS à jour automatiquement vos tables mais Melis Platform fournira un tableau de correspondance CSV avec les IDs originaux et les nouveaux. <br><br> Le CSV contiendra uniquement la liste des IDs ayant été mis à jours. Le téléchargement du tableau de correspondance se lancera automatiquement après ce message.',
+        'tr_melis_cms_page_tree_import_file_final_message_csv_keep_ids' => ' Lors d\'un import en conservant les IDs, il est possible que certains IDs de pages, templates, styles et langages changent. Si vous avez d\'autres tables utilisant ces IDs, ils seront différents. <br><br> Le système NE mettra PAS à jour automatiquement vos tables mais Melis Platform fournira un tableau de correspondance CSV avec les IDs originaux et les nouveaux. <br><br> Le CSV contiendra uniquement la liste des IDs ayant été mis à jours. Le téléchargement du tableau de correspondance se lancera automatiquement après ce message.',
         'tr_melis_cms_page_tree_import_title' => 'Import de page',
         'tr_melis_cms_page_tree_import_notification_message' => 'Page(s) importée(s) avec succès',
         'tr_melis_cms_page_tree_error_no_page_export_xml' => 'Le Zip ne contient pas PageExport.xml',
@@ -719,7 +719,7 @@
         'tr_melis_cms_page_tree_error_unexpected' => 'Erreur inattendue',
         'tr_melis_cms_page_tree_csv_old_id' => 'Ancien ID',
         'tr_melis_cms_page_tree_csv_new_id' => 'Nouvel ID',
-        'tr_melis_cms_page_tree_log_message' => 'Pages ont été importé à partir de la page id [itemId]',
+        'tr_melis_cms_page_tree_log_message' => 'Import de pages à partir de l\'ID de page [itemId]',
 
         'tr_melis_cms_page_tree_import_success' => 'Succès',
         'tr_melis_cms_page_tree_import_failed' => 'Echec',
