@@ -172,6 +172,10 @@ $(document).ready(function(){
                 $body.find('#pageImportConsole').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + formData.page_tree_import.name + '</p>');
                 $body.find('#pageImportConsole').append('<p>' + translations.tr_melis_cms_page_tree_import_validated + ': <span style="color: red;">' + translations.tr_meliscms_common_no + '</span></p>');
                 $body.find('#pageImportConsole').append('<div id="pageImportProcessing"><p>' + translations.tr_melis_cms_page_tree_import_modal_processing + ' <i class="fa fa-spinner fa-spin"></i></p></div>');
+
+                $body.find('#pageImportConsole').animate({
+                    scrollTop: $body.find('#pageImportConsole').get(0).scrollHeight
+                }, 2000);
             }
         }).success(function (data) {
             if (data.success) {
@@ -192,6 +196,10 @@ $(document).ready(function(){
                 $.each(data.errors, function (key, error) {
                     $body.find('#pageImportConsole').append('<p style="color: red;"> - ' + error + '</p>');
                 });
+
+                $body.find('#pageImportConsole').animate({
+                    scrollTop: $body.find('#pageImportConsole').get(0).scrollHeight
+                }, 2000);
             }
             melisCoreTool.done('#page-tree-import-test');
         }).error(function (data) {
