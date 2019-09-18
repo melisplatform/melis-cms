@@ -12,6 +12,7 @@ namespace MelisCms\Service;
 use MelisCore\Service\MelisCoreGeneralService;
 use Zend\Db\Metadata\Metadata;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Dom\DOMXPath;
 use ZipArchive;
 
 class MelisCmsPageImportService extends MelisCoreGeneralService
@@ -24,9 +25,10 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         'melis_cms_page_style',
         'melis_cms_page_seo'
     ];
+    protected $xmlString;
 
     /**
-     * Checks the xml of the zip file
+     * Checks the content of the xml. tables, columns, ids
      * @param $xmlString
      * @param bool $keepPrimaryId
      * @return mixed
@@ -35,23 +37,14 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
     {
         $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
         $arrayParameters = $this->sendEvent('melis_cms_page_tree_import_test_file_start', $arrayParameters);
+        $this->xmlString = $xmlString;
 
         $errors = [];
         $success = true;
         $xmlArray = $this->xmlToArray($arrayParameters['xmlString'], $errors);
 
         if ($xmlArray) {
-            // TODO: check static tables not only the root page because there is a chance that it will not have all table
-            $this->checkTables($xmlArray, $errors);
-
-            if ($arrayParameters['keepPrimaryId']) {
-                $pages = [];
-                $this->getAllPagesRecursively($xmlArray, $pages);
-                // TODO: check all page ids of pages for published and saved if there are no duplicate
-                $this->checkPageIds($pages,$errors);
-
-                // check for external
-            }
+            $this->check($xmlArray, $arrayParameters['keepPrimaryId'], $errors);
         }
 
         if (!empty($errors))
@@ -86,6 +79,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         $pagesIdMap = [];
         $errors = [];
         $success = true;
+        $firstPage = 0;
 
         $db = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
         $con = $db->getDriver()->getConnection();
@@ -113,6 +107,10 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
 
                 $page->fatherId = $fatherIdsMap[(string)$page->fatherId];
                 $pageId = $this->importPage($page->asXml(), $arrayParameters['keepIds']);
+
+                if (empty ($firstPage))
+                    $firstPage = $pageId;
+
                 $pagesIdMap[$id] = $pageId;
 
                 if (!$arrayParameters['keepIds']) {
@@ -158,6 +156,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
             'errors' => $errors,
             'pagesCount' => count($pages),
             'idsMap' => $idsMap,
+            'firstPage' => $firstPage
         ];
 
         $arrayParameters = $this->sendEvent('melis_cms_page_tree_import_import_page_tree_end', $arrayParameters);
@@ -352,14 +351,14 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
     }
 
     /**
-     * Updates external ids
-     * @param array $externalTables
+     * Updates the external tables
+     * @param $externalTables
+     * @param $externalIdsMap
      */
     private function updateExternalTables($externalTables, &$externalIdsMap)
     {
         $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
-        // TODO: use tablegateway for template and clean code no spag
-        // update external table ids
+
         foreach ($externalTables as $tableName => $tableRows) {
             foreach ($tableRows as $rowKey => $row) {
                 if ($tableName === 'melis_cms_template') {
@@ -423,6 +422,11 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         }
     }
 
+    /**
+     * Updates the external ids for the pages
+     * @param $pages
+     * @param $externalIdsMap
+     */
     private function updatePageExternalIds(&$pages, &$externalIdsMap)
     {
         foreach ($pages as $page) {
@@ -458,6 +462,11 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         }
     }
 
+    /**
+     * Reorders the list of the page tables
+     * @param $tablesArray
+     * @param $tables
+     */
     private function reorderPageTables(&$tablesArray, $tables)
     {
         foreach ($tablesArray as $tableName => $tableValue) {
@@ -495,29 +504,78 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         $tablesArray = $tablesArrayTmp;
     }
 
-    private function checkTables($xml, &$errors)
+    /**
+     * Checks the contents of the xml
+     * @param $xml
+     * @param $keepIds
+     * @param $errors
+     */
+    private function check($xml, $keepIds, &$errors)
     {
         $dbTables = $this->getDbTableNames();
-        $pageTables = $xml['page']['tables'];
         $externalTables = $xml['external']['tables'];
 
-        $this->checkPageTables($pageTables, $dbTables, $errors);
+        $pages = [];
+        $this->getAllPagesRecursively($xml, $pages);
+        $this->checkAllPageTables($pages, $dbTables, $keepIds, $errors);
         $this->checkExternalTables($externalTables, $dbTables, $errors);
     }
 
-    private function checkPageTables($pageTables, $dbTables, &$errors)
+    /**
+     * @param $pages
+     * @param $dbTables
+     * @param $keepIds
+     * @param $errors
+     */
+    private function checkAllPageTables($pages, $dbTables, $keepIds, &$errors)
     {
         $translator = $this->getServiceLocator()->get('translator');
 
-        foreach ($pageTables as $tableName => $tableColumns) {
-            if (in_array($tableName, $dbTables)) {
-                $this->checkTableColumns($tableName, $tableColumns, $errors);
-            } else {
-                $errors[] = sprintf($translator->translate('tr_melis_cms_page_tree_import_table_does_not_exist'), $tableName);
+        foreach ($pages as $page) {
+            $tables = !empty($page['tables']) ? $page['tables'] : [];
+
+            foreach ($tables as $tableName => $columns) {
+                if (is_array($columns) && !empty($columns)) {
+                    if ($this->checkTable($tableName, $dbTables)) {
+                        $this->checkTableColumns($tableName, $columns, $errors);
+
+                        if ($keepIds) {
+                            $this->checkIds($tableName, $columns, $errors);
+                        }
+                    } else {
+                        $column = array_keys($columns)[0];
+                        $lineNo = $this->getXmlLineNumber($this->xmlString, $tableName, $columns[$column]);
+                        $lineText = $translator->translate('tr_melis_cms_page_tree_import_line') . ' ' . $lineNo . ': ';
+                        $errors[] = $lineText . sprintf(
+                            $translator->translate('tr_melis_cms_page_tree_import_table_does_not_exist'),
+                            $tableName
+                        );
+                    }
+                }
             }
         }
     }
 
+    /**
+     * Will check if the table is existing in the database
+     * @param $tableName
+     * @param $dbTables
+     * @return bool
+     */
+    private function checkTable($tableName, $dbTables)
+    {
+        if (in_array($tableName, $dbTables))
+            return true;
+
+        return false;
+    }
+
+    /**
+     * Checks if the
+     * @param $externalTables
+     * @param $dbTables
+     * @param $errors
+     */
     private function checkExternalTables($externalTables, $dbTables, &$errors)
     {
         $translator = $this->getServiceLocator()->get('translator');
@@ -526,23 +584,72 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
             if (in_array($externalTableName, $dbTables)) {
                 $this->checkTableColumns($externalTableName, $externalTableColumns['row_0'], $errors);
             } else {
-                $errors[] = sprintf($translator->translate('tr_melis_cms_page_tree_import_table_does_not_exist'), $externalTableName);
+                $column = array_keys($externalTableColumns)[0];
+                $lineNo = $this->getXmlLineNumber($this->xmlString, $externalTables, $externalTableColumns[$column]);
+                $lineText = $translator->translate('tr_melis_cms_page_tree_import_line') . ' ' . $lineNo . ': ';
+                $errors[] = $lineText . sprintf(
+                    $translator->translate('tr_melis_cms_page_tree_import_table_does_not_exist'),
+                    $externalTableName
+                );
             }
         }
     }
 
+    /**
+     * Checks for the columns of the table that is listed in the xml is existing on the database
+     * @param $tableName
+     * @param $tableColumns
+     * @param $errors
+     */
     private function checkTableColumns($tableName, $tableColumns, &$errors)
     {
         $translator = $this->getServiceLocator()->get('translator');
         $columns = $this->getTableColumns($tableName);
 
         foreach ($tableColumns as $columnName => $columnValue) {
-            if (!in_array($columnName, $columns)) {
-                $errors[] = sprintf($translator->translate('tr_melis_cms_page_tree_import_column_does_not_exist'), $columnName, $tableName);
+            if (in_array($columnName, $columns)) {
+
+            } else {
+                $errors[] = sprintf(
+                    $translator->translate('tr_melis_cms_page_tree_import_column_does_not_exist'),
+                    $columnName,
+                    $tableName
+                );
             }
         }
     }
 
+    /**
+     * Checks for the entries on the xml if it is already existing in the database
+     * @param $tableName
+     * @param $columns
+     * @param $errors
+     */
+    private function checkIds($tableName, $columns, &$errors)
+    {
+        $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
+        $translator = $this->getServiceLocator()->get('translator');
+
+        $tableGateway = new TableGateway($tableName, $adapter);
+        $primaryColumn = $this->getTablePrimaryColumn($tableName);
+        $result = $tableGateway->select([$primaryColumn => $columns[$primaryColumn]])->current();
+
+        if (! empty($result)) {
+            $lineNo = $this->getXmlLineNumber($this->xmlString, $tableName, $columns[$primaryColumn], $primaryColumn);
+            $lineText = $translator->translate('tr_melis_cms_page_tree_import_line') . ' ' . $lineNo . ': ';
+            $errors[] = $lineText . sprintf(
+                $translator->translate('tr_melis_cms_page_tree_import_primary_already_used'),
+                $columns[$primaryColumn],
+                $tableName
+            );
+        }
+
+    }
+
+    /**
+     * Returns all the tables from the database
+     * @return string[]
+     */
     private function getDbTableNames()
     {
         $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
@@ -550,6 +657,11 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         return $metadata->getTableNames();
     }
 
+    /**
+     * Returns the columns of a table
+     * @param $tableName
+     * @return string[]
+     */
     private function getTableColumns($tableName)
     {
         $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
@@ -557,6 +669,11 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         return $metadata->getColumnNames($tableName);
     }
 
+    /**
+     * Returns constraints of a table
+     * @param $tableName
+     * @return \Zend\Db\Metadata\Object\ConstraintObject[]
+     */
     private function getTableConstraints($tableName)
     {
         $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
@@ -564,6 +681,11 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         return $metadata->getConstraints($tableName);
     }
 
+    /**
+     * Returns the primary column of a table
+     * @param $tableName
+     * @return mixed|null
+     */
     private function getTablePrimaryColumn($tableName)
     {
         $constraints = $this->getTableConstraints($tableName);
@@ -610,7 +732,12 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         return json_decode(json_encode($simpleXml), TRUE);
     }
 
-    // TODO: separate function for preparing the xml
+    /**
+     * Will recursively get all pages and list them from top to bottom
+     * @param $xmlArray
+     * @param $pages
+     * @param null $fatherId
+     */
     private function getAllPagesRecursively($xmlArray, &$pages, $fatherId = null)
     {
         if (isset($xmlArray['page'])) {
@@ -651,6 +778,12 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         }
     }
 
+    /**
+     * Will recursively get all pages and list them from top to bottom
+     * @param $xmlArray
+     * @param $pages
+     * @param null $fatherId
+     */
     private function getAllPagesRecursivelyAsSimpleXml($xmlArray, &$pages, $fatherId = null)
     {
         if (isset($xmlArray->page)) {
@@ -692,46 +825,16 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
     }
 
     /**
-     * Checks ids for page
-     * @param $pages
-     * @param $errors
+     * Returns list of default tables
+     * @return array
      */
-    private function checkPageIds($pages, &$errors)
-    {
-        $translator = $this->getServiceLocator()->get('translator');
-
-        foreach ($pages as $page) {
-            $tables = !empty($page['tables']) ? $page['tables'] : [];
-
-            foreach ($tables as $tableName => $tableColumns) {
-                if (is_array($tableColumns) && !empty($tableColumns)) {
-                    $primaryColumn = $this->getTablePrimaryColumn($tableName);
-
-                    if (!empty($tableColumns[$primaryColumn])) {
-                        $columnData = $tableColumns[$primaryColumn];
-
-                        $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
-                        $result = $adapter->query('SELECT * FROM `' . $tableName . '` WHERE `' . $primaryColumn . '` = ?', [$columnData])->toArray();
-
-                        if (!empty($result)) {
-                            $errors[] = sprintf($translator->translate('tr_melis_cms_page_tree_import_primary_already_used'), $columnData, $tableName);
-                        }
-                    } else {
-
-                    }
-                }
-            }
-        }
-    }
-
     private function getDefaultTableList()
     {
         return $this->defaultTableList;
     }
 
     /**
-     * Function to delete directory/file
-     *
+     * Will delete a directory recursively
      * @param $dir
      * @return bool
      */
@@ -764,16 +867,46 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         if (! file_exists($dst))
             mkdir($dst);
 
-        while(false !== ( $file = readdir($dir)) ) {
+        while (false !== ( $file = readdir($dir)) ) {
             if (( $file != '.' ) && ( $file != '..' )) {
                 if ( is_dir($src . '/' . $file) ) {
                     $this->recurse_copy($src . '/' . $file,$dst . '/' . $file);
-                }
-                else {
+                } else {
                     copy($src . '/' . $file,$dst . '/' . $file);
                 }
             }
         }
+
         closedir($dir);
+    }
+
+    /**
+     * Returns the line number on which the string is located in the xml
+     * @param $xmlString
+     * @param $key
+     * @param $search
+     * @param null $additionalKey
+     * @return int
+     */
+    private function getXmlLineNumber($xmlString, $key, $search, $additionalKey = null)
+    {
+        $doc = new \DOMDocument();
+        $doc->loadXML($xmlString);
+        $xpath = new DOMXPath($doc);
+
+        if ($additionalKey) {
+            $expression = sprintf("//%s//%s[contains(., %s)]", $key, $additionalKey, $search);
+        } else {
+            $expression = sprintf("//%s[contains(., %s)]", $key, $search);
+        }
+
+        $item = $xpath->evaluate($expression);
+        $lineNo = 0;
+
+        if (! empty($item)) {
+            $lineNo = $item->item(0)->getLineNo();
+        }
+
+        return $lineNo;
     }
 }

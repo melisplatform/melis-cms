@@ -172,7 +172,8 @@ class PageImportController extends AbstractActionController
             'errors' => ! empty($errors) ? $errors : [],
             'pagesCount' => $res['pagesCount'] ?? 0,
             'idsMap' => $res['idsMap'] ?? [],
-            'keepIds' => $formData['keepIds'] ?? false
+            'keepIds' => $formData['keepIds'] ?? false,
+            'firstPage' => $res['firstPage'] ?? 0
         ]);
     }
 

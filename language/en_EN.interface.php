@@ -708,8 +708,8 @@
         'tr_melis_cms_page_tree_import_modal_unexpected_error_detail' => 'Details of errors',
         'tr_melis_cms_page_tree_import_ko_no_file' => 'No file was uploaded',
         'tr_melis_cms_page_tree_import_file_input' => 'File Input',
-        'tr_melis_cms_page_tree_import_file_final_message_csv' => 'When importing and not keeping IDs, some pages IDs, template IDs, style IDs, language IDs are going to change. So if you have other tables that make use of these IDs, they will be different. The system WILL NOT automatically update your tables but Melis Platform will provide a CSV mapping array with the original IDs and the new ones. <br><br> The CSV will only have the list of IDs that were updated. <br><br> The mapping array was just downloaded.',
-        'tr_melis_cms_page_tree_import_file_final_message_csv_keep_ids' => 'When importing and keeping IDs, There is a chance wherein template IDs, style IDs, language IDs are going to change. So if you have other tables that make use of these IDs, they will be different. The system WILL NOT automatically update your tables but Melis Platform will provide a CSV mapping array with the original ids and the new ones. <br><br> The CSV will only have the list of IDs that were updated. <br><br> The mapping array was just downloaded.',
+        'tr_melis_cms_page_tree_import_file_final_message_csv' => '<br> When importing and not keeping IDs, some pages IDs, template IDs, style IDs, language IDs are going to change. So if you have other tables that make use of these IDs, they will be different. <br><br> The system WILL NOT automatically update your tables but Melis Platform will provide a CSV mapping array with the original IDs and the new ones. The CSV will only have the list of IDs that were updated. <br><br> The mapping array was just downloaded.',
+        'tr_melis_cms_page_tree_import_file_final_message_csv_keep_ids' => '<br> When importing and keeping IDs, There is a chance wherein template IDs, style IDs, language IDs are going to change. So if you have other tables that make use of these IDs, they will be different. The system WILL NOT automatically update your tables but Melis Platform will provide a CSV mapping array with the original ids and the new ones. <br><br> The CSV will only have the list of IDs that were updated. <br><br> If some IDs changed, a mapping array was downloaded.',
         'tr_melis_cms_page_tree_import_title' => 'Page import',
         'tr_melis_cms_page_tree_import_notification_message' => 'Page(s) imported successfully',
         'tr_melis_cms_page_tree_error_no_page_export_xml' => 'The zip does not contain PageExport.xml',
@@ -719,6 +719,7 @@
         'tr_melis_cms_page_tree_csv_new_id' => 'New ID',
         'tr_melis_cms_page_tree_log_message' => 'Import of pages from page ID [itemId]',
         'tr_melis_cms_page_tree_error_file_size_exceeded' => 'The maximum file size allowed is ',
+        'tr_melis_cms_page_tree_import_line' => 'Line',
 
         'tr_melis_cms_page_tree_import_success' => 'Success',
         'tr_melis_cms_page_tree_import_failed' => 'Failed',

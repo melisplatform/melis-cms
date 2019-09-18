@@ -710,8 +710,8 @@
         'tr_melis_cms_page_tree_import_modal_unexpected_error_detail' => 'Détails des erreurs',
         'tr_melis_cms_page_tree_import_ko_no_file' => 'Aucun fichier uploadé',
         'tr_melis_cms_page_tree_import_file_input' => 'File Input',
-        'tr_melis_cms_page_tree_import_file_final_message_csv' => ' Lors d\'un import sans conserver les IDs, des IDs de pages, templates, styles et langages vont changer. Si vous avez d\'autres tables utilisant ces IDs, ils seront différents. <br><br> Le système NE mettra PAS à jour automatiquement vos tables mais Melis Platform fournira un tableau de correspondance CSV avec les IDs originaux et les nouveaux. Le CSV contiendra uniquement la liste des IDs ayant été mis à jours. <br><br> Le tableau de correspondance vient d\'être téléchargé.',
-        'tr_melis_cms_page_tree_import_file_final_message_csv_keep_ids' => ' Lors d\'un import en conservant les IDs, il est possible que certains IDs de pages, templates, styles et langages changent. Si vous avez d\'autres tables utilisant ces IDs, ils seront différents. <br><br> Le système NE mettra PAS à jour automatiquement vos tables mais Melis Platform fournira un tableau de correspondance CSV avec les IDs originaux et les nouveaux. Le CSV contiendra uniquement la liste des IDs ayant été mis à jours. <br><br> Le tableau de correspondance vient d\'être téléchargé.',
+        'tr_melis_cms_page_tree_import_file_final_message_csv' => '<br> Lors d\'un import sans conserver les IDs, des IDs de pages, templates, styles et langages vont changer. Si vous avez d\'autres tables utilisant ces IDs, ils seront différents. <br><br> Le système NE mettra PAS à jour automatiquement vos tables mais Melis Platform fournira un tableau de correspondance CSV avec les IDs originaux et les nouveaux. Le CSV contiendra uniquement la liste des IDs ayant été mis à jours. <br><br> Le tableau de correspondance vient d\'être téléchargé.',
+        'tr_melis_cms_page_tree_import_file_final_message_csv_keep_ids' => '<br> Lors d\'un import en conservant les IDs, il est possible que certains IDs de pages, templates, styles et langages changent. Si vous avez d\'autres tables utilisant ces IDs, ils seront différents. <br><br> Le système NE mettra PAS à jour automatiquement vos tables mais Melis Platform fournira un tableau de correspondance CSV avec les IDs originaux et les nouveaux. Le CSV contiendra uniquement la liste des IDs ayant été mis à jours. <br><br> Si certains IDs ont changé, un tableau de correspondance a été téléchargé.',
         'tr_melis_cms_page_tree_import_title' => 'Import de page',
         'tr_melis_cms_page_tree_import_notification_message' => 'Page(s) importée(s) avec succès',
         'tr_melis_cms_page_tree_error_no_page_export_xml' => 'Le Zip ne contient pas PageExport.xml',
@@ -721,6 +721,7 @@
         'tr_melis_cms_page_tree_csv_new_id' => 'Nouvel ID',
         'tr_melis_cms_page_tree_log_message' => 'Import de pages à partir de l\'ID de page [itemId]',
         'tr_melis_cms_page_tree_error_file_size_exceeded' => 'La taille maximum du fichier autorisée est de ',
+        'tr_melis_cms_page_tree_import_line' => 'Ligne',
 
         'tr_melis_cms_page_tree_import_success' => 'Succès',
         'tr_melis_cms_page_tree_import_failed' => 'Echec',

@@ -94,17 +94,6 @@ $(document).ready(function(){
         submitImportForm($('#id_meliscms_tree_sites_import_page_form'));
     });
 
-    function request(url, type, data, success, error) {
-        $.ajax({
-            type: type,
-            url: url,
-            data: data,
-            cache: false,
-            contentType: false,
-            processData: false
-        }).success(success(data)).error(error);
-    }
-
     $body.on('change', 'input[name=page_tree_import]', function() {
         var max_size = $body.find('#page-import-max-file-size').val();
         var file_size = this.files[0].size;
@@ -267,8 +256,7 @@ $(document).ready(function(){
                             '#72af46'
                         );
 
-                        $("#id-mod-menu-dynatree").fancytree("destroy");
-                        mainTree();
+                        refreshTreeview(data.firstPage);
 
                         // download for csv mapping array
                         if (idsMap != false) {
@@ -309,4 +297,51 @@ $(document).ready(function(){
             }
         );
     });
+
+    function refreshTreeview(pageNumber, self) {
+        optionalArg = (typeof self === 'undefined') ? 0 : self;
+        $.ajax({
+            url         : '/melis/MelisCms/TreeSites/getPageIdBreadcrumb?idPage='+pageNumber+'&includeSelf='+optionalArg,
+            encode		: true,
+            dataType    : 'json',
+        }).success(function(data){
+
+            //process array to add to make this format '1/3/5/6...'
+            var newData = [];
+            var parentNode;
+            $.each( data, function( key, value ) {
+                newData.push("/"+value);
+                if(key === 0){
+                    parentNode = value;
+                }
+            });
+            newData = newData.toString();
+            newData = newData.replace(/,/g,'');
+
+            var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
+
+            // reload tree pages
+            tree.reload({
+                url: '/melis/MelisCms/TreeSites/get-tree-pages-by-page-id'
+            }).done(function(){
+                tree.loadKeyPath(newData, function(node, status){
+                    if (status == "ok"){
+                        node.setActive(true).done(function(){
+                            node.setExpanded(true);
+                        });
+                    }
+                }).done(function(){
+                    tree.clearFilter();
+                    // remove duplicated brach of the tree while rapidly refreshing the tree [ plugin bug fix ]
+                    if ( $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").hasClass("fancytree-lastsib") === false){
+                        $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").remove();
+                    }
+                });
+            });
+
+        }).error(function(xhr, textStatus, errorThrown){
+            // error modal
+            alert( translations.tr_meliscore_error_message );
+        });
+    }
 });
