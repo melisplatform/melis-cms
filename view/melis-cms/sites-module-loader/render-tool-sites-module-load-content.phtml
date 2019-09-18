@@ -20,7 +20,7 @@ $status = '';
                         <div class="col">
                             <div class="switch-all-noti">
                                 <div class="icon-cont clearfix">
-                                    <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="<?=$this->translate('tr_meliscore_module_management_select_deselect_all_module_noti'); ?>"></i>
+                                    <i class="fa fa-info-circle fa-lg float-right tip-info" data-toggle="tooltip" data-placement="left" title="<?=$this->translate('tr_meliscore_module_management_select_deselect_all_module_noti'); ?>"></i>
                                 </div>
                             </div>
                         </div>
@@ -29,7 +29,7 @@ $status = '';
                         <div class="col-md-5 col-sm-4">
                             <?php if(!$this->isAdmin) {?>
                                 <div id="not-admin-notice">
-                                    <h5 class="pull-left"><strong><?= $this->translate('tr_melis_cms_sites_module_load_no_access'); ?></strong></h5>
+                                    <h5 class="float-left"><strong><?= $this->translate('tr_melis_cms_sites_module_load_no_access'); ?></strong></h5>
                                 </div>
                             <?php } ?>
                         </div>
@@ -71,10 +71,10 @@ $status = '';
                                 }
                                 ?>
                                 <div class="module-cont clearfix">
-                                    <div class="pull-left mod-name-container">
+                                    <div class="float-left mod-name-container">
                                         <h4 class="mod-name" title="<?= $moduleName; ?>"><?= $moduleName; ?></h4>
                                     </div>
-                                    <div class="pull-right">
+                                    <div class="float-right">
                                         <div class="row">
                                             <div class="col-md-6 col-sm-6 col-xs-6 ">
                                                 <h4 class="module-display-indicator hidden-xs"><?= isset($this->modulesInfo[$moduleName]['version']) ? $this->modulesInfo[$moduleName]['version'] : 'v1.0'; ?> </h4>
