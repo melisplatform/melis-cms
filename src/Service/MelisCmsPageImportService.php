@@ -794,7 +794,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
             $xmlArray = $xmlArray[0];
         }
 
-        if (isset($xmlArray->children)) {
+        if (isset($xmlArray->children) && ! empty($xmlArray->children)) {
             $children = $xmlArray->children;
         }
 
@@ -811,7 +811,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                 : $xmlArray->melis_cms_page_saved->page_id;
         }
 
-        if (!empty($children)) {
+        if (isset($children)) {
             foreach ($children as $key => $child) {
                 if (count($children->page) > 1) {
                     foreach ($child as $x => $y) {
