@@ -2433,47 +2433,50 @@ $(function() {
      * Get all input values into one array on clicking save button except for the site translation inputs
      */
     $body.on("click","#btn-save-meliscms-tool-sites", function() {
-        var currentTabId = activeTabId.split("_")[0];
-        var dataString = $("#"+currentTabId+"_id_meliscms_tool_sites_edit_site form").serializeArray();
-        // serialize the new array and send it to server
-        var newEnabledModule = [];
-        $.each(dataString, function( key, value ) {
-            str1 = value.name;
-            str2 = "moduleLoad";
-            if(str1.indexOf(str2) != -1){
-                newEnabledModule.push(str1.replace('moduleLoad',''));
-            }
-        });
-        var currentEnabledModule = $("#"+currentTabId+"_currentEnabledModule").val();
-        var sitesUsingModules = $("#"+currentTabId+"_sitesUsingModules").val();
+        var currentTabId = activeTabId.split("_")[0],
+            dataString = $("#"+currentTabId+"_id_meliscms_tool_sites_edit_site form").serializeArray(),
+            // serialize the new array and send it to server
+            newEnabledModule = [];
 
-        currentEnabledModule = jQuery.parseJSON(currentEnabledModule);
-        sitesUsingModules = jQuery.parseJSON(sitesUsingModules);
-
-        var sitesUsingModulesStr = "";
-        $.each(sitesUsingModules,function (key, val) {
-            sitesUsingModulesStr += "<br>- "+ val;
-        });
-        var moduleDiff = arrayDiff(currentEnabledModule,newEnabledModule);
-
-        var siteModuleName = $("#"+currentTabId+"_siteModuleName").val();
-        var isAdmin = $("#not-admin-notice").length < 1 ? true : false;
-
-        if(moduleDiff.length > 0 && isAdmin){
-            melisCoreTool.confirm(
-                translations.tr_meliscms_common_save,
-                translations.tr_meliscms_tool_sites_cancel,
-                translations.tr_meliscms_tool_site_module_load_update_title,
-                translations.tr_meliscms_tool_site_module_load_update_confirm.replace(/%s/g, sitesUsingModulesStr),
-                function(){
-                    dataString = $.param(dataString);
-                    saveSite(dataString, currentTabId, siteModuleName);
+            $.each(dataString, function( key, value ) {
+                str1 = value.name;
+                str2 = "moduleLoad";
+                if(str1.indexOf(str2) != -1){
+                    newEnabledModule.push(str1.replace('moduleLoad',''));
                 }
-            );
-        }else{
-            dataString = $.param(dataString);
-            saveSite(dataString, currentTabId, siteModuleName);
-        }
+            });
+
+            var currentEnabledModule = $("#"+currentTabId+"_currentEnabledModule").val(),
+                sitesUsingModules = $("#"+currentTabId+"_sitesUsingModules").val();
+
+                currentEnabledModule = jQuery.parseJSON(currentEnabledModule);
+                sitesUsingModules = jQuery.parseJSON(sitesUsingModules);
+
+                var sitesUsingModulesStr = "";
+
+                $.each(sitesUsingModules,function (key, val) {
+                    sitesUsingModulesStr += "<br>- "+ val;
+                });
+
+                var moduleDiff = arrayDiff(currentEnabledModule,newEnabledModule),
+                    siteModuleName = $("#"+currentTabId+"_siteModuleName").val(),
+                    isAdmin = $("#not-admin-notice").length < 1 ? true : false;
+
+                    if ( moduleDiff.length > 0 && isAdmin ) {
+                        melisCoreTool.confirm(
+                            translations.tr_meliscms_common_save,
+                            translations.tr_meliscms_tool_sites_cancel,
+                            translations.tr_meliscms_tool_site_module_load_update_title,
+                            translations.tr_meliscms_tool_site_module_load_update_confirm.replace(/%s/g, sitesUsingModulesStr),
+                            function(){
+                                dataString = $.param(dataString);
+                                saveSite(dataString, currentTabId, siteModuleName);
+                            }
+                        );
+                    } else {
+                        dataString = $.param(dataString);
+                        saveSite(dataString, currentTabId, siteModuleName);
+                    }
     });
 
     /**
@@ -2584,26 +2587,26 @@ $(function() {
         var errs = {};
 
         $.each(errors, function (key, error) {
-            var $input = $("#" + container + " #" + key);
-            var lang = $input.data('lang');
-            var label = $input.siblings('label').text();
-            var lastChar = label.substr(label.length - 1);
-            var exploded = key.split('_');
+            var $input      = $("#" + container + " #" + key),
+                lang        = $input.data('lang'),
+                label       = $input.siblings('label').text(),
+                lastChar    = label.substr(label.length - 1),
+                exploded    = key.split('_');
 
-            if (lang != undefined) {
+            if ( lang != undefined ) {
                 label = $input.closest("div").siblings('label').text().slice(0, -1);
                 errs[lang + ' ' + label] = error;
             } else {
-                if (label === "") {
+                if ( label === "" ) {
                     label = $input.closest("div").siblings('label').text().slice(0, -2);
                     errs[label] = error;
                 } else {
-                    if (lastChar === '*') {
+                    if ( lastChar === '*' ) {
                         label = $input.siblings('label').text().slice(0, -2);
                     }
 
-                    if (exploded[1] === 'sdom') {
-                        if (lastChar === '*')
+                    if ( exploded[1] === 'sdom' ) {
+                        if ( lastChar === '*' )
                             label = $input.siblings('label').text().slice(0, -2) + '(' + exploded[0] + ')';
                         else
                             label = $input.siblings('label').text() + '(' + exploded[0] + ')';
@@ -2653,37 +2656,39 @@ $(function() {
      * This will delete the site
      */
     $body.on("click", "#tableToolSites .btnDeleteSite", function(e) {
-        var siteId = $(this).parents("tr").attr("id");
-        melisCoreTool.confirm(
-            translations.tr_meliscore_common_yes,
-            translations.tr_meliscore_common_no,
-            translations.tr_meliscms_tool_site_delete_confirm_title,
-            translations.tr_meliscms_tool_site_delete_confirm,
-            function() {
-                $.ajax({
-                    type        : "POST",
-                    url         : "/melis/MelisCms/Sites/deleteSite",
-                    data		: {siteId: siteId},
-                    dataType    : 'json',
-                    encode		: true
-                }).done(function(data) {
-                    melisCoreTool.pending(".btnDeleteSite");
-                    if(data.success) {
-                        melisHelper.tabClose(siteId + "_id_meliscms_tool_sites_edit_site");
-                        melisHelper.melisOkNotification(data.textTitle, data.textMessage);
-                        // melisHelper.zoneReload("id_meliscms_tool_site", "meliscms_tool_site");
-                        //refresh site table
-                        $("#tableToolSites").DataTable().ajax.reload();
-                    }
-                    else {
-                        melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 0);
-                    }
-                    melisCore.flashMessenger();
-                    melisCoreTool.done(".btnDeleteSite");
-                }).fail(function(xhr, textStatus, errorThrown) {
-                    alert( translations.tr_meliscore_error_message );
+        var $this   = $(this),
+            siteId  = $this.parents("tr").attr("id");
+
+            melisCoreTool.confirm(
+                translations.tr_meliscore_common_yes,
+                translations.tr_meliscore_common_no,
+                translations.tr_meliscms_tool_site_delete_confirm_title,
+                translations.tr_meliscms_tool_site_delete_confirm,
+                function() {
+                    $.ajax({
+                        type        : "POST",
+                        url         : "/melis/MelisCms/Sites/deleteSite",
+                        data		: {siteId: siteId},
+                        dataType    : 'json',
+                        encode		: true
+                    }).done(function(data) {
+                        melisCoreTool.pending(".btnDeleteSite");
+                        if(data.success) {
+                            melisHelper.tabClose(siteId + "_id_meliscms_tool_sites_edit_site");
+                            melisHelper.melisOkNotification(data.textTitle, data.textMessage);
+                            // melisHelper.zoneReload("id_meliscms_tool_site", "meliscms_tool_site");
+                            //refresh site table
+                            $("#tableToolSites").DataTable().ajax.reload();
+                        }
+                        else {
+                            melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 0);
+                        }
+                        melisCore.flashMessenger();
+                        melisCoreTool.done(".btnDeleteSite");
+                    }).fail(function(xhr, textStatus, errorThrown) {
+                        alert( translations.tr_meliscore_error_message );
+                    });
                 });
-            });
     });
 
     var modalUrl = "/melis/MelisCms/Sites/renderToolSitesModalContainer";
@@ -2719,18 +2724,19 @@ $(function() {
             itemsDesktop : false,
             afterMove: function (elem) {
                 var current = this.currentItem;
-                //hide the prev button when we are on the first step
-                if(current === 0){
-                    hideElement("#btn-prev-step");
-                }else{
-                    showElement("#btn-prev-step");
-                }
+                    //hide the prev button when we are on the first step
+                    if ( current === 0 ) {
+                        hideElement("#btn-prev-step");
+                    } else {
+                        showElement("#btn-prev-step");
+                    }
             },
-            beforeMove: function(elem){
-                var current = this.currentItem;
-                var step = elem.find(".item").eq(current).attr("data-step");
-                checkStep(step);
-                updateActiveStep(step);
+            beforeMove: function(elem) {
+                var current = this.currentItem,
+                    step    = elem.find(".item").eq(current).attr("data-step");
+
+                    checkStep(step);
+                    updateActiveStep(step);
             },
             afterInit: function(){
                 $(".sites-steps-owl .tool-sites_container_fixed_width").find("label").not(":has(input)").removeClass("melis-radio-box");
@@ -2749,22 +2755,22 @@ $(function() {
     };
 
     $body.on("click", "#btn-next-step", function(e) {
-        if(owlStep !== null) {
+        if ( owlStep !== null ) {
             /**
              * check if form is not empty before
              * proceeding to the next slide
              */
-            if(currentStepForm != "" && currentStepForm != "skip") {
+            if ( currentStepForm != "" && currentStepForm != "skip" ) {
                 var form = getSerializedForm(currentStepForm);
-                if (isFormEmpty(form, currentStepForm)) {
-                    // $("#siteAddAlert").removeClass("d-none");
+                if ( isFormEmpty(form, currentStepForm) ) {
+                    // $("#siteAddAlert").removeClass("hidden");
                 } else {
-                    $("#siteAddAlert").addClass("d-none");
+                    $("#siteAddAlert").addClass("hidden");
                     removeFormError(currentStepForm);
                     owlStep.trigger('owl.next');
                 }
-            }else{
-                $("#siteAddAlert").addClass("d-none");
+            } else {
+                $("#siteAddAlert").addClass("hidden");
                 removeFormError(currentStepForm);
                 owlStep.trigger('owl.next');
             }
@@ -2772,8 +2778,8 @@ $(function() {
     });
 
     $body.on("click", "#btn-prev-step", function(e) {
-        if(owlStep !== null) {
-            $("#siteAddAlert").addClass("d-none");
+        if ( owlStep !== null ) {
+            $("#siteAddAlert").addClass("hidden");
             removeFormError(currentStepForm);
             owlStep.trigger('owl.prev');
         }
@@ -3048,7 +3054,7 @@ $(function() {
     });
 
     $body.on("change", "#is_create_new_module_for_site input[name='is_create_module']", function() {
-        $(".step4-forms").removeClass("d-none");
+        $(".step4-forms").removeClass("hidden");
 
         var value = $(this).val(),
             step4_form = $("#step4form_module");
@@ -3221,7 +3227,7 @@ $(function() {
         /**
          * Bring back the original message
          */
-        $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_create_site_required_field).addClass('d-none');
+        $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_create_site_required_field).addClass('hidden');
 
         /**
          * if user didn't select the module option
@@ -3229,7 +3235,7 @@ $(function() {
          */
         if(form == "#step4form_module") {
             if (!isUserSelectModuleOption) {
-                $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_step4_select_module_option_err).removeClass("d-none");
+                $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_step4_select_module_option_err).removeClass("hidden");
                 return true;
             }
         }
@@ -3263,7 +3269,7 @@ $(function() {
         });
 
         if (errCtr > 0) {
-            $("#siteAddAlert").removeClass("d-none");
+            $("#siteAddAlert").removeClass("hidden");
             return true;
         }
 
@@ -3275,7 +3281,7 @@ $(function() {
         if(newModuleValue != "") {
             if (/^[A-Za-z]*$/.test(newModuleValue) === false) {
                 newModuleLabel.addClass("fieldErrorColor");
-                $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_step4_create_module_error).removeClass("d-none");
+                $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_step4_create_module_error).removeClass("hidden");
                 return true;
             }
         }
@@ -3308,7 +3314,7 @@ $(function() {
         });
 
         if (domainNameErrCtr > 0) {
-            $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_step3_invalid_domain_name).removeClass("d-none");
+            $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_step3_invalid_domain_name).removeClass("hidden");
             return true;
         } else {
             // multi domain
@@ -3319,7 +3325,7 @@ $(function() {
                         sdomMultiLbl.addClass("fieldErrorColor");
                     });
 
-                    $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_step3_domain_unique_error).removeClass("d-none");
+                    $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_step3_domain_unique_error).removeClass("hidden");
                     return true;
                 } else {
                     $.ajax({
@@ -3351,7 +3357,7 @@ $(function() {
                                 })
                             ).then(function () {
                                 melisCoreTool.done("#btn-next-step");
-                                $("#siteAddAlert").removeClass('d-none');
+                                $("#siteAddAlert").removeClass('hidden');
                                 return true;
                             });
                         } else {
@@ -3381,7 +3387,7 @@ $(function() {
                     if (!$.isEmptyObject(data.result)) {
                         newSDOmLabel.addClass("fieldErrorColor");
                         $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_step3_domain_error1 + data.result[0] + translations.tr_melis_cms_sites_tool_add_step3_domain_error2);
-                        $("#siteAddAlert").removeClass('d-none');
+                        $("#siteAddAlert").removeClass('hidden');
                         melisCoreTool.done("#btn-next-step");
                         return true;
                     } else {
@@ -3558,20 +3564,25 @@ $(function() {
      * ================================================================================
      */
     $body.on("click", "#s404_page_id_button span", function() {
-        var formId = $(this).closest('form').attr('id');
-        melisLinkTree.createInputTreeModal('#' + formId + ' ' + '#siteprop_s404_page_id');
+        var $this   = $(this),
+            formId  = $this.closest('form').attr('id');
+
+            melisLinkTree.createInputTreeModal('#' + formId + ' ' + '#siteprop_s404_page_id');
     });
 
     $body.on("click", "#site_main_page_id_button span", function() {
-        var formId = $(this).closest('form').attr('id');
-        melisLinkTree.createInputTreeModal('#' + formId + ' ' + '#siteprop_site_main_page_id');
+        var $this   = $(this),
+            formId  = $this.closest('form').attr('id');
+
+            melisLinkTree.createInputTreeModal('#' + formId + ' ' + '#siteprop_site_main_page_id');
     });
 
     $body.on("click", ".pageSelect span.input-group-addon", function() {
-        var id = $(this).siblings('input').attr('id');
-        var formId = $(this).closest('form').attr('id');
+        var $this = $(this),
+            id = $this.siblings('input').attr('id'),
+            formId = $this.closest('form').attr('id');
 
-        melisLinkTree.createInputTreeModal('#' + formId + ' ' + '#' + id);
+            melisLinkTree.createInputTreeModal('#' + formId + ' ' + '#' + id);
     });
     /**
      * ================================================================================
@@ -3600,9 +3611,10 @@ $(function() {
      * ================================================================================
      */
     $body.on('change', '.sites-tool-lang-tab-checkbox', function () {
-        var input = $(this).siblings('.sites-tool-lang-tab-checkbox-lang');
+        var $this = $(this),
+            input = $this.siblings('.sites-tool-lang-tab-checkbox-lang');
 
-        if ($(this).data('active') === 'active' && !this.checked) {
+        if ( $this.data('active') === 'active' && !this.checked ) {
             melisCoreTool.confirm(
                 translations.tr_meliscore_common_yes,
                 translations.tr_meliscore_common_no,
@@ -3620,13 +3632,14 @@ $(function() {
     // Toggle single checkbox
     $body.on("click", ".cb-cont input[type=checkbox]", function () {
         var $this = $(this);
-        if ($this.is(':checked')) {
-            $this.prop("checked", true);
-            $this.prev("span").find(".cbmask-inner").addClass('cb-active');
-        } else {
-            $this.not(".requried-module").prop("checked", false);
-            $this.not(".requried-module").prev("span").find(".cbmask-inner").removeClass('cb-active');
-        }
+        
+            if ($this.is(':checked')) {
+                $this.prop("checked", true);
+                $this.prev("span").find(".cbmask-inner").addClass('cb-active');
+            } else {
+                $this.not(".requried-module").prop("checked", false);
+                $this.not(".requried-module").prev("span").find(".cbmask-inner").removeClass('cb-active');
+            }
     });
     /**
      * ================================================================================
@@ -3735,7 +3748,7 @@ $(function() {
                     if(typeof window[callback] === "function"){
                         window[callback](pageId, meliscmsSiteSelectorInputDom);
                     }else{
-                        console.log("callback "+meliscmsSiteSelectorInputDom.data("callback")+" is not a function.")
+                        //console.log("callback "+meliscmsSiteSelectorInputDom.data("callback")+" is not a function.")
                     }
                 }
 

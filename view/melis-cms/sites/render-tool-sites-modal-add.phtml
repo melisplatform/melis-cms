@@ -45,9 +45,11 @@ if (!empty($this->zoneconfig['conf']['id']))
                     </div>
                     <div class="footer-modal d-flex flex-row justify-content-between">
                         <button type="button" data-dismiss="modal" class="btn btn-danger"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
-                        <button type="button" class="btn btn-success" id="btn-prev-step"><?php echo $this->translate('tr_meliscms_tool_sites_prev') ?></button>
-                        <button type="button" class="btn btn-success" id="btn-next-step"><?php echo $this->translate('tr_meliscms_tool_sites_next') ?></button>
-                        <button type="button" class="btn btn-success" id="btn-finish-step"><?php echo $this->translate('tr_meliscms_tool_sites_finish') ?></button>
+                        <div class="prev-next-finish">
+                            <button type="button" class="btn btn-success" id="btn-prev-step"><?php echo $this->translate('tr_meliscms_tool_sites_prev') ?></button>
+                            <button type="button" class="btn btn-success" id="btn-next-step"><?php echo $this->translate('tr_meliscms_tool_sites_next') ?></button>
+                            <button type="button" class="btn btn-success" id="btn-finish-step"><?php echo $this->translate('tr_meliscms_tool_sites_finish') ?></button>
+                        </div>
                     </div>
                 </div>
             </div>
