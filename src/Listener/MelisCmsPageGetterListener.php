@@ -54,24 +54,25 @@ class MelisCmsPageGetterListener implements ListenerAggregateInterface
                  */
                 elseif ($request->getQuery('melisSite') && !empty($container['page-cache-getter-temp']))
                 {
-                    $pageId = $params['idpage'];
-
-                    if (!empty($container['page-cache-getter-temp'][$pageId]))
-                    {
-                        // Page cache config
-                        $cacheKey = 'cms_page_getter_'.$pageId;
-                        $cacheConfig = 'meliscms_page';
-
-                        // Retrieving page cache
-                        $melisEngineCacheSystem = $sm->get('MelisEngineCacheSystem');
-                        $results = $melisEngineCacheSystem->getCacheByKey($cacheKey, $cacheConfig, true);
-                        if (!empty($results))
+                    if (! empty($params['idpage'])) {
+                        $pageId = $params['idpage'];
+                        if (!empty($container['page-cache-getter-temp'][$pageId]))
                         {
-                            // Deleting page cached
-                            $melisEngineCacheSystem->deleteCacheByPrefix($cacheKey, $cacheConfig);
+                            // Page cache config
+                            $cacheKey = 'cms_page_getter_'.$pageId;
+                            $cacheConfig = 'meliscms_page';
+
+                            // Retrieving page cache
+                            $melisEngineCacheSystem = $sm->get('MelisEngineCacheSystem');
+                            $results = $melisEngineCacheSystem->getCacheByKey($cacheKey, $cacheConfig, true);
+                            if (!empty($results))
+                            {
+                                // Deleting page cached
+                                $melisEngineCacheSystem->deleteCacheByPrefix($cacheKey, $cacheConfig);
+                            }
+                            // Unseting Publish flag from session
+                            unset($container['page-cache-getter-temp'][$pageId]);
                         }
-                        // Unseting Publish flag from session
-                        unset($container['page-cache-getter-temp'][$pageId]);
                     }
                 }
             }
