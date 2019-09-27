@@ -769,7 +769,7 @@ var melisCms = (function(){
 						glyph: {
 							map: {
 								//loading: "fa fa-spinner fa-pulse"
-								loading: "glyphicon-refresh fancytree-helper-spin" // edited by junry
+								loading: "glyphicon-refresh fancytree-helper-spin fa fa-spinner fa-pulse" // edited by junry
 							}
 						},
 						activeVisible: false,
@@ -1552,6 +1552,7 @@ window.initLangJs = function() {
 }
 $(function(){
 	var $body = $("body");
+	
 		$body.on("click", ".btnCmsPlatfomEdit", function() {
 			var pId = $(this).parents("tr").attr("id");
 

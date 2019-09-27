@@ -1,5 +1,6 @@
 $(function(){
 	var $body = $("body");
+	
 		$body.on("click", ".btnCmsPlatfomEdit", function() {
 			var pId = $(this).parents("tr").attr("id");
 
