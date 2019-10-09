@@ -364,19 +364,19 @@ var melisCms = (function(){
 		}		
 	}
 	
-	// Deactivating page edition action buttons
-    // function disableCmsButtons(id) {
-    //     $("div.make-switch label on, off").parent().css("z-index", -1).parents("div.make-switch").css("opacity", 0.5);
-    //     $("#"+id+"_id_meliscms_page_action_tabs").addClass('relative').prepend("<li class='btn-disabled'></li>");
-    // }
+	/* //Deactivating page edition action buttons
+    function disableCmsButtons(id) {
+        $("div.make-switch label on, off").parent().css("z-index", -1).parents("div.make-switch").css("opacity", 0.5);
+        $("#"+id+"_id_meliscms_page_action_tabs").addClass('relative').prepend("<li class='btn-disabled'></li>");
+    }
     
-    // Activating page edition action buttons
-    // function enableCmsbuttons(id) {
-    //     $("#"+id+"_action_tabs").removeClass('relative');
-    //     $("#"+id+"_action_tabs li.btn-disabled").remove();
+    //Activating page edition action buttons
+    function enableCmsbuttons(id) {
+        $("#"+id+"_action_tabs").removeClass('relative');
+        $("#"+id+"_action_tabs li.btn-disabled").remove();
         
-    //     $("div.make-switch label on, off").parent().css("z-index", 1).parents("div.make-switch").css("opacity", 1);
-    // }
+        $("div.make-switch label on, off").parent().css("z-index", 1).parents("div.make-switch").css("opacity", 1);
+    }*/
 	
 	// RELOAD THE TREEVIEW AND SET A NODE PAGE ACTIVE
 	function refreshTreeview(pageNumber, self) {
@@ -486,15 +486,15 @@ var melisCms = (function(){
 				 * cause it's data type on db is TEXT
                  */
 				// prevLabel.find('span').html('<i class="fa fa-text-width"></i>(' + charLength + ')');
-				//
-				// if( charLength > limit ){
-				// 	prevLabel.addClass('limit');
-				// 	prevLabel.find('span').addClass('limit');
-				// }
-				// else{
-				// 	prevLabel.removeClass('limit');
-				// 	prevLabel.find('span').removeClass('limit');
-				// }
+				
+				/*if( charLength > limit ){
+					prevLabel.addClass('limit');
+					prevLabel.find('span').addClass('limit');
+				}
+				else{
+					prevLabel.removeClass('limit');
+					prevLabel.find('span').removeClass('limit');
+				}*/
 			}
 		}
 		else {
@@ -505,10 +505,10 @@ var melisCms = (function(){
                  * Removed so that meta title & meta description has no limit
 				 * cause it's data type on db is TEXT
                  */
-				// if( charLength > limit ){
-				// 	prevLabel.addClass('limit');
-				// 	prevLabel.find('span').addClass('limit');
-				// }
+				/*if( charLength > limit ){
+					prevLabel.addClass('limit');
+					prevLabel.find('span').addClass('limit');
+				}*/
 			}
 		}
 	}
@@ -738,7 +738,7 @@ var melisCms = (function(){
 		savePage 										: 			savePage,
 		publishPage 									: 			publishPage,
 		unpublishPage 									: 			unpublishPage,
-		refreshPageTable 								: 			refreshPageTable,
+		//refreshPageTable 								: 			refreshPageTable,
 		
 		//refresh treeview
 		refreshTreeview									:			refreshTreeview,
