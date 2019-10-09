@@ -738,6 +738,7 @@ var melisCms = (function(){
 		savePage 										: 			savePage,
 		publishPage 									: 			publishPage,
 		unpublishPage 									: 			unpublishPage,
+		refreshPageTable 								: 			refreshPageTable,
 		
 		//refresh treeview
 		refreshTreeview									:			refreshTreeview,
