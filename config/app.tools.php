@@ -365,7 +365,7 @@ return array(
                                         array(
                                             'name'    => 'InArray',
                                             'options' => array(
-                                                'haystack' => array('PHP', 'ZF2'),
+                                                'haystack' => array('PHP', 'ZF2', 'TWG'),
                                                 'messages' => array(
                                                     \Zend\Validator\InArray::NOT_IN_ARRAY => 'tr_meliscms_template_form_tpl_type_error_invalid_select',
                                                 ),
