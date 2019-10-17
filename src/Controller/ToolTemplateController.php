@@ -473,37 +473,16 @@ class ToolTemplateController extends AbstractActionController
                     $siteData = $siteTable->getEntryById($site)->current();
                     $data['tpl_zf2_website_folder'] = !empty($siteData->site_name)? $siteData->site_name : '';
 
-                    if($data['tpl_type'] == 'PHP') {
-                        $phpPath = $data['tpl_php_path'];
-
-                        if(empty($phpPath)) {
+                    if ($data['tpl_type'] == 'PHP') {
+                        if (empty($site)) {
                             $textMessage = 'tr_tool_template_fm_new_content_error';
                             $status = 0;
-                            $errors= array(
-                                'tpl_php_path' => array(
-                                    'empty_path' => $translator->translate('tr_meliscms_template_form_tpl_path_error_empty')
-                                ),
-                            );
-                        }
-                        elseif(strlen($phpPath)>150) {
-                            $textMessage = 'tr_tool_template_fm_new_content_error';
-                            $status = 0;
-                            $errors= array(
-                                'tpl_php_path' => array(
-                                    'path_too_long' => $translator->translate('tr_meliscms_template_form_tpl_path_error_high')
-                                ),
-                            );
-                        }
-                        elseif(empty($site)){
-                            $textMessage = 'tr_tool_template_fm_new_content_error';
-                            $status = 0;
-                            $errors= array(
-                                'tpl_site_id' => array(
+                            $errors = [
+                                'tpl_site_id' => [
                                     'invalid_selection' => $translator->translate('tr_meliscms_template_form_tpl_site_id_error_empty')
-                                ),
-                            );
-                        }
-                        else {
+                                ],
+                            ];
+                        } else {
                             $templatesModel->save($data);
                             $textMessage = 'tr_tool_template_fm_new_content';
                             $status = 1;
