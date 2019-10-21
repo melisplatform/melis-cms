@@ -398,91 +398,111 @@ class PlatformController extends AbstractActionController
         $this->getEventManager()->trigger('meliscms_platform_IDs_delete_end', $this, array_merge($response, array('typeCode' => 'CMS_PLATFORM_IDS_DELETE', 'itemId' => $pids_id)));
         return new JsonModel($response);
     }
-    
-    /*
+
+    /**
      * Get CMS Platform ID Datas for DataTable
-     * @return Json
+     * @return JsonModel
      */
-    public function getPlatformDataAction(){
+    public function getPlatformDataAction()
+    {
         $melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
         $translator = $this->getServiceLocator()->get('translator');
         $platformTable = $this->getServiceLocator()->get('MelisCoreTablePlatform');
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
-        
-        $colId = array();
+
+        $colId = [];
         $dataCount = 0;
         $draw = 0;
-        $tableData = array();
-        
-        if($this->getRequest()->isPost()) {
-        
+        $tableData = [];
+
+        if ($this->getRequest()->isPost()) {
+
             $colId = array_keys($melisTool->getColumns());
-        
+
             $sortOrder = $this->getRequest()->getPost('order');
             $sortOrder = $sortOrder[0]['dir'];
-        
+
             $selCol = $this->getRequest()->getPost('order');
             $selCol = $colId[$selCol[0]['column']];
-        
+
             $draw = $this->getRequest()->getPost('draw');
-        
+
             $start = $this->getRequest()->getPost('start');
-            $length =  $this->getRequest()->getPost('length');
-        
+            $length = $this->getRequest()->getPost('length');
+
             $dataCount = $melisEngineTablePlatformIds->getTotalData();
-        
-            $getData = $melisEngineTablePlatformIds->getPagedData(array(
-                'order' => array(
+
+            $sortByName = false;
+            if ($selCol == 'pids_name') {
+                $sortByName = true;
+                $sortMeByName = [];
+                $sortBy = $sortOrder;
+
+                $selCol = null;
+                $sortOrder = null;
+            }
+
+            $getData = $melisEngineTablePlatformIds->getPagedData([
+                'order' => [
                     'key' => $selCol,
                     'dir' => $sortOrder,
-                ),
+                ],
                 'start' => $start,
                 'limit' => $length,
                 'columns' => $melisTool->getSearchableColumns(),
-                'date_filter' => array()
-            ));
-        
+                'date_filter' => [],
+            ]);
+
             $tableData = $getData->toArray();
-            for($ctr = 0; $ctr < count($tableData); $ctr++)
-            {
+            for ($ctr = 0; $ctr < count($tableData); $ctr++) {
                 // apply text limits
-                foreach($tableData[$ctr] as $vKey => $vValue)
-                {
+                foreach ($tableData[$ctr] as $vKey => $vValue) {
                     $tableData[$ctr][$vKey] = $melisTool->limitedText($melisTool->escapeHtml($vValue));
-                    
-                    $tableData[$ctr]['pids_name'] = $translator->translate('Deleted ('.$tableData[$ctr]['pids_id'].')');
-                    
-                    $platformName = $platformTable->getEntryById($tableData[$ctr]['pids_id']);
-                    
-                    if (!empty($platformName)){
-                        $platformName = $platformName->current();
-                        if (!empty($platformName)){
-                            
-                            if (getenv('MELIS_PLATFORM')==$platformName->plf_name){
-                                $tableData[$ctr]['DT_RowClass'] = 'noPlatformIdDeleteBtn';
-                            }
-                            
-                            $tableData[$ctr]['pids_name'] = $melisTool->limitedText($platformName->plf_name,25);
-                        }
-                    }
-                    
-                    
                 }
-                
-                // manually modify value of the desired row
-                // no specific row to be modified
-        
+
+                $tableData[$ctr]['pids_name'] = 'Deleted (' . $tableData[$ctr]['pids_id'] . ')';
+                $platformName = $platformTable->getEntryById($tableData[$ctr]['pids_id']);
+
+                if (!empty($platformName)) {
+                    $platformName = $platformName->current();
+
+                    if (!empty($platformName)) {
+                        if (getenv('MELIS_PLATFORM') == $platformName->plf_name) {
+                            $tableData[$ctr]['DT_RowClass'] = 'noPlatformIdDeleteBtn';
+                        }
+
+                        $tableData[$ctr]['pids_name'] = $melisTool->limitedText($platformName->plf_name, 25);
+
+                        if ($sortByName) {
+                            $sortMeByName[$ctr] = $tableData[$ctr]['pids_name'];
+                        }
+
+                    }
+                }
+
                 // add DataTable RowID, this will be added in the <tr> tags in each rows
                 $tableData[$ctr]['DT_RowId'] = $tableData[$ctr]['pids_id'];
             }
+
+            if ($sortByName) {
+                if ($sortBy == 'asc')
+                    asort($sortMeByName);
+                else {
+                    arsort($sortMeByName);
+                }
+
+                foreach ($sortMeByName as $key => $value) {
+                    $sortedByName[$key] = $tableData[$key];
+                }
+            }
         }
-        
-        return new JsonModel(array(
-            'draw' => (int) $draw,
+
+        return new JsonModel([
+            'draw' => (int)$draw,
             'recordsTotal' => $dataCount,
-            'recordsFiltered' =>  $melisEngineTablePlatformIds->getTotalFiltered(),
-            'data' => $tableData,
-        ));
+            'recordsFiltered' => $melisEngineTablePlatformIds->getTotalFiltered(),
+            'data' => $sortByName ? $sortedByName : $tableData,
+        ]);
     }
 }
