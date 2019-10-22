@@ -407,7 +407,6 @@ class PlatformController extends AbstractActionController
     {
         $melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
         $translator = $this->getServiceLocator()->get('translator');
-        $platformTable = $this->getServiceLocator()->get('MelisCoreTablePlatform');
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
 
@@ -431,19 +430,7 @@ class PlatformController extends AbstractActionController
             $start = $this->getRequest()->getPost('start');
             $length = $this->getRequest()->getPost('length');
 
-            $dataCount = $melisEngineTablePlatformIds->getTotalData();
-
-            $sortByName = false;
-            if ($selCol == 'pids_name') {
-                $sortByName = true;
-                $sortMeByName = [];
-                $sortBy = $sortOrder;
-
-                $selCol = null;
-                $sortOrder = null;
-            }
-
-            $getData = $melisEngineTablePlatformIds->getPagedData([
+            $platformTableData = $melisEngineTablePlatformIds->getData([
                 'order' => [
                     'key' => $selCol,
                     'dir' => $sortOrder,
@@ -453,56 +440,49 @@ class PlatformController extends AbstractActionController
                 'columns' => $melisTool->getSearchableColumns(),
                 'date_filter' => [],
             ]);
+            $tableData = $platformTableData->toArray();
 
-            $tableData = $getData->toArray();
+            /**
+             * $dataCount is the integer used by the DataTable plugin as
+             * the total no. of entries to be shown in a single pagination
+             * based on the $length variable/limit.
+             * Do not be confused by the naming "recordsTotal"
+             */
+            $dataCount = $platformTableData->getObjectPrototype()->getFilteredDataCount();
+
+            /**
+             * $dataFilteredCount is the integer used by the Datatable plugin as
+             * the total no. of rows a table have.
+             * Do not be confused by the naming "recordsFiltered"
+             */
+            $dataFilteredCount = $platformTableData->getObjectPrototype()->getUnfilteredDataCount();
+
             for ($ctr = 0; $ctr < count($tableData); $ctr++) {
                 // apply text limits
                 foreach ($tableData[$ctr] as $vKey => $vValue) {
                     $tableData[$ctr][$vKey] = $melisTool->limitedText($melisTool->escapeHtml($vValue));
                 }
 
-                $tableData[$ctr]['pids_name'] = 'Deleted (' . $tableData[$ctr]['pids_id'] . ')';
-                $platformName = $platformTable->getEntryById($tableData[$ctr]['pids_id']);
-
-                if (!empty($platformName)) {
-                    $platformName = $platformName->current();
-
-                    if (!empty($platformName)) {
-                        if (getenv('MELIS_PLATFORM') == $platformName->plf_name) {
-                            $tableData[$ctr]['DT_RowClass'] = 'noPlatformIdDeleteBtn';
-                        }
-
-                        $tableData[$ctr]['pids_name'] = $melisTool->limitedText($platformName->plf_name, 25);
-
-                        if ($sortByName) {
-                            $sortMeByName[$ctr] = $tableData[$ctr]['pids_name'];
-                        }
-
+                /** (Set pids_name = plf_name && if plf_name is the main platform: no deletebtn) else 'Deleted ...' */
+                if (empty($tableData[$ctr]['plf_name'])) {
+                    $tableData[$ctr]['pids_name'] = 'Deleted (' . $tableData[$ctr]['pids_id'] . ')';
+                } else {
+                    if (getenv('MELIS_PLATFORM') == $tableData[$ctr]['plf_name']) {
+                        $tableData[$ctr]['DT_RowClass'] = 'noPlatformIdDeleteBtn';
                     }
+
+                    $tableData[$ctr]['pids_name'] = $melisTool->limitedText($tableData[$ctr]['plf_name'], 25);
                 }
 
-                // add DataTable RowID, this will be added in the <tr> tags in each rows
                 $tableData[$ctr]['DT_RowId'] = $tableData[$ctr]['pids_id'];
-            }
-
-            if ($sortByName) {
-                if ($sortBy == 'asc')
-                    asort($sortMeByName);
-                else {
-                    arsort($sortMeByName);
-                }
-
-                foreach ($sortMeByName as $key => $value) {
-                    $sortedByName[$key] = $tableData[$key];
-                }
             }
         }
 
         return new JsonModel([
             'draw' => (int)$draw,
             'recordsTotal' => $dataCount,
-            'recordsFiltered' => $melisEngineTablePlatformIds->getTotalFiltered(),
-            'data' => $sortByName ? $sortedByName : $tableData,
+            'recordsFiltered' => $dataFilteredCount,
+            'data' => $tableData,
         ]);
     }
 }
