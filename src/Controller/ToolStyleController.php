@@ -244,7 +244,7 @@ class ToolStyleController extends AbstractActionController
 
     /**
      * Retrieves datatable's content
-     * @return \Zend\View\Model\JsonModel
+     * @return JsonModel
      */
     public function getStyleDataAction()
     {
@@ -260,14 +260,14 @@ class ToolStyleController extends AbstractActionController
          */
         $tableStyle = $this->getServiceLocator()->get('MelisEngineTableStyle');
 
-        $colId = array();
+        $colId = [];
         $dataCount = 0;
         $draw = 0;
-        $tableData = array();
+        $tableData = [];
 
         // make sure that the request is an AJAX call
-        if($this->getRequest()->isPost()) {
-            $optionFilter = array();
+        if ($this->getRequest()->isPost()) {
+            $optionFilter = [];
 
             // get the tool columns
             $columns = $melisTool->getColumns();
@@ -283,32 +283,38 @@ class ToolStyleController extends AbstractActionController
             $draw = $this->getRequest()->getPost('draw');
 
             $start = $this->getRequest()->getPost('start');
-            $length =  $this->getRequest()->getPost('length');
+            $length = $this->getRequest()->getPost('length');
 
             $search = $this->getRequest()->getPost('search');
             $search = $search['value'];
 
             $limit = $this->getRequest()->getPost('length');
 
-            $dataCount = $tableStyle->getStyleList($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder);
+            $styleData = $tableStyle->getStyleList($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $limit);
+            /**
+             * // $dataCount = $tableStyle->getStyleList($search,$melisTool->getSearchableColumns(),$selCol,$sortOrder);
+             * Instead of a separate query just to get the data count, the count is now done in one db call.
+             *
+             * $dataCount is the integer used by the DataTable plugin as the total no. of entries to be shown
+             * in a single pagination based on the $length variable/limit.
+             */
+            $dataCount = $styleData->getObjectPrototype()->getFilteredDataCount();
 
-            $getData = $tableStyle->getStyleList($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $limit);
+            /** $dataFilteredCount is the integer used by the Datatable plugin as the total no. of rows a table have. */
+            $dataFilteredCount = $styleData->getObjectPrototype()->getUnfilteredDataCount();
 
-            $tableData = $getData->toArray();
-
-            for($ctr = 0; $ctr < count($tableData); $ctr++)
-            {
+            $tableData = $styleData->toArray();
+            for ($ctr = 0; $ctr < count($tableData); $ctr++) {
                 // Append style file status in the tables data
                 $fileStatus = $this->getFilesStatus($tableData[$ctr]['style_path']);
-                $tableData[$ctr]['style_files'] = '<span class="text-'.($fileStatus? 'success' : 'danger').'"><i class="fa fa-fw fa-circle"></i></span>';
+                $tableData[$ctr]['style_files'] = '<span class="text-' . ($fileStatus ? 'success' : 'danger') . '"><i class="fa fa-fw fa-circle"></i></span>';
 
                 // apply text limits
-                foreach($tableData[$ctr] as $vKey => $vValue)
-                {
+                foreach ($tableData[$ctr] as $vKey => $vValue) {
                     $tableData[$ctr][$vKey] = $vValue;
-                    if($vKey == 'style_status'){
+                    if ($vKey == 'style_status') {
                         $status = '<span class="text-success"><i class="fa fa-fw fa-circle"></i></span>';
-                        if(!$vValue){
+                        if (!$vValue) {
                             $status = '<span class="text-danger"><i class="fa fa-fw fa-circle"></i></span>';
                         }
 
@@ -320,13 +326,12 @@ class ToolStyleController extends AbstractActionController
             }
         }
 
-        return new JsonModel(array(
-            'draw' => (int) $draw,
-            'recordsTotal' => count($dataCount->toArray()),
-            'recordsFiltered' => count($tableData),
+        return new JsonModel([
+            'draw' => (int)$draw,
+            'recordsTotal' => $dataCount,
+            'recordsFiltered' => $dataFilteredCount,
             'data' => $tableData,
-        ));
-
+        ]);
     }
 
     /**
@@ -335,16 +340,16 @@ class ToolStyleController extends AbstractActionController
      * @param string $filepath
      * @return bool
      */
-    protected function getFilesStatus(string $filepath) : bool
+    protected function getFilesStatus(string $filepath): bool
     {
-        $status     = false;
-        $path       = explode('/', $filepath);
+        $status = false;
+        $path = explode('/', $filepath);
 
         if (empty($path[0])) {
             // Internal Path
-            $site           = $path[1];
-            $acceptables    = ['css', 'CSS'];
-            $filename       = $path[count($path) - 1];
+            $site = $path[1];
+            $acceptables = ['css', 'CSS'];
+            $filename = $path[count($path) - 1];
 
             // check if style file has correct extension
             $nameParts = explode('.', $filename);
@@ -353,16 +358,18 @@ class ToolStyleController extends AbstractActionController
             }
 
             // Getting the subfolder(s)
-            $subfolders     = '';
+            $subfolders = '';
             for ($i = 2; $i <= count($path) - 2; $i++) {
                 $subfolders .= $path[$i] . '/';
             }
 
             $fullPath = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/' . $site . '/public/' . $subfolders . $filename;
-            if (is_file($fullPath) && file_exists($fullPath)) {
+            $fullVendorPath = $_SERVER['DOCUMENT_ROOT'] . '/../vendor/melisplatform/' . $site . '/public/' . $subfolders . $filename;
+
+            if ((is_file($fullPath) && file_exists($fullPath))
+                || is_file($fullVendorPath) && file_exists($fullVendorPath)) {
                 return true;
             }
-
         } else {
             // External Path
             if (filter_var($filepath, FILTER_VALIDATE_URL)) {
