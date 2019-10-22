@@ -221,7 +221,7 @@ var melisDragnDrop = (function($, window) {
                 placeholderWidth = $(ui.placeholder[0]);
         }
 
-        // Tooltip
+        // jQuery Tooltip @ https://jqueryui.com/tooltip/#custom-style
         $(".melis-cms-plugin-snippets").tooltip({
             position: {
                 my: "left center",
