@@ -598,18 +598,16 @@ var melisPluginEdition = (function($, window) {
                             window.parent.$('html, body').scrollTop(optionHandleT);
                         }, 300);
                     }
-                    
-                    setTimeout(function() {
-                        melisPluginSortable.checkedModalSlider();
-                    }, 300);
 
                     setTimeout(function() {
                         if ( $pageIdRoot.length ) {
                             $pageIdRoot.parents(".form-group").find("label").addClass("d-flex flex-row justify-content-between");
                         }
-    
-                        console.log("$pageIdRoot: ", $pageIdRoot.length);
-                    }, 1000);
+                    }, 0);
+                    
+                    setTimeout(function() {
+                        melisPluginSortable.checkedModalSlider();
+                    }, 300);
             });
     }
 
