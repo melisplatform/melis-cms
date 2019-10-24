@@ -588,18 +588,28 @@ var melisPluginEdition = (function($, window) {
 
             // requesitng to create modal and display after
             window.parent.melisHelper.createModal(zoneId, melisKey, false, modalParams, modalUrl, function() {
-                // Check if it is in IE scrollTop when open modal
-                if (document.documentMode || /Edge/.test(navigator.userAgent)) {
-                    window.parent.$('html').css({'height': 'auto'});
-                    window.parent.$('body').css('overflow', 'hidden');
+                var $pageIdRoot = window.parent.$("#pageIdRootMenu");
+
+                    // Check if it is in IE scrollTop when open modal
+                    if (document.documentMode || /Edge/.test(navigator.userAgent)) {
+                        window.parent.$('html').css({'height': 'auto'});
+                        window.parent.$('body').css('overflow', 'hidden');
+                        setTimeout(function() {
+                            window.parent.$('html, body').scrollTop(optionHandleT);
+                        }, 300);
+                    }
+                    
                     setTimeout(function() {
-                        window.parent.$('html, body').scrollTop(optionHandleT);
+                        melisPluginSortable.checkedModalSlider();
                     }, 300);
-                }
-                
-                setTimeout(function() {
-                    melisPluginSortable.checkedModalSlider();
-                }, 300);
+
+                    setTimeout(function() {
+                        if ( $pageIdRoot.length ) {
+                            $pageIdRoot.parents(".form-group").find("label").addClass("d-flex flex-row justify-content-between");
+                        }
+    
+                        console.log("$pageIdRoot: ", $pageIdRoot.length);
+                    }, 1000);
             });
     }
 

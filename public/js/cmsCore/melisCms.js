@@ -750,3 +750,8 @@ var melisCms = (function(){
 		pageTabOpenCallback								:			pageTabOpenCallback,
 	};
 })();
+
+// fixed for issue: 4274
+$(function() {
+	$("#pageIdRootMenu").parents(".form-group").find("label").addClass("d-flex flex-row justify-content-between");
+});

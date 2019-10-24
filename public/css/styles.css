@@ -21,14 +21,14 @@
 .meliscms_center_page_tabs{
 	display: inline;	
 	margin-left: -40px !important;
-	width: 300px;	
+	/* width: 300px; */
 }
 
 .meliscms_center_page_tabs li{
 	display: inline;
 	border: 1px solid black;		
 	padding: 10px;	
-	float: left;	
+	/* float: left; */	
 }
 
 hr{
@@ -94,20 +94,12 @@ hr{
 .widget.widget-tabs-double-2>.widget-head ul li:hover{
 	height: 70px;
 }
-.page-content-container .widget.widget-tabs-double-2>.widget-head ul li a.glyphicons,
-.nav-tabs>li>a{
-	/* margin: 0; */
-	/* border-bottom: 1px solid #e5e5e5; */
-}
 #id_meliscms_plugin_modal .nav-tabs>li>a {
  	border: 0;
 	border-radius: 0;
 }
 .page-content-container .widget.widget-tabs-double-2>.widget-head ul li a.glyphicons{
-min-width: 90px;
-}
-.widget.widget-tabs-double-2>.widget-head ul li.active{
-
+	min-width: 90px;
 }
 /*
 .widget.widget-tabs>.widget-head ul li.active a{
@@ -150,7 +142,7 @@ text-shadow: none;
  
 /* Not editable zone */
 .melis-noteditable{
-	pading: 20px;
+	padding: 20px;
 	color: #e61c23;
     font-size: 25px;	
 }
@@ -265,13 +257,6 @@ div.content-heading h1{
   float: left;
   height: 40px;
   overflow: hidden;
-}
-.widget.widget-tabs-double>.widget-head .melis-whead-box ul {
-/*   -webkit-transition: all 0.4s ease-in-out;
--moz-transition: all 0.4s ease-in-out;
--ms-transition: all 0.4s ease-in-out;
--o-transition: all 0.4s ease-in-out;
-transition: all 0.4s ease-in-out; */
 }
 .widget.widget-tabs-double>.widget-head .melis-whead-box ul li {
 	border-right: 0;
@@ -452,9 +437,6 @@ display: block;
 body.modal-open {
 	overflow: hidden !important;
 }
-.widget-dnd-modal {
-
-}
 /* melis cms languages */
 .pagelang-title {
 	margin-bottom: 25px;
@@ -584,7 +566,6 @@ body.modal-open {
 	margin-bottom: 20px;
 	width: 100% !important;
 }
-.dropdown-lang-box .select2 {}
 
 .dropdown-lang-box .select2-container .select2-selection--single {
 	padding: 0.4em;
