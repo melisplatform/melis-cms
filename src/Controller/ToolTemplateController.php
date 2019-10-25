@@ -333,11 +333,6 @@ class ToolTemplateController extends AbstractActionController
 
         $form = $factory->createForm($formConfig);
 
-        if ($form->get('tpl_type') instanceof Select) {
-            /** Set default template type */
-            $form->get('tpl_type')->setValue('ZF2');
-        }
-
         $view = new ViewModel();
         $view->setVariable('meliscms_tool_template_add', $form);
 
@@ -367,11 +362,6 @@ class ToolTemplateController extends AbstractActionController
         $formConfig = $result instanceof ResponseCollection && $result->count() > 0 ? $result->last() : $formConfig;
 
         $form = $factory->createForm($formConfig);
-
-        if ($form->get('tpl_type') instanceof Select) {
-            /** Set default template type */
-            $form->get('tpl_type')->setValue('ZF2');
-        }
 
         $view = new ViewModel();
         $view->setVariable('meliscms_tool_template_edit', $form);

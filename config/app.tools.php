@@ -205,31 +205,19 @@ return array(
                                 array(
                                     'spec' => array(
                                         'name' => 'tpl_type',
-                                        'type' => 'hidden',
+                                        'type' => 'select',
                                         'options' => array(
-                                            'label' => 'tr_meliscms_template_form_tpl_type',
+                                            'label' => 'tr_meliscmstemplate_typ_label',
+                                            'value_options' => [
+                                                'ZF2' => 'Zend Framework 2',
+                                            ],
                                         ),
                                         'attributes' => array(
-                                            'id' => 'id_tpl_type',
                                             'value' => 'ZF2',
+                                            'id' => 'id_tpl_type',
                                         ),
                                     ),
                                 ),
-//                                 array(
-//                                     'spec' => array(
-//                                         'name' => 'tpl_zf2_website_folder',
-//                                         'type' => 'MelisText',
-//                                         'options' => array(
-//                                             'label' => 'tr_meliscms_template_form_tpl_zf2_website_folder',
-//                                         ),
-//                                         'attributes' => array(
-//                                             'id' => 'id_tpl_zf2_website_folder',
-//                                             'value' => '',
-//                                             'maxlength' => 255,
-//                                             'required' => 'required'
-//                                         ),
-//                                     ),
-//                                 ),
                                 array(
                                     'spec' => array(
                                         'name' => 'tpl_zf2_layout',
@@ -278,23 +266,6 @@ return array(
                                         ),
                                     ),
                                 ),
-//                                 array(
-//                                     'spec' => array(
-//                                         'name' => 'tpl_php_path',
-//                                         'type' => 'MelisText',
-//                                         'options' => array(
-//                                             'label' => 'tr_meliscms_template_form_tpl_php_path',
-//                                         ),
-//                                         'attributes' => array(
-//                                             'id' => 'id_tpl_php_path',
-//                                             'value' => '',
-//                                             'maxlength' => 255,
-//                                         ),
-//                                     ),
-//                                 ),
-
-
-
                             ), // end elements
                             'input_filter' => array(
                                 'tpl_id' => array(
@@ -365,7 +336,7 @@ return array(
                                         array(
                                             'name'    => 'InArray',
                                             'options' => array(
-                                                'haystack' => array('PHP', 'ZF2', 'TWG'),
+                                                'haystack' => array('ZF2', 'TWG'),
                                                 'messages' => array(
                                                     \Zend\Validator\InArray::NOT_IN_ARRAY => 'tr_meliscms_template_form_tpl_type_error_invalid_select',
                                                 ),
@@ -383,36 +354,6 @@ return array(
                                     'filters'  => array(
                                     ),
                                 ),
-//                                 'tpl_zf2_website_folder' => array(
-//                                     'name'     => 'tpl_zf2_website_folder',
-//                                     'required' => true,
-//                                     'validators' => array(
-//                                         array(
-//                                             'name'    => 'StringLength',
-//                                             'options' => array(
-//                                                 'encoding' => 'UTF-8',
-//                                                 //'min'      => 1,
-//                                                 'max'      => 50,
-//                                                 'messages' => array(
-//                                                     \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_template_form_tpl_website_folder_error_high',
-//                                                     //    \Zend\Validator\StringLength::TOO_SHORT => 'tr_meliscms_template_form_tpl_website_folder_error_low',
-//                                                 ),
-//                                             ),
-//                                         ),
-//                                         array(
-//                                             'name' => 'NotEmpty',
-//                                             'options' => array(
-//                                                 'messages' => array(
-//                                                     \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_template_form_tpl_website_folder_error_empty',
-//                                                 ),
-//                                             ),
-//                                         ),
-//                                     ),
-//                                     'filters'  => array(
-//                                         array('name' => 'StripTags'),
-//                                         array('name' => 'StringTrim'),
-//                                     ),
-//                                 ),
                                 'tpl_zf2_layout' => array(
                                     'name'     => 'tpl_zf2_layout',
                                     'required' => true,
