@@ -58,7 +58,7 @@ return array(
                             'tpl_status' => array(
                                 'text' => 'tr_meliscms_tool_templates_tpl_status',
                                 'css' => array('width' => '5%', 'padding-right' => '0'),
-                                'sortable' => true,
+                                'sortable' => false,
                             ),
                             'tpl_type' => array(
                                 'text' => 'tr_meliscms_template_form_tpl_type',
