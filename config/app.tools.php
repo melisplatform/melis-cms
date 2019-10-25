@@ -55,34 +55,33 @@ return array(
                                 'sortable' => true,
 
                             ),
-                            
                             'tpl_status' => array(
                                 'text' => 'tr_meliscms_tool_templates_tpl_status',
                                 'css' => array('width' => '5%', 'padding-right' => '0'),
                                 'sortable' => true,
-
                             ),
-
+                            'tpl_type' => array(
+                                'text' => 'tr_meliscms_template_form_tpl_type',
+                                'css' => array('width' => '5%', 'padding-right' => '0'),
+                                'sortable' => true,
+                            ),
                             'site_label' => array(
                                 'text' => 'tr_meliscms_tool_templates_tpl_site_id',
                                 'css' => array('width' => '20%', 'padding-right' => '0'),
                                 'sortable' => true,
                             ),
-
                             'tpl_name' => array(
                                 'text' => 'tr_meliscms_tool_templates_tpl_name',
                                 'css' => array('width' => '20%', 'padding-right' => '0'),
                                 'sortable' => true,
 
                             ),
-
                             'tpl_zf2_layout' => array(
                                 'text' => 'tr_meliscms_tool_templates_tpl_zf2_layout',
-                                'css' => array('width' => '20%', 'padding-right' => '0'),
+                                'css' => array('width' => '15%', 'padding-right' => '0'),
                                 'sortable' => true,
 
                             ),
-
                             'tpl_zf2_controller' => array(
                                 'text' => 'tr_meliscms_tool_templates_tpl_zf2_controller',
                                 'css' => array('width' => '20%', 'padding-right' => '0'),
