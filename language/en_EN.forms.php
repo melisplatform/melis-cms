@@ -241,6 +241,6 @@
 
         # Template Form
         'tr_meliscmstemplate_typ_label' => 'Template type',
+        'tr_meliscmstemplate_typ_label_tooltip' => 'Select the corresponding type of template',
         'tr_meliscmstemplate_typ_ZF2' => 'Zend Framework 2',
-        'tr_meliscmstemplate_typ_TWG' => 'Twig',
 	);

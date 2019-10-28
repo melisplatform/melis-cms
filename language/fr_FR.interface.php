@@ -123,6 +123,8 @@
 	    'tr_meliscms_tool_templates_tpl_creation_date' => 'Date de création',
 	    'tr_meliscms_tool_templates_tpl_last_user_id' => 'Id User',
 	    'tr_meliscms_tool_templates_tpl_label_choose' => 'Tous',
+
+        'tr_meliscms_tool_templates_tpl_typ_module_ko' => 'Le module est désactivé ou désinstallé',
 	
 	    'tr_tool_templates_modal_tab_header' => 'Gestion des templates',
 	    'tr_tool_templates_modal_tab_text_add' => 'Templates',

@@ -207,6 +207,7 @@ return array(
                                         'type' => 'select',
                                         'options' => array(
                                             'label' => 'tr_meliscmstemplate_typ_label',
+                                            'tooltip' => 'tr_meliscmstemplate_typ_label_tooltip',
                                             'value_options' => [
                                                 'ZF2' => 'Zend Framework 2',
                                             ],
@@ -214,6 +215,7 @@ return array(
                                         'attributes' => array(
                                             'value' => 'ZF2',
                                             'id' => 'id_tpl_type',
+                                            'required' => 'required',
                                         ),
                                     ),
                                 ),
@@ -335,7 +337,7 @@ return array(
                                         array(
                                             'name'    => 'InArray',
                                             'options' => array(
-                                                'haystack' => array('ZF2', 'TWG'),
+                                                'haystack' => array('ZF2'),
                                                 'messages' => array(
                                                     \Zend\Validator\InArray::NOT_IN_ARRAY => 'tr_meliscms_template_form_tpl_type_error_invalid_select',
                                                 ),
