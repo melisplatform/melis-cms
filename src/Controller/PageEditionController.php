@@ -9,6 +9,8 @@
 
 namespace MelisCms\Controller;
 
+use Zend\EventManager\ResponseCollection;
+use Zend\Form\Factory;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
@@ -20,6 +22,8 @@ use Zend\Session\Container;
 class PageEditionController extends AbstractActionController
 {
 	const MINI_TEMPLATES_FOLDER = 'miniTemplatesTinyMce';
+    const TEMPLATE_FORM = 'meliscms/tools/meliscms_tool_templates/forms/meliscms_tool_template_generic_form';
+    const TEMPLATE_FORM_CONFIG_MODIFY = 'meliscms_template_form_config';
 	
 	/**
 	 * Makes the rendering of the Page Edition Tab
@@ -27,7 +31,7 @@ class PageEditionController extends AbstractActionController
 	 */
     public function renderPagetabEditionAction()
     {
-		$idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
     	$melisKey = $this->params()->fromRoute('melisKey', '');
     	
     	/**
@@ -65,8 +69,51 @@ class PageEditionController extends AbstractActionController
             $view->namespace = $datasTemplate->tpl_zf2_website_folder;
     	else 
     	    $view->namespace = '';
+
+        /** Get the available templating modules */
+        $activeTplModules = $this->getActiveTplModules();
+        $view->isTplModuleOK = in_array($datasTemplate->tpl_type, $activeTplModules);
     	
     	return $view;
+    }
+
+    /**
+     * Get all available templating module types
+     * @return array
+     */
+    private function getActiveTplModules()
+    {
+        $activeTypes = $this->getTemplateForm();
+        $activeTypes = empty($activeTypes->get('tpl_type')) ? [] : $activeTypes->get('tpl_type');
+        $activeTypes = empty($activeTypes->getValueOptions()) ? [] : $activeTypes->getValueOptions();
+        $activeTypes = empty($activeTypes) ? [] : array_keys($activeTypes);
+
+        return $activeTypes;
+    }
+
+    /**
+     * Template form creation
+     * @return \Zend\Form\ElementInterface
+     */
+    private function getTemplateForm()
+    {
+        $melisConfig = $this->getServiceLocator()->get('MelisCoreConfig');
+        $factory = new Factory();
+        $formElementMgr = $this->getServiceLocator()->get('FormElementManager');
+        $factory->setFormElementManager($formElementMgr);
+        $formConfig = $melisConfig->getItem(self::TEMPLATE_FORM);
+
+        /**
+         * Trigger listeners trying to modify the form config before form creation
+         *
+         *   - New Templating Engine? Register your template type using this event self::TEMPLATE_FORM_CONFIG_MODIFY
+         *
+         *  @var \Zend\EventManager\ResponseCollection $result
+         */
+        $result = $this->getEventManager()->trigger(self::TEMPLATE_FORM_CONFIG_MODIFY, $this, ['formConfig' => $formConfig]);
+        $formConfig = $result instanceof ResponseCollection && $result->count() > 0 ? $result->last() : $formConfig;
+
+        return $factory->createForm($formConfig);
     }
     
     public function loadPageContentPluginsInSession($idPage)

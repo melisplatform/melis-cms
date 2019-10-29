@@ -125,8 +125,10 @@
 	    'tr_meliscms_tool_templates_tpl_label_choose' => 'Tous',
 
         'tr_meliscms_tool_templates_tpl_typ_module_ko' => 'Le module est désactivé ou désinstallé',
-	
-	    'tr_tool_templates_modal_tab_header' => 'Gestion des templates',
+        'tr_meliscms_tool_templates_module_ko' => 'Le module de ce template est désactivé ou désinstallé.',
+        'tr_meliscms_tool_templates_module_ko_submsg' => 'Le type de template utilisé dans cette page peut être changé depuis le',
+
+        'tr_tool_templates_modal_tab_header' => 'Gestion des templates',
 	    'tr_tool_templates_modal_tab_text_add' => 'Templates',
 	    'tr_tool_templates_modal_tab_text_edit' => 'Editer un template',
 	    'tr_tool_templates_button_text_add' => 'Ajouter un template',
