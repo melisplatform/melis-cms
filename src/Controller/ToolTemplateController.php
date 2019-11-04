@@ -422,7 +422,8 @@ class ToolTemplateController extends AbstractActionController
         $userAuthDatas =  $melisCoreAuth->getStorage()->read();
 
         // get the form
-        $templateUpdateForm = $melisTool->getForm('meliscms_tool_template_generic_form');
+        //$templateUpdateForm = $melisTool->getForm('meliscms_tool_template_generic_form');
+        $templateUpdateForm = $this->getTemplateForm();
 
         if($request->isPost())
         {
@@ -872,7 +873,8 @@ class ToolTemplateController extends AbstractActionController
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_templates');
 
-        $templateUpdateForm = $melisTool->getForm('meliscms_tool_template_generic_form');
+        //$templateUpdateForm = $melisTool->getForm('meliscms_tool_template_generic_form');
+        $templateUpdateForm = $this->getTemplateForm();
 
         // get the currently logged in user
         $melisCoreAuth = $this->serviceLocator->get('MelisCoreAuth');
