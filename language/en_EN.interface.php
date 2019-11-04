@@ -125,6 +125,7 @@
 	    'tr_meliscms_tool_templates_tpl_label_choose' => 'All ',
 
 		'tr_meliscms_tool_templates_tpl_typ_module_ko' => 'The module is deactivated or uninstalled',
+		'tr_meliscms_tool_templates_no_tpl' => 'Template not found.',
 		'tr_meliscms_tool_templates_module_ko' => 'Templating module is deactivated/uninstalled.',
 		'tr_meliscms_tool_templates_module_ko_submsg' => 'The type of template used in this page can be changed from the',
 
