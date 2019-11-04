@@ -72,7 +72,7 @@ class PageEditionController extends AbstractActionController
 
         /** Get the available templating modules */
         $activeTplModules = $this->getActiveTplModules();
-        $view->isTplModuleOK = in_array($datasTemplate->tpl_type, $activeTplModules);
+        $view->isTplModuleOK = empty($datasTemplate->tpl_type) ? false : in_array($datasTemplate->tpl_type, $activeTplModules);
     	
     	return $view;
     }
