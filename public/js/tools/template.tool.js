@@ -6,9 +6,15 @@ $(document).ready(function() {
 	// for edit button
 	$("body").on("click", '.btnEditTemplates', function() {
 		var id = $(this).parents("tr").attr("id");
+		$("#id_modal_tool_template_edit  #tpl-type-error").hide();	//Hide tpl_type modal error
 		melisCoreTool.hideAlert("#templateupdateformalert");
 		melisCoreTool.showOnlyTab('#modal-template-manager-actions', '#id_modal_tool_template_edit');
 		toolTemplate.retrieveTemplateData(id);
+	});
+
+	$("body").on("change", "#id_modal_tool_template_edit #id_tpl_type", function(){
+		$(this).siblings("label").css("color", "");
+		$("#id_modal_tool_template_edit #tpl-type-error").hide();
 	});
 	
 	$("body").on("click", '.btnDelTemplate', function() {
@@ -132,8 +138,6 @@ var toolTemplate = {
     	        dataType    : 'json',
     	        encode		: true
     	    }).done(function(data){
-    	    	
-    	    	
 	    		$.each(data, function(index, value) {
 	    			// append data to your update form
 	    			$(updateForm + " input, " + updateForm +" select").each(function(index) {
@@ -141,6 +145,13 @@ var toolTemplate = {
 	    				$(updateForm + " #" + $(this).attr('id')).val(value[name]);
 	    				$("#tplid").html(value['tpl_id']);
 	    			});
+
+					/** Adding appropriate error message for disabled/uninstalled templating engine */
+					if (value['tpl_type_KO']) {
+						var tplTypeMsg = $("#id_modal_tool_template_edit #tpl-type-error");
+						tplTypeMsg.show();
+						tplTypeMsg.parent("label").css("color", "rgb(255, 0, 0)");
+					}
 	    		});
     	    }).fail(function(){
     	    	alert( translations.tr_meliscore_error_message );
