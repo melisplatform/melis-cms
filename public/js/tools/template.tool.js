@@ -144,8 +144,6 @@ var toolTemplate = {
 		        dataType    : 'json',
 		        encode		: true
 		    }).done(function(data){
-		    	
-		    	
 	    		$.each(data, function(index, value) {
 	    			// append data to your update form
 	    			$(updateForm + " input, " + updateForm +" select").each(function(index) {
@@ -153,6 +151,13 @@ var toolTemplate = {
 	    				$(updateForm + " #" + $(this).attr('id')).val(value[name]);
 	    				$("#tplid").html(value['tpl_id']);
 	    			});
+
+					/** Adding appropriate error message for disabled/uninstalled templating engine */
+					if (value['tpl_type_KO']) {
+						var tplTypeMsg = $("#id_modal_tool_template_edit #tpl-type-error");
+						tplTypeMsg.show();
+						tplTypeMsg.parent("label").css("color", "rgb(255, 0, 0)");
+					}
 	    		});
 		    }).fail(function(){
 		    	alert( translations.tr_meliscore_error_message );

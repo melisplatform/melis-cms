@@ -3,9 +3,21 @@
 	if (!empty($this->zoneconfig['conf']['id']))
 		$id = ' id="' . $this->idPage . '_' . $this->zoneconfig['conf']['id'] . '"';
 	$data_melisKey = $this->melisKey;
-	
+	$openTplTool = "javascript:melisHelper.tabOpen(translations.tr_meliscms_tool_templates, 'fa-file-code-o', 'id_meliscms_tool_templates', 'meliscms_tool_templates');"
 ?>
 <div <?= $id; ?> data-melisKey='<?= $data_melisKey; ?>' class="tab-pane widget-body-regular meliscms_center_tabs">
+    <?php if ($this->hasTemplate): ?>
+    <div class="alert alert-danger alert-dismissible show" role="alert" style="<?= $this->isTplModuleOK ? 'display: none!important;' : ""?>">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="alert-heading"><strong><?= $this->translate('tr_meliscore_common_error'); ?>:</strong> <?= $this->translate('tr_meliscms_tool_templates_module_ko'); ?></h4><hr>
+        <p><?= $this->translate('tr_meliscms_tool_templates_module_ko_submsg'); ?> <a href="<?= $openTplTool; ?>" class="alert-link"><?= $this->translate('tr_meliscms_tool_templates'); ?></a> (MelisCms > Site Tools > <?= $this->translate('tr_meliscms_tool_templates'); ?>)</p>
+    </div>
+    <?php else: ?>
+    <div class="alert alert-danger alert-dismissible show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="alert-heading"><strong><?= $this->translate('tr_meliscore_common_error'); ?>:</strong> <?= $this->translate('tr_meliscms_tool_templates_no_tpl'); ?></h4>
+    </div>
+    <?php endif; ?>
 	<iframe scrolling="no" data-iframe-id="<?= $this->idPage; ?>" onload="melisCms.iframeLoad(<?php echo $this->idPage ?>);" class="melis-iframe" src="/id/<?= $this->idPage; ?>/renderMode/melis?melisSite=<?= $this->namespace; ?>"></iframe>
 </div>
 <?php

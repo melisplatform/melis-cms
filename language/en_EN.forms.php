@@ -238,6 +238,10 @@
         'tr_melis_cms_sites_domain tooltip' => "Domain on which the site is accessible (ex: www.mysite.com)",
         'tr_melis_cms_sites_field_empty' => 'Value is required and can\'t be empty',
         'tr_melis_cms_sites_field_digits' => 'The input must contain only digits',
-        'tr_melis_cms_sites_domain_field_empty' => 'The field cannot be empty, a value is required for the current platform'
+        'tr_melis_cms_sites_domain_field_empty' => 'The field cannot be empty, a value is required for the current platform',
+
+        # Template Form
+        'tr_meliscmstemplate_typ_label' => 'Template type',
+        'tr_meliscmstemplate_typ_label_tooltip' => 'Select the corresponding type of template',
+        'tr_meliscmstemplate_typ_ZF2' => 'Zend Framework 2',
 	);
-?>
