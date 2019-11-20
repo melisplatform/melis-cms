@@ -244,7 +244,7 @@ return array(
 									array(
 										'name'    => 'InArray',
 										'options' => array(
-											'haystack' => array('SITE', 'FOLDER', 'PAGE', 'NEWSLETTER', 'NEWS_DETAIL', 'BLOG_DETAIL'),
+											'haystack' => array('SITE', 'FOLDER', 'PAGE'),
 										    'messages' => array(
 										        \Zend\Validator\InArray::NOT_IN_ARRAY => 'tr_meliscms_page_form_page_type_invalid',
 										    ),
@@ -277,21 +277,7 @@ return array(
 					            ),
 					            'filters' => array(
 					            ),
-							),       
-					/*        'page_status' => array(
-								'name'     => 'page_status',
-								'required' => true,
-								'validators' => array( 
-									array(
-										'name'    => 'InArray',
-										'options' => array(
-											'haystack' => array(0, 1)
-										)
-									),
-								),
-								'filters'  => array(
-								),
-					        ),*/
+							),
 					        'page_menu' => array(
 								'name'     => 'page_menu',
 								'required' => true,
