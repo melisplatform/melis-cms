@@ -193,7 +193,6 @@ ul.meliscms-site-language-homepage-list > li:hover {
 
 .checkbox label, .radio label {
     display: inline;
-    margin-bottom: 0;
     font-weight: 400;
     cursor: pointer;
 }
@@ -209,7 +208,7 @@ ul.meliscms-site-language-homepage-list > li:hover {
     position: absolute;
     left: 3px;
     top: 2px;
-    border: 2px solid #e61c23 !important;
+    border: 2px solid #e61c23;
     text-align: center;
     padding: 2px;
 }
