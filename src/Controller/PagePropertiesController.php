@@ -363,6 +363,39 @@ class PagePropertiesController extends AbstractActionController
                     $datas = $propertyForm->getData();
 
                     /**
+                     * Additional Form Validation
+                     *  - Raise error for the Selected language, if not active for the Site (via template)
+                     *
+                     * @var \MelisEngine\Model\Tables\MelisTemplateTable $tplTable
+                     * @var \MelisEngine\Model\Tables\MelisSiteTable $siteTable
+                     * @var \MelisEngine\Model\Tables\MelisCmsSiteLangsTable $sitelangsTable
+                     */
+                    $errors = [];
+                    $tplTable = $this->getServiceLocator()->get('MelisEngineTableTemplate');
+                    $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+                    $sitelangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+
+                    $tplData = $tplTable->getEntryById($datas['page_tpl_id'])->toArray();
+                    $tplData = reset($tplData);
+
+                    $siteData = $siteTable->getEntryById($tplData['tpl_site_id'])->toArray();
+                    $siteData = reset($siteData);
+
+                    $activeLangs = $sitelangsTable->getSiteLanguagesBySiteId($siteData['site_id'], true)->toArray();
+                    foreach ($activeLangs as $language) {
+                        $siteLangs[] = $language['slang_lang_id'];
+                    }
+
+                    if (!in_array($datas['plang_lang_id'], $siteLangs)) {
+                        $errors = [
+                            'plang_lang_id' => [
+                                'errorMessage' => $translator->translate('tr_meliscms_page_form_page_p_lang_ko'),
+                                'label' => $translator->translate('tr_meliscms_page_tab_properties_form_Language'),
+                            ],
+                        ];
+                    }
+
+                    /**
                      * First, let's copy the published table entry
                      * inside the saved table if there's no entry in it.
                      * Kind of special case, the page is not new, it's being edited after being published
@@ -396,8 +429,6 @@ class PagePropertiesController extends AbstractActionController
                      * Special fields must be set
                      */
 
-
-                    $errors = array();
                     $success = 0;
                     $language = $datas['plang_lang_id'];
                     $template = $datas['page_tpl_id'];
