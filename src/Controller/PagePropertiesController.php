@@ -174,13 +174,20 @@ class PagePropertiesController extends AbstractActionController
                  */
                 $formData = $propertyForm->getData();
                 $siteLangs = $this->getSiteLanguages($formData['page_tpl_id']);
-                $languageActive = in_array($formData['plang_lang_id'], $siteLangs) ? true : false;
+
+                if (!in_array($formData['plang_lang_id'], $siteLangs)) {
+                    return new JsonModel([
+                        'success' => 0,
+                        'datas' => [],
+                        'errors' => [[$translator->translate('tr_meliscms_page_tab_properties_form_Language') => $translator->translate('tr_meliscms_page_form_page_p_lang_ko')]]
+                    ]);
+                }
 
                 /**
                  * If page does not exist, let's create
                  * If page exist, nothing to do, properties are saved in save-page-properties, handled through event
                  */
-                if (!$exist && $languageActive) {
+                if (!$exist) {
                     // Get the order to be inserted
                     $order = 0;
                     $children = $melisEngineTablePageTree->getPageChildrenByidPage($fatherPageId);
