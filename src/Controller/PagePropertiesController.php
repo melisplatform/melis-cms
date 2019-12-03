@@ -169,10 +169,18 @@ class PagePropertiesController extends AbstractActionController
 
             if ($propertyForm->isValid()) {
                 /**
+                 * Additional Form Validation
+                 *  - Raise error for the Selected language, if not active for the Site (via template)
+                 */
+                $formData = $propertyForm->getData();
+                $siteLangs = $this->getSiteLanguages($formData['page_tpl_id']);
+                $languageActive = in_array($formData['plang_lang_id'], $siteLangs) ? true : false;
+
+                /**
                  * If page does not exist, let's create
                  * If page exist, nothing to do, properties are saved in save-page-properties, handled through event
                  */
-                if (!$exist) {
+                if (!$exist && $languageActive) {
                     // Get the order to be inserted
                     $order = 0;
                     $children = $melisEngineTablePageTree->getPageChildrenByidPage($fatherPageId);
@@ -313,6 +321,41 @@ class PagePropertiesController extends AbstractActionController
     }
 
     /**
+     * Returns all active languages in the site (via Template's ID)
+     * @param $templateId
+     * @return array
+     */
+    public function getSiteLanguages($templateId = null)
+    {
+        if (empty($templateId)) {
+            return [];
+        }
+
+        /**
+         * @var \MelisEngine\Model\Tables\MelisTemplateTable $tplTable
+         * @var \MelisEngine\Model\Tables\MelisSiteTable $siteTable
+         * @var \MelisEngine\Model\Tables\MelisCmsSiteLangsTable $sitelangsTable
+         */
+        $tplTable = $this->getServiceLocator()->get('MelisEngineTableTemplate');
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $sitelangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+
+        $tplData = $tplTable->getEntryById($templateId)->toArray();
+        $tplData = reset($tplData);
+
+        $siteData = $siteTable->getEntryById($tplData['tpl_site_id'])->toArray();
+        $siteData = reset($siteData);
+
+        $activeLangs = $sitelangsTable->getSiteLanguagesBySiteId($siteData['site_id'], true)->toArray();
+        $siteLangs = [];
+        foreach ($activeLangs as $language) {
+            $siteLangs[] = $language['slang_lang_id'];
+        }
+
+        return $siteLangs;
+    }
+
+    /**
      * This function saves the page properties form, making an entry in PageSave
      * Events: meliscms_page_saveproperties_start / meliscms_page_saveproperties_end
      *
@@ -361,31 +404,13 @@ class PagePropertiesController extends AbstractActionController
                 if ($propertyForm->isValid()) {
                     // Get datas validated
                     $datas = $propertyForm->getData();
+                    $errors = [];
 
                     /**
                      * Additional Form Validation
                      *  - Raise error for the Selected language, if not active for the Site (via template)
-                     *
-                     * @var \MelisEngine\Model\Tables\MelisTemplateTable $tplTable
-                     * @var \MelisEngine\Model\Tables\MelisSiteTable $siteTable
-                     * @var \MelisEngine\Model\Tables\MelisCmsSiteLangsTable $sitelangsTable
                      */
-                    $errors = [];
-                    $tplTable = $this->getServiceLocator()->get('MelisEngineTableTemplate');
-                    $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
-                    $sitelangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
-
-                    $tplData = $tplTable->getEntryById($datas['page_tpl_id'])->toArray();
-                    $tplData = reset($tplData);
-
-                    $siteData = $siteTable->getEntryById($tplData['tpl_site_id'])->toArray();
-                    $siteData = reset($siteData);
-
-                    $activeLangs = $sitelangsTable->getSiteLanguagesBySiteId($siteData['site_id'], true)->toArray();
-                    foreach ($activeLangs as $language) {
-                        $siteLangs[] = $language['slang_lang_id'];
-                    }
-
+                    $siteLangs = $this->getSiteLanguages($datas['page_tpl_id']);
                     if (!in_array($datas['plang_lang_id'], $siteLangs)) {
                         $errors = [
                             'plang_lang_id' => [
