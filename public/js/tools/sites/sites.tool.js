@@ -1344,7 +1344,4 @@ window.sitesTableCallback = function(){
     minifBtn.prop("disabled", true);
     minifBtn.attr("disabled", true);
     minifBtn.attr("title", translations.tr_melis_cms_minify_assets_no_module_button_title);
-
-    // pagination of dataTables
-    melisCore.paginateDataTables();
 };

@@ -199,8 +199,3 @@ window.initTemplateList = function(data, tblSettings) {
 			data.tpl_site_id = $tempSiteSelect.val();
 		}	
 }
-
-window.paginateDataTables = function() {
-	// paginate dataTables data
-	melisCore.paginateDataTables();
-}

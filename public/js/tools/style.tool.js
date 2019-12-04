@@ -30,11 +30,6 @@ $(function() {
 		});
 });
 
-window.paginateDataTables = function() {
-	// paginate dataTables data
-	melisCore.paginateDataTables();
-}
-
 var melisStyleTool = (function($, window) {
 	function openToolModal(id){
 		// initialation of local variable

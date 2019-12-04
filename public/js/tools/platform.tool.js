@@ -96,10 +96,6 @@ $(function(){
 		        $(parent).find('.noPlatformIdDeleteBtn').each(function () {
 		            var rowId = '#' + $(this).attr('id');
 		            $(parent).find(rowId).find('.btnCmsPlatformIdsDelete').remove();
-				});
-				
-				// paginateDataTables data
-				melisCore.paginateDataTables();
+				});				
 	    }
 });
-

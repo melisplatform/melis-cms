@@ -153,9 +153,6 @@ window.siteTransTableCallBack = function(data, tblSetting){
      * translation is came from the file
      */
     $("#"+siteId+"_tableMelisSiteTranslation tbody tr[data-mst-id='0']").find("#btnDeleteSiteTranslation").remove();
-
-    // pagination of dataTables data
-    melisCore.paginateDataTables();
 };
 
 /**

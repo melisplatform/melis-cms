@@ -1413,11 +1413,6 @@ window.initTemplateList = function(data, tblSettings) {
 			data.tpl_site_id = $tempSiteSelect.val();
 		}	
 }
-
-window.paginateDataTables = function() {
-	// paginate dataTables data
-	melisCore.paginateDataTables();
-}
 $(function() {
 	//var formAdd  = "#formplatformadd form#idformsite";
 	var formEdit = "#formplatformedit form#idformlang";
@@ -1557,9 +1552,6 @@ $(function() {
 
 window.initLangJs = function() {
 	$('#tableLanguages td:nth-child(3):contains("'+ melisLangId +'")').siblings(':last').html('-');
-
-	// paginate dataTables data
-	melisCore.paginateDataTables();
 }
 $(function(){
 	var $body = $("body");
@@ -1659,14 +1651,9 @@ $(function(){
 		        $(parent).find('.noPlatformIdDeleteBtn').each(function () {
 		            var rowId = '#' + $(this).attr('id');
 		            $(parent).find(rowId).find('.btnCmsPlatformIdsDelete').remove();
-				});
-				
-				// paginateDataTables data
-				melisCore.paginateDataTables();
+				});				
 	    }
 });
-
-
 $(function(){
 	var $body = $("body");
 	
@@ -1777,11 +1764,6 @@ window.initRedirectTemplateList = function(data, tblSettings){
 	if($('#redirectSiteSelect').length){
 		data.s301_site_id = $('#redirectSiteSelect').val();
 	}
-}
-
-window.paginateDataTables = function() {
-	// pagination of dataTables data
-    melisCore.paginateDataTables();
 }
  var melisLinkTree = (function($, window){
     
@@ -2275,11 +2257,6 @@ $(function() {
 			melisLinkTree.createInputTreeModal('#id_style_page_id');
 		});
 });
-
-window.paginateDataTables = function() {
-	// paginate dataTables data
-	melisCore.paginateDataTables();
-}
 
 var melisStyleTool = (function($, window) {
 	function openToolModal(id){
@@ -3783,9 +3760,6 @@ window.sitesTableCallback = function(){
     minifBtn.prop("disabled", true);
     minifBtn.attr("disabled", true);
     minifBtn.attr("title", translations.tr_melis_cms_minify_assets_no_module_button_title);
-
-    // pagination of dataTables
-    melisCore.paginateDataTables();
 };
 /*
  *	jQuery OwlCarousel v1.31
@@ -4156,9 +4130,6 @@ window.siteTransTableCallBack = function(data, tblSetting){
      * translation is came from the file
      */
     $("#"+siteId+"_tableMelisSiteTranslation tbody tr[data-mst-id='0']").find("#btnDeleteSiteTranslation").remove();
-
-    // pagination of dataTables data
-    melisCore.paginateDataTables();
 };
 
 /**

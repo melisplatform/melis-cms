@@ -137,7 +137,4 @@ $(function() {
 
 window.initLangJs = function() {
 	$('#tableLanguages td:nth-child(3):contains("'+ melisLangId +'")').siblings(':last').html('-');
-
-	// paginate dataTables data
-	melisCore.paginateDataTables();
 }
