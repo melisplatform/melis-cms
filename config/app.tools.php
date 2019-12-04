@@ -14,7 +14,7 @@ return array(
                         'target' => '#tableToolTemplateManager',
                         'ajaxUrl' => '/melis/MelisCms/ToolTemplate/getToolTemplateData',
                         'dataFunction' => 'initTemplateList',
-                        'ajaxCallback' => 'paginateDataTables()',
+                        'ajaxCallback' => '',
                         'filters' => array(
                             'left' => array(
                                 'toolTemplates-limit' => array(
@@ -656,7 +656,7 @@ return array(
                         'target' => '#tableToolStyles',
                         'ajaxUrl' => '/melis/MelisCms/ToolStyle/getStyleData',
                         'dataFunction' => '',
-                        'ajaxCallback' => 'paginateDataTables()',
+                        'ajaxCallback' => '',
                         'filters' => array(
                             'left' => array(
                                 'style-tool-table-limit' => array(
@@ -1802,7 +1802,7 @@ return array(
                         'target' => '#tableToolSite301',
                         'ajaxUrl' => '/melis/MelisCms/SiteRedirect/getSiteRedirect',
                         'dataFunction' => 'initRedirectTemplateList',
-                        'ajaxCallback' => 'paginateDataTables()',
+                        'ajaxCallback' => '',
                         'filters' => array(
                             'left' => array(
                                 'tool-site-redirect-limit' => array(
