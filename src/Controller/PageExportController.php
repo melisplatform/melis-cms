@@ -120,7 +120,10 @@ class PageExportController extends AbstractActionController
                         /**
                          * convert the folder to zip
                          */
-                        $zipFileName = date('Y_m_d').'_PageExport.zip';
+
+                        $pageName = $this->getPageName($pageId);
+                        $zipFileName = date('Ymd-His').'_PageExport_' . $pageName . '.zip';
+
                         if($pageExportService->zipFolder($folderPath, $zipFileName)){
                             $zipPath = $_SERVER['DOCUMENT_ROOT'].'/'.$zipFileName;
                             //after we zip the folder, remove the folder
@@ -190,5 +193,20 @@ class PageExportController extends AbstractActionController
         ];
 
         return new JsonModel($result);
+    }
+
+    private function getPageName($pageId)
+    {
+        $pagePublishedTable = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
+        $page = $pagePublishedTable->getPublishedSitePagesById($pageId)->toArray();
+
+        if (! empty($page)) {
+            $pageName = $page[0]['page_name'];
+        } else {
+            $pageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+            $pageName = $pageSavedTable->getSavedSitePagesById($pageId)->toArray()[0]['page_name'];
+        }
+
+        return substr($pageName, 0, 20);
     }
 }
