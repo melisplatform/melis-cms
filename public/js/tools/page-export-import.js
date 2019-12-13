@@ -157,6 +157,7 @@ $(document).ready(function(){
             url: '/melis/MelisCms/PageImport/importTest',
             data: {formData: JSON.stringify(formData)},
             beforeSend: function () {
+                $body.find('#pageImportConsole').text('');
                 $body.find('#pageImportConsole').css('display', '');
                 $body.find('#pageImportConsole').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + formData.page_tree_import.name + '</p>');
                 $body.find('#pageImportConsole').append('<p>' + translations.tr_melis_cms_page_tree_import_validated + ': <span style="color: red;">' + translations.tr_meliscms_common_no + '</span></p>');
