@@ -111,7 +111,11 @@ if (!empty($this->zoneconfig['conf']['id']))
                     </div>
                     <div align="right">
                         <button type="button" data-dismiss="modal" class="btn btn-danger pull-left"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
-                        <button type="button" class="btn btn-success" id="btn-export-pages" <?= (!$this->isAdmin) ? 'disabled="true"' : ''?>><?= $this->translate('tr_melis_cms_tree_export'); ?></button>
+                        <?php if ($this->isAdmin) : ?>
+                            <button type="button" class="btn btn-success" id="btn-export-pages" <?= (!$this->isAdmin) ? 'disabled="true"' : ''?>><?= $this->translate('tr_melis_cms_tree_export'); ?></button>
+                        <?php else : ?>
+                            <div style="display: block; clear: both;"></div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
