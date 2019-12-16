@@ -231,10 +231,10 @@ $(document).ready(function(){
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + importFormData.page_tree_import.name + '</p>');
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p>' + translations.tr_melis_cms_page_tree_import_result + ': <span style="color: green;">' + translations.tr_melis_cms_page_tree_import_success + '</span></p>');
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('</br>');
-                        var text = translations.tr_melis_cms_page_tree_import_modal_done + data.pagesCount + translations.tr_melis_cms_page_tree_import_modal_done2_p + '<br>' + $body.find('.pageImportModal').data('pagename') + ' (' + $body.find('.pageImportModal').data('pageid') + ')';
+                        var text = translations.tr_melis_cms_page_tree_import_modal_done + '<br/>' + data.pagesCount + translations.tr_melis_cms_page_tree_import_modal_done2_p + ' ' + $body.find('.pageImportModal').data('pagename') + ' (' + $body.find('.pageImportModal').data('pageid') + ')';
 
                         if (data.pagesCount == 1) {
-                            text = translations.tr_melis_cms_page_tree_import_modal_done + data.pagesCount + translations.tr_melis_cms_page_tree_import_modal_done2_s + '<br>' + $body.find('.pageImportModal').data('pagename') + ' (' + $body.find('.pageImportModal').data('pageid') + ')';
+                            text = translations.tr_melis_cms_page_tree_import_modal_done + '<br/>' + data.pagesCount + translations.tr_melis_cms_page_tree_import_modal_done2_s + ' ' + $body.find('.pageImportModal').data('pagename') + ' (' + $body.find('.pageImportModal').data('pageid') + ')';
                         }
 
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append(text);
