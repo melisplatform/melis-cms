@@ -9,7 +9,7 @@ $(document).ready(function() {
 	
 	addEvent("#btnLangCmsAdd", function() {
 		
-		var dataString = $("#idformlang").serialize();
+		var dataString = $(this).parent().find("#idformlang").serialize();
 		melisCoreTool.pending("#btnLangCmsAdd");
 		melisCoreTool.processing();
 		$.ajax({

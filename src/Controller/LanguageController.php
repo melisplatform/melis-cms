@@ -376,7 +376,7 @@ class LanguageController extends AbstractActionController
             $postValues = get_object_vars($this->getRequest()->getPost());
             $postValues = $melisTool->sanitize($postValues);
             $form->setData($postValues);
-    
+
             if($form->isValid()) {
                 $data = $form->getData();
                 $isExistData = $langTable->getEntryByField('lang_cms_locale', $data['lang_cms_locale']);

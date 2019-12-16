@@ -84,16 +84,18 @@ class SitesDomainsController extends AbstractActionController
                     $dom = $domainTable->getEntryByField('sdom_domain', $domain)->toArray();
 
                     if (!empty($dom)) {
-                        $site = $siteTable->getEntryById($dom[0]['sdom_site_id'])->toArray()[0];
-                        $result[$key] = $site['site_label'];
+                        $site = $siteTable->getEntryById($dom[0]['sdom_site_id'])->current();
+                        if(!empty($site))
+                            $result[$key] = $site->site_label;
                     }
                 }
             } else {
                 $dom = $domainTable->getEntryByField('sdom_domain', $domain)->toArray();
 
                 if (!empty($dom)) {
-                    $site = $siteTable->getEntryById($dom[0]['sdom_site_id'])->toArray()[0];
-                    $result[] = $site['site_label'];
+                    $site = $siteTable->getEntryById($dom[0]['sdom_site_id'])->current();
+                    if(!empty($site))
+                        $result[] = $site->site_label;
                 }
             }
         }

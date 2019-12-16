@@ -215,7 +215,7 @@
 									$('.hasNiceScroll').getNiceScroll().resize();
 
 									if ( $tabArrowTop.length ) {
-											$tabArrowTop.removeClass("hide-arrow");
+										$tabArrowTop.removeClass("hide-arrow");
 									}
 							},
 							dblclick: function(event, data) {

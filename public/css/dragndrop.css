@@ -333,7 +333,6 @@ body {
 .melis-ui-outlined {
     position: relative;
     z-index: 1;
-    /*min-width: 150px;*/
     transition-property: outline-color, transform;
     transition-duration: 0.4s, 0.4s;
     font-family: 'Lato', sans-serif;
@@ -342,8 +341,9 @@ body {
     font-size: 14px;
     line-height: 25px;
     transition: all 0.4s ease-in-out;
-    /* added by: Junry @ 02082019*/
-   width: inherit;
+    /* added by: Junry @ 02082019 */
+    min-width: 150px;
+    /* width: inherit; */
 }
 .melis-ui-outlined.ui-sortable-helper,
 .melis-ui-outlined.ui-resizable-resizing {

@@ -416,24 +416,24 @@ class SitesTranslationController extends AbstractActionController
              * This will select only the translation
              * depending on the lang id given
              */
-            $tempAr = [];
-            $tempAr2 = [];
-            $temp = [];
+            $currentTransData = [];
+            $otherLangTransData = [];
+            $tempTransDataHolder = [];
 
             //loop to separate the translation from the current BO language
             foreach($dataArr as $d){
                 if($d['mstt_lang_id'] == $langId){
-                    array_push($tempAr, $d);
-                    array_push($temp, $d['mst_key']);
+                    array_push($currentTransData, $d);
+                    array_push($tempTransDataHolder, $d['mst_key']);
                 }else{
-                    array_push($tempAr2, $d);
+                    array_push($otherLangTransData, $d);
                 }
             }
 
-            foreach($temp as $x){
-                foreach($tempAr2 as $key => $val){
+            foreach($tempTransDataHolder as $x){
+                foreach($otherLangTransData as $key => $val){
                     if($x == $val['mst_key']){
-                        unset($tempAr2[$key]);
+                        unset($otherLangTransData[$key]);
                     }
                 }
             }
@@ -450,15 +450,15 @@ class SitesTranslationController extends AbstractActionController
              * to display
              */
             $otherTransKey = array();
-            foreach($tempAr2 as $k => $v){
+            foreach($otherLangTransData as $k => $v){
                 if(in_array($v['mst_key'], $otherTransKey)){
-                    unset($tempAr2[$k]);
+                    unset($otherLangTransData[$k]);
                 }else{
                     array_push($otherTransKey, $v['mst_key']);
                 }
             }
 
-            $data = array_merge($tempAr, $tempAr2);
+            $data = array_merge($currentTransData, $otherLangTransData);
 
             $data = array_values(array_unique($data, SORT_REGULAR));
 

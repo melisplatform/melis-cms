@@ -123,7 +123,12 @@
 	    'tr_meliscms_tool_templates_tpl_creation_date' => 'Creation date',
 	    'tr_meliscms_tool_templates_tpl_last_user_id' => 'User ID',
 	    'tr_meliscms_tool_templates_tpl_label_choose' => 'All ',
-	    
+
+		'tr_meliscms_tool_templates_tpl_typ_module_ko' => 'The module is deactivated or uninstalled',
+		'tr_meliscms_tool_templates_no_tpl' => 'Template not found.',
+		'tr_meliscms_tool_templates_module_ko' => 'Templating module is deactivated/uninstalled.',
+		'tr_meliscms_tool_templates_module_ko_submsg' => 'The type of template used in this page can be changed from the',
+
 	    'tr_tool_templates_modal_tab_header' => 'Template manager',
 	    'tr_tool_templates_modal_tab_text_add' => 'Add new template',
 	    'tr_tool_templates_modal_tab_text_edit' => 'Edit template',
@@ -209,6 +214,7 @@
 	    'tr_meliscms_common_close' => 'Close',
 	    'tr_meliscms_common_save' => 'Save',
 	    'tr_meliscms_common_yes' => 'Yes',
+            'tr_meliscms_page_tree_save' => 'Save',
 	    'tr_meliscms_common_no' => 'No',
 	    
 	    'tr_meliscms_common_add' => 'Add',
@@ -724,5 +730,8 @@
         'tr_melis_cms_page_tree_import_success' => 'Success',
         'tr_melis_cms_page_tree_import_failed' => 'Failed',
         'tr_melis_cms_page_tree_import_close' => 'Close',
+
+        'tr_meliscms_pages_Page_header' => 'Page header',
+        'tr_meliscms_pages_Page_status_container' => 'Status container'
     );
 ?>

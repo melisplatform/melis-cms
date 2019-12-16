@@ -36,7 +36,6 @@
 		'tr_meliscms_page_tab_properties_form_Creation date' => 'Date de création',
 		'tr_meliscms_page_tab_properties_form_Creation date tooltip' => 'Date à laquelle la page a été créée',
 		'tr_meliscms_page_tab_properties_form_submittext_Save' => 'Sauvegarder',
-// 	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomie',
 	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomie  <i class="fa fa-info-circle fa-lg" data-toggle="tooltip" data-placement="left" title="" data-original-title="Saisissez les termes pour classer votre page. Séparez chaque terme par une virgule"></i>',
 	    'tr_meliscms_page_tab_properties_form_taxonomy_placeholder' => 'Séparer les mots clefs avec une virgule',
 	    'tr_meliscms_page_tab_properties_form_taxonomy_placeholder tooltip' => 'Saisissez les termes pour classer votre page. Séparez chaque terme par une virgule',
@@ -74,6 +73,8 @@
 	    
 	    'tr_meliscms_page_form_page_p_lang_id_empty' => 'Veuillez choisir une langue',
 	    'tr_meliscms_page_form_page_p_lang_id_invalid'  => 'La langue séléctionnée est invalide',
+
+        'tr_meliscms_page_form_page_p_lang_ko' => 'La langue sélectionnée n\'est pas affectée au site du template sélectionné',
 
 		// SEO
 	    'tr_meliscms_pageseo_form_page_title_long'  => 'Titre de page trop long, il doit être de moins de 65 caractères',
@@ -171,7 +172,6 @@
 	    'tr_meliscms_tool_site_melissites_directory_not_exist' => 'Le dossier de destination n\'existe pas, veuillez créer le dossier /module/MelisSites',
 	    'tr_meliscms_tool_site_site_created_title' => 'a été créé avec succès',
 	    'tr_meliscms_tool_site_site_created_message' => 'Votre nouveau site a été créé avec <b>Site module</b>, <b>Pages</b> et <b>Templates</b> générés.',
-	   # 'tr_meliscms_tool_site_site_name' => 'Nom du site',
 	    'tr_meliscms_tool_site_site_module' => 'Module du site',
 	    'tr_meliscms_tool_site_site_layout' => 'layout du site',
 	    'tr_meliscms_tool_site_homepage' => 'Page d\'accueil',
@@ -242,6 +242,10 @@
         'tr_melis_cms_sites_domain tooltip' => "Domaine sur lequel le site est accessible (ex: www.monsite.com)",
         'tr_melis_cms_sites_field_empty' => 'Le champ ne peut être vide',
         'tr_melis_cms_sites_field_digits' => 'La saisie ne doit contenir que des chiffres',
-        'tr_melis_cms_sites_domain_field_empty' => 'Le champ ne peut être vide, une valeur est requise pour la plateforme actuelle'
+        'tr_melis_cms_sites_domain_field_empty' => 'Le champ ne peut être vide, une valeur est requise pour la plateforme actuelle',
+
+        # Template Form
+        'tr_meliscmstemplate_typ_label' => 'Template type',
+        'tr_meliscmstemplate_typ_label_tooltip' => 'Sélectionnez le type de template correspondant',
+        'tr_meliscmstemplate_typ_ZF2' => 'Zend Framework 2',
     );
-?>

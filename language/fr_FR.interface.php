@@ -123,8 +123,13 @@
 	    'tr_meliscms_tool_templates_tpl_creation_date' => 'Date de création',
 	    'tr_meliscms_tool_templates_tpl_last_user_id' => 'Id User',
 	    'tr_meliscms_tool_templates_tpl_label_choose' => 'Tous',
-	
-	    'tr_tool_templates_modal_tab_header' => 'Gestion des templates',
+
+        'tr_meliscms_tool_templates_tpl_typ_module_ko' => 'Le module est désactivé ou désinstallé',
+        'tr_meliscms_tool_templates_no_tpl' => 'Template introuvable.',
+        'tr_meliscms_tool_templates_module_ko' => 'Le module de ce template est désactivé ou désinstallé.',
+        'tr_meliscms_tool_templates_module_ko_submsg' => 'Le type de template utilisé dans cette page peut être changé depuis le module',
+
+        'tr_tool_templates_modal_tab_header' => 'Gestion des templates',
 	    'tr_tool_templates_modal_tab_text_add' => 'Templates',
 	    'tr_tool_templates_modal_tab_text_edit' => 'Editer un template',
 	    'tr_tool_templates_button_text_add' => 'Ajouter un template',
@@ -210,6 +215,7 @@
 	    'tr_meliscms_common_refresh' => 'Rafraichir',
 	    'tr_meliscms_common_close' => 'Annuler',
 	    'tr_meliscms_common_save' => 'Sauvegarder',
+	    'tr_meliscms_page_tree_save' => 'Enregistrer',
 	    'tr_meliscms_common_yes' => 'Oui',
 	    'tr_meliscms_common_no' => 'Non',
 	    
@@ -726,5 +732,8 @@
         'tr_melis_cms_page_tree_import_success' => 'Succès',
         'tr_melis_cms_page_tree_import_failed' => 'Echec',
         'tr_melis_cms_page_tree_import_close' => 'Fermer',
+
+        'tr_meliscms_pages_Page_header' => 'En-tête page',
+        'tr_meliscms_pages_Page_status_container' => 'Container statut'
     );
 ?>
