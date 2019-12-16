@@ -45,11 +45,14 @@ class PageImportController extends AbstractActionController
             $max_size = $max_post;
         }
 
+        $userTable = $this->getServiceLocator()->get('MelisCoreTableUser');
+        $userData = $userTable->getEntryByField('usr_id', $this->getUser()->usr_id)->current();
+
         $view = new ViewModel();
         $view->setTerminal(false);
         $view->melisKey  = $this->params()->fromQuery('melisKey', null);;
         $view->importForm = $this->getImportForm();
-        $view->isAdmin = $this->getUser()->usr_admin;
+        $view->isAdmin = $userData->usr_admin;
         $view->pageId = $pageId;
         $view->max_size = $this->asBytes($max_size);
         $view->pageName = $this->getPageName($pageId);

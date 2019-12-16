@@ -34,6 +34,10 @@ class PageExportController extends AbstractActionController
         $auth = $this->getServiceLocator()->get('MelisCoreAuth');
         $user = $auth->getIdentity();
 
+        $userTable = $this->getServiceLocator()->get('MelisCoreTableUser');
+        $userData = $userTable->getEntryByField('usr_id', $user->usr_id)->current();
+
+
         // declare the Tool service that we will be using to completely create our tool.
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
 
@@ -50,7 +54,7 @@ class PageExportController extends AbstractActionController
         $view->setTerminal(false);
         $view->melisKey  = $melisKey;
         $view->exportForm = $form;
-        $view->isAdmin = $user->usr_admin;
+        $view->isAdmin = $userData->usr_admin;
         return $view;
     }
 
