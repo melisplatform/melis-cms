@@ -2,6 +2,7 @@ $(document).ready(function(){
     var $body = $("body");
     var importFormData;
     var idsMap;
+    var filename = '';
 
     /**
      * Process the pages export
@@ -91,6 +92,7 @@ $(document).ready(function(){
      */
     $body.on('click', '#page-tree-import-test', function () {
         melisCoreTool.pending('#page-tree-import-test');
+        filename = $body.find('.bootstrap-filestyle.input-group input').val();
         submitImportForm($('#id_meliscms_tree_sites_import_page_form'));
     });
 
@@ -134,7 +136,14 @@ $(document).ready(function(){
                 data: formData,
                 cache: false,
                 contentType: false,
-                processData: false
+                processData: false,
+                beforeSend: function () {
+                    $body.find('#pageImportConsole').text('');
+                    $body.find('#pageImportConsole').css('display', '');
+                    $body.find('#pageImportConsole').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + filename + '</p>');
+                    $body.find('#pageImportConsole').append('<p>' + translations.tr_melis_cms_page_tree_import_validated + ': <span style="color: red;">' + translations.tr_meliscms_common_no + '</span></p>');
+                    $body.find('#pageImportConsole').append('<div id="pageImportProcessing"><p>' + translations.tr_melis_cms_page_tree_import_modal_processing + ' <i class="fa fa-spinner fa-spin"></i></p></div>');
+                }
             }).success(function (data) {
                 if (data.success) {
                     importTest(data.result);
@@ -157,12 +166,6 @@ $(document).ready(function(){
             url: '/melis/MelisCms/PageImport/importTest',
             data: {formData: JSON.stringify(formData)},
             beforeSend: function () {
-                $body.find('#pageImportConsole').text('');
-                $body.find('#pageImportConsole').css('display', '');
-                $body.find('#pageImportConsole').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + formData.page_tree_import.name + '</p>');
-                $body.find('#pageImportConsole').append('<p>' + translations.tr_melis_cms_page_tree_import_validated + ': <span style="color: red;">' + translations.tr_meliscms_common_no + '</span></p>');
-                $body.find('#pageImportConsole').append('<div id="pageImportProcessing"><p>' + translations.tr_melis_cms_page_tree_import_modal_processing + ' <i class="fa fa-spinner fa-spin"></i></p></div>');
-
                 $body.find('#pageImportConsole').animate({
                     scrollTop: $body.find('#pageImportConsole').get(0).scrollHeight
                 }, 2000);
