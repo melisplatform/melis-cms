@@ -484,7 +484,8 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
                      * copy the file to the temporary folder
                      */
                     if(is_writable($fileNewPath)){
-                        copy($docRoot.$path, $fileNewPath.'/'.$info['basename']);
+                        if (file_exists($docRoot.$path))
+                            copy($docRoot.$path, $fileNewPath.'/'.$info['basename']);
                     }
                 }
             }
