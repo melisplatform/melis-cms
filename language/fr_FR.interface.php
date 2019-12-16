@@ -706,7 +706,7 @@
         'tr_melis_cms_page_tree_import_modal_are_you_sure' => 'Êtes-vous sur de vouloir importer?​',
         'tr_melis_cms_page_tree_import_modal_are_you_sure_content' => 'C’est toujours une bonne idée de faire une sauvegarde de la base de données avant de procéder à de telles actions.​',
         'tr_melis_cms_page_tree_import_modal_done' => 'L’import a été effectué avec succès. ',
-        'tr_melis_cms_page_tree_import_modal_done2_s' => ' page page a été importée sous la page ',
+        'tr_melis_cms_page_tree_import_modal_done2_s' => ' page a été importée sous la page ',
         'tr_melis_cms_page_tree_import_modal_done2_p' => ' pages ont été importées sous la page ',
         'tr_melis_cms_page_tree_import_bad_xml_structure' => 'Structure XML invalide',
         'tr_melis_cms_page_tree_import_modal_processing_done' => 'Traitement du fichier terminé',
