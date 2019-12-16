@@ -596,10 +596,15 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
 
     private function getAllPageIds($pageId, &$pages, &$templates, &$styles, &$langs, &$pageCount, $includeSubPages) {
         $pageTreeTable = $this->getServiceLocator()->get('MelisEngineTablePageTree');
+        $pageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+        $type = '';
+
+        if (! empty($pageSavedTable->getSavedSitePagesById($pageId)->toArray()))
+            $type = 'saved';
 
         $pages[] = $pageId;
 
-        $pageData = $pageTreeTable->getFullDatasPage($pageId)->toArray();
+        $pageData = $pageTreeTable->getFullDatasPage($pageId, $type)->toArray();
 
         if (!empty($pageData))
             $pageData = $pageData[0];
