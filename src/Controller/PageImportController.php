@@ -27,6 +27,7 @@ class PageImportController extends AbstractActionController
      */
     public function renderPageImportModalAction()
     {
+        $pageId = $this->params()->fromQuery('pageId', null);
         $max_post = ini_get('post_max_size');
         $max_upload = ini_get('upload_max_filesize');
         $max_size = 0;
@@ -49,8 +50,9 @@ class PageImportController extends AbstractActionController
         $view->melisKey  = $this->params()->fromQuery('melisKey', null);;
         $view->importForm = $this->getImportForm();
         $view->isAdmin = $this->getUser()->usr_admin;
-        $view->pageId = $this->params()->fromQuery('pageId', null);
+        $view->pageId = $pageId;
         $view->max_size = $this->asBytes($max_size);
+        $view->pageName = $this->getPageName($pageId);
         return $view;
     }
 
@@ -276,26 +278,44 @@ class PageImportController extends AbstractActionController
         $postData = get_object_vars($this->getRequest()->getPost());
         $data = $postData['idsMap'];
         $separator = ',';
+        $arrSize = count($data);
+        $count = 0;
 
         if ($data) {
             $content = '';
 
             foreach ($data as $key => $value) {
-                $content .= $key . $separator;
-                $content .= "\r\n";
+                $count++;
 
-                $content .= $translator->translate('tr_melis_cms_page_tree_csv_old_id') . $separator;
-                $content .= $translator->translate('tr_melis_cms_page_tree_csv_new_id') . $separator;
-                $content .= "\r\n";
+                if (! empty($value)) {
+                    $content .= $key;
+                    $content .= "\r\n";
 
-                foreach ($value as $oldId => $newId) {
-                    if ($oldId != $newId) {
-                        $content .= (string)$oldId . $separator . (string)$newId . $separator;
-                        $content .= "\r\n";
+                    $content .= $translator->translate('tr_melis_cms_page_tree_csv_old_id') . $separator;
+                    $content .= $translator->translate('tr_melis_cms_page_tree_csv_new_id');
+                    $content .= "\r\n";
+                    $size = count($value);
+                    $aCount = 0;
+
+                    foreach ($value as $oldId => $newId) {
+                        $aCount++;
+
+                        if ($oldId != $newId) {
+                            $content .= (string)$oldId . $separator . (string)$newId;
+
+                            if ($count == $arrSize) {
+                                if ($aCount < $size) {
+                                    $content .= "\r\n";
+                                }
+                            } else {
+                                $content .= "\r\n";
+                            }
+                        }
                     }
-                }
 
-                $content .= $separator . "\r\n";
+                    if ($count < $arrSize)
+                        $content .= $separator . "\r\n";
+                }
             }
 
             $response = new HttpResponse();
@@ -306,16 +326,30 @@ class PageImportController extends AbstractActionController
             $headers->addHeaderLine('Content-Length', strlen($content));
             $headers->addHeaderLine('fileName', $fileName);
             $response->setContent($content);
-
         }
 
         return $response;
     }
 
     // get bytes
-    function asBytes($size) {
+    private function asBytes($size) {
         $size = trim($size);
         $s = [ 'g'=> 1<<30, 'm' => 1<<20, 'k' => 1<<10 ];
         return intval($size) * ($s[strtolower(substr($size,-1))] ?: 1);
+    }
+
+    private function getPageName($pageId)
+    {
+        $pagePublishedTable = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
+        $page = $pagePublishedTable->getPublishedSitePagesById($pageId)->toArray();
+
+        if (! empty($page)) {
+            $pageName = $page[0]['page_name'];
+        } else {
+            $pageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+            $pageName = $pageSavedTable->getSavedSitePagesById($pageId)->toArray()[0]['page_name'];
+        }
+
+        return substr($pageName, 0, 20);
     }
 }
