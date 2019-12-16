@@ -288,7 +288,7 @@ class PageImportController extends AbstractActionController
                 $count++;
 
                 if (! empty($value)) {
-                    $content .= $key;
+                    $content .= $this->getKey($key);
                     $content .= "\r\n";
 
                     $content .= $translator->translate('tr_melis_cms_page_tree_csv_old_id') . $separator;
@@ -351,5 +351,22 @@ class PageImportController extends AbstractActionController
         }
 
         return substr($pageName, 0, 20);
+    }
+
+    private function getKey($key)
+    {
+        if ($key == 'melis_cms_template') {
+            $newKey = 'template';
+        } else if ($key == 'melis_cms_lang') {
+            $newKey = 'language';
+        } else if ($key == 'melis_cms_style') {
+            $newKey = 'style';
+        } else if ($key == 'page_ids') {
+            $newKey = 'page ID';
+        } else {
+            return $key;
+        }
+
+        return $newKey;
     }
 }
