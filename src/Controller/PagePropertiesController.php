@@ -186,7 +186,9 @@ class PagePropertiesController extends AbstractActionController
                     if (!in_array($pageLangId, $siteLangs)) {
                         return new JsonModel([
                             'success' => 0,
-                            'datas' => [],
+                            'datas' => [
+                                'idPage' => $idPage
+                            ],
                             'errors' => [
                                 [
                                     'plang_lang_id' => [
