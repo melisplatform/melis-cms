@@ -636,7 +636,7 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
                 } else {
                     $pages[] = $child['tree_page_id'];
                     $tplId = $child['page_tpl_id'] ?? $child['s_page_tpl_id'];
-                    $stylId = $child['style_id'] ?? $child['s_style_id'];
+                    $stylId = $child['style_id'];
                     $lngId = $child['lang_cms_id'];
 
                     if (!empty($tplId))
