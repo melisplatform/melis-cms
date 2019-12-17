@@ -184,11 +184,17 @@ class PagePropertiesController extends AbstractActionController
                             ->getEntryById($idPage)->current()->plang_lang_id;
 
                     if (!in_array($pageLangId, $siteLangs)) {
-
                         return new JsonModel([
                             'success' => 0,
                             'datas' => [],
-                            'errors' => [[$translator->translate('tr_meliscms_page_tab_properties_form_Language') => $translator->translate('tr_meliscms_page_form_page_p_lang_ko')]]
+                            'errors' => [
+                                [
+                                    'plang_lang_id' => [
+                                        'errorMessage' => $translator->translate('tr_meliscms_page_form_page_p_lang_ko'),
+                                        'label' => $translator->translate('tr_meliscms_page_tab_properties_form_Language')
+                                    ]
+                                ]
+                            ]
                         ]);
                     }
                 }
@@ -437,7 +443,6 @@ class PagePropertiesController extends AbstractActionController
                                 ->getEntryById($idPage)->current()->plang_lang_id;
 
                         if (!in_array($pageLangId, $siteLangs)) {
-
                             $errors = [
                                 'plang_lang_id' => [
                                     'errorMessage' => $translator->translate('tr_meliscms_page_form_page_p_lang_ko'),
