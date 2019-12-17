@@ -175,7 +175,14 @@ class PagePropertiesController extends AbstractActionController
                 $formData = $propertyForm->getData();
                 $siteLangs = $this->getSiteLanguages($formData['page_tpl_id']);
 
-                if (!in_array($formData['plang_lang_id'], $siteLangs)) {
+                // Page language
+                $pageLangId = $formData['plang_lang_id'];
+                if (empty($pageLangId))
+                    $pageLangId = $this->getServiceLocator()->get('MelisEngineTablePageLang')
+                        ->getEntryById($idPage)->current()->plang_lang_id;
+
+                if (!in_array($pageLangId, $siteLangs)) {
+
                     return new JsonModel([
                         'success' => 0,
                         'datas' => [],
@@ -418,7 +425,15 @@ class PagePropertiesController extends AbstractActionController
                      *  - Raise error for the Selected language, if not active for the Site (via template)
                      */
                     $siteLangs = $this->getSiteLanguages($datas['page_tpl_id']);
-                    if (!in_array($datas['plang_lang_id'], $siteLangs)) {
+
+                    // Page language
+                    $pageLangId = $datas['plang_lang_id'];
+                    if (empty($pageLangId))
+                        $pageLangId = $this->getServiceLocator()->get('MelisEngineTablePageLang')
+                            ->getEntryById($idPage)->current()->plang_lang_id;
+
+                    if (!in_array($pageLangId, $siteLangs)) {
+
                         $errors = [
                             'plang_lang_id' => [
                                 'errorMessage' => $translator->translate('tr_meliscms_page_form_page_p_lang_ko'),
