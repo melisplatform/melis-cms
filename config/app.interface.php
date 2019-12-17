@@ -120,6 +120,7 @@ return array(
                     '/MelisCms/js/tools/pagelang.js',
                     '/MelisCms/js/tools/style.tool.js',
                     '/MelisCms/js/tools/gdpr-banner.js',
+                    '/MelisCms/js/tools/page-export-import.js',
                 ),
                 'css' => array(
                     '/MelisCms/css/fancytree.custom.css',
@@ -1355,6 +1356,50 @@ return array(
                         'module' => 'MelisCms',
                         'controller' => 'TreeSites',
                         'action' => 'render-tree-sites-modal-form-handler',
+                    ),
+                ),
+            ),
+        ),
+        'meliscms_page_export_import_modal_handler' => array(
+            'conf' => array(
+                'id' => 'id_meliscms_page_export_modal_handler',
+                'name' => 'tr_meliscore_tool_gen_new',
+                'melisKey' => 'meliscms_page_export_modal_handler',
+            ),
+            'forward' => array(
+                'module' => 'MelisCms',
+                'controller' => 'Page',
+                'action' => 'render-page-export-modal-handler',
+                'jscallback' => '',
+                'jsdatas' => array()
+            ),
+            'interface' => array(
+                'meliscms_page_export_modal' => array(
+                    'conf' => array(
+                        'id'   => 'id_meliscms_page_export_modal',
+                        'name' => 'tr_meliscms_page_export_modal',
+                        'melisKey' => 'meliscms_page_export_modal',
+                    ),
+                    'forward' => array(
+                        'module' => 'MelisCms',
+                        'controller' => 'PageExport',
+                        'action' => 'render-page-export-modal',
+                        'jscallback' => '',
+                        'jsdatas' => array()
+                    ),
+                ),
+                'meliscms_page_import_modal' => array(
+                    'conf' => array(
+                        'id'   => 'id_meliscms_page_import_modal',
+                        'name' => 'tr_meliscms_page_import_modal',
+                        'melisKey' => 'meliscms_page_import_modal',
+                    ),
+                    'forward' => array(
+                        'module' => 'MelisCms',
+                        'controller' => 'PageImport',
+                        'action' => 'render-page-import-modal',
+                        'jscallback' => '',
+                        'jsdatas' => array()
                     ),
                 ),
             ),

@@ -52,6 +52,14 @@
 													'name': translations.tr_meliscms_menu_dupe,
 													'icon': 'copy'
 											},
+											'export': {
+													'name': translations.tr_melis_cms_tree_export_page,
+													'icon': 'export'
+											},
+										    'import': {
+													'name': translations.tr_melis_cms_page_tree_import,
+													'icon': 'import'
+											}
 									},
 									actions: function(node, action, options) {
 											if (action === 'new') {
@@ -128,6 +136,25 @@
 													melisHelper.createModal(zoneId, melisKey, false, {
 															'sourcePageId': data.melisData.page_id
 													}, modalUrl, function() {});
+											}
+											if(action === 'export' || action === 'import'){
+												var modalUrl = "/melis/MelisCms/Page/renderPageExportImportModalHandler";
+												var data = node.data;
+												if(action === 'export') {
+													melisHelper.createModal('id_meliscms_page_export_modal', 'meliscms_page_export_modal', true, {'pageId':data.melisData.page_id}, modalUrl, function () {});
+												}else{
+													melisHelper.createModal(
+														'id_meliscms_page_import_modal',
+														'meliscms_page_import_modal',
+														true,
+														{
+															'pageId':data.melisData.page_id
+														},
+														modalUrl,
+														function () {
+														}
+													);
+												}
 											}
 									}
 							},
