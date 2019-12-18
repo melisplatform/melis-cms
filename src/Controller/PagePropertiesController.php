@@ -173,21 +173,32 @@ class PagePropertiesController extends AbstractActionController
                  *  - Raise error for the Selected language, if not active for the Site (via template)
                  */
                 $formData = $propertyForm->getData();
-                $siteLangs = $this->getSiteLanguages($formData['page_tpl_id']);
 
-                // Page language
-                $pageLangId = $formData['plang_lang_id'];
-                if (empty($pageLangId))
-                    $pageLangId = $this->getServiceLocator()->get('MelisEngineTablePageLang')
-                        ->getEntryById($idPage)->current()->plang_lang_id;
+                if ($formData['page_tpl_id'] !== '-1') {
+                    $siteLangs = $this->getSiteLanguages($formData['page_tpl_id']);
 
-                if (!in_array($pageLangId, $siteLangs)) {
+                    // Page language
+                    $pageLangId = $formData['plang_lang_id'];
+                    if (empty($pageLangId))
+                        $pageLangId = $this->getServiceLocator()->get('MelisEngineTablePageLang')
+                            ->getEntryById($idPage)->current()->plang_lang_id;
 
-                    return new JsonModel([
-                        'success' => 0,
-                        'datas' => [],
-                        'errors' => [[$translator->translate('tr_meliscms_page_tab_properties_form_Language') => $translator->translate('tr_meliscms_page_form_page_p_lang_ko')]]
-                    ]);
+                    if (!in_array($pageLangId, $siteLangs)) {
+                        return new JsonModel([
+                            'success' => 0,
+                            'datas' => [
+                                'idPage' => $idPage
+                            ],
+                            'errors' => [
+                                [
+                                    'plang_lang_id' => [
+                                        'errorMessage' => $translator->translate('tr_meliscms_page_form_page_p_lang_ko'),
+                                        'label' => $translator->translate('tr_meliscms_page_tab_properties_form_Language')
+                                    ]
+                                ]
+                            ]
+                        ]);
+                    }
                 }
 
                 /**
@@ -424,22 +435,23 @@ class PagePropertiesController extends AbstractActionController
                      * Additional Form Validation
                      *  - Raise error for the Selected language, if not active for the Site (via template)
                      */
-                    $siteLangs = $this->getSiteLanguages($datas['page_tpl_id']);
+                    if ($datas['page_tpl_id'] !== '-1') {
+                        $siteLangs = $this->getSiteLanguages($datas['page_tpl_id']);
 
-                    // Page language
-                    $pageLangId = $datas['plang_lang_id'];
-                    if (empty($pageLangId))
-                        $pageLangId = $this->getServiceLocator()->get('MelisEngineTablePageLang')
-                            ->getEntryById($idPage)->current()->plang_lang_id;
+                        // Page language
+                        $pageLangId = $datas['plang_lang_id'];
+                        if (empty($pageLangId))
+                            $pageLangId = $this->getServiceLocator()->get('MelisEngineTablePageLang')
+                                ->getEntryById($idPage)->current()->plang_lang_id;
 
-                    if (!in_array($pageLangId, $siteLangs)) {
-
-                        $errors = [
-                            'plang_lang_id' => [
-                                'errorMessage' => $translator->translate('tr_meliscms_page_form_page_p_lang_ko'),
-                                'label' => $translator->translate('tr_meliscms_page_tab_properties_form_Language'),
-                            ],
-                        ];
+                        if (!in_array($pageLangId, $siteLangs)) {
+                            $errors = [
+                                'plang_lang_id' => [
+                                    'errorMessage' => $translator->translate('tr_meliscms_page_form_page_p_lang_ko'),
+                                    'label' => $translator->translate('tr_meliscms_page_tab_properties_form_Language'),
+                                ],
+                            ];
+                        }
                     }
 
                     /**
