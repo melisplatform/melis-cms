@@ -27,7 +27,6 @@ class FrontPluginsController extends AbstractActionController
 
     public function renderPluginsMenuAction()
     {
-        $container = new Container('meliscore');
         $config = $this->serviceLocator->get('config');
         $pluginsConfig = array();
         $siteModule = $this->params()->fromRoute('siteModule');
@@ -53,7 +52,6 @@ class FrontPluginsController extends AbstractActionController
         $view->modulesHasNewPlugins    = array_unique($this->modulesHasNewPlugins);
         $view->subsectionHasNewPlugins = $this->subsectionHasNewPlugins;
         $view->newPluginNotification   = $pluginMenuHandler;
-        $view->boLocale                = $container['melis-lang-locale'];
 
         return $view;
     }
