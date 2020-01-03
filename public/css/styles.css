@@ -721,6 +721,9 @@ body.modal-open {
 		display: inline-block;
 		width: 100%;
 	}
+	.div.dataTables_wrapper div.dataTables_length select {
+		width: 180px;
+	}
 }
 
 /*styling site default page id and 404 page id input site tree view btn to have a click effect*/
