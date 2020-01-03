@@ -737,7 +737,7 @@ var melisCms = (function(){
     // refresh page tab (historic, versionining etc)
 	$body.on("shown.bs.tab", '.melis-refreshPageTable', refreshPageTable );
 	
-	// click on history tab
+	// click on history tab / for newsletter dataTables
 	$body.on("click", ".page-content-container .widget-head.nav ul li a.history", showHistoryTabContentTableResponsive );
 
 	/* 
