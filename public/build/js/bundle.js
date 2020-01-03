@@ -643,7 +643,6 @@ var melisCms = (function(){
 			$tabContent = $(href);
 
 			$tabContent.find(".melis-refreshPageTable").trigger("click");
-			$tabContent.find(".dataTables_length select").removeAttr("style");
 	}
 
 	// WINDOW SCROLL FUNCTIONALITIES ========================================================================================================
