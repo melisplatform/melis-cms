@@ -715,6 +715,14 @@ body.modal-open {
 		margin-left: 10px;
 	}
 }
+
+@media (max-width: 576px) {
+	.pagehistoric-actions-filter {
+		display: inline-block;
+		width: 100%;
+	}
+}
+
 /*styling site default page id and 404 page id input site tree view btn to have a click effect*/
 
 #siteMainPageId > span:hover {

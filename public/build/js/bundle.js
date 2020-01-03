@@ -633,6 +633,18 @@ var melisCms = (function(){
 		//add another statement below if needed
 	}
 
+	/**
+	 * fix for history tab table not responsive
+	 * issue: http://mantis.melistechnology.fr/view.php?id=4447
+	 */
+	function showHistoryTabContentTableResponsive() {
+		var $this 		= $(this),
+			href 		= $this.attr("href"),
+			$tabContent = $(href);
+
+			$tabContent.find(".melis-refreshPageTable").trigger("click");
+	}
+
 	// WINDOW SCROLL FUNCTIONALITIES ========================================================================================================
 	if( melisCore.screenSize >= 768) {
 		jQuery(window).scroll(function() {
@@ -723,7 +735,10 @@ var melisCms = (function(){
     $body.on("shown.bs.tab", '.page-content-container .widget-head.nav ul li a', cmsTabEvents);
     
     // refresh page tab (historic, versionining etc)
-    $body.on("shown.bs.tab", '.melis-refreshPageTable', refreshPageTable );
+	$body.on("shown.bs.tab", '.melis-refreshPageTable', refreshPageTable );
+	
+	// click on history tab
+	$body.on("click", ".page-content-container .widget-head.nav ul li a.history", showHistoryTabContentTableResponsive );
 
 	/* 
 	* RETURN ======================================================================================================================== 
