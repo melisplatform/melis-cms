@@ -72,6 +72,8 @@
 	    'tr_meliscms_page_form_page_p_lang_id_empty' => 'Please choose a language',
 	    'tr_meliscms_page_form_page_p_lang_id_invalid'  => 'Invalid language selection',
 
+        'tr_meliscms_page_form_page_p_lang_ko' => 'The language selected is not affected to the site of the template selected',
+
 		// SEO
 	    'tr_meliscms_pageseo_form_page_title_long'  => 'Page title is too long, it should be less than 65 characters',
 		'tr_meliscms_pageseo_form_page_desc_long'  => 'Description is too long, it should be less than 255 characters',

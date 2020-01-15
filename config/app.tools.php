@@ -2204,6 +2204,127 @@ return array(
                                 ),
                             ),
                         ),
+                        'meliscms_tree_sites_export_page_form' => array(
+                            'attributes' => array(
+                                'name' => 'meliscms_tree_sites_export_page_form',
+                                'id' => 'pageExportForm',
+                                'method' => 'POST',
+                                'action' => '',
+                            ),
+                            'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                            'elements' => array(
+                                array(
+                                    'spec' => array(
+                                        'type' => 'hidden',
+                                        'name' => 'selected_page_id',
+                                        'attributes' => array(
+                                            'id' => 'selected_page_id'
+                                        ),
+                                    )
+                                ),
+                                array(
+                                    'spec' => array(
+                                        'type' => 'Zend\Form\Element\Radio',
+                                        'name' => 'page_export_type',
+                                        'options' => array(
+                                            'label' => 'tr_melis_cms_tree_export_select_export_option',
+                                            'tooltip' => 'tr_melis_cms_tree_export_select_export_option_tooltip',
+                                            'label_options' => array(
+                                                'disable_html_escape' => true,
+                                            ),
+                                            'label_attributes' => array(
+                                                'class' => 'melis-radio-box',
+                                            ),
+                                            'value_options' => array(
+                                                '1' => 'tr_melis_cms_tree_export_page_and_children',
+                                                '2' => 'tr_melis_cms_tree_export_page_only',
+                                            ),
+                                        ),
+                                        'attributes' => array(
+
+                                        ),
+                                    )
+                                ),
+                                array(
+                                    'spec' => array(
+                                        'name' => 'export_page_resources',
+                                        'type' => 'MelisText',
+                                        'options' => array(
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'export_page_resources',
+                                            'class' => 'export_page_resources',
+                                            'value' => '',
+                                            'data-label' => 'tr_melis_cms_tree_export_page_resources',
+                                            'data-tooltip' => 'tr_melis_cms_tree_export_page_resources_tooltip'
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                        'meliscms_tree_sites_import_page_form' => array(
+                            'attributes' => array(
+                                'name' => 'meliscms_tree_sites_import_page_form',
+                                'id' => 'id_meliscms_tree_sites_import_page_form',
+                                'method' => 'POST',
+                                'action' => '',
+                            ),
+                            'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                            'elements' => array(
+                                array(
+                                    'spec' => array(
+                                        'type' => 'File',
+                                        'name' => 'page_tree_import',
+                                        'options' => array(
+                                            'label' => '',
+                                            'tooltip' => 'tr_melis_cms_page_tree_import_modal_zip_tooltip',
+                                            'label_options' => array(
+                                                'disable_html_escape' => true,
+                                            ),
+                                            'filestyle_options' => array(
+                                                'buttonBefore' => true,
+                                                'buttonText' => 'tr_melis_cms_page_tree_import_zip_file',
+                                            )
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'pageImportFileUpload'
+                                        ),
+                                    )
+                                ),
+                            ),
+                            'input_filter' => array(
+                                'page_tree_import' => array(
+                                    'name'     => 'page_tree_import',
+                                    'required' => true,
+                                    'validators' => array(
+                                        [
+                                            'name' => 'fileuploadfile',
+                                            'break_chain_on_failure' => true,
+                                            'options' => [
+                                                'messages' => [
+                                                    \Zend\Validator\File\UploadFile::NO_FILE => 'tr_melis_cms_page_tree_import_ko_no_file',
+                                                ],
+                                            ],
+                                        ],
+                                        array(
+                                            'name' => 'FileExtension',
+                                            'break_chain_on_failure' => true,
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\Validator\File\Extension::FALSE_EXTENSION => 'tr_melis_cms_page_tree_import_wrong_extension',
+                                                ),
+                                                'case' => true,
+                                                'extension' => [
+                                                    'zip'
+                                                ]
+                                            ),
+                                        ),
+                                    ),
+                                    'filters' => array(
+                                    ),
+                                ),
+                            ),
+                        ),
                     ),
                 ),
             ),

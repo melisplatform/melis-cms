@@ -169,6 +169,39 @@ class PagePropertiesController extends AbstractActionController
 
             if ($propertyForm->isValid()) {
                 /**
+                 * Additional Form Validation
+                 *  - Raise error for the Selected language, if not active for the Site (via template)
+                 */
+                $formData = $propertyForm->getData();
+
+                if ($formData['page_tpl_id'] !== '-1') {
+                    $siteLangs = $this->getSiteLanguages($formData['page_tpl_id']);
+
+                    // Page language
+                    $pageLangId = $formData['plang_lang_id'];
+                    if (empty($pageLangId))
+                        $pageLangId = $this->getServiceLocator()->get('MelisEngineTablePageLang')
+                            ->getEntryById($idPage)->current()->plang_lang_id;
+
+                    if (!in_array($pageLangId, $siteLangs)) {
+                        return new JsonModel([
+                            'success' => 0,
+                            'datas' => [
+                                'idPage' => $idPage
+                            ],
+                            'errors' => [
+                                [
+                                    'plang_lang_id' => [
+                                        'errorMessage' => $translator->translate('tr_meliscms_page_form_page_p_lang_ko'),
+                                        'label' => $translator->translate('tr_meliscms_page_tab_properties_form_Language')
+                                    ]
+                                ]
+                            ]
+                        ]);
+                    }
+                }
+
+                /**
                  * If page does not exist, let's create
                  * If page exist, nothing to do, properties are saved in save-page-properties, handled through event
                  */
@@ -313,6 +346,41 @@ class PagePropertiesController extends AbstractActionController
     }
 
     /**
+     * Returns all active languages in the site (via Template's ID)
+     * @param $templateId
+     * @return array
+     */
+    public function getSiteLanguages($templateId = null)
+    {
+        if (empty($templateId)) {
+            return [];
+        }
+
+        /**
+         * @var \MelisEngine\Model\Tables\MelisTemplateTable $tplTable
+         * @var \MelisEngine\Model\Tables\MelisSiteTable $siteTable
+         * @var \MelisEngine\Model\Tables\MelisCmsSiteLangsTable $sitelangsTable
+         */
+        $tplTable = $this->getServiceLocator()->get('MelisEngineTableTemplate');
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $sitelangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+
+        $tplData = $tplTable->getEntryById($templateId)->toArray();
+        $tplData = reset($tplData);
+
+        $siteData = $siteTable->getEntryById($tplData['tpl_site_id'])->toArray();
+        $siteData = reset($siteData);
+
+        $activeLangs = $sitelangsTable->getSiteLanguagesBySiteId($siteData['site_id'], true)->toArray();
+        $siteLangs = [];
+        foreach ($activeLangs as $language) {
+            $siteLangs[] = $language['slang_lang_id'];
+        }
+
+        return $siteLangs;
+    }
+
+    /**
      * This function saves the page properties form, making an entry in PageSave
      * Events: meliscms_page_saveproperties_start / meliscms_page_saveproperties_end
      *
@@ -361,6 +429,30 @@ class PagePropertiesController extends AbstractActionController
                 if ($propertyForm->isValid()) {
                     // Get datas validated
                     $datas = $propertyForm->getData();
+                    $errors = [];
+
+                    /**
+                     * Additional Form Validation
+                     *  - Raise error for the Selected language, if not active for the Site (via template)
+                     */
+                    if ($datas['page_tpl_id'] !== '-1') {
+                        $siteLangs = $this->getSiteLanguages($datas['page_tpl_id']);
+
+                        // Page language
+                        $pageLangId = $datas['plang_lang_id'];
+                        if (empty($pageLangId))
+                            $pageLangId = $this->getServiceLocator()->get('MelisEngineTablePageLang')
+                                ->getEntryById($idPage)->current()->plang_lang_id;
+
+                        if (!in_array($pageLangId, $siteLangs)) {
+                            $errors = [
+                                'plang_lang_id' => [
+                                    'errorMessage' => $translator->translate('tr_meliscms_page_form_page_p_lang_ko'),
+                                    'label' => $translator->translate('tr_meliscms_page_tab_properties_form_Language'),
+                                ],
+                            ];
+                        }
+                    }
 
                     /**
                      * First, let's copy the published table entry
@@ -396,8 +488,6 @@ class PagePropertiesController extends AbstractActionController
                      * Special fields must be set
                      */
 
-
-                    $errors = array();
                     $success = 0;
                     $language = $datas['plang_lang_id'];
                     $template = $datas['page_tpl_id'];

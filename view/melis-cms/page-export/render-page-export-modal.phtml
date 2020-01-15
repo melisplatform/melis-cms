@@ -1,0 +1,124 @@
+<?php
+$id = '';
+if (!empty($this->zoneconfig['conf']['id']))
+    $id = ' id="' .$this->zoneconfig['conf']['id'] . '"';
+
+?>
+<div class="modal-content" <?= $id; ?> data-melisKey="<?= $this->melisKey; ?>">
+    <div class="modal-body padding-none">
+        <div class="wizard">
+            <div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none">
+                <div class="widget-head">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#<?php echo $this->zoneconfig['conf']['id'] ?>" class="glyphicons notes" data-toggle="tab" aria-expanded="true"><i></i>
+                                <?= $this->translate('tr_melis_cms_tree_export_page'); ?>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="widget-body innerAll inner-2x">
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="<?= $id ?>">
+                            <div class="page-export-container">
+                                <?php if($this->isAdmin) { ?>
+                                    <div class="page-export-form">
+                                        <?php
+                                        $form = $this->exportForm;
+                                        $form->prepare();
+
+                                        foreach ($form->getElements() as $element => $attributes) {
+                                            $el = $form->get((string) $element);
+
+                                            if ($el->getName() == 'page_export_type') {
+                                                $el->setValue('1');
+                                            }
+                                        }
+
+                                        echo $this->form()->openTag($form);
+                                        ?>
+                                        <?php
+                                        $moduleField = $form->get('selected_page_id');
+                                        echo $this->formElement($moduleField);
+                                        ?>
+                                        <div class="form-group">
+                                            <?php
+                                            $typeField = $form->get('page_export_type');
+                                            $inputLabel = $typeField->getLabelAttributes();
+                                            $typeField->setLabelAttributes(array('class', null));
+                                            $label = $typeField->getLabel().'<i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
+                                            $typeField->setLabel($label);
+                                            echo $this->formLabel($typeField);
+                                            $typeField->setLabelAttributes($inputLabel);
+                                            echo $this->formElement($typeField);
+                                            ?>
+                                        </div>
+                                        <div class="form-group">
+                                            <?php
+                                            $typeField = $form->get('export_page_resources');
+                                            $inputLabel = $typeField->getLabelAttributes();
+                                            $typeField->setLabelAttributes(array('class', null));
+                                            $label = $typeField->getLabel().'<i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
+                                            $typeField->setLabel($label);
+                                            echo $this->formLabel($typeField);
+                                            $typeField->setLabelAttributes($inputLabel);
+                                            echo $this->formElement($typeField);
+                                            ?>
+                                            <script type="text/javascript">
+                                                var targetInput = $('.export_page_resources');
+                                                if(targetInput.length) {
+                                                    targetInput.each(function () {
+                                                        var parentDiv = $(this).parent("div.form-group");
+                                                        var attribRequired = '';
+                                                        if (typeof $(this).data("required") != 'undefined') {
+                                                            attribRequired = ' *';
+                                                        }
+                                                        var attribTooltip = '';
+                                                        if (typeof $(this).data("tooltip") != 'undefined') {
+                                                            attribTooltip = '<i class="fa fa-info-circle fa-lg" data-toggle="tooltip" data-placement="left" title="" data-original-title="' + $(this).data("tooltip") + '"></i>';
+                                                        }
+                                                        var switchBtn = '<label for="' + $(this).attr("name") + '">' + $(this).data("label") + attribRequired + attribTooltip + '</label>'
+                                                            + '<div class="make-switch export_page_resources_switch" data-label-icon="glyphicon glyphicon-resize-horizontal" data-on-label="' + translations.tr_meliscore_common_yes + '" data-off-label="' + translations.tr_meliscore_common_nope + '" style="display: block;">'
+                                                            + '<input type="checkbox" name="' + $(this).attr("name") + '" id="' + $(this).attr("id") + '">'
+                                                            + '</div>';
+                                                        parentDiv.html(switchBtn);
+                                                    });
+                                                    $('.export_page_resources_switch').bootstrapSwitch('destroy', true);
+                                                    $('.export_page_resources_switch').bootstrapSwitch();
+                                                }
+                                            </script>
+                                        </div>
+                                        <?php
+                                        echo $this->form()->closeTag();
+                                        ?>
+                                    </div>
+                                    <div class="page-export-progress hidden">
+                                        <span><?= $this->translate('tr_melis_cms_tree_export_in_progress')?> ...(<prog_percent></prog_percent>%)</span>
+                                        <div class="progress">
+                                            <div id="exportImportProgressbar" class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php } else { ?>
+                                    <div class="user-no-rights">
+                                        <p>
+                                            <?= $this->translate('tr_melis_cms_tree_export_no_rights'); ?>
+                                        </p>
+                                    </div>
+                                <?php } ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div align="right">
+                        <button type="button" data-dismiss="modal" class="btn btn-danger pull-left"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
+                        <?php if ($this->isAdmin) : ?>
+                            <button type="button" class="btn btn-success" id="btn-export-pages" <?= (!$this->isAdmin) ? 'disabled="true"' : ''?>><?= $this->translate('tr_melis_cms_tree_export'); ?></button>
+                        <?php else : ?>
+                            <div style="display: block; clear: both;"></div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -832,3 +832,12 @@ ul#select2-id_mcgdprbanner_site_id-results {
     text-decoration: none;
     background-color: #f5f5f5;
 }
+/* Page export/import*/
+.page-export-container{
+	margin-bottom:30px;
+}
+
+#page-import-checkbox-span {
+	position: absolute;
+	margin-top: -9px;
+}

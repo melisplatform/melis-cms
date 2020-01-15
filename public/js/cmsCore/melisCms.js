@@ -470,9 +470,9 @@ var melisCms = (function(){
 	
 	// INPUT CHAR COUNTER IN SEO TAB
 	function charCounter(event) {
-		var charLength 	= $(this).val().length,
-			prevLabel 	= $(this).prev('label');
-		//var limit = event.data.limit;
+		var charLength = $(this).val().length;
+		var prevLabel = $(this).prev('label');
+		var limit = event.data.limit;
 		
 		if ( prevLabel.find('span').length ) {
 			
@@ -480,35 +480,27 @@ var melisCms = (function(){
 				prevLabel.removeClass('limit');
 				prevLabel.find('span').remove();
 			}
-			else {
-                /**
-				 * Removed so that meta title & meta description has no limit
-				 * cause it's data type on db is TEXT
-                 */
-				// prevLabel.find('span').html('<i class="fa fa-text-width"></i>(' + charLength + ')');
-				
-				/*if( charLength > limit ){
+			else{
+				prevLabel.find('span').html('<i class="fa fa-text-width"></i>(' + charLength + ')');
+
+				if( charLength > limit ){
 					prevLabel.addClass('limit');
 					prevLabel.find('span').addClass('limit');
 				}
 				else{
 					prevLabel.removeClass('limit');
 					prevLabel.find('span').removeClass('limit');
-				}*/
+				}
 			}
 		}
 		else {
 			if ( charLength !== 0 ) {
 				prevLabel.find(".label-text").append("<span class='text-counter-indicator'><i class='fa fa-text-width'></i>(" + charLength + ")</span>");
 
-                /**
-                 * Removed so that meta title & meta description has no limit
-				 * cause it's data type on db is TEXT
-                 */
-				/*if( charLength > limit ){
+				if( charLength > limit ){
 					prevLabel.addClass('limit');
 					prevLabel.find('span').addClass('limit');
-				}*/
+				}
 			}
 		}
 	}
@@ -726,10 +718,10 @@ var melisCms = (function(){
     $body.on('switch-change', '.page-publishunpublish', publishUnpublish);
     
     // char counter in seo title
-    $body.on("keyup keydown change", "form[name='pageseo'] input[name='pseo_meta_title']" , charCounter);
+    $body.on("keyup keydown change", "form[name='pageseo'] input[name='pseo_meta_title']" , {limit: 70}, charCounter);
     
     // char counter in seo description
-    $body.on("keyup keydown change", "form[name='pageseo'] textarea[name='pseo_meta_description']", charCounter);
+    $body.on("keyup keydown change", "form[name='pageseo'] textarea[name='pseo_meta_description']", {limit: 160}, charCounter);
     
     // main tab click event (edition, properties etc..)
     $body.on("shown.bs.tab", '.page-content-container .widget-head.nav ul li a', cmsTabEvents);

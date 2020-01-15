@@ -75,6 +75,8 @@
 	    'tr_meliscms_page_form_page_p_lang_id_empty' => 'Veuillez choisir une langue',
 	    'tr_meliscms_page_form_page_p_lang_id_invalid'  => 'La langue séléctionnée est invalide',
 
+        'tr_meliscms_page_form_page_p_lang_ko' => 'La langue sélectionnée n\'est pas affectée au site du template sélectionné',
+
 		// SEO
 	    'tr_meliscms_pageseo_form_page_title_long'  => 'Titre de page trop long, il doit être de moins de 65 caractères',
 		'tr_meliscms_pageseo_form_page_desc_long'  => 'Description trop longue, elle doit être de moins de 255 caractères',
