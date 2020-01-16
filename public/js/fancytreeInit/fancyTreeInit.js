@@ -386,7 +386,7 @@
 													url: '/melis/MelisCms/Page/movePage',
 													data: datastring,
 													encode: true
-											}).success(function(data) {}).error(function(xhr, textStatus, errorThrown) {
+											}).done(function(data) {}).fail(function(xhr, textStatus, errorThrown) {
 													alert(translations.tr_meliscore_error_message);
 											});
 									});
