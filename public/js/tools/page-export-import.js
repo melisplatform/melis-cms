@@ -28,7 +28,7 @@ $(document).ready(function(){
                     updateProgressValue(20);
                 }, 100);
             }
-        }).success(function(data, status, request){
+        }).done(function(data, status, request){
             var oData;
 
             try {
@@ -68,7 +68,7 @@ $(document).ready(function(){
             $body.find('#btn-export-pages').siblings('button.btn.btn-danger.pull-left').trigger('click');
 
             melisCoreTool.done('#btn-export-pages');
-        }).error(function(data){
+        }).fail(function(data){
             melisCoreTool.done('#btn-export-pages');
         });
     });
@@ -144,7 +144,7 @@ $(document).ready(function(){
                     $body.find('#pageImportConsole').append('<p>' + translations.tr_melis_cms_page_tree_import_validated + ': <span style="color: red;">' + translations.tr_meliscms_common_no + '</span></p>');
                     $body.find('#pageImportConsole').append('<div id="pageImportProcessing"><p>' + translations.tr_melis_cms_page_tree_import_modal_processing + ' <i class="fa fa-spinner fa-spin"></i></p></div>');
                 }
-            }).success(function (data) {
+            }).done(function (data) {
                 if (data.success) {
                     importTest(data.result);
                     importFormData = data.result;
@@ -152,7 +152,7 @@ $(document).ready(function(){
                     melisHelper.melisKoNotification(translations.tr_melis_cms_page_tree_import, '', data.errors);
                     melisCoreTool.done('#page-tree-import-test');
                 }
-            }).error(function (data) {
+            }).fail(function (data) {
                 melisCoreTool.done('#page-tree-import-test');
             });
         });
@@ -170,7 +170,7 @@ $(document).ready(function(){
                     scrollTop: $body.find('#pageImportConsole').get(0).scrollHeight
                 }, 2000);
             }
-        }).success(function (data) {
+        }).done(function (data) {
             if (data.success) {
                 $body.find('#importPageForm').css('display', 'none');
                 $body.find('#importPageValidated').css('display', '');
@@ -195,7 +195,7 @@ $(document).ready(function(){
                 }, 2000);
             }
             melisCoreTool.done('#page-tree-import-test');
-        }).error(function (data) {
+        }).fail(function (data) {
             melisCoreTool.done('#page-tree-import-test');
         });
     }
@@ -223,7 +223,7 @@ $(document).ready(function(){
                         $body.find('#pageImportConsole').append('<p>' + translations.tr_melis_cms_page_tree_import_validated + ': <span style="color: red;">' + translations.tr_meliscms_common_no + '</span></p>');
                         $body.find('#pageImportConsole').append('<div id="pageImportProcessing"><p>' + translations.tr_melis_cms_page_tree_import_modal_processing + ' <i class="fa fa-spinner fa-spin"></i></p></div>');
                     }
-                }).success(function (data) {
+                }).done(function (data) {
                     var btnClose = '<button type="button" id="importPageDoneClose" data-dismiss="modal" class="btn btn-danger pull-left" style="margin-top: -15px; margin-left: -15px;">' + translations.tr_melis_cms_page_tree_import_close + '</button>';
 
                     $body.find('#importPageValidated').css('display', 'none');
@@ -295,7 +295,7 @@ $(document).ready(function(){
                         $body.find('#importPageDone .btn-container').append(btnClose);
                     }
                     melisCoreTool.done('#page-tree-import');
-                }). error(function() {
+                }).fail(function() {
                     melisCoreTool.done('#page-tree-import');
                 });
             }
@@ -308,7 +308,7 @@ $(document).ready(function(){
             url         : '/melis/MelisCms/TreeSites/getPageIdBreadcrumb?idPage='+pageNumber+'&includeSelf='+optionalArg,
             encode		: true,
             dataType    : 'json',
-        }).success(function(data){
+        }).done(function(data){
 
             //process array to add to make this format '1/3/5/6...'
             var newData = [];
@@ -343,7 +343,7 @@ $(document).ready(function(){
                 });
             });
 
-        }).error(function(xhr, textStatus, errorThrown){
+        }).fail(function(xhr, textStatus, errorThrown){
             // error modal
             alert( translations.tr_meliscore_error_message );
         });
