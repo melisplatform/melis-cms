@@ -1202,16 +1202,16 @@ $(function() {
     });
 
     // Toggle single checkbox
-    $body.on("click", ".cb-cont input[type=checkbox]", function () {
+    $body.on("click", ".page-import-cont input[type=checkbox]", function () {
         var $this = $(this);
         
-            if ($this.is(':checked')) {
-                $this.prop("checked", true);
-                $this.prev("span").find(".cbmask-inner").addClass('cb-active');
-            } else {
-                $this.not(".requried-module").prop("checked", false);
-                $this.not(".requried-module").prev("span").find(".cbmask-inner").removeClass('cb-active');
-            }
+        if ($this.is(':checked')) {
+            $this.prop("checked", true);
+            $this.prev("span").find(".cbmask-inner").addClass('cb-active');
+        } else {
+            $this.not(".requried-module").prop("checked", false);
+            $this.parents(".page-import-cont").find(".cbmask-inner").removeClass('cb-active');
+        }
     });
     /**
      * ================================================================================
