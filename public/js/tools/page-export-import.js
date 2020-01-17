@@ -185,7 +185,7 @@ $(document).ready(function(){
             } else {
                 $body.find('#pageImportConsole #pageImportProcessing').text('');
                 $body.find('#pageImportConsole #pageImportProcessing').append('<p>' + translations.tr_melis_cms_page_tree_import_modal_processing_done + ' <i style="color: green;" class="fa fa-check-circle"></i></p>');
-                body.find('#pageImportConsole').append('<p style="color: red;">' + translations.tr_melis_cms_page_tree_import_modal_errors + ':</p>');
+                $body.find('#pageImportConsole').append('<p style="color: red;">' + translations.tr_melis_cms_page_tree_import_modal_errors + ':</p>');
                 $.each(data.errors, function (key, error) {
                     $body.find('#pageImportConsole').append('<p style="color: red;"> - ' + error + '</p>');
                 });
