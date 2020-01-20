@@ -36,7 +36,6 @@
 		'tr_meliscms_page_tab_properties_form_Creation date' => 'Creation date',
 		'tr_meliscms_page_tab_properties_form_Creation date tooltip' => 'Date when the page has been created',
 		'tr_meliscms_page_tab_properties_form_submittext_Save' => 'Save',
-// 	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomy',
 	    'tr_meliscms_page_tab_properties_form_taxonomy' => 'Taxonomy  <i class="fa fa-info-circle fa-lg" data-toggle="tooltip" data-placement="left" title="" data-original-title="Type the terms to classify your page. Separate each term by a coma"></i>',
 	    'tr_meliscms_page_tab_properties_form_taxonomy_placeholder' => 'Separate options with a comma',
 	    'tr_meliscms_page_tab_properties_form_taxonomy_placeholder tooltip' => 'Type the terms to classify your page. Separate each term by a coma',
@@ -71,6 +70,8 @@
 	    
 	    'tr_meliscms_page_form_page_p_lang_id_empty' => 'Please choose a language',
 	    'tr_meliscms_page_form_page_p_lang_id_invalid'  => 'Invalid language selection',
+
+        'tr_meliscms_page_form_page_p_lang_ko' => 'The language selected is not affected to the site of the template selected',
 
 		// SEO
 	    'tr_meliscms_pageseo_form_page_title_long'  => 'Page title is too long, it should be less than 65 characters',
@@ -238,6 +239,10 @@
         'tr_melis_cms_sites_domain tooltip' => "Domain on which the site is accessible (ex: www.mysite.com)",
         'tr_melis_cms_sites_field_empty' => 'Value is required and can\'t be empty',
         'tr_melis_cms_sites_field_digits' => 'The input must contain only digits',
-        'tr_melis_cms_sites_domain_field_empty' => 'The field cannot be empty, a value is required for the current platform'
+        'tr_melis_cms_sites_domain_field_empty' => 'The field cannot be empty, a value is required for the current platform',
+
+        # Template Form
+        'tr_meliscmstemplate_typ_label' => 'Template type',
+        'tr_meliscmstemplate_typ_label_tooltip' => 'Select the corresponding type of template',
+        'tr_meliscmstemplate_typ_ZF2' => 'Zend Framework 2',
 	);
-?>
