@@ -32,8 +32,8 @@ $data_melisKey = $this->melisKey;
                                                 <?php foreach($this->siteLangs as $key => $transLang) { ?>
                                                     <li class="">
                                                         <a class="clearfix" data-toggle="tab" id="sites_translation_lang_<?= $transLang['lang_cms_id'] ?>" href="#<?= $transLang['lang_cms_locale']; ?>-log-type-details-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $transLang['lang_cms_id'] ?>">
-                                                            <span class="pull-right">
-                                                                <img src="<?= $this->serverUrl() . '/MelisCms/images/lang-flags/' . $transLang['lang_cms_locale'] . '.png' ?>" class="pull-right">
+                                                            <span class="float-right">
+                                                                <img src="<?= $this->serverUrl() . '/MelisCms/images/lang-flags/' . $transLang['lang_cms_locale'] . '.png' ?>" class="float-right">
                                                             </span>
                                                             <span><?= $transLang['lang_cms_name'] ?></span>
                                                         </a>
@@ -91,8 +91,8 @@ $data_melisKey = $this->melisKey;
                                         </div>
                                     </div>
                                 </div>
-                                <div align="right">
-                                    <a data-dismiss="modal" class="btn btn-danger pull-left"><i class="fa fa-times"></i> <?= $this->translate('tr_melis_site_translation_close_btn')?></a>
+                                <div class="footer-modal d-flex flex-row justify-content-between">
+                                    <a data-dismiss="modal" class="btn btn-danger float-left"><i class="fa fa-times"></i> <?= $this->translate('tr_melis_site_translation_close_btn')?></a>
                                     <a class="btn btn-success btnSaveSiteTranslation"><i class="fa fa-save"></i>  <?= $this->translate('tr_melis_site_translation_save_btn'); ?></a>
                                 </div>
                             </div>
@@ -102,6 +102,7 @@ $data_melisKey = $this->melisKey;
             </div>
         </div>
     </div>
+    <!-- <script>siteTranslationEditor();</script> -->
     <script type="text/javascript">
         $(document).ready(function() {
             //we prepare the tinyMce init here to make sure that the form are already loaded

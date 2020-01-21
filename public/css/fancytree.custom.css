@@ -83,7 +83,7 @@ span.fancytree-active span.fancytree-title,
     left: 0;
     width: 16px;
     height: 16px;
-    font-family: 'FontAwesome';
+    font-family: 'FontAwesome'; /* Glyphicons Regular */
     font-size: 14px;
     line-height: 16px;
     text-align: center;

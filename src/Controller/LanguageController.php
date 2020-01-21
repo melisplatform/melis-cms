@@ -85,7 +85,7 @@ class LanguageController extends AbstractActionController
         $view = new ViewModel();
         $view->melisKey = $melisKey;
         $view->tableColumns = $columns;
-        $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration();
+        $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration(null,null,null,array('order' => '[[ 0, "desc" ]]'));
     
     
         return $view;

@@ -70,12 +70,12 @@
                                     <br>
                                     <br>
                                     <div class="clearfix">
-                                        <button data-dismiss="modal" class="btn btn-danger pull-left"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscms_plugins_modal_cancel')?></button>
+                                        <button data-dismiss="modal" class="btn btn-danger float-left"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscms_plugins_modal_cancel')?></button>
                                         <?php 
                                             if (empty($this->tabs[0]['empty']) || !$this->tabs[0]['empty'])
                                             {
                                         ?>
-                                        <button id="pluginModalBtnApply" class="btn btn-success pull-right" data-page-id="<?php echo $this->idPage ?>"><i class="fa fa-save"></i> <?php echo $this->translate('tr_meliscms_plugins_modal_apply')?></button>                 
+                                        <button id="pluginModalBtnApply" class="btn btn-success float-right" data-page-id="<?php echo $this->idPage ?>"><i class="fa fa-save"></i> <?php echo $this->translate('tr_meliscms_plugins_modal_apply')?></button>                 
                                         <?php 
                                             }
                                         ?>

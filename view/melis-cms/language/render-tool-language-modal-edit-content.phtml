@@ -11,9 +11,9 @@ echo $this->form()->closeTag();
 echo $this->melisModalInvoker()->render(
     array(
         'text' => '<i class="fa fa-times"></i> '.$this->translate('tr_meliscms_common_close'),
-        'class' => 'btn btn-danger pull-left'
+        'class' => 'btn btn-danger float-left'
     ), 'dismiss');
 ?>
 
-<a class="btn btn-success pull-right" id="btnLangEdit"><i class="fa fa-save"></i>  <?= $this->translate('tr_meliscms_common_save'); ?></a>
+<a class="btn btn-success float-right" id="btnLangEdit"><i class="fa fa-save"></i>  <?= $this->translate('tr_meliscms_common_save'); ?></a>
 </div>
