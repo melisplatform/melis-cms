@@ -148,9 +148,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                                              title="<?php if (!empty($conf['description'])) {
                                                                                  echo $this->boTranslate(str_replace('\\', null, $conf['description']));
                                                                              } ?>">
-                                                                            <?php if ($moduleName!= "MelisMiniTemplate") {?>
-                                                                                <img  src="<?= $thumbnail; ?>" alt="">
-                                                                            <?php }?>
+                                                                            <img  src="<?= $thumbnail; ?>" alt="">
                                                                             <?php if($isNew) {?>
                                                                                 <div class="melis-plugins-icon-new-sub-child ">
                                                                                     <span class="melis-plugins-icon-new new-plugin-indicator">NEW!</span>
