@@ -841,3 +841,11 @@ ul#select2-id_mcgdprbanner_site_id-results {
 	position: absolute;
 	margin-top: -9px;
 }
+
+/* sites */
+#step2form-multi_language .cb-cont .remember-me-cont {
+	padding-left: 10px;
+}
+#step2form-multi_language .cb-cont .cbmask-outer {
+	top: 0 !important;
+}

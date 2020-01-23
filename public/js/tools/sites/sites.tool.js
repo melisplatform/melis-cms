@@ -1213,6 +1213,16 @@ $(function() {
             $this.parents(".page-import-cont").find(".cbmask-inner").removeClass('cb-active');
         }
     });
+
+    $body.on("click", "#step2form-multi_language .cb-cont input[type=checkbox]", function() {
+        if ($(this).is(':checked')) {
+            $(this).prop("checked", true);
+            $(this).prev("span").find(".cbmask-inner").addClass('cb-active');
+        } else {
+            $(this).not(".requried-module").prop("checked", false);
+            $(this).not(".requried-module").prev("span").find(".cbmask-inner").removeClass('cb-active');
+        }
+    });
     /**
      * ================================================================================
      * ============================== END LANGUAGES TAB ===============================
