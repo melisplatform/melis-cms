@@ -181,7 +181,7 @@ class PagePropertiesController extends AbstractActionController
                     $pageLangId = $formData['plang_lang_id'];
                     if (empty($pageLangId))
                         $pageLangId = $this->getServiceLocator()->get('MelisEngineTablePageLang')
-                            ->getEntryById($idPage)->current()->plang_lang_id;
+                            ->getEntryByField("plang_page_id",$idPage)->current()->plang_lang_id;
 
                     if (!in_array($pageLangId, $siteLangs)) {
                         return new JsonModel([
@@ -442,7 +442,7 @@ class PagePropertiesController extends AbstractActionController
                         $pageLangId = $datas['plang_lang_id'];
                         if (empty($pageLangId))
                             $pageLangId = $this->getServiceLocator()->get('MelisEngineTablePageLang')
-                                ->getEntryById($idPage)->current()->plang_lang_id;
+                                ->getEntryByField("plang_page_id",$idPage)->current()->plang_lang_id;
 
                         if (!in_array($pageLangId, $siteLangs)) {
                             $errors = [
