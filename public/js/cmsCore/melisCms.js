@@ -626,10 +626,10 @@ var melisCms = (function(){
 	}
 
 	/**
-	 * fix for history tab table not responsive
+	 * fix force responsive for history and versioning tab table not responsive
 	 * issue: http://mantis.melistechnology.fr/view.php?id=4447
 	 */
-	function showHistoryTabContentTableResponsive() {
+	function showHistoryVersioningTableResponsive() {
 		var $this 		= $(this),
 			href 		= $this.attr("href"),
 			$tabContent = $(href);
@@ -730,7 +730,7 @@ var melisCms = (function(){
 	$body.on("shown.bs.tab", '.melis-refreshPageTable', refreshPageTable );
 	
 	// click on history tab / for newsletter dataTables
-	$body.on("click", ".page-content-container .widget-head.nav ul li a.history", showHistoryTabContentTableResponsive );
+	$body.on("click", ".page-content-container .widget-head.nav ul li a.history, .page-content-container .widget-head.nav ul li a.more_windows", showHistoryVersioningTableResponsive );
 
 	/* 
 	* RETURN ======================================================================================================================== 
