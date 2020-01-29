@@ -92,7 +92,6 @@ var melisCms = (function(){
 	
 	// NEW PAGE
 	function newPage() {
-		console.log("newPage");
    	  	//close page creation tab and open new one (in case if its already open - updated parent ID), fa-file-text-o
 		var pageID = $(this).data('pagenumber');
 	   	  	melisHelper.tabClose('0_id_meliscms_page');
