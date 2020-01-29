@@ -58,10 +58,6 @@ var melisCms = (function(){
 					
 					var dialogTop = (bodyOffsetTop + windowHeight) - dialogHeight;
 					
-					//console.log("bodyOffsetTop = " + bodyOffsetTop);
-					//console.log("windowHeight = " + windowHeight);
-					//console.log("dialogHeight = " + dialogHeight);
-					//console.log("has popup = "+ dialogTop);
 					$(".mce-floatpanel.mce-window").css("top", dialogTop);
 					$("html, body").animate({scrollTop: dialogTop }, 300);
 				}
