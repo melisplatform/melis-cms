@@ -58,10 +58,6 @@ var melisCms = (function(){
 					
 					var dialogTop = (bodyOffsetTop + windowHeight) - dialogHeight;
 					
-					//console.log("bodyOffsetTop = " + bodyOffsetTop);
-					//console.log("windowHeight = " + windowHeight);
-					//console.log("dialogHeight = " + dialogHeight);
-					//console.log("has popup = "+ dialogTop);
 					$(".mce-floatpanel.mce-window").css("top", dialogTop);
 					$("html, body").animate({scrollTop: dialogTop }, 300);
 				}
@@ -92,10 +88,10 @@ var melisCms = (function(){
 	
 	// NEW PAGE
 	function newPage() {
-   	  	//close page creation tab and open new one (in case if its already open - updated parent ID)
+   	  	//close page creation tab and open new one (in case if its already open - updated parent ID), fa-file-text-o
 		var pageID = $(this).data('pagenumber');
 	   	  	melisHelper.tabClose('0_id_meliscms_page');
-	   	  	melisHelper.tabOpen( translations.tr_meliscms_page_creation, 'fa-file-text-o', '0_id_meliscms_page', 'meliscms_page_creation',  { idPage: 0, idFatherPage: pageID } );
+	   	  	melisHelper.tabOpen( translations.tr_meliscms_page_creation, 'fa-file-o', '0_id_meliscms_page', 'meliscms_page_creation',  { idPage: 0, idFatherPage: pageID } );
 	}
 	
 	// SAVE PAGE
@@ -147,9 +143,9 @@ var melisCms = (function(){
 						
 						//remove first char on the zoneID and replace with newly create id
 						var newPageZoneId = data.datas.idPage + pageCreationId.substring(1, pageCreationId.length);
-					
+						var item_icon = ( data.datas.item_icon !== '' ) ? data.datas.item_icon : 'fa-file-o';
 						//open newly opened page
-						melisHelper.tabOpen( data.datas.item_name, data.datas.item_icon, newPageZoneId, data.datas.item_melisKey,  { idPage: data.datas.idPage } );	
+						melisHelper.tabOpen( data.datas.item_name, item_icon, newPageZoneId, data.datas.item_melisKey,  { idPage: data.datas.idPage } );	
 					} else {
 						// reload the preview in edition tab
 						melisHelper.zoneReload(pageNumber+'_id_meliscms_page','meliscms_page', {idPage:pageNumber});
@@ -626,10 +622,10 @@ var melisCms = (function(){
 	}
 
 	/**
-	 * fix for history tab table not responsive
+	 * fix force responsive for history and versioning tab table not responsive
 	 * issue: http://mantis.melistechnology.fr/view.php?id=4447
 	 */
-	function showHistoryTabContentTableResponsive() {
+	function showHistoryVersioningTableResponsive() {
 		var $this 		= $(this),
 			href 		= $this.attr("href"),
 			$tabContent = $(href);
@@ -730,7 +726,7 @@ var melisCms = (function(){
 	$body.on("shown.bs.tab", '.melis-refreshPageTable', refreshPageTable );
 	
 	// click on history tab / for newsletter dataTables
-	$body.on("click", ".page-content-container .widget-head.nav ul li a.history", showHistoryTabContentTableResponsive );
+	$body.on("click", ".page-content-container .widget-head.nav ul li a.history, .page-content-container .widget-head.nav ul li a.more_windows", showHistoryVersioningTableResponsive );
 
 	/* 
 	* RETURN ======================================================================================================================== 

@@ -871,8 +871,10 @@ var melisCmsFormHelper = (function($, window) {
                 $.each(errors, function(idx, errorData) {
                     if ( errorData['success'] === false ) {
                         errorTexts += '<h3>'+ (errorData['name']) +'</h3>';
-                        errorTexts +='<h4>'+ (errorData['message']) +'</h4>';
-
+                        if (errorData['message'] != "") {
+                            errorTexts +='<h4>'+ (errorData['message']) +'</h4>';
+                        }
+ 
                         // Highlighting errors fields
                         highlightMultiErrors(errorData['success'], errorData['errors']);
 
@@ -911,7 +913,7 @@ var melisCmsFormHelper = (function($, window) {
 
                 errorTexts += '</div>';
                 var div = '<div class="melis-modaloverlay '+ closeByButtonOnly +'"></div>';
-                    div += '<div class="melis-modal-cont KOnotif">  <div class="modal-content error">'+ errorTexts +' <span class="btn btn-block btn-primary">' + translations.tr_meliscore_notification_modal_Close +'</span></div> </div>';
+                    div += '<div class="melis-modal-cont KOnotif page-edition-multi-ko">  <div class="modal-content error">'+ errorTexts +' <span class="btn btn-block btn-primary">' + translations.tr_meliscore_notification_modal_Close +'</span></div> </div>';
 
                 $body.append(div);
         }
