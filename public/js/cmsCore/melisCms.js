@@ -147,7 +147,7 @@ var melisCms = (function(){
 						
 						//remove first char on the zoneID and replace with newly create id
 						var newPageZoneId = data.datas.idPage + pageCreationId.substring(1, pageCreationId.length);
-					
+						console.log("no item icon: ", data.datas.item_icon);
 						//open newly opened page
 						melisHelper.tabOpen( data.datas.item_name, data.datas.item_icon, newPageZoneId, data.datas.item_melisKey,  { idPage: data.datas.idPage } );	
 					} else {
