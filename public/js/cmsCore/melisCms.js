@@ -95,7 +95,7 @@ var melisCms = (function(){
    	  	//close page creation tab and open new one (in case if its already open - updated parent ID)
 		var pageID = $(this).data('pagenumber');
 	   	  	melisHelper.tabClose('0_id_meliscms_page');
-	   	  	melisHelper.tabOpen( translations.tr_meliscms_page_creation, 'fa-file-text-o', '0_id_meliscms_page', 'meliscms_page_creation',  { idPage: 0, idFatherPage: pageID } );
+	   	  	melisHelper.tabOpen( translations.tr_meliscms_page_creation, 'fa-file-o', '0_id_meliscms_page', 'meliscms_page_creation',  { idPage: 0, idFatherPage: pageID } );
 	}
 	
 	// SAVE PAGE
