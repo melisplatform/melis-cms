@@ -85,6 +85,11 @@ var melisPluginEdition = (function($, window) {
             if(data.success) {
                 savePluginUpdate(datastring, siteModule);
 
+                // Plugin inside Drag and Drop zone
+                if ($("div[data-plugin-id='"+ melisPluginId +"']").parents(".melis-dragdropzone").length) {
+                    window.fromdragdropzone = 1;
+                }
+
                 setTimeout(function() {
                     pluginRenderer(melisPluginModule, melisPluginName, melisIdPage, melisPluginId, false, window.fromdragdropzone, siteModule);
                     setTimeout(function(){
