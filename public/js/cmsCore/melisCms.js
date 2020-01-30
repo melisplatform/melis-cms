@@ -58,10 +58,6 @@ var melisCms = (function(){
 					
 					var dialogTop = (bodyOffsetTop + windowHeight) - dialogHeight;
 					
-					//console.log("bodyOffsetTop = " + bodyOffsetTop);
-					//console.log("windowHeight = " + windowHeight);
-					//console.log("dialogHeight = " + dialogHeight);
-					//console.log("has popup = "+ dialogTop);
 					$(".mce-floatpanel.mce-window").css("top", dialogTop);
 					$("html, body").animate({scrollTop: dialogTop }, 300);
 				}
@@ -92,7 +88,6 @@ var melisCms = (function(){
 	
 	// NEW PAGE
 	function newPage() {
-		console.log("newPage");
    	  	//close page creation tab and open new one (in case if its already open - updated parent ID), fa-file-text-o
 		var pageID = $(this).data('pagenumber');
 	   	  	melisHelper.tabClose('0_id_meliscms_page');
@@ -148,9 +143,9 @@ var melisCms = (function(){
 						
 						//remove first char on the zoneID and replace with newly create id
 						var newPageZoneId = data.datas.idPage + pageCreationId.substring(1, pageCreationId.length);
-					
+						var item_icon = ( data.datas.item_icon !== '' ) ? data.datas.item_icon : 'fa-file-o';
 						//open newly opened page
-						melisHelper.tabOpen( data.datas.item_name, data.datas.item_icon, newPageZoneId, data.datas.item_melisKey,  { idPage: data.datas.idPage } );	
+						melisHelper.tabOpen( data.datas.item_name, item_icon, newPageZoneId, data.datas.item_melisKey,  { idPage: data.datas.idPage } );	
 					} else {
 						// reload the preview in edition tab
 						melisHelper.zoneReload(pageNumber+'_id_meliscms_page','meliscms_page', {idPage:pageNumber});
