@@ -104,15 +104,13 @@ $data_melisKey = $this->melisKey;
     </div>
     <script type="text/javascript">
         $(document).ready(function() {
-            //we prepare the tinyMce init here to make sure that the form are already loaded
-            /* melisTinyMCE.createTinyMCE("tool", "textarea.tiny-mce-init", {
-                toolbar : 'undo redo | styleselect | bold italic | alignleft aligncenter alignright | link'
-            }); */
+            var id          = $(".tiny-mce-init").attr("id"),
+                idSelector  = "#"+id;
 
-            melisTinyMCE.createTinyMCE("tool", "textarea.tiny-mce-init", {
-                toolbar : 'undo redo link unlink | forecolor backcolor | code'
-            });
-            
+                //we prepare the tinyMce init here to make sure that the form are already loaded
+                melisTinyMCE.createTinyMCE("tool", idSelector, {
+                    toolbar : 'undo redo | styleselect | bold italic | alignleft aligncenter alignright | link'
+                });
         });
     </script>
 </div>
