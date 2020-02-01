@@ -102,12 +102,25 @@ $data_melisKey = $this->melisKey;
             </div>
         </div>
     </div>
-    <script type="text/javascript">
-        $(document).ready(function() {
+    <script type="text/javascript">+
+         var option = {
+            mode : "none",
+            height : "300px",
+            plugins : [
+				//[contextmenu, textcolor, colorpicker] this plugin is already built in the core editor as of TinyMCE v. 5
+                'lists advlist autolink link image charmap print preview anchor',
+                'searchreplace visualblocks code fullscreen',
+                'insertdatetime media table paste template'
+            ],
+            toolbar : 'undo redo | styleselect | bold italic |  alignleft aligncenter alignright alignjustify | forecolor backcolor | code',
+        };
+        melisTinyMCE.createTinyMCE("tool", ".tinyMceInit", option);
+
+        /* $(document).ready(function() {
             //we prepare the tinyMce init here to make sure that the form are already loaded
             melisTinyMCE.createTinyMCE("tool", "textarea.tiny-mce-init", {
                 toolbar : 'undo redo | styleselect | bold italic | alignleft aligncenter alignright | link'
             });
-        });
+        }); */
     </script>
 </div>

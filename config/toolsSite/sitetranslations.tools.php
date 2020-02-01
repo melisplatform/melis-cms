@@ -146,7 +146,7 @@ return array(
                                             'id' => 'mstt_text',
                                             'value' => '',
 //                                            'required' => 'required',
-                                            'class' => 'form-control tiny-mce-init',
+                                            'class' => 'form-control tinyMceInit',
                                         ),
                                     ),
                                 ),
