@@ -104,13 +104,10 @@ $data_melisKey = $this->melisKey;
     </div>
     <script type="text/javascript">
         $(document).ready(function() {
-            var id          = $(".tiny-mce-init").attr("id"),
-                idSelector  = "#"+id;
-
-                //we prepare the tinyMce init here to make sure that the form are already loaded
-                melisTinyMCE.createTinyMCE("tool", idSelector, {
-                    toolbar : 'undo redo | styleselect | bold italic | alignleft aligncenter alignright | link'
-                });
+            //we prepare the tinyMce init here to make sure that the form are already loaded
+            melisTinyMCE.createTinyMCE("tool", "textarea.tiny-mce-init", {
+                toolbar : 'undo redo | styleselect | bold italic | alignleft aligncenter alignright | link'
+            });
         });
     </script>
 </div>
