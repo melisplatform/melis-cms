@@ -696,7 +696,7 @@ return array(
                             'style_files' => array(
                                 'text' => 'tr_meliscms_tool_style_files',
                                 'css' => array('width' => '5%', 'padding-right' => '0'),
-//                                'sortable' => true,
+                                'sortable' => false,
                             ),
                             'style_status' => array(
                                 'text' => 'tr_meliscms_tool_style_page_status',
@@ -720,6 +720,7 @@ return array(
                         ),
                         'searchables' => array(
                             'melis_cms_style.style_id',
+                            'melis_cms_style.style_name',
                             'melis_cms_style.style_path',
                         ),
                         'actionButtons' => array(

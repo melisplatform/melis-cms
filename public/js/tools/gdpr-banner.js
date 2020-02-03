@@ -53,7 +53,7 @@ $(function () {
                 data: data,
                 dataType: 'json',
                 encode: true
-            }).success(function (data) {
+            }).done(function(data) {
                 if (data.success) {
                     melisHelper.melisOkNotification(data.textTitle, data.textMessage);
                     $body.find("#id_mcgdprbanner_site_id").trigger("change");
@@ -67,7 +67,7 @@ $(function () {
                 // update flash messenger component
                 melisCore.flashMessenger();
                 melisCoreTool.done(".cms-gdpr-save");
-            }).error(function () {
+            }).fail(function(xhr, textStatus, errorThrown) {
                 melisCoreTool.done(".cms-gdpr-save");
             });
         }

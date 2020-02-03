@@ -27,8 +27,6 @@ class FrontPluginsController extends AbstractActionController
 
     public function renderPluginsMenuAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
-
         $config = $this->serviceLocator->get('config');
         $pluginsConfig = array();
         $siteModule = $this->params()->fromRoute('siteModule');

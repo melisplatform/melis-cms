@@ -1,51 +1,54 @@
-$(document).ready(function() {
+$(function() {
     $body = $("body");
 
     /**
      * Get all input values into one array on clicking save button except for the site translation inputs
      */
-    $body.on("click","#btn-save-meliscms-tool-sites", function () {
-        var currentTabId = activeTabId.split("_")[0];
-        var dataString = $("#"+currentTabId+"_id_meliscms_tool_sites_edit_site form").serializeArray();
-        // serialize the new array and send it to server
-        var newEnabledModule = [];
-        $.each(dataString, function( key, value ) {
-            str1 = value.name;
-            str2 = "moduleLoad";
-            if(str1.indexOf(str2) != -1){
-                newEnabledModule.push(str1.replace('moduleLoad',''));
-            }
-        });
-        var currentEnabledModule = $("#"+currentTabId+"_currentEnabledModule").val();
-        var sitesUsingModules = $("#"+currentTabId+"_sitesUsingModules").val();
+    $body.on("click","#btn-save-meliscms-tool-sites", function() {
+        var currentTabId = activeTabId.split("_")[0],
+            dataString = $("#"+currentTabId+"_id_meliscms_tool_sites_edit_site form").serializeArray(),
+            // serialize the new array and send it to server
+            newEnabledModule = [];
 
-        currentEnabledModule = jQuery.parseJSON(currentEnabledModule);
-        sitesUsingModules = jQuery.parseJSON(sitesUsingModules);
-
-        var sitesUsingModulesStr = "";
-        $.each(sitesUsingModules,function (key, val) {
-            sitesUsingModulesStr += "<br>- "+ val;
-        });
-        var moduleDiff = arrayDiff(currentEnabledModule,newEnabledModule);
-
-        var siteModuleName = $("#"+currentTabId+"_siteModuleName").val();
-        var isAdmin = $("#not-admin-notice").length < 1 ? true : false;
-
-        if(moduleDiff.length > 0 && isAdmin){
-            melisCoreTool.confirm(
-                translations.tr_meliscms_common_save,
-                translations.tr_meliscms_tool_sites_cancel,
-                translations.tr_meliscms_tool_site_module_load_update_title,
-                translations.tr_meliscms_tool_site_module_load_update_confirm.replace(/%s/g, sitesUsingModulesStr),
-                function(){
-                    dataString = $.param(dataString);
-                    saveSite(dataString, currentTabId, siteModuleName);
+            $.each(dataString, function( key, value ) {
+                str1 = value.name;
+                str2 = "moduleLoad";
+                if(str1.indexOf(str2) != -1){
+                    newEnabledModule.push(str1.replace('moduleLoad',''));
                 }
-            );
-        }else{
-            dataString = $.param(dataString);
-            saveSite(dataString, currentTabId, siteModuleName);
-        }
+            });
+
+            var currentEnabledModule = $("#"+currentTabId+"_currentEnabledModule").val(),
+                sitesUsingModules = $("#"+currentTabId+"_sitesUsingModules").val();
+
+                currentEnabledModule = jQuery.parseJSON(currentEnabledModule);
+                sitesUsingModules = jQuery.parseJSON(sitesUsingModules);
+
+                var sitesUsingModulesStr = "";
+
+                $.each(sitesUsingModules,function (key, val) {
+                    sitesUsingModulesStr += "<br>- "+ val;
+                });
+
+                var moduleDiff = arrayDiff(currentEnabledModule,newEnabledModule),
+                    siteModuleName = $("#"+currentTabId+"_siteModuleName").val(),
+                    isAdmin = $("#not-admin-notice").length < 1 ? true : false;
+
+                    if ( moduleDiff.length > 0 && isAdmin ) {
+                        melisCoreTool.confirm(
+                            translations.tr_meliscms_common_save,
+                            translations.tr_meliscms_tool_sites_cancel,
+                            translations.tr_meliscms_tool_site_module_load_update_title,
+                            translations.tr_meliscms_tool_site_module_load_update_confirm.replace(/%s/g, sitesUsingModulesStr),
+                            function(){
+                                dataString = $.param(dataString);
+                                saveSite(dataString, currentTabId, siteModuleName);
+                            }
+                        );
+                    } else {
+                        dataString = $.param(dataString);
+                        saveSite(dataString, currentTabId, siteModuleName);
+                    }
     });
 
     /**
@@ -54,19 +57,18 @@ $(document).ready(function() {
      * @param currentTabId
      * @param siteModuleName
      */
-    function saveSite(dataString, currentTabId, siteModuleName)
-    {
+    function saveSite(dataString, currentTabId, siteModuleName) {
         $.ajax({
             type        : 'POST',
             url         : '/melis/MelisCms/Sites/saveSite?siteId='+currentTabId,
             data        : dataString,
             dataType    : 'json',
             encode		: true,
-            beforeSend  : function(){
+            beforeSend  : function() {
                 melisCoreTool.pending("#btn-save-meliscms-tool-sites");
-            },
-        }).success(function (data) {
-            if (data.success === 1) {
+            }
+        }).done(function(data) {
+            if ( data.success === 1 ) {
                 // call melisOkNotification
                 melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46' );
                 // update flash messenger values
@@ -105,7 +107,7 @@ $(document).ready(function() {
             // update flash messenger values
             melisCore.flashMessenger();
             melisCoreTool.done("#btn-save-meliscms-tool-sites");
-        }).error(function(xhr, textStatus, errorThrown) {
+        }).fail(function(xhr, textStatus, errorThrown) {
             alert( translations.tr_meliscore_error_message );
         });
     }
@@ -157,26 +159,26 @@ $(document).ready(function() {
         var errs = {};
 
         $.each(errors, function (key, error) {
-            var $input = $("#" + container + " #" + key);
-            var lang = $input.data('lang');
-            var label = $input.siblings('label').text();
-            var lastChar = label.substr(label.length - 1);
-            var exploded = key.split('_');
+            var $input      = $("#" + container + " #" + key),
+                lang        = $input.data('lang'),
+                label       = $input.siblings('label').text(),
+                lastChar    = label.substr(label.length - 1),
+                exploded    = key.split('_');
 
-            if (lang != undefined) {
+            if ( lang != undefined ) {
                 label = $input.closest("div").siblings('label').text().slice(0, -1);
                 errs[lang + ' ' + label] = error;
             } else {
-                if (label === "") {
+                if ( label === "" ) {
                     label = $input.closest("div").siblings('label').text().slice(0, -2);
                     errs[label] = error;
                 } else {
-                    if (lastChar === '*') {
+                    if ( lastChar === '*' ) {
                         label = $input.siblings('label').text().slice(0, -2);
                     }
 
-                    if (exploded[1] === 'sdom') {
-                        if (lastChar === '*')
+                    if ( exploded[1] === 'sdom' ) {
+                        if ( lastChar === '*' )
                             label = $input.siblings('label').text().slice(0, -2) + '(' + exploded[0] + ')';
                         else
                             label = $input.siblings('label').text() + '(' + exploded[0] + ')';
@@ -192,14 +194,15 @@ $(document).ready(function() {
     /**
      * This will open a new tab when editing a site
      */
-    $body.on("click", ".btnEditSites", function(){
-        var tableId = $(this).closest('tr').attr('id');
-        var name = $(this).closest('tr').find("td:nth-child(2)").text();
-        var siteLang = $(this).closest('tr').find("td:nth-child(4)").text();
-        var siteModule = $(this).closest('tr').find("td:nth-child(3)").text();
-        var selId = $(this).closest('tr').attr("id");
+    $body.on("click", ".btnEditSites", function() {
+        var $this       = $(this),
+            tableId     = $this.closest('tr').attr('id'),
+            name        = $this.closest('tr').find("td:nth-child(2)").text(),
+            siteLang    = $this.closest('tr').find("td:nth-child(4)").text(),
+            siteModule  = $this.closest('tr').find("td:nth-child(3)").text(),
+            selId       = $this.closest('tr').attr("id");
 
-        openSiteEditTab(updateSiteTitle(selId, name, siteModule, siteLang), tableId, siteModule);
+            openSiteEditTab(updateSiteTitle(selId, name, siteModule, siteLang), tableId, siteModule);
     });
 
 
@@ -208,37 +211,39 @@ $(document).ready(function() {
      * =============================== START CREATE SITES ===================================
      * ======================================================================================
      */
-    var formData = {};
-    var selectedLanguages = '';
-    var domainType = '';
-    var createFile = true;
-    var newSite = true;
-    var owlStep = null;
-    var currentStepForm = '';
-    var siteName = '';
-    var siteLabel = '';
-    var selectedDomainValue = [];
-    var isUserSelectModuleOption = false;
-    var domainSingleOpt = '';
+    var formData                    = {},
+        selectedLanguages           = '',
+        domainType                  = '',
+        createFile                  = true,
+        newSite                     = true,
+        owlStep                     = null,
+        currentStepForm             = '',
+        siteName                    = '',
+        siteLabel                   = '',
+        selectedDomainValue         = [],
+        isUserSelectModuleOption    = false,
+        domainSingleOpt             = '';
 
     /**
      * This will delete the site
      */
     $body.on("click", "#tableToolSites .btnDeleteSite", function(e) {
-        var siteId = $(this).parents("tr").attr("id");
-        melisCoreTool.confirm(
-            translations.tr_meliscore_common_yes,
-            translations.tr_meliscore_common_no,
-            translations.tr_meliscms_tool_site_delete_confirm_title,
-            translations.tr_meliscms_tool_site_delete_confirm,
-            function(){
-                $.ajax({
-                    type        : "POST",
-                    url         : "/melis/MelisCms/Sites/deleteSite",
-                    data		: {siteId: siteId},
-                    dataType    : 'json',
-                    encode		: true,
-                    success		: function(data){
+        var $this   = $(this),
+            siteId  = $this.parents("tr").attr("id");
+
+            melisCoreTool.confirm(
+                translations.tr_meliscore_common_yes,
+                translations.tr_meliscore_common_no,
+                translations.tr_meliscms_tool_site_delete_confirm_title,
+                translations.tr_meliscms_tool_site_delete_confirm,
+                function() {
+                    $.ajax({
+                        type        : "POST",
+                        url         : "/melis/MelisCms/Sites/deleteSite",
+                        data		: {siteId: siteId},
+                        dataType    : 'json',
+                        encode		: true
+                    }).done(function(data) {
                         melisCoreTool.pending(".btnDeleteSite");
                         if(data.success) {
                             melisHelper.tabClose(siteId + "_id_meliscms_tool_sites_edit_site");
@@ -252,9 +257,10 @@ $(document).ready(function() {
                         }
                         melisCore.flashMessenger();
                         melisCoreTool.done(".btnDeleteSite");
-                    }
+                    }).fail(function(xhr, textStatus, errorThrown) {
+                        alert( translations.tr_meliscore_error_message );
+                    });
                 });
-            });
     });
 
     var modalUrl = "/melis/MelisCms/Sites/renderToolSitesModalContainer";
@@ -272,7 +278,7 @@ $(document).ready(function() {
      * process of creating site
      * @type {null}
      */
-    window.initializeStep = function () {
+    window.initializeStep = function() {
         owlStep = $('.sites-steps-owl').owlCarousel({
             items: 1,
             touchDrag: false,
@@ -290,18 +296,19 @@ $(document).ready(function() {
             itemsDesktop : false,
             afterMove: function (elem) {
                 var current = this.currentItem;
-                //hide the prev button when we are on the first step
-                if(current === 0){
-                    hideElement("#btn-prev-step");
-                }else{
-                    showElement("#btn-prev-step");
-                }
+                    //hide the prev button when we are on the first step
+                    if ( current === 0 ) {
+                        hideElement("#btn-prev-step");
+                    } else {
+                        showElement("#btn-prev-step");
+                    }
             },
-            beforeMove: function(elem){
-                var current = this.currentItem;
-                var step = elem.find(".item").eq(current).attr("data-step");
-                checkStep(step);
-                updateActiveStep(step);
+            beforeMove: function(elem) {
+                var current = this.currentItem,
+                    step    = elem.find(".item").eq(current).attr("data-step");
+
+                    checkStep(step);
+                    updateActiveStep(step);
             },
             afterInit: function(){
                 $(".sites-steps-owl .tool-sites_container_fixed_width").find("label").not(":has(input)").removeClass("melis-radio-box");
@@ -319,22 +326,22 @@ $(document).ready(function() {
         });
     };
 
-    $body.on("click", "#btn-next-step", function(e){
-        if(owlStep !== null) {
+    $body.on("click", "#btn-next-step", function(e) {
+        if ( owlStep !== null ) {
             /**
              * check if form is not empty before
              * proceeding to the next slide
              */
-            if(currentStepForm != "" && currentStepForm != "skip") {
+            if ( currentStepForm != "" && currentStepForm != "skip" ) {
                 var form = getSerializedForm(currentStepForm);
-                if (isFormEmpty(form, currentStepForm)) {
+                if ( isFormEmpty(form, currentStepForm) ) {
                     // $("#siteAddAlert").removeClass("hidden");
                 } else {
                     $("#siteAddAlert").addClass("hidden");
                     removeFormError(currentStepForm);
                     owlStep.trigger('owl.next');
                 }
-            }else{
+            } else {
                 $("#siteAddAlert").addClass("hidden");
                 removeFormError(currentStepForm);
                 owlStep.trigger('owl.next');
@@ -342,8 +349,8 @@ $(document).ready(function() {
         }
     });
 
-    $body.on("click", "#btn-prev-step", function(e){
-        if(owlStep !== null) {
+    $body.on("click", "#btn-prev-step", function(e) {
+        if ( owlStep !== null ) {
             $("#siteAddAlert").addClass("hidden");
             removeFormError(currentStepForm);
             owlStep.trigger('owl.prev');
@@ -355,8 +362,7 @@ $(document).ready(function() {
      * BEFORE proceeding to next slide
      * @param step
      */
-    function checkStep(step)
-    {
+    function checkStep(step) {
         //check if multi language
         var isMultiLang = $('#is_multi_language').bootstrapSwitch('status');
         //process step
@@ -580,7 +586,7 @@ $(document).ready(function() {
      * This will send a request to
      * create a new site
      */
-    $body.on("click", "#btn-finish-step", function(e){
+    $body.on("click", "#btn-finish-step", function(e) {
         $.ajax({
             url: "/melis/MelisCms/Sites/createNewSite",
             method: "POST",
@@ -588,43 +594,44 @@ $(document).ready(function() {
             dataType: "JSON",
             beforeSend: function(){
                 melisCoreTool.pending("#btn-finish-step");
-            },
-            success: function(data){
-                if(data.success){
-                    // call melisOkNotification
-                    melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46' );
-
-                    $('#id_meliscms_tool_sites_modal_container_container').modal('hide');
-                    //re init variables
-                    initVariables();
-                    //refresh site table
-                    $("#tableToolSites").DataTable().ajax.reload();
-                    //open tabs for newly created site
-                    $.each(data.siteIds, function(i, id){
-                        openSiteEditTab(updateSiteTitle(id, data.siteName, data.siteModuleName), id,data.siteModuleName);
-                    });
-                    //refresh site tree view
-                    $("input[name=left_tree_search]").val('');
-                    $("#id-mod-menu-dynatree").fancytree("destroy");
-                    mainTree();
-                }else{
-                    melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
-                }
-                melisCore.flashMessenger();
-                melisCoreTool.done("#btn-finish-step");
-            },
-            error: function(){
-                console.log(translations.tr_melis_cms_sites_tool_add_create_site_unknown_error);
             }
+        }).done(function(data) {
+            if(data.success){
+                // call melisOkNotification
+                melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46' );
+
+                $('#id_meliscms_tool_sites_modal_container_container').modal('hide');
+                //re init variables
+                initVariables();
+                //refresh site table
+                $("#tableToolSites").DataTable().ajax.reload();
+                //open tabs for newly created site
+                $.each(data.siteIds, function(i, id){
+                    openSiteEditTab(updateSiteTitle(id, data.siteName, data.siteModuleName), id,data.siteModuleName);
+                });
+                //refresh site tree view
+                $("input[name=left_tree_search]").val('');
+                $("#id-mod-menu-dynatree").fancytree("destroy");
+                mainTree();
+            }else{
+                melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
+            }
+            melisCore.flashMessenger();
+            melisCoreTool.done("#btn-finish-step");
+        }).fail(function(xhr, textStatus, errorThrown) {
+            alert( translations.tr_melis_cms_sites_tool_add_create_site_unknown_error );
         });
+
         e.preventDefault();
     });
 
-    $body.on("change", "#is_create_new_module_for_site input[name='is_create_module']", function(){
+    $body.on("change", "#is_create_new_module_for_site input[name='is_create_module']", function() {
         $(".step4-forms").removeClass("hidden");
-        var value = $(this).val();
-        var step4_form = $("#step4form_module");
-        if(value == "yes"){
+
+        var value = $(this).val(),
+            step4_form = $("#step4form_module");
+
+        if ( value == "yes" ) {
             newSite = false;
             createFile = false;
             //show the list of modules
@@ -637,7 +644,7 @@ $(document).ready(function() {
             //remove required field on create_sites_file
             removeAttribute(step4_form.find(".form-group input[name='create_sites_file']"), "required");
             removeAttribute(step4_form.find(".form-group input[name='siteCreateModuleName']"), "required");
-        }else{
+        } else {
             newSite = true;
             //show the field to creat new module
             showElement(step4_form.find(".form-group.siteCreateModuleName"));
@@ -659,33 +666,34 @@ $(document).ready(function() {
      * @param form
      * @param lang
      */
-    function processSiteLanguage(form, lang){
-        var langData = {};
-        var data = {};
-        $.each(form, function(i, v){
-            if(this.name == "site_selected_lang") {
-                var langInfo = this.value.split("-");
-                /**
-                 * prepare lang info
-                 */
-                lang = langInfo[2];
+    function processSiteLanguage(form, lang) {
+        var langData    = {},
+            data        = {};
 
-                langData[langInfo[1]] = langInfo[0];
-            }else{
-                langData[v.name] = v.value;
-            }
+            $.each(form, function(i, v){
+                if(this.name == "site_selected_lang") {
+                    var langInfo = this.value.split("-");
+                    /**
+                     * prepare lang info
+                     */
+                    lang = langInfo[2];
 
-            data.data = langData;
-            data.langDetails = lang;
-        });
-        return data;
+                    langData[langInfo[1]] = langInfo[0];
+                }else{
+                    langData[v.name] = v.value;
+                }
+
+                data.data = langData;
+                data.langDetails = lang;
+            });
+            return data;
     }
 
     /**
      * Process site domain data
      * @param form
      */
-    function processSiteDomain(form){
+    function processSiteDomain(form) {
         var domainData = {};
         //clear domain values
         selectedDomainValue = [];
@@ -706,7 +714,7 @@ $(document).ready(function() {
      * Process the site module data
      * @returns {*|jQuery}
      */
-    function processSiteModule(){
+    function processSiteModule() {
         var form = getSerializedForm("#step4form_module");
         $.each(form, function(i, v){
             if(v.name == "create_sites_file"){
@@ -743,7 +751,7 @@ $(document).ready(function() {
      * @param domainName
      * @returns {string}
      */
-    function applyDomainValue(domainName){
+    function applyDomainValue(domainName) {
         var value = "";
         $.each(selectedDomainValue, function(i, v){
             if(v.name == domainName){
@@ -760,7 +768,7 @@ $(document).ready(function() {
      * @param currentStepForm
      * @returns {boolean}
      */
-    function isFormEmpty(form, currentStepForm){
+    function isFormEmpty(form, currentStepForm) {
         var fromInputNames = [];
         $.each(form, function(i, v){
             if(v.value != ""){
@@ -776,17 +784,17 @@ $(document).ready(function() {
      * @param fieldNames
      * @returns {boolean}
      */
-    function showFormError(form, fieldNames){
-        var newModuleLabel = "";
-        var newModuleValue = "";
-        var newSDOmLabel = "";
-        var newSDOmValue = "";
-        var multiDomainErr = {};
-        var errCtr = 0;
-        var curForm = $(form+" input, "+form+" select");
-        var domains = {};
-        var domainsArr = [];
-        var duplicates = [];
+    function showFormError(form, fieldNames) {
+        var newModuleLabel  = "",
+            newModuleValue  = "",
+            newSDOmLabel    = "",
+            newSDOmValue    = "",
+            multiDomainErr  = {},
+            errCtr          = 0,
+            curForm         = $(form+" input, "+form+" select"),
+            domains         = {},
+            domainsArr      = [],
+            duplicates      = [];
 
         /**
          * Bring back the original message
@@ -899,7 +907,7 @@ $(document).ready(function() {
                         beforeSend: function () {
                             melisCoreTool.pending("#btn-next-step");
                         }
-                    }).success(function (data) {
+                    }).done(function(data) {
                         if (!$.isEmptyObject(data.result)) {
                             $("#siteAddAlert").text('');
                             var length = data.result.length;
@@ -929,9 +937,9 @@ $(document).ready(function() {
                             owlStep.trigger('owl.next');
                             return false;
                         }
-                    }).error(function () {
-                        console.log('error on checking domain');
+                    }).fail(function(xhr, textStatus, errorThrown) {
                         melisCoreTool.done("#btn-next-step");
+                        alert( translations.tr_meliscore_error_message );
                     });
 
                     return true;
@@ -947,7 +955,7 @@ $(document).ready(function() {
                     beforeSend : function () {
                         melisCoreTool.pending("#btn-next-step");
                     }
-                }).success(function (data) {
+                }).done(function(data) {
                     if (!$.isEmptyObject(data.result)) {
                         newSDOmLabel.addClass("fieldErrorColor");
                         $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_step3_domain_error1 + data.result[0] + translations.tr_melis_cms_sites_tool_add_step3_domain_error2);
@@ -959,7 +967,7 @@ $(document).ready(function() {
                         melisCoreTool.done("#btn-next-step");
                         return false;
                     }
-                }).error(function () {
+                }).fail(function(xhr, textStatus, errorThrown) {
                     melisCoreTool.done("#btn-next-step");
                 });
 
@@ -973,7 +981,7 @@ $(document).ready(function() {
      * Remove errors from form
      * @param form
      */
-    function removeFormError(form){
+    function removeFormError(form) {
         if(form != "" && form != "skip") {
             var curForm = $(form + " input, "+form+" select");
             curForm.each(function () {
@@ -984,7 +992,7 @@ $(document).ready(function() {
         }
     }
 
-    function validatedDomainName(label, value){
+    function validatedDomainName(label, value) {
         if (/^(www\.)?(([a-zA-Z0-9-])+\.)?(([a-zA-Z0-9-])+\.)?(([a-zA-Z0-9-])+\.)?(([a-zA-Z0-9-])+\.)?[a-zA-Z0-9\-]{1,}(\.([a-zA-Z]{2,}))$/.test(value) === false) {
             label.addClass("fieldErrorColor");
             return true;
@@ -996,7 +1004,7 @@ $(document).ready(function() {
      * Function to update the slider
      * height
      */
-    function updateSliderHeight(){
+    function updateSliderHeight() {
         setInterval(function () {
             $(".sites-steps-owl").each(function () {
                 $(this).data('owlCarousel').autoHeight();
@@ -1010,13 +1018,13 @@ $(document).ready(function() {
      * @param siteId
      * @param moduleName
      */
-    function openSiteEditTab(name, siteId, moduleName){
+    function openSiteEditTab(name, siteId, moduleName) {
         melisHelper.tabOpen(name, 'fa-book', siteId+'_id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site',  { siteId : siteId, moduleName : moduleName }, 'id_meliscms_tool_sites', function(){
             $("#" + siteId + "_id_meliscms_tool_sites_edit_site_header site-title-tag").text(" / " + name);
         });
     }
 
-    function updateActiveStep(step){
+    function updateActiveStep(step) {
         var currStep = step.split("_");
         var ul = $("ul.create-site-step");
         ul.find("span.step-current").text(currStep[1]);
@@ -1034,8 +1042,7 @@ $(document).ready(function() {
         ul.find("span.step-name").text(ul.find("li.active").attr("data-stepName"));
     }
 
-    function initVariables()
-    {
+    function initVariables() {
         formData = {};
         selectedLanguages = '';
         domainType = '';
@@ -1049,8 +1056,7 @@ $(document).ready(function() {
         isUserSelectModuleOption = false;
     }
 
-    function updateSiteTitle(selId, siteName, siteModule, siteLang)
-    {
+    function updateSiteTitle(selId, siteName, siteModule, siteLang) {
         $("#tableToolSites tbody tr").each(function(){
             var siteNames = $(this).find("td:nth-child(2)").text();
             var siteModules = $(this).find("td:nth-child(3)").text();
@@ -1074,7 +1080,7 @@ $(document).ready(function() {
      * @param form
      * @returns {*|jQuery}
      */
-    function getSerializedForm(form){
+    function getSerializedForm(form) {
         return $(form).serializeArray();
     }
 
@@ -1082,7 +1088,7 @@ $(document).ready(function() {
      *
      * @param elem
      */
-    function showElement(elem){
+    function showElement(elem) {
         $(elem).show();
     }
 
@@ -1090,7 +1096,7 @@ $(document).ready(function() {
      *
      * @param elem
      */
-    function hideElement(elem){
+    function hideElement(elem) {
         $(elem).hide();
     }
 
@@ -1100,8 +1106,7 @@ $(document).ready(function() {
      * @param attr
      * @param value
      */
-    function addAttribute(elem, attr, value)
-    {
+    function addAttribute(elem, attr, value) {
         elem.attr(attr, value);
     }
 
@@ -1110,7 +1115,7 @@ $(document).ready(function() {
      * @param elem
      * @param attr
      */
-    function removeAttribute(elem, attr){
+    function removeAttribute(elem, attr) {
         elem.removeAttr(attr);
     }
 
@@ -1131,20 +1136,25 @@ $(document).ready(function() {
      * ================================================================================
      */
     $body.on("click", "#s404_page_id_button span", function() {
-        var formId = $(this).closest('form').attr('id');
-        melisLinkTree.createInputTreeModal('#' + formId + ' ' + '#siteprop_s404_page_id');
+        var $this   = $(this),
+            formId  = $this.closest('form').attr('id');
+
+            melisLinkTree.createInputTreeModal('#' + formId + ' ' + '#siteprop_s404_page_id');
     });
 
     $body.on("click", "#site_main_page_id_button span", function() {
-        var formId = $(this).closest('form').attr('id');
-        melisLinkTree.createInputTreeModal('#' + formId + ' ' + '#siteprop_site_main_page_id');
+        var $this   = $(this),
+            formId  = $this.closest('form').attr('id');
+
+            melisLinkTree.createInputTreeModal('#' + formId + ' ' + '#siteprop_site_main_page_id');
     });
 
     $body.on("click", ".pageSelect span.input-group-addon", function() {
-        var id = $(this).siblings('input').attr('id');
-        var formId = $(this).closest('form').attr('id');
+        var $this = $(this),
+            id = $this.siblings('input').attr('id'),
+            formId = $this.closest('form').attr('id');
 
-        melisLinkTree.createInputTreeModal('#' + formId + ' ' + '#' + id);
+            melisLinkTree.createInputTreeModal('#' + formId + ' ' + '#' + id);
     });
     /**
      * ================================================================================
@@ -1173,9 +1183,10 @@ $(document).ready(function() {
      * ================================================================================
      */
     $body.on('change', '.sites-tool-lang-tab-checkbox', function () {
-        var input = $(this).siblings('.sites-tool-lang-tab-checkbox-lang');
+        var $this = $(this),
+            input = $this.siblings('.sites-tool-lang-tab-checkbox-lang');
 
-        if ($(this).data('active') === 'active' && !this.checked) {
+        if ( $this.data('active') === 'active' && !this.checked ) {
             melisCoreTool.confirm(
                 translations.tr_meliscore_common_yes,
                 translations.tr_meliscore_common_no,
@@ -1191,8 +1202,19 @@ $(document).ready(function() {
     });
 
     // Toggle single checkbox
-    $body.on("click", ".cb-cont input[type=checkbox]", function () {
-        //alert("junry");
+    $body.on("click", ".page-import-cont input[type=checkbox]", function () {
+        var $this = $(this);
+        
+        if ($this.is(':checked')) {
+            $this.prop("checked", true);
+            $this.prev("span").find(".cbmask-inner").addClass('cb-active');
+        } else {
+            $this.not(".requried-module").prop("checked", false);
+            $this.parents(".page-import-cont").find(".cbmask-inner").removeClass('cb-active');
+        }
+    });
+
+    $body.on("click", "#step2form-multi_language .cb-cont input[type=checkbox]", function() {
         if ($(this).is(':checked')) {
             $(this).prop("checked", true);
             $(this).prev("span").find(".cbmask-inner").addClass('cb-active');
@@ -1207,28 +1229,28 @@ $(document).ready(function() {
      * ================================================================================
      */
 
-
     window.generatePageLink = function(pageId, inputTarget){
         var pageId = (typeof pageId !== "undifined") ? pageId : null;
 
-        inputTarget.data("idPage", pageId);
+            inputTarget.data("idPage", pageId);
 
-        dataString = inputTarget.data();
+            dataString = inputTarget.data();
 
-        if(pageId){
-            $.ajax({
-                type        : 'GET',
-                url         : '/melis/MelisCms/Page/getPageLink',
-                data		: dataString,
-                dataType    : 'json',
-                encode		: true,
-                success		: function(res) {
+            if ( pageId ) {
+                $.ajax({
+                    type        : 'GET',
+                    url         : '/melis/MelisCms/Page/getPageLink',
+                    data		: dataString,
+                    dataType    : 'json',
+                    encode		: true
+                }).done(function(res) {
                     inputTarget.val(res.link);
-                }
-            });
-        }else{
-            console.log("PageId is null");
-        }
+                }).fail(function(xhr, textStatus, errorThrown) {
+                    alert( translations.tr_meliscore_error_message );
+                });
+            } else {
+                alert( "PageId is null" );
+            }
     };
 
     // Add Event to "Minify Button"
@@ -1244,23 +1266,24 @@ $(document).ready(function() {
             encode		: true,
             beforeSend  : function(){
                 _this.attr('disabled', true);
-            },
-            success		: function(data){
-                if(data.success) {
-                    melisHelper.melisOkNotification(data.title, 'tr_front_minify_assets_compiled_successfully');
-                }else{
-                    var errorTexts = '<h3>'+ melisHelper.melisTranslator(data.title) +'</h3>';
-                    errorTexts += '<p><strong>Error: </strong>  ';
-                    errorTexts += '<span>'+ data.message + '</span>';
-                    errorTexts += '</p>';
-
-                    var div = "<div class='melis-modaloverlay overlay-hideonclick'></div>";
-                    div += "<div class='melis-modal-cont KOnotif'>  <div class='modal-content'>"+ errorTexts +" <span class='btn btn-block btn-primary'>"+ translations.tr_meliscore_notification_modal_Close +"</span></div> </div>";
-                    $body.append(div);
-                }
-
-                _this.attr('disabled', false);
             }
+        }).done(function(data) {
+            if ( data.success ) {
+                melisHelper.melisOkNotification(data.title, 'tr_front_minify_assets_compiled_successfully');
+            } else {
+                var errorTexts = '<h3>'+ melisHelper.melisTranslator(data.title) +'</h3>';
+                errorTexts += '<p><strong>Error: </strong>  ';
+                errorTexts += '<span>'+ data.message + '</span>';
+                errorTexts += '</p>';
+
+                var div = "<div class='melis-modaloverlay overlay-hideonclick'></div>";
+                div += "<div class='melis-modal-cont KOnotif'>  <div class='modal-content'>"+ errorTexts +" <span class='btn btn-block btn-primary'>"+ translations.tr_meliscore_notification_modal_Close +"</span></div> </div>";
+                $body.append(div);
+            }
+
+            _this.attr('disabled', false);
+        }).fail(function(xhr, textStatus, errorThrown) {
+            alert( translations.tr_meliscore_error_message );
         });
     });
 
@@ -1307,7 +1330,7 @@ $(document).ready(function() {
                     if(typeof window[callback] === "function"){
                         window[callback](pageId, meliscmsSiteSelectorInputDom);
                     }else{
-                        console.log("callback "+meliscmsSiteSelectorInputDom.data("callback")+" is not a function.")
+                        //console.log("callback "+meliscmsSiteSelectorInputDom.data("callback")+" is not a function.")
                     }
                 }
 
