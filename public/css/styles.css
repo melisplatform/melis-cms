@@ -842,6 +842,10 @@ ul#select2-id_mcgdprbanner_site_id-results {
 	margin-top: -9px;
 }
 
+.cb-cont .cbmask-outer {
+	left: 4px;
+}
+
 .page-import-cont.cb-cont .cbmask-outer {
 	top: 0 !important;
 }
