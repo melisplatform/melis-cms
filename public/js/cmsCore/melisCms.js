@@ -445,9 +445,9 @@ var melisCms = (function(){
 	    	}, 300, function(){
 	    		// temporarily give the iframe height so it doensn't look bad when it animates the width
 	    		$("#"+ activeTabId + " .melis-iframe").css('height','1000px');
-	    		
+
 	    		// give iframe the calculated height based from the content
-	    		var iHeight = $("#"+ activeTabId + " .melis-iframe").contents().height()+50;  
+	    		var iHeight = $("#"+ activeTabId + " .melis-iframe").contents().height()+50;
 	    		$("#"+ activeTabId + " .melis-iframe").css("height", iHeight);
 	    	});
 	}
@@ -506,9 +506,12 @@ var melisCms = (function(){
 		// trigger keyup on SEO tabs
 		$("form[name='pageseo'] input[name='pseo_meta_title']").trigger('keyup');
 		$("form[name='pageseo'] input[textarea='pseo_meta_description']").trigger('keyup');
-		
+
 		// give iframe the calculated height based from the content
-		var iHeight = $("#"+ activeTabId + " .melis-iframe").contents().height()+20;  
+		// var iHeight = $("#"+ activeTabId + " .melis-iframe").contents().height()+20;
+		// removed +20 because not sure what it's for
+		var iHeight = $("#"+ activeTabId + " .melis-iframe").contents().height();
+
 		$("#"+ activeTabId + " .melis-iframe").css("height", iHeight);
 	}
 
