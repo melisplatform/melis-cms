@@ -348,4 +348,17 @@ $(document).ready(function(){
             alert( translations.tr_meliscore_error_message );
         });
     }
+
+    // toggle checkbox
+    $body.on("click", ".page-import-cont input[type=checkbox]", function () {
+        var $this = $(this);
+
+        if ($this.is(':checked')) {
+            $this.prop("checked", true);
+            $this.prev("span").find(".cbmask-inner").addClass('cb-active');
+        } else {
+            $this.not(".requried-module").prop("checked", false);
+            $this.parents(".page-import-cont").find(".cbmask-inner").removeClass('cb-active');
+        }
+    });
 });
