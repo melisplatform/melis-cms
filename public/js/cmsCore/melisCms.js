@@ -448,7 +448,7 @@ var melisCms = (function(){
 
 	    		// give iframe the calculated height based from the content
 	    		var iHeight = $("#"+ activeTabId + " .melis-iframe").contents().height()+50;
-	    		$("#"+ activeTabId + " .melis-iframe").css("height", iHeight);
+				$("#"+ activeTabId + " .melis-iframe").css("height", iHeight);
 	    	});
 	}
 	
@@ -541,10 +541,16 @@ var melisCms = (function(){
 	
     // IFRAME HEIGHT CONTROLS (for onload, displaySettings & sidebar collapse)
     function iframeLoad(id) {
-    	var height = $("#"+ id + "_id_meliscms_page .melis-iframe").contents().height();
+		var $iframe = $("#"+id+"_id_meliscms_page .melis-iframe");
 
-	    	$("#"+ id + "_id_meliscms_page .melis-iframe").css("height", height);
-	    	$("#"+ id + "_id_meliscms_page .melis-iframe").css("min-height", "700px");  
+			$iframe.each(function() {
+				var $this 			= $(this),
+					scrollHeight 	= $this.contents()[0].body.scrollHeight;
+					
+					if ( scrollHeight !== 0 ) {
+						$this.css("height", scrollHeight);
+					}
+			});
 
 			// Activating page edition button action
 			enableCmsButtons(id);
@@ -607,7 +613,7 @@ var melisCms = (function(){
 				}
 	        }).fail(function(xhr, textStatus, errorThrown) {
 	        	alert( translations.tr_meliscore_error_message );
-	        });
+			});
     }
 
 
@@ -620,8 +626,6 @@ var melisCms = (function(){
 	function pageTabOpenCallback(pageId) {
 		//store the opened pages id
 		$openedPageIds.push(pageId);
-
-		//add another statement below if needed
 	}
 
 	/**
@@ -633,7 +637,9 @@ var melisCms = (function(){
 			href 		= $this.attr("href"),
 			$tabContent = $(href);
 
-			$tabContent.find(".melis-refreshPageTable").trigger("click");
+			if ( melisCore.screenSize <= 767 ) {
+				$tabContent.find(".melis-refreshPageTable").trigger("click");
+			}
 	}
 
 	// WINDOW SCROLL FUNCTIONALITIES ========================================================================================================
