@@ -626,9 +626,7 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
         if ($includeSubPages) {
 
             $pageTreeService = $this->getServiceLocator()->get('MelisEngineTree');
-
-            if (empty($children))
-                $children = $pageTreeService->getPageChildren($pageId)->toArray();
+            $children = $pageTreeService->getPageChildren($pageId)->toArray();
 
             foreach ($children as $id => $child) {
                 $subChildren = $pageTreeService->getPageChildren($child['tree_page_id'])->toArray();
@@ -637,18 +635,21 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
                     $this->getAllPageIds($child['tree_page_id'], $pages, $templates, $styles, $langs, $pageCount, $includeSubPages);
                 } else {
                     $pages[] = $child['tree_page_id'];
+                    $tplId = $child['page_tpl_id'] ?? $child['s_page_tpl_id'];
+                    $stylId = $child['style_id'];
+                    $lngId = $child['lang_cms_id'];
 
-                    if (!empty($child['page_tpl_id']))
-                        if (!in_array($child['page_tpl_id'], $templates))
-                            $templates[] = $child['page_tpl_id'];
+                    if (!empty($tplId))
+                        if (!in_array($tplId, $templates))
+                            $templates[] = $tplId;
 
-                    if (!empty($child['style_id']))
-                        if (!in_array($child['style_id'], $styles))
-                            $styles[] = $child['style_id'];
+                    if (!empty($stylId))
+                        if (!in_array($stylId, $styles))
+                            $styles[] = $stylId;
 
-                    if (!empty($child['lang_cms_id']))
-                        if (!in_array($child['lang_cms_id'], $langs))
-                            $langs[] = $child['lang_cms_id'];
+                    if (!empty($lngId))
+                        if (!in_array($lngId, $langs))
+                            $langs[] = $lngId;
 
                     $pageCount++;
                 }

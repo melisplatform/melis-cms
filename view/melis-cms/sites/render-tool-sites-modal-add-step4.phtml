@@ -8,7 +8,7 @@ if (!empty($this->zoneconfig['conf']['id']))
     <div class="tool-sites_container_fixed_width step-4-datas">
         <div class="form-group" tabindex="-1">
             <label class="err_site_selected_lang" tabindex="-1"><?= $this->translate('tr_melis_cms_sites_tool_add_step4_is_new_module'); ?>
-                <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="<?= $this->translate('tr_melis_cms_sites_tool_add_step4_is_new_module tooltip'); ?>" data-container="body"></i>
+                <i class="fa fa-info-circle fa-lg float-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="<?= $this->translate('tr_melis_cms_sites_tool_add_step4_is_new_module tooltip'); ?>" data-container="body"></i>
             </label>
             <div id="is_create_new_module_for_site">
                 <div class="row" tabindex="-1">
@@ -46,7 +46,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                         echo $val->getLabel();
                         echo $required;
                         ?>
-                        <i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="<?= $val->getOption('tooltip'); ?>"></i>
+                        <i class="fa fa-info-circle fa-lg float-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="<?= $val->getOption('tooltip'); ?>"></i>
                         <?php
                         echo $this->formLabel()->closeTag();
                     }

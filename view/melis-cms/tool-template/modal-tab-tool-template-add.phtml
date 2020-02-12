@@ -12,9 +12,9 @@ echo $this->form()->closeTag();
 echo $this->melisModalInvoker()->render(
     array(
         'text' => '<i class="fa fa-times"></i> '.$this->translate('tr_meliscms_common_close'),
-        'class' => 'btn btn-danger pull-left'
+        'class' => 'btn btn-danger float-left'
     ), 'dismiss');
 
 ?>
 
-<a href="#modal-template-manager-actions" class="btn btn-success pull-right" onclick="toolTemplate.addNewTemplate()" id="btnTemplateAdd"><i class="fa fa-plus"></i>  <?= $this->translate('tr_meliscms_template_add'); ?></a>
+<a href="#modal-template-manager-actions" class="btn btn-success float-right" onclick="toolTemplate.addNewTemplate()" id="btnTemplateAdd"><i class="fa fa-plus"></i>  <?= $this->translate('tr_meliscms_template_add'); ?></a>

@@ -26,8 +26,8 @@ if (!empty($this->zoneconfig['conf']['id']))
                                           echo $this->melisFieldCollection($this->form);
                                           echo $this->form()->closeTag();
                                           ?>
-                                 	<div align="right">
-                                 		<button data-dismiss="modal" class="btn btn-danger pull-left"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscms_menu_cancel')?></button>
+                                 	<div class="footer-modal d-flex flex-row justify-content-between">
+                                 		<button data-dismiss="modal" class="btn btn-danger"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscms_menu_cancel')?></button>
                                  		<button class="btn btn-success" id="saveStyleDetails" data-style-id="<?= $this->styleId?>"><i class="fa fa-save"></i>  <?php echo $this->translate('tr_meliscore_tool_gen_save') ?></button>
                                  	</div>                                 	
                             	</div>

@@ -21,14 +21,14 @@
 .meliscms_center_page_tabs{
 	display: inline;	
 	margin-left: -40px !important;
-	width: 300px;	
+	/* width: 300px; */
 }
 
 .meliscms_center_page_tabs li{
 	display: inline;
 	border: 1px solid black;		
 	padding: 10px;	
-	float: left;	
+	/* float: left; */	
 }
 
 hr{
@@ -94,20 +94,12 @@ hr{
 .widget.widget-tabs-double-2>.widget-head ul li:hover{
 	height: 70px;
 }
-.page-content-container .widget.widget-tabs-double-2>.widget-head ul li a.glyphicons,
-.nav-tabs>li>a{
-	/* margin: 0; */
-	/* border-bottom: 1px solid #e5e5e5; */
-}
 #id_meliscms_plugin_modal .nav-tabs>li>a {
  	border: 0;
 	border-radius: 0;
 }
 .page-content-container .widget.widget-tabs-double-2>.widget-head ul li a.glyphicons{
-min-width: 90px;
-}
-.widget.widget-tabs-double-2>.widget-head ul li.active{
-
+	min-width: 90px;
 }
 /*
 .widget.widget-tabs>.widget-head ul li.active a{
@@ -150,7 +142,7 @@ text-shadow: none;
  
 /* Not editable zone */
 .melis-noteditable{
-	pading: 20px;
+	padding: 20px;
 	color: #e61c23;
     font-size: 25px;	
 }
@@ -265,13 +257,6 @@ div.content-heading h1{
   float: left;
   height: 40px;
   overflow: hidden;
-}
-.widget.widget-tabs-double>.widget-head .melis-whead-box ul {
-/*   -webkit-transition: all 0.4s ease-in-out;
--moz-transition: all 0.4s ease-in-out;
--ms-transition: all 0.4s ease-in-out;
--o-transition: all 0.4s ease-in-out;
-transition: all 0.4s ease-in-out; */
 }
 .widget.widget-tabs-double>.widget-head .melis-whead-box ul li {
 	border-right: 0;
@@ -452,9 +437,6 @@ display: block;
 body.modal-open {
 	overflow: hidden !important;
 }
-.widget-dnd-modal {
-
-}
 /* melis cms languages */
 .pagelang-title {
 	margin-bottom: 25px;
@@ -584,7 +566,6 @@ body.modal-open {
 	margin-bottom: 20px;
 	width: 100% !important;
 }
-.dropdown-lang-box .select2 {}
 
 .dropdown-lang-box .select2-container .select2-selection--single {
 	padding: 0.4em;
@@ -734,6 +715,17 @@ body.modal-open {
 		margin-left: 10px;
 	}
 }
+
+@media (max-width: 576px) {
+	.pagehistoric-actions-filter {
+		display: block;
+		width: 100%;
+	}
+	div.dataTables_wrapper div.dataTables_length select {
+		width: 180px !important;
+	}
+}
+
 /*styling site default page id and 404 page id input site tree view btn to have a click effect*/
 
 #siteMainPageId > span:hover {
@@ -794,7 +786,9 @@ ul#select2-id_mcgdprbanner_site_id-results {
 	border-bottom: none;
 }
 
-#id_melis_core_gdpr_tabs.page-content-container .nav-tabs > li.active > a, .page-content-container .nav-tabs > li.active:focus > a, .page-content-container .nav-tabs > li.active:active > a {
+#id_melis_core_gdpr_tabs.page-content-container .nav-tabs > li.active > a, 
+.page-content-container .nav-tabs > li.active:focus > a, 
+.page-content-container .nav-tabs > li.active:active > a {
 	border: none;
 }
 
@@ -802,12 +796,68 @@ ul#select2-id_mcgdprbanner_site_id-results {
 	display: none;
 }
 
+/* updates bootstrap 4 jquery 3 */
+.dropdown-menu {
+	position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    display: none;
+    float: left;
+    min-width: 160px;
+    padding: 5px 0;
+    margin: 2px 0 0;
+    font-size: 14px;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    border: 1px solid #ccc;
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: 4px;
+    -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+    box-shadow: 0 6px 12px rgba(0,0,0,.175);
+}
+.dropdown-menu li a {
+	font-weight: 400;
+    padding: 3px 20px;
+    text-decoration: none;
+    color: #333;
+    display: block;
+}
+.dropdown-menu>li>a:focus, 
+.dropdown-menu>li>a:hover {
+	color: #262626;
+    text-decoration: none;
+    background-color: #f5f5f5;
+}
 /* Page export/import*/
-.page-export-container{
-	margin-bottom:30px;
+.page-export-container {
+	margin-bottom: 30px;
 }
 
 #page-import-checkbox-span {
 	position: absolute;
 	margin-top: -9px;
+}
+
+.cb-cont .cbmask-outer {
+	left: 4px;
+}
+
+.page-import-cont.cb-cont .cbmask-outer {
+	top: 0 !important;
+}
+
+.page-import-cont #page-import-checkbox-span {
+	margin-top: 0;
+}
+
+/* sites */
+#step2form-multi_language .cb-cont .remember-me-cont {
+	padding-left: 10px;
+}
+#step2form-multi_language .cb-cont .cbmask-outer {
+	top: 0 !important;
 }
