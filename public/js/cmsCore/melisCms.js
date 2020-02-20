@@ -449,6 +449,8 @@ var melisCms = (function(){
 	    		// give iframe the calculated height based from the content
 	    		var iHeight = $("#"+ activeTabId + " .melis-iframe").contents().height()+50;
 				$("#"+ activeTabId + " .melis-iframe").css("height", iHeight);
+				
+				console.log(".melis-iframe height from displaySettings() : ", iHeight);
 	    	});
 	}
 	
@@ -513,6 +515,8 @@ var melisCms = (function(){
 		var iHeight = $("#"+ activeTabId + " .melis-iframe").contents().height();
 
 		$("#"+ activeTabId + " .melis-iframe").css("height", iHeight);
+
+		//console.log(".melis-iframe height from cmsTabEvents() : ", iHeight);
 	}
 
 	// REFRESH PAGE TAB (historic, versionining etc)
@@ -541,7 +545,8 @@ var melisCms = (function(){
 	
     // IFRAME HEIGHT CONTROLS (for onload, displaySettings & sidebar collapse)
     function iframeLoad(id) {
-		var $iframe = $("#"+id+"_id_meliscms_page .melis-iframe");
+		// "#"+id+"_id_meliscms_page 
+		/* var $iframe = $("#"+activeTabId+" .melis-iframe");
 
 			$iframe.each(function() {
 				var $this 			= $(this),
@@ -549,6 +554,17 @@ var melisCms = (function(){
 					
 					if ( scrollHeight !== 0 ) {
 						$this.css("height", scrollHeight);
+					}
+			}); */
+
+		var $iframe = $(".melis-iframe");
+			
+			$iframe.on("load", function() {
+				var $this 	= $(this);
+					height 	= $this.contents()[0].body.scrollHeight;
+
+					if ( height !== 0 ) {
+						$this.css("height", height);
 					}
 			});
 
@@ -624,8 +640,15 @@ var melisCms = (function(){
 	 * @param pageId
 	 */
 	function pageTabOpenCallback(pageId) {
-		//store the opened pages id
-		$openedPageIds.push(pageId);
+		var $iframe = $("#"+pageId+"_id_meliscms_page .melis-iframe"),
+			height 	= $iframe.contents()[0].body.scrollHeight;
+
+			//store the opened pages id
+			$openedPageIds.push(pageId);
+
+			if ( height !== 0 ) {
+				$iframe.css("height", height);
+			}
 	}
 
 	/**
@@ -640,6 +663,18 @@ var melisCms = (function(){
 			if ( melisCore.screenSize <= 767 ) {
 				$tabContent.find(".melis-refreshPageTable").trigger("click");
 			}
+	}
+
+	/**
+	 * Load page with iframe
+	 */
+	function loadPageIframe() {
+		var $this 	= $(this),
+			$id 	= $( "#"+$this.data("id") ),
+			$iframe = $id.find(".iframe-container .tab-content .melis-iframe"),
+			height 	= $iframe.contents()[0].body.scrollHeight;
+
+			$iframe.css("height", height);
 	}
 
 	// WINDOW SCROLL FUNCTIONALITIES ========================================================================================================
@@ -736,6 +771,9 @@ var melisCms = (function(){
 	
 	// click on history tab / for newsletter dataTables
 	$body.on("click", ".page-content-container .widget-head.nav ul li a.history, .page-content-container .widget-head.nav ul li a.more_windows", showHistoryVersioningTableResponsive );
+
+	// click on page tab menu
+	$body.on("#melis-id-nav-bar-tabs [data-tool-meliskey='meliscms_page'] .tab-element", loadPageIframe );
 
 	/* 
 	* RETURN ======================================================================================================================== 
