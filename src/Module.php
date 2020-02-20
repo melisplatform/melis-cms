@@ -190,6 +190,8 @@ class Module
             include __DIR__ . '/../config/toolsSite/sitetranslations.tools.php',
             include __DIR__ . '/../config/dashboard-plugins/MelisCmsPagesIndicatorsPlugin.config.php',
             include __DIR__ . '/../config/gdpr.banner.interface.php',
+            // gdpr auto delete site filter
+            include __DIR__ . '/../config/gdpr/gdpr.autodelete.site.filter.php',
         );
 
         foreach ($configFiles as $file) {
