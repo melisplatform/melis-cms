@@ -875,3 +875,9 @@ ul#select2-id_mcgdprbanner_site_id-results {
 		vertical-align: -24%;
 	}
 }
+
+@media (max-width: 767px) {
+	#cms_site_config_general form[name='meliscms_tool_sites_siteconfig_form'] .input-group {
+		left: 0 !important;
+	}
+}
