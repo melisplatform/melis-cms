@@ -192,6 +192,7 @@ class Module
             include __DIR__ . '/../config/gdpr.banner.interface.php',
             // gdpr auto delete site filter
             include __DIR__ . '/../config/gdpr/gdpr.autodelete.site.filter.php',
+            include __DIR__ . '/../config/gdpr/gdpr.autodelete.user.link.php',
         );
 
         foreach ($configFiles as $file) {
