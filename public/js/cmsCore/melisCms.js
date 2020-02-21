@@ -640,15 +640,15 @@ var melisCms = (function(){
 	 * @param pageId
 	 */
 	function pageTabOpenCallback(pageId) {
-		var $iframe = $("#"+pageId+"_id_meliscms_page .melis-iframe"),
-			height 	= $iframe.contents()[0].body.scrollHeight;
+		/* var $iframe = $("#"+pageId+"_id_meliscms_page .melis-iframe"),
+			height 	= $iframe.contents()[0].body.scrollHeight; */
 
 			//store the opened pages id
 			$openedPageIds.push(pageId);
 
-			if ( height !== 0 ) {
+			/* if ( height !== 0 ) {
 				$iframe.css("height", height);
-			}
+			} */
 	}
 
 	/**
