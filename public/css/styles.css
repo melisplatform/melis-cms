@@ -862,7 +862,7 @@ ul#select2-id_mcgdprbanner_site_id-results {
 	top: 0 !important;
 }
 @media (min-width: 768px) {
-	form[name='meliscms_tool_sites_siteconfig_form'] .input-group {
+	.tab-content .product-text-tab-content:first-child form[name='meliscms_tool_sites_siteconfig_form'] .input-group {
 		display: flex;
 	}
 	form[name='meliscms_tool_sites_siteconfig_form'] .input-group-addon {
