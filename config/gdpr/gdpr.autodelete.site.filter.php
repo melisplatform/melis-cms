@@ -10,10 +10,15 @@ return [
                             'elements' => [
                                 [
                                     'spec' => [
-                                        'name' => 'site_filter',
+                                        'name' => 'mgdprc_site_id',
                                         'type' => "MelisCoreSiteSelect",
                                         'options' => [
+                                            'label' => 'Site',
+                                            'tooltip' => 'Site',
                                             'empty_option' => 'Choose site',
+                                        ],
+                                        'attributes' => [
+                                            'required' => 'required',
                                         ]
                                     ]
                                 ]
