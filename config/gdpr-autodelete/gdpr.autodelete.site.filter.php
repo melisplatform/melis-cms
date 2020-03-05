@@ -20,6 +20,7 @@ return [
                                         ],
                                         'attributes' => [
                                             'required' => 'required',
+                                            'id' => 'mgdprc_site_id'
                                         ]
                                     ]
                                 ]
