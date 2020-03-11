@@ -545,19 +545,12 @@ var melisCms = (function(){
 	
     // IFRAME HEIGHT CONTROLS (for onload, displaySettings & sidebar collapse)
     function iframeLoad(id) {
+		/* var height = $("#"+ activeTabId + " .melis-iframe").contents().height();
+    	$("#"+ activeTabId + " .melis-iframe").css("height", height);
+    	$("#"+ activeTabId + " .melis-iframe").css("min-height", "700px"); */  
+    	
 		// "#"+id+"_id_meliscms_page 
-		/* var $iframe = $("#"+activeTabId+" .melis-iframe");
-
-			$iframe.each(function() {
-				var $this 			= $(this),
-					scrollHeight 	= $this.contents()[0].body.scrollHeight;
-					
-					if ( scrollHeight !== 0 ) {
-						$this.css("height", scrollHeight);
-					}
-			}); */
-
-		var $iframe = $(".melis-iframe");
+		/* var $iframe = $(".melis-iframe");
 			
 			$iframe.on("load", function() {
 				var $this 	= $(this);
@@ -566,7 +559,15 @@ var melisCms = (function(){
 					if ( height !== 0 ) {
 						$this.css("height", height);
 					}
-			});
+			}); */
+
+			//$melisIframe 	= $("#" + activeTabId + " .melis-iframe"),
+		var $body 			= $("body"),
+			$melisIframe 	= $body.find(".melis-iframe"),
+			height 			= $melisIframe.contents().height();
+			
+			$melisIframe.css("height", height);
+			$melisIframe.css("min-height", "700px");
 
 			// Activating page edition button action
 			enableCmsButtons(id);
