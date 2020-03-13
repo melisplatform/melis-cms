@@ -732,6 +732,14 @@
         'tr_melis_cms_page_tree_import_close' => 'Close',
 
         'tr_meliscms_pages_Page_header' => 'Page header',
-        'tr_meliscms_pages_Page_status_container' => 'Status container'
+        'tr_meliscms_pages_Page_status_container' => 'Status container',
+
+		// Mini Template
+		'tr_meliscms_mini_template_manager' => 'Mini Templates & Plugins',
+		'tr_meliscms_mini_template_manager_tool' => 'Mini Template Manager',
+		'tr_meliscms_mini_template_menu_manager_tool' => 'Menu Manager',
+		'tr_meliscms_mini_template_manager_tool_header' => 'Mini-Template Manager',
+		'tr_meliscms_mini_template_manager_tool_header_sub_title' => 'Find the list of plugins available on sites and manage them.',
+		'tr_meliscms_mini_template_manager_tool_header_add_btn' => 'Add mini-template',
     );
 ?>

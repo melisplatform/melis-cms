@@ -148,6 +148,7 @@ return array(
             'MelisCms\Controller\GdprBanner' => 'MelisCms\Controller\GdprBannerController',
             'MelisCms\Controller\PageExport' => 'MelisCms\Controller\PageExportController',
             'MelisCms\Controller\PageImport' => 'MelisCms\Controller\PageImportController',
+            'MelisCms\Controller\MiniTemplateManager' => 'MelisCms\Controller\MiniTemplateManagerController',
         ),
     ),
     'controller_plugins' => array(
