@@ -18,6 +18,7 @@ class MiniTemplateManagerController extends AbstractActionController
     /**
      * TODO:
      *  - change mini template manager refresh. To only refresh the table zone.
+     *  - site selector translation
      */
 
     /**
@@ -65,53 +66,102 @@ class MiniTemplateManagerController extends AbstractActionController
      */
     public function getMiniTemplatesAction()
     {
-        // Get Templates
-        $this->getMiniTemplates();
-        // Prepare Templates Data
+        $post = $this->getRequest()->getPost();
 
-        // MelisFrontMiniTemplateConfigListener.php
+        if (empty($post['site_id'])) {
+            return new JsonModel([
+                'draw' => 0,
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'data' => []
+            ]);
+        } else {
+            print_r($post);
+            exit;
+            // Get Templates
+//        $this->getMiniTemplates();
+            // Prepare Templates Data
 
-        return new JsonModel([
-            'draw' => 0,
-            'recordsTotal' => 0,
-            'recordsFiltered' => 0,
-            'data' => []
-        ]);
+            // MelisFrontMiniTemplateConfigListener.php
+
+            return new JsonModel([
+                'draw' => 0,
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'data' => []
+            ]);
+        }
     }
 
     private function getMiniTemplates()
     {
-        $sitePath = $this->get_all_site_modules();
 
-        print_r($sitePath);
-        exit;
     }
 
-    private function get_all_site_modules()
+    private function getAllSiteModules()
     {
-        $site_path = [];
-        $composer_srv = $this->serviceLocator->get('MelisEngineComposer');
-        $vendor_modules = $composer_srv->getVendorModules();
+        $sites = [];
+        $this->getAllSiteModuleInVendor($sites);
+        $this->getAllSiteModuleInMelisSites($sites);
 
-        if (! empty($vendor_modules)) {
-            foreach ($vendor_modules as $key => $module) {
-                if ($composer_srv->isSiteModule($module)) {
-                    $path = $composer_srv->getComposerModulePath($module);
+
+    }
+
+    /**
+     * Get all site modules inside vendor
+     */
+    private function getAllSiteModuleInVendor(&$sites)
+    {
+        $composerSrv = $this->serviceLocator->get('MelisEngineComposer');
+        $vendorModules = $composerSrv->getVendorModules();
+        if (! empty($vendorModules)) {
+            foreach ($vendorModules as $key => $module) {
+                if ($composerSrv->isSiteModule($module)) {
+                    $path = $composerSrv->getComposerModulePath($module);
                     if (!empty($path)) {
-                        $path = $path . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'miniTemplatesTinyMce';
-                        $site_path[$module] = $path;
+                        $miniTemplatePath = $path . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'miniTemplatesTinyMce';
+
+                        if (file_exists($miniTemplatePath) && is_dir($miniTemplatePath))
+                            $sites[$module] = $path;
                     }
                 }
             }
         }
+    }
 
-        return $site_path;
+    private function getAllSiteModuleInMelisSites(&$sites)
+    {
+        $path = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites';
+        if(file_exists($path) && is_dir($path)) {
+            $sitesModule = $this->getDir($path);
+            if (!empty($sitesModule)) {
+                foreach ($sitesModule as $key => $module) {
+                    //public site folder
+                    $publicFolder = $path . DIRECTORY_SEPARATOR . $module . DIRECTORY_SEPARATOR . 'public';
+                    //get the mini template folder path
+                    $miniTemplatePath = $publicFolder . DIRECTORY_SEPARATOR . 'miniTemplatesTinyMce';
+
+                    if (file_exists($miniTemplatePath) && is_dir($miniTemplatePath))
+                        $sites[$module] = $path;
+                }
+            }
+        }
     }
 
     /**
      * Mini template manager table filter - limit
      */
     public function renderMiniTemplateManagerToolTableLimitAction() {}
+
+    /**
+     * @return ViewModel
+     */
+    public function renderMiniTemplateManagerToolTableSitesAction() {
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $view = new ViewModel();
+        $view->sites = $siteTable->fetchAll()->toArray();
+        return $view;
+    }
 
     /**
      * Mini template manager table filter - search
@@ -151,4 +201,20 @@ class MiniTemplateManagerController extends AbstractActionController
         return $this->params()->fromRoute('melisKey', $this->params()->fromQuery('melisKey'), null);
     }
 
+    private function getDir($dir, $excludeSubFolders = [])
+    {
+        $directories = [];
+        if (file_exists($dir)) {
+            $excludeDir = array_merge(['.', '..', '.gitignore'], $excludeSubFolders);
+            $directory  = array_diff(scandir($dir), $excludeDir);
+
+            foreach ($directory as $d) {
+                if (is_dir($dir.'/'.$d)) {
+                    $directories[] = $d;
+                }
+            }
+
+        }
+        return $directories;
+    }
 }

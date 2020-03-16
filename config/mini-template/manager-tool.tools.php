@@ -11,29 +11,34 @@ return [
                     'table' => [
                         'target' => '#tableMiniTemplateManager',
                         'ajaxUrl' => '/melis/MelisCms/MiniTemplateManager/getMiniTemplates',
-                        'dataFunction' => '',
-                        'ajaxCallback' => '',
+                        'dataFunction' => 'initMiniTemplateManagerToolTableSites',
+                        'ajaxCallback' => 'miniTemplateManagerToolTableCallback()',
                         'filters' => [
                             'left' => [
-                                'mini-template-manager-tool-table-limit' => array(
+                                'mini-template-manager-tool-table-limit' => [
                                     'module' => 'MelisCms',
                                     'controller' => 'MiniTemplateManager',
                                     'action' => 'render-mini-template-manager-tool-table-limit',
-                                ),
+                                ],
+                                'mini-template-manager-tool-table-sites' => [
+                                    'module' => 'MelisCms',
+                                    'controller' => 'MiniTemplateManager',
+                                    'action' => 'render-mini-template-manager-tool-table-sites',
+                                ],
                             ],
                             'center' => [
-                                'mini-template-manager-tool-table-search' => array(
+                                'mini-template-manager-tool-table-search' => [
                                     'module' => 'MelisCms',
                                     'controller' => 'MiniTemplateManager',
                                     'action' => 'render-mini-template-manager-tool-table-search',
-                                ),
+                                ],
                             ],
                             'right' => [
-                                'mini-template-manager-tool-table-refresh' => array(
+                                'mini-template-manager-tool-table-refresh' => [
                                     'module' => 'MelisCms',
                                     'controller' => 'MiniTemplateManager',
                                     'action' => 'render-mini-template-manager-tool-table-refresh',
-                                ),
+                                ],
                             ]
                         ],
                         'columns' => [
