@@ -212,7 +212,7 @@ var melisCms = (function(){
 					
 					// update page name tabname if page name is changed
 					$("#" + data.datas.item_zoneid + " .page-title h1:not('span')").text(data.datas.item_name);
-					$(".tabsbar a[data-id='" + data.datas.item_zoneid + "'] .navtab-pagename").text(data.datas.item_name);
+					$(".tabsbar a[data-id='" + data.datas.item_zoneid + "'] .navtab-pagename").text(pageNumber + " - " + data.datas.item_name);
 					
 					// hide the saved version text of the page once its published
 					$("#" + data.datas.item_zoneid + " .page-title .saved-version-notif").fadeOut();
