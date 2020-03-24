@@ -145,7 +145,8 @@ var melisCms = (function(){
 						var newPageZoneId = data.datas.idPage + pageCreationId.substring(1, pageCreationId.length);
 						var item_icon = ( data.datas.item_icon !== '' ) ? data.datas.item_icon : 'fa-file-o';
 						//open newly opened page
-						melisHelper.tabOpen( data.datas.item_name, item_icon, newPageZoneId, data.datas.item_melisKey,  { idPage: data.datas.idPage } );	
+						var pageName = data.datas.idPage + " - " + data.datas.item_name;
+						melisHelper.tabOpen( pageName, item_icon, newPageZoneId, data.datas.item_melisKey,  { idPage: data.datas.idPage } );
 					} else {
 						// reload the preview in edition tab
 						melisHelper.zoneReload(pageNumber+'_id_meliscms_page','meliscms_page', {idPage:pageNumber});
