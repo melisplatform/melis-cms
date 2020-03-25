@@ -14,8 +14,7 @@ $(function() {
                         melisCms.refreshTreeview(data.response.pageId);
                         if(data.response.openPageAfterDuplicate) {
                             // open page
-                            var pageID = data.response.pageId + ' - ' + data.response.name;
-                            melisHelper.tabOpen( pageID, data.response.icon, data.response.pageId + '_id_meliscms_page', 'meliscms_page',  { idPage: data.response.pageId} );
+                            melisHelper.tabOpen( data.response.name, data.response.icon, data.response.pageId + '_id_meliscms_page', 'meliscms_page',  { idPage: data.response.pageId} );
                         }
                         melisHelper.melisOkNotification(data.textTitle, data.textMessage);
                     }
