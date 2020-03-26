@@ -2266,8 +2266,7 @@ return array(
                             'attributes' => array(
                                 'name' => 'meliscms_tree_sites_import_page_form',
                                 'id' => 'id_meliscms_tree_sites_import_page_form',
-                                'method' => 'POST',
-                                'action' => '',
+                                'method' => 'POST'
                             ),
                             'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
                             'elements' => array(

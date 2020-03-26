@@ -59,13 +59,147 @@ return [
                         'actionButtons' => [
                             'edit' => [
                                 'module' => 'MelisCms',
-                                'controller' => 'Sites',
-                                'action' => 'render-tool-sites-content-action-edit',
+                                'controller' => 'MiniTemplateManager',
+                                'action' => 'render-mini-template-manager-tool-table-action-edit',
                             ],
                             'delete' => [
                                 'module' => 'MelisCms',
-                                'controller' => 'Sites',
-                                'action' => 'render-tool-sites-content-action-delete',
+                                'controller' => 'MiniTemplateManager',
+                                'action' => 'render-mini-template-manager-tool-table-action-delete',
+                            ],
+                        ],
+                    ],
+                    'forms' => [
+                        'mini_template_manager_tool_add_form' => [
+                            'attributes' => [
+                                'name' => 'mini_template_manager_tool_add',
+                                'id' => 'id_mini_template_manager_tool_add',
+                                'method' => 'POST',
+                                'action' => ''
+                            ],
+                            'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                            'elements' => [
+                                [
+                                    'spec' => [
+                                        'name' => 'miniTemplateSite',
+                                        'type' => 'MelisCoreSiteSelect',
+                                        'options' => [
+                                            'label' => 'Site',
+                                            'tooltip' => 'Site where the minitemplate will be created',
+                                            'empty_option' => 'No site',
+                                            'disable_inarray_validator' => true,
+                                        ],
+                                        'attributes' => [
+                                            'id' => 'miniTemplateSite',
+                                            'value' => '',
+                                        ],
+                                    ],
+                                ],
+                                [
+                                    'spec' => [
+                                        'name' => 'miniTemplateName',
+                                        'type' => 'MelisText',
+                                        'options' => [
+                                            'label' => 'Mini-template name',
+                                            'tooltip' => 'Name of the mini-template',
+                                        ],
+                                        'attributes' => [
+                                            'id' => 'miniTemplateName',
+                                            'value' => ''
+                                        ],
+                                    ],
+                                ],
+                                [
+                                    'spec' => [
+                                        'name' => 'miniTemplateHtml',
+                                        'type' => 'TextArea',
+                                        'options' => [
+                                            'label' => 'HTML',
+                                            'tooltip' => 'HTML for the mini-template',
+                                        ],
+                                        'attributes' => [
+                                            'id' => 'miniTemplateHTML',
+                                            'value' => '',
+                                            'class' => 'form-control editme',
+                                            'style' => 'max-width:100%',
+                                            'rows' => '4',
+                                        ],
+                                    ]
+                                ],
+                                [
+                                    'spec' => [
+                                        'name' => 'miniTemplateThumbnail',
+                                        'type' => 'file',
+                                        'options' => [
+                                            'label' => 'Thumbnail',
+                                            'tooltip' => 'Thumbnail for the mini template',
+                                        ],
+                                        'attributes' => [
+                                            'id' => 'miniTemplateThumbnail',
+                                            'accept' => '.gif,.jpg,.jpeg,.png',
+                                            'value' => '',
+                                            'placeholder' => 'Image',
+                                            'onchange' => '',
+                                            'class' => 'filestyle',
+                                            'data-buttonText' => 'Select Image',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                            'input_filter' => [
+                                'miniTemplateSite' => [
+                                    'name' => 'miniTemplateSite',
+                                    'required' => true,
+                                    'validators' => [
+                                        [
+                                            'name' => 'NotEmpty',
+                                            'options' => [
+                                                'messages' => [
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_gdpr_banner_empty_field',
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                    'filters' => [
+                                        ['name' => 'StripTags'],
+                                        ['name' => 'StringTrim'],
+                                    ],
+                                ],
+                                'miniTemplateSite' => [
+                                    'name' => 'miniTemplateSite',
+                                    'required' => true,
+                                    'validators' => [
+                                        [
+                                            'name' => 'NotEmpty',
+                                            'options' => [
+                                                'messages' => [
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscmsnews_empty_site',
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                    'filters' => [],
+                                ],
+                                'miniTemplateName' => [
+                                    'name' => 'miniTemplateName',
+                                    'required' => true,
+                                    'validators' => [
+
+                                    ],
+                                    'filters' => [
+
+                                    ],
+                                ],
+                                'miniTemplateHtml' => [
+                                    'name' => 'miniTemplateHtml',
+                                    'required' => true,
+                                    'validators' => [
+
+                                    ],
+                                    'filters' => [
+
+                                    ],
+                                ],
                             ],
                         ],
                     ],

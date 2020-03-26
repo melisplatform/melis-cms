@@ -149,7 +149,7 @@ $(document).ready(function(){
                     importTest(data.result);
                     importFormData = data.result;
                 } else {
-                    melisHelper.melisKoNotification(translations.tr_melis_cms_page_tree_import, '', data.errors);
+                    melisHelper.melisKoNotification('Melis CMS Mini-template manager', '', data.errors);
                     melisCoreTool.done('#page-tree-import-test');
                 }
             }).fail(function (data) {

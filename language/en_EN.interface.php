@@ -734,12 +734,16 @@
         'tr_meliscms_pages_Page_header' => 'Page header',
         'tr_meliscms_pages_Page_status_container' => 'Status container',
 
-		// Mini Template
+		// Mini template manager tool
 		'tr_meliscms_mini_template_manager' => 'Mini Templates & Plugins',
 		'tr_meliscms_mini_template_manager_tool' => 'Mini Template Manager',
-		'tr_meliscms_mini_template_menu_manager_tool' => 'Menu Manager',
 		'tr_meliscms_mini_template_manager_tool_header' => 'Mini-Template Manager',
 		'tr_meliscms_mini_template_manager_tool_header_sub_title' => 'Find the list of plugins available on sites and manage them.',
 		'tr_meliscms_mini_template_manager_tool_header_add_btn' => 'Add mini-template',
+
+		// Mini template menu manager tool
+		'tr_meliscms_mini_template_menu_manager_tool' => 'Menu Manager',
+		'tr_meliscms_mini_template_menu_manager_tool_header' => 'Mini-template Plugins Management',
+		'tr_meliscms_mini_template__menu_manager_tool_header_sub_title' => 'Manager here you sites\' mini-template',
     );
 ?>

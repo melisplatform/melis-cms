@@ -1,1 +1,46 @@
-<h1>Test Form will be here</h1>
+<div
+    id="<?= $this->zoneconfig['conf']['id'] ?>"
+    data-melisKey='<?= $this->zoneconfig['conf']['melisKey'] ?>'
+    data-currentmodule="<?= $this->current_module ?>"
+    data-currenttemplate="<?= $this->current_template ?>"
+>
+    <?php
+        if (! empty($form)) {
+            $form = clone $this->form;
+            $form->prepare();
+            echo $this->form()->openTag($form);
+            echo $this->melisFieldCollection($form);
+    ?>
+            <div>
+                <span class="thumbnail">
+                  <img id="new-minitemplate-thumbnail" width="300" height="300" src="/MelisCore/images/profile/default_picture.jpg" alt="<?= $this->translate('tr_meliscore_tool_user_usr_profile_image'); ?>">
+                </span>
+            </div>
+            <div>
+                <a href="#" class="small"  id="remove-mini-template-thumbnail-preview">
+                    <i class="fa fa-times"></i>
+                    Remove Thumbnail
+                </a>
+            </div>
+            <br>
+            <br>
+            <?php if ($this->type === 'create') : ?>
+                <button type="submit" id="melis-cms-minitemplate-add-btn" class="btn btn-primary">Create</button>
+            <?php else : ?>
+                <button type="submit" id="melis-cms-minitemplate-edit-btn" class="btn btn-primary">Update</button>
+            <?php endif; ?>
+    <?php
+            echo $this->form()->closeTag();
+        }
+    ?>
+</div>
+<script type="text/javascript">
+    $("#miniTemplateThumbnail").filestyle({buttonBefore: true, input: false, buttonText: '<?= $this->translate('tr_meliscore_tool_user_usr_file_button'); ?>'});
+    $(function() {
+        let tinyMceOption = {
+            height: 300,
+            templates: '/melis/MelisCore/MelisTinyMce/getTinyTemplates?siteId='
+        };
+        melisTinyMCE.createTinyMCE("tool", ".editme", tinyMceOption);
+    });
+</script>

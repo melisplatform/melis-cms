@@ -1,0 +1,18 @@
+<div
+    id="<?= $this->zoneconfig['conf']['id'] ?>"
+    data-melisKey="<?= $this->zoneconfig['conf']['melisKey'] ?>"
+    class="col-xs-12 col-lg-4"
+>
+    <div>
+        <h4>
+            Filter by site
+        </h4>
+        <?php
+            $form = clone $this->form;
+            $form->prepare();
+            echo $this->form()->openTag($form);
+            echo $this->melisFieldCollection($form);
+            echo $this->form()->closeTag();
+        ?>
+    </div>
+</div>

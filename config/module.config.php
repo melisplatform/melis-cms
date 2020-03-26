@@ -149,6 +149,7 @@ return array(
             'MelisCms\Controller\PageExport' => 'MelisCms\Controller\PageExportController',
             'MelisCms\Controller\PageImport' => 'MelisCms\Controller\PageImportController',
             'MelisCms\Controller\MiniTemplateManager' => 'MelisCms\Controller\MiniTemplateManagerController',
+            'MelisCms\Controller\MiniTemplateMenuManager' => 'MelisCms\Controller\MiniTemplateMenuManagerController',
         ),
     ),
     'controller_plugins' => array(
