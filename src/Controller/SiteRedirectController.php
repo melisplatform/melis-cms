@@ -9,9 +9,9 @@
 
 namespace MelisCms\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\View\Model\JsonModel;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
+use Laminas\View\Model\JsonModel;
 use MelisCore\Service\MelisCoreRightsService;
 
 /**
@@ -26,7 +26,7 @@ class SiteRedirectController extends AbstractActionController
      * This will retrieve the user accessiblity to the page
      * and check if the current user is allowed to access the page
      * 
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSiteRedirectAction()
     {
@@ -48,7 +48,7 @@ class SiteRedirectController extends AbstractActionController
     /**
      * Render Site Redirect page header
      * 
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSiteRedirectHeaderAction()
     {
@@ -62,7 +62,7 @@ class SiteRedirectController extends AbstractActionController
     /**
      * Render Add action button from page header
      * 
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSiteRedirectAddAction()
     {
@@ -76,7 +76,7 @@ class SiteRedirectController extends AbstractActionController
     /**
      * Render Site Redirect List table
      * 
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSiteRedirectContentAction()
     {
@@ -103,7 +103,7 @@ class SiteRedirectController extends AbstractActionController
     /**
      * Retrieving Site Redirect list for dataTable data
      * 
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function getSiteRedirectAction()
     {
@@ -170,7 +170,7 @@ class SiteRedirectController extends AbstractActionController
     /**
      * Render Limit dropdown for Site Redirect Table
      * 
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSiteRedirectFiltersLimitAction()
     {
@@ -181,7 +181,7 @@ class SiteRedirectController extends AbstractActionController
     /**
      * Render Search input for Site Rdirect Table
      * 
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSiteRedirectFiltersSearchAction()
     {
@@ -192,7 +192,7 @@ class SiteRedirectController extends AbstractActionController
     /**
      * Render Refresh page button
      * 
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSiteRedirectFiltersRefreshAction()
     {
@@ -203,7 +203,7 @@ class SiteRedirectController extends AbstractActionController
     /**
      * Render site dropdown filter
      * 
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSiteRedirectFiltersSitesAction()
     {
@@ -226,7 +226,7 @@ class SiteRedirectController extends AbstractActionController
     /**
      * Render Test button for particular site redirect
      * 
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSiteRedirectTestAction()
     {
@@ -237,7 +237,7 @@ class SiteRedirectController extends AbstractActionController
     /**
      * Render Edit button for particular site redirect
      * 
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSiteRedirectEditAction()
     {
@@ -248,7 +248,7 @@ class SiteRedirectController extends AbstractActionController
     /**
      * Render Delete button for particular site redirect
      * 
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSiteRedirectDeleteAction()
     {
@@ -279,7 +279,7 @@ class SiteRedirectController extends AbstractActionController
     /**
      * Render Site Redirect Modal container
      * 
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSiteRedirectModalAction()
     {
@@ -296,7 +296,7 @@ class SiteRedirectController extends AbstractActionController
     /**
      * Render Site Redirect form, this will appear on modal
      * 
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSiteRedirectGenericFormAction()
     {
@@ -307,7 +307,7 @@ class SiteRedirectController extends AbstractActionController
         $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
         $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_tool_site_301/forms/meliscms_tool_site_301_generic_form','meliscms_tool_site_301_generic_form');
         
-        $factory = new \Zend\Form\Factory();
+        $factory = new \Laminas\Form\Factory();
         $formElements = $this->serviceLocator->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $propertyForm = $factory->createForm($appConfigForm);
@@ -339,7 +339,7 @@ class SiteRedirectController extends AbstractActionController
     /**
      * This method will saving the Site Redirect form
      * 
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function saveSiteRedirectAction()
     {
@@ -376,7 +376,7 @@ class SiteRedirectController extends AbstractActionController
                 $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
                 $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_tool_site_301/forms/meliscms_tool_site_301_generic_form','meliscms_tool_site_301_generic_form');
                 
-                $factory = new \Zend\Form\Factory();
+                $factory = new \Laminas\Form\Factory();
                 $formElements = $this->serviceLocator->get('FormElementManager');
                 $factory->setFormElementManager($formElements);
                 $propertyForm = $factory->createForm($appConfigForm);
@@ -470,7 +470,7 @@ class SiteRedirectController extends AbstractActionController
     /**
      * This method will delete the selected Site Redirect
      * 
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function deleteSiteRedirectAction(){
         $translator = $this->getServiceLocator()->get('translator');

@@ -109,7 +109,7 @@ return array(
 						'method' => 'POST',
 						'action' => '/melis/MelisCms/Page/saveProperties',
 					),
-					'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+					'hydrator'  => 'Laminas\Stdlib\Hydrator\ArraySerializable',
 					'elements' => array(  
 						array(
 							'spec' => array(

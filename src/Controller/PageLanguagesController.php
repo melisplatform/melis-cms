@@ -9,12 +9,12 @@
 
 namespace MelisCms\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\View\Model\JsonModel;
-use Zend\Session\Container;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
+use Laminas\View\Model\JsonModel;
+use Laminas\Session\Container;
 use MelisCms\Service\MelisCmsRightsService;
-use Zend\Form\Factory;
+use Laminas\Form\Factory;
 
 /**
  * This class renders Melis CMS Page language
@@ -24,7 +24,7 @@ class PageLanguagesController extends AbstractActionController
     /**
      * This method render the Melis Page language
      *
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPagetabLanguagesAction()
     {
@@ -41,7 +41,7 @@ class PageLanguagesController extends AbstractActionController
     /**
      * This menthod render the List of languages versions of the current page
      * 
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPagetabLangListAction()
     {
@@ -101,7 +101,7 @@ class PageLanguagesController extends AbstractActionController
     /**
      * This method render the Page create form 
      * 
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPagetabLangCreateAction()
     {
@@ -184,7 +184,7 @@ class PageLanguagesController extends AbstractActionController
      * This method validate and save the submitted form
      * and create a new Page language version
      * 
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function createNewPageLangVersionAction()
     {
@@ -372,7 +372,7 @@ class PageLanguagesController extends AbstractActionController
     /**
      * Form of the Page language for creating New Page langugae version
      * 
-     * @return Zend\Form\Factory
+     * @return Laminas\Form\Factory
      */
     private function pageLangCreateForm()
     {

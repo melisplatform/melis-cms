@@ -11,8 +11,8 @@ namespace MelisCms\Listener;
 
 
 use MelisCore\Listener\MelisCoreGeneralListener;
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\ListenerAggregateInterface;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\EventManager\ListenerAggregateInterface;
 
 /**
  * The flash messenger will add logs by

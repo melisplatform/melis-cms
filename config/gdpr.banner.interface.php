@@ -81,7 +81,7 @@ return [
                         'method' => 'POST',
                         'action' => '',
                     ],
-                    'hydrator' => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                    'hydrator' => 'Laminas\Stdlib\Hydrator\ArraySerializable',
                     'elements' => [
                         [
                             'spec' => [
@@ -110,7 +110,7 @@ return [
                                     'name' => 'NotEmpty',
                                     'options' => [
                                         'messages' => [
-                                            \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_gdpr_banner_empty_field',
+                                            \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_gdpr_banner_empty_field',
                                         ],
                                     ],
                                 ],
@@ -130,7 +130,7 @@ return [
                         'method' => 'POST',
                         'action' => '',
                     ],
-                    'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                    'hydrator'  => 'Laminas\Stdlib\Hydrator\ArraySerializable',
                     'elements' => [
                         [
                             'spec' => [
@@ -170,7 +170,7 @@ return [
 //                                    'name' => 'NotEmpty',
 //                                    'options' => [
 //                                        'messages' => [
-//                                            \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_gdpr_banner_empty_field',
+//                                            \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_gdpr_banner_empty_field',
 //                                        ],
 //                                    ],
 //                                ],

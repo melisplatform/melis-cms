@@ -9,11 +9,11 @@
 
 namespace MelisCms\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\View\Model\JsonModel;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
+use Laminas\View\Model\JsonModel;
 use MelisCore\Service\MelisCoreRightsService;
-use Zend\Session\Container;
+use Laminas\Session\Container;
 /**
  *
  * Cmys Styles Manager Tool Plugin
@@ -32,7 +32,7 @@ class ToolStyleController extends AbstractActionController
      * This is the main view of the Tool,
      * View File Name: render-tool-template-manager.phtml
      *
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolStyleAction()
     {
@@ -63,7 +63,7 @@ class ToolStyleController extends AbstractActionController
 
     /**
      * This is where you place your buttons for the tools
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolStyleHeaderAction()
     {
@@ -85,7 +85,7 @@ class ToolStyleController extends AbstractActionController
 
     /**
      * Adds an ADD button in the Header section of the Tool
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolStyleHeaderAddAction()
     {
@@ -99,7 +99,7 @@ class ToolStyleController extends AbstractActionController
 
     /**
      * Renders to the Limit selection in the filter bar in the datatable
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolStyleContentFiltersLimitAction()
     {
@@ -108,7 +108,7 @@ class ToolStyleController extends AbstractActionController
 
     /**
      * Renders to the search input in the filter bar in the datatable
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolStyleContentFiltersSearchAction()
     {
@@ -117,7 +117,7 @@ class ToolStyleController extends AbstractActionController
 
     /**
      * Renders to the refresh button in the filter bar in the datatable
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolStyleContentFiltersRefreshAction()
     {
@@ -126,7 +126,7 @@ class ToolStyleController extends AbstractActionController
 
     /**
      * displays the content of the tool
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolStyleContentAction()
     {
@@ -162,7 +162,7 @@ class ToolStyleController extends AbstractActionController
 
     /**
      * Renders to the edit button in the table
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolStyleActionEditAction()
     {
@@ -172,7 +172,7 @@ class ToolStyleController extends AbstractActionController
 
     /**
      * Renders to the delete button in the table
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolStyleActionDeleteAction()
     {
@@ -182,7 +182,7 @@ class ToolStyleController extends AbstractActionController
 
     /**
      * The parent container of all modals, this is where you initialze your modal.
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolStyleModalContainerAction()
     {
@@ -211,7 +211,7 @@ class ToolStyleController extends AbstractActionController
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         $melisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
         $appConfigForm = $melisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_tool_styles/forms/meliscms_tool_styles_form','meliscms_tool_styles_form');
-        $factory = new \Zend\Form\Factory();
+        $factory = new \Laminas\Form\Factory();
         $formElements = $this->serviceLocator->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $form = $factory->createForm($appConfigForm);
@@ -411,7 +411,7 @@ class ToolStyleController extends AbstractActionController
 
         $melisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
         $appConfigForm = $melisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_tool_styles/forms/meliscms_tool_styles_form','meliscms_tool_styles_form');
-        $factory = new \Zend\Form\Factory();
+        $factory = new \Laminas\Form\Factory();
         $formElements = $this->serviceLocator->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $form = $factory->createForm($appConfigForm);

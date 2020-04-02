@@ -9,12 +9,12 @@
 
 namespace MelisCms\Controller;
 
-use Zend\EventManager\ResponseCollection;
-use Zend\Form\Factory;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\View\Model\JsonModel;
-use Zend\Session\Container;
+use Laminas\EventManager\ResponseCollection;
+use Laminas\Form\Factory;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
+use Laminas\View\Model\JsonModel;
+use Laminas\Session\Container;
 
 /**
  * This class renders Melis CMS page tab edition
@@ -27,7 +27,7 @@ class PageEditionController extends AbstractActionController
 	
 	/**
 	 * Makes the rendering of the Page Edition Tab
-	 * @return \Zend\View\Model\ViewModel
+	 * @return \Laminas\View\Model\ViewModel
 	 */
     public function renderPagetabEditionAction()
     {
@@ -94,7 +94,7 @@ class PageEditionController extends AbstractActionController
 
     /**
      * Template form creation
-     * @return \Zend\Form\ElementInterface
+     * @return \Laminas\Form\ElementInterface
      */
     private function getTemplateForm()
     {
@@ -109,7 +109,7 @@ class PageEditionController extends AbstractActionController
          *
          *   - New Templating Engine? Register your template type using this event self::TEMPLATE_FORM_CONFIG_MODIFY
          *
-         *  @var \Zend\EventManager\ResponseCollection $result
+         *  @var \Laminas\EventManager\ResponseCollection $result
          */
         $result = $this->getEventManager()->trigger(self::TEMPLATE_FORM_CONFIG_MODIFY, $this, ['formConfig' => $formConfig]);
         $formConfig = $result instanceof ResponseCollection && $result->count() > 0 ? $result->last() : $formConfig;
@@ -184,7 +184,7 @@ class PageEditionController extends AbstractActionController
      * Saves datas edited in a page and posted to this function
      * Save is made in SESSION.
      *
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function savePageSessionPluginAction()
     {
@@ -224,7 +224,7 @@ class PageEditionController extends AbstractActionController
      * Remove a specific plugin from a pageId
      * Save is made in SESSION.
      *
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function removePageSessionPluginAction()
     {
@@ -292,7 +292,7 @@ class PageEditionController extends AbstractActionController
 
 	/**
 	 * Save Page edition
-	 * @return \Zend\View\Model\JsonModel
+	 * @return \Laminas\View\Model\JsonModel
 	 */
 	public function saveEditionAction()
 	{
@@ -352,7 +352,7 @@ class PageEditionController extends AbstractActionController
 	 * in order to list only the mini-templates of the website and not
 	 * all of them
 	 * 
-	 * @return \Zend\View\Model\JsonModel
+	 * @return \Laminas\View\Model\JsonModel
 	 */
 	public function getTinyTemplatesAction()
     	{

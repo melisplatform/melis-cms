@@ -9,13 +9,13 @@
 
 namespace MelisCms\Listener;
 
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\ListenerAggregateInterface;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\Mvc\MvcEvent;
-use Zend\View\Model\ViewModel;
-use Zend\Session\Container;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\EventManager\ListenerAggregateInterface;
+use Laminas\ServiceManager\ServiceLocatorAwareInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Mvc\MvcEvent;
+use Laminas\View\Model\ViewModel;
+use Laminas\Session\Container;
 
 /**
  * This listener will call the plugin to get a formatting of the values

@@ -17,7 +17,7 @@ return array(
 							'method'=> 'POST',
 							'action'=> $_SERVER['REQUEST_URI'],
 						),
-						'hydrator' => 'Zend\Stdlib\Hydrator\ArraySerializable',
+						'hydrator' => 'Laminas\Stdlib\Hydrator\ArraySerializable',
 						'elements' => array(
 							array(
 								'spec' => array(
@@ -65,7 +65,7 @@ return array(
 										'name' => 'IsInt',
 										'option' => array(
 											'message' => array(
-												\Zend\I18n\Validator\IsInt::INVALID => 'siteId must be an integer'
+												\Laminas\I18n\Validator\IsInt::INVALID => 'siteId must be an integer'
 											),
 										),
 									),

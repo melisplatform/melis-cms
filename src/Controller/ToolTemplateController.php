@@ -9,13 +9,13 @@
 
 namespace MelisCms\Controller;
 
-use Zend\EventManager\ResponseCollection;
-use Zend\Form\Element\Select;
-use Zend\Form\Factory;
-use Zend\Form\Form;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
-use Zend\View\Model\ViewModel;
+use Laminas\EventManager\ResponseCollection;
+use Laminas\Form\Element\Select;
+use Laminas\Form\Factory;
+use Laminas\Form\Form;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 /**
  *
@@ -37,7 +37,7 @@ class ToolTemplateController extends AbstractActionController
      * This is the main view of the Tool,
      * View File Name: render-tool-template-manager.phtml
      *
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolTemplateAction()
     {
@@ -68,7 +68,7 @@ class ToolTemplateController extends AbstractActionController
 
     /**
      * This is where you place your buttons for the tools
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolTemplateHeaderAction()
     {
@@ -90,7 +90,7 @@ class ToolTemplateController extends AbstractActionController
 
     /**
      * Adds an ADD button in the Header section of the Tool
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolTemplateHeaderAddAction()
     {
@@ -104,7 +104,7 @@ class ToolTemplateController extends AbstractActionController
 
     /**
      * Renders the refresh button into the Header section of the Tool
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolTemplateHeaderRefreshAction()
     {
@@ -118,7 +118,7 @@ class ToolTemplateController extends AbstractActionController
 
     /**
      * Renders to the Limit selection in the filter bar in the datatable
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolTemplateContentFiltersLimitAction()
     {
@@ -127,7 +127,7 @@ class ToolTemplateController extends AbstractActionController
 
     /**
      * Renders to the site filter selection in the filter bar in the datatable
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolTemplateContentFiltersSitesAction()
     {
@@ -149,7 +149,7 @@ class ToolTemplateController extends AbstractActionController
 
     /**
      * Renders to the search input in the filter bar in the datatable
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolTemplateContentFiltersSearchAction()
     {
@@ -158,7 +158,7 @@ class ToolTemplateController extends AbstractActionController
 
     /**
      * Renders to the refresh button in the filter bar in the datatable
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolTemplateContentFiltersRefreshAction()
     {
@@ -172,7 +172,7 @@ class ToolTemplateController extends AbstractActionController
 
     /**
      * displays the content of the tool
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolTemplateContentAction()
     {
@@ -212,7 +212,7 @@ class ToolTemplateController extends AbstractActionController
 
     /**
      * Renders to the edit button in the table
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolTemplatesActionEditAction()
     {
@@ -222,7 +222,7 @@ class ToolTemplateController extends AbstractActionController
 
     /**
      * Renders to the delete button in the table
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolTemplatesActionDeleteAction()
     {
@@ -232,7 +232,7 @@ class ToolTemplateController extends AbstractActionController
 
     /**
      * The parent container of all modals, this is where you initialze your modal.
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolTemplateModalContainerAction()
     {
@@ -311,7 +311,7 @@ class ToolTemplateController extends AbstractActionController
 
     /**
      * Template form creation
-     * @return \Zend\Form\ElementInterface
+     * @return \Laminas\Form\ElementInterface
      */
     public function getTemplateForm()
     {
@@ -326,7 +326,7 @@ class ToolTemplateController extends AbstractActionController
          *
          *   - New Templating Engine? Register your template type using this event self::TEMPLATE_FORM_CONFIG_MODIFY
          *
-         *  @var \Zend\EventManager\ResponseCollection $result
+         *  @var \Laminas\EventManager\ResponseCollection $result
          */
         $result = $this->getEventManager()->trigger(self::TEMPLATE_FORM_CONFIG_MODIFY, $this, ['formConfig' => $formConfig]);
         $formConfig = $result instanceof ResponseCollection && $result->count() > 0 ? $result->last() : $formConfig;
@@ -610,7 +610,7 @@ class ToolTemplateController extends AbstractActionController
      * Returns all the templates data from the table,
      * usually being used whenever you want to refresh the data
      * of your table.
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function getToolTemplateDataAction()
     {

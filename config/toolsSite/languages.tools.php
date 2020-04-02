@@ -12,11 +12,11 @@
                                     'method' => 'POST',
                                     'action' => '',
                                 ],
-                                'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                                'hydrator'  => 'Laminas\Stdlib\Hydrator\ArraySerializable',
                                 'elements' => [
                                     [
                                         'spec' => [
-                                            'type' => 'Zend\Form\Element\Radio',
+                                            'type' => 'Laminas\Form\Element\Radio',
                                             'name' => 'site_opt_lang_url',
                                             'options' => [
                                                 'label' => 'tr_melis_cms_sites_tool_languages_question2',

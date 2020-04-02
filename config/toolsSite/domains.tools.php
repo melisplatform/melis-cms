@@ -13,7 +13,7 @@ return array(
                                 'method' => 'POST',
                                 'action' => '',
                             ),
-                            'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                            'hydrator'  => 'Laminas\Stdlib\Hydrator\ArraySerializable',
                             'elements' => array(
                                 array(
                                     'spec' => array(
@@ -60,7 +60,7 @@ return array(
                                 array(
                                     'spec' => array(
                                         'name' => 'sdom_scheme',
-                                        'type' => 'Zend\Form\Element\Select',
+                                        'type' => 'Laminas\Form\Element\Select',
                                         'options' => array(
                                             'label' => 'tr_melis_cms_sites_domain_scheme',
                                             'tooltip' => 'tr_melis_cms_sites_domain_scheme tooltip',
@@ -105,8 +105,8 @@ return array(
                                             'name' => 'IsInt',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'invalid id',
-                                                    \Zend\I18n\Validator\IsInt::INVALID => 'invalid id',
+                                                    \Laminas\I18n\Validator\IsInt::NOT_INT => 'invalid id',
+                                                    \Laminas\I18n\Validator\IsInt::INVALID => 'invalid id',
                                                 )
                                             )
                                         ),
@@ -124,8 +124,8 @@ return array(
                                             'name' => 'IsInt',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'invalid id',
-                                                    \Zend\I18n\Validator\IsInt::INVALID => 'invalid id',
+                                                    \Laminas\I18n\Validator\IsInt::NOT_INT => 'invalid id',
+                                                    \Laminas\I18n\Validator\IsInt::INVALID => 'invalid id',
                                                 )
                                             )
                                         ),
@@ -152,7 +152,7 @@ return array(
                                             'name'    => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_domain_field_empty',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_domain_field_empty',
                                                 ),
                                             ),
                                         ),
@@ -170,7 +170,7 @@ return array(
                                             'name'    => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_domain_field_empty',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_domain_field_empty',
                                                 ),
                                             ),
                                         ),
@@ -179,7 +179,7 @@ return array(
                                             'options' => array(
                                                 'pattern' => '/^(www\.)?(([a-zA-Z0-9-])+\.)?(([a-zA-Z0-9-])+\.)?(([a-zA-Z0-9-])+\.)?(([a-zA-Z0-9-])+\.)?[a-zA-Z0-9\-]{1,}(\.([a-zA-Z]{2,}))$/',
                                                 'messages' => array(
-                                                    \Zend\Validator\Regex::NOT_MATCH => 'tr_melis_cms_sites_tool_add_step3_invalid_domain_name',
+                                                    \Laminas\Validator\Regex::NOT_MATCH => 'tr_melis_cms_sites_tool_add_step3_invalid_domain_name',
                                                 ),
                                                 'encoding' => 'UTF-8',
                                             ),

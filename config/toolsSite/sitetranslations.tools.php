@@ -87,7 +87,7 @@ return array(
                                 'method' => 'POST',
                                 'action' => '',
                             ),
-                            'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                            'hydrator'  => 'Laminas\Stdlib\Hydrator\ArraySerializable',
                             'elements' => array(
                                 array(
                                     'spec' => array(
@@ -160,7 +160,7 @@ return array(
 //                                            'name' => 'NotEmpty',
 //                                            'options' => array(
 //                                                'messages' => array(
-//                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_site_translation_empty_text',
+//                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_melis_site_translation_empty_text',
 //                                                ),
 //                                            ),
 //                                        ),

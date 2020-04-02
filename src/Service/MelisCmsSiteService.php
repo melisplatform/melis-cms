@@ -3,8 +3,8 @@
 namespace MelisCms\Service;
 
 use MelisCore\Service\MelisCoreGeneralService;
-use Zend\Config\Config;
-use Zend\Config\Writer\PhpArray;
+use Laminas\Config\Config;
+use Laminas\Config\Writer\PhpArray;
 use ZendTest\XmlRpc\Server\TestAsset\Exception;
 
 class MelisCmsSiteService extends MelisCoreGeneralService
@@ -187,7 +187,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                      * we can rollback the db insertion if
                      * there are some error occurred
                      */
-                    $db = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');//get db adapter
+                    $db = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');//get db adapter
                     $con = $db->getDriver()->getConnection();//get db driver connection
                     $con->beginTransaction();//begin transaction
                     try {

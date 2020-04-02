@@ -9,8 +9,8 @@
 
 namespace MelisCms\Service\Factory;
 
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\ServiceManager\FactoryInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\FactoryInterface;
 use MelisCms\Service\MelisCmsPageGetterService;
 
 class MelisCmsPageGetterServiceFactory implements FactoryInterface

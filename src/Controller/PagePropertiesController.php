@@ -9,11 +9,11 @@
 
 namespace MelisCms\Controller;
 
-use Zend\Form\Factory;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Session\Container;
-use Zend\View\Model\JsonModel;
-use Zend\View\Model\ViewModel;
+use Laminas\Form\Factory;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\Session\Container;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 /**
  * This class renders Melis CMS Page tab properties
@@ -25,7 +25,7 @@ class PagePropertiesController extends AbstractActionController
 
     /**
      * Makes the rendering of the Page Properties Tab
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPagetabPropertiesAction()
     {
@@ -121,7 +121,7 @@ class PagePropertiesController extends AbstractActionController
      *
      * Events: meliscms_page_savetree_start / meliscms_page_savetree_end
      *
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function savePageTreeAction()
     {
@@ -301,7 +301,7 @@ class PagePropertiesController extends AbstractActionController
      *
      * @param $idPage
      * @param $isNew
-     * @return \Zend\Form\ElementInterface
+     * @return \Laminas\Form\ElementInterface
      */
     public function getPropertyPageForm($idPage, $isNew)
     {
@@ -384,7 +384,7 @@ class PagePropertiesController extends AbstractActionController
      * This function saves the page properties form, making an entry in PageSave
      * Events: meliscms_page_saveproperties_start / meliscms_page_saveproperties_end
      *
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function savePropertiesAction()
     {

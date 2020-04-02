@@ -10,11 +10,11 @@
 namespace MelisCms\Controller;
 
 
-use Zend\Form\Factory;
-use Zend\Form\Form;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
-use Zend\View\Model\ViewModel;
+use Laminas\Form\Factory;
+use Laminas\Form\Form;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 /**
  * Allows the customization of the text displayed on the sites
@@ -75,7 +75,7 @@ class GdprBannerController extends AbstractActionController
 
     /**
      * @param string $formName
-     * @return bool|\Zend\Form\ElementInterface
+     * @return bool|\Laminas\Form\ElementInterface
      */
     private function getForm(string $formName = '')
     {

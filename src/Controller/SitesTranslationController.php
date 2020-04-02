@@ -9,10 +9,10 @@
 
 namespace MelisCms\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Session\Container;
-use Zend\View\Model\ViewModel;
-use Zend\View\Model\JsonModel;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\Session\Container;
+use Laminas\View\Model\ViewModel;
+use Laminas\View\Model\JsonModel;
 
 class SitesTranslationController extends AbstractActionController
 {
@@ -175,7 +175,7 @@ class SitesTranslationController extends AbstractActionController
         $melisSiteTranslationService = $this->getServiceLocator()->get('MelisSiteTranslationService');
         $mstTable = $this->getServiceLocator()->get('MelisSiteTranslationTable');
 
-        $db = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');//get db adapter
+        $db = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');//get db adapter
         $con = $db->getDriver()->getConnection();//get db driver connection
         $con->beginTransaction();//begin transaction
         try {
@@ -217,7 +217,7 @@ class SitesTranslationController extends AbstractActionController
 //        $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
 
-        $factory = new \Zend\Form\Factory();
+        $factory = new \Laminas\Form\Factory();
         $formElements = $this->getServiceLocator()->get('FormElementManager');
         $factory->setFormElementManager($formElements);
 

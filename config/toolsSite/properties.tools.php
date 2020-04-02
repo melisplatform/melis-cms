@@ -13,7 +13,7 @@ return array(
                                 'method' => 'POST',
                                 'action' => '',
                             ),
-                            'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                            'hydrator'  => 'Laminas\Stdlib\Hydrator\ArraySerializable',
                             'elements' => array(
                                 array(
                                     'spec' => array(
@@ -124,8 +124,8 @@ return array(
                                             'name' => 'IsInt',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_melis_cms_sites_field_digits',
-                                                    \Zend\I18n\Validator\IsInt::INVALID => 'tr_melis_cms_sites_field_digits',
+                                                    \Laminas\I18n\Validator\IsInt::NOT_INT => 'tr_melis_cms_sites_field_digits',
+                                                    \Laminas\I18n\Validator\IsInt::INVALID => 'tr_melis_cms_sites_field_digits',
                                                 )
                                             )
                                         ),
@@ -152,7 +152,7 @@ return array(
                                             'name'    => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
                                                 ),
                                             ),
                                         ),
@@ -170,7 +170,7 @@ return array(
                                             'name'    => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
                                                 ),
                                             ),
                                         ),
@@ -188,7 +188,7 @@ return array(
                                             'name'    => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
                                                 ),
                                             ),
                                             'break_chain_on_failure' => true,
@@ -197,8 +197,8 @@ return array(
                                             'name' => 'IsInt',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_melis_cms_sites_field_digits',
-                                                    \Zend\I18n\Validator\IsInt::INVALID => 'tr_melis_cms_sites_field_digits',
+                                                    \Laminas\I18n\Validator\IsInt::NOT_INT => 'tr_melis_cms_sites_field_digits',
+                                                    \Laminas\I18n\Validator\IsInt::INVALID => 'tr_melis_cms_sites_field_digits',
                                                 )
                                             )
                                         ),
@@ -216,7 +216,7 @@ return array(
                                             'name'    => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
                                                 ),
                                             ),
                                             'break_chain_on_failure' => true,
@@ -225,8 +225,8 @@ return array(
                                             'name' => 'IsInt',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_melis_cms_sites_field_digits',
-                                                    \Zend\I18n\Validator\IsInt::INVALID => 'tr_melis_cms_sites_field_digits',
+                                                    \Laminas\I18n\Validator\IsInt::NOT_INT => 'tr_melis_cms_sites_field_digits',
+                                                    \Laminas\I18n\Validator\IsInt::INVALID => 'tr_melis_cms_sites_field_digits',
                                                 )
                                             )
                                         ),
@@ -246,7 +246,7 @@ return array(
                                 'method' => 'POST',
                                 'action' => '',
                             ),
-                            'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                            'hydrator'  => 'Laminas\Stdlib\Hydrator\ArraySerializable',
                             'elements' => array(
                                 array(
                                     'spec' => array(
@@ -346,7 +346,7 @@ return array(
                                             'name'    => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_sites_field_empty',
                                                 ),
                                             ),
                                             'break_chain_on_failure' => true,
@@ -355,8 +355,8 @@ return array(
                                             'name' => 'IsInt',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_melis_cms_sites_field_digits',
-                                                    \Zend\I18n\Validator\IsInt::INVALID => 'tr_melis_cms_sites_field_digits',
+                                                    \Laminas\I18n\Validator\IsInt::NOT_INT => 'tr_melis_cms_sites_field_digits',
+                                                    \Laminas\I18n\Validator\IsInt::INVALID => 'tr_melis_cms_sites_field_digits',
                                                 )
                                             )
                                         ),

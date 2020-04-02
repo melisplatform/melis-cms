@@ -9,7 +9,7 @@
 
 namespace MelisCms\Form\Factory;
 
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 use MelisCore\Form\Factory\MelisSelectFactory;
 /**
  * Cms Platfrom Ids select factory
@@ -27,7 +27,7 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
 	protected function loadValueOptions(ServiceLocatorInterface $formElementManager)
 	{
         /**
-         * @var \Zend\ServiceManager\ServiceLocatorInterface $serviceManager
+         * @var \Laminas\ServiceManager\ServiceLocatorInterface $serviceManager
          */
 		$serviceManager = $formElementManager->getServiceLocator();
 		$request = $serviceManager->get('Request');

@@ -9,11 +9,11 @@
 
 namespace MelisCms\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\View\Model\JsonModel;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
+use Laminas\View\Model\JsonModel;
 use MelisCore\Service\MelisCoreRightsService;
-use Zend\Config\Reader\Json;
+use Laminas\Config\Reader\Json;
 use phpDocumentor\Reflection\Types\Boolean;
 
 class SitesModuleLoaderController extends AbstractActionController

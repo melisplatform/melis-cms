@@ -9,11 +9,11 @@
 
 namespace MelisCms\Controller;
 
-use Zend\Http\PhpEnvironment\Response as HttpResponse;
+use Laminas\Http\PhpEnvironment\Response as HttpResponse;
 use MelisCms\Service\MelisCmsPageExportService;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
-use Zend\View\Model\ViewModel;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 /**
  * This class renders Melis CMS Page export
@@ -59,7 +59,7 @@ class PageExportController extends AbstractActionController
     }
 
     /**
-     * @return \Zend\Http\Response\Stream|JsonModel
+     * @return \Laminas\Http\Response\Stream|JsonModel
      */
     public function exportPageAction()
     {
@@ -135,11 +135,11 @@ class PageExportController extends AbstractActionController
                                 /**
                                  * process to download the zip
                                  */
-                                $response = new \Zend\Http\Response\Stream();
+                                $response = new \Laminas\Http\Response\Stream();
                                 $response->setStream(fopen($zipPath, 'r'));
                                 $response->setStatusCode(200);
 
-                                $headers = new \Zend\Http\Headers();
+                                $headers = new \Laminas\Http\Headers();
                                 $headers->addHeaderLine('Content-Type', 'application/zip; charset=utf-8')
                                     ->addHeaderLine('Content-Disposition', 'attachment; filename="' . $zipFileName . '"')
                                     ->addHeaderLine('Content-Length', filesize($zipPath))

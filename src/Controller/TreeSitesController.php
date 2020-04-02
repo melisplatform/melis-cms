@@ -10,10 +10,10 @@
 namespace MelisCms\Controller;
 
 use MelisCms\Service\MelisCmsRightsService;
-use Zend\Form\Factory;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
-use Zend\View\Model\ViewModel;
+use Laminas\Form\Factory;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 /**
  * This class renders Melis CMS TreeView
@@ -26,7 +26,7 @@ class TreeSitesController extends AbstractActionController
 	 * If called in xhr, will return a json view with the html and others informations
 	 * like javascript datas.
 	 *
-	 * @return \Zend\View\Model\ViewModel|\Zend\View\Model\JsonModel
+	 * @return \Laminas\View\Model\ViewModel|\Laminas\View\Model\JsonModel
 	 */
 	public function getTreePagesByPageIdAction()
 	{
@@ -95,7 +95,7 @@ class TreeSitesController extends AbstractActionController
 	 * Gets the root page when showing the tree of pages in rights tool
 	 * so that all pages are displayed and not only the one you have access to
 	 *
-	 * @return Ambigous <\Zend\View\Model\ViewModel, \Zend\View\Model\JsonModel>
+	 * @return Ambigous <\Laminas\View\Model\ViewModel, \Laminas\View\Model\JsonModel>
 	 */
 	public function getTreePagesForRightsManagementAction()
 	{
@@ -277,7 +277,7 @@ class TreeSitesController extends AbstractActionController
 	 *
 	 * @param arry $final
 	 * @param string $formatForRights
-	 * @return \Zend\View\Model\ViewModel|\Zend\View\Model\JsonModel
+	 * @return \Laminas\View\Model\ViewModel|\Laminas\View\Model\JsonModel
 	 */
 	private function formatTreeResponse($final, $formatForRights = false)
 	{
@@ -531,7 +531,7 @@ class TreeSitesController extends AbstractActionController
     /**
      * Sends back the pageId breadcrumb
      * 
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function getPageIdBreadcrumbAction()
     {
@@ -566,7 +566,7 @@ class TreeSitesController extends AbstractActionController
     /**
      * Sends back if a page can be edited by the user or not
      * 
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function canEditPagesAction()
     {
@@ -589,7 +589,7 @@ class TreeSitesController extends AbstractActionController
     
     /**
      * The parent container of all modals, this is where you initialze your modal.
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderTreeSitesModalContainerAction()
     {
@@ -660,7 +660,7 @@ class TreeSitesController extends AbstractActionController
             $factory = new Factory();
             $formElements = $this->serviceLocator->get('FormElementManager');
             $factory->setFormElementManager($formElements);
-            /** @var \Zend\Form\Form $form */
+            /** @var \Laminas\Form\Form $form */
             $form = $factory->createForm($appConfigForm);
 
             $postValues = $this->getRequest()->getPost()->toArray();

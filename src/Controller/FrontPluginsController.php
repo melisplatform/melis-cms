@@ -10,10 +10,10 @@
 namespace MelisCms\Controller;
 
 use MelisAssetManager\Service\MelisModulesService;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\View\Model\JsonModel;
-use Zend\Session\Container;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
+use Laminas\View\Model\JsonModel;
+use Laminas\Session\Container;
 use MelisCms\Service\MelisCmsRightsService;
 
 /**

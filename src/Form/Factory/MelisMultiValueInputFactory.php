@@ -9,9 +9,9 @@
 
 namespace MelisCms\Form\Factory;
 
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\ServiceManager\FactoryInterface;
-use Zend\Form\Element\Text;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\FactoryInterface;
+use Laminas\Form\Element\Text;
 
 class MelisMultiValueInputFactory extends Text implements FactoryInterface
 {

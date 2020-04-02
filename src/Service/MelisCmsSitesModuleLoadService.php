@@ -3,8 +3,8 @@
 namespace MelisCms\Service;
 
 use MelisCore\Service\MelisCoreGeneralService;
-use Zend\Config\Config;
-use Zend\Config\Writer\PhpArray;
+use Laminas\Config\Config;
+use Laminas\Config\Writer\PhpArray;
 
 class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
 {

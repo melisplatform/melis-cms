@@ -10,9 +10,9 @@
 namespace MelisCms\Service;
 
 use MelisCore\Service\MelisCoreGeneralService;
-use Zend\Db\Metadata\Metadata;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Dom\DOMXPath;
+use Laminas\Db\Metadata\Metadata;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Dom\DOMXPath;
 use ZipArchive;
 
 class MelisCmsPageImportService extends MelisCoreGeneralService
@@ -81,7 +81,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         $success = true;
         $firstPage = 0;
 
-        $db = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
+        $db = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');
         $con = $db->getDriver()->getConnection();
         $con->beginTransaction();
 
@@ -226,7 +226,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
 
     private function savePage($tablesArray, $fatherId, $keepIds = null)
     {
-        $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
+        $adapter = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');
         $pageTreeTbl = $this->getServiceLocator()->get('MelisEngineTablePageTree');
         $pageTree = array(
             'tree_father_page_id' => $fatherId
@@ -357,7 +357,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
      */
     private function updateExternalTables($externalTables, &$externalIdsMap)
     {
-        $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
+        $adapter = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');
 
         foreach ($externalTables as $tableName => $tableRows) {
             foreach ($tableRows as $rowKey => $row) {
@@ -627,7 +627,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
      */
     private function checkIds($tableName, $columns, &$errors)
     {
-        $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
+        $adapter = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');
         $translator = $this->getServiceLocator()->get('translator');
 
         $tableGateway = new TableGateway($tableName, $adapter);
@@ -652,7 +652,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
      */
     private function getDbTableNames()
     {
-        $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
+        $adapter = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');
         $metadata = new Metadata($adapter);
         return $metadata->getTableNames();
     }
@@ -664,7 +664,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
      */
     private function getTableColumns($tableName)
     {
-        $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
+        $adapter = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');
         $metadata = new Metadata($adapter);
         return $metadata->getColumnNames($tableName);
     }
@@ -672,11 +672,11 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
     /**
      * Returns constraints of a table
      * @param $tableName
-     * @return \Zend\Db\Metadata\Object\ConstraintObject[]
+     * @return \Laminas\Db\Metadata\Object\ConstraintObject[]
      */
     private function getTableConstraints($tableName)
     {
-        $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
+        $adapter = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');
         $metadata = new Metadata($adapter);
         return $metadata->getConstraints($tableName);
     }

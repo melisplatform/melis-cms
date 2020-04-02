@@ -9,10 +9,10 @@
 
 namespace MelisCms\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\View\Model\JsonModel;
-use Zend\Session\Container;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
+use Laminas\View\Model\JsonModel;
+use Laminas\Session\Container;
 
 class MelisSetupController extends AbstractActionController
 {
@@ -36,7 +36,7 @@ class MelisSetupController extends AbstractActionController
     
    //          $cmsSiteSrv = $this->getServiceLocator()->get('MelisCmsSiteService');
 			// $environmentName = getenv('MELIS_PLATFORM');
-   //          $container = new \Zend\Session\Container('melisinstaller');
+   //          $container = new \Laminas\Session\Container('melisinstaller');
    //          $container = $container->getArrayCopy();
 
    //          $selectedSite = isset($container['site_module']['site']) ? $container['site_module']['site'] : null;
@@ -103,14 +103,14 @@ class MelisSetupController extends AbstractActionController
     }
     /**
      * Create a form from the configuration
-     * @return \Zend\Form\ElementInterface
+     * @return \Laminas\Form\ElementInterface
      */
     private function getForm()
     {
         $coreConfig = $this->getServiceLocator()->get('MelisCoreConfig');
         $form = $coreConfig->getItem('melis_engine_setup/forms/melis_installer_platform_data');
 
-        $factory = new \Zend\Form\Factory();
+        $factory = new \Laminas\Form\Factory();
         $formElements = $this->serviceLocator->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $form = $factory->createForm($form);
@@ -139,7 +139,7 @@ class MelisSetupController extends AbstractActionController
 
     private function saveCmsSiteDomain($scheme, $site)
     {
-        $container = new \Zend\Session\Container('melisinstaller');
+        $container = new \Laminas\Session\Container('melisinstaller');
 
         // default platform
         $environments       = $container['environments'];

@@ -10,9 +10,9 @@
 namespace MelisCms\Service;
 
 use MelisCore\Service\MelisCoreGeneralService;
-use Zend\Db\Sql\Where;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Db\Metadata\Metadata;
+use Laminas\Db\Sql\Where;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Db\Metadata\Metadata;
 
 class MelisCmsPageExportService extends MelisCoreGeneralService
 {
@@ -201,7 +201,7 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
         // Sending service start event
         $arrayParameters = $this->sendEvent('melis_cms_page_export_external_table_start', $arrayParameters);
         try{
-            $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
+            $adapter = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');
             /**
              * prepare the table tag
              */
@@ -659,7 +659,7 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
 
     private function getTableConstraints($tableName)
     {
-        $adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
+        $adapter = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');
         $metadata = new Metadata($adapter);
         return $metadata->getConstraints($tableName);
     }

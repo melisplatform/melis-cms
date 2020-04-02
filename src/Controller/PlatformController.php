@@ -9,9 +9,9 @@
 
 namespace MelisCms\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
-use Zend\View\Model\ViewModel;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 /**
  * Platform Tool Plugin
@@ -149,7 +149,7 @@ class PlatformController extends AbstractActionController
         $genericPlatformForm = $melisMelisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_platform_tool/forms/meliscms_tool_platform_generic_form', 'meliscms_tool_platform_generic_form');
 
         // Factoring Calendar event and pass to view
-        $factory = new \Zend\Form\Factory();
+        $factory = new \Laminas\Form\Factory();
         $formElements = $this->serviceLocator->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $propertyForm = $factory->createForm($genericPlatformForm);
@@ -233,7 +233,7 @@ class PlatformController extends AbstractActionController
         $melisMelisCoreConfig = $this->getServiceLocator()->get('MelisCoreConfig');
         $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_platform_tool/forms/meliscms_tool_platform_generic_form','meliscms_tool_platform_generic_form');
          
-        $factory = new \Zend\Form\Factory();
+        $factory = new \Laminas\Form\Factory();
         $formElements = $this->serviceLocator->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $propertyForm = $factory->createForm($appConfigForm);

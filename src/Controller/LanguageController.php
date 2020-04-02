@@ -10,10 +10,10 @@
 namespace MelisCms\Controller;
 
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Session\Container;
-use Zend\View\Model\JsonModel;
-use Zend\View\Model\ViewModel;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\Session\Container;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 /**
  * This class deals with the languages button in the header
@@ -295,7 +295,7 @@ class LanguageController extends AbstractActionController
     /**
      * Creates translations for table actions in tools
      *
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function getDataTableTranslationsAction()
     {

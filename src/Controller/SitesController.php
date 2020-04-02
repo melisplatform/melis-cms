@@ -10,11 +10,11 @@
 namespace MelisCms\Controller;
 
 use MelisFront\Service\MelisSiteConfigService;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\View\Model\JsonModel;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
+use Laminas\View\Model\JsonModel;
 use MelisCore\Service\MelisCoreRightsService;
-use Zend\Config\Reader\Json;
+use Laminas\Config\Reader\Json;
 use phpDocumentor\Reflection\Types\Boolean;
 
 /**
@@ -103,7 +103,7 @@ class SitesController extends AbstractActionController
 
     /**
      * Renders to the header section of the tool
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSitesHeaderAction() {
 
@@ -124,7 +124,7 @@ class SitesController extends AbstractActionController
 
     /**
      * Renders to the refresh button in the table filter bar
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSitesContentFilterRefreshAction()
     {
@@ -133,7 +133,7 @@ class SitesController extends AbstractActionController
 
     /**
      * Renders to the Search input in the table filter bar
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSitesContentFilterSearchAction()
     {
@@ -142,7 +142,7 @@ class SitesController extends AbstractActionController
 
     /**
      * Renders to the limit selection in the table filter bar
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSitesContentFilterLimitAction()
     {
@@ -151,7 +151,7 @@ class SitesController extends AbstractActionController
     
     /**
      * Renders to the center content of the tool
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSitesContentAction()
     {
@@ -173,7 +173,7 @@ class SitesController extends AbstractActionController
 
     /**
      * Renders to the edit button in the table
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSitesContentActionMinifyAssetsAction()
     {
@@ -182,7 +182,7 @@ class SitesController extends AbstractActionController
 
     /**
      * This is the container of the modal
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSitesModalContainerAction()
     {
@@ -200,7 +200,7 @@ class SitesController extends AbstractActionController
     
     /**
      * Renders to the empty modal display, this will be displayed if the user doesn't have access to the modal tabs
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSitesModalEmptyAction()
     {
@@ -212,7 +212,7 @@ class SitesController extends AbstractActionController
 
     /**
      * Displays the add form in the modal
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSitesModalAddAction()
     {
@@ -330,7 +330,7 @@ class SitesController extends AbstractActionController
     
     /**
      * Renders to the edit button in the table
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSitesContentActionEditAction()
     {
@@ -339,7 +339,7 @@ class SitesController extends AbstractActionController
     
     /**
      * Renders to the delete button in the table
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolSitesContentActionDeleteAction()
     {
@@ -689,7 +689,7 @@ class SitesController extends AbstractActionController
 
     /**
      * Add New Site
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function saveSiteAction()
     {
@@ -780,7 +780,7 @@ class SitesController extends AbstractActionController
          * we can rollback the db process if
          * there are some error occurred
          */
-        $db = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');//get db adapter
+        $db = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');//get db adapter
         $con = $db->getDriver()->getConnection();//get db driver connection
         $con->beginTransaction();//begin transaction
         try {
@@ -905,7 +905,7 @@ class SitesController extends AbstractActionController
                  * we can rollback the db deletion if
                  * there are some error occurred
                  */
-                $db = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');//get db adapter
+                $db = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');//get db adapter
                 $con = $db->getDriver()->getConnection();//get db driver connection
                 $con->beginTransaction();//begin transaction
                 try {

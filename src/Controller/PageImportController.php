@@ -9,11 +9,11 @@
 
 namespace MelisCms\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\View\Model\JsonModel;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
+use Laminas\View\Model\JsonModel;
 use ZipArchive;
-use Zend\Http\PhpEnvironment\Response as HttpResponse;
+use Laminas\Http\PhpEnvironment\Response as HttpResponse;
 
 class PageImportController extends AbstractActionController
 {
@@ -193,7 +193,7 @@ class PageImportController extends AbstractActionController
         if (! is_dir($target))
             mkdir($target, 0777);
 
-        $fileInput = new \Zend\InputFilter\FileInput($input);
+        $fileInput = new \Laminas\InputFilter\FileInput($input);
         $fileInput->setRequired(true);
         $fileInput->getFilterChain()->attachByName(
             'filerenameupload',

@@ -2,11 +2,11 @@
 
 namespace MelisCms\Service;
 
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceLocatorAwareInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 use MelisCore\Service\MelisCoreRightsServiceInterface;
 use MelisCore\Service\MelisCoreRightsService;
-use Zend\Json\Json;
+use Laminas\Json\Json;
 
 class MelisCmsRightsService implements MelisCoreRightsServiceInterface, ServiceLocatorAwareInterface
 {

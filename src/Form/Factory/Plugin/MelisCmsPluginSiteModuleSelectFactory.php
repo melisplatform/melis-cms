@@ -9,7 +9,7 @@
 
 namespace MelisCms\Form\Factory\Plugin;
 
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 use MelisCore\Form\Factory\MelisSelectFactory;
 
 /**

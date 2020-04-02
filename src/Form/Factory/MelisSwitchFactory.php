@@ -9,9 +9,9 @@
 
 namespace MelisCms\Form\Factory; 
 
-use Zend\Form\Element\Text;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\ServiceManager\FactoryInterface;
+use Laminas\Form\Element\Text;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\FactoryInterface;
 
 /**
  * Melis Cms Switch plugin factory

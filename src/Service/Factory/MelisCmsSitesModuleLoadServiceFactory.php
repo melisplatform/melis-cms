@@ -10,8 +10,8 @@
 namespace MelisCms\Service\Factory;
 
 use MelisCms\Service\MelisCmsSitesModuleLoadService;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\ServiceManager\FactoryInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\FactoryInterface;
 
 class MelisCmsSitesModuleLoadServiceFactory implements FactoryInterface
 {

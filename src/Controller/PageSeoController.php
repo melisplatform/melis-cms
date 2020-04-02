@@ -9,9 +9,9 @@
 
 namespace MelisCms\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\View\Model\JsonModel;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
+use Laminas\View\Model\JsonModel;
 
 /**
  * This class renders Melis CMS Page tab properties
@@ -23,7 +23,7 @@ class PageSeoController extends AbstractActionController
 	
 	/**
 	 * Makes the rendering of the Page Properties Tab
-	 * @return \Zend\View\Model\ViewModel
+	 * @return \Laminas\View\Model\ViewModel
 	 */
 	public function renderPagetabSeoAction()
 	{
@@ -66,7 +66,7 @@ class PageSeoController extends AbstractActionController
 	 *
 	 * @param int $idPage
 	 * @param bool $isNew
-	 * @return \Zend\Form\Form
+	 * @return \Laminas\Form\Form
 	 */
 	public function getSeoPageForm($idPage)
 	{
@@ -84,7 +84,7 @@ class PageSeoController extends AbstractActionController
 		 * have access to our custom Melis Elements
 		 * Bind with datas
 		 */
-		$factory = new \Zend\Form\Factory();
+		$factory = new \Laminas\Form\Factory();
 		$formElements = $this->serviceLocator->get('FormElementManager');
 		$factory->setFormElementManager($formElements);
 		$appConfigForm['attributes']['action'] .= '?idPage=' . $idPage;
@@ -110,7 +110,7 @@ class PageSeoController extends AbstractActionController
 
 	/**
 	 * This function saves the page seo form
-	 * @return \Zend\View\Model\JsonModel
+	 * @return \Laminas\View\Model\JsonModel
 	 */
 	public function saveSeoAction()
 	{
@@ -271,7 +271,7 @@ class PageSeoController extends AbstractActionController
 	 * Deletes the SEO entry of the page
 	 * Events: meliscms_page_deleteseo_start / meliscms_page_deleteseo_end
 	 * 
-	 * @return \Zend\View\Model\JsonModel
+	 * @return \Laminas\View\Model\JsonModel
 	 */
 	public function deletePageSeoAction()
 	{

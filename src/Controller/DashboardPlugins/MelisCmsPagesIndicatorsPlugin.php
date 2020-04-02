@@ -10,8 +10,8 @@
 namespace MelisCms\Controller\DashboardPlugins;
 
 use MelisCore\Controller\DashboardPlugins\MelisCoreDashboardTemplatingPlugin;
-use Zend\View\Model\ViewModel;
-use Zend\Session\Container;
+use Laminas\View\Model\ViewModel;
+use Laminas\Session\Container;
 
 
 class MelisCmsPagesIndicatorsPlugin extends MelisCoreDashboardTemplatingPlugin

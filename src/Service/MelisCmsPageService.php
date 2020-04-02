@@ -844,7 +844,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
          * Generate the form through factory and change ElementManager to
          * have access to our custom Melis Elements
          */
-        $factory = new \Zend\Form\Factory();
+        $factory = new \Laminas\Form\Factory();
         $formElements = $this->serviceLocator->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $propertyForm = $factory->createForm($appConfigForm);

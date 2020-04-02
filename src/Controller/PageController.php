@@ -9,10 +9,10 @@
 
 namespace MelisCms\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\View\Model\JsonModel;
-use Zend\Session\Container;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
+use Laminas\View\Model\JsonModel;
+use Laminas\Session\Container;
 use MelisCms\Service\MelisCmsRightsService;
 
 /**
@@ -61,7 +61,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the page container
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageAction()
     {
@@ -96,7 +96,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the tab zone bellow actions (Edition/Properties/...)
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPagetabAction()
     {
@@ -125,7 +125,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the zone in which are title and page actions
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageheadAction()
     {
@@ -141,7 +141,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the title zone
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageheadTitleAction()
     {
@@ -284,7 +284,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the actions buttons zone (Save/Publish/...)
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageactionAction()
     {
@@ -321,7 +321,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the actions buttons New
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageactionNewAction()
     {
@@ -337,7 +337,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the actions buttons Delete
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageactionDeleteAction()
     {
@@ -354,7 +354,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the action button Save
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageactionSaveAction()
     {
@@ -372,7 +372,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the actions buttons Clear
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageactionClearAction()
     {
@@ -411,7 +411,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the action button Publish
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageactionPublishAction()
     {
@@ -427,7 +427,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the action button Create
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageactionCreateAction()
     {
@@ -443,7 +443,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the action button Unublish
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageactionUnpublishAction()
     {
@@ -459,7 +459,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the action button Unublish
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageactionPublishunpublishAction()
     {
@@ -490,7 +490,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the action button Notes
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageactionNotesAction()
     {
@@ -507,7 +507,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the action button View button
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageactionViewAction()
     {
@@ -527,7 +527,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the action button Preview
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageactionPreviewAction()
     {
@@ -557,7 +557,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the action button See Online
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageactionSeeonlineAction()
     {
@@ -578,7 +578,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the action button change display
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageactionDisplayAction()
     {
@@ -594,7 +594,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the action button change display mobile
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageactionDisplayMobileAction()
     {
@@ -610,7 +610,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the action button change display tablet
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageactionDisplayTabletAction()
     {
@@ -626,7 +626,7 @@ class PageController extends AbstractActionController
 
     /**
      * Renders the action button change display desktop
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderPageactionDisplayDesktopAction()
     {
@@ -674,7 +674,7 @@ class PageController extends AbstractActionController
      * $container['save-page-tmp']['errors'] : array of errors with keys as error types, or field names in forms
      * $container['save-page-tmp']['datas'] : array of datas you want to send back in the Json, like the last insert id
      *
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function savePageAction()
     {
@@ -851,7 +851,7 @@ class PageController extends AbstractActionController
 
     /**
      * Delete Saved and Session of the current Page
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function clearSavedPageAction(){
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
@@ -932,7 +932,7 @@ class PageController extends AbstractActionController
 
     /**
      * Move a saved page to the publiched table and change status to 1
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function publishSavedPageAction()
     {
@@ -982,7 +982,7 @@ class PageController extends AbstractActionController
      * Main publish action on which listeners will be attached.
      * Events: meliscms_page_publish_start / meliscms_page_publish_end
      *
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function publishPageAction()
     {
@@ -1123,7 +1123,7 @@ class PageController extends AbstractActionController
 
     /**
      * Unpublish action
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function unpublishPublishedPageAction()
     {
@@ -1184,7 +1184,7 @@ class PageController extends AbstractActionController
     /**
      * Main unpublish action which is to be hooked up for adding actions.
      * Events: meliscms_page_unpublish_start / meliscms_page_unpublish_end
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function unpublishPageAction()
     {
@@ -1264,7 +1264,7 @@ class PageController extends AbstractActionController
     /**
      * Delete a page action
      *
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function deletePageTreeAction()
     {
@@ -1392,7 +1392,7 @@ class PageController extends AbstractActionController
      * Main delete page function
      * Events: meliscms_page_delete_start / meliscms_page_delete_end
      *
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function deletePageAction()
     {
@@ -1474,7 +1474,7 @@ class PageController extends AbstractActionController
      * This function moves a page in the treeview
      * Events: meliscms_page_move_start / meliscms_page_move_end
      *
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function movePageAction()
     {
@@ -1569,7 +1569,7 @@ class PageController extends AbstractActionController
      * action buttons in the interface. Allowing to expand the rights to php saving functions, and updating
      * treeview right menu
      *
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function isActionActiveAction()
     {
@@ -1590,7 +1590,7 @@ class PageController extends AbstractActionController
     /**
      * Checks if an action (save/publish) is allowed by using the availability of
      * buttons (save/etc)
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function pageActionsRightCheckAction()
     {

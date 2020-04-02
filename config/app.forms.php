@@ -11,7 +11,7 @@ return array(
 						'method' => 'POST',
 						'action' => '/melis/MelisCms/Page/saveProperties',
 					),
-					'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+					'hydrator'  => 'Laminas\Stdlib\Hydrator\ArraySerializable',
 					'elements' => array(  
 							array(
 								'spec' => array(
@@ -46,7 +46,7 @@ return array(
 							array(
 								'spec' => array(
 									'name' => 'page_type',
-									'type' => 'Zend\Form\Element\Select',
+									'type' => 'Laminas\Form\Element\Select',
 									'options' => array(
 										'label' => 'tr_meliscms_page_tab_properties_form_Type',
 										'tooltip' => 'tr_meliscms_page_tab_properties_form_Type tooltip',
@@ -83,7 +83,7 @@ return array(
 					/*		array(
 								'spec' => array(
 									'name' => 'page_status',
-									'type' => 'Zend\Form\Element\Select',
+									'type' => 'Laminas\Form\Element\Select',
 									'options' => array(
 										'label' => 'tr_meliscms_page_tab_properties_form_Status',
 										'value_options' => array(
@@ -100,7 +100,7 @@ return array(
 							array(
 								'spec' => array(
 									'name' => 'page_menu',
-									'type' => 'Zend\Form\Element\Select',
+									'type' => 'Laminas\Form\Element\Select',
 									'options' => array(
 										'label' => 'tr_meliscms_page_tab_properties_form_Show Menu',
 										'tooltip' => 'tr_meliscms_page_tab_properties_form_Show Menu tooltip',
@@ -182,7 +182,7 @@ return array(
                             array(
                                 'spec' => array(
                                     'name' => 'page_search_type',
-//                                    'type' => 'Zend\Form\Element\Select',
+//                                    'type' => 'Laminas\Form\Element\Select',
                                     'type' => 'MelisCmsStyleSelect',
                                     'options' => array(
                                         'label' => 'tr_meliscms_page_tab_properties_search_type',
@@ -219,7 +219,7 @@ return array(
 											//'min'      => 1,
 											'max'      => 255,
 										    'messages' => array(
-										        \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_page_form_page_name_long',
+										        \Laminas\Validator\StringLength::TOO_LONG => 'tr_meliscms_page_form_page_name_long',
 										    ),
 										),
 									),
@@ -227,7 +227,7 @@ return array(
 								        'name' => 'NotEmpty',
 								        'options' => array(
 								            'messages' => array(
-								                \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_page_form_page_name_empty',
+								                \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_page_form_page_name_empty',
 								            ),
 								        ),
 								    ),
@@ -246,7 +246,7 @@ return array(
 										'options' => array(
 											'haystack' => array('SITE', 'FOLDER', 'PAGE'),
 										    'messages' => array(
-										        \Zend\Validator\InArray::NOT_IN_ARRAY => 'tr_meliscms_page_form_page_type_invalid',
+										        \Laminas\Validator\InArray::NOT_IN_ARRAY => 'tr_meliscms_page_form_page_type_invalid',
 										    ),
 										)
 									),
@@ -254,7 +254,7 @@ return array(
 								        'name' => 'NotEmpty',
 								        'options' => array(
 								            'messages' => array(
-								                \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_page_form_page_type_empty',
+								                \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_page_form_page_type_empty',
 								            ),
 								        ),
 								    ),
@@ -270,7 +270,7 @@ return array(
 					                    'name' => 'NotEmpty',
 					                    'options' => array(
 					                        'messages' => array(
-					                            \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_page_form_plang_lang_id_empty',
+					                            \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_page_form_plang_lang_id_empty',
 					                        ),
 					                    ),
 					                ),
@@ -287,7 +287,7 @@ return array(
 										'options' => array(
 											'haystack' => array('LINK', 'NOLINK', 'NONE'),
 										    'messages' => array(
-										        \Zend\Validator\InArray::NOT_IN_ARRAY => 'tr_meliscms_page_form_page_menu_invalid',
+										        \Laminas\Validator\InArray::NOT_IN_ARRAY => 'tr_meliscms_page_form_page_menu_invalid',
 										    ),
 										)
 									),
@@ -295,7 +295,7 @@ return array(
 								        'name' => 'NotEmpty',
 								        'options' => array(
 								            'messages' => array(
-								                \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_page_form_page_menu_empty',
+								                \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_page_form_page_menu_empty',
 								            ),
 								        ),
 								    ),
@@ -311,7 +311,7 @@ return array(
 								        'name' => 'NotEmpty',
 								        'options' => array(
 								            'messages' => array(
-								                \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_page_form_page_tpl_id_empty',
+								                \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_page_form_page_tpl_id_empty',
 								            ),
 								        ),
 								    ),
@@ -335,7 +335,7 @@ return array(
 						'method' => 'POST',
 						'action' => '/melis/MelisCms/PageSeo/saveSeo',
 					),
-					'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+					'hydrator'  => 'Laminas\Stdlib\Hydrator\ArraySerializable',
 					'elements' => array(  
 						array(
 							'spec' => array(
@@ -434,7 +434,7 @@ return array(
 									'options' => array(
 										'encoding' => 'UTF-8',
 									    'messages' => array(
-									        \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_pageseo_form_page_title_long',
+									        \Laminas\Validator\StringLength::TOO_LONG => 'tr_meliscms_pageseo_form_page_title_long',
 									    ),
 									),
 								),
@@ -453,7 +453,7 @@ return array(
 									'options' => array(
 										'encoding' => 'UTF-8',
 									    'messages' => array(
-									        \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_pageseo_form_page_desc_long',
+									        \Laminas\Validator\StringLength::TOO_LONG => 'tr_meliscms_pageseo_form_page_desc_long',
 									    ),
 									),
 								),
@@ -473,7 +473,7 @@ return array(
 										'encoding' => 'UTF-8',
 										'max'      => 255,
 									    'messages' => array(
-									        \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_pageseo_form_page_url_too_long',
+									        \Laminas\Validator\StringLength::TOO_LONG => 'tr_meliscms_pageseo_form_page_url_too_long',
 									    ),
 									),
 								),
@@ -493,7 +493,7 @@ return array(
 										'encoding' => 'UTF-8',
 										'max'      => 255,
 									    'messages' => array(
-									        \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_pageseo_form_page_url_too_long',
+									        \Laminas\Validator\StringLength::TOO_LONG => 'tr_meliscms_pageseo_form_page_url_too_long',
 									    ),
 									),
 								),
@@ -513,7 +513,7 @@ return array(
 										'encoding' => 'UTF-8',
 										'max'      => 255,
 									    'messages' => array(
-									        \Zend\Validator\StringLength::TOO_LONG => 'tr_meliscms_pageseo_form_page_url_too_long',
+									        \Laminas\Validator\StringLength::TOO_LONG => 'tr_meliscms_pageseo_form_page_url_too_long',
 									    ),
 									),
 								),
@@ -532,7 +532,7 @@ return array(
 			            'method' => 'POST',
 			            'action' => '',
 			        ),
-			        'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+			        'hydrator'  => 'Laminas\Stdlib\Hydrator\ArraySerializable',
 			        'elements' => array(
 			            array(
 			                'spec' => array(
@@ -566,7 +566,7 @@ return array(
 			                        'name' => 'NotEmpty',
 			                        'options' => array(
 			                            'messages' => array(
-			                                \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_page_lang_no_lang_selected',
+			                                \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_page_lang_no_lang_selected',
 			                            ),
 			                        ),
 			                    ),
