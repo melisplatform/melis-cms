@@ -554,9 +554,9 @@ var melisCms = (function(){
 			$melisIframe.css("height", height);
 			$melisIframe.css("min-height", "700px");
 
-			if ( $loader.length ) {
+			/* if ( $loader.length ) {
 				$loader.remove();
-			}
+			} */
 
 			// Activating page edition button action
 			enableCmsButtons(id);
