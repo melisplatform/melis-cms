@@ -8,34 +8,29 @@
  */
 
 namespace MelisCms\Form\Factory;
-use Laminas\ServiceManager\ServiceLocatorInterface;
+
+use Laminas\ServiceManager\ServiceManager;
 use MelisCore\Form\Factory\MelisSelectFactory;
 
 /**
  * This class creates a select box for melis page create languages version
- *
  */
 class MelisCmsPageLanguagesSelectFactory extends MelisSelectFactory
 {
-	protected function loadValueOptions(ServiceLocatorInterface $formElementManager)
+	protected function loadValueOptions(ServiceManager $serviceManager)
 	{
-		
-		$serviceManager = $formElementManager->getServiceLocator();
-		
 		$request = $serviceManager->get('request');
 		$idPage = $request->getQuery('idPage');
 		
 		$pageLangTbl = $serviceManager->get('MelisEngineTablePageLang');
 		$pageLang = $pageLangTbl->getEntryByField('plang_page_id', $idPage)->current();
 		
-		$pagesLang = array();
-		if (!empty($pageLang))
-		{
+		$pagesLang = [];
+		if (!empty($pageLang)) {
 		    $pageInitialId = $pageLang->plang_page_id_initial;
 		    $pageLang = $pageLangTbl->getEntryByField('plang_page_id_initial', $pageInitialId);
 		    
-		    foreach ($pageLang As $val)
-		    {
+		    foreach ($pageLang As $val) {
 		        array_push($pagesLang, $val->plang_lang_id);
 		    }
 		}
@@ -43,16 +38,13 @@ class MelisCmsPageLanguagesSelectFactory extends MelisSelectFactory
 		$tableLang = $serviceManager->get('MelisEngineTableCmsLang');
 		$languages = $tableLang->fetchAll();
 		
-		$valueoptions = array();
-		foreach ($languages As $val)
-		{
-		    if (!in_array($val->lang_cms_id, $pagesLang))
-		    {
+		$valueoptions = [];
+		foreach ($languages As $val) {
+		    if (!in_array($val->lang_cms_id, $pagesLang)) {
 		        $valueoptions[$val->lang_cms_locale] = $val->lang_cms_name;
 		    }
 		}
 		
 		return $valueoptions;
 	}
-
 }

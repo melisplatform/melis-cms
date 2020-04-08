@@ -1,10 +1,10 @@
 <?php 
 
-return array(
-    'css' => array(
+return [
+    'css' => [
         '/SiteSample/public/css/styles.css',
-    ),
-    'js' => array(
+    ],
+    'js' => [
         '/SiteSample/public/js/custom.js',
-    )
-);
+    ]
+];

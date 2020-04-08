@@ -9,9 +9,9 @@
 
 namespace MelisCms\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
+use MelisCore\Controller\AbstractActionController;
 use MelisCore\Service\MelisCoreRightsService;
 use Laminas\Config\Reader\Json;
 use phpDocumentor\Reflection\Types\Boolean;
@@ -28,7 +28,7 @@ class SitesModuleLoaderController extends AbstractActionController
         $modules = array();
         $request = $this->getRequest();
         $message = 'tr_meliscore_module_management_no_dependencies';
-        $tool    = $this->getServiceLocator()->get('MelisCoreTool');
+        $tool    = $this->getServiceManager()->get('MelisCoreTool');
 
         if ($request->isPost()) {
             $module = $tool->sanitize($request->getPost('module'));
@@ -57,8 +57,8 @@ class SitesModuleLoaderController extends AbstractActionController
         $modules = array();
         $requiredModules = array();
         $request = $this->getRequest();
-        $tool    = $this->getServiceLocator()->get('MelisCoreTool');
-        $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
+        $tool    = $this->getServiceManager()->get('MelisCoreTool');
+        $siteModuleLoadSvc = $this->getServiceManager()->get("MelisCmsSiteModuleLoadService");
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $message = 'tr_meliscore_module_management_no_dependencies';
 
@@ -94,7 +94,7 @@ class SitesModuleLoaderController extends AbstractActionController
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
 
-        $rightService = $this->getServiceLocator()->get('MelisCoreRights');
+        $rightService = $this->getServiceManager()->get('MelisCoreRights');
         $canAccess = $rightService->canAccess('meliscms_tool_sites_module_load_content');
 
         $view = new ViewModel();
@@ -112,9 +112,9 @@ class SitesModuleLoaderController extends AbstractActionController
     public function renderToolSitesModuleLoadContentAction() {
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $moduleName = $this->params()->fromQuery('moduleName', '');
-        $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
-        $modulesSvc = $this->getServiceLocator()->get('ModulesService');
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $siteModuleLoadSvc = $this->getServiceManager()->get("MelisCmsSiteModuleLoadService");
+        $modulesSvc = $this->getServiceManager()->get('ModulesService');
+        $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
         $siteData = $siteTable->getEntryByField("site_name",$moduleName)->toArray();
         $siteNames = array();
         if(isset($siteData)){
@@ -129,7 +129,7 @@ class SitesModuleLoaderController extends AbstractActionController
         if(empty($siteId))
             return;
 
-        $melisCoreAuth = $this->serviceLocator->get('MelisCoreAuth');
+        $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
 
         $userAuthDatas = $melisCoreAuth->getStorage()->read();
 
@@ -160,7 +160,7 @@ class SitesModuleLoaderController extends AbstractActionController
         /**
          * @var \MelisCore\Service\MelisCoreModulesService $modulesSvc
          */
-        $modulesSvc = $this->getServiceLocator()->get('ModulesService');
+        $modulesSvc = $this->getServiceManager()->get('ModulesService');
         return $modulesSvc;
     }
 
@@ -174,7 +174,7 @@ class SitesModuleLoaderController extends AbstractActionController
      */
     private function getTool()
     {
-        $toolSvc = $this->getServiceLocator()->get('MelisCoreTool');
+        $toolSvc = $this->getServiceManager()->get('MelisCoreTool');
         $toolSvc->setMelisToolKey('MelisCmsUserAccount', 'melis_cms_user_account');
         return $toolSvc;
     }

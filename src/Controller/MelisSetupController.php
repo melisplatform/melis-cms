@@ -9,10 +9,10 @@
 
 namespace MelisCms\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
 use Laminas\Session\Container;
+use MelisCore\Controller\AbstractActionController;
 
 class MelisSetupController extends AbstractActionController
 {
@@ -34,7 +34,7 @@ class MelisSetupController extends AbstractActionController
 			// $scheme  = $uri->getScheme();
 			// $siteDomain = $uri->getHost();
     
-   //          $cmsSiteSrv = $this->getServiceLocator()->get('MelisCmsSiteService');
+   //          $cmsSiteSrv = $this->$this->getServiceManager()->get('MelisCmsSiteService');
 			// $environmentName = getenv('MELIS_PLATFORM');
    //          $container = new \Laminas\Session\Container('melisinstaller');
    //          $container = $container->getArrayCopy();
@@ -95,7 +95,7 @@ class MelisSetupController extends AbstractActionController
      */
     private function getTool()
     {
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey('MelisCmsSlider', 'MelisCmsSlider_details');
 
         return $melisTool;
@@ -107,11 +107,11 @@ class MelisSetupController extends AbstractActionController
      */
     private function getForm()
     {
-        $coreConfig = $this->getServiceLocator()->get('MelisCoreConfig');
+        $coreConfig = $this->getServiceManager()->get('MelisCoreConfig');
         $form = $coreConfig->getItem('melis_engine_setup/forms/melis_installer_platform_data');
 
         $factory = new \Laminas\Form\Factory();
-        $formElements = $this->serviceLocator->get('FormElementManager');
+        $formElements = $this->getServiceManager()->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $form = $factory->createForm($form);
 
@@ -120,7 +120,7 @@ class MelisSetupController extends AbstractActionController
     }
     private function formatErrorMessage($errors = array())
     {
-        $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+        $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
         $appConfigForm = $melisMelisCoreConfig->getItem('melis_engine_setup/forms/melis_installer_platform_data');
         $appConfigForm = $appConfigForm['elements'];
 
@@ -171,7 +171,7 @@ class MelisSetupController extends AbstractActionController
 
             $platformsData = array_merge($defaultPlatformData, $platformsData);
 
-            $siteDomainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
+            $siteDomainTable = $this->getServiceManager()->get('MelisEngineTableSiteDomain');
 
             foreach($platformsData as $data) {
                 $siteDomainTable->save($data);

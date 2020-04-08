@@ -9,7 +9,7 @@
 
 namespace MelisCms\Form\Factory\Plugin;
 
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceManager;
 use MelisCore\Form\Factory\MelisSelectFactory;
 
 /**
@@ -17,15 +17,12 @@ use MelisCore\Form\Factory\MelisSelectFactory;
  */
 class MelisCmsPluginSiteSelectFactory extends MelisSelectFactory
 {
-	protected function loadValueOptions(ServiceLocatorInterface $formElementManager)
+	protected function loadValueOptions(ServiceManager $serviceManager)
 	{
-		$serviceManager = $formElementManager->getServiceLocator();
-		
 		$siteTable = $serviceManager->get('MelisEngineTableSite');
 		
 		$valueoptions = array();
-		foreach ($siteTable->fetchAll() As $val)
-		{
+		foreach ($siteTable->fetchAll() As $val) {
 		    $valueoptions[$val->site_id] = !empty($val->site_label) ? $val->site_label : $val->site_name;
 		}
 		

@@ -17,7 +17,7 @@ return array(
 							'method'=> 'POST',
 							'action'=> $_SERVER['REQUEST_URI'],
 						),
-						'hydrator' => 'Laminas\Stdlib\Hydrator\ArraySerializable',
+						'hydrator' => 'Laminas\Hydrator\ArraySerializable',
 						'elements' => array(
 							array(
 								'spec' => array(

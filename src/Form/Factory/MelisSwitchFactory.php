@@ -10,19 +10,17 @@
 namespace MelisCms\Form\Factory; 
 
 use Laminas\Form\Element\Text;
-use Laminas\ServiceManager\ServiceLocatorInterface;
-use Laminas\ServiceManager\FactoryInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Melis Cms Switch plugin factory
  */
 
-class MelisSwitchFactory extends Text implements FactoryInterface
+class MelisSwitchFactory extends Text
 {
-    public function createService(ServiceLocatorInterface $formElementManager)
+    public function __invoke(ContainerInterface $container)
     { 
         $element = new Text;        
-        
         return $element;
     }
 }

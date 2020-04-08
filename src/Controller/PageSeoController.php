@@ -9,9 +9,9 @@
 
 namespace MelisCms\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
+use MelisCore\Controller\AbstractActionController;
 
 /**
  * This class renders Melis CMS Page tab properties
@@ -37,7 +37,7 @@ class PageSeoController extends AbstractActionController
 		 */
 		if (!empty($idPage))
 		{
-			$melisTablePageSeo = $this->serviceLocator->get('MelisEngineTablePageSeo');
+			$melisTablePageSeo = $this->getServiceManager()->get('MelisEngineTablePageSeo');
 			$datasPageSeo = $melisTablePageSeo->getEntryById($idPage);
 		}
 		else
@@ -75,7 +75,7 @@ class PageSeoController extends AbstractActionController
 		/**
 		 * Get the config for this form
 		 */
-		$melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+		$melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
 		$appConfigForm = $melisMelisCoreConfig->getItem($pathAppConfigForm, $idPage . '_');
 		
 		
@@ -85,7 +85,7 @@ class PageSeoController extends AbstractActionController
 		 * Bind with datas
 		 */
 		$factory = new \Laminas\Form\Factory();
-		$formElements = $this->serviceLocator->get('FormElementManager');
+		$formElements = $this->getServiceManager()->get('FormElementManager');
 		$factory->setFormElementManager($formElements);
 		$appConfigForm['attributes']['action'] .= '?idPage=' . $idPage;
 		$seoForm = $factory->createForm($appConfigForm);
@@ -115,7 +115,7 @@ class PageSeoController extends AbstractActionController
 	public function saveSeoAction()
 	{
 		$idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
-		$translator = $this->serviceLocator->get('translator');
+		$translator = $this->getServiceManager()->get('translator');
 		
 		$eventDatas = array('idPage' => $idPage);
 		$this->getEventManager()->trigger('meliscms_page_saveseo_start', null, $eventDatas);
@@ -123,7 +123,7 @@ class PageSeoController extends AbstractActionController
 		// Get the form properly loaded
 		$seoForm = $this->getSeoPageForm($idPage);
 
-		$melisTablePageSeo = $this->serviceLocator->get('MelisEngineTablePageSeo');
+		$melisTablePageSeo = $this->getServiceManager()->get('MelisEngineTablePageSeo');
 
 		// Check if post
 		$request = $this->getRequest();
@@ -183,7 +183,7 @@ class PageSeoController extends AbstractActionController
 								if ($datasPageSeo->pseo_id != $idPage)
 								{
 									$pageNameDuplicate = '';
-									$melisPage = $this->serviceLocator->get('MelisEnginePage');
+									$melisPage = $this->getServiceManager()->get('MelisEnginePage');
 									$datasPage = $melisPage->getDatasPage($datasPageSeo->pseo_id, 'saved');
 									$pageTree = $datasPage->getMelisPageTree();
 									if (!empty($pageTree))
@@ -206,7 +206,7 @@ class PageSeoController extends AbstractActionController
 					}
 					
 					// Cleaning special char and white spaces on SEO Url
-					$enginePage = $this->getServiceLocator()->get('MelisEngineTree');
+					$enginePage = $this->getServiceManager()->get('MelisEngineTree');
 					$datas['pseo_url'] = $enginePage->cleanString(mb_strtolower($datas['pseo_url']));
 					// Checking for spaces
 					if (preg_match('/\s/', $datas['pseo_url']))
@@ -232,7 +232,7 @@ class PageSeoController extends AbstractActionController
 			{
 				// Add labels of errors
 				$errors = $seoForm->getMessages();
-				$melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+				$melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
 				$appConfigForm = $melisMelisCoreConfig->getItem(PageSeoController::PageSeoAppConfigPath, $idPage . '_');
 				$appConfigForm = $appConfigForm['elements'];
 				
@@ -276,12 +276,12 @@ class PageSeoController extends AbstractActionController
 	public function deletePageSeoAction()
 	{
 		$idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
-		$translator = $this->serviceLocator->get('translator');
+		$translator = $this->getServiceManager()->get('translator');
 
 		$eventDatas = array('idPage' => $idPage);
 		$this->getEventManager()->trigger('meliscms_page_deleteseo_start', null, $eventDatas);
 		
-		$melisTablePageSeo = $this->serviceLocator->get('MelisEngineTablePageSeo');
+		$melisTablePageSeo = $this->getServiceManager()->get('MelisEngineTablePageSeo');
 		$melisTablePageSeo->deleteById($idPage);
 		
 		$result = array(

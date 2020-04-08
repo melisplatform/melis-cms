@@ -13,9 +13,10 @@ use Laminas\EventManager\ResponseCollection;
 use Laminas\Form\Element\Select;
 use Laminas\Form\Factory;
 use Laminas\Form\Form;
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
+use MelisCore\Controller\AbstractActionController;
+use MelisCore\Service\MelisGeneralService;
 
 /**
  *
@@ -41,17 +42,17 @@ class ToolTemplateController extends AbstractActionController
      */
     public function renderToolTemplateAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $noAccessPrompt = '';
         // Checks wether the user has access to this tools or not
-        $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
+        $melisCoreRights = $this->getServiceManager()->get('MelisCoreRights');
         if(!$melisCoreRights->canAccess($this::TOOL_KEY)) {
             $noAccessPrompt = $translator->translate('tr_tool_no_access');
         }
 
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_templates');
@@ -73,7 +74,7 @@ class ToolTemplateController extends AbstractActionController
     public function renderToolTemplateHeaderAction()
     {
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_templates');
@@ -131,8 +132,8 @@ class ToolTemplateController extends AbstractActionController
      */
     public function renderToolTemplateContentFiltersSitesAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $translator = $this->getServiceManager()->get('translator');
+        $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
 
         $sites = array();
         $sites[] = '<option value="">'. $translator->translate('tr_meliscms_tool_templates_tpl_label_choose') .'</option>';
@@ -179,11 +180,11 @@ class ToolTemplateController extends AbstractActionController
 
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
 
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_templates');
@@ -240,7 +241,7 @@ class ToolTemplateController extends AbstractActionController
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_templates');
@@ -262,7 +263,7 @@ class ToolTemplateController extends AbstractActionController
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_templates');
@@ -283,7 +284,7 @@ class ToolTemplateController extends AbstractActionController
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_templates');
@@ -315,9 +316,9 @@ class ToolTemplateController extends AbstractActionController
      */
     public function getTemplateForm()
     {
-        $melisConfig = $this->getServiceLocator()->get('MelisCoreConfig');
+        $melisConfig = $this->getServiceManager()->get('MelisCoreConfig');
         $factory = new Factory();
-        $formElementMgr = $this->getServiceLocator()->get('FormElementManager');
+        $formElementMgr = $this->getServiceManager()->get('FormElementManager');
         $factory->setFormElementManager($formElementMgr);
         $formConfig = $melisConfig->getItem(self::TEMPLATE_FORM);
 
@@ -325,11 +326,13 @@ class ToolTemplateController extends AbstractActionController
          * Trigger listeners trying to modify the form config before form creation
          *
          *   - New Templating Engine? Register your template type using this event self::TEMPLATE_FORM_CONFIG_MODIFY
+
+         * Sending event with string config position and config array retrieved as parameters
          *
-         *  @var \Laminas\EventManager\ResponseCollection $result
+         * @var MelisGeneralService $srv
          */
-        $result = $this->getEventManager()->trigger(self::TEMPLATE_FORM_CONFIG_MODIFY, $this, ['formConfig' => $formConfig]);
-        $formConfig = $result instanceof ResponseCollection && $result->count() > 0 ? $result->last() : $formConfig;
+        $srv = $this->getServiceManager()->get('MelisGeneralService');
+        $result = $srv->sendEvent(self::TEMPLATE_FORM_CONFIG_MODIFY, ['formConfig' => $formConfig], $this)['formConfig'];
 
         return $factory->createForm($formConfig);
     }
@@ -372,7 +375,7 @@ class ToolTemplateController extends AbstractActionController
         $data    = array();
         if($request->isPost())
         {
-            $template = $this->getServiceLocator()->get("MelisPageTemplate");
+            $template = $this->getServiceManager()->get("MelisPageTemplate");
             $success = 2;
 
             $data = $template->getTemplate($pageId);
@@ -403,22 +406,22 @@ class ToolTemplateController extends AbstractActionController
         $textMessage = '';
 
         // translator
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         $eventDatas = array();
         $this->getEventManager()->trigger('meliscms_template_savenew_start', $this, $eventDatas);
 
         // get the service for Templates Model & Table
-        $templatesModel = $this->getServiceLocator()->get('MelisEngineTableTemplate');
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $templatesModel = $this->getServiceManager()->get('MelisEngineTableTemplate');
+        $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_templates');
 
         // get the currently logged in user
-        $melisCoreAuth = $this->serviceLocator->get('MelisCoreAuth');
+        $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
         $userAuthDatas =  $melisCoreAuth->getStorage()->read();
 
         // get the form
@@ -436,7 +439,7 @@ class ToolTemplateController extends AbstractActionController
             {
                 // Get the current page id from platform table
                 $melisModuleName = getenv('MELIS_PLATFORM');
-                $melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+                $melisEngineTablePlatformIds = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
                 $datasPlatformIds = $melisEngineTablePlatformIds->getPlatformIdsByPlatformName($melisModuleName);
                 $datasPlatformIds = $datasPlatformIds->current();
 
@@ -578,7 +581,7 @@ class ToolTemplateController extends AbstractActionController
             }
 
             // insert labels and error messages in error array
-            $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+            $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
             $appConfigForm = $melisMelisCoreConfig->getItem(self::TEMPLATE_FORM);
             $appConfigForm = $appConfigForm['elements'];
 
@@ -623,18 +626,18 @@ class ToolTemplateController extends AbstractActionController
         // make sure that the request is an AJAX call
         if($this->getRequest()->isPost()) {
             /** @var \MelisEngine\Model\Tables\MelisTemplateTable $templatesModel */
-            $templatesModel = $this->getServiceLocator()->get('MelisEngineTableTemplate');
+            $templatesModel = $this->getServiceManager()->get('MelisEngineTableTemplate');
 
             // declare the Tool service that we will be using to completely create our tool.
-            $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+            $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
             // tell the Tool what configuration in the app.tool.php that will be used.
             $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_templates');
 
             // Site Table
-            $tableSite = $this->getServiceLocator()->get('MelisEngineTableSite');
+            $tableSite = $this->getServiceManager()->get('MelisEngineTableSite');
 
-            $translator = $this->getServiceLocator()->get('translator');
+            $translator = $this->getServiceManager()->get('translator');
 
             $siteId = $this->getRequest()->getPost('tpl_site_id');
             $siteId = !empty($siteId)? $siteId : null;
@@ -739,7 +742,7 @@ class ToolTemplateController extends AbstractActionController
         $status      = false;
         $fromMelisSites = false;
 
-        $moduleSrv = $this->getServiceLocator()->get('ModulesService');
+        $moduleSrv = $this->getServiceManager()->get('ModulesService');
         $modulePath = $moduleSrv->getModulePath($template['module']);
 
         /**
@@ -862,13 +865,13 @@ class ToolTemplateController extends AbstractActionController
         $this->getEventManager()->trigger('meliscms_template_save_start', $this, $eventDatas);
 
         // translator
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         // get the service for Templates Model & Table
-        $templatesModel = $this->getServiceLocator()->get('MelisEngineTableTemplate');
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $templatesModel = $this->getServiceManager()->get('MelisEngineTableTemplate');
+        $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_templates');
@@ -877,7 +880,7 @@ class ToolTemplateController extends AbstractActionController
         $templateUpdateForm = $this->getTemplateForm();
 
         // get the currently logged in user
-        $melisCoreAuth = $this->serviceLocator->get('MelisCoreAuth');
+        $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
         $userAuthDatas =  $melisCoreAuth->getStorage()->read();
 
         // make sure it's a POST call
@@ -1016,24 +1019,19 @@ class ToolTemplateController extends AbstractActionController
                         $status = 1;
                     }
                 }
-
-
-            }
-            else {
+            } else {
                 $textMessage = 'tr_tool_template_fm_update_content_error';
                 $status = 0;
                 $errors = $templateUpdateForm->getMessages();
             }
 
             // insert labels and error messages in error array
-            $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+            $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
             $appConfigForm = $melisMelisCoreConfig->getItem(self::TEMPLATE_FORM);
             $appConfigForm = $appConfigForm['elements'];
 
-            foreach ($errors as $keyError => $valueError)
-            {
-                foreach ($appConfigForm as $keyForm => $valueForm)
-                {
+            foreach ($errors as $keyError => $valueError) {
+                foreach ($appConfigForm as $keyForm => $valueForm) {
                     if ($valueForm['spec']['name'] == $keyError &&
                         !empty($valueForm['spec']['options']['label']))
                         $errors[$keyError]['label'] = $valueForm['spec']['options']['label'];
@@ -1060,7 +1058,7 @@ class ToolTemplateController extends AbstractActionController
      */
     public function deleteTemplateDataAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
     	$eventDatas = array();
     	$this->getEventManager()->trigger('meliscms_template_delete_start', $this, $eventDatas);
@@ -1075,7 +1073,7 @@ class ToolTemplateController extends AbstractActionController
         if($request->isPost()) {
 
             // get the service for Templates Model & Table
-            $templatesModel = $this->getServiceLocator()->get('MelisEngineTableTemplate');
+            $templatesModel = $this->getServiceManager()->get('MelisEngineTableTemplate');
             $templateId = (int) $request->getPost('templateId');
 
             // make sure our ID is not empty
@@ -1109,7 +1107,7 @@ class ToolTemplateController extends AbstractActionController
 
         if($request->isPost())
         {
-            $templatesModel = $this->getServiceLocator()->get('MelisEngineTableTemplate');
+            $templatesModel = $this->getServiceManager()->get('MelisEngineTableTemplate');
             $templateId = $request->getPost('templateId');
 
             if(is_numeric($templateId))
@@ -1130,9 +1128,9 @@ class ToolTemplateController extends AbstractActionController
 
     public function exportToCsvAction()
     {
-        $templatesModel = $this->getServiceLocator()->get('MelisEngineTableTemplate');
-        $translator = $this->getServiceLocator()->get('translator');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $templatesModel = $this->getServiceManager()->get('MelisEngineTableTemplate');
+        $translator = $this->getServiceManager()->get('translator');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_templates');
 
 

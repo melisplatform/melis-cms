@@ -10,10 +10,10 @@
 namespace MelisCms\Controller;
 
 
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Session\Container;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
+use MelisCore\Controller\AbstractActionController;
 
 /**
  * This class deals with the languages button in the header
@@ -27,11 +27,11 @@ class LanguageController extends AbstractActionController
 
     public function renderToolLanguageContainerAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $noAccessPrompt = '';
         // Checks wether the user has access to this tools or not
-        $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
+        $melisCoreRights = $this->getServiceManager()->get('MelisCoreRights');
         if(!$melisCoreRights->canAccess(self::INTERFACE_KEY)) {
             $noAccessPrompt = $translator->translate('tr_tool_no_access');
         }
@@ -48,9 +48,9 @@ class LanguageController extends AbstractActionController
     
     public function renderToolLanguageHeaderAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $melisKey = $this->params()->fromRoute('melisKey', '');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
     
         $view = new ViewModel();
@@ -72,9 +72,9 @@ class LanguageController extends AbstractActionController
 
     public function renderToolLanguageContentAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $melisKey = $this->params()->fromRoute('melisKey', '');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
     
     
@@ -122,7 +122,7 @@ class LanguageController extends AbstractActionController
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
@@ -144,7 +144,7 @@ class LanguageController extends AbstractActionController
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
@@ -159,7 +159,7 @@ class LanguageController extends AbstractActionController
     public function renderToolLanguageModalAddContentAction()
     {
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
     
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
@@ -176,7 +176,7 @@ class LanguageController extends AbstractActionController
         $melisKey = $this->params()->fromRoute('melisKey', '');
     
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
     
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
@@ -190,7 +190,7 @@ class LanguageController extends AbstractActionController
     
     public function renderToolLanguageModalEditContentAction(){
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
@@ -209,8 +209,8 @@ class LanguageController extends AbstractActionController
     public function getTranslationsList()
     {
         $data = "";
-        $melisCmsAuth = $this->getServiceLocator()->get('MelisCoreAuth');
-        $melisCmsRights = $this->getServiceLocator()->get('MelisCoreRights');
+        $melisCmsAuth = $this->getServiceManager()->get('MelisCoreAuth');
+        $melisCmsRights = $this->getServiceManager()->get('MelisCoreRights');
 
         return $data;
 
@@ -220,10 +220,10 @@ class LanguageController extends AbstractActionController
     {
 
 
-        $langTable = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
-        $translator = $this->getServiceLocator()->get('translator');
+        $langTable = $this->getServiceManager()->get('MelisEngineTableCmsLang');
+        $translator = $this->getServiceManager()->get('translator');
 
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
     
         $colId = array();
@@ -303,7 +303,7 @@ class LanguageController extends AbstractActionController
         $container = new Container('meliscms');
         $locale = $container['melis-lang-locale'];
     
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
     
         $transData = array(
             'sEmptyTable' => $translator->translate('tr_meliscms_dt_sEmptyTable'),
@@ -338,7 +338,7 @@ class LanguageController extends AbstractActionController
         if($this->getRequest()->isPost())
         {
             $langId = $this->getRequest()->getPost('id');
-            $langCmsTable = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+            $langCmsTable = $this->getServiceManager()->get('MelisEngineTableCmsLang');
         
             $langData = $langCmsTable->getEntryById($langId);
         
@@ -358,10 +358,10 @@ class LanguageController extends AbstractActionController
     {
         $response = array();
         $this->getEventManager()->trigger('meliscms_language_new_start', $this, $response);
-        $langTable = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
-        $translator = $this->getServiceLocator()->get('translator');
+        $langTable = $this->getServiceManager()->get('MelisEngineTableCmsLang');
+        $translator = $this->getServiceManager()->get('translator');
 
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
         $id = null;
         $form = $melisTool->getForm('meliscms_tool_language_generic_form');
@@ -370,7 +370,7 @@ class LanguageController extends AbstractActionController
         $errors  = array();
         $textTitle = 'tr_meliscms_tool_language';
         $textMessage = 'tr_meliscms_tool_language_add_failed';
-        $melisTranslation = $this->getServiceLocator()->get('MelisCoreTranslation');
+        $melisTranslation = $this->getServiceManager()->get('MelisCoreTranslation');
         if($this->getRequest()->isPost()) {
     
             $postValues = get_object_vars($this->getRequest()->getPost());
@@ -398,7 +398,7 @@ class LanguageController extends AbstractActionController
             }
 
             if ($errors) {
-                $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+                $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
                 $appConfigForm = $melisMelisCoreConfig->getItem('meliscms/tools/meliscms_language_tool/forms/meliscms_tool_language_generic_form');
                 $appConfigForm = $appConfigForm['elements'];
         
@@ -433,7 +433,7 @@ class LanguageController extends AbstractActionController
     {
         $response = [];
         $this->getEventManager()->trigger('meliscms_platform_update_start', $this, $response);
-        $platformTable = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+        $platformTable = $this->getServiceManager()->get('MelisEngineTableCmsLang');
 
         $id = 0;
         $success = 0;
@@ -442,7 +442,7 @@ class LanguageController extends AbstractActionController
         $textMessage = 'tr_meliscms_tool_language_prompts_edit_failed';
 
         if ($this->getRequest()->isPost()) {
-            $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+            $melisTool = $this->getServiceManager()->get('MelisCoreTool');
             $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
             $form = $melisTool->getForm('meliscms_tool_language_generic_form');
 
@@ -461,7 +461,7 @@ class LanguageController extends AbstractActionController
                 $errors = $form->getMessages();
             }
 
-            $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+            $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
             $appConfigForm = $melisMelisCoreConfig->getItem('meliscms/tools/meliscms_language_tool/forms/meliscms_tool_language_generic_form');
             $appConfigForm = $appConfigForm['elements'];
 
@@ -497,12 +497,12 @@ class LanguageController extends AbstractActionController
     {
         $response = array();
         $this->getEventManager()->trigger('meliscms_language_delete_start', $this, $response);
-        $translator = $this->getServiceLocator()->get('translator');
-        $langTable = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $translator = $this->getServiceManager()->get('translator');
+        $langTable = $this->getServiceManager()->get('MelisEngineTableCmsLang');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
         $textMessage = 'tr_meliscms_tool_language_delete_failed';
-        $melisTranslation = $this->getServiceLocator()->get('MelisCoreTranslation');
+        $melisTranslation = $this->getServiceManager()->get('MelisCoreTranslation');
     
         $id = null;
         $success = 0;

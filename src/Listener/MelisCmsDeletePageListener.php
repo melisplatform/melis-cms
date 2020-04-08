@@ -20,27 +20,26 @@ use MelisCore\Listener\MelisCoreGeneralListener;
  */
 class MelisCmsDeletePageListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
 {
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
         $sharedEvents      = $events->getSharedManager();
         
         $callBackHandler = $sharedEvents->attach(
         	'MelisCms',
         	'meliscms_page_delete_start', 
-        	function($e){
+        	function($event){
 
-        		$sm = $e->getTarget()->getServiceLocator();   		
+                $sm = $event->getTarget()->getEvent()->getApplication()->getServiceManager();
 
         		$melisCoreDispatchService = $sm->get('MelisCoreDispatch');
      
         		// Check rights to delete
         		list($success, $errors, $datas) = $melisCoreDispatchService->dispatchPluginAction(
-        				$e,
-        				'meliscms',
-        				'action-page-tmp',
-        				'MelisCms\Controller\Page',
-        				array('action' => 'pageActionsRightCheck',
-        						'actionwanted' => 'delete')
+                    $e,
+                    'meliscms',
+                    'action-page-tmp',
+                    'MelisCms\Controller\Page',
+                    ['action' => 'pageActionsRightCheck', 'actionwanted' => 'delete']
         		);
         		if (!$success)
         			return;
@@ -51,29 +50,29 @@ class MelisCmsDeletePageListener extends MelisCoreGeneralListener implements Lis
     			    'meliscms',
     			    'action-page-tmp',
     			    'MelisCms\Controller\Pagelanguages',
-    			    array_merge(array('action' => 'setInitialPageLanguage'))
-    			    );
+    			    array_merge(['action' => 'setInitialPageLanguage'])
+                );
     			if (!$success)
     			    return;
         		
         		// Delete the page
         		list($success, $errors, $datas) = $melisCoreDispatchService->dispatchPluginAction(
-	    				$e,
-        				'meliscms',
-	    				'action-page-tmp',
-	    				'MelisCms\Controller\Page',
-	    				array_merge(array('action' => 'deletePageTree'))
+                    $e,
+                    'meliscms',
+                    'action-page-tmp',
+                    'MelisCms\Controller\Page',
+                    array_merge(['action' => 'deletePageTree'])
 	    		);
 	    		if (!$success)
 	    			return; 
 	    			
 	    		// Delete the SEO datas linked to the page
 	    		list($success, $errors, $datas) = $melisCoreDispatchService->dispatchPluginAction(
-	    				$e,
-	    				'meliscms',
-	    				'action-page-tmp',
-	    				'MelisCms\Controller\PageSeo',
-	    				array_merge(array('action' => 'deletePageSeo'))
+                    $e,
+                    'meliscms',
+                    'action-page-tmp',
+                    'MelisCms\Controller\PageSeo',
+                    array_merge(['action' => 'deletePageSeo'])
 	    		);
 	    		if (!$success)
 	    			return;

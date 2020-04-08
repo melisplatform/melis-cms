@@ -9,9 +9,9 @@
 
 namespace MelisCms\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
+use MelisCore\Controller\AbstractActionController;
 use ZipArchive;
 use Laminas\Http\PhpEnvironment\Response as HttpResponse;
 
@@ -45,7 +45,7 @@ class PageImportController extends AbstractActionController
             $max_size = $max_post;
         }
 
-        $userTable = $this->getServiceLocator()->get('MelisCoreTableUser');
+        $userTable = $this->getServiceManager()->get('MelisCoreTableUser');
         $userData = $userTable->getEntryByField('usr_id', $this->getUser()->usr_id)->current();
 
         $view = new ViewModel();
@@ -91,8 +91,8 @@ class PageImportController extends AbstractActionController
      */
     public function importTestAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
-        $pageImportSvc = $this->getServiceLocator()->get('MelisCmsPageImportService');
+        $translator = $this->getServiceManager()->get('translator');
+        $pageImportSvc = $this->getServiceManager()->get('MelisCmsPageImportService');
         $data = get_object_vars($this->getRequest()->getPost());
         $formData = json_decode($data['formData'], true);
         $success = true;
@@ -131,8 +131,8 @@ class PageImportController extends AbstractActionController
      */
     public function importPageAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
-        $pageImportSvc = $this->getServiceLocator()->get('MelisCmsPageImportService');
+        $translator = $this->getServiceManager()->get('translator');
+        $pageImportSvc = $this->getServiceManager()->get('MelisCmsPageImportService');
         $data = get_object_vars($this->getRequest()->getPost());
         $formData = json_decode($data['formData'], true);
         $pageId = $data['pageid'];
@@ -216,7 +216,7 @@ class PageImportController extends AbstractActionController
      */
     private function getForm($module, $toolKey, $formKey)
     {
-        $toolSvc = $this->getServiceLocator()->get('MelisCoreTool');
+        $toolSvc = $this->getServiceManager()->get('MelisCoreTool');
         $toolSvc->setMelisToolKey($module, $toolKey);
         return $toolSvc->getForm($formKey);
     }
@@ -236,7 +236,7 @@ class PageImportController extends AbstractActionController
      */
     private function getUser()
     {
-        $authSvc = $this->getServiceLocator()->get('MelisCoreAuth');
+        $authSvc = $this->getServiceManager()->get('MelisCoreAuth');
         return $authSvc->getIdentity();
     }
 
@@ -248,7 +248,7 @@ class PageImportController extends AbstractActionController
      */
     private function getFormConfig($formPath, $form)
     {
-        $melisCoreConfigSvc = $this->getServiceLocator()->get('MelisCoreConfig');
+        $melisCoreConfigSvc = $this->getServiceManager()->get('MelisCoreConfig');
         return $melisCoreConfigSvc->getFormMergedAndOrdered($formPath, $form);
     }
 
@@ -260,7 +260,7 @@ class PageImportController extends AbstractActionController
      */
     private function getFormErrors($errors, $formConfig)
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         foreach ($errors as $errorKey => $errorValue) {
             foreach ($formConfig['elements'] as $elementKey => $elementValue) {
@@ -276,7 +276,7 @@ class PageImportController extends AbstractActionController
 
     public function exportCsvAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $fileName = 'import_new_ids.csv';
         $postData = get_object_vars($this->getRequest()->getPost());
         $data = $postData['idsMap'];
@@ -343,13 +343,13 @@ class PageImportController extends AbstractActionController
 
     private function getPageName($pageId)
     {
-        $pagePublishedTable = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
+        $pagePublishedTable = $this->getServiceManager()->get('MelisEngineTablePagePublished');
         $page = $pagePublishedTable->getPublishedSitePagesById($pageId)->toArray();
 
         if (! empty($page)) {
             $pageName = $page[0]['page_name'];
         } else {
-            $pageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+            $pageSavedTable = $this->getServiceManager()->get('MelisEngineTablePageSaved');
             $pageName = $pageSavedTable->getSavedSitePagesById($pageId)->toArray()[0]['page_name'];
         }
 

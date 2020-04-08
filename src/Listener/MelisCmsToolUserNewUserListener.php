@@ -19,16 +19,16 @@ use MelisCore\Listener\MelisCoreGeneralListener;
 class MelisCmsToolUserNewUserListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
 {
 	 
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
         $sharedEvents      = $events->getSharedManager();
         
         $callBackHandler = $sharedEvents->attach(
         	'MelisCore',
         	'meliscore_tooluser_savenew_start', 
-        	function($e){
+        	function($event){
 
-        		$sm = $e->getTarget()->getServiceLocator();
+                $sm = $event->getTarget()->getEvent()->getApplication()->getServiceManager();
         		$container = new Container('meliscore');
         		
         		// Add MelisCMS rights management
@@ -39,7 +39,7 @@ class MelisCmsToolUserNewUserListener extends MelisCoreGeneralListener implement
     				$userId = $postUser['usr_id'];
     				
 				if (empty($container['action-tool-user-setrights-tmp']))
-				    $container['action-tool-user-setrights-tmp'] = array();
+				    $container['action-tool-user-setrights-tmp'] = [];
     				
     			$melisCmsRights = $sm->get('MelisCmsRights');
     			$melisCmsRights = $melisCmsRights->createXmlRightsValues($userId, $postUser);

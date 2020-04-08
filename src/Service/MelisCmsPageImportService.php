@@ -9,13 +9,13 @@
 
 namespace MelisCms\Service;
 
-use MelisCore\Service\MelisCoreGeneralService;
 use Laminas\Db\Metadata\Metadata;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Dom\DOMXPath;
+use MelisCore\Service\MelisGeneralService;
 use ZipArchive;
 
-class MelisCmsPageImportService extends MelisCoreGeneralService
+class MelisCmsPageImportService extends MelisGeneralService
 {
     protected $keepIds = false;
     protected $defaultTableList = [
@@ -81,7 +81,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
         $success = true;
         $firstPage = 0;
 
-        $db = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');
+        $db = $this->getServiceManager()->get('Laminas\Db\Adapter\Adapter');
         $con = $db->getDriver()->getConnection();
         $con->beginTransaction();
 
@@ -216,27 +216,27 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
 
     private function getCurrentPageId()
     {
-        $corePlatformTbl = $this->getServiceLocator()->get('MelisCoreTablePlatform');
+        $corePlatformTbl = $this->getServiceManager()->get('MelisCoreTablePlatform');
         $corePlatform = $corePlatformTbl->getEntryByField('plf_name', getenv('MELIS_PLATFORM'))->current();
         $corePlatformId = $corePlatform->plf_id;
-        $cmsPlatformIdsTbl = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+        $cmsPlatformIdsTbl = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
         $pagePlatformIds = $cmsPlatformIdsTbl->getEntryById($corePlatformId)->current();
         return !empty($pagePlatformIds->pids_page_id_current) ? $pagePlatformIds->pids_page_id_current : null;
     }
 
     private function savePage($tablesArray, $fatherId, $keepIds = null)
     {
-        $adapter = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');
-        $pageTreeTbl = $this->getServiceLocator()->get('MelisEngineTablePageTree');
+        $adapter = $this->getServiceManager()->get('Laminas\Db\Adapter\Adapter');
+        $pageTreeTbl = $this->getServiceManager()->get('MelisEngineTablePageTree');
         $pageTree = array(
             'tree_father_page_id' => $fatherId
         );
 
         if ($keepIds) {
-            $corePlatformTbl = $this->getServiceLocator()->get('MelisCoreTablePlatform');
+            $corePlatformTbl = $this->getServiceManager()->get('MelisCoreTablePlatform');
             $corePlatform = $corePlatformTbl->getEntryByField('plf_name', getenv('MELIS_PLATFORM'))->current();
             $corePlatformId = $corePlatform->plf_id;
-            $cmsPlatformIdsTbl = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+            $cmsPlatformIdsTbl = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
 
             $pageId = $tablesArray['melis_cms_page_published']['page_id'] ?? $tablesArray['melis_cms_page_saved']['page_id'];
             $nextPageId = $pageId + 1;
@@ -261,7 +261,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                 }
             }
 
-            $pageSrv = $this->getServiceLocator()->get('MelisCmsPageService');
+            $pageSrv = $this->getServiceManager()->get('MelisCmsPageService');
             $pageTreeTbl->save($pageTree);
             $cmsPlatformIdsTbl->save(array('pids_page_id_current' => $nextPageId), $corePlatformId);
 
@@ -322,7 +322,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                 }
             }
 
-            $pageSrv = $this->getServiceLocator()->get('MelisCmsPageService');
+            $pageSrv = $this->getServiceManager()->get('MelisCmsPageService');
             $pageSrv->savePage(
                 $pageTree,
                 $tablesArray['melis_cms_page_published'] ?? [],
@@ -357,7 +357,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
      */
     private function updateExternalTables($externalTables, &$externalIdsMap)
     {
-        $adapter = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');
+        $adapter = $this->getServiceManager()->get('Laminas\Db\Adapter\Adapter');
 
         foreach ($externalTables as $tableName => $tableRows) {
             foreach ($tableRows as $rowKey => $row) {
@@ -368,17 +368,17 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                         }
                     }
 
-                    $corePlatformTbl = $this->getServiceLocator()->get('MelisCoreTablePlatform');
+                    $corePlatformTbl = $this->getServiceManager()->get('MelisCoreTablePlatform');
                     $corePlatform = $corePlatformTbl->getEntryByField('plf_name', getenv('MELIS_PLATFORM'))->current();
                     $corePlatformId = $corePlatform->plf_id;
-                    $cmsPlatformIdsTbl = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+                    $cmsPlatformIdsTbl = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
                     $platformIds = $cmsPlatformIdsTbl->getEntryById($corePlatformId)->current();
                     $currentTempId = $platformIds->pids_tpl_id_current;
 
                     $data = $row;
                     $data['tpl_id'] = $currentTempId;
 
-                    $templateTbl = $this->getServiceLocator()->get('MelisEngineTableTemplate');
+                    $templateTbl = $this->getServiceManager()->get('MelisEngineTableTemplate');
                     $queryString = 'SELECT * FROM `melis_cms_template` WHERE `tpl_site_id` = ? AND `tpl_zf2_layout` = ? AND `tpl_zf2_controller` = ? AND `tpl_zf2_action` = ?';
                     $result = $adapter->query($queryString, [$row['tpl_site_id'], $row['tpl_zf2_layout'], $row['tpl_zf2_controller'], $row['tpl_zf2_action']])->toArray();
 
@@ -392,7 +392,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                 } else if ($tableName === 'melis_cms_style') {
                     $data = $row;
                     unset($data['style_id']);
-                    $styleTbl = $this->getServiceLocator()->get('MelisEngineTableStyle');
+                    $styleTbl = $this->getServiceManager()->get('MelisEngineTableStyle');
                     $style = $styleTbl->getEntryByField('style_path', $row['style_path'])->current();
 
                     if (!empty($style)) {
@@ -404,7 +404,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
                 } else if ($tableName === 'melis_cms_lang') {
                     $data = $row;
                     unset($data['lang_cms_id']);
-                    $langTbl = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+                    $langTbl = $this->getServiceManager()->get('MelisEngineTableCmsLang');
                     $lang = $langTbl->getEntryByField('lang_cms_locale', $row['lang_cms_locale'])->current();
 
                     if (! empty($lang)) {
@@ -529,7 +529,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
      */
     private function checkAllPageTables($pages, $dbTables, $keepIds, &$errors)
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         foreach ($pages as $page) {
             $tables = !empty($page['tables']) ? $page['tables'] : [];
@@ -578,7 +578,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
      */
     private function checkExternalTables($externalTables, $dbTables, &$errors)
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         foreach ($externalTables as $externalTableName => $externalTableColumns) {
             if (in_array($externalTableName, $dbTables)) {
@@ -603,7 +603,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
      */
     private function checkTableColumns($tableName, $tableColumns, &$errors)
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $columns = $this->getTableColumns($tableName);
 
         foreach ($tableColumns as $columnName => $columnValue) {
@@ -627,8 +627,8 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
      */
     private function checkIds($tableName, $columns, &$errors)
     {
-        $adapter = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');
-        $translator = $this->getServiceLocator()->get('translator');
+        $adapter = $this->getServiceManager()->get('Laminas\Db\Adapter\Adapter');
+        $translator = $this->getServiceManager()->get('translator');
 
         $tableGateway = new TableGateway($tableName, $adapter);
         $primaryColumn = $this->getTablePrimaryColumn($tableName);
@@ -652,7 +652,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
      */
     private function getDbTableNames()
     {
-        $adapter = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');
+        $adapter = $this->getServiceManager()->get('Laminas\Db\Adapter\Adapter');
         $metadata = new Metadata($adapter);
         return $metadata->getTableNames();
     }
@@ -664,7 +664,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
      */
     private function getTableColumns($tableName)
     {
-        $adapter = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');
+        $adapter = $this->getServiceManager()->get('Laminas\Db\Adapter\Adapter');
         $metadata = new Metadata($adapter);
         return $metadata->getColumnNames($tableName);
     }
@@ -676,7 +676,7 @@ class MelisCmsPageImportService extends MelisCoreGeneralService
      */
     private function getTableConstraints($tableName)
     {
-        $adapter = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');
+        $adapter = $this->getServiceManager()->get('Laminas\Db\Adapter\Adapter');
         $metadata = new Metadata($adapter);
         return $metadata->getConstraints($tableName);
     }

@@ -12,9 +12,9 @@ namespace MelisCms\Controller;
 
 use Laminas\Form\Factory;
 use Laminas\Form\Form;
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
+use MelisCore\Controller\AbstractActionController;
 
 /**
  * Allows the customization of the text displayed on the sites
@@ -67,7 +67,7 @@ class GdprBannerController extends AbstractActionController
      */
     private function getTool()
     {
-        $toolSvc = $this->getServiceLocator()->get('MelisCoreTool');
+        $toolSvc = $this->getServiceManager()->get('MelisCoreTool');
         $toolSvc->setMelisToolKey('MelisCmsGdprBanner', 'MelisCmsGdprBanner');
 
         return $toolSvc;
@@ -82,7 +82,7 @@ class GdprBannerController extends AbstractActionController
         $form = false;
 
         if (!empty($formName)) {
-            $melisConfig = $this->getServiceLocator()->get('MelisCoreConfig');
+            $melisConfig = $this->getServiceManager()->get('MelisCoreConfig');
             $formConfig = $melisConfig->getItem(self::MODULE_NAME . '/forms/' . $formName);
             $hasMergeFormConfig = $melisConfig->getOrderFormsConfig(self::MODULE_NAME . '/forms/' . $formName);
 
@@ -92,7 +92,7 @@ class GdprBannerController extends AbstractActionController
 
             if (!empty($formConfig)) {
                 $factory = new Factory();
-                $formMgr = $this->getServiceLocator()->get('FormElementManager');
+                $formMgr = $this->getServiceManager()->get('FormElementManager');
                 $factory->setFormElementManager($formMgr);
                 $form = $factory->createForm($formConfig);
             }
@@ -112,7 +112,7 @@ class GdprBannerController extends AbstractActionController
 
         if (!empty($siteId)) {
             /** @var \MelisEngine\Service\MelisGdprService $bannerSvc */
-            $bannerSvc = $this->getServiceLocator()->get('MelisGdprService');
+            $bannerSvc = $this->getServiceManager()->get('MelisGdprService');
             $result = $bannerSvc->getGdprBannerText((int)$siteId)->toArray();
             $bannerContents = [];
             if (!empty($result)) {
@@ -127,7 +127,7 @@ class GdprBannerController extends AbstractActionController
             /** @var Form $form */
             $form = $this->getForm('banner_content_form');
 
-            $melisEngineLangTable = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+            $melisEngineLangTable = $this->getServiceManager()->get('MelisEngineTableCmsLang');
             $melisEngineLang = $melisEngineLangTable->fetchAll();
             $languages = $melisEngineLang->toArray();
 
@@ -158,7 +158,7 @@ class GdprBannerController extends AbstractActionController
 
         if ($request->isPost()) {
             $data = $request->getPost()->toArray();
-            //$data = $this->getServiceLocator()->get('MelisCoreTool')->sanitizePost($data);
+            //$data = $this->$this->getServiceManager()->get('MelisCoreTool')->sanitizePost($data);
 
             /**
              * Validate Site & Content
@@ -195,7 +195,7 @@ class GdprBannerController extends AbstractActionController
 
             if (empty($response['errors'])) {
                 /** @var \MelisEngine\Service\MelisGdprService $bannerService */
-                $bannerService = $this->getServiceLocator()->get('MelisGdprService');
+                $bannerService = $this->getServiceManager()->get('MelisGdprService');
                 /** Save languages with non-empty content */
                 foreach ($bannerContents as $langId => $bannerContent) {
                     /** Save the content */

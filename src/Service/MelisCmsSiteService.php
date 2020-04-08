@@ -2,12 +2,11 @@
 
 namespace MelisCms\Service;
 
-use MelisCore\Service\MelisCoreGeneralService;
 use Laminas\Config\Config;
 use Laminas\Config\Writer\PhpArray;
-use ZendTest\XmlRpc\Server\TestAsset\Exception;
+use MelisCore\Service\MelisGeneralService;
 
-class MelisCmsSiteService extends MelisCoreGeneralService
+class MelisCmsSiteService extends MelisGeneralService
 {
     /**
      * This method will return the page of a site
@@ -26,7 +25,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
         
         // Service implementation start
         
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
         
         $site = $siteTable->getEntryById($arrayParameters['siteId'])->current();
         
@@ -133,7 +132,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
          * get the module path
          */
         //check if site is came from the vendor
-        $moduleSrv = $this->getServiceLocator()->get('ModulesService');
+        $moduleSrv = $this->getServiceManager()->get('ModulesService');
         if(!empty($moduleSrv->getComposerModulePath($siteModuleName))){
             $modulePath = $moduleSrv->getComposerModulePath($siteModuleName);
         }else {
@@ -141,13 +140,13 @@ class MelisCmsSiteService extends MelisCoreGeneralService
         }
 
         $curPlatform = !empty(getenv('MELIS_PLATFORM'))  ? getenv('MELIS_PLATFORM') : 'development';
-        $corePlatformTable = $this->getServiceLocator()->get('MelisCoreTablePlatform');
+        $corePlatformTable = $this->getServiceManager()->get('MelisCoreTablePlatform');
         $corePlatformData = $corePlatformTable->getEntryByField('plf_name', $curPlatform)->current();
 
         if($corePlatformData)
         {
             $platformId = $corePlatformData->plf_id;
-            $cmsPlatformTable = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+            $cmsPlatformTable = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
             $cmsPlatformData = $cmsPlatformTable->getEntryById($platformId)->current();
             /**
              * Check if there is platform
@@ -187,7 +186,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                      * we can rollback the db insertion if
                      * there are some error occurred
                      */
-                    $db = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');//get db adapter
+                    $db = $this->getServiceManager()->get('Laminas\Db\Adapter\Adapter');//get db adapter
                     $con = $db->getDriver()->getConnection();//get db driver connection
                     $con->beginTransaction();//begin transaction
                     try {
@@ -466,10 +465,10 @@ class MelisCmsSiteService extends MelisCoreGeneralService
                                        $platformId, $createSiteAndDomain,
                                         $siteLangConfig, $pageIdInitial)
     {
-        $site404Table = $this->getServiceLocator()->get('MelisEngineTableSite404');
-        $siteHomeTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
-        $sitelangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
-        $langCmsTbl = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+        $site404Table = $this->getServiceManager()->get('MelisEngineTableSite404');
+        $siteHomeTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteHome');
+        $sitelangsTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteLangs');
+        $langCmsTbl = $this->getServiceManager()->get('MelisEngineTableCmsLang');
 
         /**
          * get lang data
@@ -545,8 +544,8 @@ class MelisCmsSiteService extends MelisCoreGeneralService
     private function saveSiteAndDomain($pageId, $siteDomain, $siteData, $siteUrlSetting)
     {
         // Table services
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
-        $siteDomainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
+        $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
+        $siteDomainTable = $this->getServiceManager()->get('MelisEngineTableSiteDomain');
         // Assigning the next page id from Platform Id's
         $siteData['site_main_page_id'] = $pageId;
         if($siteUrlSetting == 1){
@@ -713,7 +712,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
             /**
              * Get lang data
              */
-            $langCmsTbl = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+            $langCmsTbl = $this->getServiceManager()->get('MelisEngineTableCmsLang');
             $langData = $langCmsTbl->getEntryById($langId)->current();
             $langLocale = $langData->lang_cms_locale;
             $localeExp = explode('_', $langLocale);
@@ -764,10 +763,10 @@ class MelisCmsSiteService extends MelisCoreGeneralService
 	    
 	    // Service implementation start
 	   
-	    $pageTreeTable = $this->getServiceLocator()->get('MelisEngineTablePageTree');
-	    $pageLangTable = $this->getServiceLocator()->get('MelisEngineTablePageLang');
-	    $pageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
-	    $cmsPlatformTable = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+	    $pageTreeTable = $this->getServiceManager()->get('MelisEngineTablePageTree');
+	    $pageLangTable = $this->getServiceManager()->get('MelisEngineTablePageLang');
+	    $pageSavedTable = $this->getServiceManager()->get('MelisEngineTablePageSaved');
+	    $cmsPlatformTable = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
 	    
 	    /**
 	     * Retrieving the Current Page tree
@@ -832,8 +831,8 @@ class MelisCmsSiteService extends MelisCoreGeneralService
 	 */
 	private function createSitePageTemplate($tplId, $siteId, $siteName, $tempName, $controler, $action, $platformId)
 	{
-	    $cmsTemplateTbl = $this->getServiceLocator()->get('MelisEngineTableTemplate');
-	    $cmsPlatformTable = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+	    $cmsTemplateTbl = $this->getServiceManager()->get('MelisEngineTableTemplate');
+	    $cmsPlatformTable = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
 	    
 	    // Template data
 	    $template = array(
@@ -879,7 +878,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
 	    {
 	        if (is_writable($melisSitesDir))
 	        {
-	            $moduleSvc = $this->getServiceLocator()->get('ModulesService');
+	            $moduleSvc = $this->getServiceManager()->get('ModulesService');
 	            
 	            $melisCmsDir = $moduleSvc->getModulePath('MelisCms');
 	            
@@ -1034,7 +1033,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
 	public function getModulePath($siteModuleName)
     {
         //check if site is came from the vendor
-        $moduleSrv = $this->getServiceLocator()->get('ModulesService');
+        $moduleSrv = $this->getServiceManager()->get('ModulesService');
         if(!empty($moduleSrv->getComposerModulePath($siteModuleName))){
             $modulePath = $moduleSrv->getComposerModulePath($siteModuleName);
         }else {
@@ -1052,7 +1051,7 @@ class MelisCmsSiteService extends MelisCoreGeneralService
 	 */
 	public function generateModuleNameCase($str, $genSmallCase = false) {
 
-        $engineTree = $this->getServiceLocator()->get('MelisEngineTree');
+        $engineTree = $this->getServiceManager()->get('MelisEngineTree');
 
         //store the given module name
         $strBp = $str;

@@ -1,12 +1,12 @@
 <?php
-return array(
-	'site' => array(
-		'SiteSample' => array(
+return [
+	'site' => [
+		'SiteSample' => [
             'siteLangConfig',
-		    'allSites' => array(
+		    'allSites' => [
                 // General cross site config
                 // No page ids here
-			),
-		)
-	)
-);
+			],
+		]
+	]
+];

@@ -11,16 +11,15 @@ namespace MelisCms\Controller;
 
 use Laminas\Http\PhpEnvironment\Response as HttpResponse;
 use MelisCms\Service\MelisCmsPageExportService;
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
+use MelisCore\Controller\AbstractActionController;
 
 /**
  * This class renders Melis CMS Page export
  */
 class PageExportController extends AbstractActionController
 {
-
     /**
      * @return ViewModel
      */
@@ -31,15 +30,15 @@ class PageExportController extends AbstractActionController
         $getValues = get_object_vars($request->getQuery());
 
         //get user info
-        $auth = $this->getServiceLocator()->get('MelisCoreAuth');
+        $auth = $this->getServiceManager()->get('MelisCoreAuth');
         $user = $auth->getIdentity();
 
-        $userTable = $this->getServiceLocator()->get('MelisCoreTableUser');
+        $userTable = $this->getServiceManager()->get('MelisCoreTableUser');
         $userData = $userTable->getEntryByField('usr_id', $user->usr_id)->current();
 
 
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tools.php that will be used.
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tree_sites_tool');
@@ -63,7 +62,7 @@ class PageExportController extends AbstractActionController
      */
     public function exportPageAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         $result = [
             'success' => true,
@@ -76,7 +75,7 @@ class PageExportController extends AbstractActionController
 
         //prepare the services need for page export
         /** @var MelisCmsPageExportService $pageExportService */
-        $pageExportService = $this->getServiceLocator()->get('MelisCmsPageExportService');
+        $pageExportService = $this->getServiceManager()->get('MelisCmsPageExportService');
 
         if(!empty($data['selected_page_id']) && $request->isPost()){
             $pageId = $data['selected_page_id'];
@@ -201,13 +200,13 @@ class PageExportController extends AbstractActionController
 
     private function getPageName($pageId)
     {
-        $pagePublishedTable = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
+        $pagePublishedTable = $this->getServiceManager()->get('MelisEngineTablePagePublished');
         $page = $pagePublishedTable->getPublishedSitePagesById($pageId)->toArray();
 
         if (! empty($page)) {
             $pageName = $page[0]['page_name'];
         } else {
-            $pageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+            $pageSavedTable = $this->getServiceManager()->get('MelisEngineTablePageSaved');
             $pageName = $pageSavedTable->getSavedSitePagesById($pageId)->toArray()[0]['page_name'];
         }
 

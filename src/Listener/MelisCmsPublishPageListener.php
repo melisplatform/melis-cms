@@ -21,37 +21,36 @@ use MelisCore\Listener\MelisCoreGeneralListener;
 class MelisCmsPublishPageListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
 {
 	
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
         $sharedEvents      = $events->getSharedManager();
         
         $callBackHandler = $sharedEvents->attach(
         	'MelisCms',
         	'meliscms_page_publish_start', 
-        	function($e){
-        		
-        		$sm = $e->getTarget()->getServiceLocator();
+        	function($event){
+
+                $sm = $event->getTarget()->getEvent()->getApplication()->getServiceManager();
         		$melisCoreDispatchService = $sm->get('MelisCoreDispatch');
         		
         		$melisCmsRights = $sm->get('MelisCmsRights');
         		list($success, $errors, $datas) = $melisCoreDispatchService->dispatchPluginAction(
-        				$e,
-        				'meliscms',
-        				'action-page-tmp',
-        				'MelisCms\Controller\Page',
-        				array('action' => 'pageActionsRightCheck',
-        						'actionwanted' => 'publish')
+                    $e,
+                    'meliscms',
+                    'action-page-tmp',
+                    'MelisCms\Controller\Page',
+                    ['action' => 'pageActionsRightCheck', 'actionwanted' => 'publish']
         		);
         		if (!$success)
         			return;
         		
         		// Move saved page to published page
 	    		list($success, $errors, $datas) = $melisCoreDispatchService->dispatchPluginAction(
-	    				$e,
-        				'meliscms',
-	    				'action-page-tmp',
-	    				'MelisCms\Controller\Page',
-	    				array_merge(array('action' => 'publishSavedPage'), $datas)
+                    $e,
+                    'meliscms',
+                    'action-page-tmp',
+                    'MelisCms\Controller\Page',
+                    array_merge(['action' => 'publishSavedPage'], $datas)
 	    		);
 	    		if (!$success)
 	    			return;

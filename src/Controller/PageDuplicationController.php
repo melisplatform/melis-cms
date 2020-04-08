@@ -10,10 +10,11 @@
 namespace MelisCms\Controller;
 
 
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
 use Laminas\Session\Container;
+use MelisCore\Controller\AbstractActionController;
+
 /**
  * This class handles the display of the page duplicate button and its' events
  */
@@ -45,7 +46,7 @@ class PageDuplicationController extends AbstractActionController
     public function getOriginOfPageByPageIdAction()
     {
         $data = array();
-        $tool = $this->getServiceLocator()->get('MelisCmsPage');
+        $tool = $this->getServiceManager()->get('MelisCmsPage');
         $data = $tool->getOriginOfPage()->toArray();
 
         return $data;
@@ -70,7 +71,7 @@ class PageDuplicationController extends AbstractActionController
         if($request->isPost()) {
             $pageId = (int) $request->getPost('id');
             $cachePageId = $pageId;
-            $pageService = $this->getServiceLocator()->get('MelisEnginePage');
+            $pageService = $this->getServiceManager()->get('MelisEnginePage');
             $pageData    = $pageService->getDatasPage($pageId);
             if(empty($pageData->getMelisTemplate())) {
                 $pageData    = $pageService->getDatasPage($pageId, 'saved');
@@ -123,14 +124,14 @@ class PageDuplicationController extends AbstractActionController
 
             if($pageId) {
                 // page content
-                $melisPageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+                $melisPageSavedTable = $this->getServiceManager()->get('MelisEngineTablePageSaved');
                 $melisPageSavedTable->save([
                     'page_content' => $pageTreeData->page_content,
                     'page_creation_date' => date('Y-m-d H:i:s'),
                 ], $pageId);
                 
                 // page SEO
-                $pageSeoTable = $this->getServiceLocator()->get('MelisEngineTablePageSeo');
+                $pageSeoTable = $this->getServiceManager()->get('MelisEngineTablePageSeo');
                 $pageSeoData  = $pageSeoTable->getEntryById($cachePageId)->current();
                 if($pageSeoData) {
                     $pageSeoTable->save([
@@ -172,7 +173,7 @@ class PageDuplicationController extends AbstractActionController
 
     private function getTool()
     {
-        $tool = $this->getServiceLocator()->get('MelisCoreTool');
+        $tool = $this->getServiceManager()->get('MelisCoreTool');
         return $tool;
     }
 

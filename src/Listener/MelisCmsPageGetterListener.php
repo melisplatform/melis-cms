@@ -20,7 +20,7 @@ use Laminas\Session\Container;
  */
 class MelisCmsPageGetterListener implements ListenerAggregateInterface
 {
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
         $callBackHandler = $events->attach(
             MvcEvent::EVENT_FINISH,
@@ -37,8 +37,7 @@ class MelisCmsPageGetterListener implements ListenerAggregateInterface
                 $container = new Container('meliscms');
 
                 // Checking if the request is from Publish action on Page Edtion
-                if ($request->getQuery('idPage') && $params['action'] == 'publishPage')
-                {
+                if ($request->getQuery('idPage') && $params['action'] == 'publishPage') {
                     $pageId = $request->getQuery('idPage');
                     /**
                      * This will initialize a Page Cache flag to excute the caching procedure
@@ -52,12 +51,10 @@ class MelisCmsPageGetterListener implements ListenerAggregateInterface
                  * Checking the request is from retrieving the site from preview
                  * that has a query data of "melisSite" and Caching session flag from Publish action
                  */
-                elseif ($request->getQuery('melisSite') && !empty($container['page-cache-getter-temp']))
-                {
+                elseif ($request->getQuery('melisSite') && !empty($container['page-cache-getter-temp'])) {
                     if (! empty($params['idpage'])) {
                         $pageId = $params['idpage'];
-                        if (!empty($container['page-cache-getter-temp'][$pageId]))
-                        {
+                        if (!empty($container['page-cache-getter-temp'][$pageId])) {
                             // Page cache config
                             $cacheKey = 'cms_page_getter_'.$pageId;
                             $cacheConfig = 'meliscms_page';
@@ -65,8 +62,7 @@ class MelisCmsPageGetterListener implements ListenerAggregateInterface
                             // Retrieving page cache
                             $melisEngineCacheSystem = $sm->get('MelisEngineCacheSystem');
                             $results = $melisEngineCacheSystem->getCacheByKey($cacheKey, $cacheConfig, true);
-                            if (!empty($results))
-                            {
+                            if (!empty($results)) {
                                 // Deleting page cached
                                 $melisEngineCacheSystem->deleteCacheByPrefix($cacheKey, $cacheConfig);
                             }
@@ -76,7 +72,6 @@ class MelisCmsPageGetterListener implements ListenerAggregateInterface
                     }
                 }
             }
-
         );
         $this->listeners[] = $callBackHandler;
     }

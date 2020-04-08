@@ -1,7 +1,7 @@
 <?php 
-	return array(
-	    'MelisAssetManager',
-		'MelisEngine',
-		'MelisFront',
-	    'SiteSample',
-	);
+return [
+    'MelisAssetManager',
+    'MelisEngine',
+    'MelisFront',
+    'SiteSample',
+];

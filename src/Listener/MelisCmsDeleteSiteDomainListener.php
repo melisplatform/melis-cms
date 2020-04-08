@@ -16,19 +16,17 @@ use Laminas\Session\Container;
 class MelisCmsDeleteSiteDomainListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
 {
 	
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
         $sharedEvents      = $events->getSharedManager();
         
         $callBackHandler = $sharedEvents->attach(
         	'MelisInstaller',
-        	array(
-                'melis_install_delete_environment_start'
-        	),
-        	function($e){
+            'melis_install_delete_environment_start',
+        	function($event){
                 $success = 1;
-        		$sm = $e->getTarget()->getServiceLocator();
-        		$params = $e->getParams();
+                $sm = $event->getTarget()->getEvent()->getApplication()->getServiceManager();
+        		$params = $event->getParams();
         		$container = new Container('melisinstaller');
         		
          		$environments = $container['environments']['new'][$params['env']];
@@ -39,9 +37,8 @@ class MelisCmsDeleteSiteDomainListener extends MelisCoreGeneralListener implemen
          		        array_splice($container['environments']['new'][$params['env']], $x, 1);
      		        }
          		}
-         		
-                
-        		return array('success' => (int) $success);
+
+        		return ['success' => (int) $success];
         	},
         100);
         

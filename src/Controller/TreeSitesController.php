@@ -11,9 +11,9 @@ namespace MelisCms\Controller;
 
 use MelisCms\Service\MelisCmsRightsService;
 use Laminas\Form\Factory;
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
+use MelisCore\Controller\AbstractActionController;
 
 /**
  * This class renders Melis CMS TreeView
@@ -81,8 +81,8 @@ class TreeSitesController extends AbstractActionController
         $isAccessible = false;
 
         if ($idPage){
-            $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
-            $melisCmsRights = $this->getServiceLocator()->get('MelisCmsRights');
+            $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
+            $melisCmsRights = $this->getServiceManager()->get('MelisCmsRights');
             $xmlRights = $melisCoreAuth->getAuthRights();
             $isAccessible = $melisCmsRights->isAccessible($xmlRights, MelisCmsRightsService::MELISCMS_PREFIX_PAGES, $idPage);
         }
@@ -129,7 +129,7 @@ class TreeSitesController extends AbstractActionController
 			$idPage = str_replace(MelisCmsRightsService::MELISCMS_PREFIX_PAGES . '_', '', $idPage);
 
 		$pageMelisKey = 'meliscms_page';
-		$melisAppConfig =$this->getServiceLocator()->get('MelisCoreConfig');
+		$melisAppConfig =$this->getServiceManager()->get('MelisCoreConfig');
 		$appsConfig = $melisAppConfig->getItem($pageMelisKey);
 
 		if (!empty($appsConfig['conf']['id']))
@@ -139,7 +139,7 @@ class TreeSitesController extends AbstractActionController
 
 
 		// Get the children
-		$melisTree = $this->serviceLocator->get('MelisEngineTree');
+		$melisTree = $this->getServiceManager()->get('MelisEngineTree');
 		if (!empty($rootPages))
 		{
 			if ($rootPages[0] == -1 || $idPage != -1)
@@ -150,7 +150,7 @@ class TreeSitesController extends AbstractActionController
 			else
 			{
 				$children = array();
-				$tablePageTree = $this->getServiceLocator()->get('MelisEngineTablePageTree');
+				$tablePageTree = $this->getServiceManager()->get('MelisEngineTablePageTree');
 				foreach ($rootPages as $idPage)
 				{
 					$pageDetails = $tablePageTree->getFullDatasPage($idPage, '');
@@ -334,7 +334,7 @@ class TreeSitesController extends AbstractActionController
 
 				);
 
-				$melisCoreUser = $this->getServiceLocator()->get('MelisCoreUser');
+				$melisCoreUser = $this->getServiceManager()->get('MelisCoreUser');
 				if ($formatForRights)
 				{
 					$userId = $this->params()->fromQuery('userId', -1);
@@ -343,7 +343,7 @@ class TreeSitesController extends AbstractActionController
 					$userXml = '';
 					if (!empty($roleId) && $roleId > 0)
 					{
-						$tableUserRole = $this->serviceLocator->get('MelisCoreTableUserRole');
+						$tableUserRole = $this->getServiceManager()->get('MelisCoreTableUserRole');
 						$datasRole = $tableUserRole->getEntryById($roleId);
 						if ($datasRole)
 						{
@@ -406,9 +406,9 @@ class TreeSitesController extends AbstractActionController
 	 */
 	private function getRootForUser()
 	{
-		$melisEngineTree = $this->serviceLocator->get('MelisEngineTree');
-		$melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
-		$melisCmsRights = $this->getServiceLocator()->get('MelisCmsRights');
+		$melisEngineTree = $this->getServiceManager()->get('MelisEngineTree');
+		$melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
+		$melisCmsRights = $this->getServiceManager()->get('MelisCmsRights');
 
 		// Get the rights of the user
 		$xmlRights = $melisCoreAuth->getAuthRights();
@@ -487,7 +487,7 @@ class TreeSitesController extends AbstractActionController
      */
     private function isAllowedDragDrop()
     {
-        $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
+        $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
 
         // Get the rights of the user
         $xmlRights = $melisCoreAuth->getAuthRights();
@@ -518,7 +518,7 @@ class TreeSitesController extends AbstractActionController
         $data = array();
         $success = 0;
 
-        $treeSite = $this->getServiceLocator()->get('MelisSiteTree');
+        $treeSite = $this->getServiceManager()->get('MelisSiteTree');
 
         if($treeSite){
             $data  = $treeSite->getParentByPageId($pageId);
@@ -539,7 +539,7 @@ class TreeSitesController extends AbstractActionController
         $idPage = ($idPage == 'root')? -1 : $idPage;
         $includeSelf = $this->params()->fromRoute('includeSelf', $this->params()->fromQuery('includeSelf', ''));
         
-    	$melisEngineTree = $this->serviceLocator->get('MelisEngineTree');
+    	$melisEngineTree = $this->getServiceManager()->get('MelisEngineTree');
 		$breadcrumb = $melisEngineTree->getPageBreadcrumb($idPage, 0, true);
 		
 		$pageFatherId = $idPage;
@@ -570,7 +570,7 @@ class TreeSitesController extends AbstractActionController
      */
     public function canEditPagesAction()
     {
-        $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
+        $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
         $xmlRights = $melisCoreAuth->getAuthRights();
     	$rightsObj = simplexml_load_string($xmlRights);
         $sectionId = MelisCmsRightsService::MELISCMS_PREFIX_PAGES;
@@ -614,11 +614,11 @@ class TreeSitesController extends AbstractActionController
         
         $melisKey = $this->params()->fromRoute('melisKey', '');
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
-        $melisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
+        $melisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
         $appConfigForm = $melisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_tree_sites_tool/forms/meliscms_tree_sites_duplicate_tree_form','meliscms_tree_sites_duplicate_tree_form');
         $factory = new Factory();
-        $formElements = $this->serviceLocator->get('FormElementManager');
+        $formElements = $this->getServiceManager()->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $form = $factory->createForm($appConfigForm);
         
@@ -647,18 +647,18 @@ class TreeSitesController extends AbstractActionController
         $success = 0;
         $errors = [];
         $data = [];
-        $translator = $this->serviceLocator->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $textMessage = $translator->translate('tr_meliscms_menu_dupe_fail');
         $textTitle = $translator->translate('tr_meliscms_menu_dupe');
         $logTypeCode = 'CMS_DUPLICATE_TREE_PAGE';
         $duplicateStartingFrom = 0;
 
         if ($this->getRequest()->isPost()) {
-            $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
-            $melisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+            $melisTool = $this->getServiceManager()->get('MelisCoreTool');
+            $melisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
             $appConfigForm = $melisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_tree_sites_tool/forms/meliscms_tree_sites_duplicate_tree_form', 'meliscms_tree_sites_duplicate_tree_form');
             $factory = new Factory();
-            $formElements = $this->serviceLocator->get('FormElementManager');
+            $formElements = $this->getServiceManager()->get('FormElementManager');
             $factory->setFormElementManager($formElements);
             /** @var \Laminas\Form\Form $form */
             $form = $factory->createForm($appConfigForm);
@@ -678,15 +678,15 @@ class TreeSitesController extends AbstractActionController
                 $pageRelation = $data['pageRelation'];
 
                 //to check if the destination pageId is existing or not
-                $pageTreeTable = $this->getServiceLocator()->get('MelisEngineTablePageTree');
+                $pageTreeTable = $this->getServiceManager()->get('MelisEngineTablePageTree');
                 $pageDestId = $pageTreeTable->getEntryById($data['destinationPageId'])->toArray();
                 $pageDestId = ($data['destinationPageId'] == -1) ? true : $pageDestId;
 
                 $sourcePage = $pageTreeTable->getFullDatasPage($data['sourcePageId'])->toArray();
-                $cmsPageService = $this->getServiceLocator()->get('MelisCmsPageService');
-                $pageService = $this->getServiceLocator()->get('MelisEnginePage');
-                $pageTree = $this->getServiceLocator()->get('MelisEngineTree');
-                $langLocale = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+                $cmsPageService = $this->getServiceManager()->get('MelisCmsPageService');
+                $pageService = $this->getServiceManager()->get('MelisEnginePage');
+                $pageTree = $this->getServiceManager()->get('MelisEngineTree');
+                $langLocale = $this->getServiceManager()->get('MelisEngineTableCmsLang');
 
                 //Language Locale
                 $langLocale = $langLocale->getEntryById($langId)->current();
@@ -799,7 +799,7 @@ class TreeSitesController extends AbstractActionController
 
     public function mapPage($parentId, $pages, $bufferedParentId = null, $langId, $pageRelation =null)
     {
-        $pageService = $this->getServiceLocator()->get('MelisCmsPageService');
+        $pageService = $this->getServiceManager()->get('MelisCmsPageService');
 
         if(is_array($pages))
         {
@@ -823,7 +823,7 @@ class TreeSitesController extends AbstractActionController
     private function checkPageLanguageVersion($pages, $data = [], $langId = null)
     {
 
-        $tablePageLang   = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+        $tablePageLang   = $this->getServiceManager()->get('MelisEngineTablePageLang');
 
         foreach($pages as $idx => $page) {
             if(isset( $page['tree_page_id'])){
@@ -859,7 +859,7 @@ class TreeSitesController extends AbstractActionController
      */
     private function checkPageRelation($pages, $data = [], $parentPageIdInitial)
     {
-        $tablePageLang = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+        $tablePageLang = $this->getServiceManager()->get('MelisEngineTablePageLang');
 
         foreach ($pages as $key => $val) {
             $cmsLang = $tablePageLang->getEntryByField('plang_page_id', $val['tree_page_id'])->current();
@@ -879,7 +879,7 @@ class TreeSitesController extends AbstractActionController
     }
     private function getPageIdInitial($pageId)
     {
-        $tablePageLang = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+        $tablePageLang = $this->getServiceManager()->get('MelisEngineTablePageLang');
         $cmsLang = $tablePageLang->getEntryByField('plang_page_id', $pageId)->current();
 
         return $cmsLang->plang_page_id_initial;
@@ -892,9 +892,9 @@ class TreeSitesController extends AbstractActionController
 
         $results = array();
         $data = array();
-        $pageTreeTable = $this->getServiceLocator()->get('MelisEngineTablePageTree');
-        $pagePublish = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
-        $tableLang = $this->getServiceLocator()->get('MelisCoreTableLang');
+        $pageTreeTable = $this->getServiceManager()->get('MelisEngineTablePageTree');
+        $pagePublish = $this->getServiceManager()->get('MelisEngineTablePagePublished');
+        $tableLang = $this->getServiceManager()->get('MelisCoreTableLang');
         $coalesceColumns = $pagePublish->getTableColumns();
         
         // re assign values if data are from save page
@@ -947,10 +947,10 @@ class TreeSitesController extends AbstractActionController
 
     public function recTestAction()
     {
-        $cmsPageService = $this->getServiceLocator()->get('MelisCmsPageService');
-        $pageService = $this->getServiceLocator()->get('MelisEnginePage');
+        $cmsPageService = $this->getServiceManager()->get('MelisCmsPageService');
+        $pageService = $this->getServiceManager()->get('MelisEnginePage');
 
-        $pageTree = $this->getServiceLocator()->get('MelisEngineTree');
+        $pageTree = $this->getServiceManager()->get('MelisEngineTree');
 
         $destinationPage = 1139;
         $duplicateStartingFrom = 1355;

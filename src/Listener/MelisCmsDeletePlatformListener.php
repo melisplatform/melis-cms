@@ -19,26 +19,25 @@ use MelisCore\Listener\MelisCoreGeneralListener;
 class MelisCmsDeletePlatformListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
 {
 	
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
         $sharedEvents      = $events->getSharedManager();
         
         $callBackHandler = $sharedEvents->attach(
         	'MelisCore',
         	'meliscore_platform_delete_end',
-        	function($e){
-        		
-        		$sm = $e->getTarget()->getServiceLocator();
-        		$params = $e->getParams();
+        	function($event){
+
+                $sm = $event->getTarget()->getEvent()->getApplication()->getServiceManager();
+        		$params = $event->getParams();
         		
         		$platformIdTable = $sm->get('MelisEngineTablePlatformIds');
         		
         		$success = (int) $params['success'];
         		$id      = (int) $params['id'];
         		
-        		if($success == 1) {
+        		if($success == 1)
         		    $platformIdTable->deleteById($id);
-        		}
         	},
         100);
         

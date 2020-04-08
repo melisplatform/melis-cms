@@ -9,10 +9,10 @@
 
 namespace MelisCms\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Session\Container;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
+use MelisCore\Controller\AbstractActionController;
 
 class SitesTranslationController extends AbstractActionController
 {
@@ -86,17 +86,17 @@ class SitesTranslationController extends AbstractActionController
         $siteId = $this->params()->fromQuery('siteId', 0);
 
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tools.php that will be used.
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
         //prepare the user profile form
         $form = $melisTool->getForm('sitestranslation_form');
 
-        $melisSiteTranslationService = $this->getServiceLocator()->get('MelisSiteTranslationService');
+        $melisSiteTranslationService = $this->getServiceManager()->get('MelisSiteTranslationService');
         $transData = $melisSiteTranslationService->getSiteTranslation($translationKey, null, $siteId);
 
-        $sitelangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+        $sitelangsTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteLangs');
         $siteLangs = $sitelangsTable->getSiteLanguagesBySiteId($siteId)->toArray();
 
         $view = new ViewModel();
@@ -116,7 +116,7 @@ class SitesTranslationController extends AbstractActionController
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->params()->fromRoute('melisKey', '');;
 
-        $rightService = $this->getServiceLocator()->get('MelisCoreRights');
+        $rightService = $this->getServiceManager()->get('MelisCoreRights');
         $canAccess = $rightService->canAccess('meliscms_tool_sites_site_translations_content');
 
         $view = new ViewModel();
@@ -142,9 +142,9 @@ class SitesTranslationController extends AbstractActionController
         if(empty($siteId))
             return;
 
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $melisKey = $this->params()->fromRoute('melisKey', '');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
 
         $columns = $melisTool->getColumns();
@@ -172,10 +172,10 @@ class SitesTranslationController extends AbstractActionController
         $request = $this->getRequest();
         $postData = get_object_vars($request->getPost());
 
-        $melisSiteTranslationService = $this->getServiceLocator()->get('MelisSiteTranslationService');
-        $mstTable = $this->getServiceLocator()->get('MelisSiteTranslationTable');
+        $melisSiteTranslationService = $this->getServiceManager()->get('MelisSiteTranslationService');
+        $mstTable = $this->getServiceManager()->get('MelisSiteTranslationTable');
 
-        $db = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');//get db adapter
+        $db = $this->getServiceManager()->get('Laminas\Db\Adapter\Adapter');//get db adapter
         $con = $db->getDriver()->getConnection();//get db driver connection
         $con->beginTransaction();//begin transaction
         try {
@@ -214,11 +214,10 @@ class SitesTranslationController extends AbstractActionController
         $langError = array();
         $needToDelete = array();
 
-//        $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         $factory = new \Laminas\Form\Factory();
-        $formElements = $this->getServiceLocator()->get('FormElementManager');
+        $formElements = $this->getServiceManager()->get('FormElementManager');
         $factory->setFormElementManager($formElements);
 
         $siteTranslationData = array();
@@ -319,7 +318,7 @@ class SitesTranslationController extends AbstractActionController
                  */
                 //get and sanitize the data
                 $postValues = $melisTool->sanitizeRecursive($siteTranslationData, array('mstt_text'), false, true);
-                $melisSiteTranslationService = $this->getServiceLocator()->get('MelisSiteTranslationService');
+                $melisSiteTranslationService = $this->getServiceManager()->get('MelisSiteTranslationService');
                 $res = $melisSiteTranslationService->saveTranslation($postValues, $needToDelete);
                 $success = $res['success'];
             }else{
@@ -354,7 +353,7 @@ class SitesTranslationController extends AbstractActionController
             //get site id
             $siteId = $this->getRequest()->getPost('siteId');
 
-            $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+            $melisTool = $this->getServiceManager()->get('MelisCoreTool');
             $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
             $colId = array_keys($melisTool->getColumns());
 
@@ -371,7 +370,7 @@ class SitesTranslationController extends AbstractActionController
             //get length(how many package will be displayed)
             $length = $this->getRequest()->getPost('length');
 
-            $melisSiteTranslationService = $this->getServiceLocator()->get('MelisSiteTranslationService');
+            $melisSiteTranslationService = $this->getServiceManager()->get('MelisSiteTranslationService');
             //get the current usded lang id from the session
             $container = new Container('meliscore');
             $langIdBO = $container['melis-lang-id'];
@@ -388,10 +387,10 @@ class SitesTranslationController extends AbstractActionController
                  * using the language locale of both to get the exact language id
                  * to make sure that we retrieve the exact translation
                  */
-                $langCoreTbl = $this->getServiceLocator()->get('MelisCoreTableLang');
+                $langCoreTbl = $this->getServiceManager()->get('MelisCoreTableLang');
                 $langDetails = $langCoreTbl->getEntryById($langIdBO)->toArray();
                 if ($langDetails) {
-                    $langCmsTbl = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+                    $langCmsTbl = $this->getServiceManager()->get('MelisEngineTableCmsLang');
                     foreach ($langDetails as $langBO) {
                         $localeBO = $langBO['lang_locale'];
                         $langCmsDetails = $langCmsTbl->getEntryByField('lang_cms_locale', $localeBO)->toArray();
@@ -535,8 +534,8 @@ class SitesTranslationController extends AbstractActionController
     {
         $siteId = (int) $this->params()->fromQuery('siteId', '');
 
-        $translator = $this->getServiceLocator()->get('translator');
-        $sitelangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+        $translator = $this->getServiceManager()->get('translator');
+        $sitelangsTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteLangs');
         $siteLangs = $sitelangsTable->getSiteLanguagesBySiteId($siteId)->toArray();
 
         $langs = array();
@@ -565,7 +564,7 @@ class SitesTranslationController extends AbstractActionController
          * get the lang info so that we can give the
          * exact error message per language
          */
-        $langCmsTbl = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+        $langCmsTbl = $this->getServiceManager()->get('MelisEngineTableCmsLang');
         $langData = $langCmsTbl->getEntryById($langId)->toArray();
         $langName = '';
         if(!empty($langData[0])){

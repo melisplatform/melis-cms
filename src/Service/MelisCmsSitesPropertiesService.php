@@ -2,11 +2,11 @@
 
 namespace MelisCms\Service;
 
-use MelisCore\Service\MelisCoreGeneralService;
 use Laminas\Config\Config;
 use Laminas\Config\Writer\PhpArray;
+use MelisCore\Service\MelisGeneralService;
 
-class MelisCmsSitesPropertiesService extends MelisCoreGeneralService
+class MelisCmsSitesPropertiesService extends MelisGeneralService
 {
     /**
      * Returns the site property of a specific site
@@ -23,8 +23,8 @@ class MelisCmsSitesPropertiesService extends MelisCoreGeneralService
 
         // Service implementation start
         $siteProp = [];
-        $sitePropTable = $this->getServiceLocator()->get('MelisEngineTableSite');
-        $site404Table = $this->getServiceLocator()->get('MelisEngineTableSite404');
+        $sitePropTable = $this->getServiceManager()->get('MelisEngineTableSite');
+        $site404Table = $this->getServiceManager()->get('MelisEngineTableSite404');
         if(is_numeric($siteId)) {
             $siteProp = $sitePropTable->getEntryById($siteId)->current();
             $site404 = $site404Table->getEntryByField("s404_site_id",$siteId)->current();
@@ -56,7 +56,7 @@ class MelisCmsSitesPropertiesService extends MelisCoreGeneralService
         $arrayParameters = $this->sendEvent('meliscmssite_service_get_site_property_start', $arrayParameters);
 
         // Service implementation start
-        $langHompageTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
+        $langHompageTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteHome');
 
         if (is_numeric($siteId)) {
             $langHompages = $langHompageTable->getEntryByField('shome_site_id', $siteId)->toArray();
@@ -86,7 +86,7 @@ class MelisCmsSitesPropertiesService extends MelisCoreGeneralService
         $arrayParameters = $this->sendEvent('meliscmssite_service_save_site_home_pages_start', $arrayParameters);
 
         // Service implementation start
-        $siteLangHomeTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
+        $siteLangHomeTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteHome');
         $siteLangHomeId = (isset($arrayParameters['data']['shome_id']) && $arrayParameters['data']['shome_id'] > 0) ? $arrayParameters['data']['shome_id'] : null;
 
         $siteLangHomeData = $siteLangHomeTable->save(

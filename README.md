@@ -44,7 +44,7 @@ Services to save a page and to save its different parts (SEO, styles, languages,
 File: /melis-cms/src/Service/MelisCmsPageService.php  
 ```
 // Get the service
-$pageSrv = $this->getServiceLocator()->get('MelisCmsPageService');  
+$pageSrv = $this->getServiceManager()->get('MelisCmsPageService');  
 // Save a page and get its id back
 $pageId = $pageSrv->savePage($pageTree, $pagePublished, $pageSaved, $pageSeo, $pageLang, $pageStyle);  
 ```
@@ -54,7 +54,7 @@ Save a site, get the list of pages of a site and many more.
 File: /melis-cms/src/Service/MelisCmsSiteService.php  
 ```
 // Get the service
-$cmsSiteSrv = $this->getServiceLocator()->get('MelisCmsSiteService');  
+$cmsSiteSrv = $this->getServiceManager()->get('MelisCmsSiteService');  
 // Get list of pages of this site
 $sitePages = $cmsSiteSrv->getSitePages($siteId);  
 ```
@@ -66,7 +66,7 @@ Cache is generated in this folder: /cache
 File: /melis-cms/src/Service/MelisCmsPageGetterService.php  
 ```
 // Get the service
-$pageGetterService = $this->getServiceLocator()->get('MelisCmsPageGetterService');  
+$pageGetterService = $this->getServiceManager()->get('MelisCmsPageGetterService');  
 // Get list of pages of this site
 $pageContent = $cmsSiteSrv->getPageContent($pageId);  
 ```
@@ -76,7 +76,7 @@ Get the rights defined for the user and adapt access to the different elements o
 File: /melis-cms/src/Service/MelisCmsRightsService.php    
 ```
 // Get the service  
-$melisCmsRights = $this->getServiceLocator()->get('MelisCmsRights');  
+$melisCmsRights = $this->getServiceManager()->get('MelisCmsRights');  
 // Get the user's rights  
 $xmlRights = $melisCoreAuth->getAuthRights();  
 // find if a user has access to it
@@ -109,7 +109,7 @@ return array(
 						'method' => 'POST',
 						'action' => '/melis/MelisCms/Page/saveProperties',
 					),
-					'hydrator'  => 'Laminas\Stdlib\Hydrator\ArraySerializable',
+					'hydrator'  => 'Laminas\Hydrator\ArraySerializable',
 					'elements' => array(  
 						array(
 							'spec' => array(
@@ -158,7 +158,7 @@ public function attach(EventManagerInterface $events)
     	),
     	function($e){
 
-    		$sm = $e->getTarget()->getServiceLocator();
+    		$sm = $e->getTarget()->getEvent()->getApplication()->getServiceManager();
     		
     		// Custom Code here
     	},

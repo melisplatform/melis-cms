@@ -9,8 +9,8 @@
 
 namespace MelisCms\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
+use MelisCore\Controller\AbstractActionController;
 
 class SitesPropertiesController extends AbstractActionController
 {
@@ -23,7 +23,7 @@ class SitesPropertiesController extends AbstractActionController
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
 
-        $rightService = $this->getServiceLocator()->get('MelisCoreRights');
+        $rightService = $this->getServiceManager()->get('MelisCoreRights');
         $canAccess = $rightService->canAccess('meliscms_tool_sites_properties_content');
 
         $view = new ViewModel();
@@ -55,7 +55,7 @@ class SitesPropertiesController extends AbstractActionController
         $homepageForm = $melisTool->getForm("meliscms_tool_sites_properties_homepage_form");
 
         // SITE PROPERTIES
-        $sitePropSvc = $this->getServiceLocator()->get("MelisCmsSitesPropertiesService");
+        $sitePropSvc = $this->getServiceManager()->get("MelisCmsSitesPropertiesService");
         $siteProp = $sitePropSvc->getSitePropAnd404BySiteId($siteId);
         $siteLangHomepages = $sitePropSvc->getLangHomepages($siteId);
 
@@ -63,7 +63,7 @@ class SitesPropertiesController extends AbstractActionController
         $propertiesForm->setData((array)$siteProp);
 
         // LANGUAGES GET ACTIVE LANGUAGES OF THE SITE
-        $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+        $siteLangsTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteLangs');
         $activeSiteLangs = $siteLangsTable->getSiteLangs(null, $siteId, null, true)->toArray();
 
         // GET SITE HOME PAGE IDS
@@ -89,7 +89,7 @@ class SitesPropertiesController extends AbstractActionController
      * @return mixed
      */
     private function getSiteHomePageIds($siteId, $langId) {
-        $siteLangHomeTbl = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
+        $siteLangHomeTbl = $this->getServiceManager()->get('MelisEngineTableCmsSiteHome');
 
         return $siteLangHomeTbl->getHomePageBySiteIdAndLangId($siteId, $langId)->toArray();
     }
@@ -109,7 +109,7 @@ class SitesPropertiesController extends AbstractActionController
      */
     private function getTool()
     {
-        $toolSvc = $this->getServiceLocator()->get('MelisCoreTool');
+        $toolSvc = $this->getServiceManager()->get('MelisCoreTool');
         $toolSvc->setMelisToolKey('meliscms', 'meliscms_tool_sites');
 
         return $toolSvc;

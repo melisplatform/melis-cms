@@ -2,9 +2,10 @@
 
 namespace MelisCms\Service;
 
-use MelisCore\Service\MelisCoreGeneralService;
 
-class MelisCmsPageGetterService extends MelisCoreGeneralService
+use MelisCore\Service\MelisGeneralService;
+
+class MelisCmsPageGetterService extends MelisGeneralService
 {
     private $cachekey = 'cms_page_getter_';
     private $cacheConfig = 'meliscms_page';
@@ -17,7 +18,7 @@ class MelisCmsPageGetterService extends MelisCoreGeneralService
     public function getPageContent($pageId)
     {
         // Retrieve cache version if front mode to avoid multiple calls
-        $melisEngineCacheSystem = $this->getServiceLocator()->get('MelisEngineCacheSystem');
+        $melisEngineCacheSystem = $this->getServiceManager()->get('MelisEngineCacheSystem');
         $pageContent = $melisEngineCacheSystem->getCacheByKey($this->cachekey.$pageId, $this->cacheConfig, true);
         
         return $pageContent;

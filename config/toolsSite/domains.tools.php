@@ -13,7 +13,7 @@ return array(
                                 'method' => 'POST',
                                 'action' => '',
                             ),
-                            'hydrator'  => 'Laminas\Stdlib\Hydrator\ArraySerializable',
+                            'hydrator'  => 'Laminas\Hydrator\ArraySerializable',
                             'elements' => array(
                                 array(
                                     'spec' => array(

@@ -2,11 +2,11 @@
 
 namespace MelisCms\Service;
 
-use MelisCore\Service\MelisCoreGeneralService;
 use Laminas\Config\Config;
 use Laminas\Config\Writer\PhpArray;
+use MelisCore\Service\MelisGeneralService;
 
-class MelisCmsSitesDomainsService extends MelisCoreGeneralService
+class MelisCmsSitesDomainsService extends MelisGeneralService
 {
 
 
@@ -26,7 +26,7 @@ class MelisCmsSitesDomainsService extends MelisCoreGeneralService
 
         // Service implementation start
 
-        $envTable = $this->getServiceLocator()->get('MelisCoreTablePlatform');
+        $envTable = $this->getServiceManager()->get('MelisCoreTablePlatform');
         $envData = $envTable->fetchAll();
         $domainData = $envData->toArray();
 
@@ -58,7 +58,7 @@ class MelisCmsSitesDomainsService extends MelisCoreGeneralService
 
         // Service implementation start
 
-        $domainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
+        $domainTable = $this->getServiceManager()->get('MelisEngineTableSiteDomain');
         $domainData = $domainTable->getDataBySiteIdAndEnv($siteId, $env);
         $domainData = $domainData->toArray();
 
@@ -88,7 +88,7 @@ class MelisCmsSitesDomainsService extends MelisCoreGeneralService
 
         // Service implementation start
 
-        $domainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
+        $domainTable = $this->getServiceManager()->get('MelisEngineTableSiteDomain');
         $domainData = $domainTable->getEntryByField("sdom_site_id", $siteId);
         $domainData = $domainData->toArray();
 
@@ -118,7 +118,7 @@ class MelisCmsSitesDomainsService extends MelisCoreGeneralService
 
 
         // Service implementation start
-        $domainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
+        $domainTable = $this->getServiceManager()->get('MelisEngineTableSiteDomain');
         $sdom_id = (isset($data["sdom_id"]) || $data["sdom_id"] > 0) ? $data["sdom_id"] : null;
         if(isset($data["sdom_id"]))
             unset($data["sdom_id"]);

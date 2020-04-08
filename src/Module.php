@@ -16,6 +16,7 @@ use Laminas\Session\SessionManager;
 use Laminas\Stdlib\ArrayUtils;
 
 use MelisCms\Listener\MelisCmsGetRightsTreeViewListener;
+use MelisCms\Listener\MelisCmsPluginSaveEditionSessionListener;
 use MelisCms\Listener\MelisCmsSavePageListener;
 use MelisCms\Listener\MelisCmsPublishPageListener;
 use MelisCms\Listener\MelisCmsUnpublishPageListener;
@@ -55,15 +56,12 @@ class Module
 
         $sm = $e->getApplication()->getServiceManager();
         $routeMatch = $sm->get('router')->match($sm->get('request'));
-        if (!empty($routeMatch))
-        {
+        if (!empty($routeMatch)) {
             $routeName = $routeMatch->getMatchedRouteName();
             $module = explode('/', $routeName);
              
-            if (!empty($module[0]))
-            {
-                if ($module[0] == 'melis-backoffice')
-                {
+            if (!empty($module[0])) {
+                if ($module[0] == 'melis-backoffice') {
                     /**
                      * Set default layout for this module
                      */
@@ -71,30 +69,28 @@ class Module
                         MvcEvent::EVENT_DISPATCH, function ($e) {
                             $e->getTarget()->layout('layout/layoutCms');
                         });
-                    
-            
-                    $eventManager->attach(new MelisCmsGetRightsTreeViewListener());
-                    $eventManager->attach(new MelisCmsSavePageListener());
-                    $eventManager->attach(new MelisCmsPublishPageListener());
-                    $eventManager->attach(new MelisCmsUnpublishPageListener());
-                    $eventManager->attach(new MelisCmsDeletePageListener());
-                    $eventManager->attach(new MelisCmsToolUserUpdateUserListener());
-                    $eventManager->attach(new MelisCmsFlashMessengerListener());
-            //         $eventManager->attach(new MelisCmsSiteDomainDeleteListener());
-                    $eventManager->attach(new MelisCmsPlatformIdListener());
-                    $eventManager->attach(new MelisCmsNewSiteDomainListener());
-                    $eventManager->attach(new MelisCmsDeleteSiteDomainListener());
-                    $eventManager->attach(new MelisCmsToolUserNewUserListener());
-                    $eventManager->attach(new MelisCmsDeletePlatformListener());
-                    $eventManager->attach(new MelisCmsPageDefaultUrlsListener());
-                    $eventManager->attach(new MelisCmsPageEditionSavePluginSessionListener());
 
+                    (new MelisCmsGetRightsTreeViewListener())->attach($eventManager);
+                    (new MelisCmsSavePageListener())->attach($eventManager);
+                    (new MelisCmsPublishPageListener())->attach($eventManager);
+                    (new MelisCmsUnpublishPageListener())->attach($eventManager);
+                    (new MelisCmsDeletePageListener())->attach($eventManager);
+                    (new MelisCmsToolUserUpdateUserListener())->attach($eventManager);
+                    (new MelisCmsFlashMessengerListener())->attach($eventManager);
+                    // (new MelisCmsSiteDomainDeleteListener())->attach($eventManager);
+                    (new MelisCmsPlatformIdListener())->attach($eventManager);
+                    (new MelisCmsNewSiteDomainListener())->attach($eventManager);
+                    (new MelisCmsDeleteSiteDomainListener())->attach($eventManager);
+                    (new MelisCmsToolUserNewUserListener())->attach($eventManager);
+                    (new MelisCmsDeletePlatformListener())->attach($eventManager);
+                    (new MelisCmsPageDefaultUrlsListener())->attach($eventManager);
+                    (new MelisCmsPageEditionSavePluginSessionListener())->attach($eventManager);
                     // Saving Plugin Tag values, Melis Side
-                    $eventManager->attach($sm->get('MelisCms\Listener\MelisCmsPluginSaveEditionSessionListener'));
+                    (new MelisCmsPluginSaveEditionSessionListener())->attach($eventManager);
                 }
                 
                 // Page Cache Listener
-                $eventManager->attach(new MelisCmsPageGetterListener());
+                (new MelisCmsPageGetterListener())->attach($eventManager);
             }
         }
     }
@@ -109,7 +105,6 @@ class Module
         $sessionManager->start();
         Container::setDefaultManager($sessionManager);
         $container = new Container('meliscms');
-
     }
 
     /**
@@ -128,15 +123,15 @@ class Module
         $locale = is_null($locale) ? 'en_EN' : $locale;
         // Load files
 
-        if (!empty($locale))
-        {   
-            $translationType = array(
+        if (!empty($locale)) {
+            $translationType = [
                 'interface',
                 'forms',
                 'install',
-            );
+            ];
             
-        $translationList = array();
+            $translationList = [];
+
             if(file_exists($_SERVER['DOCUMENT_ROOT'].'/../module/MelisModuleConfig/config/translation.list.php')){
                 $translationList = include 'module/MelisModuleConfig/config/translation.list.php';
             }
@@ -167,8 +162,8 @@ class Module
      */
     public function getConfig()
     {
-        $config = array();
-        $configFiles = array(
+        $config = [];
+        $configFiles = [
             include __DIR__ . '/../config/module.config.php',
             include __DIR__ . '/../config/app.interface.php',
             include __DIR__ . '/../config/app.forms.php',
@@ -190,23 +185,22 @@ class Module
             include __DIR__ . '/../config/toolsSite/sitetranslations.tools.php',
             include __DIR__ . '/../config/dashboard-plugins/MelisCmsPagesIndicatorsPlugin.config.php',
             include __DIR__ . '/../config/gdpr.banner.interface.php',
-        );
+        ];
 
-        foreach ($configFiles as $file) {
+        foreach ($configFiles as $file)
             $config = ArrayUtils::merge($config, $file);
-        }
 
         return $config;
     }
 
     public function getAutoloaderConfig()
     {
-        return array(
-            'Laminas\Loader\StandardAutoloader' => array(
-                'namespaces' => array(
+        return [
+            'Laminas\Loader\StandardAutoloader' => [
+                'namespaces' => [
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 }

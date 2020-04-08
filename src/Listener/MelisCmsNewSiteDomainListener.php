@@ -16,18 +16,16 @@ use Laminas\Session\Container;
 class MelisCmsNewSiteDomainListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
 {
 	
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
         $sharedEvents      = $events->getSharedManager();
         
         $callBackHandler = $sharedEvents->attach(
         	'MelisInstaller',
-        	array(
-                'melis_install_new_platform_start'
-        	),
-        	function($e){
+            'melis_install_new_platform_start',
+        	function($event){
 
-        		$sm = $e->getTarget()->getServiceLocator();
+                $sm = $event->getTarget()->getEvent()->getApplication()->getServiceManager();
         		$params = $e->getParams();
         		
         		$currentPlatform = $params['currentPlatform'];
@@ -39,21 +37,24 @@ class MelisCmsNewSiteDomainListener extends MelisCoreGeneralListener implements 
         		// update first the platform domain
         		$container    = new Container('melisinstaller');
                 $displayError = $currentPlatform['error_reporting'] != '0' ? 1 : 0;
-    		    $container->environments =  array('default_environment' => array(
-    		            'data' =>array('sdom_domain' => $currentPlatform['platform_domain']),
-    		            'wildcard' => array('sdom_env' => $defaultEnv),
+    		    $container->environments =  [
+    		        'default_environment' => [
+    		            'data' => [
+    		                'sdom_domain' => $currentPlatform['platform_domain']
+                        ],
+    		            'wildcard' => ['sdom_env' => $defaultEnv],
                         'app_interface_conf' => [
                             'send_email'      => $currentPlatform['send_email'],
                             'error_reporting' => $currentPlatform['error_reporting'],
                             'display_error'   => $displayError
                         ]
-		        )); 
+		        ]];
 
         		foreach($siteDomains as $site) {
                     $displayError = $site['error_reporting'] != '0' ? 1 : 0;
         		    if(empty($container['environments']['new'][$site['environment']])) {
         		        // add new site domain
-        		        $container['environments']['new'][$site['environment']][] = array(
+        		        $container['environments']['new'][$site['environment']][] = [
         		           'sdom_site_id' => $defaultSiteID,
         		            'sdom_env' => $site['environment'],
         		            'sdom_scheme' => $scheme,
@@ -63,11 +64,10 @@ class MelisCmsNewSiteDomainListener extends MelisCoreGeneralListener implements 
                                 'error_reporting' => $site['error_reporting'],
                                 'display_error'   => $displayError
                             ]
-        		        );
-        		    }
-        		    else {
+        		        ];
+        		    } else {
         		        // update site domain
-        		        $container['environments']['new'][$site['environment']][] = array(
+        		        $container['environments']['new'][$site['environment']][] = [
         		           'sdom_site_id' => $defaultSiteID,
         		            'sdom_env' => $site['environment'],
         		            'sdom_scheme' => $scheme,
@@ -77,7 +77,7 @@ class MelisCmsNewSiteDomainListener extends MelisCoreGeneralListener implements 
                                 'error_reporting' => $site['error_reporting'],
                                 'display_error'   => $displayError
                             ]
-        		        );
+        		        ];
         		    }
         		}
         		

@@ -8,25 +8,23 @@
  */
 
 namespace MelisCms\Form\Factory;
-use Laminas\ServiceManager\ServiceLocatorInterface;
+
+use Laminas\ServiceManager\ServiceManager;
 use MelisCore\Form\Factory\MelisSelectFactory;
 
 /**
  * This class creates a select box for melis languages
- *
  */
 class MelisCmsLanguageSelectFactory extends MelisSelectFactory
 {
-	protected function loadValueOptions(ServiceLocatorInterface $formElementManager)
+	protected function loadValueOptions(ServiceManager $serviceManager)
 	{
-		$serviceManager = $formElementManager->getServiceLocator();
 		$tableLang = $serviceManager->get('MelisEngineTableCmsLang');
 		$languages = $tableLang->fetchAll();
 		
-		$valueoptions = array();
+		$valueoptions = [];
 		$max = $languages->count();
-		for ($i = 0; $i < $max; $i++)
-		{
+		for ($i = 0; $i < $max; $i++) {
 			$tpl = $languages->current();
 			$valueoptions[$tpl->lang_cms_id] = $tpl->lang_cms_name;
 			$languages->next();

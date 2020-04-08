@@ -10,6 +10,7 @@
 namespace MelisCms\Listener;
 
 
+use Laminas\EventManager\EventInterface;
 use MelisCore\Listener\MelisCoreGeneralListener;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\EventManager\ListenerAggregateInterface;
@@ -24,57 +25,67 @@ class MelisCmsFlashMessengerListener extends MelisCoreGeneralListener implements
     /**
      * @param EventManagerInterface $events
      */
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
         $sharedEvents = $events->getSharedManager();
+        /**
+         * Attach a listener to an event emitted by components with specific identifiers.
+         *
+         * @param  string $identifier Identifier for event emitting component
+         * @param  string $eventName
+         * @param  callable $listener Listener that will handle the event.
+         * @param  int $priority Priority at which listener should execute
+         *
+         * $sharedEvents->attach($identifier, $eventName, callable $listener, $priority);
+         */
+        $identifier = 'MelisCms';
 
-        $callBackHandler = $sharedEvents->attach(
-        	'MelisCms',
-        	array(
-        	    'meliscms_page_save_end', 
-        	    'meliscms_page_publish_end', 
-        	    'meliscms_page_unpublish_end', 
-        	    'meliscms_page_delete_end', 
-        	    'meliscms_page_move_end',
-        	    'meliscms_template_savenew_end',
-        	    'meliscms_template_save_end', 
-        	    'meliscms_template_delete_end', 
-        	    'meliscms_site_save_end', 
-        	    'meliscms_site_delete_end', 
-        	    'meliscms_site_delete_by_id_end', 
-        	    'meliscms_language_new_end', 
-        	    'meliscms_language_delete_end',
-        	    'meliscms_language_update_end',
-        	    'meliscms_page_clear_saved_page_end',
-        	    'meliscms_platform_IDs_save_end', 
-        	    'meliscms_platform_IDs_delete_end',
-        	    'meliscalendar_save_site_redirect_end',
-        	    'meliscalendar_delete_site_redirect_end',
-                'meliscms_page_duplicate_end',
-                'meliscms_style_save_details_end',
-                'meliscms_style_delete_end',
-                'meliscms_create_new_page_lang_end',
-                'meliscms_tree_duplicate_page_trees_end',
-                'meliscms_gdpr_save_banner_end',
-                'meliscms_page_tree_export_end',
-                'meliscms_page_tree_import_end'
-            ),
-            function ($e) {
-                $params = $e->getParams();
+        $eventsName = [
+            'meliscms_page_save_end',
+            'meliscms_page_publish_end',
+            'meliscms_page_unpublish_end',
+            'meliscms_page_delete_end',
+            'meliscms_page_move_end',
+            'meliscms_template_savenew_end',
+            'meliscms_template_save_end',
+            'meliscms_template_delete_end',
+            'meliscms_site_save_end',
+            'meliscms_site_delete_end',
+            'meliscms_site_delete_by_id_end',
+            'meliscms_language_new_end',
+            'meliscms_language_delete_end',
+            'meliscms_language_update_end',
+            'meliscms_page_clear_saved_page_end',
+            'meliscms_platform_IDs_save_end',
+            'meliscms_platform_IDs_delete_end',
+            'meliscalendar_save_site_redirect_end',
+            'meliscalendar_delete_site_redirect_end',
+            'meliscms_page_duplicate_end',
+            'meliscms_style_save_details_end',
+            'meliscms_style_delete_end',
+            'meliscms_create_new_page_lang_end',
+            'meliscms_tree_duplicate_page_trees_end',
+            'meliscms_gdpr_save_banner_end',
+            'meliscms_page_tree_export_end',
+            'meliscms_page_tree_import_end'
+        ];
 
-                if (isset($params['tmpModuleErrorMsg'])) {
-                    $params['textMessage'] = $params['tmpModuleErrorMsg'];
-                }
+        $priority = -1000;
 
-                $e->getTarget()->forward()->dispatch(
-                    'MelisCore\Controller\MelisFlashMessenger',
-                    array_merge(
-                        ['action' => 'log'],
-                        $params
-                    ))->getVariables();
-            },
-            -1000
-        );
-        $this->listeners[] = $callBackHandler;
+        foreach ($eventsName As $event)
+            $this->listeners[] = $sharedEvents->attach($identifier, $event, [$this, 'logMessages'], $priority);
+    }
+
+    public function logMessages(EventInterface $event)
+    {
+        $params = $event->getParams();
+
+        if (isset($params['tmpModuleErrorMsg'])) {
+            $params['textMessage'] = $params['tmpModuleErrorMsg'];
+        }
+
+        $event->getTarget()->forward()->dispatch(
+            'MelisCore\Controller\MelisFlashMessenger',
+            array_merge(['action' => 'log'], $params))->getVariables();
     }
 }

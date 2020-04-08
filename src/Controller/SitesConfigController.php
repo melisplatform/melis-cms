@@ -9,8 +9,8 @@
 
 namespace MelisCms\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
+use MelisCore\Controller\AbstractActionController;
 
 class SitesConfigController extends AbstractActionController
 {
@@ -23,7 +23,7 @@ class SitesConfigController extends AbstractActionController
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
 
-        $rightService = $this->getServiceLocator()->get('MelisCoreRights');
+        $rightService = $this->getServiceManager()->get('MelisCoreRights');
         $canAccess = $rightService->canAccess('meliscms_tool_sites_site_config_content');
 
         $view = new ViewModel();
@@ -178,7 +178,7 @@ class SitesConfigController extends AbstractActionController
      */
     private function getSiteConfigFromDb($siteId)
     {
-        $siteConfigTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteConfig');
+        $siteConfigTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteConfig');
 
         return $siteConfigTable->getEntryByField('sconf_site_id', $siteId)->toArray();
     }
@@ -190,7 +190,7 @@ class SitesConfigController extends AbstractActionController
      */
     private function getSiteConfig($siteId)
     {
-        $siteConfigSrv = $this->getServiceLocator()->get('MelisSiteConfigService');
+        $siteConfigSrv = $this->getServiceManager()->get('MelisSiteConfigService');
 
         return $siteConfigSrv->getSiteConfig($siteId, true);
     }
@@ -202,7 +202,7 @@ class SitesConfigController extends AbstractActionController
      */
     private function getSiteDataById($siteId)
     {
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
 
         return $siteTable->getEntryById($siteId)->toArray()[0];
     }
@@ -214,7 +214,7 @@ class SitesConfigController extends AbstractActionController
      */
     private function getSiteActiveLanguages($siteId)
     {
-        $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+        $siteLangsTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteLangs');
 
         return $siteLangsTable->getSiteLangs(null, $siteId, null, true)->toArray();
     }
@@ -234,7 +234,7 @@ class SitesConfigController extends AbstractActionController
      */
     private function getTool()
     {
-        $toolSvc = $this->getServiceLocator()->get('MelisCoreTool');
+        $toolSvc = $this->getServiceManager()->get('MelisCoreTool');
         $toolSvc->setMelisToolKey('meliscms', 'meliscms_tool_sites');
 
         return $toolSvc;

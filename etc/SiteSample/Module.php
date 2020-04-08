@@ -32,35 +32,29 @@ class Module
         }); 
     }
     
-    public function init(ModuleManager $manager)
-    {
-
-    }
-
     public function getConfig()
     {
-    	$config = array();
-    	$configFiles = array(
-    			include __DIR__ . '/config/module.config.php',
-    			include __DIR__ . '/config/melis.plugins.config.php',
-    			include __DIR__ . '/config/SiteSample.config.php',
-    	);
+    	$config = [];
+    	$configFiles = [
+            include __DIR__ . '/config/module.config.php',
+            include __DIR__ . '/config/melis.plugins.config.php',
+            include __DIR__ . '/config/SiteSample.config.php',
+    	];
     	
-    	foreach ($configFiles as $file) {
+    	foreach ($configFiles as $file)
     		$config = ArrayUtils::merge($config, $file);
-    	} 
-    	
+
     	return $config;
     }
 
     public function getAutoloaderConfig()
     {
-        return array(
-            'Laminas\Loader\StandardAutoloader' => array(
-                'namespaces' => array(
+        return [
+            'Laminas\Loader\StandardAutoloader' => [
+                'namespaces' => [
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 }

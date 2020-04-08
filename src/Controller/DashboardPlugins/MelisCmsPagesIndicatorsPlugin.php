@@ -30,7 +30,7 @@ class MelisCmsPagesIndicatorsPlugin extends MelisCoreDashboardTemplatingPlugin
 
         // Checks wether the user has access to this tools or not
         /** @var \MelisCore\Service\MelisCoreDashboardPluginsRightsService $dashboardPluginsService */
-        $dashboardPluginsService = $this->getServiceLocator()->get('MelisCoreDashboardPluginsService');
+        $dashboardPluginsService = $this->getServiceManager()->get('MelisCoreDashboardPluginsService');
         //get the class name to make it as a key
         $path = explode('\\', __CLASS__);
         $className = array_pop($path);
@@ -45,8 +45,8 @@ class MelisCmsPagesIndicatorsPlugin extends MelisCoreDashboardTemplatingPlugin
         // Pages ID handler that exist on Page Saved table
         $savePagesId = array();
         
-        $pageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
-        $melisEngineTablePagePublished = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
+        $pageSavedTable = $this->getServiceManager()->get('MelisEngineTablePageSaved');
+        $melisEngineTablePagePublished = $this->getServiceManager()->get('MelisEngineTablePagePublished');
         
         $currentPagesSaved = $pageSavedTable->fetchAll();
         if (!empty($currentPagesSaved))

@@ -2,11 +2,11 @@
 
 namespace MelisCms\Service;
 
-use MelisCore\Service\MelisCoreGeneralService;
 use Laminas\Config\Config;
 use Laminas\Config\Writer\PhpArray;
+use MelisCore\Service\MelisGeneralService;
 
-class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
+class MelisCmsSitesModuleLoadService extends MelisGeneralService
 {
     /**
      * Returns all the available modules (enabled/disabled modules)
@@ -40,7 +40,7 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
             '.', '..','.gitignore',
         );
 
-        $moduleSrv = $this->getServiceLocator()->get('ModulesService');
+        $moduleSrv = $this->getServiceManager()->get('ModulesService');
         /**
          * Check if module is site to exclude it
          */
@@ -132,7 +132,7 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
             array_push($moduleList,$module);
         }
 
-        $moduleSrv = $this->getServiceLocator()->get('ModulesService');
+        $moduleSrv = $this->getServiceManager()->get('ModulesService');
         /**
          * get the module path
          *
@@ -250,7 +250,7 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
         /**
          * @var \MelisCore\Service\MelisCoreModulesService $modulesSvc
          */
-        $modulesSvc = $this->getServiceLocator()->get('ModulesService');
+        $modulesSvc = $this->getServiceManager()->get('ModulesService');
         return $modulesSvc;
     }
 
@@ -263,7 +263,7 @@ class MelisCmsSitesModuleLoadService extends MelisCoreGeneralService
          * @var \MelisEngine\Model\Tables\MelisSiteTable
          *
          */
-        $modulesSvc = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $modulesSvc = $this->getServiceManager()->get('MelisEngineTableSite');
         return $modulesSvc;
     }
 

@@ -21,7 +21,7 @@ use MelisCore\Listener\MelisCoreGeneralListener;
 class MelisCmsGetRightsTreeViewListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
 {
 	
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
         $sharedEvents      = $events->getSharedManager();
         
@@ -30,14 +30,15 @@ class MelisCmsGetRightsTreeViewListener extends MelisCoreGeneralListener impleme
         	'meliscore_tooluser_getrightstreeview_start', 
         	function($e){
 
-        		$sm = $e->getTarget()->getServiceLocator();
+                $sm = $e->getTarget()->getEvent()->getApplication()->getServiceManager();
         		$container = new Container('meliscore');
         		
         		// Add MelisCMS rights management
     			$userId = $sm->get('request')->getQuery()->get('userId');
     					
     			if (empty($container['action-tool-user-getrights-tmp']))
-    				$container['action-tool-user-getrights-tmp'] = array();
+    				$container['action-tool-user-getrights-tmp'] = [];
+
     			$melisCmsRights = $sm->get('MelisCmsRights');
     			$rightsCms = $melisCmsRights->getRightsValues($userId);
     			

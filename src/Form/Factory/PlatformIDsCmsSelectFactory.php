@@ -9,7 +9,7 @@
 
 namespace MelisCms\Form\Factory;
 
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceManager;
 use MelisCore\Form\Factory\MelisSelectFactory;
 
 /**
@@ -18,17 +18,14 @@ use MelisCore\Form\Factory\MelisSelectFactory;
  */
 class PlatformIDsCmsSelectFactory extends MelisSelectFactory
 {
-	protected function loadValueOptions(ServiceLocatorInterface $formElementManager)
+	protected function loadValueOptions(ServiceManager $serviceManager)
 	{
-		$serviceManager = $formElementManager->getServiceLocator();
-
 		$platformTable = $serviceManager->get('MelisEngineTablePlatformIds');
 		$platforms = $platformTable->getAvailablePlatforms();
 
-		$valueoptions = array();
+		$valueoptions = [];
 		$max = $platforms->count();
-		for ($i = 0; $i < $max; $i++)
-		{
+		for ($i = 0; $i < $max; $i++) {
 			$tpl = $platforms->current();
 			$valueoptions[$tpl->plf_id] = $tpl->plf_name;
 			$platforms->next();

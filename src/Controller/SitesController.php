@@ -9,8 +9,8 @@
 
 namespace MelisCms\Controller;
 
+use MelisCore\Controller\AbstractActionController;
 use MelisFront\Service\MelisSiteConfigService;
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
 use MelisCore\Service\MelisCoreRightsService;
@@ -155,9 +155,9 @@ class SitesController extends AbstractActionController
      */
     public function renderToolSitesContentAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $melisKey = $this->getMelisKey();
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
 
         $columns = $melisTool->getColumns();
@@ -204,7 +204,7 @@ class SitesController extends AbstractActionController
      */
     public function renderToolSitesModalEmptyAction()
     {
-        $config = $this->getServiceLocator()->get('MelisCoreConfig');
+        $config = $this->getServiceManager()->get('MelisCoreConfig');
         $tool = $config->getItem('/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_sites/interface/meliscms_tool_sites_modals');
         return new ViewModel();
     }
@@ -229,7 +229,7 @@ class SitesController extends AbstractActionController
         $melisKey = $this->getMelisKey();
 
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tools.php that will be used.
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
@@ -247,11 +247,11 @@ class SitesController extends AbstractActionController
         $melisKey = $this->getMelisKey();
 
         //get the lang list
-        $langService = $this->getServiceLocator()->get('MelisEngineLang');
+        $langService = $this->getServiceManager()->get('MelisEngineLang');
         $langList = $langService->getAvailableLanguages();
 
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tools.php that will be used.
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
@@ -272,7 +272,7 @@ class SitesController extends AbstractActionController
         $melisKey = $this->getMelisKey();
 
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tools.php that will be used.
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
@@ -291,7 +291,7 @@ class SitesController extends AbstractActionController
         $melisKey = $this->getMelisKey();
 
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tools.php that will be used.
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
@@ -316,7 +316,7 @@ class SitesController extends AbstractActionController
     public function renderToolSitesModalEditAction()
     {
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
     
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
@@ -361,11 +361,11 @@ class SitesController extends AbstractActionController
      */
     public function getSiteDataAction()
     {
-        $cmsSiteSrv = $this->getServiceLocator()->get('MelisCmsSiteService');
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
-        $translator = $this->getServiceLocator()->get('translator');
+        $cmsSiteSrv = $this->getServiceManager()->get('MelisCmsSiteService');
+        $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
+        $translator = $this->getServiceManager()->get('translator');
 
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
 
         $colId = array();
@@ -448,8 +448,8 @@ class SitesController extends AbstractActionController
         $siteTablePrefix = self::SITE_TABLE_PREFIX;
         $domainTablePrefix = self::DOMAIN_TABLE_PREFIX;
 
-        $translator = $this->getServiceLocator()->get('translator');
-        $cmsSiteSrv = $this->getServiceLocator()->get('MelisCmsSiteService');
+        $translator = $this->getServiceManager()->get('translator');
+        $cmsSiteSrv = $this->getServiceManager()->get('MelisCmsSiteService');
 
         if ($this->getRequest()->isPost()) {
             $sitesData = $this->getRequest()->getPost('data');
@@ -623,7 +623,7 @@ class SitesController extends AbstractActionController
                  */
                 $isValidName = true;
                 if ($isNewSIte) {
-                    $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+                    $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
                     $siteDBData = $siteTable->getEntryByField('site_name', $siteName)->current();
                     if (!empty($siteDBData)) {
                         $isValidName = false;
@@ -700,11 +700,11 @@ class SitesController extends AbstractActionController
         $errors  = array();
         $textMessage = 'tr_melis_cms_site_save_ko';
         $logTypeCode = 'CMS_SITE_UPDATE';
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $request = $this->getRequest();
         $data = $request->getPost()->toArray();
-        $melisCoreAuth = $this->serviceLocator->get('MelisCoreAuth');
+        $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
         $userAuthDatas = $melisCoreAuth->getStorage()->read();
         $isAdmin = isset($userAuthDatas->usr_admin) || $userAuthDatas->usr_admin != "" ? $userAuthDatas->usr_admin : 0;
 
@@ -780,7 +780,7 @@ class SitesController extends AbstractActionController
          * we can rollback the db process if
          * there are some error occurred
          */
-        $db = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');//get db adapter
+        $db = $this->getServiceManager()->get('Laminas\Db\Adapter\Adapter');//get db adapter
         $con = $db->getDriver()->getConnection();//get db driver connection
         $con->beginTransaction();//begin transaction
         try {
@@ -891,11 +891,11 @@ class SitesController extends AbstractActionController
             /**
              * Get services/tables
              */
-            $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
-            $domainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
-            $site404Table = $this->getServiceLocator()->get('MelisEngineTableSite404');
-            $siteHomeTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
-            $sitelangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+            $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
+            $domainTable = $this->getServiceManager()->get('MelisEngineTableSiteDomain');
+            $site404Table = $this->getServiceManager()->get('MelisEngineTableSite404');
+            $siteHomeTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteHome');
+            $sitelangsTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteLangs');
 
             // make sure our ID is not empty
             if(!empty($siteId))
@@ -905,7 +905,7 @@ class SitesController extends AbstractActionController
                  * we can rollback the db deletion if
                  * there are some error occurred
                  */
-                $db = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');//get db adapter
+                $db = $this->getServiceManager()->get('Laminas\Db\Adapter\Adapter');//get db adapter
                 $con = $db->getDriver()->getConnection();//get db driver connection
                 $con->beginTransaction();//begin transaction
                 try {
@@ -964,7 +964,7 @@ class SitesController extends AbstractActionController
             $form->setData($sitePropData);
 
             if ($form->isValid()) {
-                $siteTbl = $this->getServiceLocator()->get('MelisEngineTableSite');
+                $siteTbl = $this->getServiceManager()->get('MelisEngineTableSite');
                 $siteData = $siteTbl->getEntryById($siteId)->toArray()[0];
                 $dataToUpdate = [];
 
@@ -980,7 +980,7 @@ class SitesController extends AbstractActionController
                     $siteTbl->update($dataToUpdate, 'site_id', $siteId);
                 }
 
-                $site404Tbl = $this->getServiceLocator()->get('MelisEngineTableSite404');
+                $site404Tbl = $this->getServiceManager()->get('MelisEngineTableSite404');
                 $site404 = $site404Tbl->getEntryByField('s404_site_id', $siteId)->current();
                 if (!empty($site404)) {
                     if ($site404->s404_page_id != $sitePropData['s404_page_id']) {
@@ -1023,7 +1023,7 @@ class SitesController extends AbstractActionController
      */
     private function saveSiteModules($isAdmin, $siteId, $moduleList, &$status, &$path)
     {
-        $siteModuleLoadSvc = $this->getServiceLocator()->get("MelisCmsSiteModuleLoadService");
+        $siteModuleLoadSvc = $this->getServiceManager()->get("MelisCmsSiteModuleLoadService");
 
         if ($isAdmin) {
             if(!empty($moduleList)) {
@@ -1050,10 +1050,10 @@ class SitesController extends AbstractActionController
          * Check if there is data to be process
          */
         if(!empty($siteDomainData)) {
-            $siteDomainsSvc = $this->getServiceLocator()->get("MelisCmsSitesDomainsService");
+            $siteDomainsSvc = $this->getServiceManager()->get("MelisCmsSitesDomainsService");
             $err = false;
             $domains = [];
-            $translator = $this->getServiceLocator()->get('translator');
+            $translator = $this->getServiceManager()->get('translator');
 
             // First check if forms are valid for every environment
             foreach ($siteDomainData as $domainDatum) {
@@ -1135,8 +1135,8 @@ class SitesController extends AbstractActionController
      * @return bool
      */
     public function checkDomain($domainDatum, &$siteData) {
-        $domainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $domainTable = $this->getServiceManager()->get('MelisEngineTableSiteDomain');
+        $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
 
         $dom = $domainTable->getEntryByField('sdom_domain', $domainDatum['sdom_domain'])->toArray();
 
@@ -1168,7 +1168,7 @@ class SitesController extends AbstractActionController
          * Check if there is data to be process
          */
         if(!empty($siteHomeData)) {
-            $sitePropSvc = $this->getServiceLocator()->get("MelisCmsSitesPropertiesService");
+            $sitePropSvc = $this->getServiceManager()->get("MelisCmsSitesPropertiesService");
 
             foreach ($siteHomeData as $siteHomeDatum) {
                 $form = $this->getTool()->getForm('meliscms_tool_sites_properties_homepage_form');
@@ -1202,8 +1202,8 @@ class SitesController extends AbstractActionController
     private function saveSiteLanguagesTab($siteId, $data)
     {
         if(isset($data['site_opt_lang_url'])) {
-            $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
-            $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+            $siteLangsTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteLangs');
+            $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
 
             // Saving languages
             $siteLangs = $siteLangsTable->getSiteLangs(null, $siteId, null, null)->toArray();
@@ -1274,7 +1274,7 @@ class SitesController extends AbstractActionController
      */
     private function deleteDefaultUrls($siteId, $siteMainHomePageId)
     {
-        $siteLangHomeTbl = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
+        $siteLangHomeTbl = $this->getServiceManager()->get('MelisEngineTableCmsSiteHome');
         $pageIds = array();
 
         $siteHomeDatas = $siteLangHomeTbl->getHomePageBySiteId($siteId)->toArray();
@@ -1288,7 +1288,7 @@ class SitesController extends AbstractActionController
             $this->getAllPagesId($siteMainHomePageId, $pageIds);
         }
 
-        $tablePageDefaultUrls = $this->getServiceLocator()->get('MelisEngineTablePageDefaultUrls');
+        $tablePageDefaultUrls = $this->getServiceManager()->get('MelisEngineTablePageDefaultUrls');
         foreach($pageIds as $key => $id){
             $tablePageDefaultUrls->deleteById($id);
         }
@@ -1301,7 +1301,7 @@ class SitesController extends AbstractActionController
      * @param $pageIds
      */
     private function getAllPagesId($pageId, &$pageIds) {
-        $pageTreeService = $this->getServiceLocator()->get('MelisEngineTree');
+        $pageTreeService = $this->getServiceManager()->get('MelisEngineTree');
         $data = $pageTreeService->getAllPages($pageId);
         foreach($data as $key => $val){
             foreach($val as $k => $v){
@@ -1324,7 +1324,7 @@ class SitesController extends AbstractActionController
      * @param $siteConfigTabData
      */
     private function saveSiteConfig($siteId, $siteConfigTabData) {
-        $siteConfigTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteConfig');
+        $siteConfigTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteConfig');
         $siteName = $this->getSiteDataField($siteId, 'site_name');
         $config = $this->getSiteConfig($siteId);
         $configFromDb = $this->getSiteConfigFromDbById($siteId);
@@ -1450,10 +1450,10 @@ class SitesController extends AbstractActionController
      */
     private function deleteOtherTabsData($siteId, $langIds)
     {
-        $siteConfigTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteConfig');
-        $siteHomePageTbl = $this->getServiceLocator()->get('MelisEngineTableCmsSiteHome');
-        $transTextTbl = $this->getServiceLocator()->get('MelisSiteTranslationTextTable');
-        $transSvc = $this->getServiceLocator()->get('MelisSiteTranslationService');
+        $siteConfigTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteConfig');
+        $siteHomePageTbl = $this->getServiceManager()->get('MelisEngineTableCmsSiteHome');
+        $transTextTbl = $this->getServiceManager()->get('MelisSiteTranslationTextTable');
+        $transSvc = $this->getServiceManager()->get('MelisSiteTranslationService');
 
         foreach ($langIds as $langId) {
             $siteConfigTable->deleteConfig(null, $siteId, $langId);
@@ -1508,7 +1508,7 @@ class SitesController extends AbstractActionController
      */
     private function getLang($id, $siteId, $langId, $isActive = 1)
     {
-        $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+        $siteLangsTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteLangs');
 
         if ($langId == 'gen') {
             $langId = -1;
@@ -1553,7 +1553,7 @@ class SitesController extends AbstractActionController
     private function getSiteConfigFromFile($siteName)
     {
         /** @var MelisSiteConfigService $siteConfigSrv */
-        $siteConfigSrv = $this->getServiceLocator()->get('MelisSiteConfigService');
+        $siteConfigSrv = $this->getServiceManager()->get('MelisSiteConfigService');
         return $siteConfigSrv->getConfig($siteName);
     }
 
@@ -1564,7 +1564,7 @@ class SitesController extends AbstractActionController
      */
     private function getSiteConfigFromDbById($siteId)
     {
-        $siteConfigTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteConfig');
+        $siteConfigTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteConfig');
         return $siteConfigTable->getEntryByField('sconf_site_id', $siteId)->toArray();
     }
 
@@ -1576,7 +1576,7 @@ class SitesController extends AbstractActionController
     private function getSiteConfig($siteId)
     {
         /** @var MelisSiteConfigService $siteConfigSrv */
-        $siteConfigSrv = $this->getServiceLocator()->get('MelisSiteConfigService');
+        $siteConfigSrv = $this->getServiceManager()->get('MelisSiteConfigService');
         return $siteConfigSrv->getSiteConfig($siteId, true);
     }
 
@@ -1587,7 +1587,7 @@ class SitesController extends AbstractActionController
      */
     private function getSiteDataById($siteId)
     {
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
         $site = $siteTable->getEntryById($siteId)->toArray();
 
         return !empty($site) ? $site[0] : [];
@@ -1610,7 +1610,7 @@ class SitesController extends AbstractActionController
      */
     private function getTool()
     {
-        $toolSvc = $this->getServiceLocator()->get('MelisCoreTool');
+        $toolSvc = $this->getServiceManager()->get('MelisCoreTool');
         $toolSvc->setMelisToolKey('meliscms', 'meliscms_tool_sites');
 
         return $toolSvc;
@@ -1626,8 +1626,8 @@ class SitesController extends AbstractActionController
         $success    = (int) $this->params()->fromRoute('success', $this->params()->fromQuery('success', ''));
 
         if($success == 1) {
-            $domainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
-            $platformIdTable = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+            $domainTable = $this->getServiceManager()->get('MelisEngineTableSiteDomain');
+            $platformIdTable = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
 
             $platformIdTable->deleteByField('pids_id', $id);
             $domainTable->deleteByField('sdom_env', $platform);

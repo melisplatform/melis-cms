@@ -9,7 +9,7 @@
 
 namespace MelisCms\Form\Factory;
 
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceManager;
 use MelisCore\Form\Factory\MelisSelectFactory;
 /**
  * Cms Platfrom Ids select factory
@@ -21,15 +21,14 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
     const NEW_SITE = '';
 
     /**
-     * @param ServiceLocatorInterface $formElementManager
+     * @param ServiceManager $serviceManager
      * @return array
      */
-	protected function loadValueOptions(ServiceLocatorInterface $formElementManager)
+	protected function loadValueOptions(ServiceManager $serviceManager)
 	{
         /**
-         * @var \Laminas\ServiceManager\ServiceLocatorInterface $serviceManager
+         * @var \Laminas\ServiceManager $serviceManager
          */
-		$serviceManager = $formElementManager->getServiceLocator();
 		$request = $serviceManager->get('Request');
 		$idPage = (int) $request->getQuery('idPage', $request->getPost('idPage', ''));
         $styles = [];
@@ -64,12 +63,11 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
             $styles = $styleTable->getEntryByField('style_site_id', $idPage);
         }
 
-		$valueoptions = array();
+		$valueoptions = [];
 
         if ($styles) {
             $max = $styles->count();
-            for ($i = 0; $i < $max; $i++)
-            {
+            for ($i = 0; $i < $max; $i++) {
                 $style = $styles->current();
                 if(true === (bool) $style->style_status) {
                     $valueoptions[] = [
@@ -88,11 +86,11 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
 	}
 
     /**
-     * @param ServiceLocatorInterface $sl
-     * @param int                     $pageId
+     * @param ServiceManager $serviceManager
+     * @param int $pageId
      * @return int
      */
-	private function getCorrespondingSiteId(ServiceLocatorInterface $sl, $pageId) : int
+	private function getCorrespondingSiteId(ServiceManager $sl, $pageId) : int
     {
         /**
          * @var \MelisEngine\Model\Tables\MelisSiteTable $siteTable
@@ -106,7 +104,7 @@ class MelisCmsStyleSelectFactory extends MelisSelectFactory
         return 0;
     }
 
-    private function getRootPageId(ServiceLocatorInterface $sl, $pageId)
+    private function getRootPageId(ServiceManager $sl, $pageId)
     {
         $treeService = $sl->get('MelisEngineTree');
         $page = $treeService->getPageFather($pageId)->current();

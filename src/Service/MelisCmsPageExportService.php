@@ -9,12 +9,12 @@
 
 namespace MelisCms\Service;
 
-use MelisCore\Service\MelisCoreGeneralService;
 use Laminas\Db\Sql\Where;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Db\Metadata\Metadata;
+use MelisCore\Service\MelisGeneralService;
 
-class MelisCmsPageExportService extends MelisCoreGeneralService
+class MelisCmsPageExportService extends MelisGeneralService
 {
     /**
      * Default required table list to export page
@@ -166,7 +166,7 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
              * and put in xml
              */
             foreach($this->getTableServiceList() as $tblServiceName => $pageIdFieldName){
-                $tblGtWay = $this->getServiceLocator()->get($tblServiceName);
+                $tblGtWay = $this->getServiceManager()->get($tblServiceName);
                 $tblData = $tblGtWay->getEntryByField($pageIdFieldName, $pageId)->current();
                 if(!empty($tblData)){
                     $this->arrayToXml($tblData, $tblXml, $tblGtWay->getTableGateway()->getTable());
@@ -201,7 +201,7 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
         // Sending service start event
         $arrayParameters = $this->sendEvent('melis_cms_page_export_external_table_start', $arrayParameters);
         try{
-            $adapter = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');
+            $adapter = $this->getServiceManager()->get('Laminas\Db\Adapter\Adapter');
             /**
              * prepare the table tag
              */
@@ -252,7 +252,7 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
 
         $childrenNode = $this->createXmlNode('children');
 
-        $pageTreeService = $this->getServiceLocator()->get('MelisEngineTree');
+        $pageTreeService = $this->getServiceManager()->get('MelisEngineTree');
         if(empty($children)) {
             $children = $pageTreeService->getPageChildren($pageId)->toArray();
         }
@@ -306,8 +306,8 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
             /**
              * get the resources of the selected page
              */
-            $published = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
-            $saved = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+            $published = $this->getServiceManager()->get('MelisEngineTablePagePublished');
+            $saved = $this->getServiceManager()->get('MelisEngineTablePageSaved');
             $pagePubContent = $published->getEntryByField('page_id', $arrayParameters['pageId'])->current();
             $pageSavedContent = $saved->getEntryByField('page_id', $arrayParameters['pageId'])->current();
 
@@ -343,7 +343,7 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
     private function extractPageChildResources($pageId)
     {
         $resources = [];
-        $pageTreeService = $this->getServiceLocator()->get('MelisEngineTree');
+        $pageTreeService = $this->getServiceManager()->get('MelisEngineTree');
         $children = $pageTreeService->getPageChildren($pageId)->toArray();
         foreach($children as $data){
             $pageContent = $data['page_content'];
@@ -595,8 +595,8 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
     }
 
     private function getAllPageIds($pageId, &$pages, &$templates, &$styles, &$langs, &$pageCount, $includeSubPages) {
-        $pageTreeTable = $this->getServiceLocator()->get('MelisEngineTablePageTree');
-        $pageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+        $pageTreeTable = $this->getServiceManager()->get('MelisEngineTablePageTree');
+        $pageSavedTable = $this->getServiceManager()->get('MelisEngineTablePageSaved');
         $type = '';
 
         if (! empty($pageSavedTable->getSavedSitePagesById($pageId)->toArray()))
@@ -625,7 +625,7 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
 
         if ($includeSubPages) {
 
-            $pageTreeService = $this->getServiceLocator()->get('MelisEngineTree');
+            $pageTreeService = $this->getServiceManager()->get('MelisEngineTree');
             $children = $pageTreeService->getPageChildren($pageId)->toArray();
 
             foreach ($children as $id => $child) {
@@ -659,7 +659,7 @@ class MelisCmsPageExportService extends MelisCoreGeneralService
 
     private function getTableConstraints($tableName)
     {
-        $adapter = $this->getServiceLocator()->get('Laminas\Db\Adapter\Adapter');
+        $adapter = $this->getServiceManager()->get('Laminas\Db\Adapter\Adapter');
         $metadata = new Metadata($adapter);
         return $metadata->getConstraints($tableName);
     }

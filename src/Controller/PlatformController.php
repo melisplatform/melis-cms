@@ -9,9 +9,9 @@
 
 namespace MelisCms\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
+use MelisCore\Controller\AbstractActionController;
 
 /**
  * Platform Tool Plugin
@@ -27,11 +27,11 @@ class PlatformController extends AbstractActionController
      */
     public function renderContainerAction(){
         
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $noAccessPrompt = '';
         // Checks wether the user has access to this tools or not
-        $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
+        $melisCoreRights = $this->getServiceManager()->get('MelisCoreRights');
         if(!$melisCoreRights->canAccess(self::INTERFACE_KEY)) {
             $noAccessPrompt = $translator->translate('tr_tool_no_access');
         }
@@ -77,8 +77,8 @@ class PlatformController extends AbstractActionController
      */
     public function renderContentPlatformTableAction(){
         
-        $translator = $this->getServiceLocator()->get('translator');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $translator = $this->getServiceManager()->get('translator');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
         
         $columns = $melisTool->getColumns();
@@ -145,17 +145,17 @@ class PlatformController extends AbstractActionController
         $pids_id = $this->params()->fromQuery('id');
 
         // Get Cms Platform ID form from  App Tool
-        $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+        $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
         $genericPlatformForm = $melisMelisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_platform_tool/forms/meliscms_tool_platform_generic_form', 'meliscms_tool_platform_generic_form');
 
         // Factoring Calendar event and pass to view
         $factory = new \Laminas\Form\Factory();
-        $formElements = $this->serviceLocator->get('FormElementManager');
+        $formElements = $this->getServiceManager()->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $propertyForm = $factory->createForm($genericPlatformForm);
 
         $view = new ViewModel();
-        $melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+        $melisEngineTablePlatformIds = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
         $availablePlatform = $melisEngineTablePlatformIds->getAvailablePlatforms()->toArray();
         // Check if Cms Platform Id is Set
         if (!empty($pids_id)) {
@@ -163,7 +163,7 @@ class PlatformController extends AbstractActionController
             $platformIdsData = $melisEngineTablePlatformIds->getEntryById($pids_id);
             $platformIdsData = $platformIdsData->current();
 
-            $platformTable = $this->getServiceLocator()->get('MelisCoreTablePlatform');
+            $platformTable = $this->getServiceManager()->get('MelisCoreTablePlatform');
             $platformData = $platformTable->getEntryById($pids_id);
             $platformData = $platformData->current();
 
@@ -205,7 +205,7 @@ class PlatformController extends AbstractActionController
 
         if($this->getRequest()->isPost()){
             $success = 0;
-            $platform = $this->getServiceLocator()->get("Melisplatform");
+            $platform = $this->getServiceManager()->get("Melisplatform");
 
             $data = $platform->getPlatformList();
         }
@@ -218,7 +218,7 @@ class PlatformController extends AbstractActionController
      * @return Json Array
      */
     public function savePlatformIdsRangeAction(){
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         
         $request = $this->getRequest();
         // Default Values
@@ -230,14 +230,14 @@ class PlatformController extends AbstractActionController
         $responseData = array();
         $this->getEventManager()->trigger('meliscms_platform_IDs_save_start', $this, array());
         // Get Cms Platform ID form from  App Tool
-        $melisMelisCoreConfig = $this->getServiceLocator()->get('MelisCoreConfig');
+        $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
         $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_platform_tool/forms/meliscms_tool_platform_generic_form','meliscms_tool_platform_generic_form');
          
         $factory = new \Laminas\Form\Factory();
-        $formElements = $this->serviceLocator->get('FormElementManager');
+        $formElements = $this->getServiceManager()->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $propertyForm = $factory->createForm($appConfigForm);
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         if($request->isPost()) {
              
@@ -317,7 +317,7 @@ class PlatformController extends AbstractActionController
                 }
                 
                 if (empty($errors)){
-                    $melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+                    $melisEngineTablePlatformIds = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
                     
                     // Checking if The Post datas Confliction to the Existing Datas in CMS Platform IDs
                     $pids_id = ($datas['pids_id']) ? $datas['pids_id'] : 0;
@@ -381,13 +381,13 @@ class PlatformController extends AbstractActionController
      *
      */
     public function deletePlatformIdAction(){
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $this->getEventManager()->trigger('meliscms_platform_IDs_delete_start', $this, array());
         $request = $this->getRequest();
         $datas = get_object_vars($request->getPost());
         
         $pids_id = (int) $datas['pid_id'];
-        $melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+        $melisEngineTablePlatformIds = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
         $melisEngineTablePlatformIds->deleteById($pids_id);
         
         $response = array(
@@ -405,9 +405,9 @@ class PlatformController extends AbstractActionController
      */
     public function getPlatformDataAction()
     {
-        $melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
-        $translator = $this->getServiceLocator()->get('translator');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisEngineTablePlatformIds = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
+        $translator = $this->getServiceManager()->get('translator');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
 
         $colId = [];

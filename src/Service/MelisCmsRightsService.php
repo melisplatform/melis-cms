@@ -2,29 +2,14 @@
 
 namespace MelisCms\Service;
 
-use Laminas\ServiceManager\ServiceLocatorAwareInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
 use MelisCore\Service\MelisCoreRightsServiceInterface;
 use MelisCore\Service\MelisCoreRightsService;
 use Laminas\Json\Json;
+use MelisCore\Service\MelisServiceManager;
 
-class MelisCmsRightsService implements MelisCoreRightsServiceInterface, ServiceLocatorAwareInterface
+class MelisCmsRightsService extends MelisServiceManager implements MelisCoreRightsServiceInterface
 {
-	public $serviceLocator;
-	
 	const MELISCMS_PREFIX_PAGES = 'meliscms_pages';
-	
-	public function setServiceLocator(ServiceLocatorInterface $sl)
-	{
-		$this->serviceLocator = $sl;
-		return $this;
-	}
-	
-	public function getServiceLocator()
-	{
-		return $this->serviceLocator;
-	}
-
 	
 	public function isAccessible($xmlRights, $sectionId, $itemId)
     {
@@ -50,7 +35,7 @@ class MelisCmsRightsService implements MelisCoreRightsServiceInterface, ServiceL
             /**
              * @var \MelisEngine\Service\MelisTreeService $melisEngineTree
              */
-            $melisEngineTree = $this->getServiceLocator()->get('MelisEngineTree');
+            $melisEngineTree = $this->getServiceManager()->get('MelisEngineTree');
             $breadcrumb = $melisEngineTree->getPageBreadcrumb($itemId, 0, true);
 
             if (empty($rightsObj->$sectionId)) {
@@ -76,8 +61,8 @@ class MelisCmsRightsService implements MelisCoreRightsServiceInterface, ServiceL
 	
 	public function getRightsValues($id, $isRole = false)
 	{
-		$translator = $this->serviceLocator->get('translator');
-		$melisCoreUser = $this->getServiceLocator()->get('MelisCoreUser');
+		$translator = $this->getServiceManager()->get('translator');
+		$melisCoreUser = $this->getServiceManager()->get('MelisCoreUser');
 		if (!$isRole)
 		{
 			
@@ -86,7 +71,7 @@ class MelisCmsRightsService implements MelisCoreRightsServiceInterface, ServiceL
 		else
 		{
 			$xml = '';
-			$tableUserRole = $this->serviceLocator->get('MelisCoreTableUserRole');
+			$tableUserRole = $this->getServiceManager()->get('MelisCoreTableUserRole');
 			$datasRole = $tableUserRole->getEntryById($id);
 			if ($datasRole)
 			{
@@ -138,7 +123,7 @@ class MelisCmsRightsService implements MelisCoreRightsServiceInterface, ServiceL
 	
 	private function addPageOrNot($pageId, $tabPagesAlreadyFound)
 	{
-		$melisTree = $this->getServiceLocator()->get('MelisEngineTree');
+		$melisTree = $this->getServiceManager()->get('MelisEngineTree');
 		
 		$breacrumbPage = $melisTree->getPageBreadcrumb($pageId);
 		$noAdd = false;
@@ -173,13 +158,13 @@ class MelisCmsRightsService implements MelisCoreRightsServiceInterface, ServiceL
 		 */
 		if (!$isRole)
 		{
-			$melisCoreUser = $this->getServiceLocator()->get('MelisCoreUser');
+			$melisCoreUser = $this->getServiceManager()->get('MelisCoreUser');
 			$xml = $melisCoreUser->getUserXmlRights($id);
 		}
 		else
 		{
 			$xml = '';
-			$tableUserRole = $this->serviceLocator->get('MelisCoreTableUserRole');
+			$tableUserRole = $this->getServiceManager()->get('MelisCoreTableUserRole');
 			$datasRole = $tableUserRole->getEntryById($id);
 			if ($datasRole)
 			{
@@ -284,13 +269,13 @@ class MelisCmsRightsService implements MelisCoreRightsServiceInterface, ServiceL
 			break;
 		}
 		
-		$melisAppConfig = $this->getServiceLocator()->get('MelisCoreConfig');
+		$melisAppConfig = $this->getServiceManager()->get('MelisCoreConfig');
 		$melisKeys = $melisAppConfig->getMelisKeys();
 		 
-		$melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
+		$melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
 		$xmlRights = $melisCoreAuth->getAuthRights();
 
-		$melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
+		$melisCoreRights = $this->getServiceManager()->get('MelisCoreRights');
 		
 		if (!empty($melisKeys[$pathArrayConfig]))
 		{

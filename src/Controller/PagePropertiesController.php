@@ -10,10 +10,10 @@
 namespace MelisCms\Controller;
 
 use Laminas\Form\Factory;
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Session\Container;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
+use MelisCore\Controller\AbstractActionController;
 
 /**
  * This class renders Melis CMS Page tab properties
@@ -36,8 +36,8 @@ class PagePropertiesController extends AbstractActionController
         /**
          * Get the config for this form
          */
-        $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
-        $pageStyleTable = $this->getServiceLocator()->get('MelisEngineTablePageStyle');
+        $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
+        $pageStyleTable = $this->getServiceManager()->get('MelisEngineTablePageStyle');
 
         $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered(
             self::PagePropertiesAppConfigPath,
@@ -65,7 +65,7 @@ class PagePropertiesController extends AbstractActionController
          * Get the data to fill the form
          */
         if (!empty($idPage)) {
-            $melisPage = $this->serviceLocator->get('MelisEnginePage');
+            $melisPage = $this->getServiceManager()->get('MelisEnginePage');
             $datasPage = $melisPage->getDatasPage($idPage, 'saved');
             $datasPageTree = $datasPage->getMelisPageTree();
             $pageStyle = $pageStyleTable->getEntryByField('pstyle_page_id', $idPage)->current();
@@ -78,7 +78,7 @@ class PagePropertiesController extends AbstractActionController
          * Bind with datas
          */
         $factory = new Factory();
-        $formElements = $this->serviceLocator->get('FormElementManager');
+        $formElements = $this->getServiceManager()->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $appConfigForm['attributes']['action'] .= '?idPage=' . $idPage;
         $propertyForm = $factory->createForm($appConfigForm);
@@ -88,7 +88,7 @@ class PagePropertiesController extends AbstractActionController
             // modify the values of the dates to render to its locale
             $container = new Container('meliscore');
             $locale = $container['melis-lang-locale'];
-            $melisTranslation = $this->getServiceLocator()->get('MelisCoreTranslation');
+            $melisTranslation = $this->getServiceManager()->get('MelisCoreTranslation');
 
             $datasPageTree->page_creation_date = strftime($melisTranslation->getDateFormatByLocate($locale), strtotime($datasPageTree->page_creation_date));
             $datasPageTree->page_edit_date = strftime($melisTranslation->getDateFormatByLocate($locale), strtotime($datasPageTree->page_edit_date));
@@ -127,12 +127,12 @@ class PagePropertiesController extends AbstractActionController
     {
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $fatherPageId = $this->params()->fromRoute('fatherPageId', $this->params()->fromQuery('fatherPageId', -1));
-        $translator = $this->serviceLocator->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         $eventDatas = array('idPage' => $idPage, 'fatherPageId' => $fatherPageId);
         $this->getEventManager()->trigger('meliscms_page_savetree_start', null, $eventDatas);
 
-        $melisEngineTablePageTree = $this->getServiceLocator()->get('MelisEngineTablePageTree');
+        $melisEngineTablePageTree = $this->getServiceManager()->get('MelisEngineTablePageTree');
 
         // Check if the page really exist to avoid ghost datas
         $exist = false;
@@ -180,7 +180,7 @@ class PagePropertiesController extends AbstractActionController
                     // Page language
                     $pageLangId = $formData['plang_lang_id'];
                     if (empty($pageLangId))
-                        $pageLangId = $this->getServiceLocator()->get('MelisEngineTablePageLang')
+                        $pageLangId = $this->getServiceManager()->get('MelisEngineTablePageLang')
                             ->getEntryByField("plang_page_id",$idPage)->current()->plang_lang_id;
 
                     if (!in_array($pageLangId, $siteLangs)) {
@@ -216,7 +216,7 @@ class PagePropertiesController extends AbstractActionController
 
                     // Get the current page id from platform table
                     $melisModuleName = getenv('MELIS_PLATFORM');
-                    $melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+                    $melisEngineTablePlatformIds = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
                     $datasPlatformIds = $melisEngineTablePlatformIds->getPlatformIdsByPlatformName($melisModuleName);
                     $datasPlatformIds = $datasPlatformIds->current();
 
@@ -261,7 +261,7 @@ class PagePropertiesController extends AbstractActionController
                                 $langId = $postValues['plang_lang_id'];
                         }
 
-                        $melisEngineTablePageLang = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+                        $melisEngineTablePageLang = $this->getServiceManager()->get('MelisEngineTablePageLang');
                         $melisEngineTablePageLang->save(array(
                             'plang_page_id' => $datasPlatformIds->pids_page_id_current,
                             'plang_lang_id' => $langId,
@@ -308,7 +308,7 @@ class PagePropertiesController extends AbstractActionController
         /**
          * Get the config for this form
          */
-        $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+        $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
 
         $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered(
             self::PagePropertiesAppConfigPath,
@@ -338,7 +338,7 @@ class PagePropertiesController extends AbstractActionController
          */
 
         $factory = new Factory();
-        $formElements = $this->serviceLocator->get('FormElementManager');
+        $formElements = $this->getServiceManager()->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $propertyForm = $factory->createForm($appConfigForm);
 
@@ -361,9 +361,9 @@ class PagePropertiesController extends AbstractActionController
          * @var \MelisEngine\Model\Tables\MelisSiteTable $siteTable
          * @var \MelisEngine\Model\Tables\MelisCmsSiteLangsTable $sitelangsTable
          */
-        $tplTable = $this->getServiceLocator()->get('MelisEngineTableTemplate');
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
-        $sitelangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+        $tplTable = $this->getServiceManager()->get('MelisEngineTableTemplate');
+        $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
+        $sitelangsTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteLangs');
 
         $tplData = $tplTable->getEntryById($templateId)->toArray();
         $tplData = reset($tplData);
@@ -390,7 +390,7 @@ class PagePropertiesController extends AbstractActionController
     {
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $isNew = $this->params()->fromRoute('isNew', $this->params()->fromQuery('isNew', ''));
-        $translator = $this->serviceLocator->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         $eventDatas = array('idPage' => $idPage, 'isNew' => $isNew);
         $this->getEventManager()->trigger('meliscms_page_saveproperties_start', null, $eventDatas);
@@ -398,15 +398,15 @@ class PagePropertiesController extends AbstractActionController
         // Get the form properly loaded
         $propertyForm = $this->getPropertyPageForm($idPage, $isNew);
 
-        $melisPageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
-        $melisPagePublishedTable = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisPageSavedTable = $this->getServiceManager()->get('MelisEngineTablePageSaved');
+        $melisPagePublishedTable = $this->getServiceManager()->get('MelisEngineTablePagePublished');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         // Check if post
         $request = $this->getRequest();
         if ($request->isPost()) {
             // Get the current page id from platform table
             $melisModuleName = getenv('MELIS_PLATFORM');
-            $melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+            $melisEngineTablePlatformIds = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
             $datasPlatformIds = $melisEngineTablePlatformIds->getPlatformIdsByPlatformName($melisModuleName);
             $datasPlatformIds = $datasPlatformIds->current();
 
@@ -441,7 +441,7 @@ class PagePropertiesController extends AbstractActionController
                         // Page language
                         $pageLangId = $datas['plang_lang_id'];
                         if (empty($pageLangId))
-                            $pageLangId = $this->getServiceLocator()->get('MelisEngineTablePageLang')
+                            $pageLangId = $this->getServiceManager()->get('MelisEngineTablePageLang')
                                 ->getEntryByField("plang_page_id",$idPage)->current()->plang_lang_id;
 
                         if (!in_array($pageLangId, $siteLangs)) {
@@ -522,7 +522,7 @@ class PagePropertiesController extends AbstractActionController
                     } else {
                         $datas['page_edit_date'] = date('Y-m-d H:i:s');
 
-                        $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
+                        $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
                         $user = $melisCoreAuth->getIdentity();
                         if (!empty($user))
                             $datas['page_last_user_id'] = $user->usr_id;

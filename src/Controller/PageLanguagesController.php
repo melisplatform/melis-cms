@@ -9,12 +9,12 @@
 
 namespace MelisCms\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
 use Laminas\Session\Container;
 use MelisCms\Service\MelisCmsRightsService;
 use Laminas\Form\Factory;
+use MelisCore\Controller\AbstractActionController;
 
 /**
  * This class renders Melis CMS Page language
@@ -49,7 +49,7 @@ class PageLanguagesController extends AbstractActionController
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
         // Retrieving the list of Page languages
-        $pageLangTbl = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+        $pageLangTbl = $this->getServiceManager()->get('MelisEngineTablePageLang');
         $pageLang = $pageLangTbl->getEntryByField('plang_page_id', $idPage)->current();
         
         $pagesData = array();
@@ -62,7 +62,7 @@ class PageLanguagesController extends AbstractActionController
             
             $pages = $pageLangTbl->getEntryByField('plang_page_id_initial', $pageInitialId);
             
-            $pageSrv = $this->getServiceLocator()->get('MelisEnginePage');
+            $pageSrv = $this->getServiceManager()->get('MelisEnginePage');
             foreach ($pages As $val)
             {
                 $pageData = $pageSrv->getDatasPage($val->plang_page_id, 'saved')->getMelisPageTree();
@@ -109,7 +109,7 @@ class PageLanguagesController extends AbstractActionController
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
         
-        $pageLangTbl = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+        $pageLangTbl = $this->getServiceManager()->get('MelisEngineTablePageLang');
         $pageLang = $pageLangTbl->getEntryByField('plang_page_id', $idPage)->current();
         
         $pagesLang = array();
@@ -124,7 +124,7 @@ class PageLanguagesController extends AbstractActionController
             }
         }
         
-        $tableLang = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+        $tableLang = $this->getServiceManager()->get('MelisEngineTableCmsLang');
         $languages = $tableLang->fetchAll();
         
         $langFlags = '';
@@ -162,7 +162,7 @@ class PageLanguagesController extends AbstractActionController
     {
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
 
-        $cmsPageLangTbl = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+        $cmsPageLangTbl = $this->getServiceManager()->get('MelisEngineTablePageLang');
         $cmsPageLang = $cmsPageLangTbl->getEntryByField('plang_page_id', $idPage)->current();
 
         if (!empty($cmsPageLang))
@@ -216,8 +216,8 @@ class PageLanguagesController extends AbstractActionController
                 );
                 $pageLangIds = array();
 
-                $cmsLangTbl      = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
-                $pageLangTbl     = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+                $cmsLangTbl      = $this->getServiceManager()->get('MelisEngineTableCmsLang');
+                $pageLangTbl     = $this->getServiceManager()->get('MelisEngineTablePageLang');
                 $pageInitialId   = $pageLangTbl->getEntryByField('plang_page_id',$data['pageLangPageId'])->current();
                 $pageLangInitial = $pageLangTbl->getEntryByField('plang_page_id_initial',$pageInitialId->plang_page_id_initial)->toArray();
 
@@ -237,7 +237,7 @@ class PageLanguagesController extends AbstractActionController
                      * Retrieving the published data of the current page and
                      * use to create the new Page
                      */
-                    $pagePublishedTbl = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
+                    $pagePublishedTbl = $this->getServiceManager()->get('MelisEngineTablePagePublished');
                     $currentPage = $pagePublishedTbl->getEntryById($data['pageLangPageId'])->current();
                     $pagePublished = array();
                     if (!empty($currentPage))
@@ -253,7 +253,7 @@ class PageLanguagesController extends AbstractActionController
                      * Retrieving the saved data of the current page and
                      * use to create the new Page
                      */
-                    $pageSavedTbl = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+                    $pageSavedTbl = $this->getServiceManager()->get('MelisEngineTablePageSaved');
                     $currentPage = $pageSavedTbl->getEntryById($data['pageLangPageId'])->current();
                     $pageSaved = array();
                     if (!empty($currentPage))
@@ -269,7 +269,7 @@ class PageLanguagesController extends AbstractActionController
                      * Retrieving the seo data of the current page and
                      * use to create the new Page
                      */
-                    $pageSeoTbl = $this->getServiceLocator()->get('MelisEngineTablePageSeo');
+                    $pageSeoTbl = $this->getServiceManager()->get('MelisEngineTablePageSeo');
                     $currentPage = $pageSeoTbl->getEntryById($data['pageLangPageId'])->current();
                     $pageSeo = array();
                     if (!empty($currentPage))
@@ -291,7 +291,7 @@ class PageLanguagesController extends AbstractActionController
                      * Retrieving the style data of the current page and
                      * use to create the new Page
                      */
-                    $pageStyleTbl = $this->getServiceLocator()->get('MelisEngineTablePageStyle');
+                    $pageStyleTbl = $this->getServiceManager()->get('MelisEngineTablePageStyle');
                     $currentPage = $pageStyleTbl->getEntryByField('pstyle_page_id', $data['pageLangPageId'])->current();
                     $pageStyle = array();
                     if (!empty($currentPage))
@@ -307,7 +307,7 @@ class PageLanguagesController extends AbstractActionController
                     /**
                      * Saving the Page using the MelisCmsPageService Service
                      */
-                    $pageSrv = $this->getServiceLocator()->get('MelisCmsPageService');
+                    $pageSrv = $this->getServiceManager()->get('MelisCmsPageService');
                     $pageId = $pageSrv->savePage($pageTree, $pagePublished, $pageSaved, $pageSeo, $pageLang, $pageStyle);
 
                     if (!is_null($pageId))
@@ -315,7 +315,7 @@ class PageLanguagesController extends AbstractActionController
                         /**
                          * Retrieving the new created page for response of the request call
                          */
-                        $pageSrv = $this->getServiceLocator()->get('MelisEnginePage');
+                        $pageSrv = $this->getServiceManager()->get('MelisEnginePage');
                         $pageData = $pageSrv->getDatasPage($pageId, 'saved')->getMelisPageTree();
 
                         $pageInfo = array(
@@ -338,7 +338,7 @@ class PageLanguagesController extends AbstractActionController
             {
                 $errors = $form->getMessages();
                 // insert labels and error messages in error array
-                $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+                $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
                 $appConfigForm = $melisMelisCoreConfig->getItem('meliscms/forms/meliscms_page_languages');
                 $appConfigForm = $appConfigForm['elements'];
                 
@@ -379,7 +379,7 @@ class PageLanguagesController extends AbstractActionController
         /**
          * Get the config for this form
          */
-        $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+        $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
         $appConfigForm = $melisMelisCoreConfig->getItem('/meliscms/forms/meliscms_page_languages', 'meliscms_page_languages');
         
         /**
@@ -388,7 +388,7 @@ class PageLanguagesController extends AbstractActionController
          * Bind with datas
          */
         $factory = new Factory();
-        $formElements = $this->serviceLocator->get('FormElementManager');
+        $formElements = $this->getServiceManager()->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $form = $factory->createForm($appConfigForm);
         
@@ -405,7 +405,7 @@ class PageLanguagesController extends AbstractActionController
     {
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         
-        $cmsPageLangTbl = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+        $cmsPageLangTbl = $this->getServiceManager()->get('MelisEngineTablePageLang');
         $cmsPageLang = $cmsPageLangTbl->getEntryByField('plang_page_id', $idPage)->current();
         
         if (!empty($cmsPageLang))

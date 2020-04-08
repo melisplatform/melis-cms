@@ -9,11 +9,11 @@
 
 namespace MelisCms\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
 use Laminas\Session\Container;
 use MelisCms\Service\MelisCmsRightsService;
+use MelisCore\Controller\AbstractActionController;
 
 /**
  * This class renders Melis CMS Page
@@ -44,7 +44,7 @@ class PageController extends AbstractActionController
     public function renderPageImportModalAction()
     {
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tools.php that will be used.
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tree_sites_tool');
@@ -74,8 +74,8 @@ class PageController extends AbstractActionController
         // Check rights for when it's displayed  directly on page generation
         if ($idPage != 0)
         {
-            $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
-            $melisCmsRights = $this->getServiceLocator()->get('MelisCmsRights');
+            $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
+            $melisCmsRights = $this->getServiceManager()->get('MelisCmsRights');
             $xmlRights = $melisCoreAuth->getAuthRights();
             $isAccessible = $melisCmsRights->isAccessible($xmlRights, MelisCmsRightsService::MELISCMS_PREFIX_PAGES, $idPage);
         }
@@ -149,10 +149,10 @@ class PageController extends AbstractActionController
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
-        $translator = $this->serviceLocator->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         // Getting datas, saved version (if not will bring published datas)
-        $melisPage = $this->serviceLocator->get('MelisEnginePage');
+        $melisPage = $this->getServiceManager()->get('MelisEnginePage');
         $datasPage = $melisPage->getDatasPage($idPage, 'saved');
         if($datasPage)
             $datasPageTree = $datasPage->getMelisPageTree();
@@ -160,7 +160,7 @@ class PageController extends AbstractActionController
         // Locale
         $container = new Container('meliscore');
         $locale = $container['melis-lang-locale'];
-        $melisTranslation = $this->getServiceLocator()->get('MelisCoreTranslation');
+        $melisTranslation = $this->getServiceManager()->get('MelisCoreTranslation');
 
 
         // Getting info on last published page
@@ -179,7 +179,7 @@ class PageController extends AbstractActionController
 
             if (!empty($datasPagePublishedTree->page_last_user_id))
             {
-                $melisCoreTableUser = $this->getServiceLocator()->get('MelisCoreTableUser');
+                $melisCoreTableUser = $this->getServiceManager()->get('MelisCoreTableUser');
                 $user = $melisCoreTableUser->getEntryById($datasPagePublishedTree->page_last_user_id);
                 if (!empty($user))
                 {
@@ -197,7 +197,7 @@ class PageController extends AbstractActionController
         $savedName = '';
 
 
-        $melisEngineTablePageSaved = $this->serviceLocator->get('MelisEngineTablePageSaved');
+        $melisEngineTablePageSaved = $this->getServiceManager()->get('MelisEngineTablePageSaved');
         $datasPageSaved = $melisEngineTablePageSaved->getEntryById($idPage);
 
         if (!empty($datasPageSaved))
@@ -212,7 +212,7 @@ class PageController extends AbstractActionController
                 $lastSavedDate = strftime($melisTranslation->getDateFormatByLocate($locale), strtotime($lastSavedDate));
                 if (!empty($datasPageSaved->page_last_user_id))
                 {
-                    $melisCoreTableUser = $this->getServiceLocator()->get('MelisCoreTableUser');
+                    $melisCoreTableUser = $this->getServiceManager()->get('MelisCoreTableUser');
                     $user = $melisCoreTableUser->getEntryById($datasPageSaved->page_last_user_id);
                     if (!empty($user))
                     {
@@ -228,7 +228,7 @@ class PageController extends AbstractActionController
         $published = $translator->translate('tr_meliscms_page_status_last_unpublished_on');
 
         // Checking Page Current Status
-        $melisEngineTablePagePublished = $this->serviceLocator->get('MelisEngineTablePagePublished');
+        $melisEngineTablePagePublished = $this->getServiceManager()->get('MelisEngineTablePagePublished');
         $datasPagePublished = $melisEngineTablePagePublished->getEntryById($idPage);
         if (!empty($datasPagePublished))
         {
@@ -292,7 +292,7 @@ class PageController extends AbstractActionController
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $page_tpl_id = null;
 
-        $melisPage = $this->serviceLocator->get('MelisEnginePage');
+        $melisPage = $this->getServiceManager()->get('MelisEnginePage');
         if(!empty($idPage)){
             $datasPage = $melisPage->getDatasPage($idPage, 'saved');
             $datasPageTree = $datasPage->getMelisPageTree();
@@ -343,7 +343,7 @@ class PageController extends AbstractActionController
     {
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
-        $melisTree = $this->serviceLocator->get('MelisEngineTree');
+        $melisTree = $this->getServiceManager()->get('MelisEngineTree');
         $children = $melisTree->getPageChildren($idPage)->count();
         $view = new ViewModel();
         $view->idPage = $idPage;
@@ -376,16 +376,16 @@ class PageController extends AbstractActionController
      */
     public function renderPageactionClearAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
-        $melisEngineSavedPage = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+        $melisEngineSavedPage = $this->getServiceManager()->get('MelisEngineTablePageSaved');
         $savedPageRes = $melisEngineSavedPage->getEntryById($idPage);
         $savedPageData = $savedPageRes->current();
 
         // Checking Page Current Status
-        $melisEngineTablePagePublished = $this->serviceLocator->get('MelisEngineTablePagePublished');
+        $melisEngineTablePagePublished = $this->getServiceManager()->get('MelisEngineTablePagePublished');
         $datasPagePublished = $melisEngineTablePagePublished->getEntryById($idPage);
         $pagePublishedData = $datasPagePublished->current();
 
@@ -467,7 +467,7 @@ class PageController extends AbstractActionController
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         $published = 0;
-        $melisEngineTablePagePublished = $this->serviceLocator->get('MelisEngineTablePagePublished');
+        $melisEngineTablePagePublished = $this->getServiceManager()->get('MelisEngineTablePagePublished');
         $datasPagePublished = $melisEngineTablePagePublished->getEntryById($idPage);
         if (!empty($datasPagePublished))
         {
@@ -514,7 +514,7 @@ class PageController extends AbstractActionController
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
-        $melisTree = $this->serviceLocator->get('MelisEngineTree');
+        $melisTree = $this->getServiceManager()->get('MelisEngineTree');
         $link = $melisTree->getPageLink($idPage, true);
 
         $view = new ViewModel();
@@ -534,7 +534,7 @@ class PageController extends AbstractActionController
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
-        $melisPage = $this->getServiceLocator()->get('MelisEnginePage');
+        $melisPage = $this->getServiceManager()->get('MelisEnginePage');
         $datasPage = $melisPage->getDatasPage($idPage, 'saved');
         if($datasPage)
         {
@@ -564,7 +564,7 @@ class PageController extends AbstractActionController
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
-        $melisTree = $this->serviceLocator->get('MelisEngineTree');
+        $melisTree = $this->getServiceManager()->get('MelisEngineTree');
         $link = $melisTree->getPageLink($idPage, true);
 
         $view = new ViewModel();
@@ -647,7 +647,7 @@ class PageController extends AbstractActionController
     {
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
 
-        $melisCoreAuth = $this->serviceLocator->get('MelisCoreAuth');
+        $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
         $user = $melisCoreAuth->getIdentity();
 
         if (empty($user))
@@ -680,7 +680,7 @@ class PageController extends AbstractActionController
     {
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $fatherPageId = $this->params()->fromRoute('fatherPageId', $this->params()->fromQuery('fatherPageId', ''));
-        $translator = $this->serviceLocator->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         $success = 0;
         $errors = array();
@@ -726,7 +726,7 @@ class PageController extends AbstractActionController
 
             $textTitle = '';
             $textMessage = '';
-            $melisPage = $this->serviceLocator->get('MelisEnginePage');
+            $melisPage = $this->getServiceManager()->get('MelisEnginePage');
             $page = $melisPage->getDatasPage($idPage, 'saved');
 
             $pageName = '';
@@ -742,7 +742,7 @@ class PageController extends AbstractActionController
                     . $translator->translate('tr_meliscms_page_success_Page new');
 
             $pageMelisKey = 'meliscms_page';
-            $melisAppConfig =$this->getServiceLocator()->get('MelisCoreConfig');
+            $melisAppConfig =$this->getServiceManager()->get('MelisCoreConfig');
             $appsConfig = $melisAppConfig->getItem($pageMelisKey);
 
             if (!empty($appsConfig['conf']['id']))
@@ -793,7 +793,7 @@ class PageController extends AbstractActionController
             }
 
             // Add labels of errors
-            $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+            $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
 
             $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered(
                 PagePropertiesController::PagePropertiesAppConfigPath,
@@ -843,7 +843,7 @@ class PageController extends AbstractActionController
     {
         $data = array();
 
-        $melisData = $this->serviceLocator->get('MelisPage');
+        $melisData = $this->getServiceManager()->get('MelisPage');
         $data      = $melisData->fetchAll();
 
         return $data;
@@ -855,7 +855,7 @@ class PageController extends AbstractActionController
      */
     public function clearSavedPageAction(){
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
-        $translator = $this->serviceLocator->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         $success = 0;
         $errors = array();
@@ -867,7 +867,7 @@ class PageController extends AbstractActionController
         $usrAccess = $this->checkoutUserPageRightsAccess($idPage);
         if ($usrAccess['hasAccess'])
         {
-            $melisEngineSavedPage = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+            $melisEngineSavedPage = $this->getServiceManager()->get('MelisEngineTablePageSaved');
             $savedPageRes = $melisEngineSavedPage->getEntryById($idPage);
             $savedPageData = $savedPageRes->current();
 
@@ -875,7 +875,7 @@ class PageController extends AbstractActionController
             if (!empty($savedPageData)){
 
                 // Checking Page Current Status
-                $melisEngineTablePagePublished = $this->serviceLocator->get('MelisEngineTablePagePublished');
+                $melisEngineTablePagePublished = $this->getServiceManager()->get('MelisEngineTablePagePublished');
                 $datasPagePublished = $melisEngineTablePagePublished->getEntryById($idPage);
                 $pagePublishedData = $datasPagePublished->current();
 
@@ -890,7 +890,7 @@ class PageController extends AbstractActionController
                     $data['page_content'] = $newXmlContent;
                     $data['page_edit_date'] = date('Y-m-d H:i:s');
                     // Getting current user
-                    $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
+                    $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
                     $user = $melisCoreAuth->getIdentity();
                     if (!empty($user))
                     {
@@ -938,10 +938,10 @@ class PageController extends AbstractActionController
     {
 
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
-        $translator = $this->serviceLocator->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
-        $melisPageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
-        $melisPagePublishedTable = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
+        $melisPageSavedTable = $this->getServiceManager()->get('MelisEngineTablePageSaved');
+        $melisPagePublishedTable = $this->getServiceManager()->get('MelisEngineTablePagePublished');
 
         $dataSaved = $melisPageSavedTable->getEntryById($idPage);
         if ($dataSaved)
@@ -987,7 +987,7 @@ class PageController extends AbstractActionController
     public function publishPageAction()
     {
         $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
-        $translator = $this->serviceLocator->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         $eventDatas = array('idPage' => $idPage);
         $this->getEventManager()->trigger('meliscms_page_publish_start', $this, $eventDatas);
@@ -1021,7 +1021,7 @@ class PageController extends AbstractActionController
             unset($container['action-page-tmp']);
 
 
-            $melisPage = $this->serviceLocator->get('MelisEnginePage');
+            $melisPage = $this->getServiceManager()->get('MelisEnginePage');
             $page = $melisPage->getDatasPage($idPage, 'saved');
 
             $pageName = '';
@@ -1032,7 +1032,7 @@ class PageController extends AbstractActionController
             }
 
             // Add labels of errors
-            $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+            $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
 
             $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered(
                 PagePropertiesController::PagePropertiesAppConfigPath,
@@ -1058,7 +1058,7 @@ class PageController extends AbstractActionController
             }
 
             $pageMelisKey = 'meliscms_page';
-            $melisAppConfig =$this->getServiceLocator()->get('MelisCoreConfig');
+            $melisAppConfig =$this->getServiceManager()->get('MelisCoreConfig');
             $appsConfig = $melisAppConfig->getItem($pageMelisKey);
 
             if (!empty($appsConfig['conf']['id']))
@@ -1128,8 +1128,8 @@ class PageController extends AbstractActionController
     public function unpublishPublishedPageAction()
     {
         $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
-        $translator = $this->getServiceLocator()->get('translator');
-        $melisPagePublishedTable = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
+        $translator = $this->getServiceManager()->get('translator');
+        $melisPagePublishedTable = $this->getServiceManager()->get('MelisEngineTablePagePublished');
 
         $dataPublished = $melisPagePublishedTable->getEntryById($idPage);
         if ($dataPublished)
@@ -1138,7 +1138,7 @@ class PageController extends AbstractActionController
             if (count($dataPublished) > 0)
             {
 
-                $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
+                $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
 
                 $userAuthDatas =  $melisCoreAuth->getStorage()->read();
                 $userId = (int) $userAuthDatas->usr_id;
@@ -1189,7 +1189,7 @@ class PageController extends AbstractActionController
     public function unpublishPageAction()
     {
         $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
-        $translator = $this->serviceLocator->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         // Checking if user has page access rights
         $usrAccess = $this->checkoutUserPageRightsAccess($idPage);
@@ -1225,7 +1225,7 @@ class PageController extends AbstractActionController
 
             if ($success == 1) {
 
-                $melisPage = $this->serviceLocator->get('MelisEnginePage');
+                $melisPage = $this->getServiceManager()->get('MelisEnginePage');
                 $pageData = $melisPage->getDatasPage($idPage, 'saved');
                 $page = $pageData->getMelisPageTree();
                 $pageName= '"' . $page->page_name. '"';
@@ -1269,7 +1269,7 @@ class PageController extends AbstractActionController
     public function deletePageTreeAction()
     {
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
-        $translator = $this->serviceLocator->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $datasPage = null;
 
         $datas = array('idPage' => $idPage);
@@ -1290,7 +1290,7 @@ class PageController extends AbstractActionController
         else
         {
             // Check page exists for real
-            $melisPage = $this->serviceLocator->get('MelisEnginePage');
+            $melisPage = $this->getServiceManager()->get('MelisEnginePage');
             $page = $melisPage->getDatasPage($idPage, 'saved');
 
             if (empty($page->getMelisPageTree()))
@@ -1308,7 +1308,7 @@ class PageController extends AbstractActionController
             else
             {
                 // Get the children
-                $melisTree = $this->serviceLocator->get('MelisEngineTree');
+                $melisTree = $this->getServiceManager()->get('MelisEngineTree');
                 $children = $melisTree->getPageChildren($idPage);
                 $children = $children->toArray();
                 $datasPage = $page->getMelisPageTree();
@@ -1323,16 +1323,16 @@ class PageController extends AbstractActionController
                     $children = $children->toArray();
 
                     // Deleting the page
-                    $tablePageTree = $this->getServiceLocator()->get('MelisEngineTablePageTree');
+                    $tablePageTree = $this->getServiceManager()->get('MelisEngineTablePageTree');
                     $tablePageTree->deleteById($idPage);
 
-                    $tablePagePublished = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
+                    $tablePagePublished = $this->getServiceManager()->get('MelisEngineTablePagePublished');
                     $tablePagePublished->deleteById($idPage);
 
-                    $tablePageSaved = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+                    $tablePageSaved = $this->getServiceManager()->get('MelisEngineTablePageSaved');
                     $tablePageSaved->deleteById($idPage);
 
-                    $tablePageLang = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+                    $tablePageLang = $this->getServiceManager()->get('MelisEngineTablePageLang');
                     $tablePageLang->deleteByField('plang_page_id', $idPage);
 
 
@@ -1397,7 +1397,7 @@ class PageController extends AbstractActionController
     public function deletePageAction()
     {
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
-        $translator = $this->serviceLocator->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         // Checking if user has page access rights
         $usrAccess = $this->checkoutUserPageRightsAccess($idPage);
@@ -1430,7 +1430,7 @@ class PageController extends AbstractActionController
 
             $textTitle = '';
             $textMessage = '';
-            $melisPage = $this->serviceLocator->get('MelisEnginePage');
+            $melisPage = $this->getServiceManager()->get('MelisEnginePage');
             $page = $melisPage->getDatasPage($idPage, 'saved');
             $datas['idPage'] = $idPage;
 
@@ -1482,7 +1482,7 @@ class PageController extends AbstractActionController
         $oldFatherIdPage = $this->params()->fromRoute('oldFatherIdPage', $this->params()->fromQuery('oldFatherIdPage', ''));
         $newFatherIdPage = $this->params()->fromRoute('newFatherIdPage', $this->params()->fromQuery('newFatherIdPage', ''));
         $newPositionIdPage = $this->params()->fromRoute('newPositionIdPage', $this->params()->fromQuery('newPositionIdPage', ''));
-        $translator = $this->serviceLocator->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         $eventDatas = array(
             'idPage' => $idPage,
@@ -1495,7 +1495,7 @@ class PageController extends AbstractActionController
         $success = 1;
 
         // First let's get the list of children of the new father's page
-        $melisTree = $this->serviceLocator->get('MelisEngineTree');
+        $melisTree = $this->getServiceManager()->get('MelisEngineTree');
         $children = $melisTree->getPageChildren($newFatherIdPage);
         $children = $children->toArray();
 
@@ -1512,7 +1512,7 @@ class PageController extends AbstractActionController
         // Inserting the page id with new order
         array_splice($pageTree, ($newPositionIdPage - 1), 0, $idPage);
 
-        $tablePageTree = $this->getServiceLocator()->get('MelisEngineTablePageTree');
+        $tablePageTree = $this->getServiceManager()->get('MelisEngineTablePageTree');
         foreach ($pageTree As $key => $val)
         {
             $tablePageTree->save(array(
@@ -1525,7 +1525,7 @@ class PageController extends AbstractActionController
         {
             // Now we update the children of the old father page id, for their page order now that
             // the page has been deleted
-            $melisTree = $this->serviceLocator->get('MelisEngineTree');
+            $melisTree = $this->getServiceManager()->get('MelisEngineTree');
             $children = $melisTree->getPageChildren($oldFatherIdPage);
             $children = $children->toArray();
             $cpt = 1;
@@ -1540,7 +1540,7 @@ class PageController extends AbstractActionController
         $textMessage = '';
         if ($success == 1)
         {
-            $melisPage = $this->serviceLocator->get('MelisEnginePage');
+            $melisPage = $this->getServiceManager()->get('MelisEnginePage');
             $page = $melisPage->getDatasPage($idPage, 'saved');
 
             if ($page && !empty($page->getMelisPageTree()))
@@ -1575,7 +1575,7 @@ class PageController extends AbstractActionController
     {
         $actionwanted = $this->params()->fromQuery('actionwanted', '');
 
-        $melisCmsRights = $this->getServiceLocator()->get('MelisCmsRights');
+        $melisCmsRights = $this->getServiceManager()->get('MelisCmsRights');
         $active = $melisCmsRights->isActionButtonActive($actionwanted);
 
         $success = 1;
@@ -1596,16 +1596,16 @@ class PageController extends AbstractActionController
     {
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $actionwanted = $this->params()->fromRoute('actionwanted', $this->params()->fromQuery('actionwanted', ''));
-        $translator = $this->serviceLocator->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
-        $melisCmsRights = $this->getServiceLocator()->get('MelisCmsRights');
+        $melisCmsRights = $this->getServiceManager()->get('MelisCmsRights');
         $active = $melisCmsRights->isActionButtonActive($actionwanted);
 
         $textTitle = '';
         $textMessage = '';
         if ($active == 0)
         {
-            $melisPage = $this->serviceLocator->get('MelisEnginePage');
+            $melisPage = $this->getServiceManager()->get('MelisEnginePage');
             $page = $melisPage->getDatasPage($idPage, 'saved');
 
             if ($page && !empty($page->getMelisPageTree()))
@@ -1682,8 +1682,8 @@ class PageController extends AbstractActionController
     public function searchTreePagesAction()
     {
         $result = array();
-        $pageSvc = $this->getServiceLocator()->get('MelisEnginePage');
-        $treeSvc = $this->getServiceLocator()->get('MelisEngineTree');
+        $pageSvc = $this->getServiceManager()->get('MelisEnginePage');
+        $treeSvc = $this->getServiceManager()->get('MelisEngineTree');
 
         if($this->getRequest()->isPost()) {
             $postValues = get_object_vars($this->getRequest()->getPost());
@@ -1728,7 +1728,7 @@ class PageController extends AbstractActionController
         $idPage = $this->params()->fromQuery('idPage', '');
         $absolute = $this->params()->fromQuery('absolute', false);
 
-        $melisTree = $this->serviceLocator->get('MelisEngineTree');
+        $melisTree = $this->getServiceManager()->get('MelisEngineTree');
         $link['link'] = $melisTree->getPageLink($idPage, $absolute);
 
         return new JsonModel($link);
@@ -1748,15 +1748,15 @@ class PageController extends AbstractActionController
 
 
         // Checking if user has page access rights
-        $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
-        $melisCmsRights = $this->getServiceLocator()->get('MelisCmsRights');
+        $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
+        $melisCmsRights = $this->getServiceManager()->get('MelisCmsRights');
         $xmlRights = $melisCoreAuth->getAuthRights();
 
         if ($idPage === static::NEW_PAGE) {
             /**
              * @var \MelisEngine\Service\MelisTreeService $treeService
              */
-            $treeService = $this->getServiceLocator()->get('MelisEngineTree');
+            $treeService = $this->getServiceManager()->get('MelisEngineTree');
             $qParentId = (int) $this->params()->fromQuery('fatherPageId');
             $parentPageId = $treeService->getPageFather($qParentId);
             $rights = (array) simplexml_load_string($xmlRights);
@@ -1801,8 +1801,8 @@ class PageController extends AbstractActionController
 
     private function updateUrlPage($idPage)
     {
-        $melisTree = $this->serviceLocator->get('MelisEngineTree');
-        $tablePageDefaultUrls = $this->getServiceLocator()->get('MelisEngineTablePageDefaultUrls');
+        $melisTree = $this->getServiceManager()->get('MelisEngineTree');
+        $tablePageDefaultUrls = $this->getServiceManager()->get('MelisEngineTablePageDefaultUrls');
 
         $link = $melisTree->getPageLink($idPage);
         $tablePageDefaultUrls->save(

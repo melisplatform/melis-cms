@@ -10,11 +10,11 @@
 namespace MelisCms\Controller;
 
 use MelisAssetManager\Service\MelisModulesService;
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
 use Laminas\Session\Container;
 use MelisCms\Service\MelisCmsRightsService;
+use MelisCore\Controller\AbstractActionController;
 
 /**
  * This class renders Melis CMS Plugin Menu
@@ -27,11 +27,11 @@ class FrontPluginsController extends AbstractActionController
 
     public function renderPluginsMenuAction()
     {
-        $config = $this->serviceLocator->get('config');
+        $config = $this->getServiceManager()->get('config');
         $pluginsConfig = array();
         $siteModule = $this->params()->fromRoute('siteModule');
         // melis plugin service
-        $pluginSvc = $this->getServiceLocator()->get('MelisCorePluginsService');
+        $pluginSvc = $this->getServiceManager()->get('MelisCorePluginsService');
         // check for new plugins or manually installed and insert in db or fresh plugins
         $pluginSvc->checkTemplatingPlugins();
         $pluginList_ = $this->putSectionOnPlugins($config['plugins'], $siteModule);
@@ -65,7 +65,7 @@ class FrontPluginsController extends AbstractActionController
         $success = 1;
         $data    = array();
 
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $data       = "";
 
         return $data;
@@ -73,7 +73,7 @@ class FrontPluginsController extends AbstractActionController
 
     public function renderPluginModalAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         $parameters = $this->getRequest()->getQuery('parameters', array());
 
@@ -91,7 +91,7 @@ class FrontPluginsController extends AbstractActionController
         $errors = '';
         $tag = '';
         $tabs = array();
-        $config = $this->getServiceLocator()->get('config');
+        $config = $this->getServiceManager()->get('config');
         if (empty($module) || empty($pluginName) || empty($pageId) || empty($pluginId))
         {
             $errors = $translator->translate('tr_melisfront_generate_error_No module or plugin or idpage parameters');
@@ -110,7 +110,7 @@ class FrontPluginsController extends AbstractActionController
                 {
                     $pluginHardcodedConfig['id'] = $pluginId;
                     $pluginHardcodedConfig['pageId'] = $pageId;
-                    $melisPlugin = $this->getServiceLocator()->get('ControllerPluginManager')->get($pluginName);
+                    $melisPlugin = $this->getServiceManager()->get('ControllerPluginManager')->get($pluginName);
                     $melisPlugin->setUpdatesPluginConfig($pluginHardcodedConfig);
                     $melisPlugin->getPluginConfigs();
                     $tabs = $melisPlugin->createOptionsForms();
@@ -142,7 +142,7 @@ class FrontPluginsController extends AbstractActionController
 
     public function validatePluginModalAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         $parameters = get_object_vars($this->getRequest()->getPost());
 
@@ -154,7 +154,7 @@ class FrontPluginsController extends AbstractActionController
         $errors = '';
         $tag = '';
         $tabs = array();
-        $config = $this->getServiceLocator()->get('config');
+        $config = $this->getServiceManager()->get('config');
         if (empty($module) || empty($pluginName) || empty($pageId) || empty($pluginId))
         {
             $errors = $translator->translate('tr_melisfront_generate_error_No module or plugin or idpage parameters');
@@ -173,7 +173,7 @@ class FrontPluginsController extends AbstractActionController
                 {
                     $pluginHardcodedConfig['id'] = $pluginId;
                     $pluginHardcodedConfig['pageId'] = $pageId;
-                    $melisPlugin = $this->getServiceLocator()->get('ControllerPluginManager')->get($pluginName);
+                    $melisPlugin = $this->getServiceManager()->get('ControllerPluginManager')->get($pluginName);
                     $melisPlugin->setUpdatesPluginConfig($pluginHardcodedConfig);
                     $melisPlugin->getPluginConfigs();
                     $errorsTabs = $melisPlugin->createOptionsForms();
@@ -289,13 +289,12 @@ class FrontPluginsController extends AbstractActionController
     }
     private function organizedPluginsBySection($pluginList)
     {
-
         // get module categories
         /** @var MelisModulesService $moduleSvc */
-        $moduleSvc = $this->getServiceLocator()->get('ModulesService');
-        $configSvc = $this->getServiceLocator()->get('MelisCoreConfig');
-        $engineComposer  = $this->getServiceLocator()->get('MelisEngineComposer');
-        $melisPuginsSvc = $this->getServiceLocator()->get('MelisCorePluginsService');
+        $moduleSvc = $this->getServiceManager()->get('ModulesService');
+        $configSvc = $this->getServiceManager()->get('MelisCoreConfig');
+        $engineComposer  = $this->getServiceManager()->get('MelisEngineComposer');
+        $melisPuginsSvc = $this->getServiceManager()->get('MelisCorePluginsService');
         $marketPlaceModuleSection = $melisPuginsSvc->getPackagistCategories();
         $marketPlaceModuleSection = [];
         /*

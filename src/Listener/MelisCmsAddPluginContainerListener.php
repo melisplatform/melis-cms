@@ -29,7 +29,7 @@ class MelisCmsAddPluginContainerListener extends MelisCoreGeneralListener implem
             ),
             function($e){
 
-                $sm = $e->getTarget()->getServiceLocator();
+                $sm = $e->getTarget()->getEvent()->getApplication()->getServiceManager();
                 $params = $e->getParams();
 
                 if($params) {

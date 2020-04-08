@@ -9,7 +9,7 @@
 
 namespace MelisCms\Form\Factory;
 
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceManager;
 use MelisCore\Form\Factory\MelisSelectFactory;
 
 /**
@@ -17,10 +17,8 @@ use MelisCore\Form\Factory\MelisSelectFactory;
  */
 class TemplateSelectFactory extends MelisSelectFactory
 {
-	protected function loadValueOptions(ServiceLocatorInterface $formElementManager)
+	protected function loadValueOptions(ServiceManager $serviceManager)
 	{
-		$serviceManager = $formElementManager->getServiceLocator();
-
 		$translator = $serviceManager->get('translator');
 		
 		$tableTemplate = $serviceManager->get('MelisEngineTableTemplate');
@@ -41,8 +39,7 @@ class TemplateSelectFactory extends MelisSelectFactory
         }
 
 		$max = $templates->count();
-		for ($i = 0; $i < $max; $i++)
-		{
+		for ($i = 0; $i < $max; $i++) {
 			$tpl = $templates->current();
 			if(array_key_exists($tpl->tpl_site_id, $siteNames))
 			    $valueoptions[$tpl->tpl_id] = $siteNames[$tpl->tpl_site_id] . ' - ' . $tpl->tpl_name . ' (' . $tpl->tpl_id . ')';

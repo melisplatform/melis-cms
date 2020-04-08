@@ -18,18 +18,16 @@ use Laminas\Stdlib\ArrayUtils;
 class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
 {
 
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
         $priority        = -10000;
         $sharedEvents    = $events->getSharedManager();
         $callBackHandler = $sharedEvents->attach(
             'MelisCms',
-            array(
-                'meliscms_page_savesession_plugin_start',
-            ),
-            function($e){
+            'meliscms_page_savesession_plugin_start',
+            function($event){
 
-                $sm = $e->getTarget()->getServiceLocator();
+                $sm = $event->getTarget()->getEvent()->getApplication()->getServiceManager();
                 $params = $e->getParams();
 
                 if($params) {

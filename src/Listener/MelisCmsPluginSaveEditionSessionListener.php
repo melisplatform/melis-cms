@@ -11,8 +11,6 @@ namespace MelisCms\Listener;
 
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\EventManager\ListenerAggregateInterface;
-use Laminas\ServiceManager\ServiceLocatorAwareInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Mvc\MvcEvent;
 use Laminas\View\Model\ViewModel;
 use Laminas\Session\Container;
@@ -21,33 +19,20 @@ use Laminas\Session\Container;
  * This listener will call the plugin to get a formatting of the values
  * 
  */
-class MelisCmsPluginSaveEditionSessionListener implements ListenerAggregateInterface, ServiceLocatorAwareInterface
+class MelisCmsPluginSaveEditionSessionListener implements ListenerAggregateInterface
 {
-    protected $serviceLocator;
-    
-    public function setServiceLocator(ServiceLocatorInterface $sl)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $this->serviceLocator = $sl;
-        return $this;
-    }
-    
-    public function getServiceLocator()
-    {
-        return $this->serviceLocator;
-    }
-    
-    public function attach(EventManagerInterface $events)
-    {
-        $sharedEvents      = $events->getSharedManager();
+        $sharedEvents = $events->getSharedManager();
         
         $callBackHandler = $sharedEvents->attach(
         	'MelisCms',
         	'meliscms_page_savesession_plugin_start', 
-        	function($e){
+        	function($event){
 
-        		$sm = $this->getServiceLocator();   		
+        		$sm = $event->getTarget()->getEvent()->getApplication()->getServiceManager();
 
-        		$params = $e->getParams();
+        		$params = $event->getParams();
         		
         		$postValues = $params['postValues'];
         		
@@ -72,19 +57,16 @@ class MelisCmsPluginSaveEditionSessionListener implements ListenerAggregateInter
         		    return;
         		    
         		$xml = '';
-        		try 
-        		{
+        		try  {
         		    $melisPlugin = $sm->get('ControllerPluginManager')->get($plugin);
         		    $xml = $melisPlugin->savePluginConfigToXml($postValues);
 
-        		}
-        		catch(\Exception $e)
-        		{
+        		} catch(\Exception $e) {
         		    return;
         		}
+
     		    // Save in session
-    		    if ($xml != '')
-    		    {
+    		    if ($xml != '') {
     		        // if request came from resizing plugin
                     // then we do not override session so that
                     // data in renderModalPlguin will not disappear
@@ -92,7 +74,6 @@ class MelisCmsPluginSaveEditionSessionListener implements ListenerAggregateInter
                         $container = new Container('meliscms');
                         $container['content-pages'][$idPage][$tag][$id] = $xml;
                     }
-
     		    }
         	},
         80);

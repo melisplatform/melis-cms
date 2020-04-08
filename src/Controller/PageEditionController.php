@@ -11,10 +11,11 @@ namespace MelisCms\Controller;
 
 use Laminas\EventManager\ResponseCollection;
 use Laminas\Form\Factory;
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
 use Laminas\Session\Container;
+use MelisCore\Controller\AbstractActionController;
+use MelisCore\Service\MelisGeneralService;
 
 /**
  * This class renders Melis CMS page tab edition
@@ -42,13 +43,14 @@ class PageEditionController extends AbstractActionController
             if (!empty($container['content-pages'][$idPage]))
                 $container['content-pages'][$idPage] = array();
 
-        $melisCoreConf = $this->getServiceLocator()->get('MelisConfig');
+        $melisCoreConf = $this->getServiceManager()->get('MelisConfig');
         $resizeConfig   = $melisCoreConf->getItem('meliscms/conf')['pluginResizable'] ?? null;
 
-    	$melisPage = $this->getServiceLocator()->get('MelisEnginePage');
+    	$melisPage = $this->getServiceManager()->get('MelisEnginePage');
     	$datasPage = $melisPage->getDatasPage($idPage, 'saved');
-    	if($datasPage)
-    	{
+
+
+    	if($datasPage) {
     	    $datasPageTree = $datasPage->getMelisPageTree();
          	$datasTemplate = $datasPage->getMelisTemplate();
     	}
@@ -98,9 +100,9 @@ class PageEditionController extends AbstractActionController
      */
     private function getTemplateForm()
     {
-        $melisConfig = $this->getServiceLocator()->get('MelisCoreConfig');
+        $melisConfig = $this->getServiceManager()->get('MelisCoreConfig');
         $factory = new Factory();
-        $formElementMgr = $this->getServiceLocator()->get('FormElementManager');
+        $formElementMgr = $this->getServiceManager()->get('FormElementManager');
         $factory->setFormElementManager($formElementMgr);
         $formConfig = $melisConfig->getItem(self::TEMPLATE_FORM);
 
@@ -108,11 +110,13 @@ class PageEditionController extends AbstractActionController
          * Trigger listeners trying to modify the form config before form creation
          *
          *   - New Templating Engine? Register your template type using this event self::TEMPLATE_FORM_CONFIG_MODIFY
+
+         * Sending event with string config position and config array retrieved as parameters
          *
-         *  @var \Laminas\EventManager\ResponseCollection $result
+         * @var MelisGeneralService $srv
          */
-        $result = $this->getEventManager()->trigger(self::TEMPLATE_FORM_CONFIG_MODIFY, $this, ['formConfig' => $formConfig]);
-        $formConfig = $result instanceof ResponseCollection && $result->count() > 0 ? $result->last() : $formConfig;
+        $srv = $this->getServiceManager()->get('MelisGeneralService');
+        $result = $srv->sendEvent(self::TEMPLATE_FORM_CONFIG_MODIFY, ['formConfig' => $formConfig], $this)['formConfig'];
 
         return $factory->createForm($formConfig);
     }
@@ -135,14 +139,14 @@ class PageEditionController extends AbstractActionController
         $newcontentValuesArray = array();
         
         // Lets get the current content from database into an array
-        $melisPageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+        $melisPageSavedTable = $this->getServiceManager()->get('MelisEngineTablePageSaved');
         $datas = $melisPageSavedTable->getEntryById($idPage);
         $datas = $datas->toArray();
         
         if (count($datas) == 0)
         {
             // No datas saved, then let's get the published datas
-            $melisPagePublishedTable = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
+            $melisPagePublishedTable = $this->getServiceManager()->get('MelisEngineTablePagePublished');
             $datas = $melisPagePublishedTable->getEntryById($idPage);
             $datas = $datas->toArray();
         }
@@ -189,7 +193,7 @@ class PageEditionController extends AbstractActionController
     public function savePageSessionPluginAction()
     {
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
-        $translator = $this->serviceLocator->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
     
         $postValues = array();
         $request = $this->getRequest();
@@ -242,7 +246,7 @@ class PageEditionController extends AbstractActionController
             'pluginTag' => $pluginTag,
         );
         
-        $translator = $this->serviceLocator->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         if (empty($module) || empty($pluginName) || empty($pageId) || empty($pluginId))
         {
@@ -282,7 +286,7 @@ class PageEditionController extends AbstractActionController
     {
         $data = array();
 
-        $pageEdition = $this->getServiceLocator()->get('MelisEnginePage');
+        $pageEdition = $this->getServiceManager()->get('MelisEnginePage');
         $dataLogs    = $pageEdition->getEditionLogsOfPage($pageId);
 
         $data = $dataLogs;
@@ -297,7 +301,7 @@ class PageEditionController extends AbstractActionController
 	public function saveEditionAction()
 	{
 		$idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
-		$translator = $this->serviceLocator->get('translator');
+		$translator = $this->getServiceManager()->get('translator');
 		
 		$eventDatas = array('idPage' => $idPage);
 		$this->getEventManager()->trigger('meliscms_page_saveedition_start', null, $eventDatas);
@@ -330,7 +334,7 @@ class PageEditionController extends AbstractActionController
 				$newXmlContent .= '</document>';
 				
 				// Save the result
-                $melisPageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+                $melisPageSavedTable = $this->getServiceManager()->get('MelisEngineTablePageSaved');
 				$melisPageSavedTable->save(array('page_content' => $newXmlContent), $idPage);
 				
 			}	
@@ -364,7 +368,7 @@ class PageEditionController extends AbstractActionController
 		if (!empty($idPage))
 		{
 		    // Get datas from page
-		    $melisPage = $this->getServiceLocator()->get('MelisEnginePage');
+		    $melisPage = $this->getServiceManager()->get('MelisEnginePage');
 		    $datasPage = $melisPage->getDatasPage($idPage, 'saved');
 		    $datasTemplate = $datasPage->getMelisTemplate();
 
@@ -376,7 +380,7 @@ class PageEditionController extends AbstractActionController
 			$publicPath = '/public/' . self::MINI_TEMPLATES_FOLDER;
 
 			// Checking if the module path is vendor
-			$composerSrv = $this->getServiceLocator()->get('ModulesService');
+			$composerSrv = $this->getServiceManager()->get('ModulesService');
 			$path = $composerSrv->getComposerModulePath($moduleName);
 
 			if (!empty($path)) {

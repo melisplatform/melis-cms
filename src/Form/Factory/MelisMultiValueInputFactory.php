@@ -9,13 +9,12 @@
 
 namespace MelisCms\Form\Factory;
 
-use Laminas\ServiceManager\ServiceLocatorInterface;
-use Laminas\ServiceManager\FactoryInterface;
 use Laminas\Form\Element\Text;
+use Psr\Container\ContainerInterface;
 
-class MelisMultiValueInputFactory extends Text implements FactoryInterface
+class MelisMultiValueInputFactory extends Text
 {
-    public function createService(ServiceLocatorInterface $formElementManager)
+    public function __invoke(ContainerInterface $container, $targetName)
     {
         $element = new Text;
         // added melis-multi-val-input for multiple input

@@ -9,9 +9,9 @@
 
 namespace MelisCms\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
+use MelisCore\Controller\AbstractActionController;
 use MelisCore\Service\MelisCoreRightsService;
 
 /**
@@ -30,11 +30,11 @@ class SiteRedirectController extends AbstractActionController
      */
     public function renderToolSiteRedirectAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $noAccessPrompt = '';
         // Checks wether the user has access to this tools or not
-        $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
+        $melisCoreRights = $this->getServiceManager()->get('MelisCoreRights');
         if(!$melisCoreRights->canAccess($this::TOOL_KEY)) {
             $noAccessPrompt = $translator->translate('tr_tool_no_access');
         }
@@ -80,12 +80,12 @@ class SiteRedirectController extends AbstractActionController
      */
     public function renderToolSiteRedirectContentAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_site_301');
         // get the columns that has been set in the configuration (app.tools.php)
@@ -107,11 +107,11 @@ class SiteRedirectController extends AbstractActionController
      */
     public function getSiteRedirectAction()
     {
-        $site301Table = $this->getServiceLocator()->get('MelisEngineTableSite301');
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
-        $translator = $this->getServiceLocator()->get('translator');
+        $site301Table = $this->getServiceManager()->get('MelisEngineTableSite301');
+        $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
+        $translator = $this->getServiceManager()->get('translator');
         // Getting the Site Redirect Table configuration from Tool config
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey('meliscms', self::TOOL_KEY);
         
         $colId = array();
@@ -207,8 +207,8 @@ class SiteRedirectController extends AbstractActionController
      */
     public function renderToolSiteRedirectFiltersSitesAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $translator = $this->getServiceManager()->get('translator');
+        $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
         
         $sites = array();
         $sites[] = '<option value="">'. $translator->translate('tr_meliscms_tool_templates_tpl_label_choose') .'</option>';
@@ -266,7 +266,7 @@ class SiteRedirectController extends AbstractActionController
     {
         $success      = 0;
         $link         = "";
-        $siteRedirect = $this->getServiceLocator()->get("Sitedomain");
+        $siteRedirect = $this->getServiceManager()->get("Sitedomain");
 
         if($this->getRequest()->isPost()){
 
@@ -304,11 +304,11 @@ class SiteRedirectController extends AbstractActionController
         $s301Id = $this->params()->fromQuery('s301Id');
         
         // Getting the Site Redirect Form from Tool config
-        $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+        $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
         $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_tool_site_301/forms/meliscms_tool_site_301_generic_form','meliscms_tool_site_301_generic_form');
         
         $factory = new \Laminas\Form\Factory();
-        $formElements = $this->serviceLocator->get('FormElementManager');
+        $formElements = $this->getServiceManager()->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $propertyForm = $factory->createForm($appConfigForm);
         
@@ -319,7 +319,7 @@ class SiteRedirectController extends AbstractActionController
         {
             $title = 'tr_meliscms_tool_site_301_edit_site_redirect';
             
-            $site301Table = $this->getServiceLocator()->get('MelisEngineTableSite301');
+            $site301Table = $this->getServiceManager()->get('MelisEngineTableSite301');
             $s301Data = $site301Table->getEntryById($s301Id)->current();
             
             if (!empty($s301Data))
@@ -343,7 +343,7 @@ class SiteRedirectController extends AbstractActionController
      */
     public function saveSiteRedirectAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         
         $request = $this->getRequest();
         $s301_id = null;
@@ -352,9 +352,9 @@ class SiteRedirectController extends AbstractActionController
         $textMessage = '';
         $errors  = array();
 
-        $siteDomainTable = $this->getServiceLocator()->get('MelisEngineTableSiteDomain');
+        $siteDomainTable = $this->getServiceManager()->get('MelisEngineTableSiteDomain');
         
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         if($request->isPost()) {
              
             $postValues = get_object_vars($request->getPost());
@@ -373,11 +373,11 @@ class SiteRedirectController extends AbstractActionController
             if (!empty($postValues)){
                 
                 // Getting the Site Redirect Form from Tool config
-                $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+                $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
                 $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_tool_site_301/forms/meliscms_tool_site_301_generic_form','meliscms_tool_site_301_generic_form');
                 
                 $factory = new \Laminas\Form\Factory();
-                $formElements = $this->serviceLocator->get('FormElementManager');
+                $formElements = $this->getServiceManager()->get('FormElementManager');
                 $factory->setFormElementManager($formElements);
                 $propertyForm = $factory->createForm($appConfigForm);
                 // Set Data to Form from Posted Data
@@ -387,7 +387,7 @@ class SiteRedirectController extends AbstractActionController
                 {
                     $data = $propertyForm->getData();
                     
-                    $site301Table = $this->getServiceLocator()->get('MelisEngineTableSite301');
+                    $site301Table = $this->getServiceManager()->get('MelisEngineTableSite301');
                     
                     $textTitle = 'tr_meliscms_tool_site_301_add_site_redirect';
                     $textMessage = 'meliscms_tool_site_301_add_success';
@@ -473,7 +473,7 @@ class SiteRedirectController extends AbstractActionController
      * @return \Laminas\View\Model\JsonModel
      */
     public function deleteSiteRedirectAction(){
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
     
         $request = $this->getRequest();
         // Default Values
@@ -491,7 +491,7 @@ class SiteRedirectController extends AbstractActionController
                 
                 $s301_id = $postValues['s301Id'];
                 // Deleting Site Redirect using Service manager
-                $site301Table = $this->getServiceLocator()->get('MelisEngineTableSite301');
+                $site301Table = $this->getServiceManager()->get('MelisEngineTableSite301');
                 $site301Table->deleteById($postValues['s301Id']);
                 
                 $textMessage = 'meliscms_tool_site_301_delete_success';

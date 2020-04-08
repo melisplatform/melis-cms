@@ -9,8 +9,8 @@
 
 namespace MelisCms\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
+use MelisCore\Controller\AbstractActionController;
 
 class SitesLanguagesController extends AbstractActionController
 {
@@ -23,7 +23,7 @@ class SitesLanguagesController extends AbstractActionController
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
 
-        $rightService = $this->getServiceLocator()->get('MelisCoreRights');
+        $rightService = $this->getServiceManager()->get('MelisCoreRights');
         $canAccess = $rightService->canAccess('meliscms_tool_sites_languages_content');
 
         $view = new ViewModel();
@@ -103,7 +103,7 @@ class SitesLanguagesController extends AbstractActionController
      */
     private function getSiteData($siteId)
     {
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
         return $siteTable->getEntryById($siteId)->toArray();
     }
 
@@ -114,7 +114,7 @@ class SitesLanguagesController extends AbstractActionController
      */
     private function getSiteActiveLanguages($siteId)
     {
-        $siteLangsTable = $this->getServiceLocator()->get('MelisEngineTableCmsSiteLangs');
+        $siteLangsTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteLangs');
         return $siteLangsTable->getSiteLangs(null, $siteId, null, true)->toArray();
     }
 
@@ -125,7 +125,7 @@ class SitesLanguagesController extends AbstractActionController
      */
     private function getCmsLanguages()
     {
-        $melisEngineLangSvc = $this->getServiceLocator()->get('MelisEngineLang');
+        $melisEngineLangSvc = $this->getServiceManager()->get('MelisEngineLang');
         return $melisEngineLangSvc->getAvailableLanguages();
     }
 
@@ -146,7 +146,7 @@ class SitesLanguagesController extends AbstractActionController
      */
     private function getTool()
     {
-        $toolSvc = $this->getServiceLocator()->get('MelisCoreTool');
+        $toolSvc = $this->getServiceManager()->get('MelisCoreTool');
         $toolSvc->setMelisToolKey('meliscms', 'meliscms_tool_sites');
 
         return $toolSvc;

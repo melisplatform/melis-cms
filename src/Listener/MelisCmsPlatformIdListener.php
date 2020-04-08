@@ -16,16 +16,16 @@ use MelisCore\Listener\MelisCoreGeneralListener;
 class MelisCmsPlatformIdListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
 {
 	
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
         $sharedEvents      = $events->getSharedManager();
         
         $callBackHandler = $sharedEvents->attach(
         	'MelisCore',
         	'meliscore_platform_save_end', 
-        	function($e){
-        		
-        		$sm = $e->getTarget()->getServiceLocator();
+        	function($event){
+
+                $sm = $event->getTarget()->getEvent()->getApplication()->getServiceManager();
         		$params = $e->getParams();
         		
         		$platformIdTable = $sm->get('MelisEngineTablePlatformIds');
@@ -48,7 +48,7 @@ class MelisCmsPlatformIdListener extends MelisCoreGeneralListener implements Lis
         		    $tplIdRangeStart = ceil($tplMaxEnd / 1000) * 1000;
         		    $tplIdRangeEnd = ceil(($tplIdRangeStart + 1) / 1000) * 1000;
         		    
-        		    $platformIdData = array(
+        		    $platformIdData = [
         		        'pids_id' => $id,
         		        'pids_page_id_start' => $pageIdRangeStart +1,
         		        'pids_page_id_current' => $pageIdRangeStart +1,
@@ -56,12 +56,10 @@ class MelisCmsPlatformIdListener extends MelisCoreGeneralListener implements Lis
         		        'pids_tpl_id_start' => $tplIdRangeStart +1,
         		        'pids_tpl_id_current' => $tplIdRangeStart +1,
         		        'pids_tpl_id_end' => $tplIdRangeEnd,
-        		    );
+        		    ];
         		    
         		    $platformIdTable->save($platformIdData);
         		}
-        		
-
         	},
         100);
         

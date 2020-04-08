@@ -2,9 +2,10 @@
 
 namespace MelisCms\Service;
 
-use MelisCore\Service\MelisCoreGeneralService;
 
-class MelisCmsPageService extends MelisCoreGeneralService
+use MelisCore\Service\MelisGeneralService;
+
+class MelisCmsPageService extends MelisGeneralService
 {
     public function savePage($pageTree, $pagePublished = array(), $pageSaved = array(), $pageSeo = array(), $pageLang = array(), $pageStyle = array(), $pageId = null)
     {
@@ -22,15 +23,15 @@ class MelisCmsPageService extends MelisCoreGeneralService
         
         try
         {
-            $pageTreeTbl = $this->getServiceLocator()->get('MelisEngineTablePageTree');
+            $pageTreeTbl = $this->getServiceManager()->get('MelisEngineTablePageTree');
             
             if (is_null($arrayParameters['pageId']))
             {
-                $corePlatformTbl = $this->getServiceLocator()->get('MelisCoreTablePlatform');
+                $corePlatformTbl = $this->getServiceManager()->get('MelisCoreTablePlatform');
                 $corePlatform = $corePlatformTbl->getEntryByField('plf_name', getenv('MELIS_PLATFORM'))->current();
                 $corePlatformId = $corePlatform->plf_id;
                 
-                $cmsPlatformIdsTbl = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+                $cmsPlatformIdsTbl = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
                 $pagePlatformIds = $cmsPlatformIdsTbl->getEntryById($corePlatformId)->current();
                 
                 $pageCurrentId = $pagePlatformIds->pids_page_id_current;
@@ -165,7 +166,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
         
         $pageData = $arrayParameters['page'];
         
-        $pagePublishedTbl = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
+        $pagePublishedTbl = $this->getServiceManager()->get('MelisEngineTablePagePublished');
         
         if (!is_null($arrayParameters['pageId']))
         {
@@ -177,7 +178,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
         }
         
         // Get Cureent User ID
-        $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
+        $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
         $userAuthDatas =  $melisCoreAuth->getStorage()->read();
         $userId = !empty($userAuthDatas) ? (int) $userAuthDatas->usr_id : null;
         
@@ -221,12 +222,12 @@ class MelisCmsPageService extends MelisCoreGeneralService
         
         $pageData = $arrayParameters['page'];
         
-        $pageSavedTbl = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+        $pageSavedTbl = $this->getServiceManager()->get('MelisEngineTablePageSaved');
         
         if (!empty($arrayParameters['pageId']))
         {
             // Get Cureent User ID
-            $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
+            $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
             $userAuthDatas =  $melisCoreAuth->getStorage()->read();
             $userId = !empty($userAuthDatas) ? (int) $userAuthDatas->usr_id : null;
             
@@ -274,7 +275,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
         
         // Service implementation start
         
-        $pageSeoTbl = $this->getServiceLocator()->get('MelisEngineTablePageSeo');
+        $pageSeoTbl = $this->getServiceManager()->get('MelisEngineTablePageSeo');
         
         try
         {
@@ -312,7 +313,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
         
         // Service implementation start
         
-        $pageLangTbl = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+        $pageLangTbl = $this->getServiceManager()->get('MelisEngineTablePageLang');
         
         try 
         {
@@ -350,7 +351,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
         
         // Service implementation start
         
-        $pageStyleTbl = $this->getServiceLocator()->get('MelisEngineTablePageStyle');
+        $pageStyleTbl = $this->getServiceManager()->get('MelisEngineTablePageStyle');
         
         try 
         {
@@ -382,14 +383,14 @@ class MelisCmsPageService extends MelisCoreGeneralService
         //Start
         $pageId      = (int) $pageId;
         $cachePageId = $pageId;
-        $pageService = $this->getServiceLocator()->get('MelisEnginePage');
+        $pageService = $this->getServiceManager()->get('MelisEnginePage');
         $pageData    = $pageService->getDatasPage($pageId);
 
-        $tablePageLang = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+        $tablePageLang = $this->getServiceManager()->get('MelisEngineTablePageLang');
         $cmsLang       = $tablePageLang->getEntryByField('plang_page_id', $pageId)->current();
         $initialPageId = $cmsLang->plang_page_id_initial;
 
-        $tableLang  = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+        $tableLang  = $this->getServiceManager()->get('MelisEngineTableCmsLang');
         $langData   = $tableLang->getEntryById($langIdPageName)->current();
         $langPrefix = !empty($langData)? strtolower(substr($langData->lang_cms_locale, 0, 2)) : '';
 
@@ -452,14 +453,14 @@ class MelisCmsPageService extends MelisCoreGeneralService
 
         if($pageId) {
             // page content
-            $melisPageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
+            $melisPageSavedTable = $this->getServiceManager()->get('MelisEngineTablePageSaved');
             $melisPageSavedTable->save([
                 'page_content' => $pageTreeData->page_content,
                 'page_creation_date' => date('Y-m-d H:i:s'),
             ], $pageId);
 
             // page SEO
-            $pageSeoTable = $this->getServiceLocator()->get('MelisEngineTablePageSeo');
+            $pageSeoTable = $this->getServiceManager()->get('MelisEngineTablePageSeo');
             $pageSeoData  = $pageSeoTable->getEntryById($cachePageId)->current();
             if($pageSeoData) {
                 $pageSeoTable->save([
@@ -503,11 +504,11 @@ class MelisCmsPageService extends MelisCoreGeneralService
 
         $idPage       = $pageId;
         $fatherPageId = $parentId;
-        $translator = $this->serviceLocator->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         $eventDatas = array('idPage' => $idPage, 'fatherPageId' => $fatherPageId);
 
-        $melisEngineTablePageTree = $this->getServiceLocator()->get('MelisEngineTablePageTree');
+        $melisEngineTablePageTree = $this->getServiceManager()->get('MelisEngineTablePageTree');
 
         // Check if the page really exist to avoid ghost datas
         $exist = false;
@@ -559,7 +560,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
 
             // Get the current page id from platform table
             $melisModuleName = getenv('MELIS_PLATFORM');
-            $melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+            $melisEngineTablePlatformIds = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
             $datasPlatformIds = $melisEngineTablePlatformIds->getPlatformIdsByPlatformName($melisModuleName);
             $datasPlatformIds = $datasPlatformIds->current();
 
@@ -607,7 +608,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
                 if (!empty($postValues['plang_lang_id']))
                     $langId = $postValues['plang_lang_id'];
 
-                $melisEngineTablePageLang = $this->getServiceLocator()->get('MelisEngineTablePageLang');
+                $melisEngineTablePageLang = $this->getServiceManager()->get('MelisEngineTablePageLang');
 
                 /*
                  * If you want to duplicate with  page relationship
@@ -667,7 +668,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
 
         $idPage = $pageId;
 
-        $translator = $this->serviceLocator->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         $eventDatas = array('idPage' => $idPage, 'isNew' => $isNew);
         //$this->getEventManager()->trigger('meliscms_page_saveproperties_start', null, $eventDatas);
@@ -675,13 +676,13 @@ class MelisCmsPageService extends MelisCoreGeneralService
         // Get the form properly loaded
         $propertyForm = $this->getPropertyPageForm($idPage, $isNew);
 
-        $melisPageSavedTable = $this->getServiceLocator()->get('MelisEngineTablePageSaved');
-        $melisPagePublishedTable = $this->getServiceLocator()->get('MelisEngineTablePagePublished');
-        $melisTool               = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisPageSavedTable = $this->getServiceManager()->get('MelisEngineTablePageSaved');
+        $melisPagePublishedTable = $this->getServiceManager()->get('MelisEngineTablePagePublished');
+        $melisTool               = $this->getServiceManager()->get('MelisCoreTool');
 
         // Get the current page id from platform table
         $melisModuleName = getenv('MELIS_PLATFORM');
-        $melisEngineTablePlatformIds = $this->getServiceLocator()->get('MelisEngineTablePlatformIds');
+        $melisEngineTablePlatformIds = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
         $datasPlatformIds = $melisEngineTablePlatformIds->getPlatformIdsByPlatformName($melisModuleName);
         $datasPlatformIds = $datasPlatformIds->current();
 
@@ -771,7 +772,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
             {
                 $datas['page_edit_date'] = date('Y-m-d H:i:s');
 
-                $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
+                $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
                 $user = $melisCoreAuth->getIdentity();
                 if (!empty($user))
                     $datas['page_last_user_id'] = $user->usr_id;
@@ -825,7 +826,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
         /**
          * Get the config for this form
          */
-        $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+        $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
 
         $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered(
             $pathAppConfigForm,
@@ -845,7 +846,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
          * have access to our custom Melis Elements
          */
         $factory = new \Laminas\Form\Factory();
-        $formElements = $this->serviceLocator->get('FormElementManager');
+        $formElements = $this->getServiceManager()->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $propertyForm = $factory->createForm($appConfigForm);
 
@@ -860,7 +861,7 @@ class MelisCmsPageService extends MelisCoreGeneralService
 
     private function getTool()
     {
-        $tool = $this->getServiceLocator()->get('MelisCoreTool');
+        $tool = $this->getServiceManager()->get('MelisCoreTool');
         return $tool;
     }
 

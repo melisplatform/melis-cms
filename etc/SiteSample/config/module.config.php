@@ -1,108 +1,87 @@
 <?php
-/**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/ZendSkeletonApplication for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
 
-return array(
-    'router' => array(
-        'routes' => array(
-        	'SiteSample-home' => array(
-				'type'    => 'regex',
-				'options' => array(
-					'regex'    => '.*/SiteSample/.*/id/(?<idpage>[0-9]+)',
-					'defaults' => array(
-						'controller' => 'SiteSample\Controller\Index',
-						'action'     => 'indexsite',
-						),
-					'spec' => '%idpage'
-					)
-			),
-            'SiteSample-homepage' => array(
+return [
+    'router' => [
+        'routes' => [
+            'SiteSample-home' => [
+                'type'    => 'regex',
+                'options' => [
+                    'regex'    => '.*/SiteSample/.*/id/(?<idpage>[0-9]+)',
+                    'defaults' => [
+                        'controller' => 'SiteSample\Controller\Index',
+                        'action'     => 'indexsite',
+                    ],
+                    'spec' => '%idpage'
+                ]
+            ],
+            'SiteSample-homepage' => [
                 'type'    => 'Literal',
-                'options' => array(
+                'options' => [
                     'route'    => '/',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller'     => 'MelisFront\Controller\Index',
                         'action'         => 'index',
                         'renderType'     => 'melis_zf2_mvc',
                         'renderMode'     => 'front',
                         'preview'        => false,
                         'idpage'         => 'homePageId'
-                    )
-                ),
-            ),
+                    ]
+                ],
+            ],
             // The following is a route to simplify getting started creating
             // new controllers and actions without needing to create a new
             // module. Simply drop new controllers in, and you can access them
             // using the path /application/:controller/:action
-            'applicationSiteSample' => array(
+            'applicationSiteSample' => [
                 'type'    => 'Literal',
-                'options' => array(
+                'options' => [
                     'route'    => '/SiteSample',
-                    'defaults' => array(
+                    'defaults' => [
                         '__NAMESPACE__' => 'SiteSample\Controller',
                         'controller'    => 'Index',
                         'action'        => 'indexsite',
-                    ),
-                ),
+                    ],
+                ],
                 'may_terminate' => true,
-                'child_routes' => array(
-                    'default' => array(
+                'child_routes' => [
+                    'default' => [
                         'type'    => 'Segment',
-                        'options' => array(
+                        'options' => [
                             'route'    => '/[:controller[/:action]]',
-                            'constraints' => array(
+                            'constraints' => [
                                 'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
                                 'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
-                            ),
-                            'defaults' => array(
-                            ),
-                        ),
-                    ),
-                ),
-            ), 
-        ),
-    ),
-    'service_manager' => array(
-        'abstract_factories' => array(
-            'Laminas\Cache\Service\StorageCacheAbstractServiceFactory',
-            'Laminas\Log\LoggerAbstractServiceFactory',
-        ),
-        'aliases' => array(
-            'translator' => 'MvcTranslator',
-        ),
-    ),
-    'translator' => array(
-    ),
-    'controllers' => array(
-        'invokables' => array(
-            'SiteSample\Controller\Home' => 'SiteSample\Controller\HomeController',
-            'SiteSample\Controller\Page404' => 'SiteSample\Controller\Page404Controller'
-        ),
-    ),
-    'view_manager' => array(
-        'display_not_found_reason' => true,
-        'display_exceptions'       => true,
+                            ],
+                            'defaults' => [],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ],
+    'controllers' => [
+        'invokables' => [
+            'SiteSample\Controller\Home'    => SiteSample\Controller\HomeController::class,
+            'SiteSample\Controller\Page404' => SiteSample\Controller\HomeController::class
+        ],
+    ],
+    'view_manager' => [
         'doctype'                  => 'HTML5',
         'not_found_template'       => 'error/404',
         'exception_template'       => 'error/index',
-        'controller_map' => array(
+        'controller_map' => [
             'SiteSample' => true,
-        ),
-        'template_map' => array(
-            'SiteSample/defaultLayout'  	=> __DIR__ . '/../view/layout/defaultLayout.phtml',
-            'layout/errorLayout'            => __DIR__ . '/../view/error/404.phtml',
-            
+        ],
+        'template_map' => [
+            'SiteSample/defaultLayout'  => __DIR__ . '/../view/layout/defaultLayout.phtml',
+            'layout/errorLayout'        => __DIR__ . '/../view/error/404.phtml',
+
             // Errors layout
-            'error/404'               		    => __DIR__ . '/../view/error/404.phtml',
-            'error/index'             		    => __DIR__ . '/../view/error/index.phtml',
-        ),
-        'template_path_stack' => array(
+            'error/404'     => __DIR__ . '/../view/error/404.phtml',
+            'error/index'   => __DIR__ . '/../view/error/index.phtml',
+        ],
+        'template_path_stack' => [
             __DIR__ . '/../view',
-        ),
-    ),
-);
+        ],
+    ],
+];

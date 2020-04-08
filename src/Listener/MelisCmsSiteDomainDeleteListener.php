@@ -25,7 +25,7 @@ class MelisCmsSiteDomainDeleteListener extends MelisCoreGeneralListener implemen
         	'meliscore_platform_delete_end', 
         	function($e){
         		
-        		$sm = $e->getTarget()->getServiceLocator();
+        		$sm = $e->getTarget()->getEvent()->getApplication()->getServiceManager();
         		$params = $e->getParams();
         		$results = $e->getTarget()->forward()->dispatch(
         		    'MelisCms\Controller\Sites',

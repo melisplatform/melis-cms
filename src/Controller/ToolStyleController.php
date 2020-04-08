@@ -9,9 +9,9 @@
 
 namespace MelisCms\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
+use MelisCore\Controller\AbstractActionController;
 use MelisCore\Service\MelisCoreRightsService;
 use Laminas\Session\Container;
 /**
@@ -36,17 +36,17 @@ class ToolStyleController extends AbstractActionController
      */
     public function renderToolStyleAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $noAccessPrompt = '';
         // Checks wether the user has access to this tools or not
-        $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
+        $melisCoreRights = $this->getServiceManager()->get('MelisCoreRights');
         if(!$melisCoreRights->canAccess($this::TOOL_KEY)) {
             $noAccessPrompt = $translator->translate('tr_tool_no_access');
         }
 
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_styles');
@@ -68,7 +68,7 @@ class ToolStyleController extends AbstractActionController
     public function renderToolStyleHeaderAction()
     {
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_templates');
@@ -133,11 +133,11 @@ class ToolStyleController extends AbstractActionController
 
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
 
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_styles');
@@ -208,11 +208,11 @@ class ToolStyleController extends AbstractActionController
 
         $melisKey = $this->params()->fromRoute('melisKey', '');
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
-        $melisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
+        $melisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
         $appConfigForm = $melisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_tool_styles/forms/meliscms_tool_styles_form','meliscms_tool_styles_form');
         $factory = new \Laminas\Form\Factory();
-        $formElements = $this->serviceLocator->get('FormElementManager');
+        $formElements = $this->getServiceManager()->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $form = $factory->createForm($appConfigForm);
 
@@ -221,7 +221,7 @@ class ToolStyleController extends AbstractActionController
 
         if(!empty($styleId)){
 
-            $tableStyle = $this->getServiceLocator()->get('MelisEngineTableStyle');
+            $tableStyle = $this->getServiceManager()->get('MelisEngineTableStyle');
             $details = $tableStyle->getEntryById($styleId)->current();
 
             $data = (array)$details;
@@ -249,7 +249,7 @@ class ToolStyleController extends AbstractActionController
     public function getStyleDataAction()
     {
         // declare the Tool service that we will be using to completely create our tool.
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
         // tell the Tool what configuration in the app.tool.php that will be used.
         $melisTool->setMelisToolKey('meliscms', 'meliscms_tool_styles');
@@ -258,7 +258,7 @@ class ToolStyleController extends AbstractActionController
         /**
          * @var \MelisEngine\Model\Tables\MelisCmsStyleTable $tableStyle
          */
-        $tableStyle = $this->getServiceLocator()->get('MelisEngineTableStyle');
+        $tableStyle = $this->getServiceManager()->get('MelisEngineTableStyle');
 
         $colId = [];
         $dataCount = 0;
@@ -406,13 +406,13 @@ class ToolStyleController extends AbstractActionController
         $textMessage = 'tr_meliscms_tool_styles_save_fail';
         $textTitle = 'tr_meliscms_tool_styles';
 
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
-        $styleService = $this->getServiceLocator()->get('MelisEngineStyle');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
+        $styleService = $this->getServiceManager()->get('MelisEngineStyle');
 
-        $melisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+        $melisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
         $appConfigForm = $melisCoreConfig->getFormMergedAndOrdered('meliscms/tools/meliscms_tool_styles/forms/meliscms_tool_styles_form','meliscms_tool_styles_form');
         $factory = new \Laminas\Form\Factory();
-        $formElements = $this->serviceLocator->get('FormElementManager');
+        $formElements = $this->getServiceManager()->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $form = $factory->createForm($appConfigForm);
 
@@ -492,10 +492,10 @@ class ToolStyleController extends AbstractActionController
         $result = array();
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $isNew = $this->params()->fromRoute('isNew', $this->params()->fromQuery('isNew', ''));
-        $translator = $this->serviceLocator->get('translator');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
-        $styleService = $this->getServiceLocator()->get('MelisEngineStyle');
-        $pageStyleTable = $this->getServiceLocator()->get('MelisEngineTablePageStyle');
+        $translator = $this->getServiceManager()->get('translator');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
+        $styleService = $this->getServiceManager()->get('MelisEngineStyle');
+        $pageStyleTable = $this->getServiceManager()->get('MelisEngineTablePageStyle');
 
         // Check if post
         $request = $this->getRequest();
@@ -556,7 +556,7 @@ class ToolStyleController extends AbstractActionController
      */
     public function deleteStyleAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         $eventDatas = array();
         $this->getEventManager()->trigger('meliscms_style_delete_start', $this, $eventDatas);
@@ -571,7 +571,7 @@ class ToolStyleController extends AbstractActionController
         if($request->isPost()) {
 
             // get the service for Templates Model & Table
-            $tableStyle = $this->getServiceLocator()->get('MelisEngineTableStyle');
+            $tableStyle = $this->getServiceManager()->get('MelisEngineTableStyle');
             $styleId = (int) $request->getPost('styleId');
 
             // make sure our ID is not empty
@@ -603,7 +603,7 @@ class ToolStyleController extends AbstractActionController
     {
         $style = "";
 
-        $pageStyle  = $this->getServiceLocator()->get('MelisPageStyle');
+        $pageStyle  = $this->getServiceManager()->get('MelisPageStyle');
         if($pageStyle){
             $dataStyle  = $pageStyle->getStyleByPageId($pageId);
 
