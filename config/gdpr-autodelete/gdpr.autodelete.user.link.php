@@ -20,7 +20,6 @@ return [
                                             'tooltip' => 'Link for revalidating user',
                                         ],
                                         'attributes' => [
-                                            'required' => 'required',
                                             'id' => 'id_mgdpre_link',
                                             'class' => 'melis-input-group-button',
                                             'data-button-icon' => 'fa fa-sitemap',
