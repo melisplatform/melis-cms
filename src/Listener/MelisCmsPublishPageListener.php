@@ -35,7 +35,7 @@ class MelisCmsPublishPageListener extends MelisCoreGeneralListener implements Li
         		
         		$melisCmsRights = $sm->get('MelisCmsRights');
         		list($success, $errors, $datas) = $melisCoreDispatchService->dispatchPluginAction(
-                    $e,
+                    $event,
                     'meliscms',
                     'action-page-tmp',
                     'MelisCms\Controller\Page',
@@ -46,7 +46,7 @@ class MelisCmsPublishPageListener extends MelisCoreGeneralListener implements Li
         		
         		// Move saved page to published page
 	    		list($success, $errors, $datas) = $melisCoreDispatchService->dispatchPluginAction(
-                    $e,
+                    $event,
                     'meliscms',
                     'action-page-tmp',
                     'MelisCms\Controller\Page',

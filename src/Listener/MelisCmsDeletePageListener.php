@@ -35,7 +35,7 @@ class MelisCmsDeletePageListener extends MelisCoreGeneralListener implements Lis
      
         		// Check rights to delete
         		list($success, $errors, $datas) = $melisCoreDispatchService->dispatchPluginAction(
-                    $e,
+                    $event,
                     'meliscms',
                     'action-page-tmp',
                     'MelisCms\Controller\Page',
@@ -46,7 +46,7 @@ class MelisCmsDeletePageListener extends MelisCoreGeneralListener implements Lis
         		
     			// Re-assign page language initial
     			list($success, $errors, $datas) = $melisCoreDispatchService->dispatchPluginAction(
-    			    $e,
+                    $event,
     			    'meliscms',
     			    'action-page-tmp',
     			    'MelisCms\Controller\Pagelanguages',
@@ -57,7 +57,7 @@ class MelisCmsDeletePageListener extends MelisCoreGeneralListener implements Lis
         		
         		// Delete the page
         		list($success, $errors, $datas) = $melisCoreDispatchService->dispatchPluginAction(
-                    $e,
+                    $event,
                     'meliscms',
                     'action-page-tmp',
                     'MelisCms\Controller\Page',
@@ -68,7 +68,7 @@ class MelisCmsDeletePageListener extends MelisCoreGeneralListener implements Lis
 	    			
 	    		// Delete the SEO datas linked to the page
 	    		list($success, $errors, $datas) = $melisCoreDispatchService->dispatchPluginAction(
-                    $e,
+                    $event,
                     'meliscms',
                     'action-page-tmp',
                     'MelisCms\Controller\PageSeo',

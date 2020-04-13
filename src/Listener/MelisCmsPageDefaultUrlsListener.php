@@ -47,8 +47,8 @@ class MelisCmsPageDefaultUrlsListener extends MelisCoreGeneralListener implement
         $sm = $event->getTarget()->getEvent()->getApplication()->getServiceManager();
         $melisCoreDispatchService = $sm->get('MelisCoreDispatch');
 
-        $params = $e->getParams();
-        $results = $e->getTarget()->forward()->dispatch(
+        $params = $event->getParams();
+        $results = $event->getTarget()->forward()->dispatch(
             'MelisCms\Controller\Page',
             array_merge(['action' => 'updateDefaultUrls'], $params))->getVariables();
     }
