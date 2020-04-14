@@ -145,7 +145,8 @@ var melisCms = (function(){
 						var newPageZoneId = data.datas.idPage + pageCreationId.substring(1, pageCreationId.length);
 						var item_icon = ( data.datas.item_icon !== '' ) ? data.datas.item_icon : 'fa-file-o';
 						//open newly opened page
-						melisHelper.tabOpen( data.datas.item_name, item_icon, newPageZoneId, data.datas.item_melisKey,  { idPage: data.datas.idPage } );	
+						var pageName = data.datas.idPage + " - " + data.datas.item_name;
+						melisHelper.tabOpen( pageName, item_icon, newPageZoneId, data.datas.item_melisKey,  { idPage: data.datas.idPage } );
 					} else {
 						// reload the preview in edition tab
 						melisHelper.zoneReload(pageNumber+'_id_meliscms_page','meliscms_page', {idPage:pageNumber});
@@ -212,7 +213,7 @@ var melisCms = (function(){
 					
 					// update page name tabname if page name is changed
 					$("#" + data.datas.item_zoneid + " .page-title h1:not('span')").text(data.datas.item_name);
-					$(".tabsbar a[data-id='" + data.datas.item_zoneid + "'] .navtab-pagename").text(data.datas.item_name);
+					$(".tabsbar a[data-id='" + data.datas.item_zoneid + "'] .navtab-pagename").text(pageNumber + " - " + data.datas.item_name);
 					
 					// hide the saved version text of the page once its published
 					$("#" + data.datas.item_zoneid + " .page-title .saved-version-notif").fadeOut();
@@ -545,28 +546,17 @@ var melisCms = (function(){
 	
     // IFRAME HEIGHT CONTROLS (for onload, displaySettings & sidebar collapse)
     function iframeLoad(id) {
-		// "#"+id+"_id_meliscms_page 
-		/* var $iframe = $("#"+activeTabId+" .melis-iframe");
-
-			$iframe.each(function() {
-				var $this 			= $(this),
-					scrollHeight 	= $this.contents()[0].body.scrollHeight;
-					
-					if ( scrollHeight !== 0 ) {
-						$this.css("height", scrollHeight);
-					}
-			}); */
-
-		var $iframe = $(".melis-iframe");
+		var $body 			= $("body"),
+			$melisIframe 	= $body.find(".melis-iframe"),
+			height 			= $melisIframe.contents().height(),
+			$loader 		= $melisIframe.closest(".meliscms-page-tab-edition").find("#loader");
 			
-			$iframe.on("load", function() {
-				var $this 	= $(this);
-					height 	= $this.contents()[0].body.scrollHeight;
+			$melisIframe.css("height", height);
+			$melisIframe.css("min-height", "700px");
 
-					if ( height !== 0 ) {
-						$this.css("height", height);
-					}
-			});
+			/* if ( $loader.length ) {
+				$loader.remove();
+			} */
 
 			// Activating page edition button action
 			enableCmsButtons(id);

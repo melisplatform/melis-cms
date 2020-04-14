@@ -862,6 +862,9 @@ ul#select2-id_mcgdprbanner_site_id-results {
 	top: 0 !important;
 }
 @media (min-width: 768px) {
+	#cms_site_config_general form[name='meliscms_tool_sites_siteconfig_form'] .input-group {
+		display: table;
+	}
 	form[name='meliscms_tool_sites_siteconfig_form'] .input-group {
 		display: flex;
 	}
@@ -870,5 +873,11 @@ ul#select2-id_mcgdprbanner_site_id-results {
 	}
 	form[name='meliscms_tool_sites_siteconfig_form'] .input-group-addon .fa-lg {
 		vertical-align: -24%;
+	}
+}
+
+@media (max-width: 767px) {
+	#cms_site_config_general form[name='meliscms_tool_sites_siteconfig_form'] .input-group {
+		left: 0 !important;
 	}
 }
