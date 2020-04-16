@@ -28,7 +28,7 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
             function($event){
 
                 $sm = $event->getTarget()->getEvent()->getApplication()->getServiceManager();
-                $params = $e->getParams();
+                $params = $event->getParams();
 
                 if($params) {
                     $pageId = isset($params['idPage'])     ? $params['idPage']     : null;

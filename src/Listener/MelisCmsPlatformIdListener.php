@@ -26,7 +26,7 @@ class MelisCmsPlatformIdListener extends MelisCoreGeneralListener implements Lis
         	function($event){
 
                 $sm = $event->getTarget()->getEvent()->getApplication()->getServiceManager();
-        		$params = $e->getParams();
+        		$params = $event->getParams();
         		
         		$platformIdTable = $sm->get('MelisEngineTablePlatformIds');
         		

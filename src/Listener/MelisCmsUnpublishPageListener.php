@@ -33,7 +33,7 @@ class MelisCmsUnpublishPageListener extends MelisCoreGeneralListener implements 
         		$melisCmsRights = $sm->get('MelisCmsRights');
         		
         		list($success, $errors, $datas) = $melisCoreDispatchService->dispatchPluginAction(
-                    $e,
+                    $event,
                     'meliscms',
                     'action-page-tmp',
                     'MelisCms\Controller\Page',
@@ -44,7 +44,7 @@ class MelisCmsUnpublishPageListener extends MelisCoreGeneralListener implements 
         		
         		// Move saved page to published page
         		list($success, $errors, $datas) = $melisCoreDispatchService->dispatchPluginAction(
-                    $e,
+                    $event,
                     'meliscms',
                     'action-page-tmp',
                     'MelisCms\Controller\Page',

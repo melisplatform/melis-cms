@@ -26,7 +26,7 @@ class MelisCmsNewSiteDomainListener extends MelisCoreGeneralListener implements 
         	function($event){
 
                 $sm = $event->getTarget()->getEvent()->getApplication()->getServiceManager();
-        		$params = $e->getParams();
+        		$params = $event->getParams();
         		
         		$currentPlatform = $params['currentPlatform'];
         		$siteDomains = $params['siteDomain'];
