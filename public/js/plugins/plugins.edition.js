@@ -3,9 +3,11 @@ var melisPluginEdition = (function($, window) {
     /* ==================================
             Cache DOM
     ====================================*/
+    // body tag overall
     var $body                   = window.parent.$("body"),
         fromdragdropzone        = window.fromdragdropzone,
         iframe                  = window.parent.$("#"+parent.activeTabId).find(".melis-iframe"),
+        // inside iframe's body tag
         $_body                  = $("body"),
         pluginHardcodedConfig;
 
@@ -40,7 +42,15 @@ var melisPluginEdition = (function($, window) {
         $(this).removeClass("melis-focus");
     });
 
+    // run when .melis-ui-outlined loses focus and run getPluginData() to include the width related data
+    //$_body.on("blur", ".melis-ui-outlined", melisUiOutlinedLosesFocus);
+
     // $("body").on("dblclick", ".ui-resizable-e", changeWidth); // disable for now
+
+    function melisUiOutlinedLosesFocus() {
+        var $this = $(this);
+
+    }
 
     // Submit form in modal
     function submitPluginForms(e) {
@@ -648,6 +658,9 @@ var melisPluginEdition = (function($, window) {
                     stop: function(event, ui) {
                         // get all data attributes
                         var toolBox = $(ui.originalElement).children(".melis-plugin-tools-box");
+
+                        //console.log("$(ui.originalElement): ", $(ui.originalElement));
+                        //console.log("ui: ", ui);
 
                         getPluginData(toolBox, percentTotalWidth);
                         // get the function
