@@ -13,16 +13,16 @@ use Laminas\EventManager\EventManagerInterface;
 use Laminas\EventManager\ListenerAggregateInterface;
 use Laminas\Mvc\MvcEvent;
 use Laminas\Session\Container;
-use MelisCore\Listener\MelisCoreGeneralListener;
+use MelisCore\Listener\MelisGeneralListener;
 use Laminas\Stdlib\ArrayUtils;
-class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+
+class MelisCmsPageEditionSavePluginSessionListener extends MelisGeneralListener implements ListenerAggregateInterface
 {
 
     public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $priority        = -10000;
-        $sharedEvents    = $events->getSharedManager();
-        $callBackHandler = $sharedEvents->attach(
+        $this->attachEventListener(
+            $events,
             'MelisCms',
             'meliscms_page_savesession_plugin_start',
             function($event){
@@ -124,9 +124,8 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisCoreGeneralListe
                 }
             },
             // lowest priority so we can process this algorithm in the background
-            $priority);
-
-        $this->listeners[] = $callBackHandler;
+            -1000
+        );
     }
 
     /**

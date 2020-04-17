@@ -11,21 +11,18 @@ namespace MelisCms\Listener;
 
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\EventManager\ListenerAggregateInterface;
-
-use MelisCore\Listener\MelisCoreGeneralListener;
+use MelisCore\Listener\MelisGeneralListener;
 
 /**
  * This listener is executed when page publication is asked.
  *
  */
-class MelisCmsPublishPageListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+class MelisCmsPublishPageListener extends MelisGeneralListener implements ListenerAggregateInterface
 {
-	
     public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $sharedEvents      = $events->getSharedManager();
-        
-        $callBackHandler = $sharedEvents->attach(
+        $this->attachEventListener(
+            $events,
         	'MelisCms',
         	'meliscms_page_publish_start', 
         	function($event){
@@ -54,10 +51,8 @@ class MelisCmsPublishPageListener extends MelisCoreGeneralListener implements Li
 	    		);
 	    		if (!$success)
 	    			return;
-	    		
         	},
-        80);
-        
-        $this->listeners[] = $callBackHandler;
+        80
+        );
     }
 }

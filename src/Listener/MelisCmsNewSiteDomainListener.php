@@ -11,16 +11,16 @@ namespace MelisCms\Listener;
 
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\EventManager\ListenerAggregateInterface;
-use MelisCore\Listener\MelisCoreGeneralListener;
+use MelisCore\Listener\MelisGeneralListener;
 use Laminas\Session\Container;
-class MelisCmsNewSiteDomainListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+
+class MelisCmsNewSiteDomainListener extends MelisGeneralListener implements ListenerAggregateInterface
 {
 	
     public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $sharedEvents      = $events->getSharedManager();
-        
-        $callBackHandler = $sharedEvents->attach(
+        $this->attachEventListener(
+            $events,
         	'MelisInstaller',
             'melis_install_new_platform_start',
         	function($event){
@@ -83,8 +83,7 @@ class MelisCmsNewSiteDomainListener extends MelisCoreGeneralListener implements 
         		
 
         	},
-        100);
-        
-        $this->listeners[] = $callBackHandler;
+        100
+        );
     }
 }

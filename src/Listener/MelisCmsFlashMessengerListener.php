@@ -11,7 +11,7 @@ namespace MelisCms\Listener;
 
 
 use Laminas\EventManager\EventInterface;
-use MelisCore\Listener\MelisCoreGeneralListener;
+use MelisCore\Listener\MelisGeneralListener;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\EventManager\ListenerAggregateInterface;
 
@@ -20,7 +20,7 @@ use Laminas\EventManager\ListenerAggregateInterface;
  * listening to a lot of events
  *
  */
-class MelisCmsFlashMessengerListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+class MelisCmsFlashMessengerListener extends MelisGeneralListener implements ListenerAggregateInterface
 {
     /**
      * @param EventManagerInterface $events
@@ -72,20 +72,6 @@ class MelisCmsFlashMessengerListener extends MelisCoreGeneralListener implements
 
         $priority = -1000;
 
-        foreach ($eventsName As $event)
-            $this->listeners[] = $sharedEvents->attach($identifier, $event, [$this, 'logMessages'], $priority);
-    }
-
-    public function logMessages(EventInterface $event)
-    {
-        $params = $event->getParams();
-
-        if (isset($params['tmpModuleErrorMsg'])) {
-            $params['textMessage'] = $params['tmpModuleErrorMsg'];
-        }
-
-        $event->getTarget()->forward()->dispatch(
-            'MelisCore\Controller\MelisFlashMessenger',
-            array_merge(['action' => 'log'], $params))->getVariables();
+        $this->attachEventListener($events, $identifier, $eventsName, [$this, 'logMessages'], $priority);
     }
 }

@@ -11,16 +11,15 @@ namespace MelisCms\Listener;
 
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\EventManager\ListenerAggregateInterface;
-use MelisCore\Listener\MelisCoreGeneralListener;
+use MelisCore\Listener\MelisGeneralListener;
 
-class MelisCmsPlatformIdListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+class MelisCmsPlatformIdListener extends MelisGeneralListener implements ListenerAggregateInterface
 {
 	
     public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $sharedEvents      = $events->getSharedManager();
-        
-        $callBackHandler = $sharedEvents->attach(
+        $this->attachEventListener(
+            $events,
         	'MelisCore',
         	'meliscore_platform_save_end', 
         	function($event){
@@ -32,7 +31,7 @@ class MelisCmsPlatformIdListener extends MelisCoreGeneralListener implements Lis
         		
         		$success = (int) $params['success'];
         		$id      = (int) $params['id'];
-        		
+
         		if($success == 1 && $params['typeCode'] == 'CORE_PLATFORM_ADD') {
         		    
         		    $data = $platformIdTable->getLastPlatformRange()->current();
@@ -61,8 +60,7 @@ class MelisCmsPlatformIdListener extends MelisCoreGeneralListener implements Lis
         		    $platformIdTable->save($platformIdData);
         		}
         	},
-        100);
-        
-        $this->listeners[] = $callBackHandler;
+        100
+        );
     }
 }

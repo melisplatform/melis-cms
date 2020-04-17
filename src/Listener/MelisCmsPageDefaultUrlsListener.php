@@ -12,20 +12,18 @@ namespace MelisCms\Listener;
 use Laminas\EventManager\EventInterface;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\EventManager\ListenerAggregateInterface;
-use MelisCore\Listener\MelisCoreGeneralListener;
+use MelisCore\Listener\MelisGeneralListener;
 
 /**
  * The flash messenger will add logs by
  * listening to a lot of events
  * 
  */
-class MelisCmsPageDefaultUrlsListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+class MelisCmsPageDefaultUrlsListener extends MelisGeneralListener implements ListenerAggregateInterface
 {
 	
     public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $sharedEvents      = $events->getSharedManager();
-
         $identifier = 'MelisCms';
 
         $eventsName = [
@@ -38,8 +36,7 @@ class MelisCmsPageDefaultUrlsListener extends MelisCoreGeneralListener implement
 
         $priority = -1000;
 
-        foreach ($eventsName As $event)
-            $this->listeners[] = $sharedEvents->attach($identifier, $event, [$this, 'updateDefaultUrls'], $priority);
+        $this->attachEventListener($events, $identifier, $eventsName, [$this, 'updateDefaultUrls'], $priority);
     }
 
     public function updateDefaultUrls(EventInterface $event)

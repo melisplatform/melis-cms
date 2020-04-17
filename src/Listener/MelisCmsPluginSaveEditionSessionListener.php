@@ -14,18 +14,17 @@ use Laminas\EventManager\ListenerAggregateInterface;
 use Laminas\Mvc\MvcEvent;
 use Laminas\View\Model\ViewModel;
 use Laminas\Session\Container;
+use MelisCore\Listener\MelisGeneralListener;
 
 /**
  * This listener will call the plugin to get a formatting of the values
- * 
  */
-class MelisCmsPluginSaveEditionSessionListener implements ListenerAggregateInterface
+class MelisCmsPluginSaveEditionSessionListener extends MelisGeneralListener implements ListenerAggregateInterface
 {
     public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $sharedEvents = $events->getSharedManager();
-        
-        $callBackHandler = $sharedEvents->attach(
+        $this->attachEventListener(
+            $events,
         	'MelisCms',
         	'meliscms_page_savesession_plugin_start', 
         	function($event){
@@ -76,17 +75,7 @@ class MelisCmsPluginSaveEditionSessionListener implements ListenerAggregateInter
                     }
     		    }
         	},
-        80);
-        
-        $this->listeners[] = $callBackHandler;
-    }
-    
-    public function detach(EventManagerInterface $events)
-    {
-        foreach ($this->listeners as $index => $listener) {
-            if ($events->detach($listener)) {
-                unset($this->listeners[$index]);
-            }
-        }
+            80
+        );
     }
 }

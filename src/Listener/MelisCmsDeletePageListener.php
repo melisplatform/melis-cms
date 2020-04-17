@@ -11,20 +11,18 @@ namespace MelisCms\Listener;
 
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\EventManager\ListenerAggregateInterface;
-
-use MelisCore\Listener\MelisCoreGeneralListener;
+use MelisCore\Listener\MelisGeneralListener;
 
 /**
  * This listener will activate when a page is deleted
  * 
  */
-class MelisCmsDeletePageListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+class MelisCmsDeletePageListener extends MelisGeneralListener implements ListenerAggregateInterface
 {
     public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $sharedEvents      = $events->getSharedManager();
-        
-        $callBackHandler = $sharedEvents->attach(
+        $this->attachEventListener(
+            $events,
         	'MelisCms',
         	'meliscms_page_delete_start', 
         	function($event){
@@ -77,8 +75,7 @@ class MelisCmsDeletePageListener extends MelisCoreGeneralListener implements Lis
 	    		if (!$success)
 	    			return;
         	},
-        80);
-        
-        $this->listeners[] = $callBackHandler;
+        80
+        );
     }
 }

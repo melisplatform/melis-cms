@@ -15,15 +15,13 @@ use Laminas\EventManager\ListenerAggregateInterface;
 use Laminas\Mvc\MvcEvent;
 use Laminas\Session\Container;
 
-use MelisCore\Listener\MelisCoreGeneralListener;
+use MelisCore\Listener\MelisGeneralListener;
 
-class MelisCmsSavePageListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+class MelisCmsSavePageListener extends MelisGeneralListener implements ListenerAggregateInterface
 {
 	
     public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $sharedEvents      = $events->getSharedManager();
-
         $identifier = 'MelisCms';
 
         $eventsName = [
@@ -33,8 +31,7 @@ class MelisCmsSavePageListener extends MelisCoreGeneralListener implements Liste
 
         $priority = 100;
 
-        foreach ($eventsName As $event)
-            $this->listeners[] = $sharedEvents->attach($identifier, $event, [$this, 'pageSavePublish'], $priority);
+        $this->attachEventListener($events, $identifier, $eventsName, [$this, 'pageSavePublish'], $priority);
     }
 
     public function pageSavePublish(EventInterface $event)
