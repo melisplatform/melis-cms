@@ -13,9 +13,9 @@ return [
                                         'name' => 'mgdprc_site_id',
                                         'type' => "MelisCoreSiteSelect",
                                         'options' => [
-                                            'label' => 'Site',
-                                            'tooltip' => 'Site',
-                                            'empty_option' => 'Choose site',
+                                            'label' => 'tr_melis_core_gdpr_auto_delete_site',
+                                            'tooltip' => 'tr_melis_core_gdpr_auto_delete_site tooltip',
+                                            'empty_option' => 'tr_melis_core_gdpr_auto_delete_site tooltip',
                                             'disable_inarray_validator' => true,
                                         ],
                                         'attributes' => [
