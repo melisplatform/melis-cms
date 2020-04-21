@@ -659,9 +659,6 @@ var melisPluginEdition = (function($, window) {
                         // get all data attributes
                         var toolBox = $(ui.originalElement).children(".melis-plugin-tools-box");
 
-                        //console.log("$(ui.originalElement): ", $(ui.originalElement));
-                        //console.log("ui: ", ui);
-
                         getPluginData(toolBox, percentTotalWidth);
                         // get the function
                         var owlCheck = $(ui.originalElement).find(".owl-carousel");
