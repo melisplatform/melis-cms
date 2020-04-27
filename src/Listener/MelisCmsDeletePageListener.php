@@ -47,7 +47,7 @@ class MelisCmsDeletePageListener extends MelisGeneralListener implements Listene
                     $event,
     			    'meliscms',
     			    'action-page-tmp',
-    			    'MelisCms\Controller\Pagelanguages',
+    			    'MelisCms\Controller\PageLanguages',
     			    array_merge(['action' => 'setInitialPageLanguage'])
                 );
     			if (!$success)
