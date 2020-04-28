@@ -26,6 +26,25 @@ return [
                                 ]
                             ],
                             'input_filter' => [
+                                'mgdprc_site_id' => [
+                                    'name' => 'mgdprc_site_id',
+                                    'required' => true,
+                                    'validators' => [
+                                        [
+                                            'name' => 'NotEmpty',
+                                            'break_chain_on_failure' => true,
+                                            'options' => [
+                                                'messages' => [
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscore_emails_mngt_tool_general_properties_form_empty',
+                                                ]
+                                            ]
+                                        ]
+                                    ],
+                                    'filters' => [
+                                        ['name' => 'StripTags'],
+                                        ['name' => 'StringTrim']
+                                    ]
+                                ]
                             ]
                         ]
                     ]
