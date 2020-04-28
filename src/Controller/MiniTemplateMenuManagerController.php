@@ -24,12 +24,14 @@ class MiniTemplateMenuManagerController extends AbstractActionController
     public function renderMenuManagerToolHeaderAction() {}
     public function renderMenuManagerToolBodyAction() {}
     public function renderMenuManagerToolAddCategoryBodyPropertiesContentAction() {}
+
     public function renderMenuManagerToolAddCategoryBodyPluginsContentAction() {
         $params = $this->params()->fromQuery();
         $view = new ViewModel();
         $view->isHidden = (empty($params['isHidden'])) ? true : false;
         $view->id = (! empty($params['id'])) ? $params['id'] : null;
         $view->formType = (! empty($params['formType'])) ? $params['formType'] : 'add';
+        $view->status = $params['status'] ?? 0;
         return $view;
     }
 
@@ -168,6 +170,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController
         $view->form = $form;
         $view->texts = $data;
         $view->cat_id = $exploded_id[0] ?? 0;
+        $view->status = $params['status'] ?? 0;
         return $view;
     }
 

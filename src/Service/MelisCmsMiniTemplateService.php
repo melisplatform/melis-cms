@@ -271,7 +271,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
         $errors = [];
 
         try {
-            $this->saveCategorySite($params['site_id'], $cat_id);
+            $this->saveCategorySite($params['site_id'], $cat_id, $params['status']);
             unset($params['site_id']);
             unset($params['cat_id']);
             $this->saveCategoryTrans($params, $cat_id);
@@ -290,7 +290,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
     }
 
     // move to service
-    private function saveCategorySite($site_id, $cat_id) {
+    private function saveCategorySite($site_id, $cat_id, $status) {
         $category_table = $this->getServiceLocator()->get('MelisCmsCategoryTable');
         $category_site_table = $this->getServiceLocator()->get('MelisCmsMiniTplSiteCategoryTable');
         $user_id = $this->getCurrentUser()->usr_id;
@@ -300,7 +300,8 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
 
         $this->latest_category_id = $category_table->save([
             'mtplc_user_id' => $user_id,
-            'mtplc_creation_date' => date('Y-m-d h:i:s')
+            'mtplc_creation_date' => date('Y-m-d h:i:s'),
+            'mtplc_status' => $status
         ], $cat_id);
 
 
@@ -437,8 +438,9 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
             'id' => $category['mtplc_id'] . '-' . $category['mtplct_name'],
             'parent' => '#',
             'text' => $category['mtplct_name'],
-            'icon' => 'fa fa-circle text-success',
-            'type' => 'category'
+            'icon' => 'fa fa-circle ' . ($category['mtplc_status'] ? 'text-success' : 'text-danger'),
+            'type' => 'category',
+            'status' => $category['mtplc_status']
         ];
     }
 

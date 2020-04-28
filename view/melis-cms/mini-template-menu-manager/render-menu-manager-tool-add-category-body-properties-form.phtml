@@ -5,11 +5,21 @@
 >
     <!-- Header - Save button -->
     <div class="row">
-        <div class="me-hl col-xs-12 col-sm-8 col-md-9"></div>
+        <div class="me-hl col-xs-12 col-sm-8 col-md-9">
+            <div class="form-group">
+                <label><?php echo $this->translate('tr_meliscore_common_status')?></label>
+                <div id="mtpl-category-status" class="make-switch main_variant_switch" data-on-label="<?php echo $this->translate('tr_meliscms_tool_style_page_status_on')?>" data-off-label="<?php echo $this->translate('tr_meliscms_tool_style_page_status_off')?>" data-text-label="<i class='icon glyphicon glyphicon-resize-horizontal'></i>">
+                    <input type="checkbox" name="mcsdetail_status" id="" <?= ($this->status) ? 'checked' : '' ?>>
+                </div>
+            </div>
+            <script type="text/javascript">
+                $("#mtpl-category-status").bootstrapSwitch();
+            </script>
+        </div>
         <div class="me-hr col-xs-12 col-sm-4 col-md-3">
             <button class="btn btn-success" id="id_meliscms_mini_template_menu_manager_save_btn">
                 <i class="fa fa-plus"></i>
-                Save
+                <?= $this->translate('tr_meliscms_mini_template_menu_manager_tool_add_category_save') ?>
             </button>
         </div>
     </div>
@@ -20,7 +30,7 @@
         <div class="col-xs-12 col-md-4 col-lg-2">
             <div class="pdc-heading clearfix">
                 <h3>
-                    <i class="fa fa-cog"></i> <?= $this->translate('tr_meliscategory_categories_common_label_texts')?>
+                    <i class="fa fa-cog"></i> <?= $this->translate('tr_meliscms_mini_template_menu_manager_tool_add_category_texts')?>
                 </h3>
             </div>
             <div class="product-text-tab-container">

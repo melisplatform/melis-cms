@@ -70,6 +70,14 @@ $(function () {
     });
 
     $body.on('click', '#id_meliscms_mini_template_menu_manager_save_btn', function () {
+        var status = $('#mtpl-category-status').find('.switch-on');
+
+        if (status.length) {
+            status = 1;
+        } else {
+            status = 0;
+        }
+
         var formData = $("#id_meliscms_mini_template_menu_manager_tool_add_category_body_properties_form form").serializeArray();
         formData.push({
             name: 'site_id',
@@ -78,6 +86,10 @@ $(function () {
         formData.push({
             name: 'cat_id',
             value: $('#menu-manager-category-id').data('id')
+        });
+        formData.push({
+            name: 'status',
+            value: status
         });
 
         melisCoreTool.pending('#id_meliscms_mini_template_menu_manager_save_btn');
@@ -186,7 +198,7 @@ $(function () {
                     "items" : function (node) {
                         var menu = {
                             "edit_category" : {
-                                "label" : 'Edit category',
+                                "label" : translations.tr_meliscms_mini_template_menu_manager_tool_jstree_edit_category,
                                 "icon"  : "fa fa-edit",
                                 "action" : function (obj) {
                                     var parentId = parseInt(node.id),
@@ -199,7 +211,8 @@ $(function () {
                                         {
                                             isHidden: false,
                                             id: node.id,
-                                            formType: 'edit'
+                                            formType: 'edit',
+                                            status: node.original.status
                                         },
                                         function () {
                                             $('#id_meliscms_mini_template_menu_manager_tool_header a').click();
@@ -208,7 +221,7 @@ $(function () {
                                 }
                             },
                             "delete_category" : {
-                                "label" : 'Delete category',
+                                "label" : translations.tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category,
                                 "icon"  : "fa fa-trash-o",
                                 "action" : function (obj) {
                                     if (node.children.length == 0) {
@@ -249,7 +262,7 @@ $(function () {
                                 }
                             },
                             'edit_plugin': {
-                                "label" : 'Edit plugin',
+                                "label" : translations.tr_meliscms_mini_template_menu_manager_tool_jstree_edit_minitemplate,
                                 "icon"  : "fa fa-edit",
                                 "action" : function (obj) {
                                     waitForElem('#miniTemplateThumbnail', function (element) {
@@ -269,7 +282,7 @@ $(function () {
                                 }
                             },
                             'delete_plugin': {
-                                "label" : 'Delete plugin',
+                                "label" : translations.tr_meliscms_mini_template_menu_manager_tool_jstree_delete_minitemplate,
                                 "icon"  : "fa fa-edit",
                                 "action" : function (obj) {
                                     var templateName = node.original.id;

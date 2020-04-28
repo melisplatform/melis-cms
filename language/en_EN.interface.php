@@ -777,6 +777,8 @@
 		'tr_meliscms_mini_template_menu_manager_tool_add_category_header' => 'Add category',
 		'tr_meliscms_mini_template_menu_manager_tool_add_category_body_properties_tab' => 'Properties',
 		'tr_meliscms_mini_template_menu_manager_tool_add_category_body_plugins_tab' => 'Plugins',
+		'tr_meliscms_mini_template_menu_manager_tool_add_category_texts' => 'Texts',
+		'tr_meliscms_mini_template_menu_manager_tool_add_category_save' => 'Save',
 		// Filter
 		'tr_meliscms_mini_template_menu_manager_tool_sites_filter' => 'Filter by site',
 		'tr_meliscms_mini_template_menu_manager_tool_sites_filter_tooltip' => 'Select a site to display its categories and mini-templates',
