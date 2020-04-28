@@ -1,0 +1,46 @@
+.melis-cms-category-select {
+    max-width: 91%;
+    display: inline-block;
+}
+.melis-cms-category-select-button {
+    width: 9%;
+    vertical-align: top;
+}
+.melis-cms-category-select-tree {
+    margin:0 0 25px 0;
+    display: inline-block;
+}
+#melis_cms_categories_category_select_modal_content .root-option {
+    margin-left:4px;
+    display: block;
+    cursor: pointer;
+}
+#melis_cms_categories_category_select_modal_content .root-option span {
+    display: inline-block;
+    vertical-align: top;
+    margin-left:5px;
+}
+#melis_cms_categories_category_select_modal_content .filter-area {
+    margin-bottom:20px;
+}
+#melis_cms_categories_category_select_modal_content .filter-buttons {
+    margin-top:20px;
+}
+#melis_cms_categories_category_select_modal_content .jstree-proton .jstree-search {
+    background: rgb(247, 230, 230);
+    box-shadow: inset 0 0 1px rgba(169, 68, 66, 0.38);
+    border-radius: 0px;
+    padding-right: 10px;
+}
+#melis_cms_categories_category_select_modal_content .jstree-proton .jstree-clicked {
+    background: #e61c23 !important;
+    box-shadow: inset 0 0 1px #e61c23;
+    border-radius: 0px;
+    padding-right: 10px;
+    color: #fff !important;
+}
+.info-select-category-site-filter {
+    margin-top: 4px !important;
+    font-size: 12px;
+    display:none;
+}

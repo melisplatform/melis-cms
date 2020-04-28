@@ -143,10 +143,17 @@ return array(
                     '/MelisCms/js/tools/style.tool.js',
                     '/MelisCms/js/tools/gdpr-banner.js',
                     '/MelisCms/js/tools/page-export-import.js',
+                    // jstree
+                    '/MelisCms/assets/jstree/dist/jstree.min.js',
+                    '/MelisCms/plugins/js/category.plugin.select.js',
                 ),
                 'css' => array(
                     '/MelisCms/css/fancytree.custom.css',
                     '/MelisCms/css/styles.css',
+                    //jstree
+                    '/MelisCms/assets/jstree/dist/themes/proton/style.min.css',
+                    // for selecting a category in a tree
+                    '/MelisCms/plugins/css/category.plugin.select.css',
                 ),
                 /**
                  * the "build" configuration compiles all assets into one file to make

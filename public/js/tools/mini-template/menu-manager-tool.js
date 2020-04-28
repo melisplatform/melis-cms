@@ -133,6 +133,10 @@ $(function () {
             .on('#mini-template-category-tree refresh.jstree', function (e, data) {})
             .on('#mini-template-category-tree loading.jstree', function (e, data) {})
             .on('#mini-template-category-tree loaded.jstree', function (e, data) {
+                if ($('#mini-template-category-tree').find(".jstree-unchecked").length) {
+                    $('mini-template-tree-no-data').css('display', '');
+                }
+
                 $('.add-m-tpl-category').removeAttr('disabled');
                 $('.add-m-tpl-plugin').removeAttr('disabled');
             })
