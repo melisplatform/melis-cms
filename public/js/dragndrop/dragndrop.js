@@ -243,33 +243,66 @@ var melisDragnDrop = (function($, window) {
                 $this.children(".melis-plugin-tooltip").fadeIn();
         });
 
-        $body.on('click', ".melis-cms-filter-btn-sub-category", function(){
+        $body.on('click', ".melis-cms-filter-btn-sub-category", function() {
             var elem        = $(this),
                 next        = elem.next(),
                 textVal     = elem.text(),
-                activeMenu  = elem.parent().find('.active');
+                activeMenu  = elem.parent().find('.melis-cms-filter-btn-sub-category.active');
 
-                if ( activeMenu.length > 0 ) {
-                    activeMenu.next().slideUp();
-                    activeMenu.removeClass('active');
-                    //activeMenu.find('.melis-plugins-icon-new-sub-child').removeClass('reverse-color');
-                    if ( activeMenu.text() !== textVal ) {
-                        next.slideDown();
-                        elem.addClass('active');
-                        //elem.find('.melis-plugins-icon-new-sub-child').addClass('reverse-color');
-                    }
-                } else {
-                    // show menu
-                    if ( elem.hasClass('active') ) {
-                        next.slideUp();
-                        elem.removeClass('active');
-                        //elem.find('.melis-plugins-icon-new-sub-child').removeClass('reverse-color');
-                    } else {
-                        elem.addClass('active');
-                        //elem.find('.melis-plugins-icon-new-sub-child').addClass('reverse-color');
-                        next.slideDown();
-                    }
+            if (activeMenu.length > 0) {
+                activeMenu.next().slideUp();
+                activeMenu.removeClass('active');
+                //activeMenu.find('.melis-plugins-icon-new-sub-child').removeClass('reverse-color');
+                if (activeMenu.text() !== textVal) {
+                    next.slideDown();
+                    elem.addClass('active');
+                    //elem.find('.melis-plugins-icon-new-sub-child').addClass('reverse-color');
                 }
+            } else {
+                // show menu
+                if (elem.hasClass('active')) {
+                    next.slideUp();
+                    elem.removeClass('active');
+                    //elem.find('.melis-plugins-icon-new-sub-child').removeClass('reverse-color');
+                } else {
+                    elem.addClass('active');
+                    //elem.find('.melis-plugins-icon-new-sub-child').addClass('reverse-color');
+                    next.slideDown();
+                }
+            }
+        });
+
+        $body.on('click', ".melis-cms-filter-btn-mini-tpl-category", function() {
+            var elem        = $(this),
+                next        = elem.next(),
+                textVal     = elem.text(),
+                activeMenu  = elem.parent().find('.melis-cms-filter-btn-mini-tpl-category.active');
+
+            console.log(next);
+            console.log(textVal);
+            console.log(activeMenu);
+
+            if (activeMenu.length > 0) {
+                activeMenu.next().slideUp();
+                activeMenu.removeClass('active');
+                //activeMenu.find('.melis-plugins-icon-new-sub-child').removeClass('reverse-color');
+                if (activeMenu.text() !== textVal) {
+                    next.slideDown();
+                    elem.addClass('active');
+                    //elem.find('.melis-plugins-icon-new-sub-child').addClass('reverse-color');
+                }
+            } else {
+                // show menu
+                if (elem.hasClass('active')) {
+                    next.slideUp();
+                    elem.removeClass('active');
+                    //elem.find('.melis-plugins-icon-new-sub-child').removeClass('reverse-color');
+                } else {
+                    elem.addClass('active');
+                    //elem.find('.melis-plugins-icon-new-sub-child').addClass('reverse-color');
+                    next.slideDown();
+                }
+            }
         });
 
         // $( ".melis-editable" ).resizable({ disabled: true, handles: 'e' });

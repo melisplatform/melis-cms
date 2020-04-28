@@ -145,7 +145,9 @@ body {
 }
 
 .melis-cms-ps-box .melis-cms-filter-btn,
-.melis-cms-category-btn , .melis-cms-filter-btn-sub-category{
+.melis-cms-category-btn ,
+.melis-cms-filter-btn-sub-category,
+.melis-cms-filter-btn-mini-tpl-category {
     display: block;
     position: relative;
     padding: 8px 15px;
@@ -166,7 +168,8 @@ body {
 
 .melis-cms-ps-box .melis-cms-filter-btn:hover,
 .melis-cms-category-btn:hover ,
-.melis-cms-filter-btn-sub-category:hover{
+.melis-cms-filter-btn-sub-category:hover,
+.melis-cms-filter-btn-mini-tpl-category:hover {
     background: #2c2c2c;
     border-color: #2c2c2c;
 }
@@ -179,7 +182,8 @@ body {
 
 .melis-cms-ps-box .melis-cms-filter-btn.active .angle-down-menu,
 .melis-cms-category-btn.active .angle-down-menu,
-.melis-cms-filter-btn-sub-category.active .angle-down-menu {
+.melis-cms-filter-btn-sub-category.active .angle-down-menu,
+.melis-cms-filter-btn-mini-tpl-category.active .angle-down-menu {
     transform: rotateZ(-90deg);
     -webkit-transform: rotateZ(-90deg);
     -moz-transform: rotateZ(-90deg);
@@ -188,7 +192,8 @@ body {
 
 .melis-cms-ps-box .melis-cms-filter-btn .angle-down-menu,
 .melis-cms-category-btn .angle-down-menu,
-.melis-cms-filter-btn-sub-category.active .angle-down-menu {
+.melis-cms-filter-btn-sub-category .angle-down-menu,
+.melis-cms-filter-btn-mini-tpl-category .angle-down-menu {
     position: absolute;
     top: 8px;
     right: 15px;
@@ -788,21 +793,25 @@ transform:  scale(0.5) translate3d(-50%, -50%, 0); */
 .melis-cms-category-plugins-box-sub {
     display:none;
 }
-.melis-cms-filter-btn-sub-category i {
+.melis-cms-filter-btn-sub-category i,
+.melis-cms-filter-btn-mini-tpl-category i {
     right:15px;
     font-size:13px;
     top: 7px;
     position:absolute;
 }
-span.melis-cms-filter-btn-sub-category.active {
+span.melis-cms-filter-btn-sub-category.active,
+span.melis-cms-filter-btn-mini-tpl-category.active {
     background: #ab141a;
     border: 1px solid #711b17;
 }
-span.melis-cms-filter-btn-sub-category i {
+span.melis-cms-filter-btn-sub-category i,
+span.melis-cms-filter-btn-mini-tpl-category i {
     transition: transform 0.4s;
     text-indent:0;
 }
-span.melis-cms-filter-btn-sub-category.active i {
+span.melis-cms-filter-btn-sub-category.active i,
+span.melis-cms-filter-btn-mini-tpl-category.active i {
     -webkit-transform: rotateZ(-90deg);
     -moz-transform: rotateZ(-90deg);
     -ms-transform: rotateZ(-90deg);
@@ -818,7 +827,8 @@ span.melis-cms-filter-btn-sub-category.active i {
 /*
  * Plugin Menus
  */
-.melis-cms-filter-btn-sub-category {
+.melis-cms-filter-btn-sub-category,
+.melis-cms-filter-btn-mini-tpl-category {
     padding: 2px 0 2px 21px !important;
 }
 
