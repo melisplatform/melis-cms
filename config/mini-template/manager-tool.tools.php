@@ -43,18 +43,18 @@ return [
                         ],
                         'columns' => [
                             'image' => [
-                                'text' => 'Image',
+                                'text' => 'tr_meliscms_mini_template_manager_tool_table_image',
                                 'css' => [],
-                                'sortable' => true
+                                'sortable' => false
                             ],
                             'html_path' => [
-                                'text' => 'Path',
+                                'text' => 'tr_meliscms_mini_template_manager_tool_table_path',
                                 'css' => [],
-                                'sortable' => true
+                                'sortable' => false
                             ],
                         ],
                         'searchables' => [
-
+                            'html_path'
                         ],
                         'actionButtons' => [
                             'edit' => [
@@ -84,8 +84,8 @@ return [
                                         'name' => 'miniTemplateSite',
                                         'type' => 'MelisCoreSiteSelect',
                                         'options' => [
-                                            'label' => 'Site',
-                                            'tooltip' => 'Site where the minitemplate will be created',
+                                            'label' => 'tr_meliscms_mini_template_manager_tool_form_site',
+                                            'tooltip' => 'tr_meliscms_mini_template_manager_tool_form_site_tooltip',
                                             'empty_option' => 'No site',
                                             'disable_inarray_validator' => true,
                                         ],
@@ -100,8 +100,8 @@ return [
                                         'name' => 'miniTemplateName',
                                         'type' => 'MelisText',
                                         'options' => [
-                                            'label' => 'Mini-template name',
-                                            'tooltip' => 'Name of the mini-template',
+                                            'label' => 'tr_meliscms_mini_template_manager_tool_form_name',
+                                            'tooltip' => 'tr_meliscms_mini_template_manager_tool_form_name_tooltip',
                                         ],
                                         'attributes' => [
                                             'id' => 'miniTemplateName',
@@ -114,8 +114,8 @@ return [
                                         'name' => 'miniTemplateHtml',
                                         'type' => 'TextArea',
                                         'options' => [
-                                            'label' => 'HTML',
-                                            'tooltip' => 'HTML for the mini-template',
+                                            'label' => 'tr_meliscms_mini_template_manager_tool_form_html',
+                                            'tooltip' => 'tr_meliscms_mini_template_manager_tool_form_html_tooltip',
                                         ],
                                         'attributes' => [
                                             'id' => 'miniTemplateHTML',
@@ -131,8 +131,8 @@ return [
                                         'name' => 'miniTemplateThumbnail',
                                         'type' => 'file',
                                         'options' => [
-                                            'label' => 'Thumbnail',
-                                            'tooltip' => 'Thumbnail for the mini template',
+                                            'label' => 'tr_meliscms_mini_template_manager_tool_form_thumbnail',
+                                            'tooltip' => 'tr_meliscms_mini_template_manager_tool_form_thumbnail_tool_tip',
                                         ],
                                         'attributes' => [
                                             'id' => 'miniTemplateThumbnail',
@@ -141,7 +141,7 @@ return [
                                             'placeholder' => 'Image',
                                             'onchange' => '',
                                             'class' => 'filestyle',
-                                            'data-buttonText' => 'Select Image',
+                                            'data-buttonText' => 'tr_meliscms_mini_template_manager_tool_form_thumbnail_btn_text',
                                         ],
                                     ],
                                 ],
@@ -155,7 +155,7 @@ return [
                                             'name' => 'NotEmpty',
                                             'options' => [
                                                 'messages' => [
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_gdpr_banner_empty_field',
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_mini_template_manager_tool_form_empty_field',
                                                 ],
                                             ],
                                         ],
@@ -173,7 +173,7 @@ return [
                                             'name' => 'NotEmpty',
                                             'options' => [
                                                 'messages' => [
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscmsnews_empty_site',
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_mini_template_manager_tool_form_empty_field',
                                                 ],
                                             ],
                                         ],

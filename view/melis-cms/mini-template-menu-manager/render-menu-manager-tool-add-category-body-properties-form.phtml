@@ -1,0 +1,79 @@
+<div
+    id="<?= $this->zoneconfig['conf']['id'] ?>"
+    data-melisKey="<?= $this->zoneconfig['conf']['melisKey'] ?>"
+    class="tab-pane container-level-a"
+>
+    <!-- Header - Save button -->
+    <div class="row">
+        <div class="me-hl col-xs-12 col-sm-8 col-md-9"></div>
+        <div class="me-hr col-xs-12 col-sm-4 col-md-3">
+            <button class="btn btn-success" id="id_meliscms_mini_template_menu_manager_save_btn">
+                <i class="fa fa-plus"></i>
+                Save
+            </button>
+        </div>
+    </div>
+    <!-- Header - Save button END -->
+    <!-- Body - Form -->
+    <div class="row">
+        <!-- Languages tab -->
+        <div class="col-xs-12 col-md-4 col-lg-2">
+            <div class="pdc-heading clearfix">
+                <h3>
+                    <i class="fa fa-cog"></i> <?= $this->translate('tr_meliscategory_categories_common_label_texts')?>
+                </h3>
+            </div>
+            <div class="product-text-tab-container">
+                <ul class="nav-tabs product-text-tab">
+                    <?php foreach ($this->languages as $language) { ?>
+                        <li class="">
+                            <a
+                                class="clearfix"
+                                data-toggle="tab"
+                                href="#<?= $language['lang_cms_id'].'-mini-template-menu-manager-category' ?>"
+                                aria-expanded="false"
+                            >
+                                <span class="float-right">
+                                    <img
+                                        src="/MelisCms/images/lang-flags/<?= $language['lang_cms_locale'] ?>.png"
+                                        class="imgDisplay float-right"
+                                    />
+                                </span>
+                                <span><?= $language['lang_cms_name']?></span>
+                            </a>
+                        </li>
+                    <?php } ?>
+                </ul>
+            </div>
+        </div>
+        <!-- Languages tab END -->
+        <!-- Form -->
+        <div class="col-xs-12 col-md-5 col-lg-3">
+            <div class="tab-content">
+                <?php  foreach ($this->languages as $language): ?>
+                    <div id="<?php echo $language['lang_cms_id'].'-mini-template-menu-manager-category' ?>" class="tab-pane product-text-tab-content">
+                        <div class="me-heading bg-white ">
+                            <h3 class=""><i class="fa fa-language" aria-hidden="true"></i> <?php echo $language['lang_cms_name'] ?></h3>
+                        </div>
+                        <div class="product-text-tab-form-content" style="padding-bottom: 0px; padding-right: 0px;">
+                            <?php
+                                $form = clone $this->form;
+                                $form->setAttribute('id', $language['lang_cms_id'] . '_' . $form->getAttribute('id'));
+                                $input = $form->get('category_name');
+                                $input->setName($language['lang_cms_id'] . '_category_name');
+                                $input->setValue($this->texts[$language['lang_cms_id']] ?? '');
+                                $input->setAttribute('id', $input->getName());
+
+                                echo $this->form()->openTag($form);
+                                echo $this->melisFieldCollection($form);
+                                echo $this->form()->closeTag();
+                            ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <!-- Form END -->
+    </div>
+    <!-- Body - Form END -->
+</div>

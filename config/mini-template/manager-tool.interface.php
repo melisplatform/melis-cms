@@ -11,7 +11,7 @@ return [
                                 'id' =>  'id_meliscms_mini_template_manager_tool',
                                 'name' => 'tr_meliscms_mini_template_manager_tool',
                                 'melisKey' => 'meliscms_mini_template_manager_tool',
-                                'icon' => 'fa-share',
+                                'icon' => 'fa-tasks',
                                 'rights_checkbox_disable' => true,
                                 'follow_regular_rendering' => false,
                             ],
@@ -85,7 +85,7 @@ return [
                                 'id' =>  'id_meliscms_mini_template_manager_tool_add',
                                 'name' => 'tr_meliscms_mini_template_manager_tool_add',
                                 'melisKey' => 'meliscms_mini_template_manager_tool_add',
-                                'icon' => 'fa-share',
+                                'icon' => 'fa-tasks',
                             ],
                             'forward' => [
                                 'module' => 'MelisCms',

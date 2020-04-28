@@ -1,0 +1,23 @@
+.mini-template-menu-manager-lang {
+    margin-left: 5px;
+    margin-bottom: 30px;
+    width: 165px;
+    background: #eaeaea;
+    position: relative;
+}
+
+.mini-template-menu-manager-lang a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+}
+
+.mini-template-menu-manager-tool-header {
+    height: initial;
+    padding: 0;
+}
+
+#id_meliscms_mini_template_menu_manager_tool_body,
+.mini-template-menu-manager-tool-header {
+    border-bottom: 1px solid #eee;
+}

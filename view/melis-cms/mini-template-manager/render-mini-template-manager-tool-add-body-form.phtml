@@ -4,38 +4,55 @@
     data-currentmodule="<?= $this->current_module ?>"
     data-currenttemplate="<?= $this->current_template ?>"
 >
-    <?php
-        if (! empty($form)) {
+    <?php if (! empty($form)) : ?>
+        <?php
             $form = clone $this->form;
             $form->prepare();
             echo $this->form()->openTag($form);
             echo $this->melisFieldCollection($form);
-    ?>
+        ?>
+            <!-- Thumbnail preview -->
             <div>
                 <span class="thumbnail">
-                  <img id="new-minitemplate-thumbnail" width="300" height="300" src="/MelisCore/images/profile/default_picture.jpg" alt="<?= $this->translate('tr_meliscore_tool_user_usr_profile_image'); ?>">
+                  <img
+                      id="new-minitemplate-thumbnail"
+                      width="300"
+                      height="300"
+                      src="/MelisCore/images/profile/default_picture.jpg"
+                      alt="<?= $this->translate('tr_meliscore_tool_user_usr_profile_image'); ?>"
+                  >
                 </span>
             </div>
             <div>
                 <a href="#" class="small"  id="remove-mini-template-thumbnail-preview">
                     <i class="fa fa-times"></i>
-                    Remove Thumbnail
+                    <?= $this->translate('tr_meliscms_mini_template_manager_tool_form_remove_thumbnail') ?>
                 </a>
             </div>
             <br>
             <br>
-            <?php if ($this->type === 'create') : ?>
-                <button type="submit" id="melis-cms-minitemplate-add-btn" class="btn btn-primary">Create</button>
+            <!-- Thumbnail preview End -->
+
+            <?php if ($this->formType === 'create') : ?>
+                <button type="submit" id="melis-cms-minitemplate-add-btn" class="btn btn-primary">
+                    <?= $this->translate('tr_meliscms_mini_template_manager_tool_form_create') ?>
+                </button>
             <?php else : ?>
-                <button type="submit" id="melis-cms-minitemplate-edit-btn" class="btn btn-primary">Update</button>
+                <button type="submit" id="melis-cms-minitemplate-edit-btn" class="btn btn-primary">
+                    <?= $this->translate('tr_meliscms_mini_template_manager_tool_form_update') ?>
+                </button>
             <?php endif; ?>
-    <?php
-            echo $this->form()->closeTag();
-        }
-    ?>
+        <?= $this->form()->closeTag() ?>
+    <?php endif ?>
 </div>
 <script type="text/javascript">
-    $("#miniTemplateThumbnail").filestyle({buttonBefore: true, input: false, buttonText: '<?= $this->translate('tr_meliscore_tool_user_usr_file_button'); ?>'});
+    $("#miniTemplateThumbnail").filestyle(
+        {
+            buttonBefore: true,
+            input: false,
+            buttonText: '<?= $this->translate('tr_meliscore_tool_user_usr_file_button'); ?>'
+        }
+    );
     $(function() {
         let tinyMceOption = {
             height: 300,

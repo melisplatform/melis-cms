@@ -4,34 +4,58 @@
     class="col-xs-12 col-lg-8"
 >
     <!-- Languages -->
-    <div class="cat-tree-view-languages filter-dropdown clearfix">
-        <a
-            href="#"
-            class="dropdown-toggle category-list-lang-dropdown"
-            data-toggle="dropdown"
-            data-locale="<?= $this->current_lang->lang_cms_name ?>"
-        >
-            <i class="fa fa-language"></i>
-            <span class="filter-key"><?= $this->current_lang->lang_cms_name; ?></span>
-            <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu category-tree-view-lang">
-            <?php foreach ($this->languages as $lang):?>
-                <li>
-                    <a data-locale="<?= $lang['lang_cms_locale']?>">
-                        <span><?= $lang['lang_cms_name']?></span>
-                        <span class="float-right">
-                            <img src="/MelisCms/images/lang-flags/<?= $lang['lang_cms_locale']?>.png" alt="">
-                        </span>
-                    </a>
-                </li>
-            <?php endforeach;?>
-        </ul>
+    <div class="row">
+        <div class="mini-template-menu-manager-lang filter-dropdown clearfix">
+            <a
+                href="#"
+                class="dropdown-toggle category-list-lang-dropdown"
+                data-toggle="dropdown"
+                data-locale="<?= $this->current_lang->lang_cms_name ?>"
+            >
+                <i class="fa fa-language"></i>
+                <span class="filter-key"><?= $this->current_lang->lang_cms_name; ?></span>
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu mini-template-menu-manager-lang-select">
+                <?php foreach ($this->languages as $lang):?>
+                    <li>
+                        <a data-locale="<?= $lang['lang_cms_locale']?>">
+                            <span><?= $lang['lang_cms_name']?></span>
+                            <span class="float-right">
+                                <img src="/MelisCms/images/lang-flags/<?= $lang['lang_cms_locale']?>.png" alt="">
+                            </span>
+                        </a>
+                    </li>
+                <?php endforeach;?>
+            </ul>
+        </div>
+        <div class="" style="margin: 0 0 0 10px">
+            <button
+                    class="btn btn-success add-m-tpl-category"
+                    title="Select a site first"
+                    style="height: 41px;"
+                    disabled="disabled"
+            >
+                <i class="fa fa-plus"></i>
+                <?= $this->translate('tr_meliscms_mini_template_menu_manager_tool_jstree_add_category') ?>
+            </button>
+        </div>
+        <div class="" style="margin: 0 0 0 10px">
+            <button
+                    class="btn btn-success add-m-tpl-plugin"
+                    title="Select a site first"
+                    style="height: 41px;"
+                    disabled="disabled"
+            >
+                <i class="fa fa-plus"></i>
+                <?= $this->translate('tr_meliscms_mini_template_menu_manager_tool_jstree_add_minitemplate') ?>
+            </button>
+        </div>
     </div>
     <!-- Languages End -->
     <div class="cat-div" style="display: inline-block;">
-        <div class="alert alert-warning hidden" id="searchNoResult">"<strong></strong>" <?php echo $this->translate('tr_meliscmscategory_search_not_found')?></div>
-        <div class="alert alert-warning " id="noResultData"><strong><?php echo $this->translate('No data found')?></strong></div>
-        <div id="mini-template-category-tree" data-langlocale="<?php echo $this->current_lang->lang_cms_locale ?>"></div>
+        <div class="alert alert-warning hidden" id="searchNoResult">"<strong></strong>" <?= $this->translate('tr_meliscmscategory_search_not_found')?></div>
+        <div class="alert alert-warning " id="noResultData"><strong><?= $this->translate('No data found')?></strong></div>
+        <div id="mini-template-category-tree" data-langlocale="<?= $this->current_lang->lang_cms_locale ?>"></div>
     </div>
 </div>

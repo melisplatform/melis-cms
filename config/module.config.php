@@ -118,6 +118,7 @@ return array(
             'MelisCmsPageService' => 'MelisCms\Service\Factory\MelisCmsPageServiceFactory',
             'MelisCmsPageExportService' => 'MelisCms\Service\Factory\MelisCmsPageExportServiceFactory',
             'MelisCmsPageImportService' => 'MelisCms\Service\Factory\MelisCmsPageImportServiceFactory',
+            'MelisCmsMiniTemplateService' => 'MelisCms\Service\Factory\MelisCmsMiniTemplateServiceFactory',
         ),
     ),
     'controllers' => array(

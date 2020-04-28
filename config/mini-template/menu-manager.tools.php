@@ -8,11 +8,60 @@ return [
                         'title' => 'Menu manager',
                         'id' => 'menumanager',
                     ],
+                    'table' => [
+                        'target' => '#tableMiniTemplateMenuManagerPlugins',
+                        'ajaxUrl' => '/melis/MelisCms/MiniTemplateMenuManager/getMiniTemplates',
+                        'dataFunction' => 'initMiniTemplateMenuManagerPluginTables',
+                        'ajaxCallback' => '',
+                        'filters' => [
+                            'left' => [],
+                            'center' => [],
+                            'right' => [
+                                'mini-template-manager-tool-table-refresh' => [
+                                    'module' => 'MelisCms',
+                                    'controller' => 'MiniTemplateManager',
+                                    'action' => 'render-mini-template-manager-tool-table-refresh',
+                                ],
+                            ]
+                        ],
+                        'columns' => [
+                            'id' => [
+                                'text' => '<i class="fa fa-plus"> </i> ',
+                                'css' => array('width' => '1%', 'visible' => false),
+                                'sortable' => true,
+                            ],
+                            'image' => [
+                                'text' => 'Image',
+                                'css' => [],
+                                'sortable' => true
+                            ],
+                            'html_path' => [
+                                'text' => 'Path',
+                                'css' => [],
+                                'sortable' => true
+                            ],
+                        ],
+                        'searchables' => [
+
+                        ],
+                        'actionButtons' => [
+                            'edit' => [
+                                'module' => 'MelisCms',
+                                'controller' => 'MiniTemplateManager',
+                                'action' => 'render-mini-template-manager-tool-table-action-edit',
+                            ],
+                            'delete' => [
+                                'module' => 'MelisCms',
+                                'controller' => 'MiniTemplateManager',
+                                'action' => 'render-mini-template-manager-tool-table-action-delete',
+                            ],
+                        ],
+                    ],
                     'forms' => [
-                        'menu_manager_tool_site' => [
+                        'menu_manager_tool_site_add_category' => [
                             'attributes' => [
-                                'name' => 'menu_manager_tool_site',
-                                'id' => 'id_menu_manager_tool_site',
+                                'name' => 'menu_manager_tool_site_add_category',
+                                'id' => 'id_menu_manager_tool_site_add_category',
                                 'method' => 'POST',
                                 'action' => ''
                             ],
@@ -20,40 +69,21 @@ return [
                             'elements' => [
                                 [
                                     'spec' => [
-                                        'name' => 'menuManagerSite',
-                                        'type' => 'MelisCoreSiteSelect',
+                                        'name' => 'category_name',
+                                        'type' => 'MelisText',
                                         'options' => [
-                                            'label' => 'Site',
+                                            'label' => 'Category Name',
                                             'tooltip' => 'Site where the minitemplate will be created',
-                                            'empty_option' => 'No site',
-                                            'disable_inarray_validator' => true,
                                         ],
                                         'attributes' => [
-                                            'id' => 'menuManagerSite',
+                                            'id' => 'category_name',
                                             'value' => '',
                                         ],
                                     ],
                                 ],
                             ],
                             'input_filter' => [
-                                'menuManagerSite' => [
-                                    'name' => 'menuManagerSite',
-                                    'required' => true,
-                                    'validators' => [
-                                        [
-                                            'name' => 'NotEmpty',
-                                            'options' => [
-                                                'messages' => [
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_gdpr_banner_empty_field',
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                    'filters' => [
-                                        ['name' => 'StripTags'],
-                                        ['name' => 'StringTrim'],
-                                    ],
-                                ],
+
                             ],
                         ],
                     ],

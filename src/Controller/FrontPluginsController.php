@@ -38,6 +38,9 @@ class FrontPluginsController extends AbstractActionController
         $newPluginList = $this->organizedPluginsBySection($pluginList_);
         // remove section that has no child under on it
         $newPluginList = array_filter($newPluginList);
+        // add categories for the mini-templates
+        $newPluginList = $this->categorizeMiniTemplates($siteModule, $newPluginList);
+
         // get the latest plugin installed
         $latesPlugin = $pluginSvc->getLatestPlugin($pluginSvc::TEMPLATING_PLUGIN_TYPE);
         // for new plugin notifications
@@ -435,4 +438,55 @@ class FrontPluginsController extends AbstractActionController
 
     }
 
+    /**
+     * Categorizez the mini templates for each site
+     * @param $site_module
+     * @param $plugin_list
+     * @return mixed
+     */
+    private function categorizeMiniTemplates($site_module, $plugin_list)
+    {
+        if (! empty($plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_module])) {
+            $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
+            $tree = $service->getTree($site_module, 'en_EN');
+
+            $mini_templates = $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_module];
+            $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_module] = [];
+            $new_plugin_list = [];
+            $new_plugin_list['title'] = $site_module;
+
+            foreach ($tree as $key => $val) {
+                $type = $val['type'];
+                if ($type == 'category') {
+                    $new_plugin_list[$val['text']] = [
+                        'text' => $val['text'],
+                        'isCategory' => true
+                    ];
+                } else {
+                    $exploded = explode('-', $val['parent']);
+                    $parent = '';
+                    if (count($exploded) > 2) {
+                        unset($exploded[0]);
+                        $parent = implode('-', $exploded);
+                    } else if (count($exploded) == 2) {
+                        unset($exploded[0]);
+                        $parent = $exploded[1];
+                    } else {
+                        $parent = $val['parent'];
+                    }
+
+                    $title = 'MiniTemplatePlugin_' . $val['text'] . '_' . strtolower($site_module);
+                    if ($val['parent'] != '#') {
+                        $new_plugin_list[$parent][$title] = $mini_templates[$title];
+                    } else {
+                        $new_plugin_list[$title] = $mini_templates[$title];
+                    }
+                }
+            }
+
+            $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_module] = $new_plugin_list;
+        }
+
+        return $plugin_list;
+    }
 }

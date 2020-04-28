@@ -738,12 +738,61 @@
 		'tr_meliscms_mini_template_manager' => 'Mini Templates & Plugins',
 		'tr_meliscms_mini_template_manager_tool' => 'Mini Template Manager',
 		'tr_meliscms_mini_template_manager_tool_header' => 'Mini-Template Manager',
-		'tr_meliscms_mini_template_manager_tool_header_sub_title' => 'Find the list of plugins available on sites and manage them.',
+		'tr_meliscms_mini_template_manager_tool_header_sub_title' => 'Manage here the list of mini templates plugins available on your sites.',
 		'tr_meliscms_mini_template_manager_tool_header_add_btn' => 'Add mini-template',
+		'tr_meliscms_mini_template_manager_tool_add_mini_template_tab' => 'Add mini-template',
+
+		'tr_meliscms_mini_template_manager_tool_table_image' => 'Image',
+		'tr_meliscms_mini_template_manager_tool_table_path' => 'Path',
+
+		'tr_meliscms_mini_template_manager_tool_form_site' => 'Site',
+		'tr_meliscms_mini_template_manager_tool_form_site_tooltip' => 'The site where the mini-template will be created',
+		'tr_meliscms_mini_template_manager_tool_form_name' => 'Name',
+		'tr_meliscms_mini_template_manager_tool_form_name_tooltip' => 'The name for the mini-template',
+		'tr_meliscms_mini_template_manager_tool_form_html' => 'Template\'s HTML',
+		'tr_meliscms_mini_template_manager_tool_form_html_tooltip' => 'The HTML of the content for the mini-template',
+		'tr_meliscms_mini_template_manager_tool_form_thumbnail' => 'Thumbnail',
+		'tr_meliscms_mini_template_manager_tool_form_thumbnail_tool_tip' => 'The thumbnail for the mini-template displayed in the plugin menu',
+		'tr_meliscms_mini_template_manager_tool_form_thumbnail_btn_text' => 'Select Image',
+		'tr_meliscms_mini_template_manager_tool_form_remove_thumbnail' => 'Remove thumbnail',
+		'tr_meliscms_mini_template_manager_tool_form_create' => 'Create',
+		'tr_meliscms_mini_template_manager_tool_form_update' => 'Edit',
+
+		'tr_meliscms_mini_template_manager_tool_delete_modal_title' => 'Delete mini-template',
+		'tr_meliscms_mini_template_manager_tool_delete_modal_text' => 'Are you sure you want to delete this mini-template? <br> This will remove the files, the link to the category and can’t be undone.',
+		'tr_meliscms_mini_template_manager_tool_delete_modal_confirm' => 'Confirm',
+		'tr_meliscms_mini_template_manager_tool_delete_modal_cancel' => 'Cancel',
+
+		'tr_meliscms_mini_template_manager_tool_form_create_error_no_site_path_found' => 'No path was found for ',
+		'tr_meliscms_mini_template_manager_tool_form_create_error_file_already_exists' => 'File can\'t be created because it already exists',
+		'tr_meliscms_mini_template_manager_tool_form_create_error_path_not_writable' => ' is not writable',
+
+		'tr_meliscms_mini_template_manager_tool_form_empty_field' => 'This field cannot be empty',
+		'tr_meliscms_mini_template_manager_tool_form_select_site' => 'Please select a site',
 
 		// Mini template menu manager tool
 		'tr_meliscms_mini_template_menu_manager_tool' => 'Menu Manager',
 		'tr_meliscms_mini_template_menu_manager_tool_header' => 'Mini-template Plugins Management',
-		'tr_meliscms_mini_template__menu_manager_tool_header_sub_title' => 'Manager here you sites\' mini-template',
+		'tr_meliscms_mini_template__menu_manager_tool_header_sub_title' => 'Manage here your mini-templates',
+		'tr_meliscms_mini_template_menu_manager_tool_add_category_header' => 'Add category',
+		'tr_meliscms_mini_template_menu_manager_tool_add_category_body_properties_tab' => 'Properties',
+		'tr_meliscms_mini_template_menu_manager_tool_add_category_body_plugins_tab' => 'Plugins',
+		// Filter
+		'tr_meliscms_mini_template_menu_manager_tool_sites_filter' => 'Filter by site',
+		'tr_meliscms_mini_template_menu_manager_tool_sites_filter_tooltip' => 'Select a site to display its categories and mini-templates',
+		'tr_meliscms_mini_template_menu_manager_tool_sites_select_placeholder' => 'Select site',
+		// Js tree
+		'tr_meliscms_mini_template_menu_manager_tool_sites_filter_tooltip' => 'Select site to display categories and mini-templates',
+		'tr_meliscms_mini_template_menu_manager_tool_jstree_add_category' => 'Add category',
+		'tr_meliscms_mini_template_menu_manager_tool_jstree_add_minitemplate' => 'Add mini-template',
+		'tr_meliscms_mini_template_menu_manager_tool_jstree_edit_category' => 'Edit category',
+		'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category' => 'Delete category',
+		'tr_meliscms_mini_template_menu_manager_tool_jstree_edit_minitemplate' => 'Edit mini-template',
+		'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_minitemplate' => 'Delete mini-template',
+		'tr_meliscms_mini_template_menu_manager_tool_jstree_loading' => 'Loading',
+		'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_title' => 'Delete category',
+		'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_text' => 'Are you sure to delete this category?',
+		'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_error' => 'An error occured when deleting the category',
+		'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_error_children' => 'You can only delete an empty category',
     );
 ?>
