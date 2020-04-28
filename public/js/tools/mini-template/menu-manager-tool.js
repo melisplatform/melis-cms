@@ -45,6 +45,7 @@ $(function () {
 
     $body.on('change', siteSelect, function () {
         var siteId = $(this).val();
+        $("#mini-template-tree-no-data").css("display","none");
 
         if (isInitialized) {
             $(tree).jstree(true).settings.core.data.data = [
@@ -141,12 +142,22 @@ $(function () {
         });
 
         $(tree)
-            .on('#mini-template-category-tree changed.jstree', function (e, data) {})
-            .on('#mini-template-category-tree refresh.jstree', function (e, data) {})
+            .on('#mini-template-category-tree changed.jstree', function (e, data) {
+
+            })
+            .on('#mini-template-category-tree refresh.jstree', function (e, data) {
+                if ($("#mini-template-category-tree .jstree-container-ul").children("li").length ===  0) {
+                    $("#mini-template-tree-no-data").css("display","inline-block");
+                } else {
+                    $("#mini-template-tree-no-data").css("display","none");
+                }
+            })
             .on('#mini-template-category-tree loading.jstree', function (e, data) {})
             .on('#mini-template-category-tree loaded.jstree', function (e, data) {
-                if ($('#mini-template-category-tree').find(".jstree-unchecked").length) {
-                    $('mini-template-tree-no-data').css('display', '');
+                if ($("#mini-template-category-tree .jstree-container-ul").children("li").length ===  0) {
+                    $("#mini-template-tree-no-data").css("display","inline-block");
+                } else {
+                    $("#mini-template-tree-no-data").css("display","none");
                 }
 
                 $('.add-m-tpl-category').removeAttr('disabled');
