@@ -454,14 +454,19 @@ class FrontPluginsController extends AbstractActionController
             $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_module] = [];
             $new_plugin_list = [];
             $new_plugin_list['title'] = $site_module;
+            $in_active_categories = [];
 
             foreach ($tree as $key => $val) {
                 $type = $val['type'];
                 if ($type == 'category') {
-                    $new_plugin_list[$val['text']] = [
-                        'text' => $val['text'],
-                        'isCategory' => true
-                    ];
+                    if ($val['status']) {
+                        $new_plugin_list[$val['text']] = [
+                            'text' => $val['text'],
+                            'isCategory' => true
+                        ];
+                    } else {
+                        $in_active_categories[] = $val['text'];
+                    }
                 } else {
                     $exploded = explode('-', $val['parent']);
                     $parent = '';
@@ -477,7 +482,8 @@ class FrontPluginsController extends AbstractActionController
 
                     $title = 'MiniTemplatePlugin_' . $val['text'] . '_' . strtolower($site_module);
                     if ($val['parent'] != '#') {
-                        $new_plugin_list[$parent][$title] = $mini_templates[$title];
+                        if (!in_array($parent, $in_active_categories))
+                            $new_plugin_list[$parent][$title] = $mini_templates[$title];
                     } else {
                         $new_plugin_list[$title] = $mini_templates[$title];
                     }

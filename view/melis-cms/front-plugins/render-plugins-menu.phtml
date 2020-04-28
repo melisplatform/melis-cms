@@ -85,50 +85,56 @@
                                                                 if (! empty($pluginConfig) && is_array($pluginConfig)) {
                                                                     foreach ($pluginConfig as $plugin => $config) {
                                                                         if (!empty($config['isCategory'])) { ?>
+                                                                            <?php
+                                                                                $children = $config;
+                                                                                unset($children['text']);
+                                                                                unset($children['isCategory']);
+                                                                            ?>
+                                                                            <?php if (! empty($children)) : ?>
+                                                                                <span class="melis-cms-filter-btn-mini-tpl-category"><?= $config['text'] ?>
+                                                                                    <?php if(in_array($pluginConfig['title'],$subsectionHasNewPlugins)) {?>
+                                                                                        <div class="melis-plugins-icon-new-sub-child">
+                                                                                            <span class="melis-plugins-icon-new new-plugin-indicator">NEW!</span>
+                                                                                        </div>
+                                                                                    <?php }?>
+                                                                                    <i class="fa fa-angle-down"></i>
+                                                                                </span>
 
-                                                                            <span class="melis-cms-filter-btn-sub-category"><?= $config['text'] ?>
-                                                                                <?php if(in_array($pluginConfig['title'],$subsectionHasNewPlugins)) {?>
-                                                                                    <div class="melis-plugins-icon-new-sub-child">
-                                                                                    <span class="melis-plugins-icon-new new-plugin-indicator">NEW!</span>
-                                                                                </div>
-                                                                                <?php }?>
-                                                                                <i class="fa fa-angle-down"></i>
-                                                                            </span>
-
-                                                                            <div class="melis-cms-category-plugins-box-sub">
-                                                                                <?php foreach ($config as $key => $val) : ?>
-                                                                                    <?php if (!in_array($key, ['text', 'isCategory'])) : ?>
-                                                                                        <?php
-                                                                                        $conf = $val['melis'] ?? null;
-                                                                                        $thumbnail = $conf['thumbnail'] ?? "/MelisFront/plugins/images/default.jpg";
-                                                                                        $name = $conf['name'] ?? $pluginName;
-                                                                                        $name = str_replace('\\', null, $name);
-                                                                                        $subcategory = $conf['subcategory'];
-                                                                                        $subcategoryId = $subcategory['id'] ?? null;
-                                                                                        $isNew = $config['isNew'] ?? false;
-                                                                                        $newClass = '';
-                                                                                        if ($isNew) {
-                                                                                            $newClass = 'has-new-plugins';
-                                                                                        }
-                                                                                        ?>
-                                                                                        <?php if ($plugin != 'title') : ?>
-                                                                                            <div class="melis-cms-plugin-snippets <?= $newClass ?>"
-                                                                                                 data-module-name="<?= $moduleName; ?>"
-                                                                                                 data-plugin-name="<?= $key; ?>"
-                                                                                                 data-plugin-site-module="<?= $this->siteModule ?>"
-                                                                                                 title="<?php if (!empty($conf['description'])) {
-                                                                                                     echo $this->boTranslate(str_replace('\\', null, $conf['description']));
-                                                                                                 } ?>">
-                                                                                                <img  src="<?= $thumbnail; ?>" alt="">
-                                                                                                <div class="melis-plugins-icon-new-sub-child ">
-                                                                                                    <span class="melis-plugins-icon-new new-plugin-indicator">NEW!</span>
+                                                                                <div class="melis-cms-category-plugins-box-sub">
+                                                                                    <?php foreach ($config as $key => $val) : ?>
+                                                                                        <?php if (!in_array($key, ['text', 'isCategory'])) : ?>
+                                                                                            <?php
+                                                                                            $conf = $val['melis'] ?? null;
+                                                                                            $thumbnail = $conf['thumbnail'] ?? "/MelisFront/plugins/images/default.jpg";
+                                                                                            $name = $conf['name'] ?? $pluginName;
+                                                                                            $name = str_replace('\\', null, $name);
+                                                                                            $subcategory = $conf['subcategory'];
+                                                                                            $subcategoryId = $subcategory['id'] ?? null;
+                                                                                            $isNew = $config['isNew'] ?? false;
+                                                                                            $newClass = '';
+                                                                                            if ($isNew) {
+                                                                                                $newClass = 'has-new-plugins';
+                                                                                            }
+                                                                                            ?>
+                                                                                            <?php if ($plugin != 'title') : ?>
+                                                                                                <div class="melis-cms-plugin-snippets <?= $newClass ?>"
+                                                                                                     data-module-name="<?= $moduleName; ?>"
+                                                                                                     data-plugin-name="<?= $key; ?>"
+                                                                                                     data-plugin-site-module="<?= $this->siteModule ?>"
+                                                                                                     title="<?php if (!empty($conf['description'])) {
+                                                                                                         echo $this->boTranslate(str_replace('\\', null, $conf['description']));
+                                                                                                     } ?>">
+                                                                                                    <img  src="<?= $thumbnail; ?>" alt="">
+                                                                                                    <div class="melis-plugins-icon-new-sub-child ">
+                                                                                                        <span class="melis-plugins-icon-new new-plugin-indicator">NEW!</span>
+                                                                                                    </div>
+                                                                                                    <span class="melis-cms-plugin-title"><?= $this->boTranslate($name); ?></span>
                                                                                                 </div>
-                                                                                                <span class="melis-cms-plugin-title"><?= $this->boTranslate($name); ?></span>
-                                                                                            </div>
+                                                                                            <?php endif ?>
                                                                                         <?php endif ?>
-                                                                                    <?php endif ?>
-                                                                                <?php endforeach ?>
-                                                                            </div>
+                                                                                    <?php endforeach ?>
+                                                                                </div>
+                                                                            <?php endif ?>
                                                                             <?php
                                                                         } else {
                                                                             $conf = $config['melis'] ?? null;
