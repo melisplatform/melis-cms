@@ -180,7 +180,7 @@ $(function () {
             .jstree({
                 "contextmenu" : {
                     "items" : function (node) {
-                        let menu = {
+                        var menu = {
                             "edit_category" : {
                                 "label" : 'Edit category',
                                 "icon"  : "fa fa-edit",
