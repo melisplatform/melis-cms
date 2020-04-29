@@ -317,6 +317,12 @@ class MiniTemplateManagerController extends AbstractActionController
                     $data['miniTemplateThumbnail']['tmp_name'],
                     $current_site_path . '/' . $current_template . '.' . $extension
                 );
+            } else {
+                $thumbnail_file = $this->getMiniTemplateThumbnail($current_site_path, $current_template);
+
+                if (!empty($thumbnail_file['path'])) {
+                    unlink($thumbnail_file['path']);
+                }
             }
 
             $success = 1;
