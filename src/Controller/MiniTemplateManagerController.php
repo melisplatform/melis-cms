@@ -418,7 +418,6 @@ class MiniTemplateManagerController extends AbstractActionController
             if (! empty($minitemplate_thumbnail)) {
                 if (is_writable($minitemplate_thumbnail['path'])) {
                     unlink($minitemplate_thumbnail['path']);
-                    $success = 1;
                 } else {
                     $errors[] = 'No permission to delete image. No file/s deleted';
                 }
@@ -426,6 +425,8 @@ class MiniTemplateManagerController extends AbstractActionController
 
             $table = $this->getServiceLocator()->get('MelisCmsMiniTplCategoryTemplateTable');
             $table->deleteByField('mtplct_template_name', $data['template']);
+
+            $success = 1;
         } else {
             $errors[] = 'No permission to delete minitemplate. No file/s deleted';
         }
