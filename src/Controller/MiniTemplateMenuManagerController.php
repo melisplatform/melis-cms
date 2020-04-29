@@ -217,7 +217,8 @@ class MiniTemplateMenuManagerController extends AbstractActionController
     public function deleteCategoryAction() {
         $params = $this->params()->fromPost();
         $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
-        $wasDeleted = $service->deleteCategory($params['id']);
+        $cat_id = explode('-', $params['id'])[0];
+        $wasDeleted = $service->deleteCategory($cat_id);
 
         return new JsonModel([
             'success' => $wasDeleted['success'],
