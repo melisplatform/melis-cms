@@ -398,7 +398,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
         $site_path = $this->getModuleMiniTemplatePath($site->site_name);
         $tree = [];
 
-        if (! empty($site_path)) {
+        if (file_exists($site_path)) {
             $mini_templates = $this->getMiniTemplates($module);
             $categories = $this->getCategories($site->site_id, $locale);
             $cat_ids = $this->getCategoryIds($categories);
