@@ -216,6 +216,15 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
                 'mtplct_template_name' => $mini_template,
                 'mtplct_order' => $order
             ]);
+
+            $affected_mini_tempaltes = $table->getAffectedMiniTemplates($order)->toArray();
+            foreach ($affected_mini_tempaltes as $affected_mini_tempalte) {
+                if ($mini_template != $affected_mini_tempalte['mtplct_template_name']) {
+                    $table->save([
+                        'mtplct_order' => (int)$affected_mini_tempalte['mtplct_order'] + 1
+                    ], $affected_mini_tempalte['mtplct_id']);
+                }
+            }
         } catch (\Exception $e) {
             return [
                 'success' => false,
