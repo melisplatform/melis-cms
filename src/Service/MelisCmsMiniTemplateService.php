@@ -337,7 +337,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
 
         foreach ($texts as $key => $value) {
             $exploded_text = explode('_', $key);
-            $lang_id = $exploded_text[0];
+            $lang_id = (int) $exploded_text[0];
 
             if (!empty($value)) {
                 if (empty($cat_id)) {
