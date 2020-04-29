@@ -114,6 +114,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
         $categories = $table->getAffectedCategories($new_position)->toArray();
         $counter = 1;
 
+        $connection = $this->startDbTransaction();
         try {
             foreach ($categories as $category) {
                 if ($category['mtplc_order'] == $old_position) {
@@ -133,7 +134,10 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
                     $counter++;
                 }
             }
+
+            $connection->commit();
         } catch (\Exception $e) {
+            $connection->rollback();
             return [
                 'success' => false,
                 'errors' => $e->getMessage()
@@ -151,6 +155,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
         $mini_templates = $table->getAffectedMiniTemplates($new_position)->toArray();
         $counter = 1;
 
+        $connection = $this->startDbTransaction();
         try {
             foreach ($mini_templates as $mini_template) {
                 if ($mini_template['mtplct_order'] == $old_position) {
@@ -170,7 +175,9 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
                     $counter++;
                 }
             }
+            $connection->commit();
         } catch (\Exception $e) {
+            $connection->rollback();
             return [
                 'success' => false,
                 'errors' => $e->getMessage()
@@ -236,12 +243,16 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
         $category_table = $this->getServiceLocator()->get('MelisCmsCategoryTable');
         $translation_table = $this->getServiceLocator()->get('MelisCmsCategoryTransTable');
         $category_site_table = $this->getServiceLocator()->get('MelisCmsMiniTplSiteCategoryTable');
+        $connection = $this->startDbTransaction();
 
         try {
             $category_table->deleteById($cat_id);
             $translation_table->deleteByField('mtplc_id', $cat_id);
             $category_site_table->deleteByField('mtplsc_category_id', $cat_id);
+            $connection->commit();
         } catch (\Exception $e) {
+            $connection->rollback();
+
             return [
                 'success' => false,
                 'errors' => $e->getMessage()
@@ -265,6 +276,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
      * Save category
      */
     public function saveCategory($params, $cat_id) {
+        $connection = $this->startDbTransaction();
         $success = 0;
         $errors = [];
 
@@ -274,7 +286,9 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
             unset($params['cat_id']);
             $this->saveCategoryTrans($params, $cat_id);
             $success = 1;
+            $connection->commit();
         } catch (\Exception $e) {
+            $connection->rollback();
             $errors[] = $e->getMessage();
         }
 
@@ -629,6 +643,17 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
     private function getCurrentUser() {
         $auth = $this->getServiceLocator()->get('MelisCoreAuth');
         return $auth->getStorage()->read();
+    }
+
+    /**
+     * start db transaction
+     * @return mixed
+     */
+    private function startDbTransaction() {
+        $db = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
+        $connection = $db->getDriver()->getConnection();
+        $connection->beginTransaction();
+        return $connection;
     }
 
     /**
