@@ -258,6 +258,7 @@ class MiniTemplateManagerController extends AbstractActionController
         $new_site_path = $service->getModuleMiniTemplatePath($new_site->site_name);
         $errors = [];
         $success = 0;
+        $table = $this->getServiceLocator()->get('MelisCmsMiniTplCategoryTemplateTable');
 
         $errors = $this->checkUpdateErrors(
             $form,
@@ -285,6 +286,9 @@ class MiniTemplateManagerController extends AbstractActionController
                 );
 
                 $current_site_path = $new_site_path;
+
+                // remove entry to category template table
+                $table->deleteEntryByField('mtplct_template_name', $current_template);
             }
 
             // If template name is changed
@@ -297,6 +301,15 @@ class MiniTemplateManagerController extends AbstractActionController
 
                 // If there is a thumbnail, rename it
                 $thumbnail_file = $this->getMiniTemplateThumbnail($current_site_path, $current_template);
+
+                // update entry to category template table
+                $table->update([
+                    'mtplct_template_name' => $data['miniTemplateName']
+                ],
+                    'mtplct_template_name',
+                    $current_template
+                );
+
                 $current_template = $data['miniTemplateName'];
 
                 if (!empty($thumbnail_file)) {
