@@ -9,29 +9,87 @@
             $form = clone $this->form;
             $form->prepare();
             echo $this->form()->openTag($form);
-            echo $this->melisFieldCollection($form);
         ?>
-            <!-- Thumbnail preview -->
-            <div>
-                <span class="thumbnail">
-                  <img
-                      id="new-minitemplate-thumbnail"
-                      width="300"
-                      height="300"
-                      src="/MelisCore/images/profile/default_picture.jpg"
-                      alt="<?= $this->translate('tr_meliscore_tool_user_usr_profile_image'); ?>"
-                  >
-                </span>
+            <div class="row">
+                <div class="col-md-4">
+                    <!-- Site -->
+                    <div class="form-group">
+                        <?php
+                        $typeField = $form->get('miniTemplateSite');
+                        $inputLabel = $typeField->getLabelAttributes();
+                        $typeField->setLabelAttributes(array('class', null));
+                        $label = $typeField->getLabel().'<i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
+                        $typeField->setLabel($label);
+                        $typeField->setAttributes(['class' => 'form-control']);
+                        echo $this->formLabel($typeField);
+                        $typeField->setLabelAttributes($inputLabel);
+                        echo $this->formElement($typeField);
+                        ?>
+                    </div>
+                    <!-- Name -->
+                    <div class="form-group">
+                        <?php
+                        $typeField = $form->get('miniTemplateName');
+                        $inputLabel = $typeField->getLabelAttributes();
+                        $typeField->setLabelAttributes(array('class', null));
+                        $label = $typeField->getLabel().'<i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
+                        $typeField->setLabel($label);
+                        echo $this->formLabel($typeField);
+                        $typeField->setLabelAttributes($inputLabel);
+                        echo $this->formElement($typeField);
+                        ?>
+                    </div>
+                    <!-- Thumbnail -->
+                    <div class="form-group">
+                        <?php
+                        $typeField = $form->get('miniTemplateThumbnail');
+                        $inputLabel = $typeField->getLabelAttributes();
+                        $typeField->setLabelAttributes(array('class', null));
+                        $label = $typeField->getLabel().'<i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
+                        $typeField->setLabel($label);
+                        echo $this->formLabel($typeField);
+                        $typeField->setLabelAttributes($inputLabel);
+                        echo $this->formElement($typeField);
+                        ?>
+                    </div>
+                    <!-- Thumbnail preview -->
+                    <div>
+                        <span class="thumbnail">
+                            <img
+                                id="new-minitemplate-thumbnail"
+                                width="300"
+                                src="/MelisFront/plugins/images/default.jpg"
+                                alt="<?= $this->translate('tr_meliscore_tool_user_usr_profile_image'); ?>"
+                                style="margin-right: auto; margin-left: auto; display:block;"
+                            >
+                        </span>
+                    </div>
+                    <div>
+                        <a href="#" class="small"  id="remove-mini-template-thumbnail-preview">
+                            <i class="fa fa-times"></i>
+                            <?= $this->translate('tr_meliscms_mini_template_manager_tool_form_remove_thumbnail') ?>
+                        </a>
+                    </div>
+                    <br>
+                    <br>
+                    <!-- Thumbnail preview End -->
+                </div>
+                <div class="col-md">
+                    <!-- HTML -->
+                    <div class="form-group">
+                        <?php
+                        $typeField = $form->get('miniTemplateHtml');
+                        $inputLabel = $typeField->getLabelAttributes();
+                        $typeField->setLabelAttributes(array('class', null));
+                        $label = $typeField->getLabel().'<i class="fa fa-info-circle fa-lg pull-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
+                        $typeField->setLabel($label);
+                        echo $this->formLabel($typeField);
+                        $typeField->setLabelAttributes($inputLabel);
+                        echo $this->formElement($typeField);
+                        ?>
+                    </div>
+                </div>
             </div>
-            <div>
-                <a href="#" class="small"  id="remove-mini-template-thumbnail-preview">
-                    <i class="fa fa-times"></i>
-                    <?= $this->translate('tr_meliscms_mini_template_manager_tool_form_remove_thumbnail') ?>
-                </a>
-            </div>
-            <br>
-            <br>
-            <!-- Thumbnail preview End -->
 
             <?php if ($this->formType === 'create') : ?>
                 <button type="submit" id="melis-cms-minitemplate-add-btn" class="btn btn-primary">
@@ -55,8 +113,7 @@
     );
     $(function() {
         let tinyMceOption = {
-            height: 300,
-            templates: '/melis/MelisCore/MelisTinyMce/getTinyTemplates?siteId='
+            height: '500px'
         };
         melisTinyMCE.createTinyMCE("tool", ".editme", tinyMceOption);
     });

@@ -86,6 +86,9 @@ return [
                                         'options' => [
                                             'label' => 'tr_meliscms_mini_template_manager_tool_form_site',
                                             'tooltip' => 'tr_meliscms_mini_template_manager_tool_form_site_tooltip',
+                                            'label_options' => [
+                                                'disable_html_escape' => true,
+                                            ],
                                             'empty_option' => 'No site',
                                             'disable_inarray_validator' => true,
                                         ],
@@ -102,6 +105,9 @@ return [
                                         'options' => [
                                             'label' => 'tr_meliscms_mini_template_manager_tool_form_name',
                                             'tooltip' => 'tr_meliscms_mini_template_manager_tool_form_name_tooltip',
+                                            'label_options' => [
+                                                'disable_html_escape' => true,
+                                            ],
                                         ],
                                         'attributes' => [
                                             'id' => 'miniTemplateName',
@@ -116,6 +122,9 @@ return [
                                         'options' => [
                                             'label' => 'tr_meliscms_mini_template_manager_tool_form_html',
                                             'tooltip' => 'tr_meliscms_mini_template_manager_tool_form_html_tooltip',
+                                            'label_options' => [
+                                                'disable_html_escape' => true,
+                                            ],
                                         ],
                                         'attributes' => [
                                             'id' => 'miniTemplateHTML',
@@ -133,6 +142,9 @@ return [
                                         'options' => [
                                             'label' => 'tr_meliscms_mini_template_manager_tool_form_thumbnail',
                                             'tooltip' => 'tr_meliscms_mini_template_manager_tool_form_thumbnail_tool_tip',
+                                            'label_options' => [
+                                                'disable_html_escape' => true,
+                                            ],
                                         ],
                                         'attributes' => [
                                             'id' => 'miniTemplateThumbnail',
