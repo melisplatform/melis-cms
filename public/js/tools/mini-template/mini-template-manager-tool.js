@@ -162,7 +162,7 @@ $(function () {
             }
             reader.readAsDataURL(input.files[0]);
         } else {
-            $(thumbnail_preview).attr('src', '/MelisCore/images/profile/default_picture.jpg');
+            $(thumbnail_preview).attr('src', '/MelisFront/plugins/images/default.jpg');
         }
     });
 
@@ -170,7 +170,7 @@ $(function () {
     $body.on('click', remove_thumbnail_preview, function (e) {
         e.preventDefault();
         $(thumbnail_input).val('');
-        $(thumbnail_preview).attr('src', '/MelisCore/images/profile/default_picture.jpg');
+        $(thumbnail_preview).attr('src', '/MelisFront/plugins/images/default.jpg');
     });
 
     // Refresh table

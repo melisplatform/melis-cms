@@ -65,10 +65,12 @@
                         </span>
                     </div>
                     <div>
-                        <a href="#" class="small"  id="remove-mini-template-thumbnail-preview">
-                            <i class="fa fa-times"></i>
-                            <?= $this->translate('tr_meliscms_mini_template_manager_tool_form_remove_thumbnail') ?>
-                        </a>
+                        <?php if ($this->formType !== 'create') : ?>
+                            <a href="#" class="small"  id="remove-mini-template-thumbnail-preview">
+                                <i class="fa fa-times"></i>
+                                <?= $this->translate('tr_meliscms_mini_template_manager_tool_form_remove_thumbnail') ?>
+                            </a>
+                        <?php endif ?>
                     </div>
                     <br>
                     <br>
