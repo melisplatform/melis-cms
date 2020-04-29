@@ -126,6 +126,7 @@ class MiniTemplateManagerController extends AbstractActionController
         $length = $post['length'];
         $total = $filtered = 0;
         $mini_templates_filtered = [];
+        $search = $post['search']['value'] ?? '';
 
         if (! empty($post['site_name'])) {
             $path = $service->getModuleMiniTemplatePath($post['site_name']);
@@ -143,11 +144,21 @@ class MiniTemplateManagerController extends AbstractActionController
                     else
                         $thumbnail =  '<img class="mini-template-tool-table-image" src="/MelisFront/plugins/images/default.jpg" width=100 height=100>';
 
-                    $mini_templates[] = [
-                        'image' => $thumbnail,
-                        'html_path' => '<p data-module="' . $post['site_name'] . '">' . explode('..', $path)[1] . '/' . $mini_template . '</p>',
-                        'DT_RowId' => $templateName
-                    ];
+                    if (! empty($search)) {
+                        if (stripos($mini_template, $search) !== false) {
+                            $mini_templates[] = [
+                                'image' => $thumbnail,
+                                'html_path' => '<p data-module="' . $post['site_name'] . '">' . explode('..', $path)[1] . '/' . $mini_template . '</p>',
+                                'DT_RowId' => $templateName
+                            ];
+                        }
+                    } else {
+                        $mini_templates[] = [
+                            'image' => $thumbnail,
+                            'html_path' => '<p data-module="' . $post['site_name'] . '">' . explode('..', $path)[1] . '/' . $mini_template . '</p>',
+                            'DT_RowId' => $templateName
+                        ];
+                    }
                 }
 
                 $total = $filtered = count($mini_templates);
