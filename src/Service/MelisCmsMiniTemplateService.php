@@ -213,7 +213,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
 
         try {
             $table->save([
-                'mtplct_category_id' => $cat_id,
+                'mtplct_category_id' => (int) $cat_id,
                 'mtplct_template_name' => $mini_template,
                 'mtplct_order' => $order
             ]);
