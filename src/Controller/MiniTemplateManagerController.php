@@ -279,7 +279,10 @@ class MiniTemplateManagerController extends AbstractActionController
                 if (!file_exists($new_site_path))
                     mkdir($new_site_path, 0777);
 
-                rename($thumbnail_file['path'], $new_site_path . '/' . $thumbnail_file['file']);
+                if (!empty($thumbnail_file)) {
+                    rename($thumbnail_file['path'], $new_site_path . '/' . $thumbnail_file['file']);
+                }
+
                 rename(
                     $current_site_path . '/' . $current_template . '.phtml',
                     $new_site_path . '/' . $current_template . '.phtml'
