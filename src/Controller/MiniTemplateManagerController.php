@@ -291,7 +291,7 @@ class MiniTemplateManagerController extends AbstractActionController
                 $current_site_path = $new_site_path;
 
                 // remove entry to category template table
-                $table->deleteEntryByField('mtplct_template_name', $current_template);
+                $table->deleteByField('mtplct_template_name', $current_template);
             }
 
             // If template name is changed
@@ -306,9 +306,10 @@ class MiniTemplateManagerController extends AbstractActionController
                 $thumbnail_file = $this->getMiniTemplateThumbnail($current_site_path, $current_template);
 
                 // update entry to category template table
-                $table->update([
-                    'mtplct_template_name' => $data['miniTemplateName']
-                ],
+                $table->update(
+                    [
+                        'mtplct_template_name' => $data['miniTemplateName']
+                    ],
                     'mtplct_template_name',
                     $current_template
                 );
