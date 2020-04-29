@@ -247,6 +247,7 @@ class MiniTemplateManagerController extends AbstractActionController
         $data = array_merge((array) $this->getRequest()->getPost(), $this->params()->fromFiles());
         $current_module = $data['current_module'];
         $current_template = $data['current_template'];
+        $image = $data['image'];
         unset($data['current_module'], $data['current_template'], $data['image']);
         $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
         $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
@@ -346,10 +347,13 @@ class MiniTemplateManagerController extends AbstractActionController
                     $current_site_path . '/' . $current_template . '.' . $extension
                 );
             } else {
-                $thumbnail_file = $this->getMiniTemplateThumbnail($current_site_path, $current_template);
+                if ($image == '/MelisFront/plugins/images/default.jpg') {
+                    $thumbnail_file = $this->getMiniTemplateThumbnail($current_site_path, $current_template);
 
-                if (!empty($thumbnail_file['path'])) {
-                    unlink($thumbnail_file['path']);
+                    if (!empty($thumbnail_file['path'])) {
+                        if (file_exists($thumbnail_file['path']))
+                            unlink($thumbnail_file['path']);
+                    }
                 }
             }
 
