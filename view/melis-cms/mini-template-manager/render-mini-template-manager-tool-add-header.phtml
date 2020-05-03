@@ -9,13 +9,17 @@
             <p>creates a mini-template</p>
         </div>
         <div class="me-hr col-xs-12 col-sm-4 col-md-3">
-            <?php
-                if (! empty($this->zoneconfig['interface'])) {
-                    foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
-                        echo $this->$keyConfig;
-                    }
-                }
-            ?>
+            <?php if ($this->formType == 'create') : ?>
+                <button class="btn btn-success" id="melis-cms-minitemplate-add-btn">
+                    <i class="fa fa-plus"></i>
+                    Create
+                </button>
+            <?php else: ?>
+                <button class="btn btn-success" id="melis-cms-minitemplate-edit-btn">
+                    <i class="fa fa-save"></i>
+                    Save
+                </button>
+            <?php endif; ?>
         </div>
     </div>
 </div>

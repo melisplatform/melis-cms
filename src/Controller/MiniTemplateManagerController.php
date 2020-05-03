@@ -19,7 +19,10 @@ class MiniTemplateManagerController extends AbstractActionController
     public $tool_key = 'meliscms_mini_template_manager_tool';
     public $form_key = 'mini_template_manager_tool_add_form';
     public $file_types = ['png', 'PNG', 'jpg', 'JPG', 'jpeg', 'JPEG'];
-    public $mini_template_dir = 'miniTemplatesTinyMce';
+
+    // TODO:
+    //  Update Add-mini-template page header deatils to "Enter here the details of your mini-template"
+    //  Add in add-mini-template page select site error when changing site and it is linked to a category
 
     public function renderMiniTemplateManagerToolAction() {}
     public function renderMiniTemplateManagerToolHeaderAction() {}
@@ -30,7 +33,6 @@ class MiniTemplateManagerController extends AbstractActionController
     public function renderMiniTemplateManagerToolTableRefreshAction() {}
     public function renderMiniTemplateManagerToolTableActionEditAction() {}
     public function renderMiniTemplateManagerToolTableActionDeleteAction() {}
-    public function renderMiniTemplateManagerToolAddHeaderAction() {}
     public function renderMiniTemplateManagerToolAddBodyAction() {}
 
     /**
@@ -53,6 +55,13 @@ class MiniTemplateManagerController extends AbstractActionController
         return $view;
     }
 
+    public function renderMiniTemplateManagerToolAddHeaderAction() {
+        $params = $this->params()->fromQuery();
+        $view = new ViewModel();
+        $view->formType = ($params['templateName'] == 'new_template') ? 'create' : 'update';
+        return $view;
+    }
+
     /**
      * Mini template manager tool- add new mini-template form container
      * @return ViewModel
@@ -61,10 +70,36 @@ class MiniTemplateManagerController extends AbstractActionController
         $form = $this->getForm($this->module, $this->tool_key, $this->form_key);
         $params = $this->params()->fromQuery();
         $data = [];
-        $type = 'create';
 
-        if ($params['templateName'] != 'new_template') {
+        $max_post = ini_get('post_max_size');
+        $max_upload = ini_get('upload_max_filesize');
+        $max_size = 0;
+
+        // get the smaller value
+        if ($max_post != $max_upload) {
+            if ($max_post > $max_upload) {
+                if ($max_upload != 0) {
+                    $max_size = $max_upload;
+                } else {
+                    $max_size = $max_post;
+                }
+            }
+        } else {
+            $max_size = $max_post;
+        }
+
+        if ($params['templateName'] !== 'new_template') {
             $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
+            $table = $this->getServiceLocator()->get('MelisCmsMiniTplCategoryTemplateTable');
+            $category = $table->getEntryByField('mtplct_template_name', $params['templateName'])->current();
+
+            if (! empty($category)) {
+                $category_name = $service->getCategoryTexts($category->mtplct_category_id);
+                if (! empty($category_name)) {
+                    $category_name = $category_name[0]['mtplct_name'];
+                }
+            }
+
             $path = $service->getModuleMiniTemplatePath($params['module']);
             $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
             $site = $siteTable->getEntryByField('site_name', $params['module'])->current();
@@ -76,16 +111,17 @@ class MiniTemplateManagerController extends AbstractActionController
             $form->setAttribute('id', 'id_mini_template_manager_tool_update');
             $form->setAttribute('name', 'mini_template_manager_tool_update');
             $form->setData($data);
-            $type = 'update';
         } else {
             $form->setData(['miniTemplateSite' => $params['siteId']]);
         }
 
         $view = new ViewModel();
         $view->form = $form;
-        $view->formType = $type;
+        $view->formType = ($params['templateName'] == 'new_template') ? 'create' : 'update';
         $view->current_module = $params['module'] ?? '';
         $view->current_template = $params['templateName'] ?? '';
+        $view->max_size = $this->asBytes($max_size);
+        $view->categoryName = $category_name ?? 'none';
         return $view;
     }
 
@@ -245,119 +281,35 @@ class MiniTemplateManagerController extends AbstractActionController
      */
     public function updateMiniTemplateAction() {
         $data = array_merge((array) $this->getRequest()->getPost(), $this->params()->fromFiles());
-        $current_module = $data['current_module'];
-        $current_template = $data['current_template'];
-        $image = $data['image'];
-        unset($data['current_module'], $data['current_template'], $data['image']);
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $current_data = [
+            'miniTemplateSite' => $data['current_module'],
+            'miniTemplateName' => $data['current_template']
+        ];
+        $new_data = [
+            'miniTemplateSite' => $data['miniTemplateSite'],
+            'miniTemplateName' => $data['miniTemplateName'],
+            'miniTemplateHtml' => $data['miniTemplateHtml'],
+            'miniTemplateThumbnail' => $data['miniTemplateThumbnail'],
+        ];
         $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
-        $current_site = $siteTable->getEntryByField('site_name', $current_module)->current();
-        $current_site_path = $service->getModuleMiniTemplatePath($current_site->site_name);
-        $form = $this->getForm($this->module, $this->tool_key, $this->form_key);
-        $form->setData($data);
-        $new_site = $siteTable->getEntryById($data['miniTemplateSite'])->current();
-        $new_site_path = $service->getModuleMiniTemplatePath($new_site->site_name);
-        $errors = [];
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $current_site_data = $siteTable->getEntryByField('site_name', $current_data['miniTemplateSite'])->current();
+        $current_data['miniTemplateSite'] = $current_site_data->site_id;
         $success = 0;
-        $table = $this->getServiceLocator()->get('MelisCmsMiniTplCategoryTemplateTable');
+
+        $form = $this->getForm($this->module, $this->tool_key, $this->form_key);
+        $form->setData($new_data);
 
         $errors = $this->checkUpdateErrors(
             $form,
-            $current_site,
-            $current_site_path,
-            $new_site_path,
-            $current_template,
-            $data
+            $current_data,
+            $new_data
         );
 
         if (empty($errors)) {
-            // If site is changed
-            if ($current_site->site_id !== $data['miniTemplateSite']) {
-                $isNewSite = true;
-                // Move files from to the new site
-                $thumbnail_file = $this->getMiniTemplateThumbnail($current_site_path, $current_template);
-
-                if (!file_exists($new_site_path))
-                    mkdir($new_site_path, 0777);
-
-                if (!empty($thumbnail_file)) {
-                    rename($thumbnail_file['path'], $new_site_path . '/' . $thumbnail_file['file']);
-                }
-
-                rename(
-                    $current_site_path . '/' . $current_template . '.phtml',
-                    $new_site_path . '/' . $current_template . '.phtml'
-                );
-
-                $current_site_path = $new_site_path;
-
-                // remove entry to category template table
-                $table->deleteByField('mtplct_template_name', $current_template);
-            }
-
-            // If template name is changed
-            if ($current_template !== $data['miniTemplateName']) {
-                // Update the current template
-                rename(
-                    $current_site_path . '/' . $current_template . '.phtml',
-                    $current_site_path . '/' . $data['miniTemplateName'] . '.phtml'
-                );
-
-                // If there is a thumbnail, rename it
-                $thumbnail_file = $this->getMiniTemplateThumbnail($current_site_path, $current_template);
-
-                // update entry to category template table
-                $table->update(
-                    [
-                        'mtplct_template_name' => $data['miniTemplateName']
-                    ],
-                    'mtplct_template_name',
-                    $current_template
-                );
-
-                $current_template = $data['miniTemplateName'];
-
-                if (!empty($thumbnail_file)) {
-                    $extension = explode('.', $thumbnail_file['file'])[1];
-                    rename(
-                        $thumbnail_file['path'],
-                        $current_site_path . '/' . $data['miniTemplateName'] . '.' . $extension
-                    );
-                }
-            }
-
-            // check if html content is changed
-            $file_contents = file_get_contents($current_site_path . '/' . $current_template . '.phtml');
-            if ($file_contents !== $data['miniTemplateHtml']) {
-                $file = fopen($current_site_path . '/' . $current_template . '.phtml', 'w');
-                fwrite($file, $data['miniTemplateHtml']);
-                fclose($file);
-            }
-
-            // check if image is changed
-            if (!empty($data['miniTemplateThumbnail']['name'])) {
-                $thumbnail_file = $this->getMiniTemplateThumbnail($current_site_path, $current_template);
-                if (!empty($thumbnail_file))
-                    unlink($thumbnail_file['path']);
-
-                $extension = explode('.', $data['miniTemplateThumbnail']['name'])[1];
-
-                copy(
-                    $data['miniTemplateThumbnail']['tmp_name'],
-                    $current_site_path . '/' . $current_template . '.' . $extension
-                );
-            } else {
-                if ($image == '/MelisFront/plugins/images/default.jpg') {
-                    $thumbnail_file = $this->getMiniTemplateThumbnail($current_site_path, $current_template);
-
-                    if (!empty($thumbnail_file['path'])) {
-                        if (file_exists($thumbnail_file['path']))
-                            unlink($thumbnail_file['path']);
-                    }
-                }
-            }
-
-            $success = 1;
+            $res = $service->updateMiniTemplate($current_data, $new_data, $data['image']);
+            $success = $res['success'];
+            $errors = $res['errors'];
         }
 
         return new JsonModel([
@@ -375,20 +327,26 @@ class MiniTemplateManagerController extends AbstractActionController
      * @param $data
      * @return array|mixed
      */
-    private function checkUpdateErrors($form, $current_site, $current_site_path, $new_site_path, $current_template, $data) {
+    private function checkUpdateErrors($form, $current_data, $new_data) {
+        $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $current_site = $siteTable->getEntryById($current_data['miniTemplateSite'])->current();
+        $current_site_path = $service->getModuleMiniTemplatePath($current_site->site_name);
+        $new_site = $siteTable->getEntryById($new_data['miniTemplateSite'])->current();
+        $new_site_path = $service->getModuleMiniTemplatePath($new_site->site_name);
         $errors = [];
 
         if ($form->isValid()) {
-            if ($current_site->site_id !== $data['miniTemplateSite']) {
-                if (file_exists($new_site_path . '/' . $data['miniTemplateName'] . '.phtml')) {
+            if ($current_site->site_id !== $new_data['miniTemplateSite']) {
+                if (file_exists($new_site_path . '/' . $new_data['miniTemplateName'] . '.phtml')) {
                     $errors['miniTemplateName'] = [
                         'error' => 'File can\'t be created because it already exists',
                         'label' => $form->get('miniTemplateName')->getLabel()
                     ];
                 }
             } else {
-                if ($current_template !== $data['miniTemplateName']) {
-                    if (file_exists($current_site_path . '/' . $data['miniTemplateName'] . '.phtml')) {
+                if ($current_data['miniTemplateName'] !== $new_data['miniTemplateName']) {
+                    if (file_exists($current_site_path . '/' . $new_data['miniTemplateName'] . '.phtml')) {
                         $errors['miniTemplateName'] = [
                             'error' => 'File can\'t be created because it already exists',
                             'label' => $form->get('miniTemplateName')->getLabel()
@@ -439,6 +397,13 @@ class MiniTemplateManagerController extends AbstractActionController
             'success' => $success,
             'errors' => $errors
         ]);
+    }
+
+    // get bytes
+    private function asBytes($size) {
+        $size = trim($size);
+        $s = [ 'g'=> 1<<30, 'm' => 1<<20, 'k' => 1<<10 ];
+        return intval($size) * ($s[strtolower(substr($size,-1))] ?: 1);
     }
 
 

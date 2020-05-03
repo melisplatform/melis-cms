@@ -4,6 +4,8 @@
     data-currentmodule="<?= $this->current_module ?>"
     data-currenttemplate="<?= $this->current_template ?>"
 >
+    <input type="hidden" id="mini-template-manager-max-size" value="<?= $this->max_size ?>">
+    <input type="hidden" id="mini-template-manager-category-name" value="<?= $this->categoryName ?>" data-module="<?= $this->current_module ?>">
     <?php if (! empty($form)) : ?>
         <?php
             $form = clone $this->form;
@@ -92,16 +94,6 @@
                     </div>
                 </div>
             </div>
-
-            <?php if ($this->formType === 'create') : ?>
-                <button type="submit" id="melis-cms-minitemplate-add-btn" class="btn btn-primary">
-                    <?= $this->translate('tr_meliscms_mini_template_manager_tool_form_create') ?>
-                </button>
-            <?php else : ?>
-                <button type="submit" id="melis-cms-minitemplate-edit-btn" class="btn btn-primary">
-                    <?= $this->translate('tr_meliscms_mini_template_manager_tool_form_update') ?>
-                </button>
-            <?php endif; ?>
         <?= $this->form()->closeTag() ?>
     <?php endif ?>
 </div>

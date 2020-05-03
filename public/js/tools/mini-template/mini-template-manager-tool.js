@@ -14,6 +14,32 @@ $(function () {
     var tree = '#mini-template-category-tree';
     var table_refresh_btn = '.melis-mini-template-manager-table-refresh';
 
+    $body.on('keypress', '#miniTemplateName', function (e) {
+        if (e.which === 32) {
+            // get old value
+            var start = e.target.selectionStart;
+            var end = e.target.selectionEnd;
+            var old_value = e.target.value;
+
+            // replace point and change input value
+            var new_value = old_value.slice(0, start) + '-' + old_value.slice(end)
+            e.target.value = new_value;
+
+            // replace cursor
+            e.target.selectionStart = e.target.selectionEnd = start + 1;
+            e.preventDefault();
+        }
+
+        // when enter is pressed
+        if (e.keyCode === 13) {
+            e.preventDefault();
+        }
+    });
+
+    $body.on('paste', '#miniTemplateName', function (e) {
+        e.preventDefault();
+    });
+
     // Open add mini-template tab
     $body.on('click', header_add_btn, function () {
         miniTemplateManagerTool.openTab(
@@ -46,6 +72,10 @@ $(function () {
         );
     });
 
+    $body.on('click', add_btn, function () {
+       $(add_form).trigger('submit');
+    });
+
     // Creating mini-template
     $body.on('submit', add_form, function (e) {
         melisCoreTool.pending(add_btn);
@@ -76,6 +106,10 @@ $(function () {
         });
 
        e.preventDefault();
+    });
+
+    $body.on('click', '#melis-cms-minitemplate-edit-btn', function () {
+        $('#id_mini_template_manager_tool_update').trigger('submit');
     });
 
     // Update mini-template
@@ -151,20 +185,46 @@ $(function () {
     });
 
     // Thumbnail preview
-    $body.on('change', thumbnail_input, function() {
+    $body.on('change', thumbnail_input, function(e) {
         var input = this;
-        if ( input.files && input.files[0] ) {
-            var reader = new FileReader();
-            var $newImg = $(thumbnail_preview);
+        var max_size = $body.find('#mini-template-manager-max-size').val();
 
-            reader.onload = function (e) {
-                $newImg.attr('src', e.target.result);
+        if ( input.files && input.files[0] ) {
+            if (parseInt(input.files[0].size) > parseInt(max_size)) {
+                e.preventDefault();
+                $(this).val('');
+                $(thumbnail_preview).attr('src', '/MelisFront/plugins/images/default.jpg');
+
+                melisHelper.melisKoNotification(
+                    translations.tr_melis_cms_page_tree_import,
+                    translations.tr_melis_cms_page_tree_error_file_size_exceeded + formatBytes(max_size, 2),
+                    []
+                );
+            } else {
+                var reader = new FileReader();
+                var $newImg = $(thumbnail_preview);
+
+                reader.onload = function (e) {
+                    $newImg.attr('src', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
             }
-            reader.readAsDataURL(input.files[0]);
         } else {
             $(thumbnail_preview).attr('src', '/MelisFront/plugins/images/default.jpg');
         }
     });
+
+    function formatBytes(bytes, decimals) {
+        if (bytes === 0) return '0 Bytes';
+
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
 
     // Remove thumbnail
     $body.on('click', remove_thumbnail_preview, function (e) {
