@@ -24,6 +24,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController
     public function renderMenuManagerToolHeaderAction() {}
     public function renderMenuManagerToolBodyAction() {}
     public function renderMenuManagerToolAddCategoryBodyPropertiesContentAction() {}
+    public function renderMiniTemplateMenuManagerToolTableRefreshAction() {}
 
     public function renderMenuManagerToolAddCategoryBodyPluginsContentAction() {
         $params = $this->params()->fromQuery();

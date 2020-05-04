@@ -797,5 +797,7 @@
         'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_text' => 'Etes-vous sûr(e) de vouloir supprimer cette catégorie ?',
         'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_error' => 'Une erreur est survenue lors de la suppression de la catégorie',
         'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_error_children' => 'Vous ne pouvez supprimer que des catégories vides',
+
+        'tr_meliscms_mini_template_save' => 'Enregistrer',
     );
 ?>

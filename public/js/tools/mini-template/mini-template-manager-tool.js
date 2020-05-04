@@ -67,7 +67,7 @@ $(function () {
             templateName,
             {
                 module: module,
-                templateName: templateName
+                templateName: templateName,
             }
         );
     });
@@ -80,6 +80,7 @@ $(function () {
     $body.on('submit', add_form, function (e) {
         melisCoreTool.pending(add_btn);
         var formData = new FormData(this);
+        formData.append('categoryId', $('#mini-template-manager-category-id').val());
 
         $.ajax({
             type: 'POST',
@@ -170,6 +171,7 @@ $(function () {
                 }).done(function (data) {
                     if (data.success) {
                         $body.find('.mini-template-manager-tool-table-refresh ' + table_refresh_btn).trigger('click');
+                        $body.find('.melis-mini-template-menu-manager-table-refresh').trigger('click');
                     } else {
                         melisHelper.melisKoNotification(
                             translations.tr_meliscms_mini_template_manager_tool_delete_modal_title,

@@ -5,19 +5,19 @@
 >
     <div class="row">
         <div class="me-hl col-xs-12 col-sm-8 col-md-9">
-            <h1 class="content-heading">Add Mini-Template</h1>
-            <p>creates a mini-template</p>
+            <h1 class="content-heading"><?= $this->translate('tr_meliscms_mini_template_manager_tool_add_mini_template_tab') ?></h1>
+            <p><?= $this->translate('tr_meliscms_mini_template_manager_tool_add_mini_template_header') ?></p>
         </div>
         <div class="me-hr col-xs-12 col-sm-4 col-md-3">
             <?php if ($this->formType == 'create') : ?>
                 <button class="btn btn-success" id="melis-cms-minitemplate-add-btn">
                     <i class="fa fa-plus"></i>
-                    Create
+                    <?= $this->translate('tr_meliscms_mini_template_save') ?>
                 </button>
             <?php else: ?>
                 <button class="btn btn-success" id="melis-cms-minitemplate-edit-btn">
                     <i class="fa fa-save"></i>
-                    Save
+                    <?= $this->translate('tr_meliscms_mini_template_save') ?>
                 </button>
             <?php endif; ?>
         </div>

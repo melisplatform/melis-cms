@@ -1,3 +1,7 @@
+#tableMiniTemplateMenuManagerPlugins img {
+    max-width: 195px;
+    width: auto;
+}
 .mini-template-menu-manager-lang {
     margin-left: 5px;
     margin-bottom: 30px;

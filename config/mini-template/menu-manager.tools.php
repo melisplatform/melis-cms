@@ -17,10 +17,10 @@ return [
                             'left' => [],
                             'center' => [],
                             'right' => [
-                                'mini-template-manager-tool-table-refresh' => [
+                                'mini-template-menu-manager-tool-table-refresh' => [
                                     'module' => 'MelisCms',
-                                    'controller' => 'MiniTemplateManager',
-                                    'action' => 'render-mini-template-manager-tool-table-refresh',
+                                    'controller' => 'MiniTemplateMenuManager',
+                                    'action' => 'render-mini-template-menu-manager-tool-table-refresh',
                                 ],
                             ]
                         ],

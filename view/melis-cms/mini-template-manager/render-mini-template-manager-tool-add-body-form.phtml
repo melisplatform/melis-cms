@@ -5,7 +5,7 @@
     data-currenttemplate="<?= $this->current_template ?>"
 >
     <input type="hidden" id="mini-template-manager-max-size" value="<?= $this->max_size ?>">
-    <input type="hidden" id="mini-template-manager-category-name" value="<?= $this->categoryName ?>" data-module="<?= $this->current_module ?>">
+    <input type="hidden" id="mini-template-manager-category-id" value="<?= $this->categoryId ?>">
     <?php if (! empty($form)) : ?>
         <?php
             $form = clone $this->form;

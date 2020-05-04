@@ -9,6 +9,15 @@ $(function () {
 
     // how to get selected node
     // $(tree).jstree().get_selected(true)[0].text
+    $body.on('click', '.melis-mini-template-menu-manager-table-refresh', function () {
+        melisHelper.zoneReload(
+            'id_meliscms_mini_template_menu_manager_tool_add_category_body_plugins_table',
+            'meliscms_mini_template_menu_manager_tool_add_category_body_plugins_table',
+            {
+                formType: 'edit'
+            }
+        );
+    })
 
     $body.on('click', '.add-m-tpl-category', function () {
         $('#id_meliscms_mini_template_menu_manager_tool_add_category_container').removeClass('hidden');
@@ -207,6 +216,23 @@ $(function () {
                 "contextmenu" : {
                     "items" : function (node) {
                         var menu = {
+                            'add_category_template' : {
+                                "label" : 'Add mini-template',
+                                "icon"  : "fa fa-plus",
+                                "action" : function (obj) {
+                                    melisHelper.tabOpen(
+                                        translations.tr_meliscms_mini_template_manager_tool_header_add_btn,
+                                        'fa fa-tasks',
+                                        'new_template_id_meliscms_mini_template_manager_tool_add',
+                                        'meliscms_mini_template_manager_tool_add',
+                                        {
+                                            templateName: 'new_template',
+                                            siteId: $(siteSelect).find('option:selected').data('id'),
+                                            categoryId: node.original.categoryId
+                                        }
+                                    );
+                                }
+                            },
                             "edit_category" : {
                                 "label" : translations.tr_meliscms_mini_template_menu_manager_tool_jstree_edit_category,
                                 "icon"  : "fa fa-edit",
@@ -293,7 +319,7 @@ $(function () {
                             },
                             'delete_plugin': {
                                 "label" : translations.tr_meliscms_mini_template_menu_manager_tool_jstree_delete_minitemplate,
-                                "icon"  : "fa fa-edit",
+                                "icon"  : "fa fa-trash-o",
                                 "action" : function (obj) {
                                     var templateName = node.original.id;
                                     var module = node.original.module;
@@ -339,6 +365,7 @@ $(function () {
                         if (node.original.type == 'mini-template') {
                             delete menu.edit_category;
                             delete menu.delete_category;
+                            delete menu.add_category_template;
                         }
 
                         return menu;

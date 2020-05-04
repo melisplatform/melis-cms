@@ -23,6 +23,7 @@ class MiniTemplateManagerController extends AbstractActionController
     // TODO:
     //  Update Add-mini-template page header deatils to "Enter here the details of your mini-template"
     //  Add in add-mini-template page select site error when changing site and it is linked to a category
+    // not writable error
 
     public function renderMiniTemplateManagerToolAction() {}
     public function renderMiniTemplateManagerToolHeaderAction() {}
@@ -90,15 +91,8 @@ class MiniTemplateManagerController extends AbstractActionController
 
         if ($params['templateName'] !== 'new_template') {
             $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
-            $table = $this->getServiceLocator()->get('MelisCmsMiniTplCategoryTemplateTable');
-            $category = $table->getEntryByField('mtplct_template_name', $params['templateName'])->current();
-
-            if (! empty($category)) {
-                $category_name = $service->getCategoryTexts($category->mtplct_category_id);
-                if (! empty($category_name)) {
-                    $category_name = $category_name[0]['mtplct_name'];
-                }
-            }
+//            $table = $this->getServiceLocator()->get('MelisCmsMiniTplCategoryTemplateTable');
+//            $category = $table->getEntryByField('mtplct_template_name', $params['templateName'])->current();
 
             $path = $service->getModuleMiniTemplatePath($params['module']);
             $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
@@ -121,7 +115,7 @@ class MiniTemplateManagerController extends AbstractActionController
         $view->current_module = $params['module'] ?? '';
         $view->current_template = $params['templateName'] ?? '';
         $view->max_size = $this->asBytes($max_size);
-        $view->categoryName = $category_name ?? 'none';
+        $view->categoryId = $params['categoryId'] ?? '';
         return $view;
     }
 
@@ -242,6 +236,8 @@ class MiniTemplateManagerController extends AbstractActionController
     public function createMiniTemplateAction() {
         $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
         $data = array_merge((array) $this->getRequest()->getPost(), $this->params()->fromFiles());
+        $cat_id = $data['categoryId'];
+        unset($data['categoryId']);
         $form = $this->getForm($this->module, $this->tool_key, $this->form_key);
         $form->setData($data);
         $success = 0;
@@ -258,7 +254,7 @@ class MiniTemplateManagerController extends AbstractActionController
                 $uploaded_img_extension = explode('/', $data['miniTemplateThumbnail']['type'])[1];
             }
 
-            $res = $service->createMiniTemplate($module, $data['miniTemplateName'], $data['miniTemplateHtml'], $uploaded_img, $uploaded_img_extension);
+            $res = $service->createMiniTemplate($module, $data['miniTemplateName'], $data['miniTemplateHtml'], $uploaded_img, $uploaded_img_extension, $cat_id);
 
             if ($res['success']) {
                 $success = 1;
@@ -371,26 +367,19 @@ class MiniTemplateManagerController extends AbstractActionController
         $path = $service->getModuleMiniTemplatePath($data['module']);
         $minitemplate = $path . '/' . $data['template'] . '.phtml';
         $minitemplate_thumbnail = $this->getMiniTemplateThumbnail($path, $data['template']);
+        $thumbnail_path = null;
         $errors = [];
         $success = 0;
 
-        if (is_writable($minitemplate)) {
-            unlink($minitemplate);
+        if (! empty($minitemplate_thumbnail)) {
+            $thumbnail_path = $minitemplate_thumbnail['path'];
+        }
 
-            if (! empty($minitemplate_thumbnail)) {
-                if (is_writable($minitemplate_thumbnail['path'])) {
-                    unlink($minitemplate_thumbnail['path']);
-                } else {
-                    $errors[] = 'No permission to delete image. No file/s deleted';
-                }
-            }
+        $ress = $service->deleteMiniTemplate($minitemplate, $thumbnail_path, $data['template']);
 
-            $table = $this->getServiceLocator()->get('MelisCmsMiniTplCategoryTemplateTable');
-            $table->deleteByField('mtplct_template_name', $data['template']);
-
-            $success = 1;
-        } else {
-            $errors[] = 'No permission to delete minitemplate. No file/s deleted';
+        if (! empty($ress)) {
+            $errors = $ress['errors'];
+            $success = $ress['success'];
         }
 
         return new JsonModel([

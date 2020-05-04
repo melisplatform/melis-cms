@@ -796,5 +796,12 @@
 		'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_text' => 'Are you sure to delete this category?',
 		'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_error' => 'An error occured when deleting the category',
 		'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_error_children' => 'You can only delete an empty category',
+
+		'tr_meliscms_mini_template_save' => 'Save',
+		'tr_meliscms_mini_template_manager_tool_add_mini_template_header' => 'Enter here the details of your mini-template',
+		'tr_meliscms_mini_template_error_minitemplate_directory_does_not_exist' => 'miniTemplatesTinyMce directory does not exists',
+		'tr_meliscms_mini_template_error_minitemplate_directory_not_writable' => 'miniTemplatesTinyMce directory is not writable',
+		'tr_meliscms_mini_template_error' => 'Error',
+
     );
 ?>
