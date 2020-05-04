@@ -332,7 +332,7 @@ class ToolTemplateController extends AbstractActionController
          * @var MelisGeneralService $srv
          */
         $srv = $this->getServiceManager()->get('MelisGeneralService');
-        $result = $srv->sendEvent(self::TEMPLATE_FORM_CONFIG_MODIFY, ['formConfig' => $formConfig], $this)['formConfig'];
+        $formConfig = $srv->sendEvent(self::TEMPLATE_FORM_CONFIG_MODIFY, ['formConfig' => $formConfig], $this)['formConfig'];
 
         return $factory->createForm($formConfig);
     }
