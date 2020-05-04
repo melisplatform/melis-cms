@@ -62,7 +62,7 @@ return [
     'controllers' => [
         'invokables' => [
             'SiteSample\Controller\Home'    => SiteSample\Controller\HomeController::class,
-            'SiteSample\Controller\Page404' => SiteSample\Controller\HomeController::class
+            'SiteSample\Controller\Page404' => SiteSample\Controller\Page404Controller::class
         ],
     ],
     'view_manager' => [
