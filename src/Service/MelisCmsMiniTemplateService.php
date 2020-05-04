@@ -34,14 +34,6 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
         $translator = $this->getServiceLocator()->get('translator');
         $path = $this->getModuleMiniTemplatePath($arrayParameters['site_module']);
 
-        if (!file_exists($path)) {
-            if (is_writable($path)) {
-                mkdir($path, 0777);
-            } else {
-                $errors[] = $path . 'is not writable';
-            }
-        }
-
         $success = 0;
         $errors = [];
 
@@ -259,7 +251,10 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
 
         foreach ($mini_templates as $mini_template) {
             $template = $this->getMiniTemplateFiles($site_path, $mini_template['mtplct_template_name']);
-            $image = '<img data-image="test" src="' . '/' . $site->site_name . '/miniTemplatesTinyMce/' . $template['image']['file'] . '" width=100 height=100>';
+            if (! empty($template['image']))
+                $image = '<img data-image="test" src="' . '/' . $site->site_name . '/miniTemplatesTinyMce/' . $template['image']['file'] . '" width=100 height=100>';
+            else
+                $image = '<img data-image="test" src="/MelisFront/plugins/images/default.jpg" width=100 height=100>';
             $exploded = explode('.', $template['template']['file']);
             $templateName = $exploded[0];
             $tag = '<p class="mini-template-tool-table-path">' . explode('..', $template['template']['path'])[1] . '/' . $template['template']['file'] . '</p>';
@@ -269,7 +264,9 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
                 'image' => $image,
                 'html_path' => $tag,
                 'DT_RowId' => $mini_template['mtplct_id'],
-                'DR_RowAttr' => array('data-productid' => $counter, 'data-productname' => 'test'),
+                'DR_RowAttr' => [
+                    'template_name' => $mini_template['mtplct_template_name']
+                ],
                 'DT_RowClass' => 'is-draggable'
             ];
             $counter++;
@@ -453,8 +450,11 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
             $this->saveCategorySite($params['site_id'], $cat_id, $params['status']);
             unset($params['site_id']);
             unset($params['cat_id']);
+            unset($params['status']);
             $this->saveCategoryTrans($params, $cat_id);
             $success = 1;
+
+
             $connection->commit();
         } catch (\Exception $e) {
             $connection->rollback();
@@ -489,8 +489,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
         ];
 
         if (empty($cat_id)) {
-            $new_order = $this->getCategoryNewOrder();
-            $category_site_data['mtplc_order'] = $new_order;
+            $category_site_data['mtplc_order'] = 999;
         }
 
         $category_site_table->save($category_site_data, $cat_id);
@@ -521,6 +520,12 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
                             $table->save([
                                 'mtplct_name' => $value
                             ], $db_text['mtplct_id']);
+                        } else {
+                            $table->save([
+                                'mtplc_id' => $cat_id,
+                                'mtplct_lang_id' => $lang_id,
+                                'mtplct_name' => $value
+                            ]);
                         }
                     }
                 }
@@ -572,58 +577,94 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
             $categories = $this->getCategories($site->site_id, $locale);
             $cat_ids = $this->getCategoryIds($categories);
             $db_mini_templates = $this->getDbMinitemplates($cat_ids)->toArray();
+            $root_mini_templates = $this->getDbMinitemplates([-1])->toArray();
+            $root_mtpls = [];
+
+            // only get the ones that are present on the site
+            for ($i = 0; $i < count($root_mini_templates); $i++) {
+                if (in_array($root_mini_templates[$i]['mtplct_template_name'], $mini_templates)) {
+                    $root_mtpls[] = $root_mini_templates[$i];
+                }
+            }
+
             $mini_templates_db_temp = [];
+            $temp_categories = [];
+            $total = count($categories) + count($root_mini_templates);
+            $cat_counter = 0;
+            $root_mtpl_counter = 0;
+            for ($i = 0; $i < $total; $i++) {
+                // insert category
+                if (! empty($categories[$cat_counter])) {
+                    if ($categories[$cat_counter]['mtplc_order'] == $i + 1) {
+                        $this->insertCategoryToTheTree($categories[$cat_counter], $tree);
+                        $cat_mini_templates = [];
+                        foreach ($db_mini_templates as $mini_template) {
+                            if ($mini_template['mtplct_category_id'] == $categories[$cat_counter]['mtplc_id']) {
+                                $cat_mini_templates[] = $mini_template;
+                            }
+
+                            if (!in_array($mini_template['mtplct_template_name'], $mini_templates_db_temp))
+                                $mini_templates_db_temp[] = $mini_template['mtplct_template_name'];
+                        }
+                        // insert category mini-templates
+                        foreach ($cat_mini_templates as $cat_mini_template) {
+                            $template = $this->getMiniTemplateFiles($site_path, $cat_mini_template['mtplct_template_name']);
+
+                            if (!empty($template['image']['file']))
+                                $image = '/' . $site->site_name . '/miniTemplatesTinyMce/' . $template['image']['file'];
+                            else
+                                $image = '/MelisFront/plugins/images/default.jpg';
+
+                            $this->insertDbMiniTemplateToTheCategory(
+                                $categories[$cat_counter]['mtplc_id'] . '-' . $categories[$cat_counter]['mtplct_name'],
+                                $cat_mini_template,
+                                $module,
+                                $image,
+                                $tree
+                            );
+                        }
+
+                        $cat_counter++;
+                    }
+                }
+                // Insert mini-templates in db with parent #
+                if (! empty($root_mtpls[$root_mtpl_counter])) {
+                    if ($root_mtpls[$root_mtpl_counter]['mtplct_order'] == $i + 1) {
+                        $template = $this->getMiniTemplateFiles($site_path, $root_mtpls[$root_mtpl_counter]['mtplct_template_name']);
+
+                        if (!empty($template['image']['file']))
+                            $image = '/' . $site->site_name . '/miniTemplatesTinyMce/' . $template['image']['file'];
+                        else
+                            $image = '/MelisFront/plugins/images/default.jpg';
+                        $this->insertLocalMiniTemplateToTheTree($root_mtpls[$root_mtpl_counter]['mtplct_template_name'], $module, $image, $tree);
+
+                        if (! in_array($root_mtpls[$root_mtpl_counter]['mtplct_template_name'], $mini_templates_db_temp))
+                            $mini_templates_db_temp[] = $root_mtpls[$root_mtpl_counter]['mtplct_template_name'];
+
+                        $root_mtpl_counter++;
+                    }
+                }
+            }
+
+            // insert mini-templates that are not in db
+            foreach($mini_templates as $mini_template){
+                if(!in_array($mini_template, $mini_templates_db_temp)){
+                    $template=$this->getMiniTemplateFiles($site_path,$mini_template);
+
+                    if(!empty($template['image']['file']))
+                        $image='/'.$site->site_name.'/miniTemplatesTinyMce/'.$template['image']['file'];
+                    else
+                        $image='/MelisFront/plugins/images/default.jpg';
+                    $this->insertLocalMiniTemplateToTheTree($mini_template,$module,$image,$tree);
+                }
+            }
 
             foreach ($categories as $category) {
-                $this->insertCategoryToTheTree($category, $tree);
-
-                // better to use array_map? and just remove the empty elements?
-                $cat_mini_templates = [];
-                foreach ($db_mini_templates as $mini_template) {
-                    if ($mini_template['mtplct_category_id'] == $category['mtplc_id']) {
-                        $cat_mini_templates[] = $mini_template;
-                    }
-
-                    if (!in_array($mini_template['mtplct_template_name'], $mini_templates_db_temp))
-                        $mini_templates_db_temp[] = $mini_template['mtplct_template_name'];
-
-//                $key = array_search(
-//                    $mini_template['mtplct_template_name'],
-//                    $mini_templates
-//                );
-//
-//                unset($mini_templates[$key]);
-                }
-
-                foreach ($cat_mini_templates as $cat_mini_template) {
-                    $template = $this->getMiniTemplateFiles($site_path, $cat_mini_template['mtplct_template_name']);
-
-                    if (!empty($template['image']['file']))
-                        $image = '/' . $site->site_name . '/miniTemplatesTinyMce/' . $template['image']['file'];
-                    else
-                        $image = '/MelisFront/plugins/images/default.jpg';
-
-                    $this->insertDbMiniTemplateToTheCategory(
-                        $category['mtplc_id'] . '-' . $category['mtplct_name'],
-                        $cat_mini_template,
-                        $module,
-                        $image,
-                        $tree
-                    );
+                if ($category['mtplc_order'] == 999) {
+                    $this->insertCategoryToTheTree($category, $tree);
                 }
             }
 
-            foreach ($mini_templates as $mini_template) {
-                if (!in_array($mini_template, $mini_templates_db_temp)) {
-                    $template = $this->getMiniTemplateFiles($site_path, $mini_template);
-
-                    if (!empty($template['image']['file']))
-                        $image = '/' . $site->site_name . '/miniTemplatesTinyMce/' . $template['image']['file'];
-                    else
-                        $image = '/MelisFront/plugins/images/default.jpg';
-                    $this->insertLocalMiniTemplateToTheTree($mini_template, $module, $image, $tree);
-                }
-            }
         }
 
         return $tree;
@@ -661,6 +702,99 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
             'type' => 'mini-template',
             'module' => $site_module,
             'imgSource' => $image
+        ];
+    }
+
+    public function saveTree($site_id, $tree_data) {
+        $site_category_table = $this->getServiceLocator()->get('MelisCmsMiniTplSiteCategoryTable');
+        $category_template_table = $this->getServiceLocator()->get('MelisCmsMiniTplCategoryTemplateTable');
+        $category_counter = 1;
+        $last_category_flag = '';
+        $mtpl_counter = 1;
+        $errors = [];
+        $success = 1;
+        $mtpl_root_counter = 1;
+        $root_counter = 1;
+
+        $connection = $this->startDbTransaction();
+
+        try {
+            foreach ($tree_data as $node) {
+                $type = $node['type'];
+
+                if ($type == 'category') {
+                    $cat_id = explode('-', $node['id'])[0];
+                    $site_category_table->update(
+                        [
+                            'mtplc_order' => $root_counter
+                        ],
+                        'mtplsc_category_id',
+                        $cat_id
+                    );
+
+                    $root_counter++;
+                } else if ($type == 'mini-template') {
+                    if ($node['parent'] != '#') {
+                        if ($last_category_flag == $node['parent']) {
+                            $mtpl_counter++;
+                        } else {
+                            $last_category_flag = $node['parent'];
+                            $mtpl_counter = 1;
+                        }
+                    } else {
+
+                    }
+
+                    $template = $category_template_table->getEntryByField('mtplct_template_name', $node['id'])->current();
+
+                    if (!empty($template)) {
+                        if ($node['parent'] != '#') {
+                            $category_template_table->save([
+                                'mtplct_category_id' => explode('-', $node['parent'])[0],
+                                'mtplct_order' => $mtpl_counter
+                            ], $template->mtplct_id);
+                        } else {
+                            $category_template_table->save([
+                                'mtplct_category_id' => -1,
+                                'mtplct_order' => $root_counter
+                            ], $template->mtplct_id);
+
+                            $root_counter++;
+                        }
+                    } else {
+                        if ($node['parent'] != '#') {
+                            $parent_id = explode('-', $node['parent'])[0];
+
+                            $category_template_table->save([
+                                'mtplct_category_id' => $parent_id,
+                                'mtplct_template_name' => $node['id'],
+                                'mtplct_order' => $mtpl_counter
+                            ]);
+                        } else {
+                            $parent_id = '-1';
+
+                            $category_template_table->save([
+                                'mtplct_category_id' => $parent_id,
+                                'mtplct_template_name' => $node['id'],
+                                'mtplct_order' => $root_counter
+                            ]);
+
+                            $root_counter++;
+                        }
+                    }
+                }
+            }
+
+            $connection->commit();
+        } catch (\Exception $e) {
+            $connection->rollback();
+            $errors[] = $e->getMessage();
+            $success = 0;
+        }
+
+        return [
+            'errors' => $errors,
+            'success' => $success
         ];
     }
 
@@ -810,7 +944,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
         $composerSrv = $this->serviceLocator->get('MelisEngineComposer');
         $path = $composerSrv->getComposerModulePath($module);
         $miniTemplatePath = $path . '/public' . '/miniTemplatesTinyMce';
-        return $miniTemplatePath;
+        return (! empty($path)) ? $miniTemplatePath : '';
     }
 
     /**

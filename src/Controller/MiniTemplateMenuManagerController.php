@@ -229,29 +229,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController
     public function saveTreeAction() {
         $params = $this->params()->fromPost();
         $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
-        if ($params['type'] == 'category') {
-            // rearrange category
-            $response = $service->reorderCategory($params['oldPosition'], $params['position']);
-        } else {
-            if ($params['oldParentId'] == $params['newParentId']) {
-                // rearrange mini-template inside a category
-                $response = $service->reorderMiniTemplate(
-                    $params['oldPosition'],
-                    $params['position'],
-                    $params['oldParentId'],
-                    $params['newParentId']
-                );
-            } else {
-                // mini-template was placed on a different category
-                // delete enrty on old category
-                // add new entry on new category
-                if ($params['oldParentId'] != '#') {
-                    $response = $service->removeMiniTemplateInCategory($params['id']);
-                }
-
-                $response = $service->addMiniTemplateInCategory($params['newParentId'], $params['id'], $params['position']);
-            }
-        }
+        $response = $service->saveTree($params['site_id'], json_decode($params['tree_data'], true));
 
         return new JsonModel([
             'success' => $response['success'],
@@ -261,20 +239,21 @@ class MiniTemplateMenuManagerController extends AbstractActionController
 
     public function reorderMiniTemplatesAction() {
         $params = $this->params()->fromPost();
-        $new_order = explode(',', $params['data']);
+        $templates = explode(',', $params['data']);
+        $templates = array_reverse($templates);
         $table = $this->getServiceLocator()->get('MelisCmsMiniTplCategoryTemplateTable');
+        $counter = 1;
 
-        foreach ($new_order as $order) {
-            $explode = explode('=', $order);
-            $id = $explode[0];
-            $new_position = $explode[1];
-            $mini_template = $table->getEntryById($id)->current();
-            $table->save(
+        foreach ($templates as $template) {
+            $table->update(
                 [
-                    'mtplct_order' => $new_position
+                    'mtplct_order' => $counter
                 ],
-                $mini_template->mtplct_id
+                'mtplct_template_name',
+                $template
             );
+
+            $counter++;
         }
 
         return new JsonModel([

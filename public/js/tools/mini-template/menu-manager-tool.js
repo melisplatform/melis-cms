@@ -174,17 +174,16 @@ $(function () {
                 var oldParentId = data.old_parent;
                 var position = data.position + 1;
                 var old_position = data.old_position + 1;
+                var tree_data = $(tree).jstree(true).get_json('#', {flat:true});
+
+                console.log(tree_data);
 
                 $.ajax({
                     type: 'POST',
                     url: '/melis/MelisCms/MiniTemplateMenuManager/saveTree',
                     data: {
-                        id: id,
-                        type: type,
-                        newParentId: newParentId,
-                        oldParentId: oldParentId,
-                        position: position,
-                        oldPosition: old_position
+                        tree_data: JSON.stringify(tree_data),
+                        site_id: $(siteSelect).find('option:selected').data('id')
                     },
                 }).done(function (data) {
                     if (data.success) {
@@ -348,28 +347,27 @@ $(function () {
                 "core" : {
                     "multiple": false,
                     "check_callback": function (operation, node, node_parent, node_position, more) {
-                        console.log($(tree).jstree(true).get_node('#').children[node_position]);
-                        if (
-                            more
-                            && more.dnd
-                            && (operation === 'move_node' || operation === 'copy_node')
-                            && node.type == 'mini-template'
-                            && node_parent.id == '#'
-                        )  {
-                            return false;
-                        }
-                        if (
-                            more
-                            && more.dnd
-                            && (operation === 'move_node' || operation === 'copy_node')
-                            && node.type == 'category'
-                            && $(tree).jstree(true).get_node(
-                                $(tree).jstree(true).get_node('#').children[node_position]
-                            ).type == 'mini-template'
-                            ){
-                            return false;
-                        }
-                        return true;
+                        // if (
+                        //     more
+                        //     && more.dnd
+                        //     && (operation === 'move_node' || operation === 'copy_node')
+                        //     && node.type == 'mini-template'
+                        //     && node_parent.id == '#'
+                        // )  {
+                        //     return false;
+                        // }
+                        // if (
+                        //     more
+                        //     && more.dnd
+                        //     && (operation === 'move_node' || operation === 'copy_node')
+                        //     && node.type == 'category'
+                        //     && $(tree).jstree(true).get_node(
+                        //         $(tree).jstree(true).get_node('#').children[node_position]
+                        //     ).type == 'mini-template'
+                        //     ){
+                        //     return false;
+                        // }
+                        // return true;
                     },
                     "animation" : 500,
                     "themes": {
@@ -411,8 +409,8 @@ window.initMiniTemplateMenuManagerPluginTables = function (data, tableSettings) 
     data.id = $('#menu-manager-category-id').data('id');
 
     $('#tableMiniTemplateMenuManagerPlugins').on('row-reorder.dt', function ( e, diff, edit ) {
+        var form_data = $('#tableMiniTemplateMenuManagerPlugins').DataTable().rows().data();
         var result = 'Reorder started on row: '+edit.triggerRow.data()[1]+'<br>';
-        var miniTemplates = [];
 
         for ( var i=0, ien=diff.length ; i<ien ; i++ ) {
             var rowData = $('#tableMiniTemplateMenuManagerPlugins').DataTable().row(diff[i].node).data();
@@ -423,9 +421,8 @@ window.initMiniTemplateMenuManagerPluginTables = function (data, tableSettings) 
             var dataString 	= new Array,
                 prdNodes 	= new Array;
 
-            $.each(diff, function() {
-                var new_position = parseInt(this.newPosition) + 1;
-                prdNodes.push(this.node.id + '=' + new_position.toString());
+            $.each(form_data, function(key, value) {
+                prdNodes.push(value.DR_RowAttr.template_name);
             });
 
             dataString.push({
@@ -435,8 +432,6 @@ window.initMiniTemplateMenuManagerPluginTables = function (data, tableSettings) 
 
             dataString = $.param(dataString);
 
-            $('#mini-template-category-tree').jstree(true).refresh();
-
             $.ajax({
                 type        : "POST",
                 url         : "/melis/MelisCms/MiniTemplateMenuManager/reorderMiniTemplates",
@@ -444,9 +439,7 @@ window.initMiniTemplateMenuManagerPluginTables = function (data, tableSettings) 
                 dataType    : "json",
                 encode		: true
             }).done(function(data) {
-                if(!data.success) {
-
-                }
+                $('#mini-template-category-tree').jstree(true).refresh();
             }).fail(function(){
 
             });
