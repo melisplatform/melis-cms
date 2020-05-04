@@ -449,8 +449,6 @@ var melisCms = (function(){
 	    		// give iframe the calculated height based from the content
 	    		var iHeight = $("#"+ activeTabId + " .melis-iframe").contents().height()+50;
 				$("#"+ activeTabId + " .melis-iframe").css("height", iHeight);
-				
-				console.log(".melis-iframe height from displaySettings() : ", iHeight);
 	    	});
 	}
 	
@@ -515,8 +513,6 @@ var melisCms = (function(){
 		var iHeight = $("#"+ activeTabId + " .melis-iframe").contents().height();
 
 		$("#"+ activeTabId + " .melis-iframe").css("height", iHeight);
-
-		//console.log(".melis-iframe height from cmsTabEvents() : ", iHeight);
 	}
 
 	// REFRESH PAGE TAB (historic, versionining etc)
@@ -537,7 +533,7 @@ var melisCms = (function(){
 		$("#"+id+"_id_meliscms_page_action_tabs").addClass('relative').prepend("<li class='btn-disabled'></li>");
 
 		// adding of loader on [data-meliskey='meliscms_page']
-		if ( typeof loader !== undefined ) {
+		if ( typeof loader !== "undefined" ) {
 			loader.pageEditionLoading();
 		}
     }
@@ -548,7 +544,7 @@ var melisCms = (function(){
 		$("#"+id+"_id_meliscms_page .overlay-switch").remove();
 		
 		// removing of loader on [data-meliskey='meliscms_page']
-		if ( typeof loader !== undefined ) {
+		if ( typeof loader !== "undefined" ) {
 			loader.removeEditionLoading();
 		}
     }
