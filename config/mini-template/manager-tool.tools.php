@@ -181,7 +181,14 @@ return [
                                     'name' => 'miniTemplateName',
                                     'required' => true,
                                     'validators' => [
-
+                                        [
+                                            'name' => 'NotEmpty',
+                                            'options' => [
+                                                'messages' => [
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_mini_template_manager_tool_form_empty_field',
+                                                ],
+                                            ],
+                                        ],
                                     ],
                                     'filters' => [
 
@@ -191,7 +198,36 @@ return [
                                     'name' => 'miniTemplateHtml',
                                     'required' => true,
                                     'validators' => [
+                                        [
+                                            'name' => 'NotEmpty',
+                                            'options' => [
+                                                'messages' => [
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_mini_template_manager_tool_form_empty_field',
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                    'filters' => [
 
+                                    ],
+                                ],
+                                'miniTemplateThumbnail' => [
+                                    'name' => 'miniTemplateThumbnail',
+                                    'required' => false,
+                                    'validators' => [
+                                        array(
+                                            'name' => 'FileExtension',
+                                            'break_chain_on_failure' => true,
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\Validator\File\Extension::FALSE_EXTENSION => 'tr_melis_cms_page_tree_import_wrong_extension',
+                                                ),
+                                                'case' => true,
+                                                'extension' => [
+                                                    'png', 'PNG', 'jpg', 'JPG', 'jpeg', 'JPEG'
+                                                ]
+                                            ),
+                                        ),
                                     ],
                                     'filters' => [
 
