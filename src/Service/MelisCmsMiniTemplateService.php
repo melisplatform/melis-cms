@@ -498,7 +498,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
             foreach ($data as $key => $value) {
                 $errors[$key] = [
                     'error' => $translator->translate('tr_meliscms_mini_template_error_category_atleast_one_provided'),
-                    'label' => $translator->translate('tr_meliscms_mini_template_form_category_name Name')
+                    'label' => $translator->translate('tr_meliscms_mini_template_form_category_name')
                 ];
                 break;
             }
