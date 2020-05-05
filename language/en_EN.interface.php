@@ -804,7 +804,8 @@
 		'tr_meliscms_mini_template_form_category_name' => 'Category name',
 		'tr_meliscms_mini_template_form_category_name_tooltip' => 'The name for the category',
 		'tr_meliscms_mini_template_error_category_atleast_one_provided' => 'At least one category translation should be provided',
-		'tr_meliscms_mini_template_error' => 'Error',
+        'tr_meliscms_mini_template_no_data' => 'No data to display',
+        'tr_meliscms_mini_template_error' => 'Error',
 
     );
 ?>

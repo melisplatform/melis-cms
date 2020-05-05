@@ -805,6 +805,7 @@
         'tr_meliscms_mini_template_form_category_name' => 'Nom de la categorie',
         'tr_meliscms_mini_template_form_category_name_tooltip' => 'Le nom de la catégorie',
         'tr_meliscms_mini_template_error_category_atleast_one_provided' => 'Au moins une catégorie doit être renseignée',
+        'tr_meliscms_mini_template_no_data' => 'Aucune donnée disponible',
         'tr_meliscms_mini_template_error' => 'Erreur',
     );
 ?>
