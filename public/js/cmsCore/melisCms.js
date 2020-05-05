@@ -532,7 +532,7 @@ var melisCms = (function(){
             "cursor: wait; '></div>");
 		$("#"+id+"_id_meliscms_page_action_tabs").addClass('relative').prepend("<li class='btn-disabled'></li>");
 
-		// adding of loader on [data-meliskey='meliscms_page']
+		// adding of loader on page edition tab
 		if ( typeof loader !== "undefined" ) {
 			loader.pageEditionLoading();
 		}
@@ -543,7 +543,7 @@ var melisCms = (function(){
         $("#"+id+"_id_meliscms_page_action_tabs li.btn-disabled").remove();
 		$("#"+id+"_id_meliscms_page .overlay-switch").remove();
 		
-		// removing of loader on [data-meliskey='meliscms_page']
+		// removing of loader on page edition tab
 		if ( typeof loader !== "undefined" ) {
 			loader.removeEditionLoading();
 		}
