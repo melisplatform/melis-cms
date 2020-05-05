@@ -119,7 +119,8 @@ $(function () {
                     }
                 );
             } else {
-
+                melisHelper.melisKoNotification('save category', '', data.errors);
+                melisCoreTool.highlightErrors(data.success, data.errors, '1_id_menu_manager_tool_site_add_category');
             }
             melisCoreTool.done('#id_meliscms_mini_template_menu_manager_save_btn');
         }).fail(function (data) {
@@ -436,7 +437,6 @@ window.initMiniTemplateMenuManagerPluginTables = function (data, tableSettings) 
     data.id = $('#menu-manager-category-id').data('id');
 
     $('#tableMiniTemplateMenuManagerPlugins').on('row-reorder.dt', function ( e, diff, edit ) {
-        var form_data = $('#tableMiniTemplateMenuManagerPlugins').DataTable().rows().data();
         var result = 'Reorder started on row: '+edit.triggerRow.data()[1]+'<br>';
 
         for ( var i=0, ien=diff.length ; i<ien ; i++ ) {
@@ -445,11 +445,13 @@ window.initMiniTemplateMenuManagerPluginTables = function (data, tableSettings) 
         }
 
         if (!$.isEmptyObject(diff) ) {
+            // var form_data = $('#tableMiniTemplateMenuManagerPlugins').DataTable().rows().data();
+
             var dataString 	= new Array,
                 prdNodes 	= new Array;
 
-            $.each(form_data, function(key, value) {
-                prdNodes.push(value.DR_RowAttr.template_name);
+            $.each(diff, function() {
+                prdNodes.push(this.node.id+'-'+this.newPosition);
             });
 
             dataString.push({
@@ -458,7 +460,6 @@ window.initMiniTemplateMenuManagerPluginTables = function (data, tableSettings) 
             });
 
             dataString = $.param(dataString);
-
             $.ajax({
                 type        : "POST",
                 url         : "/melis/MelisCms/MiniTemplateMenuManager/reorderMiniTemplates",

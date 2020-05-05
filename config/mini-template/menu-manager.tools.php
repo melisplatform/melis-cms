@@ -25,7 +25,7 @@ return [
                             ]
                         ],
                         'columns' => [
-                            'id' => [
+                            'tempId' => [
                                 'text' => '<i class="fa fa-plus"> </i> ',
                                 'css' => array('width' => '1%', 'visible' => false),
                                 'sortable' => true,

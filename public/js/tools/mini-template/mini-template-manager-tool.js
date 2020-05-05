@@ -96,6 +96,7 @@ $(function () {
                 if ($body.find('#id_meliscms_mini_template_menu_manager_tool').length) {
                     $(tree).jstree(true).refresh();
                 }
+                $body.find('.melis-mini-template-menu-manager-table-refresh').trigger('click');
             } else {
                 melisHelper.melisKoNotification(translations.tr_melis_cms_page_tree_import, '', data.errors);
                 melisCoreTool.highlightErrors(data.success, data.errors, 'id_mini_template_manager_tool_add');
@@ -138,6 +139,7 @@ $(function () {
                 if ($body.find('#id_meliscms_mini_template_menu_manager_tool').length) {
                     $(tree).jstree(true).refresh();
                 }
+                $body.find('.melis-mini-template-menu-manager-table-refresh').trigger('click');
             } else {
                 melisHelper.melisKoNotification(translations.tr_melis_cms_page_tree_import, '', data.errors);
                 melisCoreTool.highlightErrors(data.success, data.errors, 'id_mini_template_manager_tool_update');
@@ -171,6 +173,10 @@ $(function () {
                 }).done(function (data) {
                     if (data.success) {
                         $body.find('.mini-template-manager-tool-table-refresh ' + table_refresh_btn).trigger('click');
+                        $body.find('.melis-mini-template-menu-manager-table-refresh').trigger('click');
+                        if ($body.find('#id_meliscms_mini_template_menu_manager_tool').length) {
+                            $(tree).jstree(true).refresh();
+                        }
                         $body.find('.melis-mini-template-menu-manager-table-refresh').trigger('click');
                     } else {
                         melisHelper.melisKoNotification(
