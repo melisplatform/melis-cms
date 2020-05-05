@@ -121,7 +121,13 @@ $(function () {
         var current_module = $form_container.data('currentmodule');
         var current_template = $form_container.data('currenttemplate');
         var formData = new FormData(this);
-        formData.append('image', $(thumbnail_preview).attr('src'));
+        var image_flag = false;
+
+        if ($(thumbnail_preview).attr('src') == '/MelisFront/plugins/images/default.jpg') {
+            image_flag = true;
+        }
+
+        formData.append('image', image_flag);
         formData.append('current_module', current_module);
         formData.append('current_template', current_template);
 

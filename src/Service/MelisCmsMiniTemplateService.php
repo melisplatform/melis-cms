@@ -127,7 +127,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
      * @param null $image
      * @return mixed
      */
-    public function updateMiniTemplate($current_data, $new_data, $image = null) {
+    public function updateMiniTemplate($current_data, $new_data, $image = false) {
         $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
         $arrayParameters = $this->sendEvent('melis_cms_mini_template_update_mtpl_start', $arrayParameters);
 
@@ -216,7 +216,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
                         $current_site_path . '/' . $current_template_name . '.' . $extension
                     );
                 } else {
-                    if ($image == '/MelisFront/plugins/images/default.jpg') {
+                    if ($image) {
                         if (!empty($thumbnail_file['path'])) {
                             if (file_exists($thumbnail_file['path']))
                                 unlink($thumbnail_file['path']);
