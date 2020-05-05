@@ -881,3 +881,7 @@ ul#select2-id_mcgdprbanner_site_id-results {
 		left: 0 !important;
 	}
 }
+
+#id_meliscms_tool_sites_modal_add_content .owl-carousel {
+	display: block;
+}
