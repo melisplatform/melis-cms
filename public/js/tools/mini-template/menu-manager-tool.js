@@ -186,8 +186,6 @@ $(function () {
                 var old_position = data.old_position + 1;
                 var tree_data = $(tree).jstree(true).get_json('#', {flat:true});
 
-                console.log(tree_data);
-
                 $.ajax({
                     type: 'POST',
                     url: '/melis/MelisCms/MiniTemplateMenuManager/saveTree',
