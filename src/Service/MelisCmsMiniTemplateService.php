@@ -147,8 +147,9 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
         $errors = [];
 
         if (!is_writable($current_site_path . '/' . $current_data['miniTemplateName'] . '.phtml')) {
+            $translator = $this->getServiceLocator()->get('translator');
             $errors[] = [
-                'error' => $current_site_path . '/' . $current_data . '.phtml' . ' is not writable',
+                'error' => $current_site_path . '/' . $current_data . '.phtml ' . $translator->translate('tr_meliscms_mini_template_manager_tool_form_create_error_path_not_writable'),
                 'label' => $translator->translate('tr_meliscms_mini_template_error')
             ];
         }
@@ -492,12 +493,12 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
             if (! empty($value))
                 $counter++;
         }
-
+        $translator = $this->getServiceLocator()->get('translator');
         if ($counter == 0) {
             foreach ($data as $key => $value) {
                 $errors[$key] = [
-                    'error' => 'At least one category translation should be provided',
-                    'label' => 'Category Name'
+                    'error' => $translator->translate('tr_meliscms_mini_template_error_category_atleast_one_provided'),
+                    'label' => $translator->translate('tr_meliscms_mini_template_form_category_name Name')
                 ];
                 break;
             }

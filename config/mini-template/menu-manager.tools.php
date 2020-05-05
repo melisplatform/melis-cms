@@ -72,8 +72,8 @@ return [
                                         'name' => 'category_name',
                                         'type' => 'MelisText',
                                         'options' => [
-                                            'label' => 'Category Name',
-                                            'tooltip' => 'Site where the minitemplate will be created',
+                                            'label' => 'tr_meliscms_mini_template_form_category_name',
+                                            'tooltip' => 'tr_meliscms_mini_template_form_category_name_tooltip',
                                         ],
                                         'attributes' => [
                                             'id' => 'category_name',

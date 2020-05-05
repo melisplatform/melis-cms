@@ -218,7 +218,7 @@ $(function () {
                     "items" : function (node) {
                         var menu = {
                             'add_category_template' : {
-                                "label" : 'Add mini-template',
+                                "label" : translations.tr_meliscms_mini_template_menu_manager_tool_jstree_add_minitemplate,
                                 "icon"  : "fa fa-plus",
                                 "action" : function (obj) {
                                     melisHelper.tabOpen(

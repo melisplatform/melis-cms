@@ -799,5 +799,12 @@
         'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_error_children' => 'Vous ne pouvez supprimer que des catégories vides',
 
         'tr_meliscms_mini_template_save' => 'Enregistrer',
+        'tr_meliscms_mini_template_manager_tool_add_mini_template_header' => 'Enter here the details of your mini-template',
+        'tr_meliscms_mini_template_error_minitemplate_directory_does_not_exist' => 'miniTemplatesTinyMce directory does not exists',
+        'tr_meliscms_mini_template_error_minitemplate_directory_not_writable' => 'miniTemplatesTinyMce directory is not writable',
+        'tr_meliscms_mini_template_form_category_name' => 'Category name',
+        'tr_meliscms_mini_template_form_category_name_tooltip' => 'The name for the category',
+        'tr_meliscms_mini_template_error_category_atleast_one_provided' => 'At least one category translation should be provided',
+        'tr_meliscms_mini_template_error' => 'Erreur',
     );
 ?>

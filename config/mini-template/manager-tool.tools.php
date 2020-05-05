@@ -150,7 +150,7 @@ return [
                                             'id' => 'miniTemplateThumbnail',
                                             'accept' => '.gif,.jpg,.jpeg,.png',
                                             'value' => '',
-                                            'placeholder' => 'Image',
+                                            'placeholder' => 'tr_meliscms_mini_template_manager_tool_table_image',
                                             'onchange' => '',
                                             'class' => 'filestyle',
                                             'data-buttonText' => 'tr_meliscms_mini_template_manager_tool_form_thumbnail_btn_text',
@@ -176,21 +176,6 @@ return [
                                         ['name' => 'StripTags'],
                                         ['name' => 'StringTrim'],
                                     ],
-                                ],
-                                'miniTemplateSite' => [
-                                    'name' => 'miniTemplateSite',
-                                    'required' => true,
-                                    'validators' => [
-                                        [
-                                            'name' => 'NotEmpty',
-                                            'options' => [
-                                                'messages' => [
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_mini_template_manager_tool_form_empty_field',
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                    'filters' => [],
                                 ],
                                 'miniTemplateName' => [
                                     'name' => 'miniTemplateName',

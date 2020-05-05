@@ -330,13 +330,14 @@ class MiniTemplateManagerController extends AbstractActionController
         $current_site_path = $service->getModuleMiniTemplatePath($current_site->site_name);
         $new_site = $siteTable->getEntryById($new_data['miniTemplateSite'])->current();
         $new_site_path = $service->getModuleMiniTemplatePath($new_site->site_name);
+        $translator = $this->getServiceLocator()->get('translator');
         $errors = [];
 
         if ($form->isValid()) {
             if ($current_site->site_id !== $new_data['miniTemplateSite']) {
                 if (file_exists($new_site_path . '/' . $new_data['miniTemplateName'] . '.phtml')) {
                     $errors['miniTemplateName'] = [
-                        'error' => 'File can\'t be created because it already exists',
+                        'error' => $translator->translate('tr_meliscms_mini_template_manager_tool_form_create_error_file_already_exists'),
                         'label' => $form->get('miniTemplateName')->getLabel()
                     ];
                 }
@@ -344,7 +345,7 @@ class MiniTemplateManagerController extends AbstractActionController
                 if ($current_data['miniTemplateName'] !== $new_data['miniTemplateName']) {
                     if (file_exists($current_site_path . '/' . $new_data['miniTemplateName'] . '.phtml')) {
                         $errors['miniTemplateName'] = [
-                            'error' => 'File can\'t be created because it already exists',
+                            'error' => $translator->translate('tr_meliscms_mini_template_manager_tool_form_create_error_file_already_exists'),
                             'label' => $form->get('miniTemplateName')->getLabel()
                         ];
                     }
