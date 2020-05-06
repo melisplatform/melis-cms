@@ -808,6 +808,8 @@
         'tr_meliscms_mini_template_no_data' => 'Aucune donnée disponible',
         'tr_meliscms_mini_template_error' => 'Erreur',
         'tr_meliscms_mini_template_menu_manager_save_category' => 'Enregistrer la catégorie',
-        'tr_meliscms_mini_template_menu_manager_save_mini_template' => 'Enregistrer le mini template'
+        'tr_meliscms_mini_template_menu_manager_save_mini_template' => 'Enregistrer le mini template',
+        'tr_meliscms_mini_template_menu_manager_js_tree_loading' => 'Chargement',
+        'tr_meliscms_mini_template_menu_manager_select_site_first_btn_title' => 'Sélectionnez un site pour activer',
     );
 ?>

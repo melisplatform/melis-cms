@@ -406,7 +406,7 @@ $(function () {
                         "url" : "/melis/MelisCms/MiniTemplateMenuManager/getTree?" + query,
                     },
                     'strings': {
-                        'Loading ...' : 'Loading'
+                        'Loading ...' : translations.tr_meliscms_mini_template_menu_manager_js_tree_loading
                     },
                 },
                 "types" : {
