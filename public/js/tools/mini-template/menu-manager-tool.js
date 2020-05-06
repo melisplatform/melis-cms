@@ -119,7 +119,7 @@ $(function () {
                     }
                 );
             } else {
-                melisHelper.melisKoNotification('save category', '', data.errors);
+                melisHelper.melisKoNotification(translations.tr_meliscms_mini_template_menu_manager_save_category, '', data.errors);
                 melisCoreTool.highlightErrors(data.success, data.errors, '1_id_menu_manager_tool_site_add_category');
             }
             melisCoreTool.done('#id_meliscms_mini_template_menu_manager_save_btn');
