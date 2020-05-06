@@ -806,6 +806,7 @@
 		'tr_meliscms_mini_template_error_category_atleast_one_provided' => 'Field required in at least one language',
         'tr_meliscms_mini_template_no_data' => 'No data to display',
         'tr_meliscms_mini_template_error' => 'Error',
-        'tr_meliscms_mini_template_menu_manager_save_category' => 'Save category'
+        'tr_meliscms_mini_template_menu_manager_save_category' => 'Save category',
+        'tr_meliscms_mini_template_menu_manager_save_mini_template' => 'Save mini template'
     );
 ?>

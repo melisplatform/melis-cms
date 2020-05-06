@@ -98,7 +98,7 @@ $(function () {
                 }
                 $body.find('.melis-mini-template-menu-manager-table-refresh').trigger('click');
             } else {
-                melisHelper.melisKoNotification(translations.tr_melis_cms_page_tree_import, '', data.errors);
+                melisHelper.melisKoNotification(translations.tr_meliscms_mini_template_menu_manager_save_mini_template, '', data.errors);
                 melisCoreTool.highlightErrors(data.success, data.errors, 'id_mini_template_manager_tool_add');
             }
 

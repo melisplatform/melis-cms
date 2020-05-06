@@ -807,6 +807,7 @@
         'tr_meliscms_mini_template_error_category_atleast_one_provided' => 'Champ requis dans au moins une langue',
         'tr_meliscms_mini_template_no_data' => 'Aucune donnée disponible',
         'tr_meliscms_mini_template_error' => 'Erreur',
-        'tr_meliscms_mini_template_menu_manager_save_category' => 'Enregistrer la catégorie'
+        'tr_meliscms_mini_template_menu_manager_save_category' => 'Enregistrer la catégorie',
+        'tr_meliscms_mini_template_menu_manager_save_mini_template' => 'Enregistrer le mini template'
     );
 ?>
