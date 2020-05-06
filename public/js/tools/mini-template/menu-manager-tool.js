@@ -35,7 +35,7 @@ $(function () {
 
     $body.on('click', '.add-m-tpl-plugin', function () {
         melisHelper.tabOpen(
-            'Add mini-template',
+            translations.tr_meliscms_mini_template_manager_tool_header_add_btn,
             'fa fa-list-alt',
             'new_template_id_meliscms_mini_template_manager_tool_add',
             'meliscms_mini_template_manager_tool_add',
