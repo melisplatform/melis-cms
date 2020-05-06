@@ -75,7 +75,7 @@ $(function () {
 
         $('.mini-template-menu-manager-lang a span.filter-key').text(text);
         $(tree).data('langlocale', locale);
-        $(tree).jstree(true).settings.core.data.data = [{name : "langlocale", value: locale}, {name:"siteId", value : $(siteSelect).val()}];
+        $(tree).jstree(true).settings.core.data.data = [{name : "langlocale", value: locale}, {name:"module", value : $(siteSelect).val()}];
         $(tree).jstree(true).refresh();
     });
 
