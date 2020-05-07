@@ -240,7 +240,7 @@ $(function () {
                     },
                 }).done(function (data) {
                     if (data.success) {
-
+                        $('.melis-mini-template-menu-manager-table-refresh').trigger('click');
                     } else {
 
                     }
