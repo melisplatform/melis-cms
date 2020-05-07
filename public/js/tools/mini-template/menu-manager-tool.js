@@ -53,18 +53,30 @@ $(function () {
     });
 
     $body.on('change', siteSelect, function () {
-        var siteId = $(this).val();
+        var value = $(this).val();
         $("#mini-template-tree-no-data").css("display","none");
 
-        if (isInitialized) {
-            $(tree).jstree(true).settings.core.data.data = [
-                {name: 'langlocale', value: $("#mini-template-category-tree").data('langlocale')},
-                {name: 'module', value: $(siteSelect).val()}
-            ];
-            $(tree).jstree(true).refresh();
+        if (value != 0) {
+            if (isInitialized) {
+                $(tree).jstree(true).settings.core.data.data = [
+                    {name: 'langlocale', value: $("#mini-template-category-tree").data('langlocale')},
+                    {name: 'siteId', value: $(siteSelect).find('option:selected').data('id')}
+                ];
+                $(tree).jstree(true).refresh();
+            } else {
+                initCmsMiniTemplateCategoryTree();
+                isInitialized = true;
+            }
         } else {
-            initCmsMiniTemplateCategoryTree();
-            isInitialized = true;
+            $(tree).jstree(true).destroy();
+            isInitialized = false;
+
+            $('.add-m-tpl-category').attr('disabled', 'disabled');
+            $('.add-m-tpl-category').attr('title', translations.tr_meliscms_mini_template_menu_manager_select_site_first_btn_title);
+            $('.add-m-tpl-plugin').attr('disabled', 'disabled');
+            $('.add-m-tpl-plugin').attr('title', translations.tr_meliscms_mini_template_menu_manager_select_site_first_btn_title);
+            $('.mini-template-menu-manager-lang').find('a').addClass('disabled');
+            $('.mini-template-menu-manager-lang').find('a').attr('title', translations.tr_meliscms_mini_template_menu_manager_select_site_first_btn_title);
         }
     });
 
@@ -143,7 +155,7 @@ $(function () {
     function initCmsMiniTemplateCategoryTree () {
         var current_level;
         var query = 'langlocale=' + $("#mini-template-category-tree").data('langlocale');
-        query = query + ' &module=' + $(siteSelect).val();
+        query = query + ' &siteId=' + $(siteSelect).find('option:selected').data('id');
 
         $body.on("click", "#mini-template-category-tree", function(evt) {
             $("#mini-template-category-tree ul li div").removeClass("jstree-wholerow-clicked");
@@ -171,19 +183,52 @@ $(function () {
                 }
 
                 $('.add-m-tpl-category').removeAttr('disabled');
+                $('.add-m-tpl-category').attr('title', '');
                 $('.add-m-tpl-plugin').removeAttr('disabled');
+                $('.add-m-tpl-plugin').attr('title', '');
+                $('.mini-template-menu-manager-lang').find('a').removeClass('disabled');
+                $('.mini-template-menu-manager-lang').find('a').attr('title', '');
             })
             .on('#mini-template-category-tree ready.jstree', function (e, data) {})
             .on('#mini-template-category-tree load_node.jstree', function (e, data) {})
             .on('#mini-template-category-tree open_node.jstree', function (e, data) {})
             .on('#mini-template-category-tree after_open.jstree', function (e, data) {})
+            .on('#mini-template-category-tree dblclick.jstree', function (e, data) {
+                var selected = $(tree).jstree().get_selected(true)[0];
+
+                if (selected.type == 'category') {
+                    $('#id_meliscms_mini_template_menu_manager_tool_add_category_container').removeClass('hidden');
+                    melisHelper.zoneReload(
+                        'id_meliscms_mini_template_menu_manager_tool_add_category_container',
+                        'meliscms_mini_template_menu_manager_tool_add_category_container',
+                        {
+                            isHidden: false,
+                            id: selected.id,
+                            formType: 'edit',
+                            status: selected.original.status
+                        },
+                        function () {
+                            $('#id_meliscms_mini_template_menu_manager_tool_header a').click();
+                        }
+                    );
+                } else if (selected.type == 'mini-template') {
+                    waitForElem('#miniTemplateThumbnail', function (element) {
+                        $('#new-minitemplate-thumbnail').attr('src', selected.original.imgSource);
+                    });
+
+                    melisHelper.tabOpen(
+                        'Tpl ' + selected.original.id,
+                        'fa fa-tasks',
+                        selected.original.id + '_id_meliscms_mini_template_manager_tool_add',
+                        'meliscms_mini_template_manager_tool_add',
+                        {
+                            module: selected.original.module,
+                            templateName: selected.original.id
+                        }
+                    );
+                }
+            })
             .on('#mini-template-category-tree move_node.jstree', function (e, data) {
-                var id = data.node.id;
-                var type = data.node.type;
-                var newParentId = data.parent;
-                var oldParentId = data.old_parent;
-                var position = data.position + 1;
-                var old_position = data.old_position + 1;
                 var tree_data = $(tree).jstree(true).get_json('#', {flat:true});
 
                 $.ajax({
@@ -204,12 +249,12 @@ $(function () {
                 });
             })
             .on('#mini-template-category-tree select_node.jstree', function (e, data) {
-                if (selectedNode === data.node.text) {
-                    $(tree).jstree().deselect_all();
-                    selectedNode = '';
-                } else {
-                    selectedNode = data.node.text;
-                }
+                // if (selectedNode === data.node.text) {
+                //     $(tree).jstree().deselect_all();
+                //     selectedNode = '';
+                // } else {
+                //     selectedNode = data.node.text;
+                // }
             })
             .jstree({
                 "contextmenu" : {
