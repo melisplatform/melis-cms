@@ -622,18 +622,19 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
      * @param $module
      * @param $locale
      */
-    public function getTree($module, $locale) {
+    public function getTree($siteId, $locale) {
         $site_table = $this->getServiceLocator()->get('MelisEngineTableSite');
-        $site = $site_table->getEntryByField('site_name', $module)->current();
+        $site = $site_table->getEntryById($siteId)->current();
+        $module = $site->site_name;
         $site_path = $this->getModuleMiniTemplatePath($site->site_name);
         $tree = [];
 
         if (file_exists($site_path)) {
             $mini_templates = $this->getMiniTemplates($module);
-            $categories = $this->getCategories($site->site_id, $locale);
+            $categories = $this->getCategories($siteId, $locale);
             $cat_ids = $this->getCategoryIds($categories);
             $db_mini_templates = $this->getDbMinitemplates($cat_ids)->toArray();
-            $root_mini_templates = $this->getDbMinitemplates([-1])->toArray();
+            $root_mini_templates = $this->getDbMinitemplates([-1], $siteId)->toArray();
             $root_mtpls = [];
 
             // only get the ones that are present on the site
@@ -916,9 +917,9 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
         return $final_categories;
     }
 
-    public function getDbMinitemplates($cat_ids) {
+    public function getDbMinitemplates($cat_ids, $siteId = null) {
         $table = $this->getServiceLocator()->get('MelisCmsMiniTplCategoryTemplateTable');
-        return $table->getTemplatesByCategoryIds($cat_ids);
+        return $table->getTemplatesByCategoryIds($cat_ids, $siteId);
     }
 
     public function getCategoryIds($categories) {
