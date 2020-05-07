@@ -278,10 +278,6 @@ var melisDragnDrop = (function($, window) {
                 textVal     = elem.text(),
                 activeMenu  = elem.parent().find('.melis-cms-filter-btn-mini-tpl-category.active');
 
-            console.log(next);
-            console.log(textVal);
-            console.log(activeMenu);
-
             if (activeMenu.length > 0) {
                 activeMenu.next().slideUp();
                 activeMenu.removeClass('active');
