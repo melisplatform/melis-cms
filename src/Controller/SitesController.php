@@ -821,6 +821,8 @@ class SitesController extends AbstractActionController
                             $this->deleteOtherTabsData($siteId, $LangIds);
                         }
                     }
+                    //clear cache
+                    $this->clearSiteConfigCache($siteId);
                     /**
                      * if no error, execute the saving
                      */
@@ -1646,5 +1648,22 @@ class SitesController extends AbstractActionController
            unlink($file);
            return true;
        }
+    }
+
+    /**
+     * Clear Config Cache
+     */
+    private function clearSiteConfigCache($siteId)
+    {
+        //keys need to remove
+        $cacheKeys = [
+            'getSiteConfig_'.$siteId,
+            'getSiteConfigByPageId'
+        ];
+
+        $cacheConfig = 'meliscms_page';
+        $melisEngineCacheSystem = $this->serviceLocator->get('MelisEngineCacheSystem');
+        foreach($cacheKeys as $preFix)
+            $melisEngineCacheSystem->deleteCacheByPrefix($preFix, $cacheConfig);
     }
 }
