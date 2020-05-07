@@ -259,6 +259,8 @@ $(function () {
     // Select site
     $body.on('change', table_site_select, function() {
         $(dataTable).DataTable().ajax.reload();
+        $(header_add_btn).removeClass('disabled');
+        $(header_add_btn).removeAttr('disabled');
     });
 
     var miniTemplateManagerTool = {
