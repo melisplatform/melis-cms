@@ -199,7 +199,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController
     public function getTreeAction() {
         $params = $this->params()->fromQuery();
         $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
-        $tree = $service->getTree($params['module'], $params['langlocale']);
+        $tree = $service->getTree($params['siteId'], $params['langlocale']);
 
         return new JsonModel($tree);
     }
