@@ -827,9 +827,12 @@ span.melis-cms-filter-btn-mini-tpl-category.active i {
 /*
  * Plugin Menus
  */
-.melis-cms-filter-btn-sub-category,
-.melis-cms-filter-btn-mini-tpl-category {
+.melis-cms-filter-btn-sub-category {
     padding: 2px 0 2px 21px !important;
+}
+
+.melis-cms-filter-btn-mini-tpl-category {
+    padding: 2px 0 2px 35px !important;
 }
 
 .border-new-plugin {
