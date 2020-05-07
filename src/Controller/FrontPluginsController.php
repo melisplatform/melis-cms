@@ -493,7 +493,7 @@ class FrontPluginsController extends AbstractActionController
                             $parent = $val['parent'];
                         }
 
-                        $title = 'MiniTemplatePlugin_' . $val['text'] . '_' . strtolower($site_data['site_name']);
+                        $title = 'MiniTemplatePlugin_' . strtolower($val['text']) . '_' . strtolower($site_data['site_name']);
                         if ($val['parent'] != '#') {
                             if (!in_array($parent, $in_active_categories))
                                 $new_plugin_list[$parent][$title] = $mini_templates[$title];
