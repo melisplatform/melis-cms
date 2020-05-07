@@ -1,3 +1,7 @@
+.mini-template-menu-manager-lang a.disabled {
+    cursor: not-allowed;
+}
+
 #tableMiniTemplateMenuManagerPlugins img {
     max-width: 195px;
     width: auto;
