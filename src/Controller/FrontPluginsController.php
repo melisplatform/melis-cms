@@ -447,24 +447,26 @@ class FrontPluginsController extends AbstractActionController
     private function categorizeMiniTemplates($plugin_list)
     {
         $mini_template_sites = $plugin_list['MelisCms']['MelisMiniTemplate'];
-        $sites = [];
-
+        $sites = $this->getServiceLocator()->get('MelisEngineTableSite')->fetchAll()->toArray();
+        $site_modules = [];
+        $container = new Container('meliscore');
+        // get site modules
         foreach ($mini_template_sites as $mini_template_site_key => $mini_template_site_val) {
             $exploded_mini_template_site_key = explode('_', $mini_template_site_key);
-
             if (count($exploded_mini_template_site_key) != 1)
-                $sites[] = $exploded_mini_template_site_key[1];
+                $site_modules[] = $exploded_mini_template_site_key[1];
         }
 
-        foreach ($sites as $site_module) {
-            if (! empty($plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_module])) {
+        // insert sites
+        foreach ($sites as $site_data) {
+            if (! empty($plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_name']])) {
                 $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
-                $tree = $service->getTree($site_module, 'en_EN');
+                $tree = $service->getTree($site_data['site_id'], $container['melis-lang-locale']);
 
-                $mini_templates = $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_module];
-                $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_module] = [];
+                $mini_templates = $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_name']];
+                $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_label']] = [];
                 $new_plugin_list = [];
-                $new_plugin_list['title'] = $site_module;
+                $new_plugin_list['title'] = $site_data['site_label'];
                 $in_active_categories = [];
 
                 foreach ($tree as $key => $val) {
@@ -491,7 +493,7 @@ class FrontPluginsController extends AbstractActionController
                             $parent = $val['parent'];
                         }
 
-                        $title = 'MiniTemplatePlugin_' . $val['text'] . '_' . strtolower($site_module);
+                        $title = 'MiniTemplatePlugin_' . $val['text'] . '_' . strtolower($site_data['site_name']);
                         if ($val['parent'] != '#') {
                             if (!in_array($parent, $in_active_categories))
                                 $new_plugin_list[$parent][$title] = $mini_templates[$title];
@@ -501,8 +503,13 @@ class FrontPluginsController extends AbstractActionController
                     }
                 }
 
-                $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_module] = $new_plugin_list;
+                $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_label']] = $new_plugin_list;
             }
+        }
+
+        // remove site modules
+        foreach ($site_modules as $site_module) {
+            unset($plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_module]);
         }
 
         return $plugin_list;
