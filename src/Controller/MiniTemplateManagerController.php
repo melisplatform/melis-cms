@@ -244,8 +244,6 @@ class MiniTemplateManagerController extends AbstractActionController
         $errors = [];
 
         if ($form->isValid()) {
-            $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
-            $module = $siteTable->getEntryById($data['miniTemplateSite'])->current()->site_name;
             $uploaded_img = null;
             $uploaded_img_extension = null;
 
@@ -254,7 +252,7 @@ class MiniTemplateManagerController extends AbstractActionController
                 $uploaded_img_extension = explode('/', $data['miniTemplateThumbnail']['type'])[1];
             }
 
-            $res = $service->createMiniTemplate($module, $data['miniTemplateName'], $data['miniTemplateHtml'], $uploaded_img, $uploaded_img_extension, $cat_id);
+            $res = $service->createMiniTemplate($data['miniTemplateSite'], $data['miniTemplateName'], $data['miniTemplateHtml'], $uploaded_img, $uploaded_img_extension, $cat_id);
 
             if ($res['success']) {
                 $success = 1;

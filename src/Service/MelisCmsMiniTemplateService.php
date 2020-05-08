@@ -27,17 +27,19 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
      * @param null $uploaded_image_extension
      * @return array
      */
-    public function createMiniTemplate($site_module, $name, $html, $uploaded_image = null, $uploaded_image_extension = null, $cat_id = null) {
+    public function createMiniTemplate($site_id, $name, $html, $uploaded_image = null, $uploaded_image_extension = null, $cat_id = null) {
         $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
         $arrayParameters = $this->sendEvent('melis_cms_mini_template_create_start', $arrayParameters);
 
+        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $module = $siteTable->getEntryById($arrayParameters['site_id'])->current()->site_name;
         $translator = $this->getServiceLocator()->get('translator');
-        $path = $this->getModuleMiniTemplatePath($arrayParameters['site_module']);
+        $path = $this->getModuleMiniTemplatePath($module);
 
         $success = 0;
         $errors = [];
 
-        $this->checkCreateMiniTemplateErrors($path, $arrayParameters['name'], $arrayParameters['site_module'], $errors);
+        $this->checkCreateMiniTemplateErrors($path, $arrayParameters['name'], $module, $errors);
 
         if (empty($errors)) {
             // create the file
@@ -65,6 +67,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
 
                 $table->save(
                     [
+                        'mtplct_site_id' => $arrayParameters['site_id'],
                         'mtplct_category_id' => $cat_id,
                         'mtplct_template_name' => $arrayParameters['name'],
                         'mtplct_order' => $lastOrder
