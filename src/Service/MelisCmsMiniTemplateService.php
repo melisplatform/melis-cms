@@ -808,7 +808,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
 
                     if (!empty($template)) {
                         if ($node['parent'] != '#') {
-                            $category_template_table->saveMiniTemplate(
+                            $category_template_table->updateMiniTemplate(
                                 [
                                     'mtplct_category_id' => explode('-', $node['parent'])[0],
                                     'mtplct_order' => $mtpl_counter
@@ -817,7 +817,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
                                 $template->mtplct_template_name
                             );
                         } else {
-                            $category_template_table->saveMiniTemplate(
+                            $category_template_table->updateMiniTemplate(
                                 [
                                     'mtplct_category_id' => -1,
                                     'mtplct_order' => $root_counter
