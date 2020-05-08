@@ -804,19 +804,27 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
 
                     }
 
-                    $template = $category_template_table->getEntryByField('mtplct_template_name', $node['id'])->current();
+                    $template = $category_template_table->getTemplateBySiteId($site_id, $node['id'])->current();
 
                     if (!empty($template)) {
                         if ($node['parent'] != '#') {
-                            $category_template_table->save([
-                                'mtplct_category_id' => explode('-', $node['parent'])[0],
-                                'mtplct_order' => $mtpl_counter
-                            ], $template->mtplct_id);
+                            $category_template_table->saveMiniTemplate(
+                                [
+                                    'mtplct_category_id' => explode('-', $node['parent'])[0],
+                                    'mtplct_order' => $mtpl_counter
+                                ],
+                                $site_id,
+                                $template->mtplct_template_name
+                            );
                         } else {
-                            $category_template_table->save([
-                                'mtplct_category_id' => -1,
-                                'mtplct_order' => $root_counter
-                            ], $template->mtplct_id);
+                            $category_template_table->saveMiniTemplate(
+                                [
+                                    'mtplct_category_id' => -1,
+                                    'mtplct_order' => $root_counter
+                                ],
+                                $site_id,
+                                $template->mtplct_template_name
+                            );
 
                             $root_counter++;
                         }
