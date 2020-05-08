@@ -1319,7 +1319,6 @@ class PageController extends AbstractActionController
 
                     // Get the children for update after deleting
                     $children = $melisTree->getPageChildren($fatherPageId);
-                    $children = $children->toArray();
 
                     // Deleting the page
                     $tablePageTree = $this->getServiceLocator()->get('MelisEngineTablePageTree');
