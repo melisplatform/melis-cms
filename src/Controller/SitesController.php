@@ -1658,7 +1658,10 @@ class SitesController extends AbstractActionController
         //keys need to remove
         $cacheKeys = [
             'getSiteConfig_'.$siteId,
-            'getSiteConfigByPageId'
+            'getSiteConfigByPageId',
+            //module cache
+            'getVendorModulesEngine',
+            'getComposerModulePathEngine_'
         ];
 
         $cacheConfig = 'meliscms_page';
