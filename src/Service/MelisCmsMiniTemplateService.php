@@ -825,6 +825,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
                             $parent_id = explode('-', $node['parent'])[0];
 
                             $category_template_table->save([
+                                'mtplct_site_id' => $site_id,
                                 'mtplct_category_id' => $parent_id,
                                 'mtplct_template_name' => $node['id'],
                                 'mtplct_order' => $mtpl_counter
@@ -833,6 +834,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
                             $parent_id = '-1';
 
                             $category_template_table->save([
+                                'mtplct_site_id' => $site_id,
                                 'mtplct_category_id' => $parent_id,
                                 'mtplct_template_name' => $node['id'],
                                 'mtplct_order' => $root_counter
