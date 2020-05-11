@@ -14,7 +14,7 @@ $(function () {
     var tree = '#mini-template-category-tree';
     var table_refresh_btn = '.melis-mini-template-manager-table-refresh';
 
-    $body.on('keypress', '#miniTemplateName', function (e) {
+    $body.on('keypress keyup', '#miniTemplateName', function (e) {
         // regex for special characters except for _ and -
         var regex = /^[^:\?*\/"<>\)\(}{\]\[\.,\^!@#$|&%+=;\'\\\s]+$/;
         var key = String.fromCharCode(!e.charCode ? e.which : e.charCode);
