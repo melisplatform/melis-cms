@@ -18,7 +18,7 @@ class MiniTemplateManagerController extends AbstractActionController
     public $module = 'meliscms';
     public $tool_key = 'meliscms_mini_template_manager_tool';
     public $form_key = 'mini_template_manager_tool_add_form';
-    public $file_types = ['png', 'PNG', 'jpg', 'JPG', 'jpeg', 'JPEG'];
+    public $file_types = ['png', 'PNG', 'jpg', 'JPG', 'jpeg', 'JPEG', 'gif', 'GIF'];
 
     // TODO:
     //  Update Add-mini-template page header deatils to "Enter here the details of your mini-template"
