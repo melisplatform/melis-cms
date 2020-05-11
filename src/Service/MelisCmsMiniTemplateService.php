@@ -228,8 +228,6 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
                     );
                 } else {
                     if (! empty($image)) {
-                        print_r('asdasda');
-                        exit;
                         if (!empty($thumbnail_file['path'])) {
                             if (file_exists($thumbnail_file['path']))
                                 unlink($thumbnail_file['path']);
