@@ -16,7 +16,7 @@ use Zend\Db\Metadata\Metadata;
 
 class MelisCmsMiniTemplateService extends MelisCoreGeneralService
 {
-    public $file_types = ['png', 'PNG', 'jpg', 'JPG', 'jpeg', 'JPEG'];
+    public $file_types = ['png', 'PNG', 'jpg', 'JPG', 'jpeg', 'JPEG', 'gif', 'GIF'];
     private $latest_category_id = 0;
 
     /**
