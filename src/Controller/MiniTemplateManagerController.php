@@ -20,11 +20,6 @@ class MiniTemplateManagerController extends AbstractActionController
     public $form_key = 'mini_template_manager_tool_add_form';
     public $file_types = ['png', 'PNG', 'jpg', 'JPG', 'jpeg', 'JPEG', 'gif', 'GIF'];
 
-    // TODO:
-    //  Update Add-mini-template page header deatils to "Enter here the details of your mini-template"
-    //  Add in add-mini-template page select site error when changing site and it is linked to a category
-    // not writable error
-
     public function renderMiniTemplateManagerToolAction() {}
     public function renderMiniTemplateManagerToolHeaderAction() {}
     public function renderMiniTemplateManagerToolHeaderAddBtnAction() {}
