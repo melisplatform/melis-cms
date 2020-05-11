@@ -224,7 +224,7 @@ return [
                                                 ),
                                                 'case' => true,
                                                 'extension' => [
-                                                    'png', 'PNG', 'jpg', 'JPG', 'jpeg', 'JPEG'
+                                                    'png', 'PNG', 'jpg', 'JPG', 'jpeg', 'JPEG', 'gif', 'GIF'
                                                 ]
                                             ),
                                         ),
