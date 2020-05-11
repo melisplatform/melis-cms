@@ -17,7 +17,7 @@ $(function () {
     $body.on('keypress keyup', '#miniTemplateName', function (e) {
         // regex for special characters except for _ and -
         var regex = /^[^:\?*\/"<>\)\(}{\]\[\.,\^!@#$|&%+=;\'\\\s]+$/;
-        var key = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+        var key = String.fromCharCode(!e.charCode ? e.which : e.charCode) || String.fromCharCode(e.keyCode);
 
         if (!regex.test(key)) {
             e.preventDefault();
