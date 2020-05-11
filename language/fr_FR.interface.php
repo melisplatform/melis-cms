@@ -811,5 +811,6 @@
         'tr_meliscms_mini_template_menu_manager_save_mini_template' => 'Enregistrer le mini template',
         'tr_meliscms_mini_template_menu_manager_js_tree_loading' => 'Chargement',
         'tr_meliscms_mini_template_menu_manager_select_site_first_btn_title' => 'Sélectionnez un site pour activer',
+        'tr_meliscms_mini_template_form_invalid_name' => 'Ce champ ne peut contenir que des lettres, nombres et tirets',
     );
 ?>
