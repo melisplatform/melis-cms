@@ -86,9 +86,6 @@ class MiniTemplateManagerController extends AbstractActionController
 
         if ($params['templateName'] !== 'new_template') {
             $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
-//            $table = $this->getServiceLocator()->get('MelisCmsMiniTplCategoryTemplateTable');
-//            $category = $table->getEntryByField('mtplct_template_name', $params['templateName'])->current();
-
             $path = $service->getModuleMiniTemplatePath($params['module']);
             $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
             $site = $siteTable->getEntryByField('site_name', $params['module'])->current();
@@ -260,7 +257,8 @@ class MiniTemplateManagerController extends AbstractActionController
 
         return new JsonModel([
             'success' => $success,
-            'errors' => $errors
+            'errors' => $errors,
+            'data' => $res['data'] ?? []
         ]);
     }
 
@@ -280,6 +278,7 @@ class MiniTemplateManagerController extends AbstractActionController
             'miniTemplateHtml' => $data['miniTemplateHtml'],
             'miniTemplateThumbnail' => $data['miniTemplateThumbnail'],
         ];
+
         $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
         $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
         $current_site_data = $siteTable->getEntryByField('site_name', $current_data['miniTemplateSite'])->current();
@@ -303,7 +302,8 @@ class MiniTemplateManagerController extends AbstractActionController
 
         return new JsonModel([
             'success' => $success,
-            'errors' => $errors
+            'errors' => $errors,
+            'data' => $res['data'] ?? []
         ]);
     }
 

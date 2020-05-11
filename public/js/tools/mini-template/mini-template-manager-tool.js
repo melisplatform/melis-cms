@@ -40,9 +40,9 @@ $(function () {
 
     // Open edit mini-template tab
     $body.on('click', table_edit, function () {
-        var templateName = $(this).closest('tr').attr('id');
-        var module = $(this).closest('tr').find('p').data('module');
-        var imgSource = $(this).closest('tr').find('img').attr('src');
+        var templateName = $(this).closest('tr').attr('id') || $(this).closest('tr').prev().attr('id');
+        var module = $(this).closest('tr').find('p').data('module') || $(this).closest('tr').prev().attr('module');
+        var imgSource = $(this).closest('tr').find('img').attr('src') || $(this).closest('tr').prev().attr('src');
 
         waitForEl(thumbnail_input, function (element) {
             $(thumbnail_preview).attr('src', imgSource);
@@ -75,21 +75,38 @@ $(function () {
             cache: false,
             contentType: false,
             processData: false,
-        }).done(function (data) {
-            if (data.success) {
+        }).done(function (response) {
+            if (response.success) {
                 melisHelper.tabClose('new_template_id_meliscms_mini_template_manager_tool_add');
+
+                if (response.data.thumbnail != '') {
+                    waitForEl(thumbnail_input, function (element) {
+                        $(thumbnail_preview).attr('src', response.data.thumbnail);
+                    });
+                }
+
+                miniTemplateManagerTool.openTab(
+                    'Tpl ' + response.data.template_name,
+                    response.data.template_name,
+                    {
+                        module: response.data.module,
+                        templateName: response.data.template_name,
+                    }
+                );
+
+
                 $body.find('.mini-template-manager-tool-table-refresh ' + table_refresh_btn).trigger('click');
                 if ($body.find('#id_meliscms_mini_template_menu_manager_tool').length) {
                     $(tree).jstree(true).refresh();
                 }
                 $body.find('.melis-mini-template-menu-manager-table-refresh').trigger('click');
             } else {
-                melisHelper.melisKoNotification(translations.tr_meliscms_mini_template_menu_manager_save_mini_template, '', data.errors);
-                melisCoreTool.highlightErrors(data.success, data.errors, 'id_mini_template_manager_tool_add');
+                melisHelper.melisKoNotification(translations.tr_meliscms_mini_template_menu_manager_save_mini_template, '', response.errors);
+                melisCoreTool.highlightErrors(response.success, response.errors, 'id_mini_template_manager_tool_add');
             }
 
             melisCoreTool.done(add_btn);
-        }).fail(function (data) {
+        }).fail(function (response) {
             melisCoreTool.done(add_btn);
         });
 
@@ -124,20 +141,36 @@ $(function () {
             cache: false,
             contentType: false,
             processData: false,
-        }).done(function (data) {
-            if (data.success) {
+        }).done(function (response) {
+            if (response.success) {
                 melisHelper.tabClose(current_template + '_id_meliscms_mini_template_manager_tool_add');
+
+                if (response.data.thumbnail != '') {
+                    waitForEl(thumbnail_input, function (element) {
+                        $(thumbnail_preview).attr('src', response.data.thumbnail);
+                    });
+                }
+
+                miniTemplateManagerTool.openTab(
+                    'Tpl ' + response.data.template_name,
+                    response.data.template_name,
+                    {
+                        module: response.data.module,
+                        templateName: response.data.template_name,
+                    }
+                );
+
                 $body.find('.mini-template-manager-tool-table-refresh ' + table_refresh_btn).trigger('click');
                 if ($body.find('#id_meliscms_mini_template_menu_manager_tool').length) {
                     $(tree).jstree(true).refresh();
                 }
                 $body.find('.melis-mini-template-menu-manager-table-refresh').trigger('click');
             } else {
-                melisHelper.melisKoNotification(translations.tr_melis_cms_page_tree_import, '', data.errors);
-                melisCoreTool.highlightErrors(data.success, data.errors, 'id_mini_template_manager_tool_update');
+                melisHelper.melisKoNotification(translations.tr_melis_cms_page_tree_import, '', response.errors);
+                melisCoreTool.highlightErrors(response.success, response.errors, 'id_mini_template_manager_tool_update');
             }
             melisCoreTool.done('#melis-cms-minitemplate-edit-btn');
-        }).fail(function (data) {
+        }).fail(function (response) {
             melisCoreTool.done('#melis-cms-minitemplate-edit-btn');
         });
 
