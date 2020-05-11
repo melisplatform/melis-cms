@@ -189,6 +189,14 @@ return [
                                                 ],
                                             ],
                                         ],
+                                        [
+                                            'name' => 'regex', false,
+                                            'options' => array(
+                                                'pattern' => '/^[a-zA-Z0-9_-]*$/',
+                                                'messages' => array(\Zend\Validator\Regex::NOT_MATCH => 'tr_meliscms_mini_template_form_invalid_name'),
+                                                'encoding' => 'UTF-8',
+                                            ),
+                                        ]
                                     ],
                                     'filters' => [
 

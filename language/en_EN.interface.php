@@ -810,5 +810,6 @@
         'tr_meliscms_mini_template_menu_manager_save_mini_template' => 'Save mini template',
         'tr_meliscms_mini_template_menu_manager_js_tree_loading' => 'Loading',
         'tr_meliscms_mini_template_menu_manager_select_site_first_btn_title' => 'Select a site to activate',
+        'tr_meliscms_mini_template_form_invalid_name' => 'The name can only contain letters, numbers, dash and underscore'
     );
 ?>
