@@ -15,6 +15,15 @@ $(function () {
     var table_refresh_btn = '.melis-mini-template-manager-table-refresh';
 
     $body.on('keypress', '#miniTemplateName', function (e) {
+        // regex for special characters except for _ and -
+        var regex = /^[^:\?*\/"<>\)\(}{\]\[\.,\^!@#$|&%+=;\'\\\s]+$/;
+        var key = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+
+        if (!regex.test(key)) {
+            e.preventDefault();
+        }
+
+        // catch space and change to dash
         if (e.which === 32) {
             // get old value
             var start = e.target.selectionStart;
@@ -34,6 +43,7 @@ $(function () {
         if (e.keyCode === 13) {
             e.preventDefault();
         }
+
     });
 
     $body.on('paste', '#miniTemplateName', function (e) {
