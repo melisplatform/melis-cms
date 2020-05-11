@@ -82,7 +82,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
             'success' => $success,
             'errors' => $errors
         ];
-        $arrayParameters = $this->sendEvent('melis_cms_mini_template_create_start', $arrayParameters);
+        $arrayParameters = $this->sendEvent('melis_cms_mini_template_create_end', $arrayParameters);
         return $arrayParameters['results'];
     }
 
