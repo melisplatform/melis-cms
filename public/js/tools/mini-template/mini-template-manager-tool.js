@@ -14,35 +14,7 @@ $(function () {
     var tree = '#mini-template-category-tree';
     var table_refresh_btn = '.melis-mini-template-manager-table-refresh';
 
-    $body.on('keypress keyup', '#miniTemplateName', function (e) {
-        // regex for special characters except for _ and -
-        var regex = /^[^:\?*\/"<>\)\(}{\]\[\.,\^!@#$|&%+=;\'\\\s]+$/;
-        var key = String.fromCharCode(!e.charCode ? e.which : e.charCode);
-
-        if (e.event == 'keyup') {
-            key = String.fromCharCode(e.keyCode);
-        }
-
-        if (!regex.test(key)) {
-            e.preventDefault();
-        }
-
-        // catch space and change to dash
-        if (e.which === 32) {
-            // get old value
-            var start = e.target.selectionStart;
-            var end = e.target.selectionEnd;
-            var old_value = e.target.value;
-
-            // replace point and change input value
-            var new_value = old_value.slice(0, start) + '-' + old_value.slice(end)
-            e.target.value = new_value;
-
-            // replace cursor
-            e.target.selectionStart = e.target.selectionEnd = start + 1;
-            e.preventDefault();
-        }
-
+    $body.on('keypress', '#miniTemplateName', function (e) {
         // when enter is pressed
         if (e.keyCode === 13) {
             e.preventDefault();
