@@ -774,8 +774,8 @@
         
         // Mini template menu manager tool
         'tr_meliscms_mini_template_menu_manager_tool' => 'Menu Manager',
-        'tr_meliscms_mini_template_menu_manager_tool_header' => 'Gestion des plugins mini-templates',
-        'tr_meliscms_mini_template__menu_manager_tool_header_sub_title' => 'Gérez ici vos mini-templates',
+        'tr_meliscms_mini_template_menu_manager_tool_header' => 'Menu Manager',
+        'tr_meliscms_mini_template__menu_manager_tool_header_sub_title' => 'Gérez ici les catégories des mini-templates du menu des plugins',
         'tr_meliscms_mini_template_menu_manager_tool_add_category_header' => 'Ajouter une catégorie',
         'tr_meliscms_mini_template_menu_manager_tool_add_category_body_properties_tab' => 'Propriétés',
         'tr_meliscms_mini_template_menu_manager_tool_add_category_body_plugins_tab' => 'Plugins',
