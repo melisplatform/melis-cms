@@ -329,8 +329,7 @@ $(function () {
                                                     } else {
                                                         melisHelper.melisKoNotification(
                                                             translations.tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_title,
-                                                            translations.tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_error,
-                                                            data.errors
+                                                            translations.tr_meliscms_mini_template_menu_manager_category_delete_fail
                                                         );
                                                     }
                                                 }).fail(function (data) {
@@ -396,8 +395,7 @@ $(function () {
                                                 } else {
                                                     melisHelper.melisKoNotification(
                                                         translations.tr_meliscms_mini_template_manager_tool_delete_modal_title,
-                                                        '',
-                                                        data.errors
+                                                        translations.tr_meliscms_mini_template_menu_manager_category_delete_fail
                                                     );
                                                 }
                                             }).fail(function (data) {

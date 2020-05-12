@@ -214,8 +214,7 @@ $(function () {
                     } else {
                         melisHelper.melisKoNotification(
                             translations.tr_meliscms_mini_template_manager_tool_delete_modal_title,
-                            '',
-                            response.errors
+                            translations.tr_meliscms_mini_template_delete_fail
                         );
                     }
                 }).fail(function (data) {
