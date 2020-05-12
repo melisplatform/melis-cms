@@ -168,6 +168,7 @@ class TreeSitesController extends AbstractActionController
 		$final = array();
 		foreach($children as $page)
 		{
+            $page = (array) $page;
 			$data_page_id = $page['tree_page_id'];
 
 			/**
