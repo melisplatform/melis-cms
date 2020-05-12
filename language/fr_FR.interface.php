@@ -812,5 +812,18 @@
         'tr_meliscms_mini_template_menu_manager_js_tree_loading' => 'Chargement',
         'tr_meliscms_mini_template_menu_manager_select_site_first_btn_title' => 'Sélectionnez un site pour activer',
         'tr_meliscms_mini_template_form_invalid_name' => 'Ce champ ne peut contenir que des lettres, nombres et tirets',
+        'tr_meliscms_mini_template_created_successfully' => 'Mini-template créé avec succès',
+        'tr_meliscms_mini_template_create_fail' => 'Echec de la création du mini-template',
+        'tr_meliscms_mini_template_updated_successfully' => 'Mini-template mis à jour avec succès',
+        'tr_meliscms_mini_template_update_fail' => 'Echec de la mise à jour du mini-template',
+        'tr_meliscms_mini_template_deleted_successfully' => 'Mini-template supprimé avec succès',
+        'tr_meliscms_mini_template_delete_fail' => 'Echec de la suppression du mini-template',
+        'tr_meliscms_mini_template_menu_manager_category_created_successfully' => 'Catégorie créée avec succès',
+        'tr_meliscms_mini_template_menu_manager_category_create_fail' => 'Echec de la création de la catégorie',
+        'tr_meliscms_mini_template_menu_manager_category_updated_successfully' => 'Catégorie mise à jour avec succès',
+        'tr_meliscms_mini_template_menu_manager_category_update_fail' => 'Echec de la mise à jour de la catégorie',
+        'tr_meliscms_mini_template_menu_manager_category_deleted_successfully' => 'Catégorie supprimée avec succès',
+        'tr_meliscms_mini_template_menu_manager_category_delete_fail' => 'Echec de la suppression de la catégorie',
+        'tr_meliscms_mini_template_menu_manager_category' => 'Catégorie',
     );
 ?>

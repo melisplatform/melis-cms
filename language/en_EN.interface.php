@@ -811,5 +811,18 @@
         'tr_meliscms_mini_template_menu_manager_js_tree_loading' => 'Loading',
         'tr_meliscms_mini_template_menu_manager_select_site_first_btn_title' => 'Select a site to activate',
         'tr_meliscms_mini_template_form_invalid_name' => 'This field can only contain letters, numbers, dash and underscore',
+        'tr_meliscms_mini_template_created_successfully' => 'Mini-template created successfully',
+        'tr_meliscms_mini_template_create_fail' => 'Failed to create mini-template',
+        'tr_meliscms_mini_template_updated_successfully' => 'Mini-template updated successfully',
+        'tr_meliscms_mini_template_update_fail' => 'Failed to update mini-template',
+        'tr_meliscms_mini_template_deleted_successfully' => 'Mini-template deleted successfully',
+        'tr_meliscms_mini_template_delete_fail' => 'Failed to delete mini-template',
+        'tr_meliscms_mini_template_menu_manager_category_created_successfully' => 'Category created successfully',
+        'tr_meliscms_mini_template_menu_manager_category_create_fail' => 'Failed to create category',
+        'tr_meliscms_mini_template_menu_manager_category_updated_successfully' => 'Category updated successfully',
+        'tr_meliscms_mini_template_menu_manager_category_update_fail' => 'Failed to update category',
+        'tr_meliscms_mini_template_menu_manager_category_deleted_successfully' => 'Category deleted successfully',
+        'tr_meliscms_mini_template_menu_manager_category_delete_fail' => 'Failed to delete category',
+        'tr_meliscms_mini_template_menu_manager_category' => 'Category',
     );
 ?>

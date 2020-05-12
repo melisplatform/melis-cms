@@ -127,9 +127,13 @@ $(function () {
                     'meliscms_mini_template_menu_manager_tool_add_category_container',
                     {},
                     function () {
-                        $('#id_meliscms_mini_template_menu_manager_tool_header a').click();
+                        if ($('#id_meliscms_mini_template_menu_manager_tool_header a').hasClass('collapsed'))
+                            $('#id_meliscms_mini_template_menu_manager_tool_header a').click();
                     }
                 );
+
+                melisCore.flashMessenger();
+                melisHelper.melisOkNotification(data.textTitle, data.textMessage);
             } else {
                 melisHelper.melisKoNotification(translations.tr_meliscms_mini_template_menu_manager_save_category, '', data.errors);
                 melisCoreTool.highlightErrors(data.success, data.errors, '1_id_menu_manager_tool_site_add_category');
@@ -320,6 +324,8 @@ $(function () {
                                                 }).done(function (data) {
                                                     if (data.success) {
                                                         $(tree).jstree(true).refresh();
+                                                        melisCore.flashMessenger();
+                                                        melisHelper.melisOkNotification(data.textTitle, data.textMessage);
                                                     } else {
                                                         melisHelper.melisKoNotification(
                                                             translations.tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_title,
@@ -385,6 +391,8 @@ $(function () {
                                                 if (data.success) {
                                                     $body.find('.mini-template-manager-tool-table-refresh .melis-mini-template-manager-table-refresh').trigger('click');
                                                     $(tree).jstree(true).refresh();
+                                                    melisCore.flashMessenger();
+                                                    melisHelper.melisOkNotification(data.textTitle, data.textMessage);
                                                 } else {
                                                     melisHelper.melisKoNotification(
                                                         translations.tr_meliscms_mini_template_manager_tool_delete_modal_title,

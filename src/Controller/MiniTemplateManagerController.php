@@ -55,6 +55,7 @@ class MiniTemplateManagerController extends AbstractActionController
         $params = $this->params()->fromQuery();
         $view = new ViewModel();
         $view->formType = ($params['templateName'] == 'new_template') ? 'create' : 'update';
+        $view->templateName = ($params['templateName'] != 'new_template') ? $params['templateName'] : '';
         return $view;
     }
 
@@ -228,12 +229,16 @@ class MiniTemplateManagerController extends AbstractActionController
     public function createMiniTemplateAction() {
         $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
         $data = array_merge((array) $this->getRequest()->getPost(), $this->params()->fromFiles());
+
+        $this->getEventManager()->trigger('meliscms_mini_template_manager_create_start', $this, $data);
+
         $cat_id = $data['categoryId'];
         unset($data['categoryId']);
         $form = $this->getForm($this->module, $this->tool_key, $this->form_key);
         $form->setData($data);
         $success = 0;
         $errors = [];
+        $message = 'tr_meliscms_mini_template_create_fail';
 
         if ($form->isValid()) {
             $uploaded_img = null;
@@ -246,20 +251,29 @@ class MiniTemplateManagerController extends AbstractActionController
 
             $res = $service->createMiniTemplate($data['miniTemplateSite'], $data['miniTemplateName'], $data['miniTemplateHtml'], $uploaded_img, $uploaded_img_extension, $cat_id);
 
-            if ($res['success']) {
-                $success = 1;
-            } else {
-                $errors = $res['errors'];
-            }
+            $success = $res['success'];
+            $errors = $res['errors'];
+
+            if ($success)
+                $message = 'tr_meliscms_mini_template_created_successfully';
         } else {
             $errors = $this->getFormErrors($form->getMessages(), $form);
         }
 
-        return new JsonModel([
+        $response = [
             'success' => $success,
+            'textTitle' => 'Mini-template',
+            'textMessage' => $message,
             'errors' => $errors,
-            'data' => $res['data'] ?? []
-        ]);
+            'data' => $res['data'] ?? [],
+        ];
+
+        $this->getEventManager()->trigger(
+            'meliscms_mini_template_manager_create_end',
+            $this,
+            array_merge($response, ['typeCode' => 'CMS_MTPL_ADD'])
+        );
+        return new JsonModel($response);
     }
 
     /**
@@ -268,6 +282,9 @@ class MiniTemplateManagerController extends AbstractActionController
      */
     public function updateMiniTemplateAction() {
         $data = array_merge((array) $this->getRequest()->getPost(), $this->params()->fromFiles());
+
+        $this->getEventManager()->trigger('meliscms_mini_template_manager_update_start', $this, $data);
+
         $current_data = [
             'miniTemplateSite' => $data['current_module'],
             'miniTemplateName' => $data['current_template']
@@ -284,6 +301,7 @@ class MiniTemplateManagerController extends AbstractActionController
         $current_site_data = $siteTable->getEntryByField('site_name', $current_data['miniTemplateSite'])->current();
         $current_data['miniTemplateSite'] = $current_site_data->site_id;
         $success = 0;
+        $message = 'tr_meliscms_mini_template_update_fail';
 
         $form = $this->getForm($this->module, $this->tool_key, $this->form_key);
         $form->setData($new_data);
@@ -298,13 +316,25 @@ class MiniTemplateManagerController extends AbstractActionController
             $res = $service->updateMiniTemplate($current_data, $new_data, $data['image']);
             $success = $res['success'];
             $errors = $res['errors'];
+
+            if ($success)
+                $message = 'tr_meliscms_mini_template_updated_successfully';
         }
 
-        return new JsonModel([
+        $response = [
             'success' => $success,
+            'textTitle' => 'Mini-template',
+            'textMessage' => $message,
             'errors' => $errors,
-            'data' => $res['data'] ?? []
-        ]);
+            'data' => $res['data'] ?? [],
+        ];
+
+        $this->getEventManager()->trigger(
+            'meliscms_mini_template_manager_update_end',
+            $this,
+            array_merge($response, ['typeCode' => 'CMS_MTPL_UPDATE'])
+        );
+        return new JsonModel($response);
     }
 
     /**
@@ -357,6 +387,7 @@ class MiniTemplateManagerController extends AbstractActionController
      */
     public function deleteMiniTemplateAction() {
         $data = (array) $this->getRequest()->getPost();
+        $this->getEventManager()->trigger('meliscms_mini_template_manager_delete_start', $this, $data);
         $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
         $path = $service->getModuleMiniTemplatePath($data['module']);
         $minitemplate = $path . '/' . $data['template'] . '.phtml';
@@ -364,6 +395,7 @@ class MiniTemplateManagerController extends AbstractActionController
         $thumbnail_path = null;
         $errors = [];
         $success = 0;
+        $message = 'tr_meliscms_mini_template_delete_fail';
 
         if (! empty($minitemplate_thumbnail)) {
             $thumbnail_path = $minitemplate_thumbnail['path'];
@@ -374,12 +406,24 @@ class MiniTemplateManagerController extends AbstractActionController
         if (! empty($ress)) {
             $errors = $ress['errors'];
             $success = $ress['success'];
+
+            if ($success)
+                $message = 'tr_meliscms_mini_template_deleted_successfully';
         }
 
-        return new JsonModel([
+        $response = [
             'success' => $success,
-            'errors' => $errors
-        ]);
+            'textTitle' => 'Mini-template',
+            'textMessage' => $message,
+            'errors' => $errors,
+        ];
+
+        $this->getEventManager()->trigger(
+            'meliscms_mini_template_manager_delete_end',
+            $this,
+            array_merge($response, ['typeCode' => 'CMS_MTPL_DELETE'])
+        );
+        return new JsonModel($response);
     }
 
     // get bytes

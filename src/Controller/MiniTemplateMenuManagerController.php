@@ -206,25 +206,68 @@ class MiniTemplateMenuManagerController extends AbstractActionController
 
     public function saveCategoryAction() {
         $params = $this->params()->fromPost();
+        $event = 'meliscms_mini_template_menu_manager_create_category';
+        $type_code = 'CMS_MTPL_CATEGORY_ADD';
+        $message = 'tr_meliscms_mini_template_menu_manager_category_create_fail';
+
+        if (! empty($params['cat_id'])) {
+            $event = 'meliscms_mini_template_menu_manager_update_category';
+            $type_code = 'CMS_MTPL_CATEGORY_UPDATE';
+            $message = 'tr_meliscms_mini_template_menu_manager_category_update_fail';
+        }
+
+        $this->getEventManager()->trigger($event . '_start', $this, $params);
         $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
         $res = $service->saveCategory($params, $params['cat_id']);
 
-        return new JsonModel([
+        if ($res['success']) {
+            $message = 'tr_meliscms_mini_template_menu_manager_category_created_successfully';
+            if (! empty($params['cat_id']))
+                $message = 'tr_meliscms_mini_template_menu_manager_category_updated_successfully';
+        }
+
+        $response = [
             'success' => $res['success'],
-            'errors' => $res['errors']
-        ]);
+            'textTitle' => 'Category',
+            'textMessage' => $message,
+            'errors' => $res['errors'],
+        ];
+
+        $this->getEventManager()->trigger(
+            $event . '_end',
+            $this,
+            array_merge($response, ['typeCode' => $type_code, 'itemId' => $res['id']])
+        );
+        return new JsonModel($response);
     }
 
     public function deleteCategoryAction() {
         $params = $this->params()->fromPost();
+        $this->getEventManager()->trigger('meliscms_mini_template_menu_manager_delete_category_start', $this, $params);
         $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
         $cat_id = explode('-', $params['id'])[0];
-        $wasDeleted = $service->deleteCategory($cat_id);
+        $message = 'tr_meliscms_mini_template_menu_manager_category_delete_fail';
+        $res = $service->deleteCategory($cat_id);
 
-        return new JsonModel([
-            'success' => $wasDeleted['success'],
-            'errors' => $wasDeleted['errors']
-        ]);
+        if ($res['success']) {
+            $message = 'tr_meliscms_mini_template_menu_manager_category_deleted_successfully';
+        }
+
+        $response = [
+            'success' => $res['success'],
+            'errors' => $res['errors'],
+            'textTitle' => 'Category',
+            'textMessage' => $message,
+            'id' => $cat_id
+        ];
+
+        $this->getEventManager()->trigger(
+            'meliscms_mini_template_menu_manager_delete_category_end',
+            $this,
+            array_merge($response, ['typeCode' => 'CMS_MTPL_CATEGORY_DELETE', 'itemId' => $cat_id])
+        );
+
+        return new JsonModel($response);
     }
 
     public function saveTreeAction() {
