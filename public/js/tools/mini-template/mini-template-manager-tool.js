@@ -207,6 +207,7 @@ $(function () {
                             $(tree).jstree(true).refresh();
                         }
                         $body.find('.melis-mini-template-menu-manager-table-refresh').trigger('click');
+                        $('li[data-tool-id="' + templateName + '_id_meliscms_mini_template_manager_tool_add"]').find('a.close').trigger('click');
                         melisHelper.melisOkNotification(response.textTitle, response.textMessage);
                     } else {
                         melisHelper.melisKoNotification(
