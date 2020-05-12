@@ -99,14 +99,13 @@ $(function () {
                     $(tree).jstree(true).refresh();
                 }
                 $body.find('.melis-mini-template-menu-manager-table-refresh').trigger('click');
-
-                melisCore.flashMessenger();
                 melisHelper.melisOkNotification(response.textTitle, response.textMessage);
             } else {
                 melisHelper.melisKoNotification(translations.tr_meliscms_mini_template_menu_manager_save_mini_template, '', response.errors);
                 melisCoreTool.highlightErrors(response.success, response.errors, 'id_mini_template_manager_tool_add');
             }
 
+            melisCore.flashMessenger();
             melisCoreTool.done(add_btn);
         }).fail(function (response) {
             melisCoreTool.done(add_btn);
@@ -167,13 +166,13 @@ $(function () {
                     $(tree).jstree(true).refresh();
                 }
                 $body.find('.melis-mini-template-menu-manager-table-refresh').trigger('click');
-
-                melisCore.flashMessenger();
                 melisHelper.melisOkNotification(response.textTitle, response.textMessage);
             } else {
                 melisHelper.melisKoNotification(translations.tr_melis_cms_page_tree_import, '', response.errors);
                 melisCoreTool.highlightErrors(response.success, response.errors, 'id_mini_template_manager_tool_update');
             }
+
+            melisCore.flashMessenger();
             melisCoreTool.done('#melis-cms-minitemplate-edit-btn');
         }).fail(function (response) {
             melisCoreTool.done('#melis-cms-minitemplate-edit-btn');
@@ -208,8 +207,6 @@ $(function () {
                             $(tree).jstree(true).refresh();
                         }
                         $body.find('.melis-mini-template-menu-manager-table-refresh').trigger('click');
-
-                        melisCore.flashMessenger();
                         melisHelper.melisOkNotification(response.textTitle, response.textMessage);
                     } else {
                         melisHelper.melisKoNotification(
@@ -217,6 +214,8 @@ $(function () {
                             translations.tr_meliscms_mini_template_delete_fail
                         );
                     }
+
+                    melisCore.flashMessenger();
                 }).fail(function (data) {
 
                 });
