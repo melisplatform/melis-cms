@@ -228,7 +228,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController
 
         $response = [
             'success' => $res['success'],
-            'textTitle' => 'Category',
+            'textTitle' => 'tr_meliscms_mini_template_menu_manager_category',
             'textMessage' => $message,
             'errors' => $res['errors'],
         ];
@@ -256,7 +256,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController
         $response = [
             'success' => $res['success'],
             'errors' => $res['errors'],
-            'textTitle' => 'Category',
+            'textTitle' => 'tr_meliscms_mini_template_menu_manager_category',
             'textMessage' => $message,
             'id' => $cat_id
         ];
