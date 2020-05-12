@@ -1,5 +1,4 @@
 (function($, window, document) {
-	var $body = $("body");
 
 		// On Load
 		$(window).on('load', function() {
@@ -85,12 +84,12 @@
 												var zoneId = data.melisData.item_zoneid;
 												var idPage = data.melisData.page_id;
 												var parentNode = (node.getParent().key == 'root_1') ? -1 : node.getParent().key;
-												// var parentNode = ( node.key == 'root_1') ? -1 : node.getParent().key;	
+												// var parentNode = ( node.key == 'root_1') ? -1 : node.getParent().key;
 
 												// check if page to be delete is open or not
 												var openedOrNot = $(".tabsbar a[data-id='" + zoneId + "']").parent("li");
 
-												// delete page confirmation 
+												// delete page confirmation
 												melisCoreTool.confirm(
 														translations.tr_meliscms_menu_delete,
 														translations.tr_meliscms_menu_cancel,
@@ -127,7 +126,7 @@
 										}
 										if (action === 'dupe') {
 												var data = node.data;
-												// melisHelper.tabOpen( data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,  { sourcePageId: data.melisData.page_id } ); 
+												// melisHelper.tabOpen( data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,  { sourcePageId: data.melisData.page_id } );
 
 												// initialation of local variable
 												zoneId = 'id_meliscms_tools_tree_modal_form_handler';
@@ -205,15 +204,16 @@
 								if (targetType === "title") {
 										data.node.setExpanded();
 
-										// open page on click on mobile . desktop is double click
-										if (melisCore.screenSize <= 1024) {
-												var data = data.node.data;
-												melisHelper.tabOpen(data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey, {
-														idPage: data.melisData.page_id
-												}, null, melisCms.pageTabOpenCallback(data.melisData.page_id));
-										}
-								}
-								$('.hasNiceScroll').getNiceScroll().resize();
+									// open page on click on mobile . desktop is double click
+									if (melisCore.screenSize <= 1024) {
+											var data = data.node.data;
+											var pageName = data.melisData.page_id + " - " + data.melisData.page_title;
+											melisHelper.tabOpen(pageName, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey, {
+													idPage: data.melisData.page_id
+											}, null, melisCms.pageTabOpenCallback(data.melisData.page_id));
+									}
+							}
+							$('.hasNiceScroll').getNiceScroll().resize();
 
 								if ( $tabArrowTop.length ) {
 									$tabArrowTop.removeClass("hide-arrow");
@@ -223,11 +223,12 @@
 								// get eventType to know what was clicked the 'expander (+-)' or the title
 								//targetType = data.targetType;
 
-								// open tab and page
-								var data = data.node.data;
-								melisHelper.tabOpen(data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey, {
-										idPage: data.melisData.page_id
-								}, null, melisCms.pageTabOpenCallback(data.melisData.page_id));
+							// open tab and page
+							var data = data.node.data;
+							var pageName = data.melisData.page_id + " - " + data.melisData.page_title;
+							melisHelper.tabOpen(pageName, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey, {
+									idPage: data.melisData.page_id
+							}, null, melisCms.pageTabOpenCallback(data.melisData.page_id));
 
 								$('.hasNiceScroll').getNiceScroll().resize();
 
