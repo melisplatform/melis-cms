@@ -476,6 +476,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
         $params = $arrayParameters['params'];
         $cat_id = $arrayParameters['cat_id'];
 
+        $saved_cat_id = 0;
         $connection = $this->startDbTransaction();
         $success = 0;
         $errors = [];
