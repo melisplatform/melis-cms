@@ -881,3 +881,10 @@ ul#select2-id_mcgdprbanner_site_id-results {
 		left: 0 !important;
 	}
 }
+/*
+ * Fix: 0000198: dev1 - Melis Site tool - new site - empty popup
+ * https://mantis2.uat.melistechnology.fr/view.php?id=198
+ */
+#id_meliscms_tool_sites_modal_add_content .owl-carousel {
+	display: block;
+} 
