@@ -31,6 +31,7 @@ return [
                             'input_filter' => [
                                 'mgdpre_link' => [
                                     'name' => 'mgdpre_link',
+                                    'required' => false,
                                     'validators' => [
                                         [
                                             'name' => 'IsInt',
