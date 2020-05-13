@@ -135,7 +135,19 @@ $(function () {
                 melisHelper.melisOkNotification(data.textTitle, data.textMessage);
             } else {
                 melisHelper.melisKoNotification(translations.tr_meliscms_mini_template_menu_manager_save_category, '', data.errors);
-                melisCoreTool.highlightErrors(data.success, data.errors, '1_id_menu_manager_tool_site_add_category');
+                var formData = $("#id_meliscms_mini_template_menu_manager_tool_add_category_body_properties_form form").serializeArray();
+                var errors = data.errors['1_category_name'];
+                var form_id = '_id_menu_manager_tool_site_add_category';
+
+                if (typeof $('#menu-manager-category-id').data('id') !== 'undefined')
+                    form_id = '_id_menu_manager_tool_site_update_category';
+
+                $.each(formData, function (key, value) {
+                    var lang_key = value.name.split('_')[0];
+                    var form_errors = {};
+                    form_errors[lang_key + '_category_name'] = errors;
+                    melisCoreTool.highlightErrors(data.success, form_errors, lang_key + form_id);
+                });
             }
 
             melisCore.flashMessenger();
