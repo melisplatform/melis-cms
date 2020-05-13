@@ -8,8 +8,8 @@
         <div class="me-hl col-xs-12 col-sm-8 col-md-9">
             <div class="form-group">
                 <label><?php echo $this->translate('tr_meliscore_common_status')?></label>
-                <div id="mtpl-category-status" class="make-switch main_variant_switch" data-on-label="<?php echo $this->translate('tr_meliscms_tool_style_page_status_on')?>" data-off-label="<?php echo $this->translate('tr_meliscms_tool_style_page_status_off')?>" data-text-label="<i class='icon glyphicon glyphicon-resize-horizontal'></i>">
-                    <input type="checkbox" name="mcsdetail_status" id="" <?= ($this->status) ? 'checked' : '' ?>>
+                <div id="mtpl-category-status" class="make-switch" data-on-label="<?php echo $this->translate('tr_meliscms_tool_style_page_status_on')?>" data-off-label="<?php echo $this->translate('tr_meliscms_tool_style_page_status_off')?>" data-text-label="<i class='icon glyphicon glyphicon-resize-horizontal'></i>">
+                    <input type="checkbox" name="mtpl-cat-status" id="mtpl-cat-status" <?= ($this->status) ? 'checked' : '' ?>>
                 </div>
             </div>
             <script type="text/javascript">
