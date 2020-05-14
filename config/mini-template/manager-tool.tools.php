@@ -50,7 +50,7 @@ return [
                             'html_path' => [
                                 'text' => 'tr_meliscms_mini_template_manager_tool_table_path',
                                 'css' => [],
-                                'sortable' => false
+                                'sortable' => true
                             ],
                         ],
                         'searchables' => [

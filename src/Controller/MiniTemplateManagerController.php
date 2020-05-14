@@ -150,6 +150,13 @@ class MiniTemplateManagerController extends AbstractActionController
         $total = $filtered = 0;
         $mini_templates_filtered = [];
         $search = $post['search']['value'] ?? '';
+        $order = 'asc';
+
+        if (! empty($post['order'])) {
+            if ($post['order'][0]['column'] == 1) {
+                $order = $post['order'][0]['dir'];
+            }
+        }
 
         if (! empty($post['site_name'])) {
             $path = $service->getModuleMiniTemplatePath($post['site_name']);
@@ -183,6 +190,9 @@ class MiniTemplateManagerController extends AbstractActionController
                         ];
                     }
                 }
+
+                if ($order == 'desc')
+                    $mini_templates = array_reverse($mini_templates);
 
                 $total = $filtered = count($mini_templates);
                 $mini_templates_filtered = array_slice($mini_templates, $start, $length);
