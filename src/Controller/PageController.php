@@ -1813,7 +1813,7 @@ class PageController extends AbstractActionController
             $childrenPages = $melisTree->getPageChildren($idPage, 0);
             foreach($childrenPages as $page)
             {
-                $this->updateUrlPage($page->tree_page_id);
+                $this->updateUrlPage($page['tree_page_id']);
             }
         }
     }
