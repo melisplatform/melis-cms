@@ -1,3 +1,7 @@
+table#tableMiniTemplateMenuManagerPlugins.loading-changes tbody tr td {
+    cursor: wait !important;
+}
+
 .mini-template-menu-manager-lang a.disabled {
     cursor: not-allowed;
 }

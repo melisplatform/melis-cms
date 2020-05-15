@@ -532,11 +532,13 @@ window.initMiniTemplateMenuManagerPluginTables = function (data, tableSettings) 
                 dataType    : "json",
                 encode		: true,
                 beforeSend: function () {
+                    $('#tableMiniTemplateMenuManagerPlugins').addClass('loading-changes');
                     $('#tableMiniTemplateMenuManagerPlugins').DataTable().rowReorder.disable();
                 }
             }).done(function(data) {
                 $('#mini-template-category-tree').jstree(true).refresh();
                 $('#tableMiniTemplateMenuManagerPlugins').DataTable().rowReorder.enable();
+                $('#tableMiniTemplateMenuManagerPlugins').removeClass('loading-changes');
             }).fail(function(){
 
             });
