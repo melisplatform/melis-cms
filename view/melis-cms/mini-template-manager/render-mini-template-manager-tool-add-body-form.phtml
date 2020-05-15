@@ -58,9 +58,9 @@
                     <div>
                         <span class="thumbnail">
                             <img
-                                id="new-minitemplate-thumbnail"
+                                class="new-minitemplate-thumbnail"
                                 width="300"
-                                src="/MelisFront/plugins/images/default.jpg"
+                                src="<?= (! empty($this->imgSource)) ? $this->imgSource : '/MelisFront/plugins/images/default.jpg' ?>"
                                 alt="<?= $this->translate('tr_meliscore_tool_user_usr_profile_image'); ?>"
                                 style="margin-right: auto; margin-left: auto; display:block;"
                             >
@@ -68,7 +68,7 @@
                     </div>
                     <div>
                         <?php if ($this->formType !== 'create') : ?>
-                            <a href="#" class="small"  id="remove-mini-template-thumbnail-preview">
+                            <a href="#" class="small remove-mini-template-thumbnail-preview"  id="">
                                 <i class="fa fa-times"></i>
                                 <?= $this->translate('tr_meliscms_mini_template_manager_tool_form_remove_thumbnail') ?>
                             </a>
@@ -98,7 +98,7 @@
     <?php endif ?>
 </div>
 <script type="text/javascript">
-    $("#miniTemplateThumbnail").filestyle(
+    $(".miniTemplateThumbnail").filestyle(
         {
             buttonBefore: true,
             input: false,

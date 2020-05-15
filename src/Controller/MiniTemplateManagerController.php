@@ -96,6 +96,7 @@ class MiniTemplateManagerController extends AbstractActionController
             $data['miniTemplateHtml'] = file_get_contents($path . '/' . $params['templateName'] . '.phtml');
 
             $form->setAttribute('id', 'id_mini_template_manager_tool_update');
+            $form->setAttribute('class', 'mini_template_manager_tool_update');
             $form->setAttribute('name', 'mini_template_manager_tool_update');
             $form->setData($data);
         } else {
@@ -109,6 +110,7 @@ class MiniTemplateManagerController extends AbstractActionController
         $view->current_template = $params['templateName'] ?? '';
         $view->max_size = $this->asBytes($max_size);
         $view->categoryId = $params['categoryId'] ?? '';
+        $view->imgSource = $params['imgSource'] ?? '';
         return $view;
     }
 

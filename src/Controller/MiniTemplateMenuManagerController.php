@@ -230,13 +230,13 @@ class MiniTemplateMenuManagerController extends AbstractActionController
             'success' => $res['success'],
             'textTitle' => 'tr_meliscms_mini_template_menu_manager_category',
             'textMessage' => $message,
-            'errors' => $res['errors'],
+            'errors' => $res['errors']
         ];
 
         $this->getEventManager()->trigger(
             $event . '_end',
             $this,
-            array_merge($response, ['typeCode' => $type_code, 'itemId' => $res['id']])
+            array_merge($response, ['typeCode' => $type_code, 'itemId' => $res['id'] ?? 0])
         );
         return new JsonModel($response);
     }
