@@ -147,7 +147,7 @@ return [
                                             ],
                                         ],
                                         'attributes' => [
-                                            'id' => '',
+                                            'id' => 'miniTemplateThumbnail',
                                             'accept' => '.gif,.jpg,.jpeg,.png',
                                             'value' => '',
                                             'placeholder' => 'tr_meliscms_mini_template_manager_tool_table_image',
