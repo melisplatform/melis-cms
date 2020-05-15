@@ -180,12 +180,9 @@ class SitesTranslationController extends AbstractActionController
         $con = $db->getDriver()->getConnection();//get db driver connection
         $con->beginTransaction();//begin transaction
         try {
-            $data = $mstTable->getTranslationsBySiteId($postData['siteId'])->toArray();
-            foreach ($data as $key => $val) {
-                $idToDelete = $val['mst_id'];
-                $melisSiteTranslationService->deleteTranslationKeyById($idToDelete);
-                $melisSiteTranslationService->deleteTranslationTextByMstId($idToDelete);
-            }
+            $mstId = $postData['mst_id'];
+            $melisSiteTranslationService->deleteTranslationKeyById($mstId);
+            $melisSiteTranslationService->deleteTranslationTextByMstId($mstId);
             //cache the translation
             $melisSiteTranslationService->cacheTranslations($postData['siteId']);
 
