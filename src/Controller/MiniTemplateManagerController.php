@@ -131,7 +131,9 @@ class MiniTemplateManagerController extends AbstractActionController
             '#tableMiniTemplateManager',
             false,
             false,
-            []
+            [
+                'order' => '[[1, "asc"]]'
+            ]
         );
         return $view;
     }
