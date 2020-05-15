@@ -530,9 +530,13 @@ window.initMiniTemplateMenuManagerPluginTables = function (data, tableSettings) 
                 url         : "/melis/MelisCms/MiniTemplateMenuManager/reorderMiniTemplates",
                 data		: dataString,
                 dataType    : "json",
-                encode		: true
+                encode		: true,
+                beforeSend: function () {
+                    $('#tableMiniTemplateMenuManagerPlugins').DataTable().rowReorder.disable();
+                }
             }).done(function(data) {
                 $('#mini-template-category-tree').jstree(true).refresh();
+                $('#tableMiniTemplateMenuManagerPlugins').DataTable().rowReorder.enable();
             }).fail(function(){
 
             });
