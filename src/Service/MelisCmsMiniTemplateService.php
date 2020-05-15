@@ -311,7 +311,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
                 $image = '<img data-image="test" src="/MelisFront/plugins/images/default.jpg" width=100 height=100>';
             $exploded = explode('.', $template['template']['file']);
             $templateName = $exploded[0];
-            $tag = '<p data-module="' . $site->site_name . '" class="mini-template-tool-table-path">' . explode('..', $template['template']['path'])[1] . '/' . $template['template']['file'] . '</p>';
+            $tag = '<p data-module="' . $site->site_name . '" class="mini-template-tool-table-path">' . explode('..', $template['template']['path'])[1] . '</p>';
 
             $final_mini_templates[] = [
                 'tempId' => (string)$counter,
