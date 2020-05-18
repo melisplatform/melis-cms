@@ -4,6 +4,14 @@ return [
         'meliscms' => [
             'interface' => [
                 'meliscms_mini_template_manager' => [
+                    'conf' => [
+                        'id' =>  'id_meliscms_mini_template_manager',
+                        'name' => 'tr_meliscms_mini_template_manager',
+                        'melisKey' => 'meliscms_mini_template_manager',
+                        'icon' => 'fa-tasks',
+                        'rights_checkbox_disable' => false,
+                        'follow_regular_rendering' => false,
+                    ],
                     'interface' => [
                         // Mini template manager tool
                         'meliscms_mini_template_manager_tool' => [
@@ -12,8 +20,8 @@ return [
                                 'name' => 'tr_meliscms_mini_template_manager_tool',
                                 'melisKey' => 'meliscms_mini_template_manager_tool',
                                 'icon' => 'fa-tasks',
-                                'rights_checkbox_disable' => true,
-                                'follow_regular_rendering' => false,
+                                'rights_checkbox_disable' => false,
+                                'follow_regular_rendering' => true,
                             ],
                             'forward' => [
                                 'module' => 'MelisCms',
@@ -85,6 +93,7 @@ return [
                                 'id' =>  'id_meliscms_mini_template_manager_tool_add',
                                 'name' => 'tr_meliscms_mini_template_manager_tool_add',
                                 'melisKey' => 'meliscms_mini_template_manager_tool_add',
+                                'rights_checkbox_disable' => false,
                                 'icon' => 'fa-tasks',
                             ],
                             'forward' => [

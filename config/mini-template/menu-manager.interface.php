@@ -12,7 +12,7 @@ return [
                                 'name' => 'tr_meliscms_mini_template_menu_manager_tool',
                                 'melisKey' => 'meliscms_mini_template_menu_manager_tool',
                                 'icon' => 'fa-bars',
-                                'rights_checkbox_disable' => true,
+                                'rights_checkbox_disable' => false,
                                 'follow_regular_rendering' => false,
                             ],
                             'forward' => [

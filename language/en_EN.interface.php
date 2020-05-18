@@ -737,10 +737,16 @@
 		// Mini template manager tool
 		'tr_meliscms_mini_template_manager' => 'Mini Templates & Plugins',
 		'tr_meliscms_mini_template_manager_tool' => 'Mini Template Manager',
-		'tr_meliscms_mini_template_manager_tool_header' => 'Mini-Template Manager',
 		'tr_meliscms_mini_template_manager_tool_header_sub_title' => 'Manage here the list of mini templates plugins available on your sites.',
 		'tr_meliscms_mini_template_manager_tool_header_add_btn' => 'Add mini-template',
 		'tr_meliscms_mini_template_manager_tool_add_mini_template_tab' => 'Add mini-template',
+        'tr_meliscms_mini_template_manager_tool_header' => 'Mini template manager header',
+		'tr_meliscms_mini_template_manager_tool_body' => 'Mini template manager contents',
+		'tr_meliscms_mini_template_manager_tool_body_data_table' => 'Mini templet manager table',
+		'tr_meliscms_mini_template_manager_tool_add' => 'Mini template creation',
+		'tr_meliscms_mini_template_manager_tool_add_header' => 'Add mini template header',
+		'tr_meliscms_mini_template_manager_tool_add_body' => 'Add mini template contents',
+		'tr_meliscms_mini_template_manager_tool_add_body_form' => 'Add mini template form',
 
 		'tr_meliscms_mini_template_manager_tool_table_image' => 'Image',
 		'tr_meliscms_mini_template_manager_tool_table_path' => 'Path',
@@ -772,13 +778,24 @@
 
 		// Mini template menu manager tool
 		'tr_meliscms_mini_template_menu_manager_tool' => 'Menu Manager',
-		'tr_meliscms_mini_template_menu_manager_tool_header' => 'Menu Manager',
 		'tr_meliscms_mini_template__menu_manager_tool_header_sub_title' => 'Manage here the categories of mini-templates from the plugin menu',
 		'tr_meliscms_mini_template_menu_manager_tool_add_category_header' => 'Add category',
 		'tr_meliscms_mini_template_menu_manager_tool_add_category_body_properties_tab' => 'Properties',
 		'tr_meliscms_mini_template_menu_manager_tool_add_category_body_plugins_tab' => 'Plugins',
 		'tr_meliscms_mini_template_menu_manager_tool_add_category_texts' => 'Texts',
 		'tr_meliscms_mini_template_menu_manager_tool_add_category_save' => 'Save',
+        'tr_meliscms_mini_template_menu_manager_tool_header' => 'Menu manager header',
+		'tr_meliscms_mini_template_menu_manager_tool_body' => 'Menu manager contents',
+		'tr_meliscms_mini_template_menu_manager_tool_body_left' => 'Menu manager left content',
+		'tr_meliscms_mini_template_menu_manager_tool_body_right' => 'Menu manager right content',
+		'tr_meliscms_mini_template_menu_manager_tool_add_category_container' => 'Category',
+		'tr_meliscms_mini_template_menu_manager_tool_add_category_body' => 'Category container',
+		'tr_meliscms_mini_template_menu_manager_tool_add_category_body_tabs' => 'Category tabs',
+		'tr_meliscms_mini_template_menu_manager_tool_add_category_body_contents' => 'Category contents',
+		'tr_meliscms_mini_template_menu_manager_tool_add_category_body_properties_content' => 'Properties contents',
+		'tr_meliscms_mini_template_menu_manager_tool_add_category_body_properties_form' => 'Properties form',
+		'tr_meliscms_mini_template_menu_manager_tool_add_category_body_plugins_content' => 'Plugins contents',
+		'tr_meliscms_mini_template_menu_manager_tool_add_category_body_plugins_table' => 'Plugins table',
 		// Filter
 		'tr_meliscms_mini_template_menu_manager_tool_sites_filter' => 'Filter by site',
 		'tr_meliscms_mini_template_menu_manager_tool_sites_filter_tooltip' => 'Select a site to display its categories and mini-templates',
@@ -824,5 +841,8 @@
         'tr_meliscms_mini_template_menu_manager_category_deleted_successfully' => 'Category deleted successfully',
         'tr_meliscms_mini_template_menu_manager_category_delete_fail' => 'Failed to delete category',
         'tr_meliscms_mini_template_menu_manager_category' => 'Category',
+
+        'tr_meliscms_mini_template_manager' => 'Mini Templates & Plugins',
+
     );
 ?>
