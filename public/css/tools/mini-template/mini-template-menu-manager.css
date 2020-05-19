@@ -34,47 +34,16 @@ table#tableMiniTemplateMenuManagerPlugins.loading-changes tbody tr td {
     border-bottom: 1px solid #eee;
 }
 
-/**
-* Category Custom Checkbox for Countries
-*/
-.ecom-coutries-label{
-    font-style : inherit;
+.mtpl-menu-add-category,
+.mtpl-menu-add-template {
+    margin-left: 10px;
 }
-.cms-category-checkbox{
-    cursor: pointer;
-    margin-left: 20px;
-    font-weight: normal;
-}
-.cms-category-checkbox .fa-check-square-o{
-    color: #72af46;
-}
-.cms-category-checkbox i{
-    margin-right: 5px;
-}
-.cms-category-checkbox input{
-    display : none;
-}
-#categorySiteFilter {
-    cursor: pointer;
-}
-/**
-* Category Tree View Container
-*/
+
 .cat-div {
     width: auto;
     overflow-y: auto !important;
 }
 
-#id_meliscms_catergories_list_categories_tree .jstree-proton .jstree-search {
-    background: rgb(247, 230, 230);
-    box-shadow: inset 0 0 1px rgba(169, 68, 66, 0.38);
-    border-radius: 0px;
-    font-weight: normal;
-    padding-right: 10px;
-}
-/**
-* Category Tree View Language Dropdown
-*/
 .cat-tree-view-languages {
     margin-left: 5px;
     margin-bottom: 30px;
@@ -97,40 +66,6 @@ table#tableMiniTemplateMenuManagerPlugins.loading-changes tbody tr td {
     right:5px;
 }
 
-/**
-* JSTree Search Buttons
-*/
-#cmsCategoryTreeViewPanel .btn {
-    padding-left: 0.3em;
-    padding-right: 0.3em;
-}
-#cmsCategoryTreeViewPanel .btn span{
-    font-size: 12px;
-}
-
-@media (min-width: 1753px) and (max-width: 1850px){
-    #cmsCategoryTreeViewPanel .btn{
-        font-size: 10px;
-    }
-}
-
-@media (min-width: 1200px) and (max-width: 1752px) {
-    #cmsCategoryTreeViewPanel .btn span{
-        display: none;
-    }
-}
-@media (max-width: 768px){
-    #id_melis_cms_categories_v2_list{
-        margin-top:48px;
-    }
-    #cmsCategoryTreeViewPanel {
-        margin-bottom:30px;
-    }
-}
-
-
-/*** JSTree ***/
-
 /*Contentmenu*/
 .vakata-context, .vakata-context ul {
     font-family: 'Titillium Web',sans-serif,Arial,sans-serif;
@@ -142,30 +77,18 @@ table#tableMiniTemplateMenuManagerPlugins.loading-changes tbody tr td {
     font-size: 12px;
 }
 /*Node Selected/Highlight*/
-#id_meliscms_mini_template_menu_manager_tool_body_right .jstree-proton .jstree-clicked,
-#melis_cms_categories_category_select_modal_content .jstree-proton .jstree-clicked {
+#id_meliscms_mini_template_menu_manager_tool_body_right .jstree-proton .jstree-clicked {
     background: #e61c23;
     box-shadow: inset 0 0 1px #e61c23;
     border-radius: 0px;
     padding-right: 10px;
     color:#fff !important;
 }
-#id_meliscms_mini_template_menu_manager_tool_body_right .jstree-proton .jstree-hovered,
-#melis_cms_categories_category_select_modal_content .jstree-proton .jstree-hovered{
+
+#id_meliscms_mini_template_menu_manager_tool_body_right .jstree-proton .jstree-hovered {
     background: rgba(249, 124, 119, 0.42);
     box-shadow: inset 0 0 1px rgba(169, 68, 66, 0.38);
     color: #525151 !important;
-    border-radius: 0px;
-    padding-right: 10px;
-}
-
-#id_meliscms_catergories_list_categories_tree {
-    min-height:202px;
-}
-.custom-search .jstree-hovered {
-    background: rgba(249, 124, 119, 0.42);
-    box-shadow: inset 0 0 1px rgba(169, 68, 66, 0.38);
-    color: #525151;
     border-radius: 0px;
     padding-right: 10px;
 }
@@ -202,33 +125,17 @@ table#tableMiniTemplateMenuManagerPlugins.loading-changes tbody tr td {
     cursor: move;
 }
 
-/**
- * Category Switch
- */
-.cms-category-switch{
-    width: 210px
-}
-
 .category-list-lang-dropdown{
     background: #ECEBEB;
     border-radius: 4px;
     color: #7D7B7B;
 }
 
-.custom-category-desc{
+.custom-mtpl-desc{
     display: block;
     margin: 8px;
     padding-left: 32px;
     color: #686868 !important;
-}
-
-#id_meliscommerce_categories_category .card-heading {
-    position: relative;
-}
-#id_meliscommerce_categories_category.fix-cat .card-heading {
-    position: fixed;
-    top: 38px;
-    z-index: 105;
 }
 
 /* ACCORDION */
@@ -268,9 +175,6 @@ table#tableMiniTemplateMenuManagerPlugins.loading-changes tbody tr td {
     background: #932E2A;
     color: #fff;
 }
-#id_meliscommerce_categories_page .card-heading{
-    padding: 0;
-}
 .card-title a.btn {
     margin: 10px 0 0 10px;
 }
@@ -297,16 +201,6 @@ table#tableMiniTemplateMenuManagerPlugins.loading-changes tbody tr td {
 #content .accordion-toggle h1.content-heading {
     text-transform: none;
 }
-#id_meliscommerce_categories_page .card-default {
-    border: none medium;
-}
-#id_meliscommerce_categories_page .card-title {
-    border-bottom: 1px solid #eee;
-}
-#id_meliscommerce_categories_page .card-heading {
-    border: none medium;
-    border-bottom: none medium;
-}
 #content .card > .card-heading+.card-collapse .card-body {
     border: none medium;
 }
@@ -317,307 +211,44 @@ table#tableMiniTemplateMenuManagerPlugins.loading-changes tbody tr td {
     color: #111;
 }
 
-/* TABS */
-.content-cont .product-text-tab li.active:hover a{
-    background: #932E2A;
-    border-color: transparent;
-}
-.mini-media-library .image-area,
-.mini-media-library .file-area{
-    padding:5px;
-    border:2px solid #eee;
-    border-radius:5px;
-    overflow:hidden;
-    white-space: nowrap;
-    position:relative;
-    -webkit-transition: all 0.2s ease-in-out;
-    -moz-transition: all 0.2s ease-in-out ;
-    -ms-transition: all 0.2s ease-in-out ;
-    -o-transition: all 0.2s ease-in-out ;
-    transition: all 0.2s ease-in-out ;
-    margin-bottom:10px;
-}
-.mini-media-library .image-area img{
-    max-height:100px;
-    width:100%;
-    min-height:100px;
-    border-radius:5px;
-}
-.mini-media-library .image-area .add-wrapper,
-.mini-media-library .file-area .add-wrapper{
-    position:absolute;
-    background:#000;
-    height:100%;
-    width:100%;
-    top:0;
-    text-align:center;
-    opacity:0.6;
-    border-radius:5px;
-    display:none;
-    cursor:pointer;
-    color:#fff;
-    line-height:50px;
-    left:0;
-}
-.mini-media-library .image-area:hover .add-wrapper,
-.mini-media-library .file-area:hover .add-wrapper{
-    display:block;
-}
-.mini-media-library .image-area .add-wrapper i{
-    font-size:30px;
-    margin-top:50px;
-}
-.mini-media-library .file-area .add-wrapper i {
-    font-size:30px;
-    margin-top:25px;
-}
 .margin-b-10 {
     margin-bottom:15px;
-}
-.category-image-list {
-    padding-top:10px;
-    position:relative;
-    min-height:63px;
-}
-.category-image-option {
-    position:absolute;
-    height:100%;
-    width:98%;
-    top:0;
-    background-color:rgba(0,0,0,0.5);
-    text-align:center;
-}
-.category-image-option a,
-.category-image-option span {
-    background:#fff;
-    border-radius:100%;
-    width:50px;
-    height:50px;
-    line-height:50px;
-    position:absolute;
-    top:50%;
-}
-.category-image-option a:first-child{
-    margin-left:-7%;
-}
-.category-image {
-    cursor: pointer;
-    min-height:200px;
-}
-.category-image .category-image-option {
-    display:none;
-}
-.category-image:hover .category-image-option {
-    display:block;
-}
-.mini-image-list {
-    margin-top:30px;
-    max-height: 500px;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-.file-area {
-    text-align: center;
-}
-.file-area .file-icon {
-    display:block;
-    font-size:50px;
-}
-.category-file .list-group{
-    padding:20px;
-}
-.category-file-list{
-    position: relative;
-}
-.category-file .list-group span {
-    position: relative;
-    display: block;
-    margin-bottom: 10px;
-}
-.category-file span i {
-    position: absolute;
-    right: 10px;
-    top:25%;
-    font-size: 20px;
-    cursor: pointer;
-    display: none;
-}
-.category-file span:hover i {
-    display: block;
-}
-#id_meliscategory_categories_category_form_sites{
-    margin:50px 0 0 2px;
-}
-#meliscategory_site_filer_form .select2-selection__clear {
-    background:#eee;
-    display:block;
-    width:30px;
-    text-align:center;
-    cursor:pointer;
-}
-.root-checkbox {
-    float:right;
-}
-.root-checkbox input {
-    display: none;
-}
-
-.root-checkbox label {
-    font-size: 18px;
-    color: #5D5D5D;
-    display: inline-block;
-    padding: 0 0 0 1em;
-    cursor: pointer;
-}
-.root-checkbox label:before {
-    content: '';
-    display: inline-block;
-    background: #72af46;
-    position: absolute;
-    left: 0;
-    top: 5px;
-    height: 20px;
-    width: 20px;
-    margin-right: 10px;
-    border-radius: 80%;
-    box-shadow: 0px 1px 0 0 rgba(0, 0, 0, .2);
-    box-sizing: border-box;
-    border: 10px solid #fff;
-    transition: border .3s ease;
-}
-
-.root-checkbox input:checked + label:before {
-    content: "\f046";
-}
-.root-checkbox input + label {
-    transition: color .7s ease;
-}
-.root-checkbox input:checked + label {
-    color: #5D5D5D;
-}
-.parent-image-list,
-.parent-file-list{
-    position:relative;
-}
-.back-drop {
-    position: absolute;
-    height:100%;
-    width:100%;
-    background: rgba(0,0,0,0.5);
-    display: block;
-    z-index:1999;
-    padding-top:47px;
-    cursor:pointer;
-    top:0;
-    min-height: 1027px;
-}
-.preview-image {
-    text-align: center;
-    position: relative;
-}
-.preview-image span {
-    position: relative;
-}
-.preview-nav {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    top: 0;
-    z-index: 99999999;
-    display: block;
-}
-.preview-image .close-images {
-    position: absolute;
-    font-size: 30px;
-    cursor: pointer;
-    color: #fff;
-    right: 0;
-    background: url('/MelisCmsCategory2/img/close.png');
-    height: 29px;
-    margin-top: 5px;
-    width: 27px;
-}
-
-.preview-image  img{
-    border:6px solid #fff;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    max-width:93%;
-    display: none;
-}
-.preview-image .active {
-    display:inline-block;
-}
-.media-upload-loader {
-    background: #e61c23;
-    position: absolute;
-    color: #fff;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    display: none;
-    z-index: 99;
-}
-.border-green {
-    border : 2px solid #69b344;
-}
-.text-green {
-    color:#72af46 !important;
-}
-#categoryScrollToTop {
-    float: right;
-    width: 50px;
-    text-align: center;
-    line-height: 56px;
-    cursor: pointer;
-    font-size: 28px;
-    border-radius: 3px;
-    border: 2px solid #e61c23;
-    -webkit-transition: all 0.3s ease-in-out;
-    -moz-transition: all 0.3s ease-in-out ;
-    -ms-transition: all 0.3s ase-in-out ;
-    -o-transition: all 0.3s ease-in-out ;
-    transition: all 0.3s ease-in-out ;
-}
-#categoryScrollToTop:hover {
-    background:#e61c23;
-    color:#fff !important;
 }
 #noResultData {
     display:none;
 }
-.no-image {
-    margin-left:8px;
-}
-.no-file {
-    margin-left:8px;
+
+@media (max-width: 767.98px) {
+    .mini-template-menu-manager-lang {
+        margin-left: 15px !important;
+    }
 }
 
-#fakeBackdrop {
-    opacity:1;
-    background-color:rgba(0,0,0,0.5);
-}
-.fakeLoader {
-    left:32%;
-    top:2%;
-    width:620px;
-    height:47px;
-}
-.text-red {
-    color:#ff0000 !important;
-}
-.site-filtered  > .jstree-anchor{
-    color:#72af46 !important;
-}
-#meliscms_categories_site_filter .info-site-filter {
-    font-size:12px;
-    display: none;
-}
-#meliscms_categories_filter_area .btn {
-    padding: .375rem .25rem;
-}
-.row .pdc-heading {
-    margin-bottom: 1.8rem;
+@media (max-width: 575.98px) {
+    .mtpl-menu-buttons {
+        margin-right: 0;
+    }
+    .mini-template-menu-manager-lang {
+        width: 100%;
+        margin-bottom: 14px;
+        margin-right: 15px;
+    }
+
+    .mtpl-menu-add-category,
+    .mtpl-menu-add-template {
+        margin-left: 15px;
+        margin-right: 15px;
+        width: 100%;
+        margin-bottom: 14px;
+    }
+
+    .add-m-tpl-category,
+    .add-m-tpl-plugin {
+        width: 100%;
+    }
+
+    #id_meliscms_mini_template_menu_manager_save_btn {
+        width: 100%;
+        margin-bottom: 15px;
+    }
 }

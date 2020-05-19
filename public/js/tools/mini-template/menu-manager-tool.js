@@ -52,6 +52,10 @@ $(function () {
         }
     });
 
+    $body.on('click', '#close-all-tab', function () {
+        isInitialized = false;
+    });
+
     $body.on('change', siteSelect, function () {
         var value = $(this).val();
         $("#mini-template-tree-no-data").css("display","none");

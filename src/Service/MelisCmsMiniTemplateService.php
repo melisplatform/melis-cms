@@ -305,10 +305,15 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
 
         foreach ($mini_templates as $mini_template) {
             $template = $this->getMiniTemplateFiles($site_path, $mini_template['mtplct_template_name']);
-            if (! empty($template['image']))
+            $thumbnail_file = '';
+
+            if (! empty($template['image'])) {
+                $thumbnail_file = '/' . $site->site_name . '/miniTemplatesTinyMce/' . $template['image']['file'];
                 $image = '<img data-image="test" src="' . '/' . $site->site_name . '/miniTemplatesTinyMce/' . $template['image']['file'] . '" width=100 height=100>';
-            else
+            } else {
                 $image = '<img data-image="test" src="/MelisFront/plugins/images/default.jpg" width=100 height=100>';
+            }
+
             $exploded = explode('.', $template['template']['file']);
             $templateName = $exploded[0];
             $tag = '<p data-module="' . $site->site_name . '" class="mini-template-tool-table-path">' . explode('..', $template['template']['path'])[1] . '</p>';
@@ -318,8 +323,10 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
                 'image' => $image,
                 'html_path' => $tag,
                 'DT_RowId' => $mini_template['mtplct_template_name'],
-                'DR_RowAttr' => [
-                    'template_name' => $mini_template['mtplct_template_name']
+                'DT_RowAttr' => [
+                    'templateName' => $mini_template['mtplct_template_name'],
+                    'imgSource' => $thumbnail_file,
+                    'module' => $site->site_name
                 ],
                 'DT_RowClass' => 'is-draggable'
             ];

@@ -39,9 +39,15 @@ $(function () {
 
     // Open edit mini-template tab
     $body.on('click', table_edit, function () {
-        var templateName = $(this).closest('tr').attr('id') || $(this).closest('tr').prev().attr('id');
-        var module = $(this).closest('tr').find('p').data('module') || $(this).closest('tr').prev().attr('module');
-        var imgSource = $(this).closest('tr').find('img').attr('src') || $(this).closest('tr').prev().attr('src');
+        var row_data = $('#tableMiniTemplateManager').DataTable().row('#'+$(this).closest('tr').attr('id')).data();
+
+        if ($(this).closest('tr').hasClass('child')) {
+            var row_data = $('#tableMiniTemplateManager').DataTable().row('#'+$(this).closest('tr').prev().attr('id')).data();
+        }
+
+        var templateName = row_data.DT_RowAttr.templateName;
+        var module = row_data.DT_RowAttr.module;
+        var imgSource = row_data.DT_RowAttr.imgSource;
 
         miniTemplateManagerTool.openTab(
             'Tpl ' + templateName,

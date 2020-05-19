@@ -32,9 +32,11 @@ class MiniTemplateManagerController extends AbstractActionController
     public function renderMiniTemplateManagerToolAddBodyAction() {}
 
     /**
+     * Returns the list of sites for the table
      * @return ViewModel
      */
     public function renderMiniTemplateManagerToolTableSitesAction() {
+        // TODO change to service getting sites
         $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
         $view = new ViewModel();
         $view->sites = $siteTable->fetchAll()->toArray();
@@ -66,24 +68,6 @@ class MiniTemplateManagerController extends AbstractActionController
     public function renderMiniTemplateManagerToolAddBodyFormAction() {
         $form = $this->getForm($this->module, $this->tool_key, $this->form_key);
         $params = $this->params()->fromQuery();
-        $data = [];
-
-        $max_post = ini_get('post_max_size');
-        $max_upload = ini_get('upload_max_filesize');
-        $max_size = 0;
-
-        // get the smaller value
-        if ($max_post != $max_upload) {
-            if ($max_post > $max_upload) {
-                if ($max_upload != 0) {
-                    $max_size = $max_upload;
-                } else {
-                    $max_size = $max_post;
-                }
-            }
-        } else {
-            $max_size = $max_post;
-        }
 
         if ($params['templateName'] !== 'new_template') {
             $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
@@ -91,9 +75,11 @@ class MiniTemplateManagerController extends AbstractActionController
             $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
             $site = $siteTable->getEntryByField('site_name', $params['module'])->current();
 
-            $data['miniTemplateSite'] = $site->site_id;
-            $data['miniTemplateName'] = $params['templateName'];
-            $data['miniTemplateHtml'] = file_get_contents($path . '/' . $params['templateName'] . '.phtml');
+            $data = [
+                'miniTemplateSite' => $site->site_id,
+                'miniTemplateName' => $params['templateName'],
+                'miniTemplateHtml' => file_get_contents($path . '/' . $params['templateName'] . '.phtml')
+            ];
 
             $form->setAttribute('id', 'id_mini_template_manager_tool_update');
             $form->setAttribute('class', 'mini_template_manager_tool_update');
@@ -106,9 +92,9 @@ class MiniTemplateManagerController extends AbstractActionController
         $view = new ViewModel();
         $view->form = $form;
         $view->formType = ($params['templateName'] == 'new_template') ? 'create' : 'update';
+        $view->max_size = $this->getMaxUploadOrPostSize();
         $view->current_module = $params['module'] ?? '';
         $view->current_template = $params['templateName'] ?? '';
-        $view->max_size = $this->asBytes($max_size);
         $view->categoryId = $params['categoryId'] ?? '';
         $view->imgSource = $params['imgSource'] ?? '';
         return $view;
@@ -133,9 +119,7 @@ class MiniTemplateManagerController extends AbstractActionController
             '#tableMiniTemplateManager',
             false,
             false,
-            [
-                'order' => '[[1, "asc"]]'
-            ]
+            ['order' => '[[1, "asc"]]']
         );
         return $view;
     }
@@ -146,16 +130,12 @@ class MiniTemplateManagerController extends AbstractActionController
      */
     public function getMiniTemplatesAction()
     {
-        $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
         $post = $this->getRequest()->getPost();
-        $draw = $post['draw'];
-        $start = $post['start'];
-        $length = $post['length'];
         $total = $filtered = 0;
-        $mini_templates_filtered = [];
-        $search = $post['search']['value'] ?? '';
+        $filtered_templates = [];
         $order = 'asc';
 
+        // get order
         if (! empty($post['order'])) {
             if ($post['order'][0]['column'] == 1) {
                 $order = $post['order'][0]['dir'];
@@ -163,7 +143,9 @@ class MiniTemplateManagerController extends AbstractActionController
         }
 
         if (! empty($post['site_name'])) {
+            $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
             $path = $service->getModuleMiniTemplatePath($post['site_name']);
+
             if (! empty($path)) {
                 $mini_templates_temp = $service->getMiniTemplates($post['site_name']);
                 $mini_templates = [];
@@ -172,26 +154,31 @@ class MiniTemplateManagerController extends AbstractActionController
                     $exploded = explode('.', $mini_template);
                     $templateName = $exploded[0];
                     $thumbnail = $this->getMiniTemplateThumbnail($path, $templateName);
+                    $thumbnail_file = '';
 
-                    if (! empty($thumbnail))
-                        $thumbnail = '<img class="mini-template-tool-table-image" src="'.'/'.$post['site_name'].'/miniTemplatesTinyMce/'.$thumbnail['file'].'" width=100 height=100>';
-                    else
-                        $thumbnail =  '<img class="mini-template-tool-table-image" src="/MelisFront/plugins/images/default.jpg" width=100 height=100>';
-
-                    if (! empty($search)) {
-                        if (stripos($mini_template, $search) !== false) {
-                            $mini_templates[] = [
-                                'image' => $thumbnail,
-                                'html_path' => '<p data-module="' . $post['site_name'] . '">' . explode('..', $path)[1] . '/' . $mini_template . '</p>',
-                                'DT_RowId' => $templateName
-                            ];
-                        }
+                    if (! empty($thumbnail)) {
+                        $thumbnail_file = '/' . $post['site_name'] . '/miniTemplatesTinyMce/' . $thumbnail['file'];
+                        $thumbnail = '<img class="mini-template-tool-table-image" src="' . '/' . $post['site_name'] . '/miniTemplatesTinyMce/' . $thumbnail['file'] . '" width=100 height=100>';
                     } else {
-                        $mini_templates[] = [
-                            'image' => $thumbnail,
-                            'html_path' => '<p data-module="' . $post['site_name'] . '">' . explode('..', $path)[1] . '/' . $mini_template . '</p>',
-                            'DT_RowId' => $templateName
-                        ];
+                        $thumbnail = '<img class="mini-template-tool-table-image" src="/MelisFront/plugins/images/default.jpg" width=100 height=100>';
+                    }
+
+                    $template = [
+                        'image' => $thumbnail,
+                        'html_path' => '<p>' . explode('..', $path)[1] . '/' . $mini_template . '</p>',
+                        'DT_RowId' => $templateName,
+                        'DT_RowAttr' => [
+                            'templateName' => $templateName,
+                            'thumbnail' => $thumbnail_file,
+                            'module' => $post['site_name']
+                        ]
+                    ];
+
+                    if (! empty($post['search']['value'])) {
+                        if (stripos($mini_template, $search) !== false)
+                            $mini_templates[] = $template;
+                    } else {
+                        $mini_templates[] = $template;
                     }
                 }
 
@@ -199,15 +186,15 @@ class MiniTemplateManagerController extends AbstractActionController
                     $mini_templates = array_reverse($mini_templates);
 
                 $total = $filtered = count($mini_templates);
-                $mini_templates_filtered = array_slice($mini_templates, $start, $length);
+                $filtered_templates = array_slice($mini_templates, $post['start'], $post['length']);
             }
         }
 
         return new JsonModel([
-            'draw' => $draw,
+            'draw' => $post['draw'],
             'recordsTotal' => $total,
             'recordsFiltered' => $filtered,
-            'data' => $mini_templates_filtered
+            'data' => $filtered_templates
         ]);
     }
 
@@ -485,5 +472,28 @@ class MiniTemplateManagerController extends AbstractActionController
         }
 
         return $errors;
+    }
+
+    private function getMaxUploadOrPostSize() {
+        $max_post = ini_get('post_max_size');
+        $max_upload = ini_get('upload_max_filesize');
+        $max_size = 0;
+
+        if ($max_post != $max_upload) {
+            if ($max_post > $max_upload) {
+                if ($max_upload != 0) {
+                    $max_size = $max_upload;
+                } else {
+                    $max_size = $max_post;
+                }
+            }
+        } else {
+            $max_size = $max_post;
+        }
+
+        if ($max_size != 0)
+            $max_size = $this->asBytes($max_size);
+
+        return $max_size;
     }
 }

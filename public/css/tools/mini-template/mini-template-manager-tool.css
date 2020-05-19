@@ -15,7 +15,8 @@ label[for="miniTemplateThumbnail"] .badge {
     }
 
     #melis-cms-minitemplate-add-btn,
-    #melis-cms-minitemplate-edit-btn {
+    #melis-cms-minitemplate-edit-btn,
+    #id_meliscms_mini_template_manager_tool_header_add_btn {
         width: 100%;
     }
 }
