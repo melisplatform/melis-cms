@@ -6,10 +6,10 @@ table#tableMiniTemplateMenuManagerPlugins.loading-changes tbody tr td {
     cursor: not-allowed;
 }
 
-#tableMiniTemplateMenuManagerPlugins img {
-    max-width: 195px;
-    width: auto;
-}
+/*#tableMiniTemplateMenuManagerPlugins img {*/
+/*    max-width: 195px;*/
+/*    width: auto;*/
+/*}*/
 .mini-template-menu-manager-lang {
     margin-left: 5px;
     margin-bottom: 30px;
@@ -218,7 +218,7 @@ table#tableMiniTemplateMenuManagerPlugins.loading-changes tbody tr td {
     display:none;
 }
 
-@media (max-width: 767.98px) {
+@media (max-width: 991.98px) {
     .mini-template-menu-manager-lang {
         margin-left: 15px !important;
     }
