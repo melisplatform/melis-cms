@@ -7,6 +7,10 @@ $(function () {
     var isInitialized = false;
     var selectedNode = '';
 
+    $body.on('click', '.mtpl-menu-plugins-tab', function () {
+        $('.melis-mini-template-menu-manager-table-refresh').trigger('click');
+    });
+
     // how to get selected node
     // $(tree).jstree().get_selected(true)[0].text
     $body.on('click', '.melis-mini-template-menu-manager-table-refresh', function () {

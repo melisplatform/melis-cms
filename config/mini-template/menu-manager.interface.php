@@ -132,7 +132,8 @@ return [
                                                                 'id' =>  'id_meliscms_mini_template_menu_manager_tool_add_category_body_properties_tab',
                                                                 'name' => 'tr_meliscms_mini_template_menu_manager_tool_add_category_body_properties_tab',
                                                                 'melisKey' => 'meliscms_mini_template_menu_manager_tool_add_category_body_properties_tab',
-                                                                'icon' => 'glyphicons tag'
+                                                                'icon' => 'glyphicons tag',
+                                                                'class' => 'mtpl-menu-properties-tab'
                                                             ],
                                                         ],
                                                         // Plugins Tab
@@ -141,7 +142,8 @@ return [
                                                                 'id' =>  'id_meliscms_mini_template_menu_manager_tool_add_category_body_plugins_tab',
                                                                 'name' => 'tr_meliscms_mini_template_menu_manager_tool_add_category_body_plugins_tab',
                                                                 'melisKey' => 'meliscms_mini_template_menu_manager_tool_add_category_body_plugins_tab',
-                                                                'icon' => 'glyphicons tag'
+                                                                'icon' => 'glyphicons tag',
+                                                                'class' => 'mtpl-menu-plugins-tab'
                                                             ],
                                                         ],
                                                     ],
