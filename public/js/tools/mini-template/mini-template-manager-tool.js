@@ -219,7 +219,7 @@ $(function () {
 
     // Thumbnail preview
     $body.on('change', thumbnail_input, function(e) {
-        var input = $('#'+activeTabId).find(thumbnail_input);
+        var input = this;
         var max_size = $body.find('#mini-template-manager-max-size').val();
 
         if ( input.files && input.files[0] ) {
