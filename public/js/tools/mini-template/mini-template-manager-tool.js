@@ -226,7 +226,7 @@ $(function () {
             if (parseInt(input.files[0].size) > parseInt(max_size)) {
                 e.preventDefault();
                 $(input).val('');
-                $(input).closest('form').find(thumbnail_preview).attr('src', '/MelisFront/plugins/images/default.jpg');
+                $('#'+activeTabId).find(thumbnail_preview).attr('src', '/MelisFront/plugins/images/default.jpg');
 
                 melisHelper.melisKoNotification(
                     translations.tr_melis_cms_page_tree_import,
@@ -236,12 +236,12 @@ $(function () {
             } else {
                 var reader = new FileReader();
                 reader.onload = function (e) {
-                    $(input).closest('form').find(thumbnail_preview).attr('src', e.target.result);
+                    $('#'+activeTabId).find(thumbnail_preview).attr('src', e.target.result);
                 }
                 reader.readAsDataURL(input.files[0]);
             }
         } else {
-            $(input).closest('form').find(thumbnail_preview).attr('src', '/MelisFront/plugins/images/default.jpg');
+            $('#'+activeTabId).find(thumbnail_preview).attr('src', '/MelisFront/plugins/images/default.jpg');
         }
     });
 
