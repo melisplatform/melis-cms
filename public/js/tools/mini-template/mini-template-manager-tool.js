@@ -219,7 +219,7 @@ $(function () {
 
     // Thumbnail preview
     $body.on('change', thumbnail_input, function(e) {
-        var input = this;
+        var input = $('#'+activeTabId).find(thumbnail_input);
         var max_size = $body.find('#mini-template-manager-max-size').val();
 
         if ( input.files && input.files[0] ) {
@@ -260,8 +260,8 @@ $(function () {
     // Remove thumbnail
     $body.on('click', remove_thumbnail_preview, function (e) {
         e.preventDefault();
-        $(this).closest('form').find(thumbnail_input).val('');
-        $(this).closest('form').find(thumbnail_preview).attr('src', '/MelisFront/plugins/images/default.jpg');
+        $('#'+activeTabId).find(thumbnail_input).val('');
+        $('#'+activeTabId).find(thumbnail_preview).attr('src', '/MelisFront/plugins/images/default.jpg');
     });
 
     // Refresh table
