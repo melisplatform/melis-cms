@@ -994,3 +994,7 @@ span.melis-cms-filter-btn-sub-category.active i {
     color: #222f3e;
     cursor: pointer;
 }
+/*Added to fixed the problem on page edition plugin icon alignment*/
+.melis-plugin-indicator i.fa.fa-plug {
+    line-height: 40px;
+}
