@@ -42,12 +42,12 @@ $(function () {
         var row_data = $('#tableMiniTemplateManager').DataTable().row('#'+$(this).closest('tr').attr('id')).data();
 
         if ($(this).closest('tr').hasClass('child')) {
-            var row_data = $('#tableMiniTemplateManager').DataTable().row('#'+$(this).closest('tr').prev().attr('id')).data();
+            row_data = $('#tableMiniTemplateManager').DataTable().row('#'+$(this).closest('tr').prev().attr('id')).data();
         }
 
         var templateName = row_data.DT_RowAttr.templateName;
         var module = row_data.DT_RowAttr.module;
-        var imgSource = row_data.DT_RowAttr.imgSource;
+        var thumbnail = row_data.DT_RowAttr.thumbnail;
 
         miniTemplateManagerTool.openTab(
             'Tpl ' + templateName,
@@ -55,7 +55,7 @@ $(function () {
             {
                 module: module,
                 templateName: templateName,
-                imgSource: imgSource
+                thumbnail: thumbnail
             }
         );
     });
@@ -87,7 +87,7 @@ $(function () {
                     {
                         module: response.data.module,
                         templateName: response.data.template_name,
-                        imgSource: response.data.thumbnail
+                        thumbnail: response.data.thumbnail
                     }
                 );
 
@@ -150,7 +150,7 @@ $(function () {
                     {
                         module: response.data.module,
                         templateName: response.data.template_name,
-                        imgSource: response.data.thumbnail
+                        thumbnail: response.data.thumbnail
                     }
                 );
 

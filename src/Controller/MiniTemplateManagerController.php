@@ -36,7 +36,6 @@ class MiniTemplateManagerController extends AbstractActionController
      * @return ViewModel
      */
     public function renderMiniTemplateManagerToolTableSitesAction() {
-        // TODO change to service getting sites
         $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
         $view = new ViewModel();
         $view->sites = $siteTable->fetchAll()->toArray();
@@ -96,7 +95,7 @@ class MiniTemplateManagerController extends AbstractActionController
         $view->current_module = $params['module'] ?? '';
         $view->current_template = $params['templateName'] ?? '';
         $view->categoryId = $params['categoryId'] ?? '';
-        $view->imgSource = $params['imgSource'] ?? '';
+        $view->imgSource = $params['thumbnail'] ?? '';
         return $view;
     }
 
