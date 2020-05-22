@@ -18,12 +18,12 @@ return [
                                             'label_attribute' => [
                                                 'class' => "d-flex flex-row justify-content-between"
                                             ],
+                                            'no_id' => true
                                         ],
                                         'attributes' => [
-                                            'id' => 'id_mgdpre_link',
                                             'class' => 'melis-input-group-button',
                                             'data-button-icon' => 'fa fa-sitemap',
-                                            'data-button-id' => 'meliscms-site-selector',
+                                            'data-button-class' => 'meliscms-site-selector'
                                         ]
                                     ]
                                 ],
