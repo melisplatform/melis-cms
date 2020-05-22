@@ -230,9 +230,8 @@ $(function () {
     }
 
     // Remove thumbnail
-    $body.on('click', remove_thumbnail_preview, function (e) {
-        e.preventDefault();
-        $('#'+activeTabId).find(thumbnail_input).val('');
+    $body.on('click', remove_thumbnail_preview, function () {
+        $('#'+activeTabId).find('input[name="miniTemplateThumbnail"]').val('');
         $('#'+activeTabId).find(thumbnail_preview).attr('src', '/MelisFront/plugins/images/default.jpg');
     });
 
@@ -283,11 +282,9 @@ window.miniTemplateManagerToolTableCallback = function () {
 
 window.thumbnailPreview = function(id, fileInput) {
     var max_size = $('#' + activeTabId).find('#mini-template-manager-max-size').val();
-    console.log($(fileInput).closest('form').find('#miniTemplateName').val());
 
     if ( fileInput.files && fileInput.files[0] ) {
         if (parseInt(fileInput.files[0].size) > parseInt(max_size)) {
-            e.preventDefault();
             $(fileInput).val('');
             $('#' + activeTabId + ' ' + id).attr('src', '/MelisFront/plugins/images/default.jpg');
 
