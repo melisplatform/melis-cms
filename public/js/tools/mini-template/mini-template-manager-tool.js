@@ -217,34 +217,6 @@ $(function () {
         );
     });
 
-    // Thumbnail preview
-    $body.on('change', thumbnail_input, function(e) {
-        var input = this;
-        var max_size = $body.find('#mini-template-manager-max-size').val();
-
-        if ( input.files && input.files[0] ) {
-            if (parseInt(input.files[0].size) > parseInt(max_size)) {
-                e.preventDefault();
-                $(input).val('');
-                $('#'+activeTabId).find(thumbnail_preview).attr('src', '/MelisFront/plugins/images/default.jpg');
-
-                melisHelper.melisKoNotification(
-                    translations.tr_melis_cms_page_tree_import,
-                    translations.tr_melis_cms_page_tree_error_file_size_exceeded + formatBytes(max_size, 2),
-                    []
-                );
-            } else {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    $('#'+activeTabId).find(thumbnail_preview).attr('src', e.target.result);
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        } else {
-            $('#'+activeTabId).find(thumbnail_preview).attr('src', '/MelisFront/plugins/images/default.jpg');
-        }
-    });
-
     function formatBytes(bytes, decimals) {
         if (bytes === 0) return '0 Bytes';
 
@@ -308,6 +280,33 @@ window.miniTemplateManagerToolTableCallback = function () {
         }
     });
 };
+
+window.thumbnailPreview = function(id, fileInput) {
+    var max_size = $('#' + activeTabId).find('#mini-template-manager-max-size').val();
+    console.log($(fileInput).closest('form').find('#miniTemplateName').val());
+
+    if ( fileInput.files && fileInput.files[0] ) {
+        if (parseInt(fileInput.files[0].size) > parseInt(max_size)) {
+            e.preventDefault();
+            $(fileInput).val('');
+            $('#' + activeTabId + ' ' + id).attr('src', '/MelisFront/plugins/images/default.jpg');
+
+            melisHelper.melisKoNotification(
+                translations.tr_melis_cms_page_tree_import,
+                translations.tr_melis_cms_page_tree_error_file_size_exceeded + formatBytes(max_size, 2),
+                []
+            );
+        } else {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#' + activeTabId + ' ' + id).attr('src', e.target.result);
+            }
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+    } else {
+        $('#' + activeTabId + ' ' + id).attr('src', '/MelisFront/plugins/images/default.jpg');
+    }
+}
 
 // Know when an element is already rendered
 function waitForEl(selector, callback){

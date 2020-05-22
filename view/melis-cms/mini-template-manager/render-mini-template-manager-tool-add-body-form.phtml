@@ -44,7 +44,10 @@
                     <!-- Thumbnail -->
                     <div class="form-group">
                         <?php
+                        $hash = md5(time());
                         $typeField = $form->get('miniTemplateThumbnail');
+                        $typeField->setAttribute('class', 'mini-template-input miniTemplateThumbnail' . $hash);
+                        $typeField->setAttribute('id', 'miniTemplateThumbnail' . $hash);
                         $inputLabel = $typeField->getLabelAttributes();
                         $typeField->setLabelAttributes(array('class', null));
                         $label = $typeField->getLabel().'<i class="fa fa-info-circle fa-lg float-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
@@ -82,7 +85,10 @@
                     <!-- HTML -->
                     <div class="form-group">
                         <?php
+                        $tinymceId = 'tinyce-textarea-'.uniqid();
                         $typeField = $form->get('miniTemplateHtml');
+                        $typeField->setAttribute('id', $tinymceId);
+                        $typeField->setAttribute('data-tinymce-id', $tinymceId);
                         $inputLabel = $typeField->getLabelAttributes();
                         $typeField->setLabelAttributes(array('class', null));
                         $label = $typeField->getLabel().' *<i class="fa fa-info-circle fa-lg float-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
@@ -98,17 +104,16 @@
     <?php endif ?>
 </div>
 <script type="text/javascript">
-    $(".miniTemplateThumbnail").filestyle(
+    $('.miniTemplateThumbnail<?= $hash ?>').filestyle(
         {
             buttonBefore: true,
             input: false,
-            buttonText: '<?= $this->translate('tr_meliscore_tool_user_usr_file_button'); ?>'
+            buttonText: '<?= $this->translate('tr_meliscore_tool_user_usr_file_button'); ?>',
+            badge: false
         }
     );
-    $(function() {
-        let tinyMceOption = {
-            height: '500px'
-        };
-        melisTinyMCE.createTinyMCE("tool", ".editme", tinyMceOption);
-    });
+    var tinyMceOption = {
+        height: '500px'
+    };
+    melisTinyMCE.createTinyMCE("tool", "textarea[data-tinymce-id='<?= $tinymceId ?>']", tinyMceOption);
 </script>

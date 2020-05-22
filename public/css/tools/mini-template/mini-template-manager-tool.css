@@ -1,14 +1,3 @@
-/*.mini-template-tool-table-image {*/
-/*    !*max-height: 116px;*!*/
-/*    !*height: auto;*!*/
-/*    max-width: 195px;*/
-/*    width: auto;*/
-/*}*/
-
-label[for="miniTemplateThumbnail"] .badge {
-    display: none;
-}
-
 @media (max-width: 575.98px) {
     label[for="miniTemplateThumbnail"] {
         width: 100%;
