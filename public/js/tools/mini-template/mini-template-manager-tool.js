@@ -257,7 +257,8 @@ $(function () {
                 'fa fa-tasks',
                 template_name + '_id_meliscms_mini_template_manager_tool_add',
                 'meliscms_mini_template_manager_tool_add',
-                parameters
+                parameters,
+                'id_meliscms_mini_template_manager_tool'
             );
         }
     };

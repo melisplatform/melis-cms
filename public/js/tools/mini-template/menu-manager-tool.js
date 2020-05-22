@@ -38,16 +38,25 @@ $(function () {
     });
 
     $body.on('click', '.add-m-tpl-plugin', function () {
-        melisHelper.tabOpen(
-            translations.tr_meliscms_mini_template_manager_tool_header_add_btn,
-            'fa fa-list-alt',
-            'new_template_id_meliscms_mini_template_manager_tool_add',
-            'meliscms_mini_template_manager_tool_add',
-            {
-                templateName: 'new_template',
-                siteId:$(siteSelect).find('option:selected').data('id')
+        melisHelper.tabOpen(translations.tr_meliscms_mini_template_manager_tool, 'fa fa-tasks', 'id_meliscms_mini_template_manager_tool', 'meliscms_mini_template_manager_tool');
+        var alreadyOpen = $("body #melis-id-nav-bar-tabs li a.tab-element[data-id='id_meliscms_mini_template_manager_tool']");
+
+        var checkTab = setInterval(function() {
+            if (alreadyOpen.length) {
+                melisHelper.tabOpen(
+                    translations.tr_meliscms_mini_template_manager_tool_header_add_btn,
+                    'fa fa-list-alt',
+                    'new_template_id_meliscms_mini_template_manager_tool_add',
+                    'meliscms_mini_template_manager_tool_add',
+                    {
+                        templateName: 'new_template',
+                        siteId:$(siteSelect).find('option:selected').data('id')
+                    },
+                    'id_meliscms_mini_template_manager_tool'
+                );
+                clearInterval(checkTab);
             }
-        );
+        }, 500);
     });
 
     $body.on('click', '.close', function () {
@@ -237,20 +246,26 @@ $(function () {
                         }
                     );
                 } else if (selected.type == 'mini-template') {
-                    waitForElem('#miniTemplateThumbnail', function (element) {
-                        $('#new-minitemplate-thumbnail').attr('src', selected.original.imgSource);
-                    });
+                    melisHelper.tabOpen(translations.tr_meliscms_mini_template_manager_tool, 'fa fa-tasks', 'id_meliscms_mini_template_manager_tool', 'meliscms_mini_template_manager_tool');
+                    var alreadyOpen = $("body #melis-id-nav-bar-tabs li a.tab-element[data-id='id_meliscms_mini_template_manager_tool']");
 
-                    melisHelper.tabOpen(
-                        'Tpl ' + selected.original.id,
-                        'fa fa-tasks',
-                        selected.original.id + '_id_meliscms_mini_template_manager_tool_add',
-                        'meliscms_mini_template_manager_tool_add',
-                        {
-                            module: selected.original.module,
-                            templateName: selected.original.id
+                    var checkTab = setInterval(function() {
+                        if (alreadyOpen.length) {
+                            melisHelper.tabOpen(
+                                'Tpl ' + selected.original.id,
+                                'fa fa-tasks',
+                                selected.original.id + '_id_meliscms_mini_template_manager_tool_add',
+                                'meliscms_mini_template_manager_tool_add',
+                                {
+                                    module: selected.original.module,
+                                    templateName: selected.original.id,
+                                    thumbnail: selected.original.imgSource
+                                },
+                                'id_meliscms_mini_template_manager_tool'
+                            );
+                            clearInterval(checkTab);
                         }
-                    );
+                    }, 500);
                 }
             })
             .on('#mini-template-category-tree move_node.jstree', function (e, data) {
@@ -289,17 +304,26 @@ $(function () {
                                 "label" : translations.tr_meliscms_mini_template_menu_manager_tool_jstree_add_minitemplate,
                                 "icon"  : "fa fa-plus",
                                 "action" : function (obj) {
-                                    melisHelper.tabOpen(
-                                        translations.tr_meliscms_mini_template_manager_tool_header_add_btn,
-                                        'fa fa-tasks',
-                                        'new_template_id_meliscms_mini_template_manager_tool_add',
-                                        'meliscms_mini_template_manager_tool_add',
-                                        {
-                                            templateName: 'new_template',
-                                            siteId: $(siteSelect).find('option:selected').data('id'),
-                                            categoryId: node.original.categoryId
+                                    melisHelper.tabOpen(translations.tr_meliscms_mini_template_manager_tool, 'fa fa-tasks', 'id_meliscms_mini_template_manager_tool', 'meliscms_mini_template_manager_tool');
+                                    var alreadyOpen = $("body #melis-id-nav-bar-tabs li a.tab-element[data-id='id_meliscms_mini_template_manager_tool']");
+
+                                    var checkTab = setInterval(function() {
+                                        if (alreadyOpen.length) {
+                                            melisHelper.tabOpen(
+                                                translations.tr_meliscms_mini_template_manager_tool_header_add_btn,
+                                                'fa fa-tasks',
+                                                'new_template_id_meliscms_mini_template_manager_tool_add',
+                                                'meliscms_mini_template_manager_tool_add',
+                                                {
+                                                    templateName: 'new_template',
+                                                    siteId: $(siteSelect).find('option:selected').data('id'),
+                                                    categoryId: node.original.categoryId
+                                                },
+                                                'id_meliscms_mini_template_manager_tool'
+                                            );
+                                            clearInterval(checkTab);
                                         }
-                                    );
+                                    }, 500);
                                 }
                             },
                             "edit_category" : {
@@ -372,20 +396,26 @@ $(function () {
                                 "label" : translations.tr_meliscms_mini_template_menu_manager_tool_jstree_edit_minitemplate,
                                 "icon"  : "fa fa-edit",
                                 "action" : function (obj) {
-                                    waitForElem('#miniTemplateThumbnail', function (element) {
-                                        $('#new-minitemplate-thumbnail').attr('src', node.original.imgSource);
-                                    });
+                                    melisHelper.tabOpen(translations.tr_meliscms_mini_template_manager_tool, 'fa fa-tasks', 'id_meliscms_mini_template_manager_tool', 'meliscms_mini_template_manager_tool');
+                                    var alreadyOpen = $("body #melis-id-nav-bar-tabs li a.tab-element[data-id='id_meliscms_mini_template_manager_tool']");
 
-                                    melisHelper.tabOpen(
-                                        'Tpl ' + node.original.id,
-                                        'fa fa-tasks',
-                                        node.original.id + '_id_meliscms_mini_template_manager_tool_add',
-                                        'meliscms_mini_template_manager_tool_add',
-                                        {
-                                            module: node.original.module,
-                                            templateName: node.original.id
+                                    var checkTab = setInterval(function() {
+                                        if (alreadyOpen.length) {
+                                            melisHelper.tabOpen(
+                                                'Tpl ' + node.original.id,
+                                                'fa fa-tasks',
+                                                node.original.id + '_id_meliscms_mini_template_manager_tool_add',
+                                                'meliscms_mini_template_manager_tool_add',
+                                                {
+                                                    module: node.original.module,
+                                                    templateName: node.original.id,
+                                                    thumbnail: node.original.imgSource
+                                                },
+                                                'id_meliscms_mini_template_manager_tool'
+                                            );
+                                            clearInterval(checkTab);
                                         }
-                                    );
+                                    }, 500);
                                 }
                             },
                             'delete_plugin': {
