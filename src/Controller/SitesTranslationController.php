@@ -9,6 +9,7 @@
 
 namespace MelisCms\Controller;
 
+use Zend\Config\Writer\PhpArray;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Session\Container;
 use Zend\View\Model\ViewModel;
@@ -179,12 +180,12 @@ class SitesTranslationController extends AbstractActionController
         $con = $db->getDriver()->getConnection();//get db driver connection
         $con->beginTransaction();//begin transaction
         try {
-            $data = $mstTable->getTranslationsBySiteId($postData['siteId'])->toArray();
-            foreach ($data as $key => $val) {
-                $idToDelete = $val['mst_id'];
-                $melisSiteTranslationService->deleteTranslationKeyById($idToDelete);
-                $melisSiteTranslationService->deleteTranslationTextByMstId($idToDelete);
-            }
+            $mstId = $postData['mst_id'];
+            $melisSiteTranslationService->deleteTranslationKeyById($mstId);
+            $melisSiteTranslationService->deleteTranslationTextByMstId($mstId);
+            //cache the translation
+            $melisSiteTranslationService->cacheTranslations($postData['siteId']);
+
             $success = true;
             $con->commit();
         }catch(\Exception $ex){
@@ -209,6 +210,7 @@ class SitesTranslationController extends AbstractActionController
      */
     public function saveTranslationAction()
     {
+        $siteId = 0;
         $success = false;
         $errors = array();
         $langError = array();
@@ -232,6 +234,10 @@ class SitesTranslationController extends AbstractActionController
             foreach($data as $key => $val) {
                 $fieldName = explode('-', $key);
                 if(!empty($fieldName[1])){
+                    //get site Id
+                    if($fieldName[1] == 'mst_site_id' && empty($siteId))
+                        $siteId = $val;
+
                     if(!isset($siteTranslationData[$fieldName[0]])){
                         /**
                          * Prepare the data of the translation
@@ -297,21 +303,6 @@ class SitesTranslationController extends AbstractActionController
                     unset($siteTranslationData[$key]);
                     array_push($needToDelete, array('mst_id' => $transData['mst_id'], 'mstt_id' => $transData['mstt_id']));
                 }
-//                $appConfigForm = $melisMelisCoreConfig->getFormMergedAndOrdered('meliscms/tools/site_translation_tool/forms/sitestranslation_form','sitestranslation_form');
-//                $propertyForm = $factory->createForm($appConfigForm);
-//                //we need to merge the data from mst_data and mstt_data array to validate the form
-//                $tempFormValidationData = array_merge($transData['mst_data'], $transData['mstt_data']);
-//                //assign the data to the form
-//                $propertyForm->setData($tempFormValidationData);
-//                //check if form is valid(if all the form field are match with the value that we pass from routes)
-//                if(!$propertyForm->isValid()) {
-//                    $appConfigForm = $appConfigForm['elements'];
-//                    $formErrors = $propertyForm->getMessages();
-//                    $errors = array_merge($errors, $this->processErrors($formErrors, $appConfigForm, $key));
-//                    array_push($langError, $key);
-//                }
-
-
             }
             if(!empty($siteTranslationData) || !empty($needToDelete)){
                 /**
@@ -322,6 +313,14 @@ class SitesTranslationController extends AbstractActionController
                 $melisSiteTranslationService = $this->getServiceLocator()->get('MelisSiteTranslationService');
                 $res = $melisSiteTranslationService->saveTranslation($postValues, $needToDelete);
                 $success = $res['success'];
+
+                /**
+                 * Process the storing of translations
+                 * in the cache
+                 */
+                if($success){
+                    $melisSiteTranslationService->cacheTranslations($siteId);
+                }
             }else{
                 $success = true;
             }
