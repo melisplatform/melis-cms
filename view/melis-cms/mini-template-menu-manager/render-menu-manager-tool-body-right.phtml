@@ -10,11 +10,11 @@
                 href="#"
                 class="dropdown-toggle category-list-lang-dropdown disabled"
                 data-toggle="dropdown"
-                data-locale="<?= $this->current_lang->lang_cms_name ?>"
+                data-locale="<?= $this->current_lang['lang_cms_name'] ?>"
                 title="<?= $this->translate('tr_meliscms_mini_template_menu_manager_select_site_first_btn_title') ?>"
             >
                 <i class="fa fa-language"></i>
-                <span class="filter-key"><?= $this->current_lang->lang_cms_name; ?></span>
+                <span class="filter-key"><?= $this->current_lang['lang_cms_name'] ?></span>
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu mini-template-menu-manager-lang-select">
@@ -57,6 +57,6 @@
     <div class="cat-div" style="display: inline-block;">
         <div class="alert alert-warning hidden" id="searchNoResult">"<strong></strong>" <?= $this->translate('tr_meliscmscategory_search_not_found')?></div>
         <div class="alert alert-warning " id="mini-template-tree-no-data" style="display: none;"><strong><?= $this->translate('tr_meliscms_mini_template_no_data')?></strong></div>
-        <div id="mini-template-category-tree" data-langlocale="<?= $this->current_lang->lang_cms_locale ?>"></div>
+        <div id="mini-template-category-tree" data-langlocale="<?= $this->current_lang['lang_cms_locale'] ?>"></div>
     </div>
 </div>

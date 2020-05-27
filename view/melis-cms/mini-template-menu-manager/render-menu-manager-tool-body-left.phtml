@@ -23,10 +23,10 @@
                 <option value="0"><?= $this->translate('tr_meliscms_mini_template_menu_manager_tool_sites_select_placeholder') ?></option>
                 <?php foreach($this->sites as $site) : ?>
                     <option
-                        value="<?= $site->site_name ?>"
-                        data-id="<?= $site->site_id ?>"
+                        value="<?= $site['site_name'] ?>"
+                        data-id="<?= $site['site_id'] ?>"
                     >
-                        <?= $site->site_label ?>
+                        <?= $site['site_label'] ?>
                     </option>
                 <?php endforeach; ?>
             </select>

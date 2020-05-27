@@ -36,9 +36,9 @@ class MiniTemplateManagerController extends AbstractActionController
      * @return ViewModel
      */
     public function renderMiniTemplateManagerToolTableSitesAction() {
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $site_service = $this->getServiceLocator()->get('MelisCmsSiteService');
         $view = new ViewModel();
-        $view->sites = $siteTable->fetchAll()->toArray();
+        $view->sites = $site_service->getAllSites();
         return $view;
     }
 
@@ -71,8 +71,8 @@ class MiniTemplateManagerController extends AbstractActionController
         if ($params['templateName'] !== 'new_template') {
             $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
             $path = $service->getModuleMiniTemplatePath($params['module']);
-            $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
-            $site = $siteTable->getEntryByField('site_name', $params['module'])->current();
+            $site_service = $this->getServiceLocator()->get('MelisCmsSiteService');
+            $site = $site_service->getSiteByModule($params['module']);
 
             $data = [
                 'miniTemplateSite' => $site->site_id,
@@ -297,8 +297,8 @@ class MiniTemplateManagerController extends AbstractActionController
         ];
 
         $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
-        $current_site_data = $siteTable->getEntryByField('site_name', $current_data['miniTemplateSite'])->current();
+        $site_service = $this->getServiceLocator()->get('MelisCmsSiteService');
+        $current_site_data = $site_service->getSiteByModule($current_data['miniTemplateSite']);
         $current_data['miniTemplateSite'] = $current_site_data->site_id;
         $success = 0;
         $message = 'tr_meliscms_mini_template_update_fail';
@@ -348,10 +348,10 @@ class MiniTemplateManagerController extends AbstractActionController
      */
     private function checkUpdateErrors($form, $current_data, $new_data) {
         $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
-        $siteTable = $this->getServiceLocator()->get('MelisEngineTableSite');
-        $current_site = $siteTable->getEntryById($current_data['miniTemplateSite'])->current();
+        $site_service = $this->getServiceLocator()->get('MelisCmsSiteService');
+        $current_site = $site_service->getSiteById($current_data['miniTemplateSite']);
         $current_site_path = $service->getModuleMiniTemplatePath($current_site->site_name);
-        $new_site = $siteTable->getEntryById($new_data['miniTemplateSite'])->current();
+        $new_site = $site_service->getSiteById($new_data['miniTemplateSite']);
         $new_site_path = $service->getModuleMiniTemplatePath($new_site->site_name);
         $translator = $this->getServiceLocator()->get('translator');
         $errors = [];

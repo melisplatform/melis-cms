@@ -148,8 +148,8 @@ class MiniTemplateMenuManagerController extends AbstractActionController
 
     public function renderMenuManagerToolAddCategoryBodyPropertiesFormAction() {
         $params = $this->params()->fromQuery();
-        $lang_table = $this->serviceLocator->get('MelisEngineTableCmsLang');
-        $languages = $lang_table->fetchAll()->toArray();
+        $lang_service = $this->serviceLocator->get('MelisEngineLang');
+        $languages = $lang_service->getAvailableLanguages();
         $form = $this->getForm($this->module, $this->tool_key, $this->form_add_category_key);
         $data = [];
 
@@ -177,17 +177,17 @@ class MiniTemplateMenuManagerController extends AbstractActionController
 
     public function renderMenuManagerToolBodyLeftAction() {
         $view = new ViewModel();
-        $view->sites = $this->getServiceLocator()->get('MelisEngineTableSite')->fetchAll();
+        $view->sites = $this->getServiceLocator()->get('MelisCmsSiteService')->getAllSites();
         return $view;
     }
 
     public function renderMenuManagerToolBodyRightAction() {
-        $cms_lang_table = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
-        $languages = $cms_lang_table->fetchAll()->toArray();
+        $lang_service = $this->getServiceLocator()->get('MelisEngineLang');
+        $languages = $lang_service->getAvailableLanguages();
 
         $container = new Container('meliscore');
         $current_locale = $container['melis-lang-locale'];
-        $current_lang = $cms_lang_table->getEntryByField('lang_cms_locale', $current_locale)->current();
+        $current_lang = $lang_service->getLangByLocale($current_locale);
 
         $view = new ViewModel();
         $view->melisKey = $this->getMelisKey();
