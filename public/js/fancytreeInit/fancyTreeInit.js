@@ -324,17 +324,19 @@
 										appendTo: "body",
 								},
 								dragStart: function(node, data) {
-										// disable drag & drop if its on mobile
-										if (melisCore.screenSize >= 1024) {
-												// determine if the node is draggable or not
-												if (!data.node.data.dragdrop) {
-														return false;
-												} else {
-														return true;
-												}
-										} else {
+									// disable drag & drop if its on mobile
+									if ( melisCore.screenSize >= 1024 ) {
+										// determine if the node is draggable or not
+										if ( !data.node.data.dragdrop ) {
 												return false;
+										} 
+										else {
+												return true;
 										}
+									} 
+									else {
+										return false;
+									}
 								},
 								dragEnter: function(node, data) {
 										return true;
