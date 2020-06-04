@@ -922,7 +922,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
      * @param $template
      * @return array|null
      */
-    private function getMiniTemplateThumbnail($path, $template)
+    public function getMiniTemplateThumbnail($path, $template)
     {
         $files = glob($path ."/" . $template . ".*");
 

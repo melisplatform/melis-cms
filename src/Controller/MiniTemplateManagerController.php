@@ -16,7 +16,6 @@ class MiniTemplateManagerController extends AbstractActionController {
     public $module = 'meliscms';
     public $tool_key = 'meliscms_mini_template_manager_tool';
     public $form_key = 'mini_template_manager_tool_add_form';
-    public $file_types = ['png', 'PNG', 'jpg', 'JPG', 'jpeg', 'JPEG', 'gif', 'GIF'];
 
     public function renderMiniTemplateManagerToolAction() {}
     public function renderMiniTemplateManagerToolHeaderAction() {}
@@ -153,7 +152,7 @@ class MiniTemplateManagerController extends AbstractActionController {
                 foreach ($mini_templates_temp as $mini_template) {
                     $exploded = explode('.', $mini_template);
                     $templateName = $exploded[0];
-                    $thumbnail = $this->getMiniTemplateThumbnail($path, $templateName);
+                    $thumbnail = $mtpl_service->getMiniTemplateThumbnail($path, $templateName);
                     $thumbnail_file = '';
 
                     if (! empty($thumbnail)) {
@@ -196,31 +195,6 @@ class MiniTemplateManagerController extends AbstractActionController {
             'recordsFiltered' => $filtered,
             'data' => $filtered_templates
         ]);
-    }
-
-    /**
-     * Gets the mini template thumbnail
-     * @param $path
-     * @param $template
-     * @return array|null
-     */
-    private function getMiniTemplateThumbnail($path, $template)
-    {
-        $files = glob($path ."/" . $template . ".*");
-
-        foreach ($files as $file) {
-            $base_name = basename($file);
-            $exploded_name = explode('.', $base_name);
-
-            if (in_array($exploded_name[1], $this->file_types)) {
-                return [
-                    'file' => $base_name,
-                    'path' => $file
-                ];
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -392,7 +366,7 @@ class MiniTemplateManagerController extends AbstractActionController {
         $site_service = $this->getServiceManager()->get('MelisCmsSiteService');
         $path = $site_service->getModulePath($data['module']) . '/public/miniTemplatesTinyMce';
         $minitemplate = $path . '/' . $data['template'] . '.phtml';
-        $minitemplate_thumbnail = $this->getMiniTemplateThumbnail($path, $data['template']);
+        $minitemplate_thumbnail = $mtpl_service->getMiniTemplateThumbnail($path, $data['template']);
         $thumbnail_path = null;
         $errors = [];
         $success = 0;
