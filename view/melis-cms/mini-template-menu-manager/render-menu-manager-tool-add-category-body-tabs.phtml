@@ -1,0 +1,36 @@
+<div
+    id="<?= $this->zoneconfig['conf']['id'] ?>"
+    data-melisKey="<?= $this->zoneconfig['conf']['melisKey'] ?>"
+    class="widget widget-tabs widget-tabs-double-2 widget-tabs-responsive"
+>
+    <div class="widget-head nav">
+        <ul class="tabs-label nav-tabs">
+            <?php if(! empty($this->zoneconfig['interface'])) : ?>
+                <?php foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig) : ?>
+                    <?php if ($this->formType == 'add') : ?>
+                        <?php if ($keyConfig == 'meliscms_mini_template_menu_manager_tool_add_category_body_plugins_tab') : ?>
+                            <?php continue; ?>
+                        <?php endif ?>
+                    <?php endif ?>
+                        <?php
+                            $broken_id = explode('_', $menuConfig['conf']['id']);
+                            $length = count($broken_id);
+                            $broken_id[$length - 1] = 'content';
+                            $target = implode('_', $broken_id);
+                        ?>
+                        <li>
+                            <a
+                                class="<?= $menuConfig['conf']['icon'] . ' ' . $menuConfig['conf']['class']?>"
+                                data-toggle="tab"
+                                href="#<?= $target ?>"
+                                aria-expanded="true"
+                            >
+                                <i></i>
+                                <span><?= $this->translate($menuConfig['conf']['name']) ?></span>
+                            </a>
+                        </li>
+                <?php endforeach ?>
+            <?php endif ?>
+        </ul>
+    </div>
+</div>

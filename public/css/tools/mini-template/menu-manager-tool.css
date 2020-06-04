@@ -1,0 +1,264 @@
+table#tableMiniTemplateMenuManagerPlugins.loading-changes tbody tr td {
+    cursor: wait !important;
+}
+
+.mini-template-menu-manager-lang a.disabled {
+    cursor: not-allowed;
+}
+
+.content-cont .card-title > a {
+    color: #111;
+}
+
+/* TABS */
+.content-cont .product-text-tab li.active:hover a {
+    background: #932E2A;
+    border-color: transparent;
+}
+
+/*#tableMiniTemplateMenuManagerPlugins img {*/
+/*    max-width: 195px;*/
+/*    width: auto;*/
+/*}*/
+.mini-template-menu-manager-lang {
+    margin-left: 5px;
+    margin-bottom: 30px;
+    width: 165px;
+    background: #eaeaea;
+    position: relative;
+}
+
+.mini-template-menu-manager-lang a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+}
+
+.mini-template-menu-manager-tool-header {
+    height: initial;
+    padding: 0;
+}
+
+#id_meliscms_mini_template_menu_manager_tool_body,
+.mini-template-menu-manager-tool-header {
+    border-bottom: 1px solid #eee;
+}
+
+.mtpl-menu-add-category,
+.mtpl-menu-add-template {
+    margin-left: 10px;
+}
+
+.cat-div {
+    width: auto;
+    overflow-y: auto !important;
+}
+
+.cat-tree-view-languages {
+    margin-left: 5px;
+    margin-bottom: 30px;
+    width: 165px;
+    background: #eaeaea;
+    position:relative;
+}
+.cat-tree-view-languages a {
+    display: block;
+    padding:10px;
+    text-decoration: none;
+}
+.category-tree-view-lang li a {
+    cursor: pointer;
+    position: relative;
+}
+.category-tree-view-lang li a img {
+    position: absolute;
+    top:0;
+    right:5px;
+}
+
+/*Contentmenu*/
+.vakata-context, .vakata-context ul {
+    font-family: 'Titillium Web',sans-serif,Arial,sans-serif;
+    box-shadow: 2px 4px 9px #717070;
+    border-radius: 0px 3px 3px;
+}
+.vakata-context li>a {
+    color: #4c4c4c;
+    font-size: 12px;
+}
+/*Node Selected/Highlight*/
+#id_meliscms_mini_template_menu_manager_tool_body_right .jstree-proton .jstree-clicked {
+    background: #e61c23;
+    box-shadow: inset 0 0 1px #e61c23;
+    border-radius: 0px;
+    padding-right: 10px;
+    color:#fff !important;
+}
+
+#id_meliscms_mini_template_menu_manager_tool_body_right .jstree-proton .jstree-hovered {
+    background: rgba(249, 124, 119, 0.42);
+    box-shadow: inset 0 0 1px rgba(169, 68, 66, 0.38);
+    color: #525151 !important;
+    border-radius: 0px;
+    padding-right: 10px;
+}
+/**
+* Category Header card Buttons Styles
+**/
+.card-heading-buttons{
+    margin: 10px 10px 0px;
+}
+.card-heading-buttons button{
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+/**
+ * Common Styles
+ */
+.margin-bottom-5{
+    margin-bottom: 5px;
+}
+
+.margin-bottom-10{
+    margin-bottom: 10px;
+}
+
+/**
+ * Panel Group
+ */
+.accordion-group {
+    margin-bottom: 0px;
+}
+
+.is-draggable td:first-of-type{
+    cursor: move;
+}
+
+.category-list-lang-dropdown{
+    background: #ECEBEB;
+    border-radius: 4px;
+    color: #7D7B7B;
+}
+
+.custom-mtpl-desc{
+    display: block;
+    margin: 8px;
+    padding-left: 32px;
+    color: #686868 !important;
+}
+
+/* ACCORDION */
+.a-accordion .fa-times {
+    clear: none;
+    float: right;
+    font-size: 20px;
+}
+.a-accordion span {
+    float: left;
+}
+.tab-pane a.btn.a-accordion:before {
+    font-family: 'Glyphicons Halflings';
+    content: "\e114";
+    float: left;
+    padding: 0 10px;
+    color: #fff;
+}
+.tab-pane a.btn.a-accordion.collapsed:hover:before {
+    color: #fff
+}
+.tab-pane a.btn.a-accordion.collapsed:before {
+    content: "\e080";
+    color: #fff;
+}
+.tab-pane a.btn.a-accordion.collapsed {
+    margin: 0 0 5px;
+    border-radius: 5px;
+    background: #932E2A;
+    color: #fff;
+}
+.tab-pane a.btn.a-accordion.collapsed:hover,
+.tab-pane a.btn.a-accordion {
+    margin: 0 0 5px;
+    border-radius: 5px;
+    border-color: #932E2A;
+    background: #932E2A;
+    color: #fff;
+}
+.card-title a.btn {
+    margin: 10px 0 0 10px;
+}
+.card-title > a {
+    display: block;
+    text-decoration: none;
+}
+.card-heading .accordion-toggle:before {
+    font-family: 'Glyphicons Halflings';
+    content: "\e114";
+    float: left;
+    color: grey;
+    margin: 12px 0 0;
+    padding: 0 10px;
+}
+.card-heading .accordion-toggle.collapsed:before {
+    content: "\e080";
+}
+.accordion-toggle {
+    background: #fff;
+    border-bottom: #dadada;
+    padding: 0 10px 0;
+}
+#content .accordion-toggle h1.content-heading {
+    text-transform: none;
+}
+#content .card > .card-heading+.card-collapse .card-body {
+    border: none medium;
+}
+.card-body {
+    padding: 0;
+}
+.content-cont .card-title > a {
+    color: #111;
+}
+
+.margin-b-10 {
+    margin-bottom:15px;
+}
+#noResultData {
+    display:none;
+}
+
+@media (max-width: 991.98px) {
+    .mini-template-menu-manager-lang {
+        margin-left: 15px !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .mtpl-menu-buttons {
+        margin-right: 0;
+    }
+    .mini-template-menu-manager-lang {
+        width: 100%;
+        margin-bottom: 14px;
+        margin-right: 15px;
+    }
+
+    .mtpl-menu-add-category,
+    .mtpl-menu-add-template {
+        margin-left: 15px;
+        margin-right: 15px;
+        width: 100%;
+        margin-bottom: 14px;
+    }
+
+    .add-m-tpl-category,
+    .add-m-tpl-plugin {
+        width: 100%;
+    }
+
+    #id_meliscms_mini_template_menu_manager_save_btn {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+}

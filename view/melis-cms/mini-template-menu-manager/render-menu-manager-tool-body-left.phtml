@@ -1,0 +1,35 @@
+<div
+    id="<?= $this->zoneconfig['conf']['id'] ?>"
+    data-melisKey="<?= $this->zoneconfig['conf']['melisKey'] ?>"
+    class="col-xs-12 col-lg-4"
+>
+    <div>
+        <h4>
+            <?= $this->translate('tr_meliscms_mini_template_menu_manager_tool_sites_filter') ?>
+        </h4>
+        <div class="form-group">
+            <label class="d-flex flex-row justify-content-between">
+                <div class="label-text">Sites</div>
+                <div class="slider-open-tooltip">
+                    <i
+                        class="fa fa-info-circle fa-lg tip-info"
+                        data-toggle="tooltip" data-placement="left"
+                        title=""
+                        data-original-title="<?= $this->translate('tr_meliscms_mini_template_menu_manager_tool_sites_filter_tooltip') ?>"
+                    ></i>
+                </div>
+            </label>
+            <select id="mini-template-menu-manager-site-select" class="form-control">
+                <option value="0"><?= $this->translate('tr_meliscms_mini_template_menu_manager_tool_sites_select_placeholder') ?></option>
+                <?php foreach($this->sites as $site) : ?>
+                    <option
+                        value="<?= $site['site_name'] ?>"
+                        data-id="<?= $site['site_id'] ?>"
+                    >
+                        <?= $site['site_label'] ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
+</div>

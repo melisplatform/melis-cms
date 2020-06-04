@@ -1,0 +1,27 @@
+<div id="<?= $this->zoneconfig['conf']['id'] ?>" class="card-heading" data-melisKey="<?= $this->zoneconfig['conf']['melisKey'] ?>">
+    <div class="card-title" style="margin-top: inherit; margin-bottom: 0;">
+        <div class="card-heading-buttons float-right">
+            <?php
+                if (!empty($this->zoneconfig['interface'])) {
+                    foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
+                        echo $this->$keyConfig;
+                    }
+                }
+            ?>
+        </div>
+        <a class="accordion-toggle" data-toggle="collapse" data-target="#id_meliscms_mini_template_menu_manager_tool_add_category_body">
+            <?php if ($this->formType == 'add') : ?>
+                <h1 class="content-heading"><?= $this->translate('tr_meliscms_mini_template_menu_manager_tool_add_category_header') ?>
+                    <span class="custom-mtpl-desc"><?= $this->translate('tr_meliscms_mini_template__menu_manager_tool_header_sub_title') ?></span>
+                </h1>
+            <?php else : ?>
+                <?php
+                    $exploded_id = explode('-', $this->id);
+                ?>
+                <h1 id="menu-manager-category-id" class="content-heading" data-id="<?= $exploded_id[0] ?>">
+                    Edit "<?= $exploded_id[1] ?>"
+                </h1>
+            <?php endif ?>
+        </a>
+    </div>
+</div>
