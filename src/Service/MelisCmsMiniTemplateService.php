@@ -807,7 +807,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
      * @return array
      */
     public function getMiniTemplateFiles($path, $template) {
-        $files = glob($path ."/*" . $template . "*");
+        $files = glob($path ."/" . $template . ".*");
         $data = [];
 
         foreach ($files as $file) {
