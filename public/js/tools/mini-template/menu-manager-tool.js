@@ -73,10 +73,12 @@ $(function () {
         var value = $(this).val();
         $("#mini-template-tree-no-data").css("display","none");
 
-        if (!$('#id_meliscms_mini_template_menu_manager_tool_add_category_container').hasClass('hidden')) {
+        if (! $('#id_meliscms_mini_template_menu_manager_tool_add_category_container').hasClass('hidden')) {
             melisHelper.zoneReload(
                 'id_meliscms_mini_template_menu_manager_tool_add_category_container',
                 'meliscms_mini_template_menu_manager_tool_add_category_container',
+                {},
+                function () {}
             );
         }
 
