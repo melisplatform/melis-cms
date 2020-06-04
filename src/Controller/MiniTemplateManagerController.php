@@ -357,7 +357,7 @@ class MiniTemplateManagerController extends AbstractActionController {
         $errors = [];
 
         if ($form->isValid()) {
-            if ($current_site->site_id !== $new_data['miniTemplateSite']) {
+            if ($current_site->site_id != $new_data['miniTemplateSite']) {
                 if (file_exists($new_site_path . '/' . $new_data['miniTemplateName'] . '.phtml')) {
                     $errors['miniTemplateName'] = [
                         'error' => $translator->translate('tr_meliscms_mini_template_manager_tool_form_create_error_file_already_exists'),
