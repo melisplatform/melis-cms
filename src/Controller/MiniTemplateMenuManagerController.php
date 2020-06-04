@@ -25,6 +25,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController {
     public function renderMiniTemplateMenuManagerToolTableRefreshAction() {}
 
     /**
+     * Renders the category plugins zone
      * @return ViewModel
      */
     public function renderMenuManagerToolAddCategoryBodyPluginsContentAction() {
@@ -38,6 +39,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController {
     }
 
     /**
+     * Renders the category zone contents
      * @return ViewModel
      */
     public function renderMenuManagerToolAddCategoryBodyContentsAction() {
@@ -50,6 +52,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController {
     }
 
     /**
+     * Renders the category data table
      * @return ViewModel
      */
     public function renderMenuManagerToolAddCategoryBodyPluginsTableAction() {
@@ -101,6 +104,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController {
     }
 
     /**
+     * Returns the mini templates of a category
      * @return JsonModel
      */
     public function getMiniTemplatesAction() {
@@ -124,6 +128,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController {
     }
 
     /**
+     * Renders the category header
      * @return ViewModel
      */
     public function renderMenuManagerToolAddCategoryHeaderAction() {
@@ -135,6 +140,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController {
     }
 
     /**
+     * Renders the cateogory tabs (properties and plugins)
      * @return ViewModel
      */
     public function renderMenuManagerToolAddCategoryBodyTabsAction() {
@@ -145,6 +151,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController {
     }
 
     /**
+     * Renders the cateogry container
      * @return ViewModel
      */
     public function renderMenuManagerToolAddCategoryContainerAction() {
@@ -157,6 +164,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController {
     }
 
     /**
+     * Renders the category zone
      * @return ViewModel
      */
     public function renderMenuManagerToolAddCategoryBodyAction() {
@@ -169,6 +177,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController {
     }
 
     /**
+     * renders the category form
      * @return ViewModel
      */
     public function renderMenuManagerToolAddCategoryBodyPropertiesFormAction() {
@@ -201,6 +210,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController {
     }
 
     /**
+     * Renders the left zone (site select)
      * @return ViewModel
      */
     public function renderMenuManagerToolBodyLeftAction() {
@@ -210,6 +220,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController {
     }
 
     /**
+     * Renders the right (jstree)
      * @return ViewModel
      */
     public function renderMenuManagerToolBodyRightAction() {
@@ -228,6 +239,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController {
     }
 
     /**
+     * Returns the tree data
      * @return JsonModel
      */
     public function getTreeAction() {
@@ -239,6 +251,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController {
     }
 
     /**
+     * Saves the category
      * @return JsonModel
      */
     public function saveCategoryAction() {
@@ -279,6 +292,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController {
     }
 
     /**
+     * Deletes a category
      * @return JsonModel
      */
     public function deleteCategoryAction() {
@@ -311,6 +325,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController {
     }
 
     /**
+     * Saves the js tree
      * @return JsonModel
      */
     public function saveTreeAction() {
@@ -325,6 +340,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController {
     }
 
     /**
+     * Saves the new order of mini templates when it is dragged and dropped in the data table
      * @return JsonModel
      */
     public function reorderMiniTemplatesAction() {
