@@ -401,7 +401,11 @@ class MiniTemplateManagerController extends AbstractActionController {
         return new JsonModel($response);
     }
 
-    // get bytes
+    /**
+     * Format as bytes
+     * @param $size
+     * @return float|int
+     */
     private function asBytes($size) {
         $size = trim($size);
         $s = [ 'g'=> 1<<30, 'm' => 1<<20, 'k' => 1<<10 ];
