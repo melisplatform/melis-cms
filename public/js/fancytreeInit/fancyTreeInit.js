@@ -1,5 +1,5 @@
 (function($, window, document) {
-
+	var $body = $("body");
 		// On Load
 		$(window).on('load', function() {
 			window.mainTree = function(completeEvent) {
@@ -240,61 +240,61 @@
 								// if there is no/empty pages in the treeview
 								var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
 
-								// // PAGE ACCESS user rights checking
-								// $.ajax({
-								//     url         : '/melis/MelisCms/TreeSites/canEditPages',
-								//     encode		: true
-								// }).success(function(data){
-								// 	// has no access
-								// 	if(data.edit === 0){
-								// 	 	$(".meliscms-search-box.sidebar-treeview-search").hide();
-								// 		$("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='no-access'>" + translations.tr_meliscms_no_access + "</span></div>");
-								// 	}
-								// 	// has access
-								// 	else{
-								// 		 if(tree.count() === 0){
-								// 		$(".meliscms-search-box.sidebar-treeview-search").hide();
-								// 		$("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='btn btn-success'>"+ translations.tr_meliscms_create_page +"</span></div>");
-								// 		 }
-								// 		 else{
-								// 		$(".meliscms-search-box.sidebar-treeview-search").show();
-								// 			$("#id-mod-menu-dynatree .create-newpage").remove();
-								// 		 }
-								// 	}
-								// }).error(function(xhr, textStatus, errorThrown){
-								// 	alert( translations.tr_meliscore_error_message );
-								// });
+								/* // PAGE ACCESS user rights checking
+								$.ajax({
+								    url         : '/melis/MelisCms/TreeSites/canEditPages',
+								    encode		: true
+								}).success(function(data){
+									// has no access
+									if(data.edit === 0){
+									 	$(".meliscms-search-box.sidebar-treeview-search").hide();
+										$("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='no-access'>" + translations.tr_meliscms_no_access + "</span></div>");
+									}
+									// has access
+									else{
+										 if(tree.count() === 0){
+										$(".meliscms-search-box.sidebar-treeview-search").hide();
+										$("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='btn btn-success'>"+ translations.tr_meliscms_create_page +"</span></div>");
+										 }
+										 else{
+										$(".meliscms-search-box.sidebar-treeview-search").show();
+											$("#id-mod-menu-dynatree .create-newpage").remove();
+										 }
+									}
+								}).error(function(xhr, textStatus, errorThrown){
+									alert( translations.tr_meliscore_error_message );
+								});
 
 
-								// // SAVE user rights checking
-								// $.ajax({
-								//     url         : '/melis/MelisCms/Page/isActionActive?actionwanted=save',
-								//     encode		: true
-								// }).success(function(data){
-								// 	if(data.active === 0){
-								// 		$("body").addClass('disable-create');
-								// 	}
-								// 	else{
-								// 		$("body").removeClass('disable-create');
-								// 	}
-								// }).error(function(xhr, textStatus, errorThrown){
-								// 	alert( translations.tr_meliscore_error_message );
-								// });
-								//
-								// // DELETE user rights checking
-								// $.ajax({
-								//     url         : '/melis/MelisCms/Page/isActionActive?actionwanted=delete',
-								//     encode		: true
-								// }).success(function(data){
-								// 	if(data.active === 0){
-								// 		$("body").addClass('disable-delete');
-								// 	}
-								// 	else{
-								// 		$("body").removeClass('disable-delete');
-								// 	}
-								// }).error(function(xhr, textStatus, errorThrown){
-								// 	alert( translations.tr_meliscore_error_message );
-								// });
+								// SAVE user rights checking
+								$.ajax({
+								    url         : '/melis/MelisCms/Page/isActionActive?actionwanted=save',
+								    encode		: true
+								}).success(function(data){
+									if(data.active === 0){
+										$("body").addClass('disable-create');
+									}
+									else{
+										$("body").removeClass('disable-create');
+									}
+								}).error(function(xhr, textStatus, errorThrown){
+									alert( translations.tr_meliscore_error_message );
+								});
+								
+								// DELETE user rights checking
+								$.ajax({
+								    url         : '/melis/MelisCms/Page/isActionActive?actionwanted=delete',
+								    encode		: true
+								}).success(function(data){
+									if(data.active === 0){
+										$("body").addClass('disable-delete');
+									}
+									else{
+										$("body").removeClass('disable-delete');
+									}
+								}).error(function(xhr, textStatus, errorThrown){
+									alert( translations.tr_meliscore_error_message );
+								}); */
 						},
 						renderNode: function(event, data) {
 								// removed .fancytree-icon class and replace it with font-awesome icons
@@ -324,22 +324,24 @@
 										appendTo: "body",
 								},
 								dragStart: function(node, data) {
-									// disable drag & drop if its on mobile
-									if ( melisCore.screenSize >= 1024 ) {
-										// determine if the node is draggable or not
-										if ( !data.node.data.dragdrop ) {
+									var pageLocked = $("#leftLockDragDropTreeView .fa-lock").length;
+
+										// disable drag & drop if its on mobile
+										if ( melisCore.screenSize >= 1024 && pageLocked === 0 ) {
+											// determine if the node is draggable or not
+											if ( !data.node.data.dragdrop ) {
 												return false;
+											} 
+											else {
+												return true;
+											}
 										} 
 										else {
-												return true;
+											return false;
 										}
-									} 
-									else {
-										return false;
-									}
 								},
 								dragEnter: function(node, data) {
-										return true;
+									return true;
 								},
 								dragOver: function(node, data) {
 
@@ -351,50 +353,50 @@
 
 								},
 								dragDrop: function(node, data) {
-										node.setExpanded(true).always(function() {
-												// This function MUST be defined to enable dropping of items on the tree.
-												// data.hitMode is 'before', 'after', or 'over'.
-												// We could for example move the source to the new target:
+									node.setExpanded(true).always(function() {
+											// This function MUST be defined to enable dropping of items on the tree.
+											// data.hitMode is 'before', 'after', or 'over'.
+											// We could for example move the source to the new target:
 
-												// catch if its 'root_*' parent
-												var isRootOldParentId = data.otherNode.getParent().key.toString();
-												var oldParentId = (isRootOldParentId.includes('root')) ? -1 : data.otherNode.getParent().key;
+											// catch if its 'root_*' parent
+											var isRootOldParentId = data.otherNode.getParent().key.toString();
+											var oldParentId = (isRootOldParentId.includes('root')) ? -1 : data.otherNode.getParent().key;
 
-												// move the node to drag parent ------------------------------------------------
+											// move the node to drag parent ------------------------------------------------
 
-												data.otherNode.moveTo(node, data.hitMode);
+											data.otherNode.moveTo(node, data.hitMode);
 
-												var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
+											var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
 
-												var draggedPage = data.otherNode.key
+											var draggedPage = data.otherNode.key
 
-												// catch if its 'root_*' parent
-												var isRootNewParentId = node.getParent().key.toString();
-												var newParentId = (isRootNewParentId.includes('root')) ? -1 : node.getParent().key;
+											// catch if its 'root_*' parent
+											var isRootNewParentId = node.getParent().key.toString();
+											var newParentId = (isRootNewParentId.includes('root')) ? -1 : node.getParent().key;
 
-												if (data.hitMode == 'over') {
-														newParentId = data.node.key;
-												}
+											if (data.hitMode == 'over') {
+													newParentId = data.node.key;
+											}
 
-												var newIndexPosition = data.otherNode.getIndex() + 1;
+											var newIndexPosition = data.otherNode.getIndex() + 1;
 
-												//send data to apply new position of the dragged node
-												var datastring = {
-														idPage: draggedPage,
-														oldFatherIdPage: oldParentId,
-														newFatherIdPage: newParentId,
-														newPositionIdPage: newIndexPosition
-												};
+											//send data to apply new position of the dragged node
+											var datastring = {
+													idPage: draggedPage,
+													oldFatherIdPage: oldParentId,
+													newFatherIdPage: newParentId,
+													newPositionIdPage: newIndexPosition
+											};
 
-												$.ajax({
-														url: '/melis/MelisCms/Page/movePage',
-														data: datastring,
-														encode: true
-												}).done(function(data) {}).fail(function(xhr, textStatus, errorThrown) {
-														alert(translations.tr_meliscore_error_message);
-												});
-										});
-										// end
+											$.ajax({
+													url: '/melis/MelisCms/Page/movePage',
+													data: datastring,
+													encode: true
+											}).done(function(data) {}).fail(function(xhr, textStatus, errorThrown) {
+													alert(translations.tr_meliscore_error_message);
+											});
+									});
+									// end
 								}
 						},
 				});

@@ -1,5 +1,4 @@
 <?php
-
 	$name = '';
 	$id = '';
 	if (!empty($this->zoneconfig['conf']['name']))
@@ -7,7 +6,6 @@
 	if (!empty($this->zoneconfig['conf']['id']))
 		$id = ' id="' . $this->zoneconfig['conf']['id'] . '"';
 	$data_melisKey = $this->melisKey;
-
 
 	if ($this->hasSiteTreeAccess){
 ?>
@@ -22,8 +20,11 @@
                 <div id="leftSearchTreeView" class="sbox-icon" title="Search">
                     <i class="fa fa-search" title=""></i>
                 </div>
-                <div id="leftResetTreeView" class="sbox-icon sbox-icon-refresh" title="Refresh" style="top:2px;right: 2px;">
+                <div id="leftResetTreeView" class="sbox-icon sbox-icon-refresh" title="Refresh">
                     <i class="fa fa-refresh"></i>
+                </div>
+                <div id="leftLockDragDropTreeView" class="sbox-icon page-treeview-lock" title="Lock" style="top:2px;right: 2px;">
+                    <i class="fa fa-lock"></i>
                 </div>
             </div>
             <div class="mod-menu-dynatree" id="id-mod-menu-dynatree">

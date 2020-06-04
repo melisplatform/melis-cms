@@ -1,11 +1,51 @@
- var melisSearchPageTree = (function($, window){
-
+ var melisSearchPageTree = (function($, window) {
     // cache DOM
     var $body = $('body');
 
 	    $body.on("click", "#leftSearchTreeView", function(e){
 	    	startTreeSearch();
 		});
+
+		// page lock icon locked/unlocked drag and drop of fancytree node
+		$body.on("click", "#leftLockDragDropTreeView", function() {
+			var $this 		= $(this),
+				$resetTree 	= $("#leftResetTreeView"),
+				$pageLock 	= $this.find(".fa.fa-lock"),
+				$pageUnlock = $this.find(".fa.fa-unlock");
+
+				// trigger refresh
+				$resetTree.trigger("click");
+
+				// toggle of lock and unlock icon
+				if ( $pageLock.length ) {
+					$pageLock.removeClass("fa-lock").addClass("fa-unlock");
+				}
+				else if ( $pageUnlock.length ) {
+					$pageUnlock.removeClass("fa-unlock").addClass("fa-lock");
+				}
+		});
+
+		// lock on drag and drop treeview, automatic locked after 5 minutes
+		function lockDragDropTreeView() {
+			var toLockTime 				= 300000, //300000
+				intervalTime 			= 30000;
+
+				var checkUnlock = setInterval(function() {
+					var $lockDragDropTreeView 	= $("#leftLockDragDropTreeView"),
+						$pageUnlock 			= $lockDragDropTreeView.find(".fa.fa-unlock");
+
+						if ( $pageUnlock.length ) {
+							setTimeout(function() {
+								$pageUnlock.removeClass("fa-unlock").addClass("fa-lock");
+							}, toLockTime);
+
+							clearInterval( checkUnlock );
+						}
+				}, intervalTime);
+		}
+
+		// run on document ready
+		lockDragDropTreeView();
 
 	    // Filter Search
 	    $(document).on("keyup", "input[name=left_tree_search]", function(event) {
