@@ -18,7 +18,6 @@ class MiniTemplateManagerController extends AbstractActionController
     public $module = 'meliscms';
     public $tool_key = 'meliscms_mini_template_manager_tool';
     public $form_key = 'mini_template_manager_tool_add_form';
-    public $file_types = ['png', 'PNG', 'jpg', 'JPG', 'jpeg', 'JPEG', 'gif', 'GIF'];
 
     public function renderMiniTemplateManagerToolAction() {}
     public function renderMiniTemplateManagerToolHeaderAction() {}
@@ -52,6 +51,9 @@ class MiniTemplateManagerController extends AbstractActionController
         return $view;
     }
 
+    /**
+     * @return ViewModel
+     */
     public function renderMiniTemplateManagerToolAddHeaderAction() {
         $params = $this->params()->fromQuery();
         $view = new ViewModel();
@@ -69,15 +71,14 @@ class MiniTemplateManagerController extends AbstractActionController
         $params = $this->params()->fromQuery();
 
         if ($params['templateName'] !== 'new_template') {
-            $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
-            $path = $service->getModuleMiniTemplatePath($params['module']);
             $site_service = $this->getServiceLocator()->get('MelisCmsSiteService');
+            $path = $site_service->getModulePath($params['module']) . '/public/miniTemplatesTinyMce/';
             $site = $site_service->getSiteByModule($params['module']);
 
             $data = [
                 'miniTemplateSite' => $site->site_id,
                 'miniTemplateName' => $params['templateName'],
-                'miniTemplateHtml' => file_get_contents($path . '/' . $params['templateName'] . '.phtml')
+                'miniTemplateHtml' => file_get_contents($path . $params['templateName'] . '.phtml')
             ];
 
             $form->setAttribute('id', 'id_mini_template_manager_tool_update');
@@ -142,17 +143,18 @@ class MiniTemplateManagerController extends AbstractActionController
         }
 
         if (! empty($post['site_name'])) {
-            $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
-            $path = $service->getModuleMiniTemplatePath($post['site_name']);
+            $site_service = $this->getServiceLocator()->get('MelisCmsSiteService');
+            $path = $site_service->getModulePath($post['site_name']) . '/public/miniTemplatesTinyMce';
 
-            if (! empty($path)) {
-                $mini_templates_temp = $service->getMiniTemplates($post['site_name']);
+            if (file_exists($path)) {
+                $mtpl_service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
+                $mini_templates_temp = $mtpl_service->getMiniTemplates($post['site_name']);
                 $mini_templates = [];
 
                 foreach ($mini_templates_temp as $mini_template) {
                     $exploded = explode('.', $mini_template);
                     $templateName = $exploded[0];
-                    $thumbnail = $this->getMiniTemplateThumbnail($path, $templateName);
+                    $thumbnail = $mtpl_service->getMiniTemplateThumbnail($path, $templateName);
                     $thumbnail_file = '';
 
                     if (! empty($thumbnail)) {
@@ -195,31 +197,6 @@ class MiniTemplateManagerController extends AbstractActionController
             'recordsFiltered' => $filtered,
             'data' => $filtered_templates
         ]);
-    }
-
-    /**
-     * Gets the mini template thumbnail
-     * @param $path
-     * @param $template
-     * @return array|null
-     */
-    private function getMiniTemplateThumbnail($path, $template)
-    {
-        $files = glob($path ."/" . $template . ".*");
-
-        foreach ($files as $file) {
-            $base_name = basename($file);
-            $exploded_name = explode('.', $base_name);
-
-            if (in_array($exploded_name[1], $this->file_types)) {
-                return [
-                    'file' => $base_name,
-                    'path' => $file
-                ];
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -347,17 +324,16 @@ class MiniTemplateManagerController extends AbstractActionController
      * @return array|mixed
      */
     private function checkUpdateErrors($form, $current_data, $new_data) {
-        $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
         $site_service = $this->getServiceLocator()->get('MelisCmsSiteService');
         $current_site = $site_service->getSiteById($current_data['miniTemplateSite']);
-        $current_site_path = $service->getModuleMiniTemplatePath($current_site->site_name);
+        $current_site_path = $site_service->getModulePath($current_site->site_name) . '/public/miniTemplatesTinyMce';
         $new_site = $site_service->getSiteById($new_data['miniTemplateSite']);
-        $new_site_path = $service->getModuleMiniTemplatePath($new_site->site_name);
+        $new_site_path = $site_service->getModulePath($new_site->site_name) . '/public/miniTemplatesTinyMce';
         $translator = $this->getServiceLocator()->get('translator');
         $errors = [];
 
         if ($form->isValid()) {
-            if ($current_site->site_id !== $new_data['miniTemplateSite']) {
+            if ($current_site->site_id != $new_data['miniTemplateSite']) {
                 if (file_exists($new_site_path . '/' . $new_data['miniTemplateName'] . '.phtml')) {
                     $errors['miniTemplateName'] = [
                         'error' => $translator->translate('tr_meliscms_mini_template_manager_tool_form_create_error_file_already_exists'),
@@ -388,10 +364,11 @@ class MiniTemplateManagerController extends AbstractActionController
     public function deleteMiniTemplateAction() {
         $data = (array) $this->getRequest()->getPost();
         $this->getEventManager()->trigger('meliscms_mini_template_manager_delete_start', $this, $data);
-        $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
-        $path = $service->getModuleMiniTemplatePath($data['module']);
+        $mtpl_service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
+        $site_service = $this->getServiceLocator()->get('MelisCmsSiteService');
+        $path = $site_service->getModulePath($data['module']) . '/public/miniTemplatesTinyMce';
         $minitemplate = $path . '/' . $data['template'] . '.phtml';
-        $minitemplate_thumbnail = $this->getMiniTemplateThumbnail($path, $data['template']);
+        $minitemplate_thumbnail = $mtpl_service->getMiniTemplateThumbnail($path, $data['template']);
         $thumbnail_path = null;
         $errors = [];
         $success = 0;
@@ -401,7 +378,7 @@ class MiniTemplateManagerController extends AbstractActionController
             $thumbnail_path = $minitemplate_thumbnail['path'];
         }
 
-        $ress = $service->deleteMiniTemplate($minitemplate, $thumbnail_path, $data['template']);
+        $ress = $mtpl_service->deleteMiniTemplate($minitemplate, $thumbnail_path, $data['template']);
 
         if (! empty($ress)) {
             $errors = $ress['errors'];
@@ -426,7 +403,11 @@ class MiniTemplateManagerController extends AbstractActionController
         return new JsonModel($response);
     }
 
-    // get bytes
+    /**
+     * Format as bytes
+     * @param $size
+     * @return float|int
+     */
     private function asBytes($size) {
         $size = trim($size);
         $s = [ 'g'=> 1<<30, 'm' => 1<<20, 'k' => 1<<10 ];
@@ -473,6 +454,10 @@ class MiniTemplateManagerController extends AbstractActionController
         return $errors;
     }
 
+    /**
+     * Returns the max upload size
+     * @return float|int|string
+     */
     private function getMaxUploadOrPostSize() {
         $max_post = ini_get('post_max_size');
         $max_upload = ini_get('upload_max_filesize');

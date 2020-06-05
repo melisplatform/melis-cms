@@ -26,6 +26,10 @@ class MiniTemplateMenuManagerController extends AbstractActionController
     public function renderMenuManagerToolAddCategoryBodyPropertiesContentAction() {}
     public function renderMiniTemplateMenuManagerToolTableRefreshAction() {}
 
+    /**
+     * Renders the category plugins zone
+     * @return ViewModel
+     */
     public function renderMenuManagerToolAddCategoryBodyPluginsContentAction() {
         $params = $this->params()->fromQuery();
         $view = new ViewModel();
@@ -36,6 +40,10 @@ class MiniTemplateMenuManagerController extends AbstractActionController
         return $view;
     }
 
+    /**
+     * Renders the category zone contents
+     * @return ViewModel
+     */
     public function renderMenuManagerToolAddCategoryBodyContentsAction() {
         $params = $this->params()->fromQuery();
         $view = new ViewModel();
@@ -45,6 +53,10 @@ class MiniTemplateMenuManagerController extends AbstractActionController
         return $view;
     }
 
+    /**
+     * Renders the category data table
+     * @return ViewModel
+     */
     public function renderMenuManagerToolAddCategoryBodyPluginsTableAction() {
         $params = $this->params()->fromQuery();
         $translator = $this->getServiceLocator()->get('translator');
@@ -93,6 +105,10 @@ class MiniTemplateMenuManagerController extends AbstractActionController
         return $view;
     }
 
+    /**
+     * Returns the mini templates of a category
+     * @return JsonModel
+     */
     public function getMiniTemplatesAction() {
         $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
         $post = $this->getRequest()->getPost();
@@ -113,6 +129,10 @@ class MiniTemplateMenuManagerController extends AbstractActionController
         ]);
     }
 
+    /**
+     * Renders the category header
+     * @return ViewModel
+     */
     public function renderMenuManagerToolAddCategoryHeaderAction() {
         $params = $this->params()->fromQuery();
         $view = new ViewModel();
@@ -121,6 +141,10 @@ class MiniTemplateMenuManagerController extends AbstractActionController
         return $view;
     }
 
+    /**
+     * Renders the cateogory tabs (properties and plugins)
+     * @return ViewModel
+     */
     public function renderMenuManagerToolAddCategoryBodyTabsAction() {
         $params = $this->params()->fromQuery();
         $view = new ViewModel();
@@ -128,6 +152,10 @@ class MiniTemplateMenuManagerController extends AbstractActionController
         return $view;
     }
 
+    /**
+     * Renders the cateogry container
+     * @return ViewModel
+     */
     public function renderMenuManagerToolAddCategoryContainerAction() {
         $params = $this->params()->fromQuery();
         $view = new ViewModel();
@@ -137,6 +165,10 @@ class MiniTemplateMenuManagerController extends AbstractActionController
         return $view;
     }
 
+    /**
+     * Renders the category zone
+     * @return ViewModel
+     */
     public function renderMenuManagerToolAddCategoryBodyAction() {
         $params = $this->params()->fromQuery();
         $view = new ViewModel();
@@ -146,9 +178,13 @@ class MiniTemplateMenuManagerController extends AbstractActionController
         return $view;
     }
 
+    /**
+     * renders the category form
+     * @return ViewModel
+     */
     public function renderMenuManagerToolAddCategoryBodyPropertiesFormAction() {
         $params = $this->params()->fromQuery();
-        $lang_service = $this->serviceLocator->get('MelisEngineLang');
+        $lang_service = $this->getServiceLocator()->get('MelisEngineLang');
         $languages = $lang_service->getAvailableLanguages();
         $form = $this->getForm($this->module, $this->tool_key, $this->form_add_category_key);
         $data = [];
@@ -175,12 +211,20 @@ class MiniTemplateMenuManagerController extends AbstractActionController
         return $view;
     }
 
+    /**
+     * Renders the left zone (site select)
+     * @return ViewModel
+     */
     public function renderMenuManagerToolBodyLeftAction() {
         $view = new ViewModel();
         $view->sites = $this->getServiceLocator()->get('MelisCmsSiteService')->getAllSites();
         return $view;
     }
 
+    /**
+     * Renders the right (jstree)
+     * @return ViewModel
+     */
     public function renderMenuManagerToolBodyRightAction() {
         $lang_service = $this->getServiceLocator()->get('MelisEngineLang');
         $languages = $lang_service->getAvailableLanguages();
@@ -196,6 +240,10 @@ class MiniTemplateMenuManagerController extends AbstractActionController
         return $view;
     }
 
+    /**
+     * Returns the tree data
+     * @return JsonModel
+     */
     public function getTreeAction() {
         $params = $this->params()->fromQuery();
         $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
@@ -204,6 +252,10 @@ class MiniTemplateMenuManagerController extends AbstractActionController
         return new JsonModel($tree);
     }
 
+    /**
+     * Saves the category
+     * @return JsonModel
+     */
     public function saveCategoryAction() {
         $params = $this->params()->fromPost();
         $event = 'meliscms_mini_template_menu_manager_create_category';
@@ -241,6 +293,10 @@ class MiniTemplateMenuManagerController extends AbstractActionController
         return new JsonModel($response);
     }
 
+    /**
+     * Deletes a category
+     * @return JsonModel
+     */
     public function deleteCategoryAction() {
         $params = $this->params()->fromPost();
         $this->getEventManager()->trigger('meliscms_mini_template_menu_manager_delete_category_start', $this, $params);
@@ -270,6 +326,10 @@ class MiniTemplateMenuManagerController extends AbstractActionController
         return new JsonModel($response);
     }
 
+    /**
+     * Saves the js tree
+     * @return JsonModel
+     */
     public function saveTreeAction() {
         $params = $this->params()->fromPost();
         $service = $this->getServiceLocator()->get('MelisCmsMiniTemplateService');
@@ -281,6 +341,10 @@ class MiniTemplateMenuManagerController extends AbstractActionController
         ]);
     }
 
+    /**
+     * Saves the new order of mini templates when it is dragged and dropped in the data table
+     * @return JsonModel
+     */
     public function reorderMiniTemplatesAction() {
         $params = $this->params()->fromPost();
         $templates = explode(',', $params['data']);

@@ -755,7 +755,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
      */
     public function getCategories($site_id, $locale) {
         $table = $this->getServiceLocator()->get('MelisCmsCategoryTable');
-        $lang_table = $this->serviceLocator->get('MelisEngineTableCmsLang');
+        $lang_table = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
         $lang = $lang_table->getEntryByField('lang_cms_locale', $locale)->current();
         $categories = $table->getCategoryBySite($site_id)->toArray();
         $final_categories = [];
@@ -811,7 +811,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
      * @return array
      */
     public function getMiniTemplateFiles($path, $template) {
-        $files = glob($path ."/*" . $template . "*");
+        $files = glob($path ."/" . $template . ".*");
         $data = [];
 
         foreach ($files as $file) {
@@ -926,7 +926,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
      * @param $template
      * @return array|null
      */
-    private function getMiniTemplateThumbnail($path, $template)
+    public function getMiniTemplateThumbnail($path, $template)
     {
         $files = glob($path ."/" . $template . ".*");
 
@@ -950,7 +950,7 @@ class MelisCmsMiniTemplateService extends MelisCoreGeneralService
      * @return string
      */
     private function getComposerModulePath($module) {
-        $composerSrv = $this->serviceLocator->get('MelisEngineComposer');
+        $composerSrv = $this->getServiceLocator()->get('MelisEngineComposer');
         $path = $composerSrv->getComposerModulePath($module);
         $miniTemplatePath = $path . '/public' . '/miniTemplatesTinyMce';
         return (! empty($path)) ? $miniTemplatePath : '';
