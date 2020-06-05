@@ -110,7 +110,7 @@
                                                                                             $name = str_replace('\\', null, $name);
                                                                                             $subcategory = $conf['subcategory'];
                                                                                             $subcategoryId = $subcategory['id'] ?? null;
-                                                                                            $isNew = $config['isNew'] ?? false;
+                                                                                            $isNew = $val['isNew'] ?? false;
                                                                                             $newClass = '';
                                                                                             if ($isNew) {
                                                                                                 $newClass = 'has-new-plugins';
@@ -125,9 +125,11 @@
                                                                                                          echo $this->boTranslate(str_replace('\\', null, $conf['description']));
                                                                                                      } ?>">
                                                                                                     <img  src="<?= $thumbnail; ?>" width="195">
-                                                                                                    <div class="melis-plugins-icon-new-sub-child ">
-                                                                                                        <span class="melis-plugins-icon-new new-plugin-indicator">NEW!</span>
-                                                                                                    </div>
+                                                                                                    <?php if ($isNew) : ?>
+                                                                                                        <div class="melis-plugins-icon-new-sub-child ">
+                                                                                                            <span class="melis-plugins-icon-new new-plugin-indicator">NEW!</span>
+                                                                                                        </div>
+                                                                                                    <?php endif ?>
                                                                                                     <span class="melis-cms-plugin-title"><?= $this->boTranslate($name); ?></span>
                                                                                                 </div>
                                                                                             <?php endif ?>
