@@ -1310,7 +1310,6 @@ class PageController extends AbstractActionController
                 // Get the children
                 $melisTree = $this->getServiceManager()->get('MelisEngineTree');
                 $children = $melisTree->getPageChildren($idPage);
-                $children = $children->toArray();
                 $datasPage = $page->getMelisPageTree();
 
                 if (count($children) == 0)
@@ -1320,7 +1319,6 @@ class PageController extends AbstractActionController
 
                     // Get the children for update after deleting
                     $children = $melisTree->getPageChildren($fatherPageId);
-                    $children = $children->toArray();
 
                     // Deleting the page
                     $tablePageTree = $this->getServiceManager()->get('MelisEngineTablePageTree');
@@ -1497,8 +1495,6 @@ class PageController extends AbstractActionController
         // First let's get the list of children of the new father's page
         $melisTree = $this->getServiceManager()->get('MelisEngineTree');
         $children = $melisTree->getPageChildren($newFatherIdPage);
-        $children = $children->toArray();
-
 
         $pageTree = array();
         foreach ($children As $val)
@@ -1527,7 +1523,6 @@ class PageController extends AbstractActionController
             // the page has been deleted
             $melisTree = $this->getServiceManager()->get('MelisEngineTree');
             $children = $melisTree->getPageChildren($oldFatherIdPage);
-            $children = $children->toArray();
             $cpt = 1;
             foreach ($children as $child)
             {
@@ -1818,7 +1813,7 @@ class PageController extends AbstractActionController
             $childrenPages = $melisTree->getPageChildren($idPage, 0);
             foreach($childrenPages as $page)
             {
-                $this->updateUrlPage($page->tree_page_id);
+                $this->updateUrlPage($page['tree_page_id']);
             }
         }
     }

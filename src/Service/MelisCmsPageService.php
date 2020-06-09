@@ -551,10 +551,10 @@ class MelisCmsPageService extends MelisGeneralService
         {
             // Get the order to be inserted
             $order = 0;
-            $children = $melisEngineTablePageTree->getPageChildrenByidPage($fatherPageId);
+            $melisTree = $this->getServiceManager()->get('MelisEngineTree');
+            $children = $melisTree->getPageChildren($fatherPageId);
             if ($children)
             {
-                $children = $children->toArray();
                 $order = count($children) + 1;
             }
 
