@@ -344,7 +344,7 @@ class PageController extends AbstractActionController
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $melisTree = $this->getServiceManager()->get('MelisEngineTree');
-        $children = $melisTree->getPageChildren($idPage)->count();
+        $children = count($melisTree->getPageChildren($idPage));
         $view = new ViewModel();
         $view->idPage = $idPage;
         $view->melisKey = $melisKey;
