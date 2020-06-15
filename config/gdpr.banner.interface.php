@@ -146,7 +146,7 @@ return [
                         [
                             'spec' => [
                                 'name' => 'mcgdpr_text_value',
-                                'type' => 'TextArea',
+                                'type' => 'Textarea',
                                 'options' => [
                                     'label' => 'tr_melis_cms_gdpr_banner_content',
                                     'tooltip' => 'tr_melis_cms_gdpr_banner_content_tooltip',
