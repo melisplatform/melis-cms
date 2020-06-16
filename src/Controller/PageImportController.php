@@ -11,11 +11,11 @@ namespace MelisCms\Controller;
 
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 use ZipArchive;
 use Laminas\Http\PhpEnvironment\Response as HttpResponse;
 
-class PageImportController extends AbstractActionController
+class PageImportController extends MelisAbstractActionController
 {
     const FORM_CONFIG_PATH = 'meliscms/tools/meliscms_tree_sites_tool/forms/meliscms_tree_sites_import_page_form';
     const FORM_PARENT_KEY = 'meliscms_tree_sites_tool';

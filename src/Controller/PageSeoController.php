@@ -11,12 +11,12 @@ namespace MelisCms\Controller;
 
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 
 /**
  * This class renders Melis CMS Page tab properties
  */
-class PageSeoController extends AbstractActionController
+class PageSeoController extends MelisAbstractActionController
 {
 	// The form is loaded from the app.form array
 	const PageSeoAppConfigPath = '/meliscms/forms/meliscms_page_seo';

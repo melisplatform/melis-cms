@@ -13,12 +13,12 @@ use Laminas\Http\PhpEnvironment\Response as HttpResponse;
 use MelisCms\Service\MelisCmsPageExportService;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 
 /**
  * This class renders Melis CMS Page export
  */
-class PageExportController extends AbstractActionController
+class PageExportController extends MelisAbstractActionController
 {
     /**
      * @return ViewModel

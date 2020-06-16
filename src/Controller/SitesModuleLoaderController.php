@@ -11,12 +11,12 @@ namespace MelisCms\Controller;
 
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 use MelisCore\Service\MelisCoreRightsService;
 use Laminas\Config\Reader\Json;
 use phpDocumentor\Reflection\Types\Boolean;
 
-class SitesModuleLoaderController extends AbstractActionController
+class SitesModuleLoaderController extends MelisAbstractActionController
 {
     /**
      * Returns the module that is dependent to the provided module

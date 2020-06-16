@@ -14,12 +14,12 @@ use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
 use Laminas\Session\Container;
 use MelisCms\Service\MelisCmsRightsService;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 
 /**
  * This class renders Melis CMS Plugin Menu
  */
-class FrontPluginsController extends AbstractActionController
+class FrontPluginsController extends MelisAbstractActionController
 {
     private $sectionHasNewPlugins = [];
     private $modulesHasNewPlugins = [];

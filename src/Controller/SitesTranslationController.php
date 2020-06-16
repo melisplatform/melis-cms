@@ -12,9 +12,9 @@ namespace MelisCms\Controller;
 use Laminas\Session\Container;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 
-class SitesTranslationController extends AbstractActionController
+class SitesTranslationController extends MelisAbstractActionController
 {
     const TOOL_INDEX = 'meliscms';
     const TOOL_KEY = 'site_translation_tool';

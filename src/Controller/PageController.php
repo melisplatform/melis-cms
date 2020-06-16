@@ -13,12 +13,12 @@ use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
 use Laminas\Session\Container;
 use MelisCms\Service\MelisCmsRightsService;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 
 /**
  * This class renders Melis CMS Page
  */
-class PageController extends AbstractActionController
+class PageController extends MelisAbstractActionController
 {
     const NEW_PAGE = '0';
 

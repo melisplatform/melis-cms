@@ -12,9 +12,9 @@ namespace MelisCms\Controller;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
 use Laminas\Session\Container;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 
-class MelisSetupController extends AbstractActionController
+class MelisSetupController extends MelisAbstractActionController
 {
 
     public function setupResultAction()

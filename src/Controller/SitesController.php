@@ -9,7 +9,7 @@
 
 namespace MelisCms\Controller;
 
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 use MelisFront\Service\MelisSiteConfigService;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
@@ -20,7 +20,7 @@ use phpDocumentor\Reflection\Types\Boolean;
 /**
  * Site Tool Plugin
  */
-class SitesController extends AbstractActionController
+class SitesController extends MelisAbstractActionController
 {
     const TOOL_INDEX = 'meliscms';
     const TOOL_KEY = 'meliscms_tool_sites';

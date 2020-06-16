@@ -13,12 +13,12 @@ use MelisCms\Service\MelisCmsRightsService;
 use Laminas\Form\Factory;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 
 /**
  * This class renders Melis CMS TreeView
  */
-class TreeSitesController extends AbstractActionController
+class TreeSitesController extends MelisAbstractActionController
 {
 	/**
 	 * Get the children of an idPage

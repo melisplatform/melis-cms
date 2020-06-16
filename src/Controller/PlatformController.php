@@ -11,12 +11,12 @@ namespace MelisCms\Controller;
 
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 
 /**
  * Platform Tool Plugin
  */
-class PlatformController extends AbstractActionController
+class PlatformController extends MelisAbstractActionController
 {
     const TOOL_INDEX = 'meliscms';
     const TOOL_KEY = 'meliscms_platform_tool';

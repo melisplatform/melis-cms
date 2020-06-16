@@ -10,9 +10,9 @@
 namespace MelisCms\Controller;
 
 use Laminas\View\Model\ViewModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 
-class SitesPropertiesController extends AbstractActionController
+class SitesPropertiesController extends MelisAbstractActionController
 {
     /**
      * Render Site Properties Container
