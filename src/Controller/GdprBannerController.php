@@ -14,13 +14,13 @@ use Laminas\Form\Factory;
 use Laminas\Form\Form;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 
 /**
  * Allows the customization of the text displayed on the sites
  * to inform users on cookies and data protection rights.
  */
-class GdprBannerController extends AbstractActionController
+class GdprBannerController extends MelisAbstractActionController
 {
     const MODULE_NAME = 'MelisCmsGdprBanner';
     const LOG_UPDATE = 'UDPATE';

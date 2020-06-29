@@ -9,7 +9,7 @@
 
 namespace MelisCms\Controller;
 
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 use MelisFront\Service\MelisSiteConfigService;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
@@ -20,7 +20,7 @@ use phpDocumentor\Reflection\Types\Boolean;
 /**
  * Site Tool Plugin
  */
-class SitesController extends AbstractActionController
+class SitesController extends MelisAbstractActionController
 {
     const TOOL_INDEX = 'meliscms';
     const TOOL_KEY = 'meliscms_tool_sites';
@@ -821,6 +821,8 @@ class SitesController extends AbstractActionController
                             $this->deleteOtherTabsData($siteId, $LangIds);
                         }
                     }
+                    //clear cache
+                    $this->clearSiteConfigCache($siteId);
                     /**
                      * if no error, execute the saving
                      */
@@ -1646,5 +1648,25 @@ class SitesController extends AbstractActionController
            unlink($file);
            return true;
        }
+    }
+
+    /**
+     * Clear Config Cache
+     */
+    private function clearSiteConfigCache($siteId)
+    {
+        //keys need to remove
+        $cacheKeys = [
+            'getSiteConfig_'.$siteId,
+            'getSiteConfigByPageId',
+            //module cache
+            'getVendorModulesEngine',
+            'getComposerModulePathEngine_'
+        ];
+
+        $cacheConfig = 'meliscms_page';
+        $melisEngineCacheSystem = $this->getServiceManager()->get('MelisEngineCacheSystem');
+        foreach($cacheKeys as $preFix)
+            $melisEngineCacheSystem->deleteCacheByPrefix($preFix, $cacheConfig);
     }
 }

@@ -14,12 +14,12 @@ use Laminas\View\Model\JsonModel;
 use Laminas\Session\Container;
 use MelisCms\Service\MelisCmsRightsService;
 use Laminas\Form\Factory;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 
 /**
  * This class renders Melis CMS Page language
  */
-class PageLanguagesController extends AbstractActionController
+class PageLanguagesController extends MelisAbstractActionController
 {
     /**
      * This method render the Melis Page language

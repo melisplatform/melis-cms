@@ -53,6 +53,7 @@ $(function(){
                 id      = $(this).closest("tr").attr('data-site-id'),
                 obj     = {};
 
+                obj.mst_id = t_id;
                 obj.siteId = id;
 
                 if(t_id != 0 && t_id != "") {

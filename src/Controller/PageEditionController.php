@@ -14,13 +14,13 @@ use Laminas\Form\Factory;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
 use Laminas\Session\Container;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 use MelisCore\Service\MelisGeneralService;
 
 /**
  * This class renders Melis CMS page tab edition
  */
-class PageEditionController extends AbstractActionController
+class PageEditionController extends MelisAbstractActionController
 {
 	const MINI_TEMPLATES_FOLDER = 'miniTemplatesTinyMce';
     const TEMPLATE_FORM = 'meliscms/tools/meliscms_tool_templates/forms/meliscms_tool_template_generic_form';
@@ -396,7 +396,7 @@ class PageEditionController extends AbstractActionController
 			    {
 				while (false !== ($entry = readdir($handle)))
 				{
-				    if (is_dir($folderSite . '/' . $entry) || $entry == '.' || $entry == '..')
+				    if (is_dir($folderSite . '/' . $entry) || $entry == '.' || $entry == '..' || !$this->isImage($entry))
 					continue;
 				    array_push($tinyTemplates,
 						array(
@@ -414,5 +414,17 @@ class PageEditionController extends AbstractActionController
 
 		return new JsonModel($tinyTemplates);
     	}
+
+    function isImage($fileName)
+    {
+        $image_ext = ['PNG', 'png', 'JPG', 'jpg', 'JPEG', 'jpeg'];
+        foreach($image_ext as $ext){
+            //if file is image, don't include it
+            if(strpos($fileName, $ext) !== false) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 

@@ -11,7 +11,7 @@ namespace MelisCms\Controller;
 
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 use MelisCore\Service\MelisCoreRightsService;
 use Laminas\Session\Container;
 /**
@@ -19,7 +19,7 @@ use Laminas\Session\Container;
  * Cmys Styles Manager Tool Plugin
  *
  */
-class ToolStyleController extends AbstractActionController
+class ToolStyleController extends MelisAbstractActionController
 {
     /**
      * This constant variable will map to the app.tool.php configuration file

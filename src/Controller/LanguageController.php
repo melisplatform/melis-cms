@@ -13,12 +13,12 @@ namespace MelisCms\Controller;
 use Laminas\Session\Container;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 
 /**
  * This class deals with the languages button in the header
  */
-class LanguageController extends AbstractActionController
+class LanguageController extends MelisAbstractActionController
 {
 	const TOOL_INDEX = 'meliscms';
     const TOOL_KEY = 'meliscms_language_tool';

@@ -13,12 +13,12 @@ use MelisCms\Service\MelisCmsRightsService;
 use Laminas\Form\Factory;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 
 /**
  * This class renders Melis CMS TreeView
  */
-class TreeSitesController extends AbstractActionController
+class TreeSitesController extends MelisAbstractActionController
 {
 	/**
 	 * Get the children of an idPage
@@ -138,14 +138,14 @@ class TreeSitesController extends AbstractActionController
 			$zoneId = 'id_meliscms_page';
 
 
-		// Get the children
+        // Get the children
+        $children = [];
 		$melisTree = $this->getServiceManager()->get('MelisEngineTree');
 		if (!empty($rootPages))
 		{
 			if ($rootPages[0] == -1 || $idPage != -1)
 			{
 				$children = $melisTree->getPageChildren($idPage);
-				$children = $children->toArray();
 			}
 			else
 			{
@@ -169,6 +169,7 @@ class TreeSitesController extends AbstractActionController
 		$final = array();
 		foreach($children as $page)
 		{
+            $page = (array) $page;
 			$data_page_id = $page['tree_page_id'];
 
 			/**
@@ -195,7 +196,6 @@ class TreeSitesController extends AbstractActionController
 			$childrenTmp = $melisTree->getPageChildren($data_page_id);
 			if ($childrenTmp)
 			{
-				$childrenTmp = $childrenTmp->toArray();
 				if (count($childrenTmp) > 0)
 					$has_children = true;
 			}

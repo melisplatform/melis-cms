@@ -26,17 +26,17 @@ class MelisCmsPageExportService extends MelisGeneralService
                                     'MelisEngineTablePageSaved'     => 'page_id',
                                     'MelisEngineTablePageSeo'       => 'pseo_id',
                                     'MelisEngineTablePageStyle'     => 'pstyle_page_id'
-                                  ];
+                                ];
 
     /**
      *Default external tables needed to export page
-     * @var array
-     */
+    * @var array
+    */
     protected $defaultExternalTables = [
                                             'MelisEngineTableStyle',
                                             'MelisEngineTableTemplate',
                                             'MelisEngineTableCmsLang'
-                                       ];
+                                    ];
 
     protected $defaultExternalTablesList = [
         'melis_cms_template' => 'templates',
@@ -254,7 +254,7 @@ class MelisCmsPageExportService extends MelisGeneralService
 
         $pageTreeService = $this->getServiceManager()->get('MelisEngineTree');
         if(empty($children)) {
-            $children = $pageTreeService->getPageChildren($pageId)->toArray();
+            $children = $pageTreeService->getPageChildren($pageId);
         }
 
         foreach($children as $idx => $child) {
@@ -272,7 +272,7 @@ class MelisCmsPageExportService extends MelisGeneralService
             /**
              * process the sub pages of the page
              */
-            $subChildren = $pageTreeService->getPageChildren($child['tree_page_id'])->toArray();
+            $subChildren = $pageTreeService->getPageChildren($child['tree_page_id']);
             if(!empty($subChildren)){
                 $childrenData = $this->processSubPagesExport($child['tree_page_id'], $subChildren);
                 $pageData = htmlspecialchars_decode($childrenData, ENT_XML1);
@@ -344,7 +344,7 @@ class MelisCmsPageExportService extends MelisGeneralService
     {
         $resources = [];
         $pageTreeService = $this->getServiceManager()->get('MelisEngineTree');
-        $children = $pageTreeService->getPageChildren($pageId)->toArray();
+        $children = $pageTreeService->getPageChildren($pageId);
         foreach($children as $data){
             $pageContent = $data['page_content'];
             //check if page content is also available on page saved
@@ -629,7 +629,7 @@ class MelisCmsPageExportService extends MelisGeneralService
             $children = $pageTreeService->getPageChildren($pageId)->toArray();
 
             foreach ($children as $id => $child) {
-                $subChildren = $pageTreeService->getPageChildren($child['tree_page_id'])->toArray();
+                $subChildren = $pageTreeService->getPageChildren($child['tree_page_id']);
 
                 if (!empty($subChildren)) {
                     $this->getAllPageIds($child['tree_page_id'], $pages, $templates, $styles, $langs, $pageCount, $includeSubPages);

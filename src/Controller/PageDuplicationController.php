@@ -13,12 +13,12 @@ namespace MelisCms\Controller;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
 use Laminas\Session\Container;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 
 /**
  * This class handles the display of the page duplicate button and its' events
  */
-class PageDuplicationController extends AbstractActionController
+class PageDuplicationController extends MelisAbstractActionController
 {
 
     /**

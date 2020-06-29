@@ -10,9 +10,9 @@
 namespace MelisCms\Controller;
 
 use Laminas\View\Model\ViewModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 
-class SitesConfigController extends AbstractActionController
+class SitesConfigController extends MelisAbstractActionController
 {
     /**
      * Renders Site Config Tab Container

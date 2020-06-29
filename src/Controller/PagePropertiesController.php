@@ -13,12 +13,12 @@ use Laminas\Form\Factory;
 use Laminas\Session\Container;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 
 /**
  * This class renders Melis CMS Page tab properties
  */
-class PagePropertiesController extends AbstractActionController
+class PagePropertiesController extends MelisAbstractActionController
 {
     // The form is loaded from the app.form array
     const PagePropertiesAppConfigPath = '/meliscms/forms/meliscms_page_properties';
@@ -208,9 +208,9 @@ class PagePropertiesController extends AbstractActionController
                 if (!$exist) {
                     // Get the order to be inserted
                     $order = 0;
-                    $children = $melisEngineTablePageTree->getPageChildrenByidPage($fatherPageId);
+                    $melisTree = $this->getServiceManager()->get('MelisEngineTree');
+                    $children = $melisTree->getPageChildren($fatherPageId);
                     if ($children) {
-                        $children = $children->toArray();
                         $order = count($children) + 1;
                     }
 

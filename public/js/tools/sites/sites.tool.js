@@ -339,12 +339,16 @@ $(function() {
                 } else {
                     $("#siteAddAlert").addClass("hidden");
                     removeFormError(currentStepForm);
+                    //owlStep.trigger('owl-next');
                     owlStep.trigger('owl.next');
+                    //$(".owl-next").trigger("click");
                 }
             } else {
                 $("#siteAddAlert").addClass("hidden");
                 removeFormError(currentStepForm);
+                //owlStep.trigger('owl-next');
                 owlStep.trigger('owl.next');
+                //$(".owl-next").trigger("click");
             }
         }
     });
@@ -353,7 +357,9 @@ $(function() {
         if ( owlStep !== null ) {
             $("#siteAddAlert").addClass("hidden");
             removeFormError(currentStepForm);
+            //owlStep.trigger('owl-prev');
             owlStep.trigger('owl.prev');
+            //$(".owl-prev").trigger("click");
         }
     });
 
@@ -934,7 +940,9 @@ $(function() {
                             });
                         } else {
                             melisCoreTool.done("#btn-next-step");
+                            //owlStep.trigger('owl-next');
                             owlStep.trigger('owl.next');
+                            //$(".owl-next").trigger("click");
                             return false;
                         }
                     }).fail(function(xhr, textStatus, errorThrown) {
@@ -963,7 +971,9 @@ $(function() {
                         melisCoreTool.done("#btn-next-step");
                         return true;
                     } else {
+                        //owlStep.trigger('owl-next');
                         owlStep.trigger('owl.next');
+                        //$(".owl-next").trigger("click");
                         melisCoreTool.done("#btn-next-step");
                         return false;
                     }

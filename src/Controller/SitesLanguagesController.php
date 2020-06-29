@@ -10,9 +10,9 @@
 namespace MelisCms\Controller;
 
 use Laminas\View\Model\ViewModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 
-class SitesLanguagesController extends AbstractActionController
+class SitesLanguagesController extends MelisAbstractActionController
 {
     /**
      * Renders the languages tab

@@ -15,7 +15,7 @@ use Laminas\Form\Factory;
 use Laminas\Form\Form;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 use MelisCore\Service\MelisGeneralService;
 
 /**
@@ -23,7 +23,7 @@ use MelisCore\Service\MelisGeneralService;
  * Template Manager Tool Plugin
  *
  */
-class ToolTemplateController extends AbstractActionController
+class ToolTemplateController extends MelisAbstractActionController
 {
     /**
      * This constant variable will map to the app.tool.php configuration file

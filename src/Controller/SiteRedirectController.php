@@ -11,13 +11,13 @@ namespace MelisCms\Controller;
 
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 use MelisCore\Service\MelisCoreRightsService;
 
 /**
  * Site Redirect Tool
  */
-class SiteRedirectController extends AbstractActionController
+class SiteRedirectController extends MelisAbstractActionController
 {
     const TOOL_KEY = 'meliscms_tool_site_301';
     
