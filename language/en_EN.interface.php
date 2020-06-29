@@ -783,7 +783,7 @@
 		'tr_meliscms_mini_template_menu_manager_tool_add_category_body_properties_tab' => 'Properties',
 		'tr_meliscms_mini_template_menu_manager_tool_add_category_body_plugins_tab' => 'Plugins',
 		'tr_meliscms_mini_template_menu_manager_tool_add_category_texts' => 'Texts',
-		'tr_meliscms_mini_template_menu_manager_tool_add_category_save' => 'Save',
+		'tr_meliscms_mini_template_menu_manager_tool_add_category_save' => 'Save category',
         'tr_meliscms_mini_template_menu_manager_tool_header' => 'Menu manager header',
 		'tr_meliscms_mini_template_menu_manager_tool_body' => 'Menu manager contents',
 		'tr_meliscms_mini_template_menu_manager_tool_body_left' => 'Menu manager left content',

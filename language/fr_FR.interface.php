@@ -785,7 +785,7 @@
         'tr_meliscms_mini_template_menu_manager_tool_add_category_body_properties_tab' => 'Propriétés',
         'tr_meliscms_mini_template_menu_manager_tool_add_category_body_plugins_tab' => 'Plugins',
         'tr_meliscms_mini_template_menu_manager_tool_add_category_texts' => 'Textes',
-        'tr_meliscms_mini_template_menu_manager_tool_add_category_save' => 'Enregistrer',
+        'tr_meliscms_mini_template_menu_manager_tool_add_category_save' => 'Enregistrer la catégorie',
         'tr_meliscms_mini_template_menu_manager_tool_header' => 'En-tête Menu manager',
         'tr_meliscms_mini_template_menu_manager_tool_body' => 'Contenu Menu manager',
         'tr_meliscms_mini_template_menu_manager_tool_body_left' => 'Menu manager contenu de gauche',
