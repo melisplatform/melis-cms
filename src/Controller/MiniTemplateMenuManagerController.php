@@ -8,12 +8,12 @@
 
 namespace MelisCms\Controller;
 
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
 use Laminas\Session\Container;
 
-class MiniTemplateMenuManagerController extends AbstractActionController {
+class MiniTemplateMenuManagerController extends MelisAbstractActionController {
     public $module = 'meliscms';
     public $tool_key = 'meliscms_mini_template_menu_manager_tool';
     public $form_add_category_key = 'menu_manager_tool_site_add_category';
@@ -259,6 +259,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController {
         $event = 'meliscms_mini_template_menu_manager_create_category';
         $type_code = 'CMS_MTPL_CATEGORY_ADD';
         $message = 'tr_meliscms_mini_template_menu_manager_category_create_fail';
+        $form = $this->getForm($this->module, $this->tool_key, $this->form_add_category_key);
 
         if (! empty($params['cat_id'])) {
             $event = 'meliscms_mini_template_menu_manager_update_category';
@@ -267,6 +268,7 @@ class MiniTemplateMenuManagerController extends AbstractActionController {
         }
 
         $this->getEventManager()->trigger($event . '_start', $this, $params);
+
         $service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
         $res = $service->saveCategory($params, $params['cat_id']);
 

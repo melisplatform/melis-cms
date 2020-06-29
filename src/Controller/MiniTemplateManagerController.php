@@ -8,11 +8,11 @@
 
 namespace MelisCms\Controller;
 
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
 
-class MiniTemplateManagerController extends AbstractActionController {
+class MiniTemplateManagerController extends MelisAbstractActionController {
     public $module = 'meliscms';
     public $tool_key = 'meliscms_mini_template_manager_tool';
     public $form_key = 'mini_template_manager_tool_add_form';

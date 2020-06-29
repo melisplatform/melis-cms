@@ -3,33 +3,34 @@
     data-melisKey="<?= $this->zoneconfig['conf']['melisKey'] ?>"
     class="tab-pane container-level-a"
 >
-    <!-- Header - Save button -->
-        <div class="d-flex justify-content-end">
-            <button class="btn btn-success" id="id_meliscms_mini_template_menu_manager_save_btn">
-                <i class="fa fa-plus"></i>
-                <?= $this->translate('tr_meliscms_mini_template_menu_manager_tool_add_category_save') ?>
-            </button>
-        </div>
+    <div class="border-bottom" style="margin-bottom: 20px;padding-bottom: 20px">
+        <div class="row">
+            <div class="col-xs-12 col-md-6 col-lg-6">
+                <h3><?= $this->translate('tr_meliscms_page_tab_properties_Properties') ?></h3>
+            </div>
+            <div class="col-xs-12 col-md-6 col-lg-6">
+                <div class="form-group pull-right">
+                    <div id="mtpl-category-status" class="make-switch mtpl-switch-width" data-on-label="<?= $this->translate('tr_meliscms_tool_style_page_status_on')?>" data-off-label="<?= $this->translate('tr_meliscms_tool_style_page_status_off')?>" data-text-label="<?= $this->translate('tr_meliscore_common_status') ?>">
+                        <input type="checkbox" name="mtpl-cat-status" id="mtpl-cat-status" <?= ($this->status) ? 'checked' : '' ?>>
+                    </div>
+                </div>
 
-        <div class="form-group float-none">
-            <label><?php echo $this->translate('tr_meliscore_common_status')?></label>
-            <div id="mtpl-category-status" class="make-switch" data-on-label="<?php echo $this->translate('tr_meliscms_tool_style_page_status_on')?>" data-off-label="<?php echo $this->translate('tr_meliscms_tool_style_page_status_off')?>" data-text-label="<i class='icon glyphicon glyphicon-resize-horizontal'></i>">
-                <input type="checkbox" name="mtpl-cat-status" id="mtpl-cat-status" <?= ($this->status) ? 'checked' : '' ?>>
+                <script type="text/javascript">
+                    $("#mtpl-category-status").bootstrapSwitch();
+                </script>
             </div>
         </div>
-        <script type="text/javascript">
-            $("#mtpl-category-status").bootstrapSwitch();
-        </script>
+    </div>
 
     <!-- Header - Save button END -->
     <!-- Body - Form -->
     <div class="row">
         <!-- Languages tab -->
         <div class="col-xs-12 col-md-6 col-lg-2">
-            <div class="pdc-heading clearfix">
-                <h3>
+            <div class="pdc-heading clearfix" style="padding-bottom: 20px; padding-right: 10px;">
+                <h4>
                     <i class="fa fa-cog"></i> <?= $this->translate('tr_meliscms_mini_template_menu_manager_tool_add_category_texts')?>
-                </h3>
+                </h4>
             </div>
             <div class="product-text-tab-container">
                 <ul class="nav-tabs product-text-tab">
