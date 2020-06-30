@@ -282,7 +282,8 @@ class MiniTemplateMenuManagerController extends AbstractActionController
             'success' => $res['success'],
             'textTitle' => 'tr_meliscms_mini_template_menu_manager_category',
             'textMessage' => $message,
-            'errors' => $res['errors']
+            'errors' => $res['errors'],
+            'id' => $res['id']
         ];
 
         $this->getEventManager()->trigger(

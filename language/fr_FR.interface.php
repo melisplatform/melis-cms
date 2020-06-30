@@ -842,5 +842,7 @@
         'tr_meliscms_mini_template_menu_manager_category_deleted_successfully' => 'Catégorie supprimée avec succès',
         'tr_meliscms_mini_template_menu_manager_category_delete_fail' => 'Echec de la suppression de la catégorie',
         'tr_meliscms_mini_template_menu_manager_category' => 'Catégorie',
+        'tr_meliscms_mini_template_header_edit' => 'Editer',
+        'tr_meliscms_mini_template_manager' => 'Mini Templates & Plugins',
     );
 ?>

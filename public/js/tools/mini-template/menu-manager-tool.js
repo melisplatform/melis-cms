@@ -6,6 +6,7 @@ $(function () {
     var tree = '#mini-template-category-tree';
     var isInitialized = false;
     var selectedNode = '';
+    var locale = melisLangId;
 
     $body.on('click', '.mtpl-menu-plugins-tab', function () {
         $('.melis-mini-template-menu-manager-table-refresh').trigger('click');
@@ -62,6 +63,7 @@ $(function () {
     $body.on('click', '.close', function () {
         if ($(this).data('id') == 'id_meliscms_mini_template_menu_manager_tool') {
             isInitialized = false;
+            locale = melisLangId;
         }
     });
 
@@ -109,7 +111,8 @@ $(function () {
     $body.on('click', languageSelect, function () {
         var $this = $(this);
         var text = $this.text();
-        var locale = $this.data('locale');
+        // var locale = $this.data('locale');
+        locale = $this.data('locale');
 
         $('.mini-template-menu-manager-lang a span.filter-key').text(text);
         $(tree).data('langlocale', locale);
@@ -151,7 +154,12 @@ $(function () {
                 melisHelper.zoneReload(
                     'id_meliscms_mini_template_menu_manager_tool_add_category_container',
                     'meliscms_mini_template_menu_manager_tool_add_category_container',
-                    {},
+                    {
+                        isHidden: false,
+                        id: data.id + '-' + $('input[data-locale="' + locale + '"').val(),
+                        formType: 'edit',
+                        status: status
+                    },
                     function () {
                         if ($('#id_meliscms_mini_template_menu_manager_tool_header a').hasClass('collapsed'))
                             $('#id_meliscms_mini_template_menu_manager_tool_header a').click();

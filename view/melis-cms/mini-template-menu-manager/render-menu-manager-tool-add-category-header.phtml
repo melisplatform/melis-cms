@@ -16,7 +16,7 @@
                 </h1>
             <?php else : ?>
                 <?php
-                    $exploded_id = explode('-', $this->id);
+                    $exploded_id = explode('-', $this->id, 2);
                 ?>
                 <h1 id="menu-manager-category-id" class="content-heading" data-id="<?= $exploded_id[0] ?>">
                     Edit "<?= $exploded_id[1] ?>"
