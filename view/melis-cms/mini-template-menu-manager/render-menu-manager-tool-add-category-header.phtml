@@ -19,7 +19,7 @@
                     $exploded_id = explode('-', $this->id);
                 ?>
                 <h1 id="menu-manager-category-id" class="content-heading" data-id="<?= $exploded_id[0] ?>">
-                    Edit "<?= $exploded_id[1] ?>"
+                    <?= $this->translate('tr_meliscms_mini_template_header_edit') ?> "<?= $exploded_id[1] ?>"
                 </h1>
             <?php endif ?>
         </a>
