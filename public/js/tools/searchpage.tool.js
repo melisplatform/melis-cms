@@ -1,7 +1,6 @@
  var melisSearchPageTree = (function($, window) {
     // cache DOM
     var $body = $('body');
-
 	    $body.on("click", "#leftSearchTreeView", function(e){
 	    	startTreeSearch();
 		});
@@ -16,25 +15,34 @@
 				// trigger refresh
 				$resetTree.trigger("click");
 
+				/* console.log("$pageLock: ", $pageLock.length);
+				console.log("$pageUnlock: ", $pageUnlock.length); */
+
 				// toggle of lock and unlock icon
 				if ( $pageLock.length ) {
 					$pageLock.removeClass("fa-lock").addClass("fa-unlock");
+					//console.log("pageLocked");
+					lockDragDropCmsMenuTreeView();
+					//console.log("lockDragDropCmsMenuTreeView triggered! time 1 minute");
 				}
 				else if ( $pageUnlock.length ) {
 					$pageUnlock.removeClass("fa-unlock").addClass("fa-lock");
+					//console.log("pageUnlocked");
 				}
 		});
 
 		// lock on drag and drop treeview, automatic locked after 5 minutes
-		function lockDragDropTreeView() {
-			var toLockTime 				= 300000, //300000
-				intervalTime 			= 30000;
+		function lockDragDropCmsMenuTreeView() {	
+			var toLockTime 		= 60000, //300000 5 minutes, 60000 1 minute
+				intervalTime 	= 30000;
 
 				var checkUnlock = setInterval(function() {
 					var $lockDragDropTreeView 	= $("#leftLockDragDropTreeView"),
 						$pageUnlock 			= $lockDragDropTreeView.find(".fa.fa-unlock");
 
 						if ( $pageUnlock.length ) {
+							$pageUnlock.attr("title", translations.tr_meliscms_menu_treeview_page_unlock);
+							
 							setTimeout(function() {
 								$pageUnlock.removeClass("fa-unlock").addClass("fa-lock");
 							}, toLockTime);
@@ -45,7 +53,7 @@
 		}
 
 		// run on document ready
-		lockDragDropTreeView();
+		//lockDragDropCmsMenuTreeView();
 
 	    // Filter Search
 	    $(document).on("keyup", "input[name=left_tree_search]", function(event) {
@@ -126,5 +134,5 @@
 			    	alert( translations.tr_meliscore_error_message );
 			    });
 	    	}
-	    }
+		}
 })(jQuery, window);

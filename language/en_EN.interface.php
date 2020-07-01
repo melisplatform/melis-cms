@@ -1,6 +1,11 @@
 <?php 
 	return array(
 		'tr_meliscms_menu_sitetree_Name' => 'Site tree view',
+
+		// when locked
+		'tr_meliscms_menu_treeview_page_lock' => 'Unlock the treeview',
+		// when unlocked
+		'tr_meliscms_menu_treeview_page_unlock' => 'Lock the treeview',
 			
 		'tr_meliscms_page_title_Create new page' => 'Create a new page',
 
