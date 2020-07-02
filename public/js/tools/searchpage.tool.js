@@ -15,34 +15,32 @@
 				// trigger refresh
 				$resetTree.trigger("click");
 
-				/* console.log("$pageLock: ", $pageLock.length);
-				console.log("$pageUnlock: ", $pageUnlock.length); */
-
 				// toggle of lock and unlock icon
 				if ( $pageLock.length ) {
 					$pageLock.removeClass("fa-lock").addClass("fa-unlock");
-					//console.log("pageLocked");
+
+					$this.attr("title", translations.tr_meliscms_menu_treeview_page_unlock);
+
 					lockDragDropCmsMenuTreeView();
-					//console.log("lockDragDropCmsMenuTreeView triggered! time 1 minute");
 				}
-				else if ( $pageUnlock.length ) {
+				
+				if ( $pageUnlock.length ) {
 					$pageUnlock.removeClass("fa-unlock").addClass("fa-lock");
-					//console.log("pageUnlocked");
+
+					$this.attr("title", translations.tr_meliscms_menu_treeview_page_lock);
 				}
 		});
 
 		// lock on drag and drop treeview, automatic locked after 5 minutes
 		function lockDragDropCmsMenuTreeView() {	
-			var toLockTime 		= 60000, //300000 5 minutes, 60000 1 minute
-				intervalTime 	= 30000;
+			var toLockTime 		= 300000, // 300000 5 minutes, 60000 1 minute
+				intervalTime 	= 30000; // 30 seconds
 
 				var checkUnlock = setInterval(function() {
 					var $lockDragDropTreeView 	= $("#leftLockDragDropTreeView"),
 						$pageUnlock 			= $lockDragDropTreeView.find(".fa.fa-unlock");
 
 						if ( $pageUnlock.length ) {
-							$pageUnlock.attr("title", translations.tr_meliscms_menu_treeview_page_unlock);
-							
 							setTimeout(function() {
 								$pageUnlock.removeClass("fa-unlock").addClass("fa-lock");
 							}, toLockTime);
@@ -51,9 +49,6 @@
 						}
 				}, intervalTime);
 		}
-
-		// run on document ready
-		//lockDragDropCmsMenuTreeView();
 
 	    // Filter Search
 	    $(document).on("keyup", "input[name=left_tree_search]", function(event) {
@@ -135,4 +130,8 @@
 			    });
 	    	}
 		}
+
+	var $leftLockDragDropTreeView = $("#leftLockDragDropTreeView");
+		$leftLockDragDropTreeView.attr("title", translations.tr_meliscms_menu_treeview_page_lock);
+
 })(jQuery, window);
