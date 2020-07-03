@@ -13,7 +13,7 @@
 				$pageUnlock = $this.find(".fa.fa-unlock");
 
 				// trigger refresh
-				$resetTree.trigger("click");
+				//$resetTree.trigger("click");
 
 				// toggle of lock and unlock icon
 				if ( $pageLock.length ) {
