@@ -43,6 +43,8 @@
 						if ( $pageUnlock.length ) {
 							setTimeout(function() {
 								$pageUnlock.removeClass("fa-unlock").addClass("fa-lock");
+
+								$lockDragDropTreeView.attr("title", translations.tr_meliscms_menu_treeview_page_lock);
 							}, toLockTime);
 
 							clearInterval( checkUnlock );
