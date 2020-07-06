@@ -9,7 +9,7 @@
 				if (melisCore.screenSize <= 767) {
 					melisExtensions = ['contextMenu', 'filter', 'glyph'];
 				} else {
-					melisExtensions = ['contextMenu', 'dnd', 'filter', 'glyph'];
+					melisExtensions = ['contextMenu', 'dnd', 'filter', 'glyph', 'persist'];
 				}
 
 				$('#id-mod-menu-dynatree').fancytree({
@@ -20,6 +20,12 @@
 								//loading: "glyphicon-refresh fancytree-helper-spin" // edited by junry
 							}
 						},
+						persist: {
+							cookiePrefix: 'fancytree-1-',
+							expandLazy: true,
+							overrideSource: true,  // true: cookie takes precedence over `source` data attributes.
+							store: "auto" // 'cookie', 'local': use localStore, 'session': sessionStore
+						},						
 						activeVisible: false,
 						debugLevel: 0,
 						autoScroll: true,
