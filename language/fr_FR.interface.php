@@ -1,6 +1,11 @@
 <?php 
 	return array(  
 		'tr_meliscms_menu_sitetree_Name' => 'Sites',
+
+		// when locked
+		'tr_meliscms_menu_treeview_page_lock' => 'Dévérouiller l\'arborescence',
+		// when unlocked
+		'tr_meliscms_menu_treeview_page_unlock' => 'Vérouiller l\'arborescence',
 			
 		'tr_meliscms_page_title_Create new page' => 'Créer une nouvelle page',
 

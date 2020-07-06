@@ -44,7 +44,7 @@ class FrontPluginsController extends MelisAbstractActionController
         $pluginMenuHandler = $pluginSvc->getNewPluginMenuHandlerNotifDuration();
 
         $view = new ViewModel();
-       // $view->pluginsConfig = $finalPluginList;
+    // $view->pluginsConfig = $finalPluginList;
         $view->siteModule              = $siteModule;
         $view->newPluginList           = $newPluginList;
         $view->latestPlugin            = $latesPlugin;
@@ -199,8 +199,6 @@ class FrontPluginsController extends MelisAbstractActionController
                 $success = 0;
             }
 
-
-
         }
         $finalErrors = $errorsTabs;
 
@@ -298,9 +296,9 @@ class FrontPluginsController extends MelisAbstractActionController
         $marketPlaceModuleSection = $melisPuginsSvc->getPackagistCategories();
         $marketPlaceModuleSection = [];
         /*
-         * In case there is no internet or cant connect to the markeplace domain
-         * we put a predefined section just not destroy the plugins menu
-         */
+        * In case there is no internet or cant connect to the markeplace domain
+        * we put a predefined section just not destroy the plugins menu
+        */
         if (empty($marketPlaceModuleSection)) {
             $fallbackSection = $configSvc->getItem('/meliscore/datas/fallBacksection');
             $marketPlaceModuleSection= $fallbackSection;
@@ -335,13 +333,13 @@ class FrontPluginsController extends MelisAbstractActionController
             }
 
             /*
-             * organized plugins with no subcategory
-             */
+            * organized plugins with no subcategory
+            */
             $publicModules = $melisPuginsSvc->getMelisPublicModules(true);
             foreach ($pluginList as $moduleName => $plugins) {
                 // double check moduleName if it exisit on composer to avoid showing plugins that doesnt exists
                 if (in_array(strtolower($moduleName),$vendorModules) || ($moduleName == "MelisMiniTemplate")) {
-                   /*
+                /*
                     * check first if the module is public or not
                     *  if public we will based the section on what is set from marketplace
                     */
@@ -431,7 +429,5 @@ class FrontPluginsController extends MelisAbstractActionController
         }
 
         return $newPluginList;
-
     }
-
 }
