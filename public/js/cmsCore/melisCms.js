@@ -450,8 +450,6 @@ var melisCms = (function(){
 	    		// give iframe the calculated height based from the content
 	    		var iHeight = $("#"+ activeTabId + " .melis-iframe").contents().height()+50;
 				$("#"+ activeTabId + " .melis-iframe").css("height", iHeight);
-				
-				console.log(".melis-iframe height from displaySettings() : ", iHeight);
 	    	});
 	}
 	
@@ -516,8 +514,6 @@ var melisCms = (function(){
 		var iHeight = $("#"+ activeTabId + " .melis-iframe").contents().height();
 
 		$("#"+ activeTabId + " .melis-iframe").css("height", iHeight);
-
-		//console.log(".melis-iframe height from cmsTabEvents() : ", iHeight);
 	}
 
 	// REFRESH PAGE TAB (historic, versionining etc)
@@ -535,13 +531,23 @@ var melisCms = (function(){
             "position: absolute;top: 0;" +
             "left: 0;z-index: 99999999;" +
             "cursor: wait; '></div>");
-        $("#"+id+"_id_meliscms_page_action_tabs").addClass('relative').prepend("<li class='btn-disabled'></li>");
+		$("#"+id+"_id_meliscms_page_action_tabs").addClass('relative').prepend("<li class='btn-disabled'></li>");
+
+		// adding of loader on page edition tab
+		if ( typeof loader !== "undefined" ) {
+			loader.pageEditionLoading();
+		}
     }
     
     function enableCmsButtons(id) {
         $("#"+id+"_id_meliscms_page_action_tabs").removeClass('relative');
         $("#"+id+"_id_meliscms_page_action_tabs li.btn-disabled").remove();
-        $("#"+id+"_id_meliscms_page .overlay-switch").remove();
+		$("#"+id+"_id_meliscms_page .overlay-switch").remove();
+		
+		// removing of loader on page edition tab
+		if ( typeof loader !== "undefined" ) {
+			loader.removeEditionLoading();
+		}
     }
 	
     // IFRAME HEIGHT CONTROLS (for onload, displaySettings & sidebar collapse)

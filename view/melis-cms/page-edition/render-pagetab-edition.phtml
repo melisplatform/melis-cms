@@ -6,7 +6,6 @@
 	$openTplTool = "javascript:melisHelper.tabOpen(translations.tr_meliscms_tool_templates, 'fa-file-code-o', 'id_meliscms_tool_templates', 'meliscms_tool_templates');"
 ?>
 <div <?= $id; ?> data-melisKey='<?= $data_melisKey; ?>' class="tab-pane widget-body-regular meliscms_center_tabs meliscms-page-tab-edition">
-    <!-- <div id="loader" class="overlay-loader"><img class="loader-icon spinning-cog" src="/MelisCore/assets/images/cog12.svg" data-cog="cog12"></div> -->
     <?php if ($this->hasTemplate): ?>
     <div class="alert alert-danger alert-dismissible show" role="alert" style="<?= $this->isTplModuleOK ? 'display: none!important;' : ""?>">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>

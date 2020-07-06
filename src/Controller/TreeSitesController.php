@@ -145,7 +145,6 @@ class TreeSitesController extends AbstractActionController
 			if ($rootPages[0] == -1 || $idPage != -1)
 			{
 				$children = $melisTree->getPageChildren($idPage);
-				$children = $children->toArray();
 			}
 			else
 			{
@@ -169,6 +168,7 @@ class TreeSitesController extends AbstractActionController
 		$final = array();
 		foreach($children as $page)
 		{
+            $page = (array) $page;
 			$data_page_id = $page['tree_page_id'];
 
 			/**
@@ -195,7 +195,6 @@ class TreeSitesController extends AbstractActionController
 			$childrenTmp = $melisTree->getPageChildren($data_page_id);
 			if ($childrenTmp)
 			{
-				$childrenTmp = $childrenTmp->toArray();
 				if (count($childrenTmp) > 0)
 					$has_children = true;
 			}

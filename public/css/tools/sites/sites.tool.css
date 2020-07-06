@@ -344,4 +344,9 @@ ul.meliscms-site-language-homepage-list > li:hover {
         font-size: 13px;
     }
 }
-
+/*
+ * Fix: https://mantis2.uat.melistechnology.fr/view.php?id=345
+ */
+#id_meliscms_tool_sites_languages_form .sites-language .cb-cont label {
+    padding-left: 30px;
+}
