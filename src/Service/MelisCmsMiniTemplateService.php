@@ -309,7 +309,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
 
                     if (empty($matches)) {
                         $errors[$key] = [
-                            'error' => $translator->translate('tr_meliscms_mini_template_form_invalid_name'),
+                            'error' => $translator->translate('tr_meliscms_mini_template_form_invalid_category_name'),
                             'label' => $translator->translate('tr_meliscms_mini_template_form_category_name') . ' (' . $langs[$input_lang_id] . ')'
                         ];
                     }

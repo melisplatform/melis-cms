@@ -844,5 +844,6 @@
         'tr_meliscms_mini_template_menu_manager_category' => 'Catégorie',
         'tr_meliscms_mini_template_header_edit' => 'Editer',
         'tr_meliscms_mini_template_manager' => 'Mini Templates & Plugins',
+        'tr_meliscms_mini_template_form_invalid_category_name' => 'Ce champ ne peut contenir que des lettres et nombres',
     );
 ?>
