@@ -272,6 +272,13 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         $connection = $this->startDbTransaction();
         $success = 0;
         $errors = [];
+        $translator = $this->getServiceManager()->get('translator');
+        $cms_langs = $this->getServiceManager()->get('MelisEngineLang')->getAvailableLanguages();
+        $langs = [];
+
+        foreach ($cms_langs as $lang) {
+            $langs[$lang['lang_cms_id']] = $lang['lang_cms_name'];
+        }
 
         $data = $params;
         unset($data['site_id']);
@@ -286,13 +293,27 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         }
         // error for no category name provided
         if ($counter == 0) {
-            $translator = $this->getServiceManager()->get('translator');
             foreach ($data as $key => $value) {
                 $errors[$key] = [
                     'error' => $translator->translate('tr_meliscms_mini_template_error_category_atleast_one_provided'),
                     'label' => $translator->translate('tr_meliscms_mini_template_form_category_name')
                 ];
-                break;
+            }
+        }
+        // check for regex
+        if (empty($errors)) {
+            foreach ($data as $key => &$value) {
+                if (! empty($value)) {
+                    $input_lang_id =  explode('_', $key, 2)[0];
+                    preg_match('/^[a-zA-Z0-9 ]*$/', $value, $matches, PREG_OFFSET_CAPTURE);
+
+                    if (empty($matches)) {
+                        $errors[$key] = [
+                            'error' => $translator->translate('tr_meliscms_mini_template_form_invalid_name'),
+                            'label' => $translator->translate('tr_meliscms_mini_template_form_category_name') . ' (' . $langs[$input_lang_id] . ')'
+                        ];
+                    }
+                }
             }
         }
 

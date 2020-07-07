@@ -256,11 +256,12 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
      */
     public function saveCategoryAction() {
         $params = $this->params()->fromPost();
+        $this->trimData($params);
+
         $event = 'meliscms_mini_template_menu_manager_create_category';
         $type_code = 'CMS_MTPL_CATEGORY_ADD';
         $message = 'tr_meliscms_mini_template_menu_manager_category_create_fail';
-        $form = $this->getForm($this->module, $this->tool_key, $this->form_add_category_key);
-
+        
         if (! empty($params['cat_id'])) {
             $event = 'meliscms_mini_template_menu_manager_update_category';
             $type_code = 'CMS_MTPL_CATEGORY_UPDATE';
@@ -407,5 +408,11 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
     private function getMelisKey()
     {
         return $this->params()->fromRoute('melisKey', $this->params()->fromQuery('melisKey'), null);
+    }
+
+    private function trimData(&$array) {
+        foreach ($array as $key => &$value) {
+            $value = trim($value);
+        }
     }
 }

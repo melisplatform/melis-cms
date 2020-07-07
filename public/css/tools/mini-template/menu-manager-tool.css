@@ -11,10 +11,10 @@ table#tableMiniTemplateMenuManagerPlugins.loading-changes tbody tr td {
 }
 
 /* TABS */
-.content-cont .product-text-tab li.active:hover a {
-    background: #932E2A;
-    border-color: transparent;
-}
+/*.content-cont .product-text-tab li.active:hover a {*/
+/*    background: #932E2A;*/
+/*    border-color: transparent;*/
+/*}*/
 
 /*#tableMiniTemplateMenuManagerPlugins img {*/
 /*    max-width: 195px;*/
@@ -179,11 +179,11 @@ table#tableMiniTemplateMenuManagerPlugins.loading-changes tbody tr td {
 }
 .tab-pane a.btn.a-accordion.collapsed:hover,
 .tab-pane a.btn.a-accordion {
-    margin: 0 0 5px;
-    border-radius: 5px;
-    border-color: #932E2A;
-    background: #932E2A;
-    color: #fff;
+    /*margin: 0 0 5px;*/
+    /*border-radius: 5px;*/
+    /*border-color: #932E2A;*/
+    /*background: #932E2A;*/
+    /*color: #fff;*/
 }
 .card-title a.btn {
     margin: 10px 0 0 10px;
@@ -265,4 +265,47 @@ table#tableMiniTemplateMenuManagerPlugins.loading-changes tbody tr td {
 
 .mtpl-switch-width {
     width: 210px !important;
+}
+
+.dropdown-menu>li>a span {
+    line-height: 30px;
+}
+
+.dropdown-menu>li>a {
+    display: inline-block;
+    width: 100%;
+    padding: 0 10px;
+}
+
+.dropdown-menu li a {
+    font-weight: 400;
+    line-height: 25px;
+}
+
+.dropdown-menu>li {
+    height: 30px;
+    min-height: 30px;
+    height: auto !important;
+}
+
+.dropdown-menu li {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.imgDisplay {
+    border: none!important;
+    max-width: 24px!important;
+    max-height: 24px!important;
+}
+
+.mm-tab-error-color {
+    color: #e61c23 !important;
+}
+
+.content-cont .menu-manager-tab li:hover a span.mm-lang-name{
+    color: #fff !important;
+}
+
+.content-cont .menu-manager-tab li.active a span.mm-lang-name{
+    color: #fff !important;
 }

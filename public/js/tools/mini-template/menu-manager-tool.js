@@ -7,6 +7,7 @@ $(function () {
     var isInitialized = false;
     var selectedNode = '';
     var locale = melisLangId;
+    var tab_errors = [];
 
     $body.on('click', '.mtpl-menu-plugins-tab', function () {
         $('.melis-mini-template-menu-manager-table-refresh').trigger('click');
@@ -169,19 +170,44 @@ $(function () {
 
                 melisHelper.melisOkNotification(data.textTitle, data.textMessage);
             } else {
-                melisHelper.melisKoNotification(translations.tr_meliscms_mini_template_menu_manager_save_category, '', data.errors);
+                var errors = {};
+                $.each(data.errors, function (key, value) {
+                    if (value.error === translations.tr_meliscms_mini_template_error_category_atleast_one_provided) {
+                        errors[key] = value;
+                        return false;
+                    } else {
+                        errors[key] = value;
+                    }
+                });
+                melisHelper.melisKoNotification(translations.tr_meliscms_mini_template_menu_manager_save_category, '', errors);
+
                 var formData = $("#id_meliscms_mini_template_menu_manager_tool_add_category_body_properties_form form").serializeArray();
-                var errors = data.errors['1_category_name'];
                 var form_id = '_id_menu_manager_tool_site_add_category';
+                var tab = '-mini-template-menu-manager-category';
 
                 if (typeof $('#menu-manager-category-id').data('id') !== 'undefined')
                     form_id = '_id_menu_manager_tool_site_update_category';
 
                 $.each(formData, function (key, value) {
-                    var lang_key = value.name.split('_')[0];
+                    var eSuccess = 1;
+                    var input_lang_id = value.name.split('_', 1);
                     var form_errors = {};
-                    form_errors[lang_key + '_category_name'] = errors;
-                    melisCoreTool.highlightErrors(data.success, form_errors, lang_key + form_id);
+                    var count = 0;
+
+                    $.each(data.errors, function (eKey, eValue) {
+                        if (value.name == eKey) {
+                            eSuccess = 0;
+                            form_errors[input_lang_id + '_category_name'] = eValue;
+                            $('a[href="#' + input_lang_id + tab + '"] span.mm-lang-name').addClass('mm-tab-error-color');
+                            count++;
+                        }
+                    });
+
+                    if (count == 0) {
+                        $('a[href="#' + input_lang_id + tab + '"] span.mm-lang-name').removeClass('mm-tab-error-color');
+                    }
+
+                    melisCoreTool.highlightErrors(eSuccess, form_errors, input_lang_id + form_id);
                 });
             }
 

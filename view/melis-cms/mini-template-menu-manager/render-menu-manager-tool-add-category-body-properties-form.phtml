@@ -33,7 +33,7 @@
                 </h4>
             </div>
             <div class="product-text-tab-container">
-                <ul class="nav-tabs product-text-tab">
+                <ul class="nav-tabs product-text-tab menu-manager-tab">
                     <?php foreach ($this->languages as $language) { ?>
                         <li class="">
                             <a
@@ -48,7 +48,7 @@
                                         class="imgDisplay float-right"
                                     />
                                 </span>
-                                <span><?= $language['lang_cms_name']?></span>
+                                <span class="mm-lang-name"><?= $language['lang_cms_name']?></span>
                             </a>
                         </li>
                     <?php } ?>
