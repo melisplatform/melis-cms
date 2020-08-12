@@ -535,7 +535,7 @@ var melisCms = (function(){
 
 		// adding of loader on page edition tab
 		if ( typeof loader !== "undefined" ) {
-			loader.pageEditionLoading();
+			loader.addPageEditionLoading();
 		}
     }
     
@@ -546,7 +546,7 @@ var melisCms = (function(){
 		
 		// removing of loader on page edition tab
 		if ( typeof loader !== "undefined" ) {
-			loader.removeEditionLoading();
+			loader.removePageEditionLoading();
 		}
     }
 	
@@ -556,13 +556,9 @@ var melisCms = (function(){
 			$melisIframe 	= $body.find(".melis-iframe"),
 			height 			= $melisIframe.contents().height(),
 			$loader 		= $melisIframe.closest(".meliscms-page-tab-edition").find("#loader");
-			
+	
 			$melisIframe.css("height", height);
 			$melisIframe.css("min-height", "700px");
-
-			/* if ( $loader.length ) {
-				$loader.remove();
-			} */
 
 			// Activating page edition button action
 			enableCmsButtons(id);
