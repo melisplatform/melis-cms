@@ -131,6 +131,7 @@
 	    'tr_meliscms_template_form_tpl_site_id_error_empty' => 'Please select a valid site',
 	    
 	    'tr_tool_template_fm_new_content_error' => 'Unable to add template',
+	    'tr_meliscms_template_form_empty' => 'Value is required and can\'t be empty',
 	    
 	    // Site Tool
 	    'tr_meliscms_tool_site_new_site' => 'New site',

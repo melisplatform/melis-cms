@@ -675,8 +675,8 @@ var melisCms = (function() {
 			.prepend("<li class='btn-disabled'></li>");
 
 		// adding of loader on page edition tab
-		if (typeof loader !== "undefined") {
-			loader.pageEditionLoading();
+		if ( typeof loader !== "undefined" ) {
+			loader.addPageEditionLoading();
 		}
 	}
 
@@ -686,53 +686,42 @@ var melisCms = (function() {
 		$("#" + id + "_id_meliscms_page .overlay-switch").remove();
 
 		// removing of loader on page edition tab
-		if (typeof loader !== "undefined") {
-			loader.removeEditionLoading();
+		if ( typeof loader !== "undefined" ) {
+			loader.removePageEditionLoading();
 		}
 	}
-
+	
 	// IFRAME HEIGHT CONTROLS (for onload, displaySettings & sidebar collapse)
 	function iframeLoad(id) {
-		var $body = $("body"),
-			$melisIframe = $body.find(".melis-iframe"),
-			height = $melisIframe.contents().height(),
-			$loader = $melisIframe
-				.closest(".meliscms-page-tab-edition")
-				.find("#loader");
+		var $body 			= $("body"),
+			$melisIframe 	= $body.find(".melis-iframe"),
+			height 			= $melisIframe.contents().height(),
+			$loader 		= $melisIframe.closest(".meliscms-page-tab-edition").find("#loader");
+	
+			$melisIframe.css("height", height);
+			$melisIframe.css("min-height", "700px");
 
-		$melisIframe.css("height", height);
-		$melisIframe.css("min-height", "700px");
+			// Activating page edition button action
+			enableCmsButtons(id);
 
-		/* if ( $loader.length ) {
-				$loader.remove();
-			} */
+			//clear the opened tab pages id
+			$openedPageIds = [];
 
-		// Activating page edition button action
-		enableCmsButtons(id);
-
-		//clear the opened tab pages id
-		$openedPageIds = [];
-
-		// PAGE ACCESS user rights checking
-		$.ajax({
-			url: "/melis/MelisCms/TreeSites/canEditPages",
-			encode: true,
-		})
-			.done(function(data) {
+			// PAGE ACCESS user rights checking
+			$.ajax({
+				url         : '/melis/MelisCms/TreeSites/canEditPages',
+				encode		: true
+			}).done(function(data) {
 				var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
-
-				// has no access
-				if (data.edit === 0) {
-					$(".meliscms-search-box.sidebar-treeview-search").hide();
-					$("#id-mod-menu-dynatree").prepend(
-						"<div class='create-newpage'><span class='no-access'>" +
-							translations.tr_meliscms_no_access +
-							"</span></div>"
-					);
-				}
-				// has access
-				else {
-					if (tree.count() === 0) {
+			
+					// has no access
+					if(data.edit === 0){
+						$(".meliscms-search-box.sidebar-treeview-search").hide();
+						$("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='no-access'>" + translations.tr_meliscms_no_access + "</span></div>");
+					}
+					// has access
+					else{
+						if(tree.count() === 0){
 						$(".meliscms-search-box.sidebar-treeview-search").hide();
 						$("#id-mod-menu-dynatree").prepend(
 							"<div class='create-newpage'><span class='btn btn-success'>" +
@@ -976,10 +965,10 @@ var melisCms = (function() {
 	);
 
 	/*
-	 * RETURN ========================================================================================================================
-	 * include your newly created functions inside the array so it will be accessable in the outside scope
-	 * sample syntax in calling it outside - melisCms.savePage;
-	 */
+	* RETURN ========================================================================================================================
+	* include your newly created functions inside the array so it will be accessable in the outside scope
+	* sample syntax in calling it outside - melisCms.savePage;
+	*/
 
 	return {
 		//key - access name outside									// value - name of function above

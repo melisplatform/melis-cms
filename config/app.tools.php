@@ -343,14 +343,6 @@ return array(
                                                 ),
                                             )
                                         ),
-                                        array(
-                                            'name' => 'NotEmpty',
-                                            'options' => array(
-                                                'messages' => array(
-                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_template_form_tpl_type_error_empty',
-                                                ),
-                                            ),
-                                        ),
                                     ),
                                     'filters'  => array(
                                     ),
@@ -359,6 +351,15 @@ return array(
                                     'name'     => 'tpl_zf2_layout',
                                     'required' => true,
                                     'validators' => array(
+                                        array(
+                                            'name' => 'NotEmpty',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_template_form_empty',
+                                                ),
+                                            ),
+                                            'break_chain_on_failure' => true,
+                                        ),
                                         array(
                                             'name' => 'regex', false,
                                             'options' => array(
@@ -378,6 +379,15 @@ return array(
                                     'required' => true,
                                     'validators' => array(
                                         array(
+                                            'name' => 'NotEmpty',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_template_form_empty',
+                                                ),
+                                            ),
+                                            'break_chain_on_failure' => true,
+                                        ),
+                                        array(
                                             'name' => 'regex', false,
                                             'options' => array(
                                                 'pattern' => '/^[a-zA-Z0-9]+([_ -]?[a-zA-Z0-9])*$/',
@@ -395,6 +405,15 @@ return array(
                                     'name'     => 'tpl_zf2_action',
                                     'required' => true,
                                     'validators' => array(
+                                        array(
+                                            'name' => 'NotEmpty',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_template_form_empty',
+                                                ),
+                                            ),
+                                            'break_chain_on_failure' => true,
+                                        ),
                                         array(
                                             'name' => 'regex', false,
                                             'options' => array(
