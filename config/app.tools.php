@@ -355,7 +355,7 @@ return array(
                                             'name' => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_comments_forms_generic_empty',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_template_form_empty',
                                                 ),
                                             ),
                                             'break_chain_on_failure' => true,
@@ -382,7 +382,7 @@ return array(
                                             'name' => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_comments_forms_generic_empty',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_template_form_empty',
                                                 ),
                                             ),
                                             'break_chain_on_failure' => true,
@@ -409,7 +409,7 @@ return array(
                                             'name' => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_comments_forms_generic_empty',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_template_form_empty',
                                                 ),
                                             ),
                                             'break_chain_on_failure' => true,
