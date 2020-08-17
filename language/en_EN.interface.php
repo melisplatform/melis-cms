@@ -227,7 +227,7 @@
 	    'tr_meliscms_common_apply_language' => 'Switch the current language to ',
 	    
 	    //Language Tool Translation
-	    'tr_meliscms_tool_language' => 'Page\'s languages',
+	    'tr_meliscms_tool_language' => 'Languages',
 	    'tr_meliscms_tool_description' => 'Define here the different languages that the pages can use.',
 	    'tr_meliscms_tool_modal_text' => 'Each language must have a name and its "locale" defined.',
 	    'tr_meliscms_tool_language_header' => 'Header',

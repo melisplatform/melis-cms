@@ -229,7 +229,7 @@
 	    'tr_meliscms_common_apply_language' => 'Changer le langage courrant vers ',
 			
 	  	 //Language Tool Translation
-	    'tr_meliscms_tool_language' => 'Langages des pages',
+	    'tr_meliscms_tool_language' => 'Langages',
 	    'tr_meliscms_tool_description' => 'Définissez ici les différents langages que peuvent utiliser les pages.',
 	    'tr_meliscms_tool_modal_text' => 'Chaque langage doit avoir un nom et sa "locale" définis.',
 	    'tr_meliscms_tool_language_header' => 'Header',
