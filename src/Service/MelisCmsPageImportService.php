@@ -11,7 +11,6 @@ namespace MelisCms\Service;
 
 use Laminas\Db\Metadata\Metadata;
 use Laminas\Db\TableGateway\TableGateway;
-use Laminas\Dom\DOMXPath;
 use MelisCore\Service\MelisGeneralService;
 use ZipArchive;
 
@@ -255,7 +254,11 @@ class MelisCmsPageImportService extends MelisGeneralService
             // clean empty values
             foreach ($tablesArray as $tableName => $tableValue) {
                 foreach ($tableValue as $column => $value) {
-                    if (empty($value)) {
+                    if (is_string($value) && strlen($value) == 0) {
+                        unset($tablesArray[$tableName][$column]);
+                    }
+
+                    if (is_array($value) && empty($value)) {
                         unset($tablesArray[$tableName][$column]);
                     }
                 }
@@ -316,7 +319,11 @@ class MelisCmsPageImportService extends MelisGeneralService
             // clean empty values
             foreach ($tablesArray as $tableName => $tableValue) {
                 foreach ($tableValue as $column => $value) {
-                    if (empty($value)) {
+                    if (is_string($value) && strlen($value) == 0) {
+                        unset($tablesArray[$tableName][$column]);
+                    }
+
+                    if (is_array($value) && empty($value)) {
                         unset($tablesArray[$tableName][$column]);
                     }
                 }
@@ -474,7 +481,7 @@ class MelisCmsPageImportService extends MelisGeneralService
 
             if (!empty($tablesArray[$tableName]->page_content)) {
                 $domtree = new \DOMDocument('1.0', 'UTF-8');
-                $domtree->loadXML($tablesArray[$tableName]->page_content->document->asXml());
+                $domtree->loadXML((string) $tablesArray[$tableName]->page_content);
                 $tablesArray[$tableName]->page_content = $domtree->saveXML();
             }
 
@@ -892,7 +899,7 @@ class MelisCmsPageImportService extends MelisGeneralService
     {
         $doc = new \DOMDocument();
         $doc->loadXML($xmlString);
-        $xpath = new DOMXPath($doc);
+        $xpath = new \DOMXPath($doc);
 
         if ($additionalKey) {
             $expression = sprintf("//%s//%s[contains(., %s)]", $key, $additionalKey, $search);
