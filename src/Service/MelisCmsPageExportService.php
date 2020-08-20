@@ -123,7 +123,7 @@ class MelisCmsPageExportService extends MelisGeneralService
             $externalNode['domNode']->appendChild($externalNode['domInstance']->importNode($externalSource->documentElement, true));
             $rootNode['domNode']->appendChild($rootNode['domInstance']->importNode($externalNode['domInstance']->documentElement, true));
             //save the generated xml
-            $result['xml'] = htmlspecialchars_decode($rootNode['domInstance']->saveXML(), ENT_XML1);
+            $result['xml'] = $rootNode['domInstance']->saveXML();
 
             /**
              * check if we need to export the page resources
@@ -172,11 +172,12 @@ class MelisCmsPageExportService extends MelisGeneralService
                     $this->arrayToXml($tblData, $tblXml, $tblGtWay->getTableGateway()->getTable());
                 }
             }
+
             /**
              * construct xml and format
              */
             $tblXmlDoc = new \DOMDocument();
-            $tblXmlDoc->loadXML($this->removeXmlDeclaration(htmlspecialchars_decode($tblXml->asXML(), ENT_XML1)));
+            $tblXmlDoc->loadXML($tblXml->asXML());
 
             //return results
             $arrayParameters['results'] = $tblXmlDoc->saveXML();
@@ -261,8 +262,7 @@ class MelisCmsPageExportService extends MelisGeneralService
             /**
              * process the parent page
              */
-            $pageData = htmlspecialchars_decode($this->exportPage($child['tree_page_id']), ENT_XML1);
-            $pageData = $this->removeXmlDeclaration($pageData);
+            $pageData = $this->exportPage($child['tree_page_id']);
             $pageSource = new \DOMDocument();
             $pageSource->loadXml($pageData);
 
@@ -275,8 +275,7 @@ class MelisCmsPageExportService extends MelisGeneralService
             $subChildren = $pageTreeService->getPageChildren($child['tree_page_id']);
             if(!empty($subChildren)){
                 $childrenData = $this->processSubPagesExport($child['tree_page_id'], $subChildren);
-                $pageData = htmlspecialchars_decode($childrenData, ENT_XML1);
-                $pageData = $this->removeXmlDeclaration($pageData);
+                $pageData = $childrenData;
                 $pageSource = new \DOMDocument();
                 $pageSource->loadXml($pageData);
                 //add the children data to its parent page
@@ -626,7 +625,7 @@ class MelisCmsPageExportService extends MelisGeneralService
         if ($includeSubPages) {
 
             $pageTreeService = $this->getServiceManager()->get('MelisEngineTree');
-            $children = $pageTreeService->getPageChildren($pageId)->toArray();
+            $children = $pageTreeService->getPageChildren($pageId);
 
             foreach ($children as $id => $child) {
                 $subChildren = $pageTreeService->getPageChildren($child['tree_page_id']);

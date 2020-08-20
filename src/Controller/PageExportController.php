@@ -117,7 +117,7 @@ class PageExportController extends MelisAbstractActionController
                         $xml->preserveWhiteSpace = false;
                         $xml->formatOutput = true;
                         //remove the xml declaration
-                        $xmlRes = preg_replace( "/<\?xml.+?\?>/", "", $export['xml']);
+                        $xmlRes = $export['xml'];
                         $xml->loadXml($xmlRes);
                         $xml->save($folderPath.'/'.$xmlFileName);
                         /**
