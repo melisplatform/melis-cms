@@ -2078,11 +2078,13 @@ return array(
                                         'options' => array(
                                             'label' => 'tr_meliscms_tree_sites_duplication_source',
                                             'tooltip' => 'tr_meliscms_tree_sites_duplication_source tooltip',
-                                            'button' => 'fa fa-sitemap',
-                                            'button-id' => 'sourcePageIdFindPageTree',
                                         ),
                                         'attributes' => array(
                                             'id' => 'sourcePageId',
+                                            'class' => 'melis-input-group-button',
+                                            'data-button-icon' => 'fa fa-sitemap',
+                                            'data-button-id' => 'sourcePageIdFindPageTree',
+                                            'placeholder' => '',
                                             'required' => 'required',
                                         ),
                                     ),
@@ -2123,12 +2125,14 @@ return array(
                                         'type' => 'MelisText',
                                         'options' => array(
                                             'label' => 'tr_meliscms_tree_sites_duplication_destination',
-                                            'tooltip' => 'tr_meliscms_tree_sites_duplication_destination tooltip',
-                                            'button' => 'fa fa-sitemap',
-                                            'button-id' => 'destinationPageIdFindPageTree',
+                                            'tooltip' => 'tr_meliscms_tree_sites_duplication_destination tooltip'
                                         ),
                                         'attributes' => array(
                                             'id' => 'destinationPageId',
+                                            'class' => 'melis-input-group-button',
+                                            'data-button-icon' => 'fa fa-sitemap',
+                                            'data-button-id' => 'destinationPageIdFindPageTree',
+                                            'placeholder' => '',
                                             'required' => 'required',
                                         ),
                                     ),
