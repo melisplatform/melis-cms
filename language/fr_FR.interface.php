@@ -739,6 +739,10 @@
         'tr_melis_cms_page_tree_import_close' => 'Fermer',
 
         'tr_meliscms_pages_Page_header' => 'En-tête page',
-        'tr_meliscms_pages_Page_status_container' => 'Container statut'
+        'tr_meliscms_pages_Page_status_container' => 'Container statut',
+
+        'tr_meliscms_page_export_modal_handler' => 'Import/Export pages',
+        'tr_meliscms_page_import_modal' => 'Modal d\'import',
+        'tr_meliscms_page_export_modal' => 'Modal d\'export'
     );
 ?>
