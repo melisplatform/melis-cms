@@ -427,11 +427,11 @@
 			});
 		});
 
-		$body.on("click", '#sourcePageIdFindPageTree span', function() {
+		$body.on("click", '#sourcePageIdFindPageTree', function() {
 			melisLinkTree.createInputTreeModal('#sourcePageId');
 		});
 
-		$body.on("click", '#destinationPageIdFindPageTree span', function() {
+		$body.on("click", '#destinationPageIdFindPageTree', function() {
 			melisLinkTree.createInputTreeModal('#destinationPageId');
 		});
 
@@ -482,7 +482,7 @@
 							melisHelper.melisOkNotification(data.textTitle, data.textMessage);
 					} else {
 							melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
-							melisCoreTool.highlightErrors(data.success, data.errors, "stylesForm");
+							melisCoreTool.highlightErrors(data.success, data.errors, "duplicatePageTreeForm");
 					}
 					melisCore.flashMessenger();
 					melisCoreTool.done("#duplicatePageTree");
