@@ -209,7 +209,7 @@ return array(
                                             'label' => 'tr_meliscmstemplate_typ_label',
                                             'tooltip' => 'tr_meliscmstemplate_typ_label_tooltip',
                                             'value_options' => [
-                                                'ZF2' => 'Zend Framework 2',
+                                                'ZF2' => 'Laminas',
                                             ],
                                         ),
                                         'attributes' => array(
