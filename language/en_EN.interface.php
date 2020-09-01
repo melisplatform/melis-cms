@@ -737,6 +737,10 @@
         'tr_melis_cms_page_tree_import_close' => 'Close',
 
         'tr_meliscms_pages_Page_header' => 'Page header',
-        'tr_meliscms_pages_Page_status_container' => 'Status container'
+        'tr_meliscms_pages_Page_status_container' => 'Status container',
+
+		'tr_meliscms_page_export_modal_handler' => 'Page Import/Export',
+		'tr_meliscms_page_import_modal' => 'Import modal',
+		'tr_meliscms_page_export_modal' => 'Export modal'
     );
 ?>
