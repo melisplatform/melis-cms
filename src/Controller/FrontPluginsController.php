@@ -471,15 +471,15 @@ class FrontPluginsController extends MelisAbstractActionController
                     $type = $val['type'];
                     if ($type == 'category') {
                         if ($val['status']) {
-                            $new_plugin_list[$val['text']] = [
-                                'text' => $val['text'],
+                            $new_plugin_list[html_entity_decode($val['text'])] = [
+                                'text' => html_entity_decode($val['text']),
                                 'isCategory' => true
                             ];
                         } else {
                             $in_active_categories[] = $val['text'];
                         }
                     } else {
-                        $exploded = explode('-', $val['parent']);
+                        $exploded = explode('-', $val['parent'], 2);
                         $parent = '';
                         if (count($exploded) > 2) {
                             unset($exploded[0]);
@@ -491,7 +491,7 @@ class FrontPluginsController extends MelisAbstractActionController
                             $parent = $val['parent'];
                         }
 
-                        $title = 'MiniTemplatePlugin_' . strtolower($val['text']) . '_' . strtolower($site_data['site_name']);
+                        $title = 'MiniTemplatePlugin_' . strtolower(html_entity_decode($val['text'])) . '_' . strtolower($site_data['site_name']);
                         if ($val['parent'] != '#') {
                             if (!in_array($parent, $in_active_categories))
                                 $new_plugin_list[$parent][$title] = $mini_templates[$title];
