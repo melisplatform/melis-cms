@@ -237,6 +237,48 @@ $(function () {
         },100);
     }
 
+    $body.on('click', '.menu-mini-template-tool-delete-btn', function() {
+        var row_data = $('#tableMiniTemplateMenuManagerPlugins').DataTable().row('#'+$(this).closest('tr').attr('id')).data();
+
+        if ($(this).closest('tr').hasClass('child')) {
+            row_data = $('#tableMiniTemplateMenuManagerPlugins').DataTable().row('#' + $(this).closest('tr').prev().attr('id')).data();
+        }
+
+        var templateName = row_data.DT_RowAttr.templateName;
+
+        melisCoreTool.confirm(
+            translations.tr_meliscms_mini_template_manager_tool_delete_modal_confirm,
+            translations.tr_meliscms_mini_template_manager_tool_delete_modal_cancel,
+            translations.tr_meliscms_mini_template_menu_manager_remove_plugin,
+            translations.tr_meliscms_mini_template_menu_manager_remove_plugin_text,
+            function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '/melis/MelisCms/MiniTemplateMenuManager/removePluginFromCategory',
+                    data: {
+                        template: templateName,
+                        siteId: $(siteSelect).find('option:selected').data('id')
+                    },
+                }).done(function (response) {
+                    if (response.success) {
+                        $body.find('.melis-mini-template-menu-manager-table-refresh').trigger('click');
+                        if ($body.find('#id_meliscms_mini_template_menu_manager_tool').length) {
+                            $(tree).jstree(true).refresh();
+                        }
+                        $('li[data-tool-id="' + templateName + '_id_meliscms_mini_template_manager_tool_add"]').find('a.close').trigger('click');
+                    } else {
+                        melisHelper.melisKoNotification(
+                            translations.tr_meliscms_mini_template_manager_tool_delete_modal_title,
+                            translations.tr_meliscms_mini_template_delete_fail
+                        );
+                    }
+                }).fail(function (data) {
+
+                });
+            }
+        );
+    });
+
     function initCmsMiniTemplateCategoryTree () {
         var current_level;
         var query = 'langlocale=' + $("#mini-template-category-tree").data('langlocale');
@@ -469,47 +511,6 @@ $(function () {
                                     }, 500);
                                 }
                             },
-                            'delete_plugin': {
-                                "label" : translations.tr_meliscms_mini_template_menu_manager_tool_jstree_delete_minitemplate,
-                                "icon"  : "fa fa-trash-o",
-                                "action" : function (obj) {
-                                    var templateName = node.original.id;
-                                    var module = node.original.module;
-
-                                    melisCoreTool.confirm(
-                                        translations.tr_meliscms_mini_template_manager_tool_delete_modal_confirm,
-                                        translations.tr_meliscms_mini_template_manager_tool_delete_modal_cancel,
-                                        translations.tr_meliscms_mini_template_manager_tool_delete_modal_title,
-                                        translations.tr_meliscms_mini_template_manager_tool_delete_modal_text,
-                                        function () {
-                                            $.ajax({
-                                                type: 'POST',
-                                                url: '/melis/MelisCms/MiniTemplateManager/deleteMiniTemplate',
-                                                data: {
-                                                    template: templateName,
-                                                    module: module
-                                                },
-                                            }).done(function (data) {
-                                                if (data.success) {
-                                                    $body.find('.mini-template-manager-tool-table-refresh .melis-mini-template-manager-table-refresh').trigger('click');
-                                                    $(tree).jstree(true).refresh();
-                                                    $('li[data-tool-id="' + templateName + '_id_meliscms_mini_template_manager_tool_add"]').find('a.close').trigger('click');
-                                                    melisHelper.melisOkNotification(data.textTitle, data.textMessage);
-                                                } else {
-                                                    melisHelper.melisKoNotification(
-                                                        translations.tr_meliscms_mini_template_manager_tool_delete_modal_title,
-                                                        translations.tr_meliscms_mini_template_menu_manager_category_delete_fail
-                                                    );
-                                                }
-
-                                                melisCore.flashMessenger();
-                                            }).fail(function (data) {
-
-                                            });
-                                        }
-                                    );
-                                }
-                            }
                         };
 
                         if (node.original.type == 'category') {

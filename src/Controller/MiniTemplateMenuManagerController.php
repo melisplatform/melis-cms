@@ -23,6 +23,7 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
     public function renderMenuManagerToolBodyAction() {}
     public function renderMenuManagerToolAddCategoryBodyPropertiesContentAction() {}
     public function renderMiniTemplateMenuManagerToolTableRefreshAction() {}
+    public function renderMiniTemplateMenuManagerToolTableActionDeleteAction() {}
 
     /**
      * Renders the category plugins zone
@@ -396,6 +397,21 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
         return new JsonModel([
             'success' => true,
             'errors' => []
+        ]);
+    }
+
+    /**
+     * Removes the plugin from the category
+     * @return JsonModel
+     */
+    public function removePluginFromCategoryAction() {
+        $params = $this->params()->fromPost();
+        $service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
+        $response = $service->removePluginFromCategory($params['siteId'], $params['template']);
+
+        return new JsonModel([
+            'success' => $response['success'] ?? 0,
+            'errors' => $response['errors'] ?? []
         ]);
     }
 

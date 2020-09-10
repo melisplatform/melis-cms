@@ -52,8 +52,8 @@ return [
                             ],
                             'delete' => [
                                 'module' => 'MelisCms',
-                                'controller' => 'MiniTemplateManager',
-                                'action' => 'render-mini-template-manager-tool-table-action-delete',
+                                'controller' => 'MiniTemplateMenuManager',
+                                'action' => 'render-mini-template-menu-manager-tool-table-action-delete',
                             ],
                         ],
                     ],

@@ -773,6 +773,8 @@
         'tr_meliscms_mini_template_manager_tool_delete_modal_text' => 'Are you sure you want to delete this mini-template? <br> This will remove the files, the link to the category and can’t be undone.',
         'tr_meliscms_mini_template_manager_tool_delete_modal_confirm' => 'Confirm',
         'tr_meliscms_mini_template_manager_tool_delete_modal_cancel' => 'Cancel',
+        'tr_melis_cms_mini_template_manager_tool_delete_no_permission_image' => 'You don\'t have the rights to delete images, please contact the admin for help.',
+        'tr_melis_cms_mini_template_manager_tool_delete_no_permission_mini_template' => 'You don\'t have the rights to delete mini-templates, please contact the admin for help.',
 
         'tr_meliscms_mini_template_manager_tool_form_create_error_no_site_path_found' => 'No path was found for ',
         'tr_meliscms_mini_template_manager_tool_form_create_error_file_already_exists' => 'File can\'t be created because it already exists',
@@ -849,6 +851,9 @@
         'tr_meliscms_mini_template_header_edit' => 'Edit',
         'tr_meliscms_mini_template_manager' => 'Mini Templates & Plugins',
         'tr_meliscms_mini_template_form_invalid_category_name' => 'This field can only contain letters and numbers',
+		'tr_meliscms_mini_template_menu_manager_plugins_table_remove' => 'Remove',
+		'tr_meliscms_mini_template_menu_manager_remove_plugin' => 'Remove the mini-template',
+		'tr_meliscms_mini_template_menu_manager_remove_plugin_text' => 'Are you sure you want to remove this mini-template from the category?',
 
 		'tr_meliscms_page_export_modal_handler' => 'Page Import/Export',
 		'tr_meliscms_page_import_modal' => 'Import modal',

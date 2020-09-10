@@ -226,6 +226,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         $arrayParameters = $this->sendEvent('meliscms_mini_template_service_delete_template_start', $arrayParameters);
         $errors = [];
         $success = 0;
+        $translator = $this->getServiceManager()->get('translator');
 
         if (is_writable($arrayParameters['mini_template_path'])) {
             unlink($arrayParameters['mini_template_path']);
@@ -234,7 +235,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                 if (is_writable($arrayParameters['mini_template_thumbnail_path'])) {
                     unlink($arrayParameters['mini_template_thumbnail_path']);
                 } else {
-                    $errors[] = 'No permission to delete image. No file/s deleted';
+                    $errors[] = $translator->translate('tr_melis_cms_mini_template_manager_tool_delete_no_permission_image');
                 }
             }
 
@@ -245,7 +246,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
 
             $success = 1;
         } else {
-            $errors[] = 'No permission to delete minitemplate. No file/s deleted';
+            $errors[] = $translator->translate('tr_melis_cms_mini_template_manager_tool_delete_no_permission_mini_template');
         }
 
         $arrayParameters['results'] = [
