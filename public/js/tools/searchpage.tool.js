@@ -1,11 +1,56 @@
- var melisSearchPageTree = (function($, window){
-
+ var melisSearchPageTree = (function($, window) {
     // cache DOM
     var $body = $('body');
-
 	    $body.on("click", "#leftSearchTreeView", function(e){
 	    	startTreeSearch();
 		});
+
+		// page lock icon locked/unlocked drag and drop of fancytree node
+		$body.on("click", "#leftLockDragDropTreeView", function() {
+			var $this 		= $(this),
+				$resetTree 	= $("#leftResetTreeView"),
+				$pageLock 	= $this.find(".fa.fa-lock"),
+				$pageUnlock = $this.find(".fa.fa-unlock");
+
+				// trigger refresh
+				$resetTree.trigger("click");
+
+				// toggle of lock and unlock icon
+				if ( $pageLock.length ) {
+					$pageLock.removeClass("fa-lock").addClass("fa-unlock");
+
+					$this.attr("title", translations.tr_meliscms_menu_treeview_page_unlock);
+
+					lockDragDropCmsMenuTreeView();
+				}
+				
+				if ( $pageUnlock.length ) {
+					$pageUnlock.removeClass("fa-unlock").addClass("fa-lock");
+
+					$this.attr("title", translations.tr_meliscms_menu_treeview_page_lock);
+				}
+		});
+
+		// lock on drag and drop treeview, automatic locked after 5 minutes
+		function lockDragDropCmsMenuTreeView() {	
+			var toLockTime 		= 300000, // 300000 5 minutes, 60000 1 minute
+				intervalTime 	= 30000; // 30 seconds
+
+				var checkUnlock = setInterval(function() {
+					var $lockDragDropTreeView 	= $("#leftLockDragDropTreeView"),
+						$pageUnlock 			= $lockDragDropTreeView.find(".fa.fa-unlock");
+
+						if ( $pageUnlock.length ) {
+							setTimeout(function() {
+								$pageUnlock.removeClass("fa-unlock").addClass("fa-lock");
+
+								$lockDragDropTreeView.attr("title", translations.tr_meliscms_menu_treeview_page_lock);
+							}, toLockTime);
+
+							clearInterval( checkUnlock );
+						}
+				}, intervalTime);
+		}
 
 	    // Filter Search
 	    $(document).on("keyup", "input[name=left_tree_search]", function(event) {
@@ -86,5 +131,9 @@
 			    	alert( translations.tr_meliscore_error_message );
 			    });
 	    	}
-	    }
+		}
+
+	var $leftLockDragDropTreeView = $("#leftLockDragDropTreeView");
+		$leftLockDragDropTreeView.attr("title", translations.tr_meliscms_menu_treeview_page_lock);
+
 })(jQuery, window);

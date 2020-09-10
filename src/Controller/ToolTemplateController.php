@@ -687,8 +687,13 @@ class ToolTemplateController extends MelisAbstractActionController
                 }
 
                 // Turn the text color of Template Type to red if templating module is disabled/not installed
-                if (!in_array($tableData[$ctr]['tpl_type'], $activeTypes)) {
+                if (!in_array($tableData[$ctr]['tpl_type'], array_merge($activeTypes, ['ZF2']))) {
                     $tableData[$ctr]['tpl_type'] = str_replace("%TPL_TYPE%", $tableData[$ctr]['tpl_type'], $tplTypKO);
+                }
+
+                // ZF2 template display Laminas
+                if ($tableData[$ctr]['tpl_type'] == 'ZF2') {
+                    $tableData[$ctr]['tpl_type'] = str_replace("ZF2", 'Laminas', $tableData[$ctr]['tpl_type']);
                 }
 
                 $tableData[$ctr]['DT_RowId'] = $tableData[$ctr]['tpl_id'];

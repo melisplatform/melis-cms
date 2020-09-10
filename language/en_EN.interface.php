@@ -1,6 +1,11 @@
 <?php 
 	return array(
 		'tr_meliscms_menu_sitetree_Name' => 'Site tree view',
+
+		// when locked
+		'tr_meliscms_menu_treeview_page_lock' => 'Unlock the treeview',
+		// when unlocked
+		'tr_meliscms_menu_treeview_page_unlock' => 'Lock the treeview',
 			
 		'tr_meliscms_page_title_Create new page' => 'Create a new page',
 
@@ -222,7 +227,7 @@
 	    'tr_meliscms_common_apply_language' => 'Switch the current language to ',
 	    
 	    //Language Tool Translation
-	    'tr_meliscms_tool_language' => 'Page\'s languages',
+	    'tr_meliscms_tool_language' => 'Languages',
 	    'tr_meliscms_tool_description' => 'Define here the different languages that the pages can use.',
 	    'tr_meliscms_tool_modal_text' => 'Each language must have a name and its "locale" defined.',
 	    'tr_meliscms_tool_language_header' => 'Header',
@@ -844,5 +849,9 @@
         'tr_meliscms_mini_template_header_edit' => 'Edit',
         'tr_meliscms_mini_template_manager' => 'Mini Templates & Plugins',
         'tr_meliscms_mini_template_form_invalid_category_name' => 'This field can only contain letters and numbers',
+
+		'tr_meliscms_page_export_modal_handler' => 'Page Import/Export',
+		'tr_meliscms_page_import_modal' => 'Import modal',
+		'tr_meliscms_page_export_modal' => 'Export modal'
     );
 ?>

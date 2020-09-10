@@ -437,7 +437,7 @@ class FrontPluginsController extends MelisAbstractActionController
     }
 
     /**
-     * Categorizez the mini templates for each site
+     * Categorizes the mini templates for each site
      * @param $site_module
      * @param $plugin_list
      * @return mixed

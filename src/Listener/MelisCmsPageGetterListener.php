@@ -12,7 +12,6 @@ namespace MelisCms\Listener;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\EventManager\ListenerAggregateInterface;
 use Laminas\Mvc\MvcEvent;
-use Laminas\Mvc\Router\Http\Segment;
 use Laminas\Session\Container;
 
 /**
