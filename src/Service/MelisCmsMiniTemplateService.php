@@ -284,6 +284,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         unset($data['site_id']);
         unset($data['cat_id']);
         unset($data['status']);
+        unset($data['currentLocale']);
 
         // check for trans data
         $counter = 0;
@@ -329,7 +330,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                     $exploded_text = explode('_', $key);
                     $lang_id = (int)$exploded_text[0];
 
-                    if (!empty($value)) {
+                    if (! empty($value)) {
                         // we save the translation
                         if (empty($cat_id)) {
                             // update translation
@@ -944,6 +945,31 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         }
 
         return null;
+    }
+
+    public function removePluginFromCategory($siteId, $template) {
+        $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
+        $arrayParameters = $this->sendEvent('meliscms_mini_template_service_remove_plugin_from_category_start', $arrayParameters);
+        $success = 0;
+        $errors = [];
+        $connection = $this->startDbTransaction();
+
+        try {
+            $table = $this->getServiceManager()->get('MelisCmsMiniTplCategoryTemplateTable');
+            $table->deletePluginFromCategory($siteId, $template);
+            $connection->commit();
+            $success = 1;
+        } catch(\Exception $ex) {
+            $connection->rollback();
+            $errors[] = $ex->getMessage();
+        }
+
+        $arrayParameters['results'] = [
+            'success' => $success,
+            'errors' => $errors
+        ];
+        $arrayParameters = $this->sendEvent('meliscms_mini_template_service_remove_plugin_from_category_end', $arrayParameters);
+        return $arrayParameters['results'];
     }
 
     /**
