@@ -17,9 +17,9 @@
                 <span class="filter-key"><?= $this->current_lang['lang_cms_name'] ?></span>
                 <span class="caret"></span>
             </a>
-            <ul class="dropdown-menu mini-template-menu-manager-lang-select">
+            <ul class="dropdown-menu mini-template-menu-manager-lang-select" style="padding: 0px;">
                 <?php foreach ($this->languages as $lang):?>
-                    <li>
+                    <li style="padding-top: 3px; padding-bottom: 3px">
                         <a data-locale="<?= $lang['lang_cms_locale']?>">
                             <span><?= $lang['lang_cms_name']?></span>
                             <span class="float-right">
