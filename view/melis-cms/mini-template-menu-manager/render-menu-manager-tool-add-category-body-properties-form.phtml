@@ -72,7 +72,7 @@
                                 $input->setName($language['lang_cms_id'] . '_category_name');
                                 $input->setValue($this->texts[$language['lang_cms_id']] ?? '');
                                 $input->setAttribute('id', $input->getName());
-                                $input->setAttribute('data-locale', $language['lang_cms_locale']);
+                                $input->setAttribute('data-input-locale', $language['lang_cms_locale']);
 
                                 echo $this->form()->openTag($form);
                                 echo $this->melisFieldCollection($form);

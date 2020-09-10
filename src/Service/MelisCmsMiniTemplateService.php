@@ -300,22 +300,6 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                 ];
             }
         }
-        // check for regex
-        if (empty($errors)) {
-            foreach ($data as $key => &$value) {
-                if (! empty($value)) {
-                    $input_lang_id =  explode('_', $key, 2)[0];
-                    preg_match('/^[a-zA-Z0-9 ]*$/', $value, $matches, PREG_OFFSET_CAPTURE);
-
-                    if (empty($matches)) {
-                        $errors[$key] = [
-                            'error' => $translator->translate('tr_meliscms_mini_template_form_invalid_category_name'),
-                            'label' => $translator->translate('tr_meliscms_mini_template_form_category_name') . ' (' . $langs[$input_lang_id] . ')'
-                        ];
-                    }
-                }
-            }
-        }
 
         if (empty($errors)) {
             try {
@@ -893,7 +877,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         $tree[] = [
             'id' => $category['mtplc_id'] . '-' . $category['mtplct_name'],
             'parent' => '#',
-            'text' => $category['mtplct_name'],
+            'text' => htmlspecialchars($category['mtplct_name']),
             'icon' => 'fa fa-circle ' . ($category['mtplc_status'] ? 'text-success' : 'text-danger'),
             'type' => 'category',
             'status' => $category['mtplc_status'],

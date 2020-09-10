@@ -7,7 +7,6 @@ $(function () {
     var isInitialized = false;
     var selectedNode = '';
     var locale = melisLangId;
-    var tab_errors = [];
 
     $body.on('click', '.mtpl-menu-plugins-tab', function () {
         $('.melis-mini-template-menu-manager-table-refresh').trigger('click');
@@ -144,12 +143,20 @@ $(function () {
             name: 'status',
             value: status
         });
+        formData.push({
+            name: 'status',
+            value: status
+        });
+        formData.push({
+            name: 'currentLocale',
+            value: melisLangId
+        });
 
         melisCoreTool.pending('#id_meliscms_mini_template_menu_manager_save_btn');
         $.ajax({
             type: 'POST',
             url: '/melis/MelisCms/MiniTemplateMenuManager/saveCategory',
-            data: formData,
+            data: formData
         }).done(function (data) {
             if (data.success) {
                 $(tree).jstree(true).refresh();
@@ -158,7 +165,7 @@ $(function () {
                     'meliscms_mini_template_menu_manager_tool_add_category_container',
                     {
                         isHidden: false,
-                        id: data.id + '-' + $('input[data-locale="' + locale + '"').val(),
+                        id: data.id + '-' + data.categoryName,
                         formType: 'edit',
                         status: status
                     },

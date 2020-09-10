@@ -136,6 +136,7 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
         $view = new ViewModel();
         $view->formType = (!empty($params['formType'])) ? $params['formType'] : 'add';
         $view->id = (! empty($params['id'])) ? $params['id'] : null;
+        $view->categoryName = $params['categoryName'] ?? '';
         return $view;
     }
 
@@ -160,6 +161,7 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
         $view->isHidden = (empty($params['isHidden'])) ? true : false;
         $view->id = (! empty($params['id'])) ? $params['id'] : null;
         $view->formType = (! empty($params['formType'])) ? $params['formType'] : 'add';
+        $view->categoryName = $params['categoryName'] ?? '';
         return $view;
     }
 
@@ -256,7 +258,9 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
      */
     public function saveCategoryAction() {
         $params = $this->params()->fromPost();
-        $this->trimData($params);
+
+        $langService = $this->getServiceManager()->get('MelisEngineLangService');
+        $currentLang = $langService->getLangByLocale($params['currentLocale']);
 
         $event = 'meliscms_mini_template_menu_manager_create_category';
         $type_code = 'CMS_MTPL_CATEGORY_ADD';
@@ -277,6 +281,28 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
             $message = 'tr_meliscms_mini_template_menu_manager_category_created_successfully';
             if (! empty($params['cat_id']))
                 $message = 'tr_meliscms_mini_template_menu_manager_category_updated_successfully';
+
+            $langService = $this->getServiceManager()->get('MelisEngineLangService');
+            $currentLang = $langService->getLangByLocale($params['currentLocale']);
+            $categoryName = '';
+            foreach ($params as $key => $param) {
+                if (strpos($key, '_category_name') !== false) {
+                    if (! empty($param)) {
+                        $trans_lang_id = explode('_', $key)[0];
+                        $lang = $langService->getLangDataById($trans_lang_id);
+
+                        if (! empty($lang))
+                            $lang = $lang[0];
+
+                        if (empty($categoryName))
+                            $categoryName = $param . ' (' . $lang['lang_cms_name'] . ')';
+
+                        if ($trans_lang_id == $currentLang['lang_cms_id']) {
+                            $categoryName = $param;
+                        }
+                    }
+                }
+            }
         }
 
         $response = [
@@ -284,7 +310,8 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
             'textTitle' => 'tr_meliscms_mini_template_menu_manager_category',
             'textMessage' => $message,
             'errors' => $res['errors'],
-            'id' => $res['id']
+            'id' => $res['id'],
+            'categoryName' => $categoryName
         ];
 
         $this->getEventManager()->trigger(

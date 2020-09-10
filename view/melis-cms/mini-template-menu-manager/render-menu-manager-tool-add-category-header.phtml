@@ -16,10 +16,10 @@
                 </h1>
             <?php else : ?>
                 <?php
-                    $exploded_id = explode('-', $this->id);
+                    $exploded_id = explode('-', $this->id, 2);
                 ?>
                 <h1 id="menu-manager-category-id" class="content-heading" data-id="<?= $exploded_id[0] ?>">
-                    <?= $this->translate('tr_meliscms_mini_template_header_edit') ?> "<?= $exploded_id[1] ?>"
+                    <?= $this->translate('tr_meliscms_mini_template_header_edit') ?> "<?= htmlspecialchars($exploded_id[1]) ?>"
                 </h1>
             <?php endif ?>
         </a>

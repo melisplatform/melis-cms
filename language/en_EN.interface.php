@@ -734,7 +734,7 @@
         'tr_meliscms_pages_Page_header' => 'Page header',
         'tr_meliscms_pages_Page_status_container' => 'Status container',
 
-// Mini template manager tool
+        // Mini template manager tool
         'tr_meliscms_mini_template_manager' => 'Mini Templates & Plugins',
         'tr_meliscms_mini_template_manager_tool' => 'Mini Template Manager',
         'tr_meliscms_mini_template_manager_tool_header_sub_title' => 'Manage here the list of mini templates plugins available on your sites.',
