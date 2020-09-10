@@ -309,3 +309,54 @@ table#tableMiniTemplateMenuManagerPlugins.loading-changes tbody tr td {
 .content-cont .menu-manager-tab li.active a span.mm-lang-name{
     color: #fff !important;
 }
+
+/* TABS */
+.content-cont .nav-tabs.product-text-tab li a {
+    border: 0 !important;
+}
+.content-cont .product-text-tab li.active:hover a{
+    background: #932E2A;
+    border: 0 !important;
+}
+.content-cont .nav-tabs.product-text-tab li.active a,
+.content-cont .nav-tabs.product-text-tab li.active:focus a,
+.content-cont .nav-tabs.product-text-tab li.active:active a,
+.content-cont .nav-tabs.product-text-tab li a:hover{
+    color: #fff;
+    background: #932E2A;
+    font-weight: normal;
+    text-decoration: none;
+
+}
+.content-cont .product-text-tab li.active span,
+.content-cont .product-text-tab li.active i,
+.content-cont .product-text-tab li a:hover span,
+.content-cont .product-text-tab li a:hover i{
+    color: #fff;
+}
+.content-cont .product-text-tab li a{
+    padding: 0;
+    background: #ECEBEB;
+    border-radius: 4px;
+    color: #7D7B7B;
+    display: block;
+    margin: 0 0 10px;
+    text-shadow: none;
+    box-shadow: none;
+    border: none;
+    max-height: 36px;
+}
+.content-cont .product-text-tab li a i{
+    float: right;
+    padding: 7px 10px 7px 7px;
+    font-size: 18px;
+    vertical-align: middle;
+    cursor: pointer;
+    color: #C3C0C0;
+}
+.content-cont .product-text-tab li a span{
+    display: inline-block;
+    padding: 6px 7px 6px 15px;
+    vertical-align: middle;
+    color: #7D7B7B;
+}
