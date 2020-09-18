@@ -63,7 +63,7 @@
                             <img
                                 class="new-minitemplate-thumbnail"
                                 width="300"
-                                src="<?= (! empty($this->imgSource)) ? $this->imgSource : '/MelisFront/plugins/images/default.jpg' ?>"
+                                src="<?= (! empty($this->imgSource)) ? $this->imgSource . '?rand=' . $hash : '/MelisFront/plugins/images/default.jpg' ?>"
                                 alt="<?= $this->translate('tr_meliscore_tool_user_usr_profile_image'); ?>"
                                 style="margin-right: auto; margin-left: auto; display:block;"
                             >
