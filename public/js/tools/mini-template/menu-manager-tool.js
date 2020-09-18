@@ -225,17 +225,37 @@ $(function () {
         });
     });
 
-    // Know when an element is already rendered
-    function waitForElem(selector, callback){
-        var poller1 = setInterval(function(){
-            $jObject = $(selector);
-            if($jObject.length < 1){
-                return;
+    $body.on('click', '.menu-mini-template-tool-edit-btn', function() {
+        var row_data = $('#tableMiniTemplateMenuManagerPlugins').DataTable().row('#'+$(this).closest('tr').attr('id')).data();
+
+        if ($(this).closest('tr').hasClass('child')) {
+            row_data = $('#tableMiniTemplateMenuManagerPlugins').DataTable().row('#'+$(this).closest('tr').prev().attr('id')).data();
+        }
+
+        var templateName = row_data.DT_RowAttr.templateName;
+        var module = row_data.DT_RowAttr.module;
+        var thumbnail = row_data.DT_RowAttr.thumbnail;
+
+        melisHelper.tabOpen(translations.tr_meliscms_mini_template_manager_tool, 'fa fa-tasks', 'id_meliscms_mini_template_manager_tool', 'meliscms_mini_template_manager_tool');
+        var alreadyOpen = $("body #melis-id-nav-bar-tabs li a.tab-element[data-id='id_meliscms_mini_template_manager_tool']");
+        var checkTab = setInterval(function() {
+            if (alreadyOpen.length) {
+                melisHelper.tabOpen(
+                    'Tpl ' + templateName,
+                    'fa fa-tasks',
+                    templateName + '_id_meliscms_mini_template_manager_tool_add',
+                    'meliscms_mini_template_manager_tool_add',
+                    {
+                        module: module,
+                        templateName: templateName,
+                        thumbnail: thumbnail
+                    },
+                    'id_meliscms_mini_template_manager_tool'
+                );
+                clearInterval(checkTab);
             }
-            clearInterval(poller1);
-            callback($jObject)
-        },100);
-    }
+        }, 500);
+    });
 
     $body.on('click', '.menu-mini-template-tool-delete-btn', function() {
         var row_data = $('#tableMiniTemplateMenuManagerPlugins').DataTable().row('#'+$(this).closest('tr').attr('id')).data();

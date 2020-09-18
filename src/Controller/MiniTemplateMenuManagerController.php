@@ -24,6 +24,7 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
     public function renderMenuManagerToolAddCategoryBodyPropertiesContentAction() {}
     public function renderMiniTemplateMenuManagerToolTableRefreshAction() {}
     public function renderMiniTemplateMenuManagerToolTableActionDeleteAction() {}
+    public function renderMiniTemplateMenuManagerToolTableActionEditAction() {}
 
     /**
      * Renders the category plugins zone

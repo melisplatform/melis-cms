@@ -47,8 +47,8 @@ return [
                         'actionButtons' => [
                             'edit' => [
                                 'module' => 'MelisCms',
-                                'controller' => 'MiniTemplateManager',
-                                'action' => 'render-mini-template-manager-tool-table-action-edit',
+                                'controller' => 'MiniTemplateMenuManager',
+                                'action' => 'render-mini-template-menu-manager-tool-table-action-edit',
                             ],
                             'delete' => [
                                 'module' => 'MelisCms',
