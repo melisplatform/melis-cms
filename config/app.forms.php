@@ -543,7 +543,7 @@ return array(
 			            array(
 			                'spec' => array(
 			                    'name' => 'pageLangLocale',
-			                    'type' => 'MelisCmsPageLanguagesSelect',
+			                    'type' => 'Select',
 			                    'options' => array(
 			                        'label' => 'tr_meliscms_page_lang_language_field',
 			                        'tooltip' => 'tr_meliscms_page_lang_language_field tooltip',
