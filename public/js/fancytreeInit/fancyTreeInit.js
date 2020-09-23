@@ -427,7 +427,11 @@
 			});
 		});
 
-		$body.on("click", '#sourcePageIdFindPageTree', function() {
+		/**
+		 * Changed to fix: https://mantis2.uat.melistechnology.fr/view.php?id=894
+		 * Just trigger on the button and not on the input text
+		 */
+		$body.on("click", '#sourcePageIdFindPageTree .input-button-hover-pointer', function() {
 			melisLinkTree.createInputTreeModal('#sourcePageId');
 		});
 
