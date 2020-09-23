@@ -431,7 +431,15 @@
 			melisLinkTree.createInputTreeModal('#sourcePageId');
 		});
 
-		$body.on("click", '#destinationPageIdFindPageTree', function() {
+		/**
+		 * Commented for this issue: https://mantis2.uat.melistechnology.fr/view.php?id=894
+		 * Replaced #destinationPageIdFindPageTree .input-button-hover-pointer
+		 * /
+		/* $body.on("click", '#destinationPageIdFindPageTree', function() {
+			melisLinkTree.createInputTreeModal('#destinationPageId');
+		}); */
+
+		$body.on("click", "#destinationPageIdFindPageTree .input-button-hover-pointer", function() {
 			melisLinkTree.createInputTreeModal('#destinationPageId');
 		});
 
