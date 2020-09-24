@@ -122,10 +122,15 @@ class PageLanguagesController extends MelisAbstractActionController
 
         // get the site id
         $treeService = $this->getServiceManager()->get('MelisTreeService');
-        $siteId = $treeService->getSiteByPageId($idPage)->site_id;
+        $site = $treeService->getSiteByPageId($idPage);
+        if (! empty($site))
+            $siteId = $site->site_id;
         // get available and active site languages
         $siteLangTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteLangs');
-        $languages = $siteLangTable->getSiteLanguagesBySiteId($siteId)->toArray();
+        if (! empty($siteId))
+            $languages = $siteLangTable->getSiteLanguagesBySiteId($siteId)->toArray();
+        else
+            $languages = [];
 
         $langFlags = '';
         $langsToDisplay = [];
