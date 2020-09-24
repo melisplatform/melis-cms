@@ -39,21 +39,20 @@
         
     $body.on("click", "#generateTreePageLink", function(){
         melisCoreTool.pending('#generateTreePageLink');
-        var id = $('#find-page-dynatree .fancytree-active').parent('li'). attr('id').split("_")[1];
-        $.ajax({
-            type        : 'GET', 
-            url         : 'melis/MelisCms/Page/getPageLink',
-            data        : {'idPage': id},
-            dataType    : 'json',
-            encode      : true
-        }).done(function(data) {
-            dataUrl = data.link;
-            showUrl(dataUrl);
-            $("#id_meliscms_find_page_tree_container").modal("hide");
-        }).fail(function(xhr, textStatus, errorThrown) {
-            alert( translations.tr_meliscore_error_message );
-        });
-
+        var id = $('#find-page-dynatree .fancytree-active').parent('li').attr('id').split("_")[1];
+            $.ajax({
+                type        : 'GET', 
+                url         : 'melis/MelisCms/Page/getPageLink',
+                data        : {'idPage': id},
+                dataType    : 'json',
+                encode      : true
+            }).done(function(data) {
+                dataUrl = data.link;
+                showUrl(dataUrl);
+                $("#id_meliscms_find_page_tree_container").modal("hide");
+            }).fail(function(xhr, textStatus, errorThrown) {
+                alert( translations.tr_meliscore_error_message );
+            });
         melisCoreTool.done('#generateTreePageLink');
     });
     
@@ -76,15 +75,15 @@
             opts        = {},
             tmp         = '';
 
-             tree.clearFilter();
+            tree.clearFilter();
 
-             $("#find-page-dynatree").fancytree("getRootNode").visit(function(node){
+            $("#find-page-dynatree").fancytree("getRootNode").visit(function(node){
                 node.resetLazy();
-             });
+            });
 
-             $("input[name=tree_search]").prop('disabled', true);
+            $("input[name=tree_search]").prop('disabled', true);
 
-             var searchContainer = $("input[name=tree_search]").closest(".meliscms-search-box");
+            var searchContainer = $("input[name=tree_search]").closest(".meliscms-search-box");
                 searchContainer.addClass("searching");
 
                 $.ajax({
@@ -101,28 +100,29 @@
                                 $(this).remove();
                             });
                             $("input[name=tree_search]").prop('disabled', false);
-                            $("input[name=tree_search]").focus();
+                            //$("input[name=tree_search]").focus();
+                            $("input[name=tree_search]").trigger("focus");
                         }, 1000);
                     } else {
                         var arr = $.map(data, function(el) { return el });
-        
-                        tree.loadKeyPath(arr, function(node, status){
-                            if(!node.isVisible()) {
-                                switch( status ) {
-                                case "loaded":
-                                    node.makeVisible();
-                                    break;
-                                case "ok":
-                                    node.makeVisible();
-                                    break;
+
+                            tree.loadKeyPath(arr, function(node, status){
+
+                                if ( !node.isVisible() ) {
+                                    switch( status ) {
+                                        case "loaded":
+                                            node.makeVisible();
+                                            break;
+                                        case "ok":
+                                            node.makeVisible();
+                                            break;
+                                        }
                                 }
-        
-                            }
-                            filterFunc.call(tree, match, opts);
-                        }).done(function(){
-                            $("input[name=tree_search]").prop('disabled', false);
-                            searchContainer.removeClass("searching");
-                        });
+                                filterFunc.call(tree, match, opts);
+                            }).done(function(){
+                                $("input[name=tree_search]").prop('disabled', false);
+                                searchContainer.removeClass("searching");
+                            });
                     }
                 }).fail(function(xhr, textStatus, errorThrown) {
                     alert( translations.tr_meliscore_error_message );
@@ -234,28 +234,27 @@
                 cache: true
             },
             lazyLoad: function(event, data) {
-              // get the page ID and pass it to lazyload
-              var pageId = data.node.data.melisData.page_id;
-              data.result = { 
-                      url: '/melis/MelisCms/TreeSites/get-tree-pages-by-page-id?nodeId='+pageId,
-                      data: {
-                          mode: 'children',
-                          parent: data.node.key
-                      },
-                      cache: false
-              }
+                // get the page ID and pass it to lazyload
+                var pageId = data.node.data.melisData.page_id;
+                    data.result = { 
+                        url: '/melis/MelisCms/TreeSites/get-tree-pages-by-page-id?nodeId='+pageId,
+                        data: {
+                            mode: 'children',
+                            parent: data.node.key
+                        },
+                        cache: false
+                    }
             },
             renderNode: function (event, data) {
                 // removed .fancytree-icon class and replace it with font-awesome icons
                 $(data.node.span).find('.fancytree-icon').addClass(data.node.data.iconTab).removeClass('fancytree-icon');
-                
-                if(data.node.statusNodeType !== 'loading'){
+                if ( data.node.statusNodeType !== 'loading' ) {
                     
-                    if( data.node.data.melisData.page_is_online === 0){
-                        //$(data.node.span).find('.fancytree-title, .fa').css("color","#000");     
-                    }
+                    /* if ( data.node.data.melisData.page_is_online === 0 ) {
+                        $(data.node.span).find('.fancytree-title, .fa').css("color","#000");     
+                    } */
                     
-                    if( data.node.data.melisData.page_has_saved_version === 1){
+                    if ( data.node.data.melisData.page_has_saved_version === 1 ) {
                         //check if it has already 'unpublish' circle - avoid duplicate circle bug
                         if( $(data.node.span).children("span").hasClass("unpublish") == false  ){
                             $(data.node.span).find('.fancytree-title').before("<span class='unpublish'></span>");
@@ -265,7 +264,7 @@
             },
             filter: {
                 autoApply: true,   // Re-apply last filter if lazy data is loaded
-                autoExpand: false, // Expand all branches that contain matches while filtered
+                autoExpand: true, // Expand all branches that contain matches while filtered
                 counter: true,     // Show a badge with number of matching child nodes near parent icons
                 fuzzy: false,      // Match single characters in order, e.g. 'fb' will match 'FooBar'
                 hideExpandedCounter: true,  // Hide counter badge if parent is expanded
@@ -273,11 +272,13 @@
                 highlight: true,   // Highlight matches by wrapping inside <mark> tags
                 leavesOnly: false, // Match end nodes only
                 nodata: true,      // Display a 'no data' status node if result is empty
-                mode: "hide"       // Grayout unmatched nodes (pass "hide" to remove unmatched node instead)
-              },
+                /**
+                 * Change mode option from "hide" to "dimm"
+                 * To fix: https://mantis2.uat.melistechnology.fr/view.php?id=212
+                 */
+                mode: "dimm"       // Grayout unmatched nodes (pass "hide" to remove unmatched node instead)
+            }
         });
-        
-
     }
 
     return {
@@ -287,5 +288,4 @@
         checkBtn                :       checkBtn,
         showUrl                 :       showUrl,
     }
-
 })(jQuery, window);

@@ -184,7 +184,7 @@
 					init: function(event, data, flag) {
 						melisHelper.removeLoadingZone($('#treeview-container'));
 						// focus search box
-						$("input[name=left_tree_search]").focus();
+						$("input[name=left_tree_search]").trigger("focus");
 
 						var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
 
