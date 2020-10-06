@@ -207,16 +207,21 @@
 					},
 					click: function(event, data) {
 						targetType = data.targetType;
-						if (targetType === "title") {
+						if ( targetType === "title" ) {
 								data.node.setExpanded();
 
 							// open page on click on mobile . desktop is double click
-							if (melisCore.screenSize <= 1024) {
+							if ( melisCore.screenSize <= 1024 ) {
 									var data = data.node.data;
 									var pageName = data.melisData.page_id + " - " + data.melisData.page_title;
 									melisHelper.tabOpen(pageName, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey, {
 											idPage: data.melisData.page_id
 									}, null, melisCms.pageTabOpenCallback(data.melisData.page_id));
+
+									// check for loading on page iframe
+									if ( typeof loader !== undefined ) {
+										loader.checkPageLoading( data.melisData.item_zoneid );
+									}
 							}
 						}
 						
@@ -227,15 +232,23 @@
 						}
 					},
 					dblclick: function(event, data) {
-							// get eventType to know what was clicked the 'expander (+-)' or the title
-							//targetType = data.targetType;
+						/**
+						 * Get eventType to know what was clicked the 'expander (+-)' or the title
+						 * targetType = data.targetType;
+						 */
 
 						// open tab and page
-						var data = data.node.data;
-						var pageName = data.melisData.page_id + " - " + data.melisData.page_title;
-						melisHelper.tabOpen(pageName, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey, {
-								idPage: data.melisData.page_id
-						}, null, melisCms.pageTabOpenCallback(data.melisData.page_id));
+						var data = data.node.data,
+							pageName = data.melisData.page_id + " - " + data.melisData.page_title;
+							
+							melisHelper.tabOpen(pageName, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey, {
+									idPage: data.melisData.page_id
+							}, null, melisCms.pageTabOpenCallback(data.melisData.page_id));
+
+							// check for loading on page iframe
+							//if ( typeof loader !== undefined ) {
+								loader.checkPageLoading( data.melisData.item_zoneid );
+							//}
 
 							$('.hasNiceScroll').getNiceScroll().resize();
 
@@ -251,7 +264,7 @@
 						$.ajax({
 							url         : '/melis/MelisCms/TreeSites/canEditPages',
 							encode		: true
-						}).success(function(data){
+						}).done(function(data){
 							// has no access
 							if(data.edit === 0){
 								$(".meliscms-search-box.sidebar-treeview-search").hide();
@@ -268,7 +281,7 @@
 									$("#id-mod-menu-dynatree .create-newpage").remove();
 									}
 							}
-						}).error(function(xhr, textStatus, errorThrown){
+						}).fail(function(xhr, textStatus, errorThrown){
 							alert( translations.tr_meliscore_error_message );
 						});
 
@@ -277,14 +290,14 @@
 						$.ajax({
 							url         : '/melis/MelisCms/Page/isActionActive?actionwanted=save',
 							encode		: true
-						}).success(function(data){
+						}).done(function(data){
 							if(data.active === 0){
 								$("body").addClass('disable-create');
 							}
 							else{
 								$("body").removeClass('disable-create');
 							}
-						}).error(function(xhr, textStatus, errorThrown){
+						}).fail(function(xhr, textStatus, errorThrown){
 							alert( translations.tr_meliscore_error_message );
 						});
 						
@@ -292,14 +305,14 @@
 						$.ajax({
 							url         : '/melis/MelisCms/Page/isActionActive?actionwanted=delete',
 							encode		: true
-						}).success(function(data){
+						}).done(function(data){
 							if(data.active === 0){
 								$("body").addClass('disable-delete');
 							}
 							else{
 								$("body").removeClass('disable-delete');
 							}
-						}).error(function(xhr, textStatus, errorThrown){
+						}).fail(function(xhr, textStatus, errorThrown){
 							alert( translations.tr_meliscore_error_message );
 						}); */
 					},
