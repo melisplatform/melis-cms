@@ -27,15 +27,21 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
         $arrayParameters = $this->sendEvent('meliscms_mini_template_service_create_template_start', $arrayParameters);
 
+        $translator = $this->getServiceManager()->get('translator');
         $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
         $module = $siteTable->getEntryById($arrayParameters['site_id'])->current()->site_name;
-        $translator = $this->getServiceManager()->get('translator');
         $path = $this->getModuleMiniTemplatePath($module);
 
         $success = 0;
         $errors = [];
 
-        $this->checkCreateMiniTemplateErrors($path, $arrayParameters['name'], $module, $errors);
+        if (is_array($path)) {
+            $errors[] = [
+                'error' => $path['error'],
+                'label' => $translator->translate('tr_meliscms_mini_template_error')
+            ];
+        } else
+            $this->checkCreateMiniTemplateErrors($path, $arrayParameters['name'], $module, $errors);
 
         if (empty($errors)) {
             // create the file
@@ -103,21 +109,31 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         $new_data = $arrayParameters['new_data'];
         $image = $arrayParameters['image'] != 'false';
 
+        $translator = $this->getServiceManager()->get('translator');
         $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
+        $table = $this->getServiceManager()->get('MelisCmsMiniTplCategoryTemplateTable');
+
         $current_site = $siteTable->getEntryById($current_data['miniTemplateSite'])->current();
         $current_module = $current_site->site_name;
         $current_site_path = $this->getModuleMiniTemplatePath($current_site->site_name);
+        $current_template_name = $current_data['miniTemplateName'];
+
         $new_site = $siteTable->getEntryById($new_data['miniTemplateSite'])->current();
         $new_site_path = $this->getModuleMiniTemplatePath($new_site->site_name);
-        $current_template_name = $current_data['miniTemplateName'];
-        $table = $this->getServiceManager()->get('MelisCmsMiniTplCategoryTemplateTable');
+
         $success = 1;
         $errors = [];
 
-        if (!is_writable($current_site_path . '/' . $current_data['miniTemplateName'] . '.phtml')) {
-            $translator = $this->getServiceManager()->get('translator');
+        if (is_array($new_site_path)) {
             $errors[] = [
-                'error' => $current_site_path . '/' . $current_data . '.phtml ' . $translator->translate('tr_meliscms_mini_template_manager_tool_form_create_error_path_not_writable'),
+                'error' => $new_site_path['error'],
+                'label' => $translator->translate('tr_meliscms_mini_template_error')
+            ];
+        }
+
+        if (!is_writable($current_site_path . '/' . $current_template_name . '.phtml')) {
+            $errors[] = [
+                'error' => $current_site_path . '/' . $current_template_name . '.phtml ' . $translator->translate('tr_meliscms_mini_template_manager_tool_form_create_error_path_not_writable'),
                 'label' => $translator->translate('tr_meliscms_mini_template_error')
             ];
         }
@@ -196,6 +212,8 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                 $errors[] = $e->getMessage();
                 $success = 0;
             }
+        } else {
+            $success = 0;
         }
 
         $thumbnail_file = $this->getMiniTemplateThumbnail($current_site_path, $current_template_name);
@@ -483,17 +501,6 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
     }
 
     /**
-     * @param $module
-     * @return string|null
-     */
-    public function getModuleMiniTemplatePath($module) {
-        $path = $this->getComposerModulePath($module);
-        if (empty($path))
-            $path = $this->getNonComposerModulePath($module);
-        return $path ?? null;
-    }
-
-    /**
      * @param $siteId
      * @param $locale
      * @return array
@@ -505,7 +512,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         $site_path = $this->getModuleMiniTemplatePath($module);
         $tree = [];
 
-        if (file_exists($site_path)) {
+        if (! is_array($site_path)) {
             $mini_templates = $this->getMiniTemplates($module);
             $categories = $this->getCategories($siteId, $locale);
             $category_ids = $this->getCategoryIds($categories);
@@ -730,11 +737,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         $path = $this->getModuleMiniTemplatePath($module);
         $templates = [];
 
-        if (!file_exists($path)) {
-            if (is_writable($path)) {
-                mkdir($path);
-            }
-        } else {
+        if (! is_array($path)) {
             $files = array_diff(scandir($path), ['..', '.']);
 
             foreach ($files as $file) {
@@ -842,31 +845,10 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
     private function checkCreateMiniTemplateErrors($path, $template_name, $site_module, &$errors) {
         $translator = $this->getServiceManager()->get('translator');
 
-        if (! empty($path)) {
-            if (file_exists($path)) {
-                if (!file_exists($path . '/' . $template_name . '.phtml')) {
-                    if (!is_writable($path)) {
-                        $errors[] = [
-                            'error' => $translator->translate('tr_meliscms_mini_template_error_minitemplate_directory_not_writable'),
-                            'label' => $translator->translate('tr_meliscms_mini_template_error')
-                        ];
-                    }
-                } else {
-                    $errors['miniTemplateName'] = [
-                        'error' => $translator->translate('tr_meliscms_mini_template_manager_tool_form_create_error_file_already_exists'),
-                        'label' => $translator->translate('tr_meliscms_mini_template_manager_tool_form_name')
-                    ];
-                }
-            } else {
-                $errors[] = [
-                    'error' => $translator->translate('tr_meliscms_mini_template_error_minitemplate_directory_does_not_exist'),
-                    'label' => $translator->translate('tr_meliscms_mini_template_error')
-                ];
-            }
-        } else {
-            $errors[] = [
-                'error' => $translator->translate('tr_meliscms_mini_template_manager_tool_form_create_error_no_site_path_found') . $site_module,
-                'label' => $translator->translate('tr_meliscms_mini_template_error')
+        if (file_exists($path . '/' . $template_name . '.phtml')) {
+            $errors['miniTemplateName'] = [
+                'error' => $translator->translate('tr_meliscms_mini_template_manager_tool_form_create_error_file_already_exists'),
+                'label' => $translator->translate('tr_meliscms_mini_template_manager_tool_form_name')
             ];
         }
     }
@@ -975,31 +957,82 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
 
     /**
      * @param $module
-     * @return string
+     * @return string|null
      */
-    private function getComposerModulePath($module) {
-        $composerSrv = $this->getServiceManager()->get('MelisEngineComposer');
-        $path = $composerSrv->getComposerModulePath($module);
-        $miniTemplatePath = $path . '/public' . '/miniTemplatesTinyMce';
-        return (! empty($path)) ? $miniTemplatePath : '';
+    public function getModuleMiniTemplatePath($module) {
+        $path = $this->getComposerModulePath($module, $ecode);
+        if ($path == 'e2' || $path == null)
+            $path = $this->getNonComposerModulePath($module, $ecode);
+
+        if ($path == null)
+            $error = $this->getErrorMessage('e1');
+        else
+            $error = $this->getErrorMessage($path);
+
+        if (empty($error))
+            return $path;
+        else
+            return $error;
     }
 
     /**
      * @param $module
      * @return string
      */
-    private function getNonComposerModulePath($module) {
-        $path = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites';
-        if (file_exists($path) && is_dir($path)) {
-            $sites = $this->getDir($path);
-            if (! empty($sites)) {
-                if (in_array($module, $sites)) {
-                    $publicPath = $path . '/' . $module . '/public';
-                    $miniTemplatePath = $publicPath . '/miniTemplatesTinyMce';
-                }
-            }
+    private function getComposerModulePath($module, &$ecode) {
+        $composerSrv = $this->getServiceManager()->get('MelisEngineComposer');
+        $path = $composerSrv->getComposerModulePath($module);
+        if (empty($path))
+            return 'e2';
+
+        $publicPath = $path . '/public';
+        if (! file_exists($publicPath))
+            return 'e3';
+
+        $mtplPath = $publicPath . '/miniTemplatesTinyMce';
+        if (! file_exists($path . '/public' . '/miniTemplatesTinyMce')) {
+            if (! mkdir($mtplPath, 0777, true))
+                return 'e4';
         }
-        return $miniTemplatePath;
+
+        if (! is_writable($mtplPath))
+            return 'e5';
+
+        return $mtplPath ?? null;
+    }
+
+    /**
+     * @param $module
+     * @return string
+     */
+    private function getNonComposerModulePath($module, &$ecode) {
+        $path = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites';
+        if (! file_exists($path)) {
+            if (! is_dir($path))
+                return 'e6';
+            return 'e7';
+        }
+
+        $sites = $this->getDir($path);
+        if (empty($sites))
+            return 'e8';
+        if (! in_array($module, $sites))
+            return 'e9';
+
+        $publicPath = $path . '/' . $module . '/public';
+        if (! file_exists($publicPath))
+            return 'e10';
+
+        $mtplPath = $publicPath . '/miniTemplatesTinyMce';
+        if (! file_exists($mtplPath)) {
+            if (! mkdir($mtplPath, 0777, true))
+                return 'e11';
+        }
+
+        if (! is_writable($mtplPath))
+            return 'e12';
+
+        return $mtplPath ?? null;
     }
 
     /**
@@ -1040,5 +1073,25 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
 
         }
         return $directories;
+    }
+
+    private function getErrorMessage($code) {
+        $error = '';
+        $missingModuleOrPathFilesErrors = ['e1', 'e2', 'e3', 'e6', 'e7', 'e8', 'e9', 'e10'];
+
+        if (in_array($code, $missingModuleOrPathFilesErrors))
+            $error = 'tr_meliscms_mini_template_error_module_or_public_does_not_exist';
+        if ($code == 'e4' || $code == 'e11')
+            $error = 'tr_meliscms_mini_template_error_rights_mtpl_directory';
+        if ($code == 'e5' || $code == 'e12')
+            $error = 'tr_meliscms_mini_template_error_rights_phtml';
+
+        if (empty($error))
+            return null;
+
+        return [
+            'success' => 0,
+            'error' => $this->getServiceManager()->get('translator')->translate($error)
+        ];
     }
 }
