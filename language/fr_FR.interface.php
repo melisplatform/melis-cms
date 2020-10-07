@@ -784,6 +784,9 @@
 
         'tr_meliscms_mini_template_manager_tool_form_empty_field' => 'Ce champ ne peut être vide',
         'tr_meliscms_mini_template_manager_tool_form_select_site' => 'Veuillez sélectionner un site',
+        'tr_meliscms_mini_template_error_module_or_public_does_not_exist' => 'Le module du site ou le dossier public n\'existe pas, merci de voir avec un administrateur',
+        'tr_meliscms_mini_template_error_rights_phtml' => 'Le mini-template ne peut-être créé pour des raisons de droits',
+        'tr_meliscms_mini_template_error_rights_mtpl_directory' => 'Le dossier miniTemplatesTinyMce ne peut pas être créé pour des raisons de droits',
 
         // Mini template menu manager tool
         'tr_meliscms_mini_template_menu_manager_tool' => 'Menu Manager',

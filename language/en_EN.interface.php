@@ -782,6 +782,9 @@
 
         'tr_meliscms_mini_template_manager_tool_form_empty_field' => 'This field cannot be empty',
         'tr_meliscms_mini_template_manager_tool_form_select_site' => 'Please select a site',
+        'tr_meliscms_mini_template_error_module_or_public_does_not_exist' => 'The site\'s module or the public folder doesn\'t exist, please see with an administrator',
+        'tr_meliscms_mini_template_error_rights_phtml' => 'The mini-template cannot be created because of rights problems',
+        'tr_meliscms_mini_template_error_rights_mtpl_directory' => 'The folder miniTemplatesTinyMce cannot be created because of rights problems',
 
         // Mini template menu manager tool
         'tr_meliscms_mini_template_menu_manager_tool' => 'Menu Manager',
