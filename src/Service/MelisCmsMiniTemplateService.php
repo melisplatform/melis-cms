@@ -133,7 +133,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
 
         if (!is_writable($current_site_path . '/' . $current_template_name . '.phtml')) {
             $errors[] = [
-                'error' => $current_site_path . '/' . $current_template_name . '.phtml ' . $translator->translate('tr_meliscms_mini_template_manager_tool_form_create_error_path_not_writable'),
+                'error' => $translator->translate('tr_meliscms_mini_template_error_rights_phtml'),
                 'label' => $translator->translate('tr_meliscms_mini_template_error')
             ];
         }
@@ -1078,13 +1078,12 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
     private function getErrorMessage($code) {
         $error = '';
         $missingModuleOrPathFilesErrors = ['e1', 'e2', 'e3', 'e6', 'e7', 'e8', 'e9', 'e10'];
+        $mtplDirectoryRightsProblem = ['e4', 'e5', 'e11', 'e12'];
 
         if (in_array($code, $missingModuleOrPathFilesErrors))
             $error = 'tr_meliscms_mini_template_error_module_or_public_does_not_exist';
-        if ($code == 'e4' || $code == 'e11')
+        if (in_array($code, $mtplDirectoryRightsProblem))
             $error = 'tr_meliscms_mini_template_error_rights_mtpl_directory';
-        if ($code == 'e5' || $code == 'e12')
-            $error = 'tr_meliscms_mini_template_error_rights_phtml';
 
         if (empty($error))
             return null;
