@@ -39,7 +39,7 @@ class FrontPluginsController extends MelisAbstractActionController
         // remove section that has no child under on it
         $newPluginList = array_filter($newPluginList);
         // add categories for the mini-templates
-        $newPluginList = $this->categorizeMiniTemplates($newPluginList);
+        $newPluginList = $this->categorizeMiniTemplates($newPluginList, $siteModule);
         // get the latest plugin installed
         $latesPlugin = $pluginSvc->getLatestPlugin($pluginSvc::TEMPLATING_PLUGIN_TYPE);
         // for new plugin notifications
@@ -437,12 +437,12 @@ class FrontPluginsController extends MelisAbstractActionController
     }
 
     /**
-     * Categorizes the mini templates for each site
+     * Categorizes the mini templates for the page's current site
      * @param $site_module
      * @param $plugin_list
      * @return mixed
      */
-    private function categorizeMiniTemplates($plugin_list)
+    private function categorizeMiniTemplates($plugin_list, $siteModule)
     {
         $mini_template_sites = $plugin_list['MelisCms']['MelisMiniTemplate'];
         $sites = $this->getServiceManager()->get('MelisEngineTableSite')->fetchAll()->toArray();
@@ -457,51 +457,53 @@ class FrontPluginsController extends MelisAbstractActionController
 
         // insert sites
         foreach ($sites as $site_data) {
-            if (! empty($plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_name']])) {
-                $service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
-                $tree = $service->getTree($site_data['site_id'], $container['melis-lang-locale']);
+            if ($site_data['site_name'] == $siteModule) {
+                if (!empty($plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_name']])) {
+                    $service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
+                    $tree = $service->getTree($site_data['site_id'], $container['melis-lang-locale']);
 
-                $mini_templates = $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_name']];
-                $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_label']] = [];
-                $new_plugin_list = [];
-                $new_plugin_list['title'] = $site_data['site_label'];
-                $in_active_categories = [];
+                    $mini_templates = $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_name']];
+                    $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_label']] = [];
+                    $new_plugin_list = [];
+                    $new_plugin_list['title'] = $site_data['site_label'];
+                    $in_active_categories = [];
 
-                foreach ($tree as $key => $val) {
-                    $type = $val['type'];
-                    if ($type == 'category') {
-                        if ($val['status']) {
-                            $new_plugin_list[html_entity_decode($val['text'])] = [
-                                'text' => html_entity_decode($val['text']),
-                                'isCategory' => true
-                            ];
+                    foreach ($tree as $key => $val) {
+                        $type = $val['type'];
+                        if ($type == 'category') {
+                            if ($val['status']) {
+                                $new_plugin_list[html_entity_decode($val['text'])] = [
+                                    'text' => html_entity_decode($val['text']),
+                                    'isCategory' => true
+                                ];
+                            } else {
+                                $in_active_categories[] = $val['text'];
+                            }
                         } else {
-                            $in_active_categories[] = $val['text'];
-                        }
-                    } else {
-                        $exploded = explode('-', $val['parent'], 2);
-                        $parent = '';
-                        if (count($exploded) > 2) {
-                            unset($exploded[0]);
-                            $parent = implode('-', $exploded);
-                        } else if (count($exploded) == 2) {
-                            unset($exploded[0]);
-                            $parent = $exploded[1];
-                        } else {
-                            $parent = $val['parent'];
-                        }
+                            $exploded = explode('-', $val['parent'], 2);
+                            $parent = '';
+                            if (count($exploded) > 2) {
+                                unset($exploded[0]);
+                                $parent = implode('-', $exploded);
+                            } else if (count($exploded) == 2) {
+                                unset($exploded[0]);
+                                $parent = $exploded[1];
+                            } else {
+                                $parent = $val['parent'];
+                            }
 
-                        $title = 'MiniTemplatePlugin_' . strtolower(html_entity_decode($val['text'])) . '_' . strtolower($site_data['site_name']);
-                        if ($val['parent'] != '#') {
-                            if (!in_array($parent, $in_active_categories))
-                                $new_plugin_list[$parent][$title] = $mini_templates[$title];
-                        } else {
-                            $new_plugin_list[$title] = $mini_templates[$title];
+                            $title = 'MiniTemplatePlugin_' . strtolower(html_entity_decode($val['text'])) . '_' . strtolower($site_data['site_name']);
+                            if ($val['parent'] != '#') {
+                                if (!in_array($parent, $in_active_categories))
+                                    $new_plugin_list[$parent][$title] = $mini_templates[$title];
+                            } else {
+                                $new_plugin_list[$title] = $mini_templates[$title];
+                            }
                         }
                     }
-                }
 
-                $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_label']] = $new_plugin_list;
+                    $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_label']] = $new_plugin_list;
+                }
             }
         }
 
