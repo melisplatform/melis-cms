@@ -988,6 +988,8 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         $publicPath = $path . '/public';
         if (! file_exists($publicPath))
             return 'e3';
+        if (! is_writable($publicPath))
+            return 'e14';
 
         $mtplPath = $publicPath . '/miniTemplatesTinyMce';
         if (! file_exists($path . '/public' . '/miniTemplatesTinyMce')) {
@@ -1022,6 +1024,8 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         $publicPath = $path . '/' . $module . '/public';
         if (! file_exists($publicPath))
             return 'e10';
+        if (! is_writable($publicPath))
+            return 'e13';
 
         $mtplPath = $publicPath . '/miniTemplatesTinyMce';
         if (! file_exists($mtplPath)) {
@@ -1078,10 +1082,11 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
     private function getErrorMessage($code) {
         $error = '';
         $missingModuleOrPathFilesErrors = ['e1', 'e2', 'e3', 'e6', 'e7', 'e8', 'e9', 'e10'];
+        $noPublicDirectoryRights = ['e4', 'e11', 'e13', 'e14'];
 
         if (in_array($code, $missingModuleOrPathFilesErrors))
             $error = 'tr_meliscms_mini_template_error_module_or_public_does_not_exist';
-        if ($code == 'e4' || $code == 'e11')
+        if (in_array($code, $noPublicDirectoryRights))
             $error = 'tr_meliscms_mini_template_error_rights_mtpl_directory';
         if ($code == 'e5' || $code == 'e12')
             $error = 'tr_meliscms_mini_template_error_rights_phtml';
