@@ -30,6 +30,7 @@ class FrontPluginsController extends MelisAbstractActionController
         $config = $this->getServiceManager()->get('config');
         $pluginsConfig = array();
         $siteModule = $this->params()->fromRoute('siteModule');
+        $pageId = $this->params()->fromRoute('pageId');
         // melis plugin service
         $pluginSvc = $this->getServiceManager()->get('MelisCorePluginsService');
         // check for new plugins or manually installed and insert in db or fresh plugins
@@ -39,7 +40,7 @@ class FrontPluginsController extends MelisAbstractActionController
         // remove section that has no child under on it
         $newPluginList = array_filter($newPluginList);
         // add categories for the mini-templates
-        $newPluginList = $this->categorizeMiniTemplates($newPluginList, $siteModule);
+        $newPluginList = $this->categorizeMiniTemplates($newPluginList, $pageId);
         // get the latest plugin installed
         $latesPlugin = $pluginSvc->getLatestPlugin($pluginSvc::TEMPLATING_PLUGIN_TYPE);
         // for new plugin notifications
@@ -442,10 +443,15 @@ class FrontPluginsController extends MelisAbstractActionController
      * @param $plugin_list
      * @return mixed
      */
-    private function categorizeMiniTemplates($plugin_list, $siteModule)
+    private function categorizeMiniTemplates($plugin_list, $pageId)
     {
         $mini_template_sites = $plugin_list['MelisCms']['MelisMiniTemplate'];
         $sites = $this->getServiceManager()->get('MelisEngineTableSite')->fetchAll()->toArray();
+        $pageTreeService = $this->getServiceManager()->get('MelisEngineTree');
+        $site = $pageTreeService->getSiteByPageId($pageId);
+        if (empty($site))
+            $site = $pageTreeService->getSiteByPageId($pageId, 'saved');
+
         $site_modules = [];
         $container = new Container('meliscore');
         // get site modules
@@ -457,7 +463,7 @@ class FrontPluginsController extends MelisAbstractActionController
 
         // insert sites
         foreach ($sites as $site_data) {
-            if ($site_data['site_name'] == $siteModule) {
+            if ($site_data['site_label'] == $site->site_label) {
                 if (!empty($plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_name']])) {
                     $service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
                     $tree = $service->getTree($site_data['site_id'], $container['melis-lang-locale']);
