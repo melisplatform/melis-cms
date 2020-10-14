@@ -44,6 +44,8 @@ $(function () {
 
         var checkTab = setInterval(function() {
             if (alreadyOpen.length) {
+                $(".close.close-tab[data-id='new_template_id_meliscms_mini_template_manager_tool_add']").click();
+
                 melisHelper.tabOpen(
                     translations.tr_meliscms_mini_template_manager_tool_header_add_btn,
                     'fa fa-list-alt',
@@ -422,6 +424,8 @@ $(function () {
 
                                     var checkTab = setInterval(function() {
                                         if (alreadyOpen.length) {
+                                            $(".close.close-tab[data-id='new_template_id_meliscms_mini_template_manager_tool_add']").click();
+
                                             melisHelper.tabOpen(
                                                 translations.tr_meliscms_mini_template_manager_tool_header_add_btn,
                                                 'fa fa-tasks',
