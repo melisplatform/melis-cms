@@ -463,7 +463,7 @@ class FrontPluginsController extends MelisAbstractActionController
 
         // insert sites
         foreach ($sites as $site_data) {
-            if ($site_data['site_label'] == $site->site_label) {
+            if ($site_data['site_id'] == $site->site_id) {
                 if (!empty($plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_name']])) {
                     $service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
                     $tree = $service->getTree($site_data['site_id'], $container['melis-lang-locale']);
