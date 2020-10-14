@@ -81,10 +81,10 @@ return [
                             'elements' => [
                                 [
                                     'spec' => [
-                                        'name' => 'miniTemplateSite',
-                                        'type' => 'MelisCoreSiteSelect',
+                                        'name' => 'miniTemplateSiteModule',
+                                        'type' => 'select',
                                         'options' => [
-                                            'label' => 'tr_meliscms_mini_template_manager_tool_form_site',
+                                            'label' => 'tr_meliscms_tool_site_site_module',
                                             'tooltip' => 'tr_meliscms_mini_template_manager_tool_form_site_tooltip',
                                             'label_options' => [
                                                 'disable_html_escape' => true,
@@ -93,7 +93,7 @@ return [
                                             'disable_inarray_validator' => true,
                                         ],
                                         'attributes' => [
-                                            'id' => 'miniTemplateSite',
+                                            'id' => 'miniTemplateSiteModule',
                                             'value' => '',
                                         ],
                                     ],
@@ -159,8 +159,8 @@ return [
                                 ],
                             ],
                             'input_filter' => [
-                                'miniTemplateSite' => [
-                                    'name' => 'miniTemplateSite',
+                                'miniTemplateSiteModule' => [
+                                    'name' => 'miniTemplateSiteModule',
                                     'required' => true,
                                     'validators' => [
                                         [

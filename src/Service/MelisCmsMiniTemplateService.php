@@ -23,75 +23,75 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
      * @param null $cat_id
      * @return mixed
      */
-    public function createMiniTemplate($site_id, $name, $html, $image_tmp_path = null, $img_ext = null, $cat_id = null) {
+    public function createMiniTemplate(
+        $module,
+        $name,
+        $html,
+        $image_tmp_path = null,
+        $img_ext = null,
+        $cat_id = null,
+        $site_id = null
+    ) {
+        // params to array
         $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
-        $arrayParameters = $this->sendEvent('meliscms_mini_template_service_create_template_start', $arrayParameters);
 
+        // event start
+        $arrayParameters = $this->sendEvent(
+            'meliscms_mini_template_service_create_template_start',
+            $arrayParameters
+        );
+
+        // initialize variables
         $translator = $this->getServiceManager()->get('translator');
-        $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
-        $module = $siteTable->getEntryById($arrayParameters['site_id'])->current()->site_name;
         $path = $this->getModuleMiniTemplatePath($module);
-
+        $thumbnail = '';
         $success = 0;
         $errors = [];
 
-        if (is_array($path)) {
-            $errors[] = [
-                'error' => $path['error'],
-                'label' => $translator->translate('tr_meliscms_mini_template_error')
-            ];
-        } else
-            $this->checkCreateMiniTemplateErrors($path, $arrayParameters['name'], $module, $errors);
+        // check if the path has errors
+        $this->checkCreateMiniTemplateErrors($path, $arrayParameters['name'], $module, $errors);
 
+        // main process
         if (empty($errors)) {
-            // create the file
-            $miniTemplateFile = fopen($path . '/' . $arrayParameters['name'] . '.phtml', 'wb');
-            // add the html
-            fwrite($miniTemplateFile, $arrayParameters['html']);
-            fclose($miniTemplateFile);
-            chmod($path . '/' . $arrayParameters['name'] . '.phtml', 0777);
-            // copy the thumbnail
-            if (!empty($arrayParameters['image_tmp_path'])) {
-                copy(
+            $path_without_extension = $path.'/'.$arrayParameters['name'];
+
+            // create the view file
+            $this->createPhtmlFile($path_without_extension.'.phtml', $arrayParameters['html']);
+
+            // if there is a thumbnail, we copy it from the tmp path to the site mtpl path
+            if (! empty($arrayParameters['image_tmp_path'])) {
+                $this->copyThumbnail(
                     $arrayParameters['image_tmp_path'],
-                    $path . '/' . $arrayParameters['name'] . '.' . $arrayParameters['img_ext']
+                    $path_without_extension.'.'.$arrayParameters['img_ext']
                 );
+
+                $thumbnail = $module.'/miniTemplatesTinyMce/'.$arrayParameters['name'].'.'. $arrayParameters['img_ext'];
             }
 
-            if (! empty($cat_id)) {
-                $table = $this->getServiceManager()->get('MelisCmsMiniTplCategoryTemplateTable');
-                $lastOrder = $table->getLatestOrder($cat_id)->current();
-
-                if (! empty($lastOrder))
-                    $lastOrder = (int)$lastOrder->mtplct_order + 1;
-                else
-                    $lastOrder = 1;
-
-                $table->save(
-                    [
-                        'mtplct_site_id' => $arrayParameters['site_id'],
-                        'mtplct_category_id' => $cat_id,
-                        'mtplct_template_name' => $arrayParameters['name'],
-                        'mtplct_order' => $lastOrder
-                    ]
-                );
-            }
+            // if category id is passed, we will link the template into a category
+            if (! empty($cat_id))
+                $this->saveMiniTemplateToCategory($cat_id, $site_id, $arrayParameters['name']);
 
             $success = 1;
         }
 
+        // results
         $arrayParameters['results'] = [
             'success' => $success,
             'errors' => $errors,
             'data' => [
                 'module' => $module,
                 'template_name' => $arrayParameters['name'],
-                'thumbnail' => (! empty($arrayParameters['image_tmp_path']))
-                    ? $module . '/miniTemplatesTinyMce/' . $arrayParameters['name'] . '.' . $arrayParameters['img_ext']
-                    : '',
+                'thumbnail' => $thumbnail,
             ]
         ];
-        $arrayParameters = $this->sendEvent('meliscms_mini_template_service_create_template_end', $arrayParameters);
+
+        // event end
+        $arrayParameters = $this->sendEvent(
+            'meliscms_mini_template_service_create_template_end',
+            $arrayParameters
+        );
+
         return $arrayParameters['results'];
     }
 
@@ -102,9 +102,16 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
      * @return mixed
      */
     public function updateMiniTemplate($current_data, $new_data, $image = false) {
+        // params to array
         $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
-        $arrayParameters = $this->sendEvent('meliscms_mini_template_service_update_template_start', $arrayParameters);
 
+        // event start
+        $arrayParameters = $this->sendEvent(
+            'meliscms_mini_template_service_update_template_start',
+            $arrayParameters
+        );
+
+        // initialize variables
         $current_data = $arrayParameters['current_data'];
         $new_data = $arrayParameters['new_data'];
         $image = $arrayParameters['image'] != 'false';
@@ -113,17 +120,17 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
         $table = $this->getServiceManager()->get('MelisCmsMiniTplCategoryTemplateTable');
 
-        $current_site = $siteTable->getEntryById($current_data['miniTemplateSite'])->current();
-        $current_module = $current_site->site_name;
-        $current_site_path = $this->getModuleMiniTemplatePath($current_site->site_name);
+        $current_module = $current_data['miniTemplateSiteModule'];
+        $current_site_path = $this->getModuleMiniTemplatePath($current_module);
         $current_template_name = $current_data['miniTemplateName'];
 
-        $new_site = $siteTable->getEntryById($new_data['miniTemplateSite'])->current();
-        $new_site_path = $this->getModuleMiniTemplatePath($new_site->site_name);
+        $new_site_module = $new_data['miniTemplateSiteModule'];
+        $new_site_path = $this->getModuleMiniTemplatePath($new_site_module);
 
         $success = 1;
         $errors = [];
 
+        // check if path has errors
         if (is_array($new_site_path)) {
             $errors[] = [
                 'error' => $new_site_path['error'],
@@ -139,78 +146,70 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         }
 
         if (empty($errors)) {
-            try {
-                if ($current_data['miniTemplateSite'] != $new_data['miniTemplateSite']) {
-                    $thumbnail_file = $this->getMiniTemplateThumbnail($current_site_path, $current_template_name);
-                    // Move thumbnail to new site
-                    if (!empty($thumbnail_file)) {
-                        rename($thumbnail_file['path'], $new_site_path . '/' . $thumbnail_file['file']);
-                    }
-                    // Move template to new site
-                    rename(
-                        $current_site_path . '/' . $current_template_name . '.phtml',
-                        $new_site_path . '/' . $current_template_name . '.phtml'
-                    );
-                    // remove link to category if there is any
-                    $table->deleteByField('mtplct_template_name', $current_template_name);
-                    $current_site_path = $new_site_path;
-                    $current_module = $new_site->site_name;
-                }
-
-                if ($current_data['miniTemplateName'] !== $new_data['miniTemplateName']) {
-                    // Update the current template
-                    rename(
-                        $current_site_path . '/' . $current_template_name . '.phtml',
-                        $current_site_path . '/' . $new_data['miniTemplateName'] . '.phtml'
-                    );
-                    // update entry to category template table
-                    $table->update(
-                        [
-                            'mtplct_template_name' => $new_data['miniTemplateName']
-                        ],
-                        'mtplct_template_name',
-                        $current_template_name
-                    );
-                    // If there is a thumbnail, rename it
-                    $thumbnail_file = $this->getMiniTemplateThumbnail($current_site_path, $current_template_name);
-                    if (!empty($thumbnail_file)) {
-                        $extension = explode('.', $thumbnail_file['file'])[1];
-                        rename(
-                            $thumbnail_file['path'],
-                            $current_site_path . '/' . $new_data['miniTemplateName'] . '.' . $extension
-                        );
-                    }
-                    $current_template_name = $new_data['miniTemplateName'];
-                }
-
-                // Update html
-                $file = fopen($current_site_path . '/' . $current_template_name . '.phtml', 'w');
-                fwrite($file, $new_data['miniTemplateHtml']);
-                fclose($file);
-
-                // Update thumbnail
+            if ($current_data['miniTemplateSiteModule'] != $new_data['miniTemplateSiteModule']) {
                 $thumbnail_file = $this->getMiniTemplateThumbnail($current_site_path, $current_template_name);
-                if (! empty($new_data['miniTemplateThumbnail']['name'])) {
-                    if (!empty($thumbnail_file))
-                        unlink($thumbnail_file['path']);
+                // Move thumbnail to new site
+                if (!empty($thumbnail_file))
+                    rename($thumbnail_file['path'], $new_site_path . '/' . $thumbnail_file['file']);
+                // Move template to new site
+                rename(
+                    $current_site_path . '/' . $current_template_name . '.phtml',
+                    $new_site_path . '/' . $current_template_name . '.phtml'
+                );
+                // remove link to category if there is any
+                $table->deleteByField('mtplct_template_name', $current_template_name);
+                $current_site_path = $new_site_path;
+                $current_module = $new_site_module;
+            }
 
-                    $extension = explode('.', $new_data['miniTemplateThumbnail']['name'])[1];
-
-                    copy(
-                        $new_data['miniTemplateThumbnail']['tmp_name'],
-                        $current_site_path . '/' . $current_template_name . '.' . $extension
+            if ($current_data['miniTemplateName'] !== $new_data['miniTemplateName']) {
+                // Update the current template
+                rename(
+                    $current_site_path . '/' . $current_template_name . '.phtml',
+                    $current_site_path . '/' . $new_data['miniTemplateName'] . '.phtml'
+                );
+                // update entry to category template table
+                $table->update(
+                    [
+                        'mtplct_template_name' => $new_data['miniTemplateName']
+                    ],
+                    'mtplct_template_name',
+                    $current_template_name
+                );
+                // If there is a thumbnail, rename it
+                $thumbnail_file = $this->getMiniTemplateThumbnail($current_site_path, $current_template_name);
+                if (!empty($thumbnail_file)) {
+                    $extension = explode('.', $thumbnail_file['file'])[1];
+                    rename(
+                        $thumbnail_file['path'],
+                        $current_site_path . '/' . $new_data['miniTemplateName'] . '.' . $extension
                     );
-                } else {
-                    if (! empty($image)) {
-                        if (!empty($thumbnail_file['path'])) {
-                            if (file_exists($thumbnail_file['path']))
-                                unlink($thumbnail_file['path']);
-                        }
+                }
+                $current_template_name = $new_data['miniTemplateName'];
+            }
+
+            // Update html
+            $this->updatePhtmlFileContents($current_site_path . '/' . $current_template_name . '.phtml', $new_data['miniTemplateHtml']);
+
+            // Update thumbnail
+            $thumbnail_file = $this->getMiniTemplateThumbnail($current_site_path, $current_template_name);
+            if (! empty($new_data['miniTemplateThumbnail']['name'])) {
+                if (!empty($thumbnail_file))
+                    unlink($thumbnail_file['path']);
+
+                $extension = explode('.', $new_data['miniTemplateThumbnail']['name'])[1];
+
+                copy(
+                    $new_data['miniTemplateThumbnail']['tmp_name'],
+                    $current_site_path . '/' . $current_template_name . '.' . $extension
+                );
+            } else {
+                if (! empty($image)) {
+                    if (!empty($thumbnail_file['path'])) {
+                        if (file_exists($thumbnail_file['path']))
+                            unlink($thumbnail_file['path']);
                     }
                 }
-            } catch (\Exception $e) {
-                $errors[] = $e->getMessage();
-                $success = 0;
             }
         } else {
             $success = 0;
@@ -229,7 +228,12 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             ]
         ];
 
-        $arrayParameters = $this->sendEvent('meliscms_mini_template_service_update_template_end', $arrayParameters);
+        // event end
+        $arrayParameters = $this->sendEvent(
+            'meliscms_mini_template_service_update_template_end',
+            $arrayParameters
+        );
+
         return $arrayParameters['results'];
     }
 
@@ -743,10 +747,13 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             foreach ($files as $file) {
                 $exploded = explode('.', $file);
                 $templateName = $exploded[0];
-                $extension = $exploded[1];
 
-                if (in_array($extension, ['phtml'])) {
-                    array_push($templates, $templateName);
+                if (! empty($exploded[1])) {
+                    $extension = $exploded[1];
+
+                    if (in_array($extension, ['phtml'])) {
+                        array_push($templates, $templateName);
+                    }
                 }
             }
         }
@@ -845,6 +852,15 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
     private function checkCreateMiniTemplateErrors($path, $template_name, $site_module, &$errors) {
         $translator = $this->getServiceManager()->get('translator');
 
+        // check if path has errors
+        if (is_array($path)) {
+            $errors[] = [
+                'error' => $path['error'],
+                'label' => $translator->translate('tr_meliscms_mini_template_error')
+            ];
+        }
+
+        // check if file is already existing
         if (file_exists($path . '/' . $template_name . '.phtml')) {
             $errors['miniTemplateName'] = [
                 'error' => $translator->translate('tr_meliscms_mini_template_manager_tool_form_create_error_file_already_exists'),
@@ -1098,5 +1114,44 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             'success' => 0,
             'error' => $this->getServiceManager()->get('translator')->translate($error)
         ];
+    }
+
+    private function createPhtmlFile($filename, $html) {
+        $file = fopen($filename, 'wb');
+        fwrite($file, $html);
+        fclose($file);
+        chmod($filename, 0777);
+    }
+
+    private function updatePhtmlFileContents($filename, $html) {
+        $file = fopen($filename, 'w');
+        fwrite($file, $html);
+        fclose($file);
+    }
+
+    private function copyThumbnail($img_tmp_path, $filename) {
+        copy(
+            $img_tmp_path,
+            $filename
+        );
+    }
+
+    private function saveMiniTemplateToCategory($category_id, $site_id, $name) {
+        $table = $this->getServiceManager()->get('MelisCmsMiniTplCategoryTemplateTable');
+        $lastOrder = $table->getLatestOrder($category_id)->current();
+
+        if (! empty($lastOrder))
+            $lastOrder = (int)$lastOrder->mtplct_order + 1;
+        else
+            $lastOrder = 1;
+
+        $table->save(
+            [
+                'mtplct_site_id' => $site_id,
+                'mtplct_category_id' => $category_id,
+                'mtplct_template_name' => $name,
+                'mtplct_order' => $lastOrder
+            ]
+        );
     }
 }

@@ -32,7 +32,7 @@ $(function () {
             'new_template',
             {
                 templateName: 'new_template',
-                siteId: $(table_site_select).find('option:selected').data('id')
+                module: $(table_site_select).find('option:selected').val()
             }
         );
     });
@@ -69,6 +69,7 @@ $(function () {
         melisCoreTool.pending(add_btn);
         var formData = new FormData(this);
         formData.append('categoryId', $('#mini-template-manager-category-id').val());
+        formData.append('siteId', $('#mini-template-manager-site-id').val());
 
         $.ajax({
             type: 'POST',

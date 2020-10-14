@@ -51,7 +51,7 @@ $(function () {
                     'meliscms_mini_template_manager_tool_add',
                     {
                         templateName: 'new_template',
-                        siteId:$(siteSelect).find('option:selected').data('id')
+                        module: $(siteSelect).find('option:selected').val()
                     },
                     'id_meliscms_mini_template_manager_tool'
                 );
@@ -430,6 +430,7 @@ $(function () {
                                                 {
                                                     templateName: 'new_template',
                                                     siteId: $(siteSelect).find('option:selected').data('id'),
+                                                    module: $(siteSelect).find('option:selected').val(),
                                                     categoryId: node.original.categoryId
                                                 },
                                                 'id_meliscms_mini_template_manager_tool'

@@ -33,9 +33,8 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
      * @return ViewModel
      */
     public function renderMiniTemplateManagerToolTableSitesAction() {
-        $site_service = $this->getServiceManager()->get('MelisCmsSiteService');
         $view = new ViewModel();
-        $view->sites = $site_service->getAllSites();
+        $view->site_modules = $this->getSiteModules();
         return $view;
     }
 
@@ -65,16 +64,16 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
      * @return ViewModel
      */
     public function renderMiniTemplateManagerToolAddBodyFormAction() {
-        $form = $this->getForm($this->module, $this->tool_key, $this->form_key);
         $params = $this->params()->fromQuery();
+        $form = $this->getForm($this->module, $this->tool_key, $this->form_key);
+        $form->get('miniTemplateSiteModule')->setValueOptions($this->getSiteModules());
 
         if ($params['templateName'] !== 'new_template') {
             $site_service = $this->getServiceManager()->get('MelisCmsSiteService');
             $path = $site_service->getModulePath($params['module']) . '/public/miniTemplatesTinyMce/';
-            $site = $site_service->getSiteByModule($params['module']);
 
             $data = [
-                'miniTemplateSite' => $site->site_id,
+                'miniTemplateSiteModule' => $params['module'],
                 'miniTemplateName' => $params['templateName'],
                 'miniTemplateHtml' => file_get_contents($path . $params['templateName'] . '.phtml')
             ];
@@ -84,7 +83,7 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
             $form->setAttribute('name', 'mini_template_manager_tool_update');
             $form->setData($data);
         } else {
-            $form->setData(['miniTemplateSite' => $params['siteId']]);
+            $form->setData(['miniTemplateSiteModule' => $params['module']]);
         }
 
         $view = new ViewModel();
@@ -95,6 +94,7 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
         $view->current_template = $params['templateName'] ?? '';
         $view->categoryId = $params['categoryId'] ?? '';
         $view->imgSource = $params['thumbnail'] ?? '';
+        $view->siteId = $params['siteId'] ?? '';
         return $view;
     }
 
@@ -202,20 +202,26 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
      * @return JsonModel
      */
     public function createMiniTemplateAction() {
-        $service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
         $data = array_merge((array) $this->getRequest()->getPost(), $this->params()->fromFiles());
 
         $this->getEventManager()->trigger('meliscms_mini_template_manager_create_start', $this, $data);
 
         $cat_id = $data['categoryId'];
         unset($data['categoryId']);
+        $siteId = $data['siteId'];
+        unset($data['siteId']);
+
+        $service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
         $form = $this->getForm($this->module, $this->tool_key, $this->form_key);
         $form->setData($data);
         $success = 0;
         $errors = [];
         $message = 'tr_meliscms_mini_template_create_fail';
 
-        if ($form->isValid()) {
+        if (!$form->isValid())
+            $errors = $this->getFormErrors($form->getMessages(), $form);
+
+        if (empty($errors)) {
             $uploaded_img = null;
             $uploaded_img_extension = null;
 
@@ -224,15 +230,21 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
                 $uploaded_img_extension = explode('/', $data['miniTemplateThumbnail']['type'])[1];
             }
 
-            $res = $service->createMiniTemplate($data['miniTemplateSite'], $data['miniTemplateName'], $data['miniTemplateHtml'], $uploaded_img, $uploaded_img_extension, $cat_id);
+            $res = $service->createMiniTemplate(
+                $data['miniTemplateSiteModule'],
+                $data['miniTemplateName'],
+                $data['miniTemplateHtml'],
+                $uploaded_img,
+                $uploaded_img_extension,
+                $cat_id,
+                $siteId
+            );
 
             $success = $res['success'];
             $errors = $res['errors'];
 
             if ($success)
                 $message = 'tr_meliscms_mini_template_created_successfully';
-        } else {
-            $errors = $this->getFormErrors($form->getMessages(), $form);
         }
 
         $response = [
@@ -257,24 +269,20 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
      */
     public function updateMiniTemplateAction() {
         $data = array_merge((array) $this->getRequest()->getPost(), $this->params()->fromFiles());
-
         $this->getEventManager()->trigger('meliscms_mini_template_manager_update_start', $this, $data);
 
         $current_data = [
-            'miniTemplateSite' => $data['current_module'],
+            'miniTemplateSiteModule' => $data['current_module'],
             'miniTemplateName' => $data['current_template']
         ];
         $new_data = [
-            'miniTemplateSite' => $data['miniTemplateSite'],
+            'miniTemplateSiteModule' => $data['miniTemplateSiteModule'],
             'miniTemplateName' => $data['miniTemplateName'],
             'miniTemplateHtml' => $data['miniTemplateHtml'],
             'miniTemplateThumbnail' => $data['miniTemplateThumbnail'],
         ];
 
         $service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
-        $site_service = $this->getServiceManager()->get('MelisCmsSiteService');
-        $current_site_data = $site_service->getSiteByModule($current_data['miniTemplateSite']);
-        $current_data['miniTemplateSite'] = $current_site_data->site_id;
         $success = 0;
         $message = 'tr_meliscms_mini_template_update_fail';
 
@@ -323,15 +331,13 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
      */
     private function checkUpdateErrors($form, $current_data, $new_data) {
         $site_service = $this->getServiceManager()->get('MelisCmsSiteService');
-        $current_site = $site_service->getSiteById($current_data['miniTemplateSite']);
-        $current_site_path = $site_service->getModulePath($current_site->site_name) . '/public/miniTemplatesTinyMce';
-        $new_site = $site_service->getSiteById($new_data['miniTemplateSite']);
-        $new_site_path = $site_service->getModulePath($new_site->site_name) . '/public/miniTemplatesTinyMce';
+        $current_site_path = $site_service->getModulePath($current_data['miniTemplateSiteModule']) . '/public/miniTemplatesTinyMce';
+        $new_site_path = $site_service->getModulePath($new_data['miniTemplateSiteModule']) . '/public/miniTemplatesTinyMce';
         $translator = $this->getServiceManager()->get('translator');
         $errors = [];
 
         if ($form->isValid()) {
-            if ($current_site->site_id != $new_data['miniTemplateSite']) {
+            if ($current_data['miniTemplateSiteModule'] != $new_data['miniTemplateSiteModule']) {
                 if (file_exists($new_site_path . '/' . $new_data['miniTemplateName'] . '.phtml')) {
                     $errors['miniTemplateName'] = [
                         'error' => $translator->translate('tr_meliscms_mini_template_manager_tool_form_create_error_file_already_exists'),
@@ -477,5 +483,18 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
             $max_size = $this->asBytes($max_size);
 
         return $max_size;
+    }
+
+    private function getSiteModules() {
+        $site_service = $this->getServiceManager()->get('MelisCmsSiteService');
+        $sites = $site_service->getAllSites();
+        $site_modules = [];
+
+        foreach ($sites as $site) {
+            if (! in_array($site['site_name'], $site_modules))
+                $site_modules[$site['site_name']] = $site['site_name'];
+        }
+
+        return $site_modules;
     }
 }
