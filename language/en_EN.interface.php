@@ -756,7 +756,7 @@
         'tr_meliscms_mini_template_manager_tool_table_image' => 'Image',
         'tr_meliscms_mini_template_manager_tool_table_path' => 'Path',
 
-        'tr_meliscms_mini_template_manager_tool_form_site' => 'Site',
+        'tr_meliscms_mini_template_manager_tool_form_site_module' => 'Site modules',
         'tr_meliscms_mini_template_manager_tool_form_site_tooltip' => 'The site where the mini-template will be created',
         'tr_meliscms_mini_template_manager_tool_form_name' => 'Name',
         'tr_meliscms_mini_template_manager_tool_form_name_tooltip' => 'The name for the mini-template',

@@ -758,7 +758,7 @@
         'tr_meliscms_mini_template_manager_tool_table_image' => 'Image',
         'tr_meliscms_mini_template_manager_tool_table_path' => 'Chemin',
 
-        'tr_meliscms_mini_template_manager_tool_form_site' => 'Site',
+        'tr_meliscms_mini_template_manager_tool_form_site_module' => 'Modules de sites',
         'tr_meliscms_mini_template_manager_tool_form_site_tooltip' => 'Le site où le mini-template sera créé',
         'tr_meliscms_mini_template_manager_tool_form_name' => 'Nom',
         'tr_meliscms_mini_template_manager_tool_form_name_tooltip' => 'Le nom du mini-template',

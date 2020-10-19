@@ -84,7 +84,7 @@ return [
                                         'name' => 'miniTemplateSiteModule',
                                         'type' => 'select',
                                         'options' => [
-                                            'label' => 'tr_meliscms_tool_site_site_module',
+                                            'label' => 'tr_meliscms_mini_template_manager_tool_form_site_module',
                                             'tooltip' => 'tr_meliscms_mini_template_manager_tool_form_site_tooltip',
                                             'label_options' => [
                                                 'disable_html_escape' => true,
