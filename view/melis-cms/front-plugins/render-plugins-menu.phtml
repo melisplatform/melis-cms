@@ -135,7 +135,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                                             unset($children['isCategory']);
                                                                             ?>
                                                                             <?php if (! empty($children)) : ?>
-                                                                                <span class="melis-cms-filter-btn-mini-tpl-category"><?= $config['text'] ?>
+                                                                                <span class="melis-cms-filter-btn-mini-tpl-category"><?= htmlentities($config['text']) ?>
                                                                                     <?php if(in_array($pluginConfig['title'],$subsectionHasNewPlugins)) {?>
                                                                                         <div class="melis-plugins-icon-new-sub-child">
                                                                                             <span class="melis-plugins-icon-new new-plugin-indicator">NEW!</span>
