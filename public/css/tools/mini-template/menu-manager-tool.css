@@ -360,3 +360,7 @@ table#tableMiniTemplateMenuManagerPlugins.loading-changes tbody tr td {
     vertical-align: middle;
     color: #7D7B7B;
 }
+
+ul.dropdown-menu.mini-template-menu-manager-lang-select.show {
+    cursor: pointer;
+}
