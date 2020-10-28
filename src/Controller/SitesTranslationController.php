@@ -170,7 +170,7 @@ class SitesTranslationController extends MelisAbstractActionController
         $success = false;
         //get the request
         $request = $this->getRequest();
-        $postData = get_object_vars($request->getPost());
+        $postData = $request->getPost()->toArray();
 
         $melisSiteTranslationService = $this->getServiceManager()->get('MelisSiteTranslationService');
         $mstTable = $this->getServiceManager()->get('MelisSiteTranslationTable');

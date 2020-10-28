@@ -416,13 +416,13 @@ class ToolStyleController extends MelisAbstractActionController
         $factory->setFormElementManager($formElements);
         $form = $factory->createForm($appConfigForm);
 
-        $postValues = get_object_vars($this->getRequest()->getPost());
+        $postValues = $this->getRequest()->getPost()->toArray();
 
         if($this->getRequest()->isPost()){
 
             $this->getEventManager()->trigger('meliscms_style_save_details_start', $this, array());
 
-            $postValues = get_object_vars($this->getRequest()->getPost());
+            $postValues = $this->getRequest()->getPost()->toArray();
             $postValues = $melisTool->sanitizePost($postValues);
 
             if (!empty($postValues['style_id'])){
@@ -504,7 +504,7 @@ class ToolStyleController extends MelisAbstractActionController
         {
 
             if(!isset($postValues['page_duplicate_event_flag'])) {
-                $postValues = get_object_vars($request->getPost());
+                $postValues = $request->getPost()->toArray();
                 $postValues = $melisTool->sanitizePost($postValues);
             }
 

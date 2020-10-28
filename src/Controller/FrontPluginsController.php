@@ -144,7 +144,7 @@ class FrontPluginsController extends MelisAbstractActionController
     {
         $translator = $this->getServiceManager()->get('translator');
 
-        $parameters = get_object_vars($this->getRequest()->getPost());
+        $parameters = $this->getRequest()->getPost()->toArray();
 
         $module = (!empty($parameters['melisModule'])) ? $parameters['melisModule'] : '';
         $pluginName = (!empty($parameters['melisPluginName'])) ? $parameters['melisPluginName'] : '';
