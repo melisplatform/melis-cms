@@ -42,128 +42,128 @@
 					},
 					contextMenu: {
 						menu: {
-								'new': {
-										'name': translations.tr_meliscms_menu_new,
-										'icon': 'paste'
-								},
-								'edit': {
-										'name': translations.tr_meliscms_menu_edit,
-										'icon': 'edit'
-								},
-								'delete': {
-										'name': translations.tr_meliscms_menu_delete,
-										'icon': 'delete'
-								},
-								'dupe': {
-										'name': translations.tr_meliscms_menu_dupe,
-										'icon': 'copy'
-								},
-								'export': {
-										'name': translations.tr_melis_cms_tree_export_page,
-										'icon': 'export'
-								},
-								'import': {
-										'name': translations.tr_melis_cms_page_tree_import,
-										'icon': 'import'
-								}
+							'new': {
+									'name': translations.tr_meliscms_menu_new,
+									'icon': 'paste'
+							},
+							'edit': {
+									'name': translations.tr_meliscms_menu_edit,
+									'icon': 'edit'
+							},
+							'delete': {
+									'name': translations.tr_meliscms_menu_delete,
+									'icon': 'delete'
+							},
+							'dupe': {
+									'name': translations.tr_meliscms_menu_dupe,
+									'icon': 'copy'
+							},
+							'export': {
+									'name': translations.tr_melis_cms_tree_export_page,
+									'icon': 'export'
+							},
+							'import': {
+									'name': translations.tr_melis_cms_page_tree_import,
+									'icon': 'import'
+							}
 						},
 						actions: function(node, action, options) {
-								if (action === 'new') {
-									var data = node.data;
+							if (action === 'new') {
+								var data = node.data;
 
-									//close page creation tab and open new one (in case if its already open - updated parent ID)
-									melisHelper.tabClose('0_id_meliscms_page');
-									melisHelper.tabOpen(translations.tr_meliscms_page_creation, 'fa-file-text-o', '0_id_meliscms_page', 'meliscms_page_creation', {
-											idPage: 0,
-											idFatherPage: data.melisData.page_id
-									});
-								}
-								if (action === 'edit') {
-									var data = node.data;
-									melisHelper.tabOpen(data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey, {
-											idPage: data.melisData.page_id
-									});
-								}
-								if (action === 'delete') {
-									var data = node.data;
-									var zoneId = data.melisData.item_zoneid;
-									var idPage = data.melisData.page_id;
-									var parentNode = (node.getParent().key == 'root_1') ? -1 : node.getParent().key;
-									var $resetView = $("#leftResetTreeView");
-									// var parentNode = ( node.key == 'root_1') ? -1 : node.getParent().key;
+								//close page creation tab and open new one (in case if its already open - updated parent ID)
+								melisHelper.tabClose('0_id_meliscms_page');
+								melisHelper.tabOpen(translations.tr_meliscms_page_creation, 'fa-file-text-o', '0_id_meliscms_page', 'meliscms_page_creation', {
+										idPage: 0,
+										idFatherPage: data.melisData.page_id
+								});
+							}
+							if (action === 'edit') {
+								var data = node.data;
+								melisHelper.tabOpen(data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey, {
+										idPage: data.melisData.page_id
+								});
+							}
+							if (action === 'delete') {
+								var data = node.data;
+								var zoneId = data.melisData.item_zoneid;
+								var idPage = data.melisData.page_id;
+								var parentNode = (node.getParent().key == 'root_1') ? -1 : node.getParent().key;
+								var $resetView = $("#leftResetTreeView");
+								// var parentNode = ( node.key == 'root_1') ? -1 : node.getParent().key;
 
-									// check if page to be delete is open or not
-									var openedOrNot = $(".tabsbar a[data-id='" + zoneId + "']").parent("li");
+								// check if page to be delete is open or not
+								var openedOrNot = $(".tabsbar a[data-id='" + zoneId + "']").parent("li");
 
-									// delete page confirmation
-									melisCoreTool.confirm(
-											translations.tr_meliscms_menu_delete,
-											translations.tr_meliscms_menu_cancel,
-											translations.tr_meliscms_delete_confirmation,
-											translations.tr_meliscms_delete_confirmation_msg,
-											function() {
-												// reload and expand the treeview
-												melisCms.refreshTreeview(parentNode, 1);
+								// delete page confirmation
+								melisCoreTool.confirm(
+										translations.tr_meliscms_menu_delete,
+										translations.tr_meliscms_menu_cancel,
+										translations.tr_meliscms_delete_confirmation,
+										translations.tr_meliscms_delete_confirmation_msg,
+										function() {
+											// reload and expand the treeview
+											melisCms.refreshTreeview(parentNode, 1);
 
-												// check if node has children if TRUE then cannot be deleted
-												$.ajax({
-													url: '/melis/MelisCms/Page/deletePage?idPage=' + idPage,
-													encode: true
-												}).done(function(data) {
-													if (data.success === 1) {
-														//close the page if its open. do nothing if its not open
-														if (openedOrNot.length === 1) {
-															melisHelper.tabClose(zoneId);
-														}
-
-														// notify deleted page
-														melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
-
-														// update flash messenger values
-														melisCore.flashMessenger();
-
-													} else {
-														melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, '#000');
+											// check if node has children if TRUE then cannot be deleted
+											$.ajax({
+												url: '/melis/MelisCms/Page/deletePage?idPage=' + idPage,
+												encode: true
+											}).done(function(data) {
+												if (data.success === 1) {
+													//close the page if its open. do nothing if its not open
+													if (openedOrNot.length === 1) {
+														melisHelper.tabClose(zoneId);
 													}
-												}).fail(function(xhr, textStatus, errorThrown) {
-													alert(translations.tr_meliscore_error_message);
-												});
-											});
-									
-								}
-								if (action === 'dupe') {
-									var data = node.data;
-									// melisHelper.tabOpen( data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,  { sourcePageId: data.melisData.page_id } );
 
-									// initialation of local variable
-									zoneId = 'id_meliscms_tools_tree_modal_form_handler';
-									melisKey = 'meliscms_tools_tree_modal_form_handler';
-									modalUrl = 'melis/MelisCms/TreeSites/renderTreeSitesModalContainer';
-									// requesitng to create modal and display after
-									melisHelper.createModal(zoneId, melisKey, false, {
-											'sourcePageId': data.melisData.page_id
-									}, modalUrl, function() {});
+													// notify deleted page
+													melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
+
+													// update flash messenger values
+													melisCore.flashMessenger();
+
+												} else {
+													melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, '#000');
+												}
+											}).fail(function(xhr, textStatus, errorThrown) {
+												alert(translations.tr_meliscore_error_message);
+											});
+										});
+								
+							}
+							if (action === 'dupe') {
+								var data = node.data;
+								// melisHelper.tabOpen( data.melisData.page_title, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,  { sourcePageId: data.melisData.page_id } );
+
+								// initialation of local variable
+								zoneId = 'id_meliscms_tools_tree_modal_form_handler';
+								melisKey = 'meliscms_tools_tree_modal_form_handler';
+								modalUrl = 'melis/MelisCms/TreeSites/renderTreeSitesModalContainer';
+								// requesitng to create modal and display after
+								melisHelper.createModal(zoneId, melisKey, false, {
+										'sourcePageId': data.melisData.page_id
+								}, modalUrl, function() {});
+							}
+							if ( action === 'export' || action === 'import' ) {
+								var modalUrl = "/melis/MelisCms/Page/renderPageExportImportModalHandler";
+								var data = node.data;
+								if ( action === 'export' ) {
+									melisHelper.createModal('id_meliscms_page_export_modal', 'meliscms_page_export_modal', true, {'pageId':data.melisData.page_id}, modalUrl, function () {});
 								}
-								if ( action === 'export' || action === 'import' ) {
-									var modalUrl = "/melis/MelisCms/Page/renderPageExportImportModalHandler";
-									var data = node.data;
-									if ( action === 'export' ) {
-										melisHelper.createModal('id_meliscms_page_export_modal', 'meliscms_page_export_modal', true, {'pageId':data.melisData.page_id}, modalUrl, function () {});
-									}
-									else {
-										melisHelper.createModal(
-											'id_meliscms_page_import_modal',
-											'meliscms_page_import_modal',
-											true,
-											{
-												'pageId':data.melisData.page_id
-											},
-											modalUrl,
-											function () {
-											}
-										);
-									}
+								else {
+									melisHelper.createModal(
+										'id_meliscms_page_import_modal',
+										'meliscms_page_import_modal',
+										true,
+										{
+											'pageId':data.melisData.page_id
+										},
+										modalUrl,
+										function () {
+										}
+									);
 								}
+							}
 						}
 					},
 					lazyLoad: function(event, data) {
@@ -172,8 +172,8 @@
 						data.result = {
 							url: '/melis/MelisCms/TreeSites/get-tree-pages-by-page-id?nodeId=' + pageId,
 							data: {
-									mode: 'children',
-									parent: data.node.key
+								mode: 'children',
+								parent: data.node.key
 							},
 							cache: false,
 						}
@@ -187,13 +187,14 @@
 						$("input[name=left_tree_search]").trigger("focus");
 
 						var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
+						//var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
 
 						if ( tree.count() === 0 ) {
 							$(".meliscms-search-box.sidebar-treeview-search").hide();
 							// Checking if the user has a Page rights to access
 							// -1 is the value for creating new page right
 							$.get('/melis/MelisCms/TreeSites/checkUserPageTreeAccress', {
-									idPage: -1
+								idPage: -1
 							}, function(res) {
 								if (res.isAccessible) {
 									$("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='btn btn-success'>" + translations.tr_meliscms_create_page + "</span></div>");
@@ -208,12 +209,13 @@
 					click: function(event, data) {
 						targetType = data.targetType;
 						if ( targetType === "title" ) {
-								data.node.setExpanded();
+							data.node.setExpanded();
 
 							// open page on click on mobile . desktop is double click
 							if ( melisCore.screenSize <= 1024 ) {
-									var data = data.node.data;
-									var pageName = data.melisData.page_id + " - " + data.melisData.page_title;
+								var data = data.node.data;
+								var pageName = data.melisData.page_id + " - " + data.melisData.page_title;
+
 									melisHelper.tabOpen(pageName, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey, {
 											idPage: data.melisData.page_id
 									}, null, melisCms.pageTabOpenCallback(data.melisData.page_id));
@@ -246,9 +248,9 @@
 							}, null, melisCms.pageTabOpenCallback(data.melisData.page_id));
 
 							// check for loading on page iframe
-							//if ( typeof loader !== undefined ) {
+							if ( typeof loader !== undefined ) {
 								loader.checkPageLoading( data.melisData.item_zoneid );
-							//}
+							}
 
 							$('.hasNiceScroll').getNiceScroll().resize();
 
@@ -258,7 +260,7 @@
 						//RUNS ONLY ONCE
 
 						// if there is no/empty pages in the treeview
-						var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
+						//var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
 				
 						/* // PAGE ACCESS user rights checking
 						$.ajax({
@@ -380,47 +382,47 @@
 						},
 						dragDrop: function(node, data) {
 							node.setExpanded(true).always(function() {
-									// This function MUST be defined to enable dropping of items on the tree.
-									// data.hitMode is 'before', 'after', or 'over'.
-									// We could for example move the source to the new target:
+								// This function MUST be defined to enable dropping of items on the tree.
+								// data.hitMode is 'before', 'after', or 'over'.
+								// We could for example move the source to the new target:
 
-									// catch if its 'root_*' parent
-									var isRootOldParentId = data.otherNode.getParent().key.toString();
-									var oldParentId = (isRootOldParentId.includes('root')) ? -1 : data.otherNode.getParent().key;
+								// catch if its 'root_*' parent
+								var isRootOldParentId = data.otherNode.getParent().key.toString();
+								var oldParentId = (isRootOldParentId.includes('root')) ? -1 : data.otherNode.getParent().key;
 
-									// move the node to drag parent ------------------------------------------------
+								// move the node to drag parent ------------------------------------------------
 
-									data.otherNode.moveTo(node, data.hitMode);
+								data.otherNode.moveTo(node, data.hitMode);
 
-									var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
+								//var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
 
-									var draggedPage = data.otherNode.key
+								var draggedPage = data.otherNode.key
 
-									// catch if its 'root_*' parent
-									var isRootNewParentId = node.getParent().key.toString();
-									var newParentId = (isRootNewParentId.includes('root')) ? -1 : node.getParent().key;
+								// catch if its 'root_*' parent
+								var isRootNewParentId = node.getParent().key.toString();
+								var newParentId = (isRootNewParentId.includes('root')) ? -1 : node.getParent().key;
 
-									if (data.hitMode == 'over') {
-											newParentId = data.node.key;
-									}
+								if (data.hitMode == 'over') {
+										newParentId = data.node.key;
+								}
 
-									var newIndexPosition = data.otherNode.getIndex() + 1;
+								var newIndexPosition = data.otherNode.getIndex() + 1;
 
-									//send data to apply new position of the dragged node
-									var datastring = {
-											idPage: draggedPage,
-											oldFatherIdPage: oldParentId,
-											newFatherIdPage: newParentId,
-											newPositionIdPage: newIndexPosition
-									};
+								//send data to apply new position of the dragged node
+								var datastring = {
+									idPage: draggedPage,
+									oldFatherIdPage: oldParentId,
+									newFatherIdPage: newParentId,
+									newPositionIdPage: newIndexPosition
+								};
 
-									$.ajax({
-											url: '/melis/MelisCms/Page/movePage',
-											data: datastring,
-											encode: true
-									}).done(function(data) {}).fail(function(xhr, textStatus, errorThrown) {
-											alert(translations.tr_meliscore_error_message);
-									});
+								$.ajax({
+									url: '/melis/MelisCms/Page/movePage',
+									data: datastring,
+									encode: true
+								}).done(function(data) {}).fail(function(xhr, textStatus, errorThrown) {
+									alert(translations.tr_meliscore_error_message);
+								});
 							});
 							// end
 						}
@@ -462,9 +464,9 @@
 
 		$body.on("click", 'button[data-inputid="#destinationPageId"]', function() {
 			$('[name="use_root"]').each(function() {
-					if ($(this).is(':checked')) {
-							$(this).prop("checked", false);
-					}
+				if ($(this).is(':checked')) {
+					$(this).prop("checked", false);
+				}
 			})
 			$('.remember-me-cont .cbmask-inner').removeClass('cb-active');
 			$("#destinationPageId").prop('disabled', false);
@@ -493,28 +495,27 @@
 			$("#duplicatePageTree").find('i').removeClass();
 			$("#duplicatePageTree").find('i').addClass('fa fa-spinner fa-spin');
 			$.ajax({
-					type: 'POST',
-					url: '/melis/MelisCms/TreeSites/duplicateTreePage',
-					data: dataString,
-					dataType: 'json',
-					encode: true
+				type: 'POST',
+				url: '/melis/MelisCms/TreeSites/duplicateTreePage',
+				data: dataString,
+				dataType: 'json',
+				encode: true
 			}).done(function(data) {
-
-					if (data.success) {
-							$('#id_meliscms_tools_tree_modal_form_handler_container').modal('hide');
-							melisCms.refreshTreeview(parentNode, 1);
-							// clear Add Form
-							melisHelper.melisOkNotification(data.textTitle, data.textMessage);
-					} else {
-							melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
-							melisCoreTool.highlightErrors(data.success, data.errors, "duplicatePageTreeForm");
-					}
-					melisCore.flashMessenger();
-					melisCoreTool.done("#duplicatePageTree");
-					$("#duplicatePageTree").find('i').removeClass();
-					$("#duplicatePageTree").find('i').addClass('fa fa-save');
+				if (data.success) {
+						$('#id_meliscms_tools_tree_modal_form_handler_container').modal('hide');
+						melisCms.refreshTreeview(parentNode, 1);
+						// clear Add Form
+						melisHelper.melisOkNotification(data.textTitle, data.textMessage);
+				} else {
+						melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
+						melisCoreTool.highlightErrors(data.success, data.errors, "duplicatePageTreeForm");
+				}
+				melisCore.flashMessenger();
+				melisCoreTool.done("#duplicatePageTree");
+				$("#duplicatePageTree").find('i').removeClass();
+				$("#duplicatePageTree").find('i').addClass('fa fa-save');
 			}).fail(function() {
-					alert(translations.tr_meliscore_error_message);
+				alert(translations.tr_meliscore_error_message);
 			});
 		});
 })(jQuery, window);

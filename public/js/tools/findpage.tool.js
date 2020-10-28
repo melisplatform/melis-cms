@@ -226,6 +226,7 @@
     function findPageMainTree() {
         $("#find-page-dynatree").fancytree({
             extensions: ["filter"],
+            quicksearch: true,
             keyboard: true,
             generateIds: true, // Generate id attributes like <span id='fancytree-id-KEY'>
             idPrefix: "pageid_", // Used to generate node id´s like <span id='fancytree-id-<key>'>
