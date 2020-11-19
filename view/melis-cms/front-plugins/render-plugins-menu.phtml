@@ -300,7 +300,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                                          data-plugin-name="<?= $plugin; ?>"
                                                                          data-plugin-site-module="<?= $this->siteModule ?>"
                                                                          title="<?php if (!empty($conf['description'])) {
-                                                                             echo $this->boTranslate(str_replace('\\',null,$conf['description']));
+                                                                             echo $this->translate(str_replace('\\',null,$conf['description']));
                                                                          } ?>">
                                                                         <?php if ($moduleName!= "MelisMiniTemplate") : ?>
                                                                             <img  src="<?= $thumbnail; ?>" alt="">
@@ -310,7 +310,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                                                 <span class="melis-plugins-icon-new new-plugin-indicator">NEW!</span>
                                                                             </div>
                                                                         <?php endif ?>
-                                                                        <span class="melis-cms-plugin-title"><?= $this->boTranslate($name); ?></span>
+                                                                        <span class="melis-cms-plugin-title"><?= $this->translate($name); ?></span>
                                                                     </div>
                                                                 <?php endif ?>
                                                             <?php endforeach ?>
