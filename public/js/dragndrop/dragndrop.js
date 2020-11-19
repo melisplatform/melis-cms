@@ -225,7 +225,7 @@ var melisDragnDrop = (function($, window) {
         $(".melis-cms-plugin-snippets").tooltip({
             position: {
                 my: "left center",
-                at: "left+110% center",
+                at: "left+115% center",
                 using: function( position, feedback ) {
                     var $this = $(this);
                         $this.css( position );
