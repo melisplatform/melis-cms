@@ -197,7 +197,7 @@ class PageLanguagesController extends MelisAbstractActionController
         
         if ($request->isPost())
         {
-            $data = get_object_vars($request->getPost());
+            $data = $request->getPost()->toArray();
             
             // Page language create from
             $form = $this->pageLangCreateForm();

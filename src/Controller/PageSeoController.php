@@ -130,7 +130,7 @@ class PageSeoController extends MelisAbstractActionController
 		if ($request->isPost())
 		{
             // Get values posted and set them in form
-            $postValues = get_object_vars($request->getPost());
+            $postValues = $request->getPost()->toArray();
 
             if (!empty($postValues['pseo_url'])) {
                 $postValues['pseo_url'] =  $this->cleanURL($postValues['pseo_url']);

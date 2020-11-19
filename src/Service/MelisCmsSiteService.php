@@ -1086,6 +1086,35 @@ class MelisCmsSiteService extends MelisGeneralService
             return $this->generateModuleNameCase($strBp, true);
         }
 	}
+
+    /**
+     * Returns all sites
+     * @return mixed
+     */
+    public function getAllSites() {
+        $table = $this->getServiceManager()->get('MelisEngineTableSite');
+        return $table->fetchAll()->toArray();
+    }
+
+    /**
+     * Returns site by module
+     * @param $site_module
+     * @return mixed
+     */
+    public function getSiteByModule($site_module) {
+        $table = $this->getServiceManager()->get('MelisEngineTableSite');
+        return $table->getEntryByField('site_name', $site_module)->current();
+    }
+
+    /**
+     * Returns site by id
+     * @param $site_id
+     * @return mixed
+     */
+    public function getSiteById($site_id) {
+        $table = $this->getServiceManager()->get('MelisEngineTableSite');
+        return $table->getEntryById($site_id)->current();
+    }
 	
 	/**
 	 * This will modified a string to valid zf2 view name

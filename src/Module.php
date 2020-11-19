@@ -185,6 +185,10 @@ class Module
             include __DIR__ . '/../config/toolsSite/sitetranslations.tools.php',
             include __DIR__ . '/../config/dashboard-plugins/MelisCmsPagesIndicatorsPlugin.config.php',
             include __DIR__ . '/../config/gdpr.banner.interface.php',
+            include __DIR__ . '/../config/mini-template/manager-tool.interface.php',
+            include __DIR__ . '/../config/mini-template/manager-tool.tools.php',
+            include __DIR__ . '/../config/mini-template/menu-manager-tool.interface.php',
+            include __DIR__ . '/../config/mini-template/menu-manager-tool.tools.php',
             // gdpr auto delete site filter
             include __DIR__ . '/../config/gdpr-autodelete/gdpr.autodelete.site.filter.php',
             include __DIR__ . '/../config/gdpr-autodelete/gdpr.autodelete.user.link.php',

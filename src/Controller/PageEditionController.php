@@ -200,7 +200,7 @@ class PageEditionController extends MelisAbstractActionController
         if (!empty($idPage) && $request->isPost())
         {
             // Get values posted and set them in form
-            $postValues = get_object_vars($request->getPost());
+            $postValues = $request->getPost()->toArray();
             	
     
             // Send the event and let listeners do their job to catch and format their plugins values

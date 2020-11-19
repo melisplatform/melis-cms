@@ -61,7 +61,7 @@ class PageImportController extends MelisAbstractActionController
 
     public function checkImportFormAction()
     {
-        $data = array_merge(get_object_vars($this->getRequest()->getPost()), $this->params()->fromFiles());
+        $data = array_merge($this->getRequest()->getPost()->toArray(), $this->params()->fromFiles());
         $form = $this->getImportForm();
         $formConfig = $this->getFormConfig(self::FORM_CONFIG_PATH, self::FORM_KEY);
         $this->prepareFile('page_tree_import', $form);
@@ -93,7 +93,7 @@ class PageImportController extends MelisAbstractActionController
     {
         $translator = $this->getServiceManager()->get('translator');
         $pageImportSvc = $this->getServiceManager()->get('MelisCmsPageImportService');
-        $data = get_object_vars($this->getRequest()->getPost());
+        $data = $this->getRequest()->getPost()->toArray();
         $formData = json_decode($data['formData'], true);
         $success = true;
 
@@ -133,7 +133,7 @@ class PageImportController extends MelisAbstractActionController
     {
         $translator = $this->getServiceManager()->get('translator');
         $pageImportSvc = $this->getServiceManager()->get('MelisCmsPageImportService');
-        $data = get_object_vars($this->getRequest()->getPost());
+        $data = $this->getRequest()->getPost()->toArray();
         $formData = json_decode($data['formData'], true);
         $pageId = $data['pageid'];
         $zip = new ZipArchive;
@@ -278,7 +278,7 @@ class PageImportController extends MelisAbstractActionController
     {
         $translator = $this->getServiceManager()->get('translator');
         $fileName = 'import_new_ids.csv';
-        $postData = get_object_vars($this->getRequest()->getPost());
+        $postData = $this->getRequest()->getPost()->toArray();
         $data = $postData['idsMap'];
         $separator = ',';
         $arrSize = count($data);

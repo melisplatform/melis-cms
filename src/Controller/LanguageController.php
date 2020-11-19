@@ -373,7 +373,7 @@ class LanguageController extends MelisAbstractActionController
         $melisTranslation = $this->getServiceManager()->get('MelisCoreTranslation');
         if($this->getRequest()->isPost()) {
     
-            $postValues = get_object_vars($this->getRequest()->getPost());
+            $postValues = $this->getRequest()->getPost()->toArray();
             $postValues = $melisTool->sanitize($postValues);
             $form->setData($postValues);
 

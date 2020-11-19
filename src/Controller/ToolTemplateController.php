@@ -431,7 +431,7 @@ class ToolTemplateController extends MelisAbstractActionController
         if($request->isPost())
         {
 
-            $postValues = get_object_vars($this->getRequest()->getPost());
+            $postValues = $this->getRequest()->getPost()->toArray();
             $postValues = $melisTool->sanitizePost($postValues);
             $templateUpdateForm->setData($postValues);
 
@@ -892,7 +892,7 @@ class ToolTemplateController extends MelisAbstractActionController
         if($request->isPost())
         {
 
-            $postValues = get_object_vars($this->getRequest()->getPost());
+            $postValues = $this->getRequest()->getPost()->toArray();
             $postValues = $melisTool->sanitizePost($postValues);
 
             $templateId = (int) $request->getPost('tpl_id');

@@ -272,6 +272,35 @@ var melisDragnDrop = (function($, window) {
                 }
         });
 
+        $body.on('click', ".melis-cms-filter-btn-mini-tpl-category", function() {
+            var elem        = $(this),
+                next        = elem.next(),
+                textVal     = elem.text(),
+                activeMenu  = elem.parent().find('.melis-cms-filter-btn-mini-tpl-category.active');
+
+            if (activeMenu.length > 0) {
+                activeMenu.next().slideUp();
+                activeMenu.removeClass('active');
+                //activeMenu.find('.melis-plugins-icon-new-sub-child').removeClass('reverse-color');
+                if (activeMenu.text() !== textVal) {
+                    next.slideDown();
+                    elem.addClass('active');
+                    //elem.find('.melis-plugins-icon-new-sub-child').addClass('reverse-color');
+                }
+            } else {
+                // show menu
+                if (elem.hasClass('active')) {
+                    next.slideUp();
+                    elem.removeClass('active');
+                    //elem.find('.melis-plugins-icon-new-sub-child').removeClass('reverse-color');
+                } else {
+                    elem.addClass('active');
+                    //elem.find('.melis-plugins-icon-new-sub-child').addClass('reverse-color');
+                    next.slideDown();
+                }
+            }
+        });
+
         // $( ".melis-editable" ).resizable({ disabled: true, handles: 'e' });
         function requestPlugin(module, plugin, dropzone, pageId, dropLocation, siteModule) {
             // locate plugin location
