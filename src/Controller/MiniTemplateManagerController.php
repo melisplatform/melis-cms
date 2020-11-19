@@ -132,6 +132,7 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
         $total = $filtered = 0;
         $filtered_templates = [];
         $order = 'asc';
+        $search = $post['search']['value'];
 
         // get order
         if (! empty($post['order'])) {
