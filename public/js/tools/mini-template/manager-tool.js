@@ -68,7 +68,7 @@ $(function () {
     $body.on('submit', add_form, function (e) {
         melisCoreTool.pending(add_btn);
         var formData = new FormData(this);
-        formData.append('categoryId', $('#mini-template-manager-category-id').val());
+        formData.append('categoryId', $(this).closest('div').find('.mtpl-category-id').val());
         formData.append('siteId', $('#mini-template-manager-site-id').val());
 
         $.ajax({
