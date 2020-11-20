@@ -1,0 +1,17 @@
+@media (max-width: 575.98px) {
+    label[for="miniTemplateThumbnail"] {
+        width: 100%;
+    }
+
+    #melis-cms-minitemplate-add-btn,
+    #id_meliscms_mini_template_manager_tool_header_add_btn,
+    .melis-cms-minitemplate-edit-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 991.98px) {
+    #new-minitemplate-thumbnail {
+        width: 100%;
+    }
+}

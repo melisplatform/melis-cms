@@ -244,6 +244,13 @@ span.fancytree-active span.fancytree-title,
     color: #686868;
 }
 
+/* .fancytree-match .fancytree-title {
+    background: #fcf8e3;
+} */
+
+.fancytree-active.fancytree-match .fancytree-title mark {
+    background-color: transparent;
+} 
 
 /* ------------------------=[ RESPONSIVE ]=-------------------------*/
 @media ( min-width: 768px ) {

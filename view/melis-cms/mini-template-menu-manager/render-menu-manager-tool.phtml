@@ -1,0 +1,15 @@
+<div
+    id="<?= $this->zoneconfig['conf']['id'] ?>"
+    data-melisKey="<?= $this->zoneconfig['conf']['melisKey'] ?>"
+    class="tab-pane container-level-a"
+>
+    <div class="content-cont">
+        <?php
+            if (! empty($this->zoneconfig['interface'])) {
+                foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
+                    echo $this->$keyConfig;
+                }
+            }
+        ?>
+    </div>
+</div>

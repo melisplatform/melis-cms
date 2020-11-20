@@ -1,0 +1,120 @@
+<div
+    id="<?= $this->zoneconfig['conf']['id'] ?>"
+    data-melisKey='<?= $this->zoneconfig['conf']['melisKey'] ?>'
+    data-currentmodule="<?= $this->current_module ?>"
+    data-currenttemplate="<?= $this->current_template ?>"
+>
+    <input type="hidden" id="mini-template-manager-max-size" value="<?= $this->max_size ?>">
+    <input type="hidden" id="mini-template-manager-category-id" class="mtpl-category-id" value="<?= $this->categoryId ?>">
+    <input type="hidden" id="mini-template-manager-site-id" value="<?= $this->siteId ?>">
+    <?php if (! empty($form)) : ?>
+        <?php
+            $form = clone $this->form;
+            $form->prepare();
+            echo $this->form()->openTag($form);
+        ?>
+            <div class="row">
+                <div class="col-md-4">
+                    <!-- Site -->
+                    <div class="form-group">
+                        <?php
+                        $typeField = $form->get('miniTemplateSiteModule');
+                        $inputLabel = $typeField->getLabelAttributes();
+                        $typeField->setLabelAttributes(array('class', null));
+                        $label = $typeField->getLabel().' *<i class="fa fa-info-circle fa-lg float-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
+                        $typeField->setLabel($label);
+                        $typeField->setAttributes(['class' => 'form-control']);
+                        echo $this->formLabel($typeField);
+                        $typeField->setLabelAttributes($inputLabel);
+                        echo $this->formElement($typeField);
+                        ?>
+                    </div>
+                    <!-- Name -->
+                    <div class="form-group">
+                        <?php
+                        $typeField = $form->get('miniTemplateName');
+                        $inputLabel = $typeField->getLabelAttributes();
+                        $typeField->setLabelAttributes(array('class', null));
+                        $label = $typeField->getLabel().' *<i class="fa fa-info-circle fa-lg float-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
+                        $typeField->setLabel($label);
+                        echo $this->formLabel($typeField);
+                        $typeField->setLabelAttributes($inputLabel);
+                        echo $this->formElement($typeField);
+                        ?>
+                    </div>
+                    <!-- Thumbnail -->
+                    <div class="form-group">
+                        <?php
+                        $hash = md5(time());
+                        $typeField = $form->get('miniTemplateThumbnail');
+                        $typeField->setAttribute('class', 'mini-template-input miniTemplateThumbnail' . $hash);
+                        $typeField->setAttribute('id', 'miniTemplateThumbnail' . $hash);
+                        $inputLabel = $typeField->getLabelAttributes();
+                        $typeField->setLabelAttributes(array('class', null));
+                        $label = $typeField->getLabel().'<i class="fa fa-info-circle fa-lg float-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
+                        $typeField->setLabel($label);
+                        echo $this->formLabel($typeField);
+                        $typeField->setLabelAttributes($inputLabel);
+                        echo $this->formElement($typeField);
+                        ?>
+                    </div>
+                    <!-- Thumbnail preview -->
+                    <div>
+                        <span class="thumbnail">
+                            <img
+                                class="new-minitemplate-thumbnail"
+                                width="300"
+                                src="<?= (! empty($this->imgSource)) ? $this->imgSource . '?rand=' . $hash : '/MelisFront/plugins/images/default.jpg' ?>"
+                                alt="<?= $this->translate('tr_meliscore_tool_user_usr_profile_image'); ?>"
+                                style="margin-right: auto; margin-left: auto; display:block;"
+                            >
+                        </span>
+                    </div>
+                    <div>
+                        <?php if ($this->formType !== 'create') : ?>
+                            <a href="#" class="small remove-mini-template-thumbnail-preview"  id="">
+                                <i class="fa fa-times"></i>
+                                <?= $this->translate('tr_meliscms_mini_template_manager_tool_form_remove_thumbnail') ?>
+                            </a>
+                        <?php endif ?>
+                    </div>
+                    <br>
+                    <br>
+                    <!-- Thumbnail preview End -->
+                </div>
+                <div class="col-md">
+                    <!-- HTML -->
+                    <div class="form-group">
+                        <?php
+                        $tinymceId = 'tinyce-textarea-'.uniqid();
+                        $typeField = $form->get('miniTemplateHtml');
+                        $typeField->setAttribute('id', $tinymceId);
+                        $typeField->setAttribute('data-tinymce-id', $tinymceId);
+                        $inputLabel = $typeField->getLabelAttributes();
+                        $typeField->setLabelAttributes(array('class', null));
+                        $label = $typeField->getLabel().' *<i class="fa fa-info-circle fa-lg float-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
+                        $typeField->setLabel($label);
+                        echo $this->formLabel($typeField);
+                        $typeField->setLabelAttributes($inputLabel);
+                        echo $this->formElement($typeField);
+                        ?>
+                    </div>
+                </div>
+            </div>
+        <?= $this->form()->closeTag() ?>
+    <?php endif ?>
+</div>
+<script type="text/javascript">
+    $('.miniTemplateThumbnail<?= $hash ?>').filestyle(
+        {
+            buttonBefore: true,
+            input: false,
+            buttonText: '<?= $this->translate('tr_meliscore_tool_user_usr_file_button'); ?>',
+            badge: false
+        }
+    );
+    var tinyMceOption = {
+        height: '500px'
+    };
+    melisTinyMCE.createTinyMCE("tool", "textarea[data-tinymce-id='<?= $tinymceId ?>']", tinyMceOption);
+</script>

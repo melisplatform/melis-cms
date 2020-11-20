@@ -1681,7 +1681,7 @@ class PageController extends MelisAbstractActionController
         $treeSvc = $this->getServiceManager()->get('MelisEngineTree');
 
         if($this->getRequest()->isPost()) {
-            $postValues = get_object_vars($this->getRequest()->getPost());
+            $postValues = $this->getRequest()->getPost()->toArray();
 
             $publishedPages = $pageSvc->searchPage($postValues['value'], 'published');
             $savedPages = $pageSvc->searchPage($postValues['value'], 'saved');

@@ -242,7 +242,7 @@ class PlatformController extends MelisAbstractActionController
         if($request->isPost()) {
              
             // Getting Post Datas
-            $datas = get_object_vars($request->getPost());
+            $datas = $request->getPost()->toArray();
             $postValues = $melisTool->sanitizePost($datas);
             // Response Messages Initialization
             $textTitle = $translator->translate('tr_meliscms_tool_platform_ids');
@@ -384,7 +384,7 @@ class PlatformController extends MelisAbstractActionController
         $translator = $this->getServiceManager()->get('translator');
         $this->getEventManager()->trigger('meliscms_platform_IDs_delete_start', $this, array());
         $request = $this->getRequest();
-        $datas = get_object_vars($request->getPost());
+        $datas = $request->getPost()->toArray();
         
         $pids_id = (int) $datas['pid_id'];
         $melisEngineTablePlatformIds = $this->getServiceManager()->get('MelisEngineTablePlatformIds');

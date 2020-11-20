@@ -12,10 +12,16 @@ $(function() {
                 }).done(function(data) {
                     if ( data.success ) {
                         melisCms.refreshTreeview(data.response.pageId);
-                        if(data.response.openPageAfterDuplicate) {
+                        if ( data.response.openPageAfterDuplicate ) {
                             // open page
                             var pageID = data.response.pageId + ' - ' + data.response.name;
-                            melisHelper.tabOpen( pageID, data.response.icon, data.response.pageId + '_id_meliscms_page', 'meliscms_page',  { idPage: data.response.pageId} );
+
+                                melisHelper.tabOpen( pageID, data.response.icon, data.response.pageId + '_id_meliscms_page', 'meliscms_page',  { idPage: data.response.pageId} );
+
+                                // check for loader and add loader
+                                //if ( typeof loader !== undefined ) {
+                                    loader.checkClickEventPageLoading( data.response.pageId + '_id_meliscms_page' );
+                                //}
                         }
                         melisHelper.melisOkNotification(data.textTitle, data.textMessage);
                     }
