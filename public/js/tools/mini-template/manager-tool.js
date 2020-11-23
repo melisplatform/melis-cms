@@ -209,6 +209,7 @@ $(function () {
                         $body.find('.melis-mini-template-menu-manager-table-refresh').trigger('click');
                         $('li[data-tool-id="' + templateName + '_id_meliscms_mini_template_manager_tool_add"]').find('a.close').trigger('click');
                         melisHelper.melisOkNotification(response.textTitle, response.textMessage);
+                        removeMiniTemplateInPluginsMenu(templateName, module);
                     } else {
                         melisHelper.melisKoNotification(
                             translations.tr_meliscms_mini_template_manager_tool_delete_modal_title,
@@ -269,6 +270,26 @@ $(function () {
             );
         }
     };
+
+    // Removes the mini template plugin in the plugins menu for page edition
+    function removeMiniTemplateInPluginsMenu(templateName, module) {
+        var pluginNamePrefix = 'MiniTemplatePlugin_';
+        var pluginNameSuffix = '_'+module.toLowerCase();
+        var pluginName = pluginNamePrefix + templateName + pluginNameSuffix;
+        var pageEditions = $('.melis-iframe').contents();
+        var pluginsMenuSelector = '.melis-cms-dnd-box div[data-plugin-name="'+pluginName+'"]';
+        var categoryDiv = pageEditions.find(pluginsMenuSelector).closest('.melis-cms-category-plugins-box-sub');
+
+        // Remove mini template plugin for all opened pages
+        pageEditions.find(pluginsMenuSelector).remove();
+
+        if (categoryDiv.children().length === 0) {
+            // If there is only one mini template inside the category we will remove the category div because there is
+            // no point of showing the category if it is empty
+            categoryDiv.prev().remove();
+            categoryDiv.remove();
+        }
+    } 
 });
 
 window.initMiniTemplateManagerToolTableSites = function (data, tableSettings) {
