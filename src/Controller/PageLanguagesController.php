@@ -107,47 +107,53 @@ class PageLanguagesController extends MelisAbstractActionController
     {
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage'));
         $melisKey = $this->params()->fromRoute('melisKey', '');
-        
-        
+        // get page versions (by language)
         $pageLangTbl = $this->getServiceManager()->get('MelisEngineTablePageLang');
-        $pageLang = $pageLangTbl->getEntryByField('plang_page_id', $idPage)->current();
-        
-        $pagesLang = array();
-        if (!empty($pageLang))
-        {
+        $pageLang = $pageLangTbl->getEntryByField('plang_page_id', $idPage)->current(); 
+        $pagesLang = [];
+        // we keep track on languages that we already have for the page
+        if (! empty($pageLang)) {
             $pageInitialId = $pageLang->plang_page_id_initial;
             $pageLang = $pageLangTbl->getEntryByField('plang_page_id_initial', $pageInitialId);
             
             foreach ($pageLang As $val)
-            {
                 array_push($pagesLang, $val->plang_lang_id);
-            }
         }
-        
-        $tableLang = $this->getServiceManager()->get('MelisEngineTableCmsLang');
-        $languages = $tableLang->fetchAll();
-        
+
+        // get the site id
+        $treeService = $this->getServiceManager()->get('MelisTreeService');
+        $site = $treeService->getSiteByPageId($idPage);
+        if (empty($site))
+            $site = $treeService->getSiteByPageId($idPage, 'saved');
+
+        if (! empty($site))
+            $siteId = $site->site_id;
+        // get available and active site languages
+        $siteLangTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteLangs');
+        if (! empty($siteId))
+            $languages = $siteLangTable->getSiteLanguagesBySiteId($siteId)->toArray();
+        else
+            $languages = [];
+
         $langFlags = '';
-        foreach ($languages As $val)
-        {
-            if (!in_array($val->lang_cms_id, $pagesLang))
-            {
-                // Adding language flag
+        $langsToDisplay = [];
+        foreach ($languages as $language) {
+            // we will only display the language if we still don't have the page in that language
+            if (! in_array($language['slang_lang_id'], $pagesLang)) {
+                $langsToDisplay[$language['lang_cms_locale']] = $language['lang_cms_name'];
+                // get flag
                 $langFlag = '/MelisCms/images/lang-flags/default.png';
-                if (file_exists(__DIR__.'/../../public/images/lang-flags/'.$val->lang_cms_locale.'.png'))
-                {
-                    $langFlag = '/MelisCms/images/lang-flags/'.$val->lang_cms_locale.'.png';
-                }
-                
-                $langFlags .= '<span id="'.$idPage.$val->lang_cms_locale.'"><img src="'.$langFlag.'" class="img-flag" /> '.$val->lang_cms_name.'</span>'.PHP_EOL;
+                if (file_exists(__DIR__.'/../../public/images/lang-flags/'.$language['lang_cms_locale'].'.png'))
+                    $langFlag = '/MelisCms/images/lang-flags/'.$language['lang_cms_locale'].'.png';
+                $langFlags .= '<span id="'.$idPage.$language['lang_cms_locale'].'"><img src="'.$langFlag.'" class="img-flag" /> '.$language['lang_cms_name'].'</span>'.PHP_EOL;
             }
         }
         
         // Page language create from
         $form = $this->pageLangCreateForm();
-        
         // Set current page id value
         $form->get('pageLangPageId')->setValue($idPage);
+        $form->get('pageLangLocale')->setValueOptions($langsToDisplay);
         
         $view = new ViewModel();
         $view->idPage = $idPage;

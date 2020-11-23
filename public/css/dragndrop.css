@@ -212,12 +212,12 @@ body {
 
 .melis-plugin-tooltip {
     position: absolute;
-    right: calc(100% + 20px);
+    /*right: calc(100% + 20px);*/
     background: #212121;
     color: #fff;
     line-height: 1.2;
     font-size: 12px;
-    width: 280px;
+    /*width: 280px;*/
     padding: 20px;
     border-radius: 4px;
     opacity: 1;

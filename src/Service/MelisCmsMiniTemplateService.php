@@ -327,9 +327,9 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
 
         if (empty($errors)) {
             try {
-                $category_table = $this->getServiceManager()->get('MelisCmsCategoryTable');
+                $category_table = $this->getServiceManager()->get('MelisCmsMiniTplCategoryTable');
                 $category_site_table = $this->getServiceManager()->get('MelisCmsMiniTplSiteCategoryTable');
-                $table = $this->getServiceManager()->get('MelisCmsCategoryTransTable');
+                $table = $this->getServiceManager()->get('MelisCmsMiniTplCategoryTransTable');
                 $user_id = $this->getCurrentUser()->usr_id;
 
                 // save category
@@ -414,8 +414,8 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         $arrayParameters = $this->sendEvent('meliscms_mini_template_service_delete_category_start', $arrayParameters);
 
         $cat_id = $arrayParameters['cat_id'];
-        $category_table = $this->getServiceManager()->get('MelisCmsCategoryTable');
-        $translation_table = $this->getServiceManager()->get('MelisCmsCategoryTransTable');
+        $category_table = $this->getServiceManager()->get('MelisCmsMiniTplCategoryTable');
+        $translation_table = $this->getServiceManager()->get('MelisCmsMiniTplCategoryTransTable');
         $category_site_table = $this->getServiceManager()->get('MelisCmsMiniTplSiteCategoryTable');
         $connection = $this->startDbTransaction();
         $errors = [];
@@ -498,7 +498,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
      * @return mixed
      */
     public function getCategoryTexts($cat_id) {
-        $table = $this->getServiceManager()->get('MelisCmsCategoryTransTable');
+        $table = $this->getServiceManager()->get('MelisCmsMiniTplCategoryTransTable');
         $texts = $table->getEntryByField('mtplc_id', $cat_id)->toArray();
 
         return $texts;
@@ -767,7 +767,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
      * @return array
      */
     public function getCategories($site_id, $locale) {
-        $table = $this->getServiceManager()->get('MelisCmsCategoryTable');
+        $table = $this->getServiceManager()->get('MelisCmsMiniTplCategoryTable');
         $lang_table = $this->getServiceManager()->get('MelisEngineTableCmsLang');
         $lang = $lang_table->getEntryByField('lang_cms_locale', $locale)->current();
         $categories = $table->getCategoryBySite($site_id)->toArray();
