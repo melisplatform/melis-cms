@@ -157,7 +157,7 @@ class PagePropertiesController extends MelisAbstractActionController
         if ($request->isPost()) {
             $postValues = $this->params()->fromRoute();
             if (!isset($postValues['page_duplicate_event_flag'])) {
-                $postValues = get_object_vars($request->getPost());
+                $postValues = $request->getPost()->toArray();
             }
 
             $propertyForm->setData($postValues);
@@ -414,7 +414,7 @@ class PagePropertiesController extends MelisAbstractActionController
                 // Get values posted and set them in form
                 $postValues = $this->params()->fromRoute();
                 if (!isset($postValues['page_duplicate_event_flag'])) {
-                    $postValues = get_object_vars($request->getPost());
+                    $postValues = $request->getPost()->toArray();
                     $postValues = $melisTool->sanitizePost($postValues);
                 }
 

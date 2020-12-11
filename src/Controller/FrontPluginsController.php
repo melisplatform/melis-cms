@@ -30,6 +30,7 @@ class FrontPluginsController extends MelisAbstractActionController
         $config = $this->getServiceManager()->get('config');
         $pluginsConfig = array();
         $siteModule = $this->params()->fromRoute('siteModule');
+        $pageId = $this->params()->fromRoute('pageId');
         // melis plugin service
         $pluginSvc = $this->getServiceManager()->get('MelisCorePluginsService');
         // check for new plugins or manually installed and insert in db or fresh plugins
@@ -38,13 +39,15 @@ class FrontPluginsController extends MelisAbstractActionController
         $newPluginList = $this->organizedPluginsBySection($pluginList_);
         // remove section that has no child under on it
         $newPluginList = array_filter($newPluginList);
+        // add categories for the mini-templates
+        $newPluginList = $this->categorizeMiniTemplates($newPluginList, $pageId);
         // get the latest plugin installed
         $latesPlugin = $pluginSvc->getLatestPlugin($pluginSvc::TEMPLATING_PLUGIN_TYPE);
         // for new plugin notifications
         $pluginMenuHandler = $pluginSvc->getNewPluginMenuHandlerNotifDuration();
 
         $view = new ViewModel();
-    // $view->pluginsConfig = $finalPluginList;
+       // $view->pluginsConfig = $finalPluginList;
         $view->siteModule              = $siteModule;
         $view->newPluginList           = $newPluginList;
         $view->latestPlugin            = $latesPlugin;
@@ -144,7 +147,7 @@ class FrontPluginsController extends MelisAbstractActionController
     {
         $translator = $this->getServiceManager()->get('translator');
 
-        $parameters = get_object_vars($this->getRequest()->getPost());
+        $parameters = $this->getRequest()->getPost()->toArray();
 
         $module = (!empty($parameters['melisModule'])) ? $parameters['melisModule'] : '';
         $pluginName = (!empty($parameters['melisPluginName'])) ? $parameters['melisPluginName'] : '';
@@ -198,6 +201,8 @@ class FrontPluginsController extends MelisAbstractActionController
             if(!$response['success']) {
                 $success = 0;
             }
+
+
 
         }
         $finalErrors = $errorsTabs;
@@ -296,9 +301,9 @@ class FrontPluginsController extends MelisAbstractActionController
         $marketPlaceModuleSection = $melisPuginsSvc->getPackagistCategories();
         $marketPlaceModuleSection = [];
         /*
-        * In case there is no internet or cant connect to the markeplace domain
-        * we put a predefined section just not destroy the plugins menu
-        */
+         * In case there is no internet or cant connect to the markeplace domain
+         * we put a predefined section just not destroy the plugins menu
+         */
         if (empty($marketPlaceModuleSection)) {
             $fallbackSection = $configSvc->getItem('/meliscore/datas/fallBacksection');
             $marketPlaceModuleSection= $fallbackSection;
@@ -333,13 +338,13 @@ class FrontPluginsController extends MelisAbstractActionController
             }
 
             /*
-            * organized plugins with no subcategory
-            */
+             * organized plugins with no subcategory
+             */
             $publicModules = $melisPuginsSvc->getMelisPublicModules(true);
             foreach ($pluginList as $moduleName => $plugins) {
                 // double check moduleName if it exisit on composer to avoid showing plugins that doesnt exists
                 if (in_array(strtolower($moduleName),$vendorModules) || ($moduleName == "MelisMiniTemplate")) {
-                /*
+                   /*
                     * check first if the module is public or not
                     *  if public we will based the section on what is set from marketplace
                     */
@@ -429,5 +434,90 @@ class FrontPluginsController extends MelisAbstractActionController
         }
 
         return $newPluginList;
+
+    }
+
+    /**
+     * Categorizes the mini templates for the page's current site
+     * @param $site_module
+     * @param $plugin_list
+     * @return mixed
+     */
+    private function categorizeMiniTemplates($plugin_list, $pageId)
+    {
+        $mini_template_sites = $plugin_list['MelisCms']['MelisMiniTemplate'];
+        $sites = $this->getServiceManager()->get('MelisEngineTableSite')->fetchAll()->toArray();
+        $pageTreeService = $this->getServiceManager()->get('MelisEngineTree');
+        $site = $pageTreeService->getSiteByPageId($pageId);
+        if (empty($site))
+            $site = $pageTreeService->getSiteByPageId($pageId, 'saved');
+
+        $site_modules = [];
+        $container = new Container('meliscore');
+        // get site modules
+        foreach ($mini_template_sites as $mini_template_site_key => $mini_template_site_val) {
+            $exploded_mini_template_site_key = explode('_', $mini_template_site_key);
+            if (count($exploded_mini_template_site_key) != 1)
+                $site_modules[] = $exploded_mini_template_site_key[1];
+        }
+
+        // insert sites
+        foreach ($sites as $site_data) {
+            if ($site_data['site_id'] == $site->site_id) {
+                if (!empty($plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_name']])) {
+                    $service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
+                    $tree = $service->getTree($site_data['site_id'], $container['melis-lang-locale']);
+
+                    $mini_templates = $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_name']];
+                    $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_label']] = [];
+                    $new_plugin_list = [];
+                    $new_plugin_list['title'] = $site_data['site_label'];
+                    $in_active_categories = [];
+
+                    foreach ($tree as $key => $val) {
+                        $type = $val['type'];
+                        if ($type == 'category') {
+                            if ($val['status']) {
+                                $new_plugin_list[html_entity_decode($val['text'])] = [
+                                    'text' => html_entity_decode($val['text']),
+                                    'isCategory' => true
+                                ];
+                            } else {
+                                $in_active_categories[] = $val['text'];
+                            }
+                        } else {
+                            $exploded = explode('-', $val['parent'], 2);
+                            $parent = '';
+                            if (count($exploded) > 2) {
+                                unset($exploded[0]);
+                                $parent = implode('-', $exploded);
+                            } else if (count($exploded) == 2) {
+                                unset($exploded[0]);
+                                $parent = $exploded[1];
+                            } else {
+                                $parent = $val['parent'];
+                            }
+
+                            $title = 'MiniTemplatePlugin_' . strtolower(html_entity_decode($val['text'])) . '_' . strtolower($site_data['site_name']);
+                            if ($val['parent'] != '#') {
+                                if (!in_array($parent, $in_active_categories))
+                                    $new_plugin_list[$parent][$title] = $mini_templates[$title];
+                            } else {
+                                $new_plugin_list[$title] = $mini_templates[$title];
+                            }
+                        }
+                    }
+
+                    $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_label']] = $new_plugin_list;
+                }
+            }
+        }
+
+        // remove site modules
+        foreach ($site_modules as $site_module) {
+            unset($plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_module]);
+        }
+
+        return $plugin_list;
     }
 }

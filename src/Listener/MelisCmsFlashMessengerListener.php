@@ -67,7 +67,13 @@ class MelisCmsFlashMessengerListener extends MelisGeneralListener implements Lis
             'meliscms_tree_duplicate_page_trees_end',
             'meliscms_gdpr_save_banner_end',
             'meliscms_page_tree_export_end',
-            'meliscms_page_tree_import_end'
+            'meliscms_page_tree_import_end',
+            'meliscms_mini_template_manager_create_end',
+            'meliscms_mini_template_manager_update_end',
+            'meliscms_mini_template_manager_delete_end',
+            'meliscms_mini_template_menu_manager_create_category_end',
+            'meliscms_mini_template_menu_manager_update_category_end',
+            'meliscms_mini_template_menu_manager_delete_category_end'
         ];
 
         $priority = -1000;
