@@ -219,7 +219,7 @@
 									}, null, melisCms.pageTabOpenCallback(data.melisData.page_id));
 
 									// check for loading on page iframe
-									if ( typeof loader !== undefined ) {
+									if ( typeof loader !== "undefined" ) {
 										loader.checkPageLoading( data.melisData.item_zoneid );
 									}
 							}
@@ -246,9 +246,9 @@
 							}, null, melisCms.pageTabOpenCallback(data.melisData.page_id));
 
 							// check for loading on page iframe
-							//if ( typeof loader !== undefined ) {
+							if ( typeof loader !== "undefined" ) {
 								loader.checkPageLoading( data.melisData.item_zoneid );
-							//}
+							}
 
 							$('.hasNiceScroll').getNiceScroll().resize();
 
@@ -258,7 +258,7 @@
 						//RUNS ONLY ONCE
 
 						// if there is no/empty pages in the treeview
-						var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
+						//var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
 				
 						/* // PAGE ACCESS user rights checking
 						$.ajax({
