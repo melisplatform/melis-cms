@@ -17,12 +17,12 @@
             //[contextmenu, textcolor, colorpicker] this plugin is already built in the core editor as of TinyMCE v. 5
            'lists advlist autolink link paste image charmap preview anchor emoticons help hr nonbreaking',
            'searchreplace visualblocks code fullscreen',
-           'insertdatetime media table template'
+           'insertdatetime media table minitemplate'
        ),
        'image_advtab' => true,
-       'toolbar' => 'insertfile undo redo paste | formatselect | forecolor | bold italic strikethrough underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media template | code',
+       'toolbar' => 'insertfile undo redo paste | formatselect | forecolor | bold italic strikethrough underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media minitemplate | code',
        'setup' => 'melisTinyMCE.tinyMceActionEvent',
-       'init_instance_callback' => 'tinyMceCleaner'
+       'init_instance_callback' => 'tinyMceCleaner'        
    );
 
 # For Reference
