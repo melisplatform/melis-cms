@@ -19,6 +19,9 @@
            'searchreplace visualblocks code fullscreen',
            'insertdatetime media table minitemplate'
        ),
+       'external_plugins' => [
+            'minitemplate' => '/MelisCore/js/minitemplate/plugin.min.js'
+        ],
        'image_advtab' => true,
        'toolbar' => 'insertfile undo redo paste | formatselect | forecolor | bold italic strikethrough underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media minitemplate | code',
        'setup' => 'melisTinyMCE.tinyMceActionEvent',
