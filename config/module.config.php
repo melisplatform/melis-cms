@@ -108,7 +108,8 @@ return [
             'MelisCmsPageService'               => \MelisCms\Service\MelisCmsPageService::class,
             'MelisCmsPageExportService'         => \MelisCms\Service\MelisCmsPageExportService::class,
             'MelisCmsPageImportService'         => \MelisCms\Service\MelisCmsPageImportService::class,
-            'MelisCmsMiniTemplateService'       => \MelisCms\Service\MelisCmsMiniTemplateService::class
+            'MelisCmsMiniTemplateService'       => \MelisCms\Service\MelisCmsMiniTemplateService::class,
+            'MelisCmsMiniTemplateGetterService' => \MelisCms\Service\MelisCmsMiniTemplateGetterService::class,
         ],
     ],
     'controllers' => [
