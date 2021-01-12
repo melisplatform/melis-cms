@@ -370,50 +370,69 @@ class PageEditionController extends MelisAbstractActionController
 		    // Get datas from page
 		    $melisPage = $this->getServiceManager()->get('MelisEnginePage');
 		    $datasPage = $melisPage->getDatasPage($idPage, 'saved');
-		    $datasTemplate = $datasPage->getMelisTemplate();
+		    $siteId = $datasPage->getMelisTemplate()->tpl_site_id;
 
 		    // No template, return empty array 
-		    if (!empty($datasTemplate))
+		    if (!empty($siteId))
 		    {
-			// Get the path of mini-templates to this website
-			$moduleName = $datasTemplate->tpl_zf2_website_folder;
-			$publicPath = '/public/' . self::MINI_TEMPLATES_FOLDER;
-
-			// Checking if the module path is vendor
-			$composerSrv = $this->getServiceManager()->get('ModulesService');
-			$path = $composerSrv->getComposerModulePath($moduleName);
-
-			if (!empty($path)) {
-			    $folderSite = $path.$publicPath;
-			}else{
-			    $folderSite = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/' . $moduleName.$publicPath;
-			}
-
-			// List the mini-templates from the folder
-			if (is_dir($folderSite))
-			{
-			    if ($handle = opendir($folderSite))
-			    {
-				while (false !== ($entry = readdir($handle)))
-				{
-				    if (is_dir($folderSite . '/' . $entry) || $entry == '.' || $entry == '..' || !$this->isImage($entry))
-					continue;
-				    array_push($tinyTemplates,
-						array(
-						    'title' => $entry,
-						    'url' => "/" .  $datasTemplate->tpl_zf2_website_folder . '/' . 
-							     self::MINI_TEMPLATES_FOLDER . '/' . $entry
-				    ));
-				}
-
-				closedir($handle);
-			    }
-			}
+                /**
+                 * get mini templates baesd from mini template manager service
+                 */
+                $tinyTemplates = $this->getService('MelisCmsMiniTemplateGetterService')->getMiniTemplates($siteId);
 		    }
 		}
 
 		return new JsonModel($tinyTemplates);
-    	}
+    }
+
+    /**
+     * old method in getting the min templates
+     */
+    private function getMiniTemplates($idPage)
+    {
+        $tinyTemplates =[];
+        // Get datas from page
+        $melisPage = $this->getServiceManager()->get('MelisEnginePage');
+        $datasPage = $melisPage->getDatasPage($idPage, 'saved');
+        $datasTemplate = $datasPage->getMelisTemplate();
+
+        // Get the path of mini-templates to this website
+        $moduleName = $datasTemplate->tpl_zf2_website_folder;
+        $publicPath = '/public/' . self::MINI_TEMPLATES_FOLDER;
+
+        // Checking if the module path is vendor
+        $composerSrv = $this->getServiceManager()->get('ModulesService');
+        $path = $composerSrv->getComposerModulePath($moduleName);
+
+        if (!empty($path)) {
+            $folderSite = $path.$publicPath;
+        }else{
+            $folderSite = $_SERVER['DOCUMENT_ROOT'] . '/../module/MelisSites/' . $moduleName.$publicPath;
+        }
+
+        // List the mini-templates from the folder
+        if (is_dir($folderSite))
+        {
+            if ($handle = opendir($folderSite))
+            {
+                while (false !== ($entry = readdir($handle)))
+                {
+                    if (is_dir($folderSite . '/' . $entry) || $entry == '.' || $entry == '..' || !$this->isImage($entry))
+                        continue;
+                    array_push($tinyTemplates,
+                        array(
+                            'title' => $entry,
+                            'url' => "/" .  $datasTemplate->tpl_zf2_website_folder . '/' . 
+                            self::MINI_TEMPLATES_FOLDER . '/' . $entry
+                        ));
+                }
+
+                closedir($handle);
+            }
+        }
+
+        return $tinyTemplates;
+    }
 
     function isImage($fileName)
     {
@@ -425,6 +444,14 @@ class PageEditionController extends MelisAbstractActionController
             }
         }
         return true;
+    }
+
+    /**
+     * get laminas service class
+     */
+    private function getService($serviceName)
+    {
+        return $this->getServiceManager()->get($serviceName);
     }
 }
 
