@@ -378,7 +378,7 @@ class PageEditionController extends MelisAbstractActionController
                 /**
                  * get mini templates baesd from mini template manager service
                  */
-                $tinyTemplates = $this->getService('MelisCmsMiniTemplateGetterService')->getMiniTemplates($siteId);
+                $tinyTemplates = $this->getService('MelisCmsMiniTemplateGetterService')->getMiniTemplates($siteId, null,null, true);
 		    }
 		}
 

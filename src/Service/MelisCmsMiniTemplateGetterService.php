@@ -38,7 +38,7 @@ class MelisCmsMiniTemplateGetterService extends MelisGeneralService
      *
      * @return array
      */
-    public function getMiniTemplates($siteId, $prefix = "", $locale = null)
+    public function getMiniTemplates($siteId, $prefix = "", $locale = null, $treeStyle = false)
     {
          // Event parameters prepare
         $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
@@ -56,6 +56,13 @@ class MelisCmsMiniTemplateGetterService extends MelisGeneralService
          */
         $data = $this->getService('MelisCmsMiniTemplateService')->getTree($siteId, $locale ?? $this->getLocale());
          
+        /**
+         * format to tree style
+         */
+        if ($treeStyle) {
+            $data = $this->groupByParentCategory($data); 
+        }
+
         // check data if not empty
         if (! empty($data)) {
             $tmp = [];
@@ -96,6 +103,37 @@ class MelisCmsMiniTemplateGetterService extends MelisGeneralService
         $arrayParameters = $this->sendEvent('melis_cms_mini_template_getter_get_mini_templates_end', $arrayParameters);
 
         return $arrayParameters['results'];
+    }
+
+    /**
+     * format category data to tree style
+     */
+    private function groupByParentCategory($data)
+    {
+        $newData = [];
+        if (! empty($data)) {
+            foreach($data as $i => $val) {
+
+                /**
+                 * put the plugin based from its parent
+                 */
+                if ($val['parent'] != "#") {
+                    if (!empty($newData)) {
+
+                        foreach ($newData as $idx => $val2) {
+                            if ($val2['id'] == $val['parent']) {
+                                $newData[$idx]['plugins'][] = $val;
+                            }
+                        }
+                    }
+                } else {
+                    // add only root parents
+                    $newData[] = $val;
+                }
+            } 
+        }
+        
+        return $newData;
     }
 
     /**
