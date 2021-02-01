@@ -359,8 +359,10 @@ class PageEditionController extends MelisAbstractActionController
 	 * @return \Laminas\View\Model\JsonModel
 	 */
 	public function getTinyTemplatesAction()
-    	{
+    {
 		$idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        // tinyMCE type
+        $type   = $this->params()->fromRoute('type', $this->params()->fromQuery('type', ''));
 		$success = 1;
 		$tinyTemplates = array();
 
@@ -375,10 +377,13 @@ class PageEditionController extends MelisAbstractActionController
 		    // No template, return empty array 
 		    if (!empty($siteId))
 		    {
+                // get prefix that was set in the config of tinyMCE
+                $prefix = $this->getTinyMCEByType($type);
+
                 /**
                  * get mini templates baesd from mini template manager service
                  */
-                $tinyTemplates = $this->getService('MelisCmsMiniTemplateGetterService')->getMiniTemplates($siteId, null,null, true);
+                $tinyTemplates = $this->getService('MelisCmsMiniTemplateGetterService')->getMiniTemplates($siteId, $prefix);
 		    }
 		}
 
@@ -452,6 +457,43 @@ class PageEditionController extends MelisAbstractActionController
     private function getService($serviceName)
     {
         return $this->getServiceManager()->get($serviceName);
+    }
+
+    /**
+     * get tinyMCE configuration
+     */
+    private function getTinyMCEByType($type)
+    {
+        // prefix
+        $prefix = "";
+        // tinymce config
+        $configTinyMce = $this->getService('config')['tinyMCE'];
+        // config url path
+        $configDir = $configTinyMce[$type] ?? null;
+        // Getting the module name
+        $nameModuleTab = explode('/', $configDir);
+        // get module name
+        $nameModule = $nameModuleTab[0] ?? null;
+        // Getting the path of the Module
+        $path = $this->getService('ModulesService')->getModulePath($nameModule);
+        // Generating the directory of the requested TinyMCE configuration
+        $file  = $path . str_replace($nameModule, '', $configDir);
+        if (file_exists($file)) {
+            // include file
+            $config = include($file);
+            // for the melis_minitemplates configuration key
+            if (isset($config['melis_minitemplates']) && $config['melis_minitemplates']) {
+                // config
+                $miniTmpConfig = $config['melis_minitemplates'];
+                // prefix
+                if (isset($miniTmpConfig['prefix'])) {
+                    // set prefix
+                    $prefix = $miniTmpConfig['prefix']; 
+                }
+            }
+        }
+
+        return $prefix;
     }
 }
 

@@ -22,6 +22,9 @@
        'external_plugins' => [
             'minitemplate' => '/MelisCore/js/minitemplate/plugin.min.js'
         ],
+        'melis_minitemplates' => [
+            'prefix' => ''
+        ],
        'image_advtab' => true,
        'toolbar' => 'insertfile undo redo paste | formatselect | forecolor | bold italic strikethrough underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media minitemplate | code',
        'setup' => 'melisTinyMCE.tinyMceActionEvent',
