@@ -607,11 +607,12 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                             if (!empty($item['category_id'])) {
                                 $this->insertDbMiniTemplateToTheCategory($item['category_id'], $item, $module, $image, $tree);
                             } else {
-                                $this->insertLocalMiniTemplateToTheTree($item['mtplct_template_name'], $module, $image, $tree);
+                                $this->insertLocalMiniTemplateToTheTree($item['mtplct_template_name'], $module, $image, $tree, $item['site_label']);
                             }
                         }
                     }
                 } else {
+                    
                     $template = $this->getMiniTemplateFiles($site_path, $item);
 
                     if (!empty($template['image']['file']))
@@ -619,7 +620,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                     else
                         $image = '/MelisFront/plugins/images/default.jpg';
 
-                    $this->insertLocalMiniTemplateToTheTree($item, $module, $image, $tree);
+                    $this->insertLocalMiniTemplateToTheTree($item, $module, $image, $tree, $item['site_label']);
                 }
             }
         }
@@ -881,6 +882,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             'icon' => 'fa fa-circle ' . ($category['mtplc_status'] ? 'text-success' : 'text-danger'),
             'type' => 'category',
             'status' => $category['mtplc_status'],
+            'site_name' => $category['site_label'],
             'categoryId' => $category['mtplc_id']
         ];
     }
@@ -900,6 +902,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             'icon' => 'fa fa-plug text-success',
             'type' => 'mini-template',
             'module' => $site_module,
+            'site_name' => $mini_template['site_label'],
             'imgSource' => $image
         ];
     }
@@ -910,7 +913,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
      * @param $image
      * @param $tree
      */
-    private function insertLocalMiniTemplateToTheTree($mini_template_name, $site_module, $image, &$tree) {
+    private function insertLocalMiniTemplateToTheTree($mini_template_name, $site_module, $image, &$tree, $siteName = null) {
         $tree[] = [
             'id' => $mini_template_name,
             'parent' => '#',
@@ -918,6 +921,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             'icon' => 'fa fa-plug text-success',
             'type' => 'mini-template',
             'module' => $site_module,
+            'site_name' => $siteName,
             'imgSource' => $image
         ];
     }
