@@ -620,7 +620,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                     else
                         $image = '/MelisFront/plugins/images/default.jpg';
 
-                    $this->insertLocalMiniTemplateToTheTree($item, $module, $image, $tree, $item['site_label']);
+                    $this->insertLocalMiniTemplateToTheTree($item, $module, $image, $tree, $item['site_label'] ?? null);
                 }
             }
         }
