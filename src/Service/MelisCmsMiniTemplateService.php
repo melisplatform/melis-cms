@@ -526,6 +526,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             $categories_with_no_order = [];
             $final_items = [];
 
+           
             // prepare mini templates
             foreach ($root_mini_templates as &$tpl) {
                 $tpl['order'] = $tpl['mtplct_order'];
@@ -541,7 +542,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                     unset($categories[$key]);
                 }
             };
-
+            
             // get db mini template
             foreach ($category_mini_templates as $category_mini_template) {
                 $db_mini_templates[] = $category_mini_template['mtplct_template_name'];
@@ -550,6 +551,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             foreach ($root_mini_templates as $root_mini_template) {
                 $db_mini_templates[] = $root_mini_template['mtplct_template_name'];
             }
+           
 
             // sort db category and minitemplate with order
             $items = array_merge($root_mini_templates, $categories);
@@ -568,7 +570,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                     $items[] = $mini_template;
                 }
             }
-
+            
             // add category mini templates
             foreach ($items as $item) {
                 $final_items[] = $item;
@@ -614,13 +616,14 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                 } else {
                     
                     $template = $this->getMiniTemplateFiles($site_path, $item);
+                    
 
                     if (!empty($template['image']['file']))
                         $image = '/' . $module . '/miniTemplatesTinyMce/' . $template['image']['file'];
                     else
                         $image = '/MelisFront/plugins/images/default.jpg';
 
-                    $this->insertLocalMiniTemplateToTheTree($item, $module, $image, $tree, $item['site_label'] ?? null);
+                    $this->insertLocalMiniTemplateToTheTree($item, $module, $image, $tree, $site->site_label);
                 }
             }
         }
