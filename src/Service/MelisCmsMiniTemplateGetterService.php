@@ -160,4 +160,34 @@ class MelisCmsMiniTemplateGetterService extends MelisGeneralService
         return (new Container('meliscore'))['melis-lang-locale'];
     }
 
+    /**
+     * get tinyMCE configuration
+     */
+    public function getTinyMCEByType($type)
+    {
+        $config = [];
+        // prefix
+        $prefix = "";
+        // tinymce config
+        $configTinyMce = $this->getService('config')['tinyMCE'];
+        // config url path
+        $configDir = $configTinyMce[$type] ?? null;
+        // Getting the module name
+        $nameModuleTab = explode('/', $configDir);
+        // get module name
+        $nameModule = $nameModuleTab[0] ?? null;
+        // Getting the path of the Module
+        $path = $this->getService('ModulesService')->getModulePath($nameModule);
+        // Generating the directory of the requested TinyMCE configuration
+        $file  = $path . str_replace($nameModule, '', $configDir);
+        if (file_exists($file)) {
+            // include file
+            $config = include($file);
+
+            return $config;
+        }
+
+        return $config;
+    }
+
 }

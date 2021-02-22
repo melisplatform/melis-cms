@@ -512,7 +512,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
     public function getTree($siteId, $locale) {
         $table = $this->getServiceManager()->get('MelisEngineTableSite');
         $site = $table->getEntryById($siteId)->current();
-        $module = $site->site_name;
+        $module = $site->site_name ?? null;
         $site_path = $this->getModuleMiniTemplatePath($module);
         $tree = [];
 
