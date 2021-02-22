@@ -15,10 +15,24 @@
 			//[contextmenu, textcolor, colorpicker] this plugin is already built in the core editor as of TinyMCE v. 5
 		    'lists advlist autolink link image charmap print preview anchor',
 		    'searchreplace visualblocks code fullscreen',
-		    'insertdatetime media table paste autoresize'
+		    'insertdatetime media table paste autoresize minitemplate'
 	    ),
+		'external_plugins' => [
+            'minitemplate' => '/MelisCore/js/minitemplate/plugin.min.js'
+        ],
+		'melis_minitemplate' => [
+			/**
+			 * return templates with the given prefix only
+			 */
+			'prefix' => '',
+
+			/**
+			 * site id
+			 */
+			'site_id' => ''
+		],
 	    'autoresize_on_init' => false,
-	    'toolbar' => 'undo redo link unlink | forecolor backcolor | code',
+	    'toolbar' => 'undo redo link unlink | forecolor backcolor minitemplate | code',
 	    'setup' => 'melisTinyMCE.tinyMceActionEvent',
 	    'init_instance_callback'  => 'tinyMceCleaner'
 	);
