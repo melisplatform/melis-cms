@@ -574,7 +574,10 @@ var melisPluginEdition = (function($, window) {
     }
 
     function disableLinks(e) {
-        $(e).click(function(event) { event.preventDefault(); });
+        $(e).on("click", function(event) { event.preventDefault(); });
+        $("*").off("click");
+        $("[onclick]").removeAttr("onclick");
+        $("[type=submit]").removeAttr("onclick");
     }
 
     function createPluginModal() {
