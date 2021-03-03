@@ -38,7 +38,7 @@ class MelisCmsMiniTemplateGetterService extends MelisGeneralService
      *
      * @return array
      */
-    public function getMiniTemplates($siteId, $prefix = "", $locale = null, $treeStyle = false)
+    public function getMiniTemplates($siteId = null, $prefix = "", $locale = null, $treeStyle = false)
     {
          // Event parameters prepare
         $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
@@ -51,10 +51,21 @@ class MelisCmsMiniTemplateGetterService extends MelisGeneralService
         // prefix
         $prefix = $arrayParameters['prefix'];
 
+        $data = [];
         /**
          * get mini template tree based from mini template manager service
          */
-        $data = $this->getService('MelisCmsMiniTemplateService')->getTree($siteId, $locale ?? $this->getLocale());
+        if (! empty($siteId)) {
+            $data = $this->getService('MelisCmsMiniTemplateService')->getTree($siteId, $locale ?? $this->getLocale());
+        } else {
+            // get all sites
+            $sites = $this->getService('MelisEngineTableSite')->fetchAll()->toArray();
+            if (! empty($sites)) {
+                foreach ($sites as $site) {
+                    $data = array_merge($data, $this->getService('MelisCmsMiniTemplateService')->getTree($site['site_id'], $locale ?? $this->getLocale()));
+                }
+            }
+        }
          
         /**
          * format to tree style

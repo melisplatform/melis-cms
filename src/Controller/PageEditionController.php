@@ -361,6 +361,7 @@ class PageEditionController extends MelisAbstractActionController
 	public function getTinyTemplatesAction()
     {
 		$idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+		$prefix = $this->params()->fromRoute('prefix', $this->params()->fromQuery('prefix', ''));
         // tinyMCE type
         $type   = $this->params()->fromRoute('type', $this->params()->fromQuery('type', ''));
 		$success = 1;
@@ -377,9 +378,6 @@ class PageEditionController extends MelisAbstractActionController
 		    // No template, return empty array 
 		    if (!empty($siteId))
 		    {
-                // get prefix that was set in the config of tinyMCE
-                $prefix = $this->getTinyMCEByType($type);
-
                 /**
                  * get mini templates baesd from mini template manager service
                  */
