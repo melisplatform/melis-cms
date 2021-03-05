@@ -445,6 +445,9 @@ class FrontPluginsController extends MelisAbstractActionController
      */
     private function categorizeMiniTemplates($plugin_list, $pageId)
     {
+        if ( empty($plugin_list['MelisCms']['MelisMiniTemplate']))
+            return $plugin_list;
+
         $mini_template_sites = $plugin_list['MelisCms']['MelisMiniTemplate'];
         $sites = $this->getServiceManager()->get('MelisEngineTableSite')->fetchAll()->toArray();
         $pageTreeService = $this->getServiceManager()->get('MelisEngineTree');
@@ -508,14 +511,14 @@ class FrontPluginsController extends MelisAbstractActionController
                         }
                     }
 
+                    // remove site modules
+                    foreach ($site_modules as $site_module) {
+                        unset($plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_module]);
+                    }
+
                     $plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_data['site_label']] = $new_plugin_list;
                 }
             }
-        }
-
-        // remove site modules
-        foreach ($site_modules as $site_module) {
-            unset($plugin_list['MelisCms']['MelisMiniTemplate']['miniTemplatePlugins_' . $site_module]);
         }
 
         return $plugin_list;
