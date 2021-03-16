@@ -886,6 +886,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             'type' => 'category',
             'status' => $category['mtplc_status'],
             'site_name' => $category['site_label'],
+            'unique_text' => $category['site_label']. "-" . $category['mtplct_name'],
             'categoryId' => $category['mtplc_id']
         ];
     }
