@@ -906,6 +906,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             'type' => 'mini-template',
             'module' => $site_module,
             'site_name' => $mini_template['site_label'],
+            'unique_text' => $mini_template['site_label']. "-" . $mini_template['mtplct_template_name'],
             'imgSource' => $image
         ];
     }
@@ -925,6 +926,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             'type' => 'mini-template',
             'module' => $site_module,
             'site_name' => $siteName,
+            'unique_text' => $siteName . "-" . $mini_template_name,
             'imgSource' => $image
         ];
     }
