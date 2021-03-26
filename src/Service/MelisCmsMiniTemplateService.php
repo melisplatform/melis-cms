@@ -512,7 +512,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
     public function getTree($siteId, $locale) {
         $table = $this->getServiceManager()->get('MelisEngineTableSite');
         $site = $table->getEntryById($siteId)->current();
-        $module = $site->site_name;
+        $module = $site->site_name ?? null;
         $site_path = $this->getModuleMiniTemplatePath($module);
         $tree = [];
 
@@ -526,6 +526,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             $categories_with_no_order = [];
             $final_items = [];
 
+           
             // prepare mini templates
             foreach ($root_mini_templates as &$tpl) {
                 $tpl['order'] = $tpl['mtplct_order'];
@@ -541,7 +542,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                     unset($categories[$key]);
                 }
             };
-
+            
             // get db mini template
             foreach ($category_mini_templates as $category_mini_template) {
                 $db_mini_templates[] = $category_mini_template['mtplct_template_name'];
@@ -550,6 +551,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             foreach ($root_mini_templates as $root_mini_template) {
                 $db_mini_templates[] = $root_mini_template['mtplct_template_name'];
             }
+           
 
             // sort db category and minitemplate with order
             $items = array_merge($root_mini_templates, $categories);
@@ -568,7 +570,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                     $items[] = $mini_template;
                 }
             }
-
+            
             // add category mini templates
             foreach ($items as $item) {
                 $final_items[] = $item;
@@ -607,19 +609,21 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                             if (!empty($item['category_id'])) {
                                 $this->insertDbMiniTemplateToTheCategory($item['category_id'], $item, $module, $image, $tree);
                             } else {
-                                $this->insertLocalMiniTemplateToTheTree($item['mtplct_template_name'], $module, $image, $tree);
+                                $this->insertLocalMiniTemplateToTheTree($item['mtplct_template_name'], $module, $image, $tree, $item['site_label']);
                             }
                         }
                     }
                 } else {
+                    
                     $template = $this->getMiniTemplateFiles($site_path, $item);
+                    
 
                     if (!empty($template['image']['file']))
                         $image = '/' . $module . '/miniTemplatesTinyMce/' . $template['image']['file'];
                     else
                         $image = '/MelisFront/plugins/images/default.jpg';
 
-                    $this->insertLocalMiniTemplateToTheTree($item, $module, $image, $tree);
+                    $this->insertLocalMiniTemplateToTheTree($item, $module, $image, $tree, $site->site_label);
                 }
             }
         }
@@ -881,6 +885,8 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             'icon' => 'fa fa-circle ' . ($category['mtplc_status'] ? 'text-success' : 'text-danger'),
             'type' => 'category',
             'status' => $category['mtplc_status'],
+            'site_name' => $category['site_label'],
+            'unique_text' => $category['site_label']. "-" . $category['mtplct_name'],
             'categoryId' => $category['mtplc_id']
         ];
     }
@@ -900,6 +906,8 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             'icon' => 'fa fa-plug text-success',
             'type' => 'mini-template',
             'module' => $site_module,
+            'site_name' => $mini_template['site_label'],
+            'unique_text' => $mini_template['site_label']. "-" . $mini_template['mtplct_template_name'],
             'imgSource' => $image
         ];
     }
@@ -910,7 +918,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
      * @param $image
      * @param $tree
      */
-    private function insertLocalMiniTemplateToTheTree($mini_template_name, $site_module, $image, &$tree) {
+    private function insertLocalMiniTemplateToTheTree($mini_template_name, $site_module, $image, &$tree, $siteName = null) {
         $tree[] = [
             'id' => $mini_template_name,
             'parent' => '#',
@@ -918,6 +926,8 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             'icon' => 'fa fa-plug text-success',
             'type' => 'mini-template',
             'module' => $site_module,
+            'site_name' => $siteName,
+            'unique_text' => $siteName . "-" . $mini_template_name,
             'imgSource' => $image
         ];
     }
