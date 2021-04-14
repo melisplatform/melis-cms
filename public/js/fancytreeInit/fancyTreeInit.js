@@ -1,5 +1,3 @@
-var temmmp = 0;
-var temmmpInt;
 (function($, window, document) {
 	var $body = $("body");
 	// On Load
@@ -274,13 +272,15 @@ var temmmpInt;
 									idPage: data.melisData.page_id,
 								},
 								null,
-								melisCms.pageTabOpenCallback(data.melisData.page_id)
-							);
+								() => {
+									melisCms.pageTabOpenCallback(data.melisData.page_id);
 
-							// check for loading on page iframe
-							if (typeof loader !== "undefined") {
-								loader.checkPageLoading(data.melisData.item_zoneid);
-							}
+									// show page loader
+									loader.addActivePageEditionLoading(
+										data.melisData.item_zoneid
+									);
+								}
+							);
 						}
 					}
 
@@ -314,23 +314,10 @@ var temmmpInt;
 						null,
 						() => {
 							melisCms.pageTabOpenCallback(data.melisData.page_id);
-
-							// loader.checkPageLoading(data.melisData.item_zoneid);
+							// show page loader
 							loader.addActivePageEditionLoading(data.melisData.item_zoneid);
-
-							console.log(data.melisData.item_zoneid);
-							window.temmmp = 0;
-							console.log(window.temmmp);
-							temmmpInt = setInterval(() => {
-								window.temmmp++;
-							}, 1000);
 						}
 					);
-
-					// check for loading on page iframe
-					// if (typeof loader !== "undefined") {
-					// loader.checkPageLoading(data.melisData.item_zoneid);
-					// }
 
 					$(".hasNiceScroll")
 						.getNiceScroll()
