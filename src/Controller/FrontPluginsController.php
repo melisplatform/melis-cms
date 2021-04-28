@@ -298,7 +298,7 @@ class FrontPluginsController extends MelisAbstractActionController
         $configSvc = $this->getServiceManager()->get('MelisCoreConfig');
         $engineComposer  = $this->getServiceManager()->get('MelisEngineComposer');
         $melisPuginsSvc = $this->getServiceManager()->get('MelisCorePluginsService');
-        $marketPlaceModuleSection = $melisPuginsSvc->getPackagistCategories();
+        //$marketPlaceModuleSection = $melisPuginsSvc->getPackagistCategories();
         $marketPlaceModuleSection = [];
         /*
          * In case there is no internet or cant connect to the markeplace domain

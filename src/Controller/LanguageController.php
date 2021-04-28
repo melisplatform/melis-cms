@@ -290,47 +290,6 @@ class LanguageController extends MelisAbstractActionController
             'data' => $tableData,
         ));
     }
-   
-    
-    /**
-     * Creates translations for table actions in tools
-     *
-     * @return \Laminas\View\Model\JsonModel
-     */
-    public function getDataTableTranslationsAction()
-    {
-        // Get the current language
-        $container = new Container('meliscms');
-        $locale = $container['melis-lang-locale'];
-    
-        $translator = $this->getServiceManager()->get('translator');
-    
-        $transData = array(
-            'sEmptyTable' => $translator->translate('tr_meliscms_dt_sEmptyTable'),
-            'sInfo' => $translator->translate('tr_meliscms_dt_sInfo'),
-            'sInfoEmpty' => $translator->translate('tr_meliscms_dt_sInfoEmpty'),
-            'sInfoFiltered' => $translator->translate('tr_meliscms_dt_sInfoFiltered'),
-            'sInfoPostFix' => $translator->translate('tr_meliscms_dt_sInfoPostFix'),
-            'sInfoThousands' => $translator->translate('tr_meliscms_dt_sInfoThousands'),
-            'sLengthMenu' => $translator->translate('tr_meliscms_dt_sLengthMenu'),
-            'sLoadingRecords' => $translator->translate('tr_meliscms_dt_sLoadingRecords'),
-            'sProcessing' => $translator->translate('tr_meliscms_dt_sProcessing'),
-            'sSearch' => $translator->translate('tr_meliscms_dt_sSearch'),
-            'sZeroRecords' => $translator->translate('tr_meliscms_dt_sZeroRecords'),
-            'oPaginate' => array(
-                'sFirst' => $translator->translate('tr_meliscms_dt_sFirst'),
-                'sLast' => $translator->translate('tr_meliscms_dt_sLast'),
-                'sNext' => $translator->translate('tr_meliscms_dt_sNext'),
-                'sPrevious' => $translator->translate('tr_meliscms_dt_sPrevious'),
-            ),
-            'oAria' => array(
-                'sSortAscending' => $translator->translate('tr_meliscms_dt_sSortAscending'),
-                'sSortDescending' => $translator->translate('tr_meliscms_dt_sSortDescending'),
-            ),
-        );
-    
-        return new JsonModel($transData);
-    }
     
     public function getLanguageByIdAction()
     {
