@@ -465,9 +465,9 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
 
                 if (!empty($template['image'])) {
                     $thumbnail_file = '/' . $site->site_name . '/miniTemplatesTinyMce/' . $template['image']['file'];
-                    $image = '<img data-image="test" src="' . '/' . $site->site_name . '/miniTemplatesTinyMce/' . $template['image']['file'] . '?rand=' . uniqid('', true) . '" width=100 height=100>';
+                    $image = '<img data-image="test" src="' . '/' . $site->site_name . '/miniTemplatesTinyMce/' . $template['image']['file'] . '?rand=' . uniqid('', true) . '">';
                 } else {
-                    $image = '<img data-image="test" src="/MelisFront/plugins/images/default.jpg" width=100 height=100>';
+                    $image = '<img data-image="test" src="/MelisFront/plugins/images/default.jpg">';
                 }
 
                 $exploded = explode('.', $template['template']['file']);
