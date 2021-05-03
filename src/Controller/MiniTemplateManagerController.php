@@ -160,7 +160,7 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
                         $thumbnail_file = '/' . $post['site_name'] . '/miniTemplatesTinyMce/' . $thumbnail['file'];
                         $thumbnail = '<img class="mini-template-tool-table-image" src="' . '/' . $post['site_name'] . '/miniTemplatesTinyMce/' . $thumbnail['file'] . '?rand=' . uniqid('', true) . '">';
                     } else {
-                        $thumbnail = '<img class="mini-template-tool-table-image" src="/MelisFront/plugins/images/default.jpg" width=100 height=100>';
+                        $thumbnail = '<img class="mini-template-tool-table-image" src="/MelisFront/plugins/images/default.jpg">';
                     }
 
                     $template = [
