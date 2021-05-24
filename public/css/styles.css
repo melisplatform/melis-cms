@@ -89,8 +89,14 @@ hr{
 }
 
 span.fancytree-checkbox {
+	/* display: none; */
 	margin-top: 3px;
 }
+
+span.fancytree-checkbox.selected {
+	background-position: -32px -32px;
+}
+
 .icon-check:before {
 	content: "";
 }
@@ -98,7 +104,6 @@ span.fancytree-checkbox {
 span.fancytree-selected span.fancytree-title {
 	font-weight: normal;
 }
-
 
 /* tab head */
 .widget.widget-tabs-double-2>.widget-head ul li:hover{

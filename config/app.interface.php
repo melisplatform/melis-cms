@@ -145,6 +145,8 @@ return array(
                     '/MelisCms/js/tools/page-export-import.js',
                     // jsTree
                     '/MelisCms/assets/jstree/dist/jstree.min.js',
+                    // page tree view checkboxes
+                    '/MelisCms/js/cmsCore/melis-cms-page-treeview-checkboxes.js',
                 ),
                 'css' => array(
                     '/MelisCms/css/fancytree.custom.css',
@@ -157,7 +159,7 @@ return array(
                  * lesser requests
                  */
                 'build' => [
-                    'disable_bundle' => false,
+                    'disable_bundle' => true,
                     // lists of assets that will be loaded in the layout
                     'css' => [
                         '/MelisCms/build/css/bundle.css',
