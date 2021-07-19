@@ -15,7 +15,7 @@
        'images_upload_url' => '/melis/MelisCore/melisTinyMce/uploadImage',
        'plugins' => array(
             //[contextmenu, textcolor, colorpicker] this plugin is already built in the core editor as of TinyMCE v. 5
-           'lists advlist autolink link paste image charmap preview anchor emoticons help hr nonbreaking',
+           'lists advlist autolink link paste image charmap preview anchor help hr nonbreaking',
            'searchreplace visualblocks code fullscreen',
            'insertdatetime media table template'
        ),
