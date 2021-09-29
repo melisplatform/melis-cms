@@ -413,9 +413,12 @@
 
         // plugins edition
 	    'tr_meliscms_plugins_modal_cancel' => 'Annuler',
-	    'tr_meliscms_plugins_modal_apply' => 'Appliquer',
-	    
+	    'tr_meliscms_plugins_modal_apply' => 'Appliquer',	    
 	    'tr_meliscms_page_tree_no_selected_page' => 'No page selected, please select a page and try again',
+	    'tr_meliscms_common_label_yes' => 'Oui',
+	    'tr_meliscms_common_label_no' => 'Non',
+	    'tr_meliscms_common_label_delete_plugin' => 'Supprimer Plugin' ,
+	    'tr_meliscms_common_label_delete_plugin_confirm' => 'Etes-vous sûr de vouloir retirer ce plugin?',
 	    
 	    // tool style
 	    'tr_meliscms_tool_styles' => 'Styles',

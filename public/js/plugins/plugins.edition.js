@@ -514,21 +514,29 @@ var melisPluginEdition = (function($, window) {
             melisPluginTag          = pluginsToolsBox.data("melis-tag"),
             melisIdPage             = window.parent.$("#"+parent.activeTabId).find(".melis-iframe").data("iframe-id");
 
-            $.ajax({
-                type: 'GET',
-                url: "/melis/MelisCms/PageEdition/removePageSessionPlugin?module="+ melisPluginModuleName+"&pluginName="+ melisPluginName +"&pageId="+ melisIdPage +"&pluginId="+ melisPluginID +"&pluginTag="+ melisPluginTag
-            }).done(function(data) {
-                if(data.success) {
-                    pluginContainer.remove();
-                    calcFrameHeight();
-                    sendDragnDropList(dropzone, melisIdPage);
-                    pluginContainerChecker();
-                    pluginDetector();
-                } else {
-                    melisCmsFormHelper.melisMultiKoNotification(data.errors);
-                }
-            }).fail(function(xhr, textStatus, errorThrown) {
-                alert( translations.tr_meliscore_error_message );
+            //confirm deletion 
+            window.parent.melisCoreTool.confirm(
+                translations.tr_meliscms_common_label_yes,
+                translations.tr_meliscms_common_label_no,
+                translations.tr_meliscms_common_label_delete_plugin,
+                translations.tr_meliscms_common_label_delete_plugin_confirm,
+                function () {
+                    $.ajax({
+                        type: 'GET',
+                        url: "/melis/MelisCms/PageEdition/removePageSessionPlugin?module="+ melisPluginModuleName+"&pluginName="+ melisPluginName +"&pageId="+ melisIdPage +"&pluginId="+ melisPluginID +"&pluginTag="+ melisPluginTag
+                    }).done(function(data) {
+                        if(data.success) {
+                            pluginContainer.remove();
+                            calcFrameHeight();
+                            sendDragnDropList(dropzone, melisIdPage);
+                            pluginContainerChecker();
+                            pluginDetector();
+                        } else {
+                            melisCmsFormHelper.melisMultiKoNotification(data.errors);
+                        }
+                    }).fail(function(xhr, textStatus, errorThrown) {
+                        alert( translations.tr_meliscore_error_message );
+                    });
             });
     }
 
