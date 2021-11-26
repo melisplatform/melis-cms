@@ -39,16 +39,16 @@
                             <a
                                 class="clearfix"
                                 data-toggle="tab"
-                                href="#<?= $language['lang_cms_id'].'-mini-template-menu-manager-category' ?>"
+                                href="#<?= $language['lang_id'].'-mini-template-menu-manager-category' ?>"
                                 aria-expanded="false"
                             >
                                 <span class="float-right">
                                     <img
-                                        src="/MelisCms/images/lang-flags/<?= $language['lang_cms_locale'] ?>.png"
+                                        src="/MelisCore/assets/images/lang/<?= explode('_', $language['lang_locale'])[0] ?>.png"
                                         class="imgDisplay float-right"
                                     />
                                 </span>
-                                <span class="mm-lang-name"><?= $language['lang_cms_name']?></span>
+                                <span class="mm-lang-name"><?= $language['lang_name']?></span>
                             </a>
                         </li>
                     <?php } ?>
@@ -60,19 +60,19 @@
         <div class="col-xs-12 col-md-5 col-lg-3">
             <div class="tab-content">
                 <?php  foreach ($this->languages as $language): ?>
-                    <div id="<?php echo $language['lang_cms_id'].'-mini-template-menu-manager-category' ?>" class="tab-pane product-text-tab-content">
+                    <div id="<?php echo $language['lang_id'].'-mini-template-menu-manager-category' ?>" class="tab-pane product-text-tab-content">
                         <div class="me-heading bg-white ">
-                            <h3 class=""><i class="fa fa-language" aria-hidden="true"></i> <?php echo $language['lang_cms_name'] ?></h3>
+                            <h3 class=""><i class="fa fa-language" aria-hidden="true"></i> <?php echo $language['lang_name'] ?></h3>
                         </div>
                         <div class="product-text-tab-form-content" style="padding-bottom: 0px; padding-right: 0px;">
                             <?php
                                 $form = clone $this->form;
-                                $form->setAttribute('id', $language['lang_cms_id'] . '_' . $form->getAttribute('id'));
+                                $form->setAttribute('id', $language['lang_id'] . '_' . $form->getAttribute('id'));
                                 $input = $form->get('category_name');
-                                $input->setName($language['lang_cms_id'] . '_category_name');
-                                $input->setValue($this->texts[$language['lang_cms_id']] ?? '');
+                                $input->setName($language['lang_id'] . '_category_name');
+                                $input->setValue($this->texts[$language['lang_id']] ?? '');
                                 $input->setAttribute('id', $input->getName());
-                                $input->setAttribute('data-input-locale', $language['lang_cms_locale']);
+                                $input->setAttribute('data-input-locale', $language['lang_locale']);
 
                                 echo $this->form()->openTag($form);
                                 echo $this->melisFieldCollection($form);

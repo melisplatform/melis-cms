@@ -186,8 +186,10 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
      */
     public function renderMenuManagerToolAddCategoryBodyPropertiesFormAction() {
         $params = $this->params()->fromQuery();
-        $lang_service = $this->getServiceManager()->get('MelisEngineLang');
-        $languages = $lang_service->getAvailableLanguages();
+        //retrieve all BO languages
+        $langTable = $this->getServiceManager()->get('MelisCoreTableLang');
+        $languages = $langTable->fetchAll()->toArray();
+
         $form = $this->getForm($this->module, $this->tool_key, $this->form_add_category_key);
         $data = [];
 
