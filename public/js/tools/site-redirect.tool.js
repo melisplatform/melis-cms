@@ -80,7 +80,7 @@ $(function(){
 			var btn 		= $(this),
 				parentTr 	= btn.parents("tr"),
 				s301Id 		= parentTr.attr("id"),
-				oldUrl 		= $("#tableToolSite301 tr#"+s301Id+" td:nth-child(4)").text();
+				oldUrl 		= $("#tableToolSite301 tr#"+s301Id+" td:nth-child(3)").text();		
 
 				if ( oldUrl !== '' ) {
 					window.open(oldUrl,"_blank");
