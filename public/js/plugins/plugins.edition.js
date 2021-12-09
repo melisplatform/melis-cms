@@ -68,8 +68,16 @@ var melisPluginEdition = (function($, window) {
 
             pluginHardcodedConfig = $.trim($this.closest("#id_meliscms_plugin_modal_container").find(".plugin-hardcoded-conf").text());
 
-        // Construct data string
-        var datastring = dataString.serializeArray();
+            // Construct data string
+            var datastring = dataString.serializeArray();
+
+            //add to datastring the unchecked checkbox fields
+            $this.closest('.modal-content').find("form input:checkbox").each(function(){
+                if (!this.checked) {
+                    datastring.push({name: this.name, value: 0});
+                }                
+            });
+
             datastring.push({name: "melisIdPage", value: melisIdPage});
             datastring.push({name: "melisModule", value: melisPluginModule});
             datastring.push({name: "melisPluginName", value: melisPluginName});
