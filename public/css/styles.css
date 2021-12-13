@@ -905,3 +905,6 @@ ul#select2-id_mcgdprbanner_site_id-results {
 #id_meliscms_tree_sites_import_page_form .checkbox .page-import-cont .remember-me-cont input[type="checkbox"] {
 	display: none;
 }
+
+/*to enable scrolling when multiple modals were being opened*/
+.modal { overflow: auto !important; }
