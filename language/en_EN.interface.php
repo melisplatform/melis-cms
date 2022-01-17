@@ -595,6 +595,7 @@
         'tr_melis_cms_sites_homepages' => 'Homepages',
         'tr_melis_cms_sites_shome_page_id' => 'Home Page ID',
         'tr_melis_cms_sites_shome_page_id tooltip' => 'Identifier of the home page per language',
+        'tr_melis_cms_sites_homepages_404pages' => 'Homepages / 404 Pages',
 
         #SITES TRANSLATION TAB
         'tr_melis_site_translation_name' => 'Melis Site Translation',

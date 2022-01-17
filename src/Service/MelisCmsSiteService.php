@@ -507,8 +507,14 @@ class MelisCmsSiteService extends MelisGeneralService
              */
             $arrayParameters['site404']['s404_page_id'] = $page404Id;
             $arrayParameters['site404']['s404_site_id'] = $savedSiteId;
+
+            /**
+             * added new field:s404_lang_id
+             */
+            $arrayParameters['site404']['s404_lang_id'] = $langId;
             $site404Table->save($arrayParameters['site404']);
         }
+        
         /**
          * save the site home page language id
          */
@@ -518,6 +524,8 @@ class MelisCmsSiteService extends MelisGeneralService
             'shome_page_id' => $pageId
         );
         $siteHomeTable->save($siteHomeData);
+
+
         /**
          * Save the site lang id
          */

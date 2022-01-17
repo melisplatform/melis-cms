@@ -711,14 +711,25 @@ class SitesController extends MelisAbstractActionController
         $success = 0;
         $ctr = 0;
         $ctr1 = 0;
+        $ctr2 = 0;
 
         $moduleList = [];
         $domainData = [];
         $sitePropData = [];
         $siteHomeData = [];
+        $site404Data = [];
         $siteConfigTabData = [];
 
         foreach ($data as $datum => $val) {
+            //collecting data for 404 pages for each language
+            if (strpos($datum,'siteprop_') === false && strstr($datum,'s404_')) {               
+                $key = substr($datum, (strpos($datum, '_') ?: -1) + 1);               
+                if(!empty($site404Data[$ctr2]))
+                    if(array_key_exists($key, $site404Data[$ctr2]))
+                        $ctr2++;
+                $site404Data[$ctr2][$key] = $val;
+            }
+
             //collecting data for site module load
             if ($isAdmin) {
                 if (strstr($datum,'moduleLoad')) {
@@ -750,7 +761,8 @@ class SitesController extends MelisAbstractActionController
                         $ctr1++;
                 $siteHomeData[$ctr1][$key] = $val;
             }
-
+                  
+          
             //data for site config
             if (strstr($datum,'sconf_')) {
                 $lang = explode('_', $datum)[0];
@@ -775,6 +787,7 @@ class SitesController extends MelisAbstractActionController
             }
         }
 
+
         /**
          * Prepare the transaction so that
          * we can rollback the db process if
@@ -788,10 +801,12 @@ class SitesController extends MelisAbstractActionController
              * Try to save the site data's
              */
             $this->saveSiteDomains($domainData, $errors, $status);
-            $this->saveSiteHomePages($siteHomeData, $data, $errors, $status);
+            $this->saveSiteHomePages($siteHomeData, $data, $errors, $status);           
             $this->saveSiteConfig($siteId,$siteConfigTabData);
             $this->saveSiteProperties($siteId, $sitePropData, $errors, $status);
             $this->saveSiteLanguagesTab($siteId, $data);
+            $this->saveSite404Pages($site404Data, $data, $errors, $status);
+
             /**
              * If there is no error
              * execute the saving
@@ -1184,6 +1199,46 @@ class SitesController extends MelisAbstractActionController
 
                             foreach ($form->getMessages() as $key => $err) {
                                 $currErr[$siteHomeDatum["shome_lang_id"] . "_" . $key] = $err;
+                            }
+
+                            $errors = array_merge($errors, $currErr);
+                            $status = 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Save site 404 page ids
+     *
+     * @param $site404Data
+     * @param $data
+     * @param $errors
+     * @param $status
+     */
+    private function saveSite404Pages($site404Data, $data, &$errors, &$status)
+    {
+        /**
+         * Check if there is data to be process
+         */
+        if(!empty($site404Data)) {
+            $sitePropSvc = $this->getServiceManager()->get("MelisCmsSitesPropertiesService");
+
+            foreach ($site404Data as $site404Datum) {
+                $form = $this->getTool()->getForm('meliscms_tool_sites_properties_404page_form');
+                $form->setData($site404Datum);
+                if(!empty($data['slang_lang_id'])) {
+                    if (in_array($site404Datum['s404_lang_id'], $data['slang_lang_id'])) {
+                        if ($form->isValid()) {
+                            $sitePropSvc->saveSiteLang404($site404Datum);
+                        } else {
+                            $currErr = [];
+
+                            foreach ($form->getMessages() as $key => $err) {
+                                $currErr[$site404Datum["s404_lang_id"] . "_" . $key] = $err;
                             }
 
                             $errors = array_merge($errors, $currErr);

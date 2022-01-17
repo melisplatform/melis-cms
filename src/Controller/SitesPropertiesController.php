@@ -41,6 +41,9 @@ class SitesPropertiesController extends MelisAbstractActionController
      */
     public function renderToolSitesPropertiesContentAction() {
         $siteId = (int) $this->params()->fromQuery('siteId', '');
+        $siteLang404pages = null;
+        $s404pageForm = null;
+
         /**
          * Make sure site id is not empty
          */
@@ -53,12 +56,12 @@ class SitesPropertiesController extends MelisAbstractActionController
         // GET FORMS
         $propertiesForm = $melisTool->getForm("meliscms_tool_sites_properties_form");
         $homepageForm = $melisTool->getForm("meliscms_tool_sites_properties_homepage_form");
-
+        
         // SITE PROPERTIES
         $sitePropSvc = $this->getServiceManager()->get("MelisCmsSitesPropertiesService");
         $siteProp = $sitePropSvc->getSitePropAnd404BySiteId($siteId);
         $siteLangHomepages = $sitePropSvc->getLangHomepages($siteId);
-
+  
         // SET DATA TO FORM
         $propertiesForm->setData((array)$siteProp);
 
@@ -69,15 +72,30 @@ class SitesPropertiesController extends MelisAbstractActionController
         // GET SITE HOME PAGE IDS
         $siteHomePageIds = $this->getSiteHomePageIds($siteId, null);
 
+        //retrieve site_opt_lang_url 
+        $siteSvc = $this->getServiceManager()->get("MelisCmsSiteService");
+        $siteData = $siteSvc->getSiteById($siteId);
+        $siteOptLangUrl = $siteData->site_opt_lang_url;
+
+        //get 404 pages of each language of the given site if the site_opt_lang_url equals to 2 (locale is shown after domain)
+        if($siteOptLangUrl == 2) {
+            //retrieve the 404 pages of each language of the given site
+            $siteLang404pages = $sitePropSvc->getLang404pages($siteId);
+            $s404pageForm = $melisTool->getForm("meliscms_tool_sites_properties_404page_form");
+        }
+
         $view = new ViewModel();
 
         $view->melisKey = $melisKey;
         $view->siteId = $siteId;
         $view->propertiesForm = $propertiesForm;
         $view->homepageForm = $homepageForm;
+        $view->s404pageForm = $s404pageForm;
         $view->siteLangHomepages = $siteLangHomepages;
+        $view->siteLang404pages = $siteLang404pages;
         $view->activeSiteLangs = $activeSiteLangs;
-        $view->siteHomePageIds = $siteHomePageIds;
+        $view->siteHomePageIds = $siteHomePageIds;  
+        $view->siteOptLangUrl = $siteOptLangUrl;    
 
         return $view;
     }
@@ -92,7 +110,8 @@ class SitesPropertiesController extends MelisAbstractActionController
         $siteLangHomeTbl = $this->getServiceManager()->get('MelisEngineTableCmsSiteHome');
 
         return $siteLangHomeTbl->getHomePageBySiteIdAndLangId($siteId, $langId)->toArray();
-    }
+    } 
+
 
     /**
      * Returns Melis Key

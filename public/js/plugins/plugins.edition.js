@@ -86,6 +86,8 @@ var melisPluginEdition = (function($, window) {
 
     // Validate form in modal
     function validateModal(melisIdPage, melisPluginModule, melisPluginName, melisPluginId, melisPluginTag, datastring, siteModule) {
+        //console.log('validate modal');
+
        $.ajax({
             type: 'POST',
             url: "/melis/MelisCms/FrontPlugins/validatePluginModal?validate&melisSite="+siteModule,
@@ -135,6 +137,8 @@ var melisPluginEdition = (function($, window) {
 
     // Saving Plugin
     function savePluginUpdate(data, siteModule){
+        //console.log('save plugin update');
+
         $.ajax({
             type: "POST",
             url: "/melis/MelisCms/PageEdition/savePageSessionPlugin?idPage=" + melisActivePageId + "&melisSite="+siteModule,
@@ -221,6 +225,7 @@ var melisPluginEdition = (function($, window) {
                         }
 
                         if (parent.pluginResizable == 1){
+                            //console.log('plugin is resizable');
                             initResizable();
                         }
                     }
@@ -396,6 +401,9 @@ var melisPluginEdition = (function($, window) {
 
     // Send the list of plugin inside DragnDropzone
     function sendDragnDropList(dropzone, pageId) {
+
+        //console.log('sendDragnDropList');
+
         var $dropzone               = $('div[data-dragdropzone-id='+ dropzone +']'),
             dragdropzoneModule      = $dropzone.data("module"),
             dragdropzonePlugin      = $dropzone.data("plugin"),
@@ -630,6 +638,8 @@ var melisPluginEdition = (function($, window) {
 
     //  Resize Plugin
     function initResizable() {
+        console.log('init resizable function');
+
         var totalWidth, parentWidth,
             percentTotalWidth,
             iframe = window.parent.$("#"+ parent.activeTabId).find('iframe');
@@ -676,6 +686,10 @@ var melisPluginEdition = (function($, window) {
     }
 
     function getPluginData(el, percentTotalWidth) {
+
+        console.log('get plugin data');
+
+        
         var toolBox         = el,
             mobileWidth, tabletWidth, desktopWidth, currentClass, newClass,
             iframe          = window.parent.$("#"+ parent.activeTabId).find('iframe'),
@@ -769,6 +783,7 @@ var melisPluginEdition = (function($, window) {
                 pluginList['melisPluginTabletWidth'] = tabletWidth;
                 pluginList['melisPluginDesktopWidth'] = desktopWidth;
                 pluginList['resize'] = true;
+
                 // pass is to savePageSession
                 savePluginUpdate(pluginList, toolBox.data("site-module"));
 

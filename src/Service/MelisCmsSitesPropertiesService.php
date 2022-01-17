@@ -106,4 +106,70 @@ class MelisCmsSitesPropertiesService extends MelisGeneralService
 
         return $arrayParameters['results'];
     }
+
+    /**
+     * save the 404 page id of each language of a specific site
+     * @param array $data | data of the site domain of the page
+     * @return int siteLang404Data | the id of the newly saved or updated site language 404 page
+     */
+    public function saveSiteLang404($data)
+    {
+        // Event parameters prepare
+        $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
+
+        // Sending service start event
+        $arrayParameters = $this->sendEvent('meliscmssite_service_save_site_404_pages_start', $arrayParameters);
+
+        // Service implementation start
+        $siteLang404Table = $this->getServiceManager()->get('MelisEngineTableSite404');
+        $siteLang404Id = (isset($arrayParameters['data']['s404_id']) && $arrayParameters['data']['s404_id'] > 0) ? $arrayParameters['data']['s404_id'] : null;
+
+        $siteLang404Data = $siteLang404Table->save(
+            [
+                's404_site_id' => $arrayParameters['data']['s404_site_id'],
+                's404_lang_id' => $arrayParameters['data']['s404_lang_id'],
+                's404_page_id' => $arrayParameters['data']['s404_page_id']
+            ],
+            $siteLang404Id
+        );
+        // Service implementation end
+
+        // Adding results to parameters for events treatment if needed
+        $arrayParameters['results'] = $siteLang404Data;
+        // Sending service end event
+        $arrayParameters = $this->sendEvent('meliscmssite_service_save_site_404_pages_end', $arrayParameters);
+
+        return $arrayParameters['results'];
+    }
+
+
+     /**
+     * Returns the 404 pages of each language of a specific site
+     * @param $siteId param int $siteId | id of the site property to retrieve
+     * @return array
+     */
+    public function getLang404pages($siteId)
+    {
+        // Event parameters prepare
+        $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
+
+        // Sending service start event
+        $arrayParameters = $this->sendEvent('meliscmssite_service_get_site_property_start', $arrayParameters);
+
+        // Service implementation start
+        $lang404pageTable = $this->getServiceManager()->get('MelisEngineTableSite404');
+
+        if (is_numeric($siteId)) {
+            $lang404pages = $lang404pageTable->getEntryByField('s404_site_id', $siteId)->toArray();
+        }
+
+        // Service implementation end
+
+        // Adding results to parameters for events treatment if needed
+        $arrayParameters['results'] = $lang404pages;
+        // Sending service end event
+        $arrayParameters = $this->sendEvent('meliscmssite_service_get_site_property_end', $arrayParameters);
+
+        return $arrayParameters['results'];
+    }
 }

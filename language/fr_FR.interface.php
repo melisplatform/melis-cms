@@ -597,6 +597,7 @@
         'tr_melis_cms_sites_homepages' => 'Pages d\'accueil',
         'tr_melis_cms_sites_shome_page_id' => 'ID page d\'accueil',
         'tr_melis_cms_sites_shome_page_id tooltip' => 'Identifiant de la page d\'accueil par langue',
+        'tr_melis_cms_sites_homepages_404pages' => 'Pages d\'accueil / Pages 404 ',
 
         #SITE TRANSLATION TAB
         'tr_melis_site_translation_name' => 'Traduction du site Melis',

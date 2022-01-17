@@ -43,6 +43,20 @@ class PageEditionController extends MelisAbstractActionController
             if (!empty($container['content-pages'][$idPage]))
                 $container['content-pages'][$idPage] = array();
 
+        // if(!empty($_SESSION['meliscms']['content-pages'][$idPage])){
+        //     dump('session content-pages not empty');
+        //     $_SESSION['meliscms']['content-pages'][$idPage] = array();
+        //     unset($_SESSION['meliscms']['content-pages'][$idPage]);
+        // }
+
+
+        // dump('session data before update');
+        //dump( $_SESSION['meliscms']['content-pages']);
+
+        // dump('session melis pages');
+        // dump($_SESSION['meliscms']['content-pages'][$idPage]);
+
+
         $melisCoreConf = $this->getServiceManager()->get('MelisConfig');
         $resizeConfig   = $melisCoreConf->getItem('meliscms/conf')['pluginResizable'] ?? null;
 
@@ -123,6 +137,9 @@ class PageEditionController extends MelisAbstractActionController
     
     public function loadPageContentPluginsInSession($idPage)
     {
+
+       // dump('inside load page content plugins in session func');
+
         // Create container if needed to save in session tags modified
         $container = new Container('meliscms');
         
@@ -170,6 +187,10 @@ class PageEditionController extends MelisAbstractActionController
                 $container['content-pages'][$idPage] = $newcontentValuesArray;
             }
         }
+
+
+        // dump('newcontentValuesArray');
+        // dump($newcontentValuesArray);
         
     }
 
@@ -202,11 +223,19 @@ class PageEditionController extends MelisAbstractActionController
             // Get values posted and set them in form
             $postValues = $request->getPost()->toArray();
             	
-    
+            // dump('post values ');
+            // dump($postValues);
+
+            dump('session data before update');
+            dump( $_SESSION['meliscms']['content-pages']);
+
             // Send the event and let listeners do their job to catch and format their plugins values
             $eventDatas = array('idPage' => $idPage, 'postValues' => $postValues);
             $this->getEventManager()->trigger('meliscms_page_savesession_plugin_start', $this, $eventDatas);
              
+            dump('session data after update');
+            dump( $_SESSION['meliscms']['content-pages']);
+
             $result = array(
                 'success' => 1,
                 'errors' => array()
@@ -263,8 +292,15 @@ class PageEditionController extends MelisAbstractActionController
             
             // removing plugin from session
             $container = new Container('meliscms');
-            if (!empty($container['content-pages'][$pageId][$pluginTag][$pluginId]))
+            if (!empty($container['content-pages'][$pageId][$pluginTag][$pluginId])){
                 unset($container['content-pages'][$pageId][$pluginTag][$pluginId]);
+               
+            }
+            
+            // if(!empty($_SESSION['meliscms']['content-pages'][$pageId][$pluginTag][$pluginId])){
+            //     unset($_SESSION['meliscms']['content-pages'][$pageId][$pluginTag][$pluginId]);
+            // }
+            
             
             $this->getEventManager()->trigger('meliscms_page_removesession_plugin_end', null, $parameters);
             

@@ -952,12 +952,21 @@ class PageController extends MelisAbstractActionController
             {
                 $dataSaved = $dataSaved[0];
 
+                
                 $dataSaved['page_status'] = 1;
                 $dataSaved['page_edit_date'] = date('Y-m-d H:i:s');
 
                 $idPageTmp = $melisPagePublishedTable->save($dataSaved, $idPage);
 
                 $melisPageSavedTable->deleteById($idPage);
+
+
+
+                // dump( "session content after publish" .$_SESSION['meliscms']['content-pages']);
+                // dump('data saved ');
+                // dump($dataSaved);
+
+
             }
 
             $result = array(
