@@ -290,6 +290,7 @@ class FrontPluginsController extends MelisAbstractActionController
 
         return $pluginList;
     }
+
     private function organizedPluginsBySection($pluginList)
     {
         // get module categories
@@ -340,10 +341,11 @@ class FrontPluginsController extends MelisAbstractActionController
             /*
              * organized plugins with no subcategory
              */
-            $publicModules = $melisPuginsSvc->getMelisPublicModules(true);
+            $publicModules = array_change_key_case($melisPuginsSvc->getMelisPublicModules(true), CASE_LOWER); 
+
             foreach ($pluginList as $moduleName => $plugins) {
                 // double check moduleName if it exisit on composer to avoid showing plugins that doesnt exists
-                if (in_array(strtolower($moduleName),$vendorModules) || ($moduleName == "MelisMiniTemplate")) {
+                if (in_array(strtolower($moduleName),$vendorModules) || ($moduleName == "MelisMiniTemplate")) {                   
                    /*
                     * check first if the module is public or not
                     *  if public we will based the section on what is set from marketplace
