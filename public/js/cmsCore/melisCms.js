@@ -406,9 +406,13 @@ var melisCms = (function(){
 		    	}).done(function(){
 				    tree.loadKeyPath(newData, function(node, status){
 		        	    if (status == "ok"){
-		        	        node.setActive(true).done(function(){
-		        	    	   node.setExpanded(true);
-		        	        });
+		        	        // node.setActive(true).done(function(){
+		        	    	 //   node.setExpanded(true);
+		        	        // });
+                            try{
+                                node.setActive(true);
+                                node.setExpanded(true);
+                            }catch (e){}
 		        	    }
 		        	}).done(function(){
 		        		tree.clearFilter();
