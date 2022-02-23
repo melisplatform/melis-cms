@@ -39,7 +39,7 @@ return array(
             ),
             'ressources' => array(
                 'js' => array(
-                    '/MelisCms/js/tools/sites/sitesModuleLoad.tool.js',
+
                 ),
                 'css' => array(
 

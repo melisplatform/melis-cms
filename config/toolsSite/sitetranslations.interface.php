@@ -30,7 +30,7 @@ return array(
             ),
             'ressources' => array(
                 'js' => array(
-                    '/MelisCms/js/tools/sites/site-translation.js',
+
                 ),
                 'css' => array(
 

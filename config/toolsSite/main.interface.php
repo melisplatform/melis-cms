@@ -6,6 +6,8 @@ return array(
             'ressources' => array(
                 'js' => array(
                     '/MelisCms/js/tools/sites/sites.tool.js',
+                    '/MelisCms/js/tools/sites/sitesModuleLoad.tool.js',
+                    '/MelisCms/js/tools/sites/site-translation.js',
                     '/MelisCms/js/owl.carousel.js',
                 ),
                 'css' => array(
