@@ -158,9 +158,9 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
 
                     if (! empty($thumbnail)) {
                         $thumbnail_file = '/' . $post['site_name'] . '/miniTemplatesTinyMce/' . $thumbnail['file'];
-                        $thumbnail = '<img class="mini-template-tool-table-image" src="' . '/' . $post['site_name'] . '/miniTemplatesTinyMce/' . $thumbnail['file'] . '?rand=' . uniqid('', true) . '" width=100 height=100>';
+                        $thumbnail = '<img class="mini-template-tool-table-image" src="' . '/' . $post['site_name'] . '/miniTemplatesTinyMce/' . $thumbnail['file'] . '?rand=' . uniqid('', true) . '" width="195" height="100%">';
                     } else {
-                        $thumbnail = '<img class="mini-template-tool-table-image" src="/MelisFront/plugins/images/default.jpg" width=100 height=100>';
+                        $thumbnail = '<img class="mini-template-tool-table-image" src="/MelisFront/plugins/images/default.jpg" width="195" height="100%">';
                     }
 
                     $template = [
