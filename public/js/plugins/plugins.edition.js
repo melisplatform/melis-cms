@@ -68,8 +68,16 @@ var melisPluginEdition = (function($, window) {
 
             pluginHardcodedConfig = $.trim($this.closest("#id_meliscms_plugin_modal_container").find(".plugin-hardcoded-conf").text());
 
-        // Construct data string
-        var datastring = dataString.serializeArray();
+            // Construct data string
+            var datastring = dataString.serializeArray();
+
+            //add to datastring the unchecked checkbox fields
+            $this.closest('.modal-content').find("form input:checkbox").each(function(){
+                if (!this.checked) {
+                    datastring.push({name: this.name, value: 0});
+                }                
+            });
+
             datastring.push({name: "melisIdPage", value: melisIdPage});
             datastring.push({name: "melisModule", value: melisPluginModule});
             datastring.push({name: "melisPluginName", value: melisPluginName});
@@ -559,10 +567,11 @@ var melisPluginEdition = (function($, window) {
     function calcFrameHeight() {
         // recalculate frame height
         var //frameHeight = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe").contents().find("body").height(),
+            // Uses the document.body.scrollHeight for tinymce plugins used at the bottom will be cut off if "body".height is used.
             frameHeight = document.body.scrollHeight,
-            frame       = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe");
+            $frame      = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe");
 
-            frame.height(frameHeight);
+            $frame.height(frameHeight);
 
             /*
              * Added iframe.length for fixing issue: Uncaught TypeError: Cannot read property 'calcFrameHeight' of undefined
@@ -575,9 +584,6 @@ var melisPluginEdition = (function($, window) {
 
     function disableLinks(e) {
         $(e).on("click", function(event) { event.preventDefault(); });
-        $("*").off("click");
-        $("[onclick]").removeAttr("onclick");
-        $("[type=submit]").removeAttr("onclick");
     }
 
     function createPluginModal() {

@@ -27,7 +27,7 @@ class PageExportController extends MelisAbstractActionController
     {
         //get the request
         $request = $this->getRequest();
-        $getValues = get_object_vars($request->getQuery());
+        $getValues = $request->getQuery()->toArray();
 
         //get user info
         $auth = $this->getServiceManager()->get('MelisCoreAuth');
@@ -71,7 +71,7 @@ class PageExportController extends MelisAbstractActionController
         ];
         //get the request
         $request = $this->getRequest();
-        $data = get_object_vars($request->getPost());
+        $data = $request->getPost()->toArray();
 
         //prepare the services need for page export
         /** @var MelisCmsPageExportService $pageExportService */

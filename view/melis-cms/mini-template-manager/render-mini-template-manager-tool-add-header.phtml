@@ -1,0 +1,29 @@
+<div
+    id="<?= $this->zoneconfig['conf']['id'] ?>"
+    class="me-heading bg-white border-bottom"
+    data-melisKey="<?= $this->zoneconfig['conf']['melisKey'] ?>"
+>
+    <div class="row">
+        <div class="me-hl col-xs-12 col-sm-8 col-md-9">
+            <?php if (! empty($this->templateName)) : ?>
+                <h1 class="content-heading">Tpl <?= $this->templateName ?></h1>
+            <?php else : ?>
+                <h1 class="content-heading"><?= $this->translate('tr_meliscms_mini_template_manager_tool_add_mini_template_tab') ?></h1>
+            <?php endif ?>
+            <p><?= $this->translate('tr_meliscms_mini_template_manager_tool_add_mini_template_header') ?></p>
+        </div>
+        <div class="me-hr col-xs-12 col-sm-4 col-md-3">
+            <?php if ($this->formType == 'create') : ?>
+                <button class="btn btn-success" id="melis-cms-minitemplate-add-btn">
+                    <i class="fa fa-save"></i>
+                    <?= $this->translate('tr_meliscms_mini_template_save') ?>
+                </button>
+            <?php else: ?>
+                <button class="btn btn-success melis-cms-minitemplate-edit-btn">
+                    <i class="fa fa-save"></i>
+                    <?= $this->translate('tr_meliscms_mini_template_save') ?>
+                </button>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>

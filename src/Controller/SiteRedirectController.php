@@ -357,7 +357,7 @@ class SiteRedirectController extends MelisAbstractActionController
         $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         if($request->isPost()) {
              
-            $postValues = get_object_vars($request->getPost());
+            $postValues = $request->getPost()->toArray();
             $postValues = $melisTool->sanitizePost($postValues);
              
             if ($postValues['s301_id'])
@@ -484,7 +484,7 @@ class SiteRedirectController extends MelisAbstractActionController
          
         if($request->isPost()) {
              
-            $postValues = get_object_vars($request->getPost());
+            $postValues = $request->getPost()->toArray();
              
             // Checking if the Site Redirect Id has value
             if (!empty($postValues['s301Id'])){

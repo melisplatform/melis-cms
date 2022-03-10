@@ -21,7 +21,7 @@ $(function() {
           if (!$.isEmptyObject(data.pageInfo)) {
             // Opening new Page language created
             melisHelper.tabOpen(
-              data.pageInfo.name,
+              data.pageInfo.pageid + ' - ' + data.pageInfo.name,
               data.pageInfo.tabicon,
               data.pageInfo.id,
               data.pageInfo.meliskey,
@@ -61,7 +61,7 @@ $(function() {
   $body.on("click", ".open-page-from-lan-tab", function() {
     var data = $(this).data();
     if (!$.isEmptyObject(data)) {
-      melisHelper.tabOpen(data.name, data.tabicon, data.id, data.meliskey, {
+      melisHelper.tabOpen(data.pageid + ' - ' + data.name, data.tabicon, data.id, data.meliskey, {
         idPage: data.pageid,
       });
     }

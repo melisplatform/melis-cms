@@ -108,6 +108,8 @@ return [
             'MelisCmsPageService'               => \MelisCms\Service\MelisCmsPageService::class,
             'MelisCmsPageExportService'         => \MelisCms\Service\MelisCmsPageExportService::class,
             'MelisCmsPageImportService'         => \MelisCms\Service\MelisCmsPageImportService::class,
+            'MelisCmsMiniTemplateService'       => \MelisCms\Service\MelisCmsMiniTemplateService::class,
+            'MelisCmsMiniTemplateGetterService' => \MelisCms\Service\MelisCmsMiniTemplateGetterService::class,
         ],
     ],
     'controllers' => [
@@ -138,6 +140,8 @@ return [
             'MelisCms\Controller\GdprBanner'        => \MelisCms\Controller\GdprBannerController::class,
             'MelisCms\Controller\PageExport'        => \MelisCms\Controller\PageExportController::class,
             'MelisCms\Controller\PageImport'        => \MelisCms\Controller\PageImportController::class,
+            'MelisCms\Controller\MiniTemplateManager' => \MelisCms\Controller\MiniTemplateManagerController::class,
+            'MelisCms\Controller\MiniTemplateMenuManager' => \MelisCms\Controller\MiniTemplateMenuManagerController::class,
         ],
     ],
     'controller_plugins' => [

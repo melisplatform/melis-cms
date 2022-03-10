@@ -88,6 +88,28 @@ return array(
                                         ),
                                     ]
                                 ),
+                                // Mini Template Menu
+                                'meliscms_mini_template_manager' => [
+                                    'conf' => [
+                                        'id' => 'id_meliscms_menu_mini_template_manager',
+                                        'name' => 'tr_meliscms_mini_template_manager',
+                                        'rights_checkbox_disable' => false,
+                                        'melisKey' => 'meliscms_mini_template_manager',
+                                        'icon' => 'fa-file-code-o',
+                                    ],
+                                    'interface' => [
+                                        'meliscms_mini_template_manager_tool' => [
+                                            'conf' => [
+                                                'type' =>'/meliscms/interface/meliscms_mini_template_manager/interface/meliscms_mini_template_manager_tool'
+                                            ]
+                                        ],
+                                        'meliscms_mini_template_menu_manager_tool' => [
+                                            'conf' => [
+                                                'type' =>'/meliscms/interface/meliscms_mini_template_manager/interface/meliscms_mini_template_menu_manager_tool'
+                                            ]
+                                        ],
+                                    ],
+                                ]
                             ),
                         ),
                     ),
@@ -121,10 +143,14 @@ return array(
                     '/MelisCms/js/tools/style.tool.js',
                     '/MelisCms/js/tools/gdpr-banner.js',
                     '/MelisCms/js/tools/page-export-import.js',
+                    // jsTree
+                    '/MelisCms/assets/jstree/dist/jstree.min.js',
                 ),
                 'css' => array(
                     '/MelisCms/css/fancytree.custom.css',
                     '/MelisCms/css/styles.css',
+                    //jstree
+                    '/MelisCms/assets/jstree/dist/themes/proton/style.min.css',
                 ),
                 /**
                  * the "build" configuration compiles all assets into one file to make

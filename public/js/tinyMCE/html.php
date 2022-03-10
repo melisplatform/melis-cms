@@ -17,12 +17,26 @@
             //[contextmenu, textcolor, colorpicker] this plugin is already built in the core editor as of TinyMCE v. 5
            'lists advlist autolink link paste image charmap preview anchor help hr nonbreaking',
            'searchreplace visualblocks code fullscreen',
-           'insertdatetime media table template'
-       ),
+           'insertdatetime media table minitemplate'
+        ),
+        'external_plugins' => [
+            'minitemplate' => '/MelisCore/js/minitemplate/plugin.min.js'
+        ],
+        'melis_minitemplate' => [
+            /**
+             * return templates with the given prefix only
+             */
+            'prefix' => '',
+
+            /**
+             * site id
+             */
+            'site_id' => ''
+        ],
        'image_advtab' => true,
-       'toolbar' => 'insertfile undo redo paste | formatselect | forecolor | bold italic strikethrough underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media template | code',
+       'toolbar' => 'insertfile undo redo paste | formatselect | forecolor | bold italic strikethrough underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media minitemplate | code',
        'setup' => 'melisTinyMCE.tinyMceActionEvent',
-       'init_instance_callback' => 'tinyMceCleaner'
+       'init_instance_callback' => 'tinyMceCleaner'        
    );
 
 # For Reference
