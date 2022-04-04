@@ -77,7 +77,7 @@ return [
                                 'method' => 'POST',
                                 'action' => ''
                             ],
-                            'hydrator'  => 'Zend\Hydrator\ArraySerializable',
+                            'hydrator'  => 'Laminas\Hydrator\ArraySerializable',
                             'elements' => [
                                 [
                                     'spec' => [
@@ -167,7 +167,7 @@ return [
                                             'name' => 'NotEmpty',
                                             'options' => [
                                                 'messages' => [
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_mini_template_manager_tool_form_empty_field',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_mini_template_manager_tool_form_empty_field',
                                                 ],
                                             ],
                                         ],
@@ -185,7 +185,7 @@ return [
                                             'name' => 'NotEmpty',
                                             'options' => [
                                                 'messages' => [
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_mini_template_manager_tool_form_empty_field',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_mini_template_manager_tool_form_empty_field',
                                                 ],
                                             ],
                                         ],
@@ -193,7 +193,7 @@ return [
                                             'name' => 'regex', false,
                                             'options' => array(
                                                 'pattern' => '/^[a-zA-Z0-9_-]*$/',
-                                                'messages' => array(\Zend\Validator\Regex::NOT_MATCH => 'tr_meliscms_mini_template_form_invalid_name'),
+                                                'messages' => array(\Laminas\Validator\Regex::NOT_MATCH => 'tr_meliscms_mini_template_form_invalid_name'),
                                                 'encoding' => 'UTF-8',
                                             ),
                                         ]
@@ -210,7 +210,7 @@ return [
                                             'name' => 'NotEmpty',
                                             'options' => [
                                                 'messages' => [
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_mini_template_manager_tool_form_empty_field',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_meliscms_mini_template_manager_tool_form_empty_field',
                                                 ],
                                             ],
                                         ],
@@ -228,7 +228,7 @@ return [
                                             'break_chain_on_failure' => true,
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\Validator\File\Extension::FALSE_EXTENSION => 'tr_melis_cms_page_tree_import_wrong_extension',
+                                                    \Laminas\Validator\File\Extension::FALSE_EXTENSION => 'tr_melis_cms_page_tree_import_wrong_extension',
                                                 ),
                                                 'case' => true,
                                                 'extension' => [
