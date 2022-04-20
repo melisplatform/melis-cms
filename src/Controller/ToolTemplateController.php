@@ -659,6 +659,8 @@ class ToolTemplateController extends MelisAbstractActionController
             $search = $search['value'];
 
             $templateData = $templatesModel->getData($search, $siteId, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length);
+            //template data with no limit 
+            $templateDataNoLimit = $templatesModel->getData($search, $siteId, $melisTool->getSearchableColumns(), $selCol, $sortOrder, null, null);
             /**
              * // $dataCount = $templatesModel->getTotalData();
              * Instead of a separate query just to get the data count, the count is now done in one db call.
@@ -669,7 +671,7 @@ class ToolTemplateController extends MelisAbstractActionController
             $dataCount = $templateData->getObjectPrototype()->getFilteredDataCount();
 
             /** $dataFilteredCount is the integer used by the Datatable plugin as the total no. of rows a table have. */
-            $dataFilteredCount = $templateData->getObjectPrototype()->getUnfilteredDataCount();
+            $dataFilteredCount = $templateDataNoLimit->getObjectPrototype()->getFilteredDataCount();
 
             $tableData = $templateData->toArray();
 
