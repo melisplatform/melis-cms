@@ -20,6 +20,7 @@
                         <?php
                         $typeField = $form->get('miniTemplateSiteModule');
                         $inputLabel = $typeField->getLabelAttributes();
+                        $typeField->setLabelAttributes(array('class' => ''));
                         $label = $typeField->getLabel().' *<i class="fa fa-info-circle fa-lg float-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
                         $typeField->setLabel($label);
                         $typeField->setAttributes(['class' => 'form-control']);                   
@@ -34,6 +35,7 @@
                         <?php
                         $typeField = $form->get('miniTemplateName');
                         $inputLabel = $typeField->getLabelAttributes();                        
+                        $typeField->setLabelAttributes(array('class' => ''));
                         $label = $typeField->getLabel().' *<i class="fa fa-info-circle fa-lg float-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
                         $typeField->setLabel($label);
                         echo $this->formLabel($typeField);
@@ -49,6 +51,7 @@
                         $typeField->setAttribute('class', 'mini-template-input miniTemplateThumbnail' . $hash);
                         $typeField->setAttribute('id', 'miniTemplateThumbnail' . $hash);
                         $inputLabel = $typeField->getLabelAttributes();                       
+                        $typeField->setLabelAttributes(array('class' => ''));
                         $label = $typeField->getLabel().'<i class="fa fa-info-circle fa-lg float-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
                         $typeField->setLabel($label);
                         echo $this->formLabel($typeField);
@@ -89,6 +92,7 @@
                         $typeField->setAttribute('id', $tinymceId);
                         $typeField->setAttribute('data-tinymce-id', $tinymceId);
                         $inputLabel = $typeField->getLabelAttributes();                        
+                        $typeField->setLabelAttributes(array('class' => ''));
                         $label = $typeField->getLabel().' *<i class="fa fa-info-circle fa-lg float-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
                         $typeField->setLabel($label);
                         echo $this->formLabel($typeField);
