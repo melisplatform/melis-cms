@@ -468,8 +468,8 @@ return array(
                                             'label' => 'tr_meliscms_tool_style_page_status',
                                             'tooltip' => 'tr_meliscms_tool_style_page_status tooltip',
                                             'use_hidden_element' => false,
-                                            'checked_value' => 1,
-                                            'unchecked_value' => 0,
+                                            'checked_value' => '1',
+                                            'unchecked_value' => '0',
                                             'switchOptions' => array(
                                                 'label' => "<i class='glyphicon glyphicon-resize-horizontal'></i>",
                                                 'label-off' => 'tr_meliscms_tool_style_page_status_off',
@@ -858,8 +858,8 @@ return array(
                                         'options' => array(
                                             'label' => 'tr_melis_cms_sites_tool_add_step1_is_multi_lang',
                                             'tooltip' => 'tr_melis_cms_sites_tool_add_step1_is_multi_lang tooltip',
-                                            'checked_value' => 1,
-                                            'unchecked_value' => 0,
+                                            'checked_value' => '1',
+                                            'unchecked_value' => '0',
                                             'switchOptions' => array(
                                                 'label-on' => 'tr_meliscms_common_yes',
                                                 'label-off' => 'tr_meliscms_common_no',
