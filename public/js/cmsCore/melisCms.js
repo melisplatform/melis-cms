@@ -708,33 +708,30 @@ var melisCms = (function() {
 
 	// IFRAME HEIGHT CONTROLS (for onload, displaySettings & sidebar collapse)
 	function iframeLoad(id) {
-		var $body = $("body"),
-			$melisIframe = $("#" + id + "_id_meliscms_page").find(".melis-iframe"),
-			height = $melisIframe.contents().height(),
-			$loader = $melisIframe
-				.closest(".meliscms-page-tab-edition")
-				.find("#loader");
+		var $activeTabIdIframe 			= $("[id="+activeTabId+"]").find(".melis-iframe"),
+			$activeTabIdIframeContents 	= $activeTabIdIframe.contents(),
+			activeTabIdIframeHeight 	= $activeTabIdIframe.contents().height();
 
-		$melisIframe.css("height", height);
-		$melisIframe.css("min-height", "700px");
+			if ( activeTabIdIframeHeight > 0 ) {
+				$activeTabIdIframe.css("height", activeTabIdIframeHeight);
+			}
 
-		// Activating page edition button action
-		enableCmsButtons(id);
+			// Activating page edition button action
+			enableCmsButtons(id);
 
-		// remove page loader
-		window.parent.loader.removeActivePageEditionLoading(
-			id + "_id_meliscms_page"
-		);
+			// remove page loader
+			window.parent.loader.removeActivePageEditionLoading(
+				id + "_id_meliscms_page"
+			);
 
-		//clear the opened tab pages id
-		$openedPageIds = [];
+			//clear the opened tab pages id
+			$openedPageIds = [];
 
-		// PAGE ACCESS user rights checking
-		$.ajax({
-			url: "/melis/MelisCms/TreeSites/canEditPages",
-			encode: true,
-		})
-			.done(function(data) {
+			// PAGE ACCESS user rights checking
+			$.ajax({
+				url: "/melis/MelisCms/TreeSites/canEditPages",
+				encode: true,
+			}).done(function(data) {
 				var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
 				// has no access
 				if (data.edit === 0) {
@@ -764,12 +761,11 @@ var melisCms = (function() {
 				alert(translations.tr_meliscore_error_message);
 			});
 
-		// SAVE user rights checking
-		$.ajax({
-			url: "/melis/MelisCms/Page/isActionActive?actionwanted=save",
-			encode: true,
-		})
-			.done(function(data) {
+			// SAVE user rights checking
+			$.ajax({
+				url: "/melis/MelisCms/Page/isActionActive?actionwanted=save",
+				encode: true,
+			}).done(function(data) {
 				if (data.active === 0) {
 					$("body").addClass("disable-create");
 				} else {
@@ -780,12 +776,11 @@ var melisCms = (function() {
 				alert(translations.tr_meliscore_error_message);
 			});
 
-		// DELETE user rights checking
-		$.ajax({
-			url: "/melis/MelisCms/Page/isActionActive?actionwanted=delete",
-			encode: true,
-		})
-			.done(function(data) {
+			// DELETE user rights checking
+			$.ajax({
+				url: "/melis/MelisCms/Page/isActionActive?actionwanted=delete",
+				encode: true,
+			}).done(function(data) {
 				if (data.active === 0) {
 					$("body").addClass("disable-delete");
 				} else {
