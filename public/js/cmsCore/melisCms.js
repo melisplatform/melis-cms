@@ -556,7 +556,7 @@ var melisCms = (function(){
 	
     // IFRAME HEIGHT CONTROLS (for onload, displaySettings & sidebar collapse)
     function iframeLoad(id) {
-		var $activeTabIdIframe 			= $("[id="+activeTabId+"]").find(".melis-iframe"),
+		var $activeTabIdIframe 			= $("[id="+id+"_id_meliscms_page]").find(".melis-iframe"),
 			$activeTabIdIframeContents 	= $activeTabIdIframe.contents(),
 			activeTabIdIframeHeight 	= $activeTabIdIframe.contents().height();
 
