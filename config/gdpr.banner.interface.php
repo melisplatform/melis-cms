@@ -81,7 +81,7 @@ return [
                         'method' => 'POST',
                         'action' => '',
                     ],
-                    'hydrator' => 'Laminas\Hydrator\ArraySerializable',
+                    'hydrator' => 'Laminas\Hydrator\ArraySerializableHydrator',
                     'elements' => [
                         [
                             'spec' => [
@@ -130,7 +130,7 @@ return [
                         'method' => 'POST',
                         'action' => '',
                     ],
-                    'hydrator'  => 'Laminas\Hydrator\ArraySerializable',
+                    'hydrator'  => 'Laminas\Hydrator\ArraySerializableHydrator',
                     'elements' => [
                         [
                             'spec' => [

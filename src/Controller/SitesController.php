@@ -1486,7 +1486,7 @@ class SitesController extends MelisAbstractActionController
         return $siteField;
     }
 
-    private function getLangField($id, $siteId, $langId, $isActive = 1, $field)
+    private function getLangField($id, $siteId, $langId, $isActive, $field)
     {
         $lang = $this->getLang($id, $siteId, $langId, $isActive);
         $fieldData = '';

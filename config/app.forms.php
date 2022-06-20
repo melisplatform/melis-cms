@@ -11,7 +11,7 @@ return array(
 						'method' => 'POST',
 						'action' => '/melis/MelisCms/Page/saveProperties',
 					),
-					'hydrator'  => 'Laminas\Hydrator\ArraySerializable',
+					'hydrator'  => 'Laminas\Hydrator\ArraySerializableHydrator',
 					'elements' => array(  
 							array(
 								'spec' => array(
@@ -335,7 +335,7 @@ return array(
 						'method' => 'POST',
 						'action' => '/melis/MelisCms/PageSeo/saveSeo',
 					),
-					'hydrator'  => 'Laminas\Hydrator\ArraySerializable',
+					'hydrator'  => 'Laminas\Hydrator\ArraySerializableHydrator',
 					'elements' => array(  
 						array(
 							'spec' => array(
@@ -532,7 +532,7 @@ return array(
 			            'method' => 'POST',
 			            'action' => '',
 			        ),
-			        'hydrator'  => 'Laminas\Hydrator\ArraySerializable',
+			        'hydrator'  => 'Laminas\Hydrator\ArraySerializableHydrator',
 			        'elements' => array(
 			            array(
 			                'spec' => array(
