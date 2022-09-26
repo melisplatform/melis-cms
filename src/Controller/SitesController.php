@@ -1537,14 +1537,14 @@ class SitesController extends MelisAbstractActionController
             if ($dbConfig['sconf_lang_id'] == '-1') {
                 $dbConfig['sconf_datas'] = [
                     'site' => [
-                        $siteName => unserialize($dbConfig['sconf_datas']),
+                        $siteName => unserialize($dbConfig['sconf_datas'], ['allowed_classes' => false]),
                     ],
                 ];
             } else {
                 $dbConfig['sconf_datas'] = [
                     'site' => [
                         $siteName => [
-                            $siteId => unserialize($dbConfig['sconf_datas'])
+                            $siteId => unserialize($dbConfig['sconf_datas'], ['allowed_classes' => false])
                         ],
                     ],
                 ];

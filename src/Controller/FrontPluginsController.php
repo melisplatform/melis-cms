@@ -89,7 +89,7 @@ class FrontPluginsController extends MelisAbstractActionController
 
         $pluginHardcodedConfig = html_entity_decode($pluginHardcodedConfig, ENT_QUOTES);
         $pluginHardcodedConfig = html_entity_decode($pluginHardcodedConfig, ENT_QUOTES);
-        $pluginHardcodedConfig = unserialize($pluginHardcodedConfig);
+        $pluginHardcodedConfig = unserialize($pluginHardcodedConfig, ['allowed_classes' => false]);  
 
         $errors = '';
         $tag = '';
