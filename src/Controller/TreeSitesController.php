@@ -797,7 +797,7 @@ class TreeSitesController extends MelisAbstractActionController
     }
 
 
-    public function mapPage($parentId, $pages, $bufferedParentId = null, $langId, $pageRelation =null)
+    public function mapPage($parentId, $pages, $bufferedParentId, $langId, $pageRelation =null)
     {
         $pageService = $this->getServiceManager()->get('MelisCmsPageService');
 
@@ -857,7 +857,7 @@ class TreeSitesController extends MelisAbstractActionController
      * @param $parentPageIdInitial
      * @return array
      */
-    private function checkPageRelation($pages, $data = [], $parentPageIdInitial)
+    private function checkPageRelation($pages, $data, $parentPageIdInitial)
     {
         $tablePageLang = $this->getServiceManager()->get('MelisEngineTablePageLang');
 

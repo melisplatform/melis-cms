@@ -76,6 +76,9 @@ class PageDuplicationController extends MelisAbstractActionController
             if(empty($pageData->getMelisTemplate())) {
                 $pageData    = $pageService->getDatasPage($pageId, 'saved');
             }
+
+            //added for the melis cms page script editor module usage
+            $this->getEventManager()->trigger('meliscms_page_duplicate_start', $this, array('pageId' => $pageId));
             
             $templateData = $pageData->getMelisTemplate();
             $pageTreeData = $pageData->getMelisPageTree();
