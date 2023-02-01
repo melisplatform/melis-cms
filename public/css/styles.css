@@ -908,3 +908,18 @@ ul#select2-id_mcgdprbanner_site_id-results {
 
 /*to enable scrolling when multiple modals were being opened*/
 .modal { overflow: auto !important; }
+/*
+ * Adding this fix: 0004484: BO > Mini-templates in menu > thumbnail image (JIRA AL-1147)
+ * https://mantis2.uat.melistechnology.fr/view.php?id=4484 
+ */
+.new-minitemplate-thumbnail {
+    width: auto;
+    max-width: 200px;
+}
+#mini-template-buttons .tox-button img,
+#tableMiniTemplateManager .mini-template-tool-table-image {
+    display: block !important;
+    width: auto !important;
+    height: auto;
+    max-width: 200px;
+}
