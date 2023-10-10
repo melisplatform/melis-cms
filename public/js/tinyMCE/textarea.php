@@ -30,7 +30,7 @@
 			'site_id' => ''
 		],
 	    'autoresize_on_init' => false,
-	    'toolbar' => 'undo redo link unlink | forecolor backcolor | code',
+	    'toolbar' => 'undo redo link unlink | forecolor backcolor | code', // minitemplate before code
 		'deprecation_warnings' => false,
 	    'setup' => 'melisTinyMCE.tinyMceActionEvent',
 	    'init_instance_callback'  => 'tinyMceCleaner'

@@ -30,7 +30,7 @@
 			'site_id' => ''
 		],
         'image_advtab' => true,
-        'toolbar' => 'insertfile undo redo link image media | code',
+        'toolbar' => 'insertfile undo redo link image media | code', // minitemplate before code
         'deprecation_warnings' => false,
         'init_instance_callback' => 'tinyMceCleaner',
     ]; 
