@@ -13,11 +13,11 @@
         'images_upload_url' => '/melis/MelisCore/melisTinyMce/uploadImage',
         'plugins' => [
             'lists', 'advlist', 'autolink', 'link', 'image', 'charmap', 'preview', 'anchor',
-            'searchreplace', 'visualblocks', 'code', 'fullscreen', 'insertdatetime', 'media', 'table', 'minitemplate'
+            'searchreplace', 'visualblocks', 'code', 'fullscreen', 'insertdatetime', 'media', 'table' // 'minitemplate'
         ],
-        'external_plugins' => [
+        /* 'external_plugins' => [
             'minitemplate' => '/MelisCore/js/minitemplate/plugin.min.js'
-        ],
+        ], */
         'melis_minitemplate' => [
 			/**
 			 * return templates with the given prefix only
@@ -30,7 +30,7 @@
 			'site_id' => ''
 		],
         'image_advtab' => true,
-        'toolbar' => 'insertfile undo redo link image media minitemplate | code',
+        'toolbar' => 'insertfile undo redo link image media | code',
         'deprecation_warnings' => false,
         'init_instance_callback' => 'tinyMceCleaner',
     ]; 
