@@ -18,17 +18,12 @@
         /* 'external_plugins' => [
             'minitemplate' => '/MelisCore/js/minitemplate/plugin.min.js'
         ], */
-        'melis_minitemplate' => [
-			/**
-			 * return templates with the given prefix only
-			 */
+        /* 'melis_minitemplate' => [
+            // return templates with the given prefix only
 			'prefix' => '',
-
-			/**
-			 * site id
-			 */
+            // site id
 			'site_id' => ''
-		],
+		], */
         'image_advtab' => true,
         'toolbar' => 'insertfile undo redo link image media | code', // minitemplate before code
         'deprecation_warnings' => false,
