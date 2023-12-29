@@ -31,10 +31,10 @@
 		"melis-module-category": "cms"
 	},
 	"require": {
-		"php": "^7.3|^8.0",
-		"melisplatform/melis-core": "^5.0",
-		"melisplatform/melis-engine": "^5.0",
-		"melisplatform/melis-front": "^5.0"
+		"php": "^8.1|^8.3",
+		"melisplatform/melis-core": "*",
+		"melisplatform/melis-engine": "*",
+		"melisplatform/melis-front": "*"
 	},
 	"autoload": {
 		"psr-4": {
