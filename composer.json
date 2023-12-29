@@ -36,6 +36,7 @@
 		"melisplatform/melis-engine": "dev-update/php83@dev",
 		"melisplatform/melis-front": "dev-update/php83@dev"
 	},
+	"minimum-stability": "dev",
 	"autoload": {
 		"psr-4": {
 			"MelisCms\\": "src/"
