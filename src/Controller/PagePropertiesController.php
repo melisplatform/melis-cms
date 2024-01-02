@@ -90,8 +90,8 @@ class PagePropertiesController extends MelisAbstractActionController
             $locale = $container['melis-lang-locale'];
             $melisTranslation = $this->getServiceManager()->get('MelisCoreTranslation');
 
-            $datasPageTree->page_creation_date = strftime($melisTranslation->getDateFormatByLocate($locale), strtotime($datasPageTree->page_creation_date));
-            $datasPageTree->page_edit_date = strftime($melisTranslation->getDateFormatByLocate($locale), strtotime($datasPageTree->page_edit_date));
+            $datasPageTree->page_creation_date = date($melisTranslation->getDateFormatByLocate($locale), strtotime($datasPageTree->page_creation_date ?? ''));
+            $datasPageTree->page_edit_date = date($melisTranslation->getDateFormatByLocate($locale), strtotime($datasPageTree->page_edit_date ?? ''));
             $propertyForm->bind($datasPageTree);
         }
 
