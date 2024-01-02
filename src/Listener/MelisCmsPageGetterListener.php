@@ -19,6 +19,8 @@ use Laminas\Session\Container;
  */
 class MelisCmsPageGetterListener implements ListenerAggregateInterface
 {
+    public $listeners = [];
+
     public function attach(EventManagerInterface $events, $priority = 1)
     {
         $callBackHandler = $events->attach(
