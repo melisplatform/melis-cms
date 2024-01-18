@@ -65,7 +65,7 @@ return [
                                 'method' => 'POST',
                                 'action' => ''
                             ],
-                            'hydrator'  => 'Zend\Hydrator\ArraySerializable',
+                            'hydrator'  => 'Laminas\Hydrator\ArraySerializableHydrator',
                             'elements' => [
                                 [
                                     'spec' => [
