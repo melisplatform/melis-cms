@@ -13,7 +13,7 @@
         'images_upload_url' => '/melis/MelisCore/melisTinyMce/uploadImage',
         'plugins' => [
             'lists', 'advlist', 'autolink', 'link', 'image', 'charmap', 'preview', 'anchor',
-            'searchreplace', 'visualblocks', 'code', 'fullscreen', 'insertdatetime', 'media', 'table', 'minitemplate'
+            'searchreplace', 'visualblocks', 'code', 'insertdatetime', 'media', 'table', 'minitemplate' // 'fullscreen',
         ],
         'external_plugins' => [
             'minitemplate' => '/MelisCore/js/minitemplate/plugin.min.js'
