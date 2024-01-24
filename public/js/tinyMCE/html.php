@@ -16,7 +16,7 @@
        'plugins' => [
            'lists', 'advlist', 'autolink', 'link', 'image', 'charmap', 'preview', 
            'anchor', 'emoticons', 'help', 'nonbreaking', 'searchreplace', 'visualblocks',
-           'code', 'insertdatetime', 'media', 'table', 'minitemplate' // 'fullscreen',
+           'code', 'fullscreen', 'insertdatetime', 'media', 'table', 'minitemplate'
         ],
         'external_plugins' => [
             'minitemplate' => '/MelisCore/js/minitemplate/plugin.min.js'
