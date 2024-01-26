@@ -544,7 +544,7 @@ class MelisCmsPageExportService extends MelisGeneralService
                 $subnode = $tblXml->addChild($key);
                 $this->arrayToXml($value, $subnode);
             } else {
-                $tblXml->addChild($key, htmlspecialchars($value));
+                $tblXml->addChild($key, htmlspecialchars((string) $value));
             }
         }
     }

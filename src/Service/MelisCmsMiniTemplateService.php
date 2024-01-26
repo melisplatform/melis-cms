@@ -1077,7 +1077,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
      * @return mixed
      */
     private function startDbTransaction() {
-        $db = $this->getServiceManager()->get('Zend\Db\Adapter\Adapter');
+        $db = $this->getServiceManager()->get('Laminas\Db\Adapter\Adapter');
         $connection = $db->getDriver()->getConnection();
         $connection->beginTransaction();
         return $connection;

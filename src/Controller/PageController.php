@@ -174,7 +174,7 @@ class PageController extends MelisAbstractActionController
             {
                 $lastPublishedDate = $datasPagePublishedTree->page_edit_date;
 
-                $lastPublishedDate = strftime($melisTranslation->getDateFormatByLocate($locale), strtotime($lastPublishedDate));
+                $lastPublishedDate = date($melisTranslation->getDateFormatByLocate($locale), strtotime($lastPublishedDate ?? ''));
             }
 
             if (!empty($datasPagePublishedTree->page_last_user_id))
@@ -209,7 +209,7 @@ class PageController extends MelisAbstractActionController
                     $lastSavedDate = $datasPageSaved->page_creation_date;
                 else
                     $lastSavedDate = $datasPageSaved->page_edit_date;
-                $lastSavedDate = strftime($melisTranslation->getDateFormatByLocate($locale), strtotime($lastSavedDate));
+                $lastSavedDate = date($melisTranslation->getDateFormatByLocate($locale), strtotime($lastSavedDate ?? ''));
                 if (!empty($datasPageSaved->page_last_user_id))
                 {
                     $melisCoreTableUser = $this->getServiceManager()->get('MelisCoreTableUser');

@@ -151,7 +151,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                                                             $conf = $val['melis'] ?? null;
                                                                                             $thumbnail = $conf['thumbnail'] ?? "/MelisFront/plugins/images/default.jpg";
                                                                                             $name = $conf['name'] ?? $pluginName;
-                                                                                            $name = str_replace('\\', null, $name);
+                                                                                            $name = str_replace('\\', '', $name);
                                                                                             $subcategory = $conf['subcategory'];
                                                                                             $subcategoryId = $subcategory['id'] ?? null;
                                                                                             $isNew = $val['isNew'] ?? false;
@@ -166,7 +166,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                                                                      data-plugin-name="<?= $key; ?>"
                                                                                                      data-plugin-site-module="<?= $this->siteModule ?>"
                                                                                                      title="<?php if (!empty($conf['description'])) {
-                                                                                                         echo $this->boTranslate(str_replace('\\', null, $conf['description']));
+                                                                                                         echo $this->boTranslate(str_replace('\\', '', $conf['description']));
                                                                                                      } ?>">
                                                                                                     <img  src="<?= $thumbnail; ?>" width="195">
                                                                                                     <?php if ($isNew) : ?>
@@ -186,7 +186,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                                             $conf = $config['melis'] ?? null;
                                                                             $thumbnail = $conf['thumbnail'] ?? "/MelisFront/plugins/images/default.jpg";
                                                                             $name = $conf['name'] ?? $pluginName;
-                                                                            $name = str_replace('\\', null, $name);
+                                                                            $name = str_replace('\\', '', $name);
                                                                             $subcategory = $conf['subcategory'] ?? null;
                                                                             $subcategoryId = $subcategory['id'] ?? null;
                                                                             $isNew = $config['isNew'] ?? false;
@@ -201,7 +201,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                                                      data-plugin-name="<?= $plugin; ?>"
                                                                                      data-plugin-site-module="<?= $this->siteModule ?>"
                                                                                      title="<?php if (!empty($conf['description'])) {
-                                                                                         echo $this->boTranslate(str_replace('\\', null, $conf['description']));
+                                                                                         echo $this->boTranslate(str_replace('\\', '', $conf['description']));
                                                                                      } ?>">
                                                                                     <img  src="<?= $thumbnail; ?>" width="195">
                                                                                     <?php if($isNew) {?>
@@ -225,7 +225,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                         $conf = $pluginConfig['melis'];
                                                         $thumbnail = $conf['thumbnail']  ?? "/MelisFront/plugins/images/default.jpg";
                                                         $name      = $conf['name'] ?? $pluginName;
-                                                        $name      = str_replace('\\', null, $name);
+                                                        $name      = str_replace('\\', '', $name);
                                                         $moduleTextDisplay = $conf['moduleName'];
                                                         $titleTextClass = '';
                                                         $isNew = $pluginConfig['isNew'] ?? false;
@@ -234,7 +234,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                             $newClass = 'has-new-plugins';
                                                         }
                                                         ?>
-                                                        <div class="melis-cms-plugin-snippets <?= $newClass ?>" data-module-name="<?= $moduleName; ?>" data-plugin-name="<?= $pluginName; ?>" data-plugin-site-module="<?= $this->siteModule ?>" title="<?php if (!empty($conf['description'])){ echo $this->boTranslate(str_replace('\\', null, $conf['description'])); } ?>">
+                                                        <div class="melis-cms-plugin-snippets <?= $newClass ?>" data-module-name="<?= $moduleName; ?>" data-plugin-name="<?= $pluginName; ?>" data-plugin-site-module="<?= $this->siteModule ?>" title="<?php if (!empty($conf['description'])){ echo $this->boTranslate(str_replace('\\', '', $conf['description'])); } ?>">
                                                             <?php if ($moduleName!= "MelisMiniTemplate") { ?>
                                                                 <img  src="<?= $thumbnail; ?>" alt="">
                                                             <?php }?>
@@ -285,7 +285,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                                 $conf = $config['melis'] ?? null;
                                                                 $thumbnail = $conf['thumbnail'] ?? "/MelisFront/plugins/images/default.jpg";
                                                                 $name = $conf['name'] ?? $pluginName;
-                                                                $name = str_replace('\\',null,$name);
+                                                                $name = str_replace('\\','',$name);
                                                                 $subcategory = $conf['subcategory'] ?? null;
                                                                 $subcategoryId = $subcategory['id'] ?? null;
                                                                 $isNew = $config['isNew'] ?? false;
@@ -300,7 +300,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                                          data-plugin-name="<?= $plugin; ?>"
                                                                          data-plugin-site-module="<?= $this->siteModule ?>"
                                                                          title="<?php if (!empty($conf['description'])) {
-                                                                             echo $this->boTranslate(str_replace('\\',null,$conf['description']));
+                                                                             echo $this->boTranslate(str_replace('\\','',$conf['description']));
                                                                          } ?>">
                                                                         <?php if ($moduleName!= "MelisMiniTemplate") : ?>
                                                                             <img  src="<?= $thumbnail; ?>" alt="">
@@ -322,7 +322,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                 $conf = $pluginConfig['melis'];
                                                 $thumbnail = $conf['thumbnail']  ?? "/MelisFront/plugins/images/default.jpg";
                                                 $name      = $conf['name'] ?? $pluginName;
-                                                $name      = str_replace('\\',null,$name);
+                                                $name      = str_replace('\\','',$name);
                                                 $moduleTextDisplay = $conf['moduleName'];
                                                 $isNew = $pluginConfig['isNew'] ?? false;
                                                 $newClass = '';
@@ -335,7 +335,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                         data-module-name="<?= $moduleName; ?>"
                                                         data-plugin-name="<?= $pluginName; ?>"
                                                         data-plugin-site-module="<?= $this->siteModule ?>"
-                                                        title="<?php if (!empty($conf['description'])){ echo $this->boTranslate(str_replace('\\',null,$conf['description'])); } ?>"
+                                                        title="<?php if (!empty($conf['description'])){ echo $this->boTranslate(str_replace('\\','',$conf['description'])); } ?>"
                                                 >
                                                     <?php if ($moduleName!= "MelisMiniTemplate") : ?>
                                                         <img  src="<?= $thumbnail; ?>" alt="">
