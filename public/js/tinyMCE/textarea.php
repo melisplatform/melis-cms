@@ -16,14 +16,14 @@
 			'visualblocks', 'code', 'fullscreen', 'insertdatetime', 'media', 'table', 'autoresize', 'minitemplate'
 		],
 		'external_plugins' => [
-            'minitemplate' => '/MelisCore/js/minitemplate/plugin.min.js'
+            'minitemplate' => '/MelisCore/js/minitemplate/plugin.min.js?v=20230214'
         ],
-		/* 'melis_minitemplate' => [
+		'melis_minitemplate' => [
 			// return templates with the given prefix only
 			'prefix' => '',
 			// site id
 			'site_id' => ''
-		], */
+		],
 	    'autoresize_on_init' => false,
 	    'toolbar' => 'undo redo link unlink | forecolor backcolor | minitemplate code',
 		'deprecation_warnings' => false,
