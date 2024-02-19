@@ -169,6 +169,7 @@ return array(
     					            'name' => 'page_taxonomy',
     					            'type' => 'MelisMultiValInput',
     					            'options' => array(
+    					                'label' => 'tr_meliscms_page_tab_properties_form_taxonomy',
     					            	'tooltip' => 'tr_meliscms_page_tab_properties_form_taxonomy_tooltip',
     					            ),
     					            'attributes' => array(
