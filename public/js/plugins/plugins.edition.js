@@ -566,20 +566,21 @@ var melisPluginEdition = (function($, window) {
 
     function calcFrameHeight() {
         // recalculate frame height
-        var //frameHeight = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe").contents().find("body").height(),
-            // Uses the document.body.scrollHeight for tinymce plugins used at the bottom will be cut off if "body".height is used.
-            frameHeight = document.body.scrollHeight,
+        // frameHeight = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe").contents().find("body").height(),
+        
+        // Uses the document.body.scrollHeight for tinymce plugins used at the bottom will be cut off if "body".height is used.
+        var frameHeight = document.body.scrollHeight,
             $frame      = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe");
 
-            $frame.height(frameHeight);
+            // $frame.height(frameHeight);
 
             /*
              * Added iframe.length for fixing issue: Uncaught TypeError: Cannot read property 'calcFrameHeight' of undefined
              * Added by: Junry 22/05/2019
              */
-            /* if ( frame.length ) {
-                frame.height(frameHeight);
-            } */
+            if ( $frame.length ) {
+                $frame.height(frameHeight);
+            }
     }
 
     function disableLinks(e) {
