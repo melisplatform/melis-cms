@@ -567,24 +567,27 @@ var melisPluginEdition = (function($, window) {
     function calcFrameHeight() {
         // recalculate frame height
         // frameHeight = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe").contents().find("body").height()
+        // window.parent.document.body.find('[id="'+parent.activeTabId+'"] .melis-iframe')
         // window.parent.$("#"+ parent.activeTabId).find(".melis-iframe")
         
-        // Uses the document.body.scrollHeight for tinymce plugins used at the bottom will be cut off if "body".height is used.
-        var frameHeight = document.body.scrollHeight,
-            $frame      = window.parent.document.find('[id="'+parent.activeTabId+'"] .melis-iframe');
+        setTimeout(function() {
+            // Uses the document.body.scrollHeight for tinymce plugins used at the bottom will be cut off if "body".height is used.
+            var frameHeight = document.body.scrollHeight,
+                $frame      = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe");
 
-            console.log("$frame window.parent: ", window.parent);
-            console.log("$frame: ", $frame);
+                console.log("setTimeout 2000 $frame window.parent: ", window.parent);
+                console.log("setTimeout 2000 $frame: ", $frame);
 
-            // $frame.height(frameHeight);
+                // $frame.height(frameHeight);
 
-            /*
-             * Added iframe.length for fixing issue: Uncaught TypeError: Cannot read property 'calcFrameHeight' of undefined
-             * Added by: Junry 22/05/2019
-             */
-            if ( $frame.length ) {
-                $frame.height(frameHeight);
-            }
+                /*
+                * Added iframe.length for fixing issue: Uncaught TypeError: Cannot read property 'calcFrameHeight' of undefined
+                * Added by: Junry 22/05/2019
+                */
+                if ( $frame.length ) {
+                    $frame.height(frameHeight);
+                }
+        }, 2000);
     }
 
     function disableLinks(e) {
