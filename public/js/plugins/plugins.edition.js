@@ -566,14 +566,15 @@ var melisPluginEdition = (function($, window) {
 
     function calcFrameHeight() {
         // recalculate frame height
-        // frameHeight = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe").contents().find("body").height(),
+        // frameHeight = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe").contents().find("body").height()
+        // window.parent.$("#"+ parent.activeTabId).find(".melis-iframe")
         
         // Uses the document.body.scrollHeight for tinymce plugins used at the bottom will be cut off if "body".height is used.
         var frameHeight = document.body.scrollHeight,
-            $frame      = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe");
+            $frame      = window.parent.document.find('[id="'+parent.activeTabId+'"] .melis-iframe');
 
             console.log("$frame window.parent: ", window.parent);
-            console.log("$frame parent.activeTabId: ", parent.activeTabId);
+            console.log("$frame: ", $frame);
 
             // $frame.height(frameHeight);
 
