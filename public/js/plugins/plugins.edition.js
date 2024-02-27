@@ -573,6 +573,7 @@ var melisPluginEdition = (function($, window) {
             $frame      = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe");
 
             console.log("$frame window.parent: ", window.parent);
+            console.log("$frame parent.activeTabId: ", parent.activeTabId);
 
             // $frame.height(frameHeight);
 
