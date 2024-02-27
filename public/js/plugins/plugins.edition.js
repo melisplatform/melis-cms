@@ -572,6 +572,8 @@ var melisPluginEdition = (function($, window) {
         var frameHeight = document.body.scrollHeight,
             $frame      = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe");
 
+            console.log("$frame window.parent: ", window.parent);
+
             // $frame.height(frameHeight);
 
             /*
