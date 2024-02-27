@@ -575,9 +575,6 @@ var melisPluginEdition = (function($, window) {
             var frameHeight = document.body.scrollHeight,
                 $frame      = window.parent.$("#"+ parent.activeTabId).find(".melis-iframe");
 
-                console.log("setTimeout 2000 $frame window.parent: ", window.parent);
-                console.log("setTimeout 2000 $frame: ", $frame);
-
                 // $frame.height(frameHeight);
 
                 /*
