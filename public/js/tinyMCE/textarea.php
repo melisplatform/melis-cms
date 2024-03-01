@@ -5,7 +5,7 @@
 		'language' => 'en',
 		'inline' => true,
 		'menubar' => false,
-		'forced_root_block'  => 'div',
+		'forced_root_block'  => 'p',
 		'cleanup'  => false,
 		'verify_html'  => false,
 		'file_picker_types' => 'file image media',
