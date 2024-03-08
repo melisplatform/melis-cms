@@ -57,7 +57,7 @@ var melisDragnDrop = (function($, window) {
                 var placeholderWidth = ( 100 * parseFloat($(ui.helper[0]).css("width")) / parseFloat($(ui.helper[0]).parent().css('width')) ) + '%';
                     $(ui.placeholder[0]).css("width", placeholderWidth);
 
-                // change its css to fit for theme design specific for the melismenitemplate
+                // change its css to fit for theme design specific for the melis minitemplate
                 var ddn = $(ui.helper[0]).attr("data-module-name");
 
                     if ( ddn == "MelisMiniTemplate" ) {

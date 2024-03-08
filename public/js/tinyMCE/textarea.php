@@ -6,6 +6,7 @@
 		'inline' => true,
 		'menubar' => false,
 		'forced_root_block'  => 'p',
+		'image_uploadtab' => false,
 		'cleanup'  => false,
 		'verify_html'  => false,
 		'file_picker_types' => 'file image media',
