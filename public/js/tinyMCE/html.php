@@ -9,7 +9,6 @@
        'menubar' => false,
        'forced_root_block' => 'p',
        //'paste_word_valid_elements'=> "p,b,strong,i,em,h1,h2,h3,h4",
-       //'extended_valid_elements' => 'a[!href|target|title|rel=nofollow]',
        'image_uploadtab' => false,
        'cleanup' => false,
        'verify_html' => false,
@@ -34,6 +33,7 @@
        // formatselect = blocks
        'toolbar' => 'insertfile undo redo | blocks | forecolor | bold italic strikethrough underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media | minitemplate code',
        'deprecation_warnings' => false,
+       'promotion' => false,
        'setup' => 'melisTinyMCE.tinyMceActionEvent',
        'init_instance_callback' => 'tinyMceCleaner'        
     ];

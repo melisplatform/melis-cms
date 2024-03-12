@@ -28,5 +28,6 @@
         'image_advtab' => true,
         'toolbar' => 'insertfile undo redo link image media | minitemplate code',
         'deprecation_warnings' => false,
+        'promotion' => false,
         'init_instance_callback' => 'tinyMceCleaner',
     ]; 
