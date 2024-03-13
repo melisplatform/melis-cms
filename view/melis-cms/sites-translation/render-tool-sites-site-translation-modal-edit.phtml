@@ -103,12 +103,15 @@ $data_melisKey = $this->melisKey;
         </div>
     </div>
     <script type="text/javascript">
-        $(document).ready(function() {
+        $(function() {
+            var option = {
+                height: "400px"
+            };
+
             //we prepare the tinyMce init here to make sure that the form are already loaded
-            melisTinyMCE.createTinyMCE("tool", "textarea.tiny-mce-init", {
-                // styleselect = styles
-                toolbar : 'undo redo | styles | bold italic | alignleft aligncenter alignright | link'
-            });
+            melisTinyMCE.createTinyMCE("tool", "textarea.tiny-mce-init", option);
+            // styleselect = styles
+            //toolbar : 'undo redo | styles | bold italic | alignleft aligncenter alignright | link'
         });
     </script>
 </div>
