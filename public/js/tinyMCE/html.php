@@ -32,6 +32,7 @@
        'image_advtab' => true,
        // formatselect = blocks
        'toolbar' => 'insertfile undo redo | blocks | forecolor | bold italic strikethrough underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media | minitemplate code',
+       'toolbar_mode' => 'sliding',
        'deprecation_warnings' => false,
        'promotion' => false,
        'setup' => 'melisTinyMCE.tinyMceActionEvent',

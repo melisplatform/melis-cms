@@ -27,6 +27,7 @@
 		],
 	    'autoresize_on_init' => false,
 	    'toolbar' => 'undo redo link unlink | forecolor backcolor | minitemplate code',
+		'toolbar_mode' => 'sliding',
 		'deprecation_warnings' => false,
 		'promotion' => false,
 	    'setup' => 'melisTinyMCE.tinyMceActionEvent',
