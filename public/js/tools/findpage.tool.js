@@ -37,22 +37,29 @@
         }, 2000);
     });
         
-    $body.on("click", "#generateTreePageLink", function(){
+    $body.on("click", "#generateTreePageLink", function() {
         melisCoreTool.pending('#generateTreePageLink');
-        var id = $('#find-page-dynatree .fancytree-active').parent('li').attr('id').split("_")[1];
-            $.ajax({
-                type        : 'GET', 
-                url         : 'melis/MelisCms/Page/getPageLink',
-                data        : {'idPage': id},
-                dataType    : 'json',
-                encode      : true
-            }).done(function(data) {
-                dataUrl = data.link;
-                showUrl(dataUrl);
-                $("#id_meliscms_find_page_tree_container").modal("hide");
-            }).fail(function(xhr, textStatus, errorThrown) {
-                alert( translations.tr_meliscore_error_message );
-            });
+
+            var attr = $('#find-page-dynatree .fancytree-active').parent('li').attr('id');
+                
+                if ( typeof attr !== undefined ) {
+                    var id = attr.split("_")[1];
+                        
+                        $.ajax({
+                            type        : 'GET', 
+                            url         : 'melis/MelisCms/Page/getPageLink',
+                            data        : {'idPage': id},
+                            dataType    : 'json',
+                            encode      : true
+                        }).done(function(data) {
+                            dataUrl = data.link;
+                            showUrl(dataUrl);
+                            $("#id_meliscms_find_page_tree_container").modal("hide");
+                        }).fail(function(xhr, textStatus, errorThrown) {
+                            alert( translations.tr_meliscore_error_message );
+                        });
+                }
+
         melisCoreTool.done('#generateTreePageLink');
     });
     
