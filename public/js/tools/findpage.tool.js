@@ -39,12 +39,9 @@
         
     $body.on("click", "#generateTreePageLink", function() {
         melisCoreTool.pending('#generateTreePageLink');
-
             var attr = $('#find-page-dynatree .fancytree-active').parent('li').attr('id');
-                
-                if ( typeof attr !== undefined ) {
+                if ( attr?.split("_") ) {
                     var id = attr.split("_")[1];
-                        
                         $.ajax({
                             type        : 'GET', 
                             url         : 'melis/MelisCms/Page/getPageLink',
@@ -59,7 +56,9 @@
                             alert( translations.tr_meliscore_error_message );
                         });
                 }
-
+                else {
+                    confirm("Need to select one of the pages.");
+                }
         melisCoreTool.done('#generateTreePageLink');
     });
     
