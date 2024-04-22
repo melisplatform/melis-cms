@@ -845,7 +845,7 @@ var melisCms = (function() {
 
 	// WINDOW SCROLL FUNCTIONALITIES ========================================================================================================
 	if (melisCore.screenSize >= 768) {
-		jQuery(window).scroll(function() {
+		jQuery(window).on("scroll", function() {
 			// sticky page actions
 			var sidebarStatus = $("body").hasClass("sidebar-mini"),
 				sidebarWidth = 0;
@@ -885,7 +885,7 @@ var melisCms = (function() {
 		});
 
 		// sticky page actions IE fix
-		$("body.show-breadcrumb.show-nav-tabs").scroll(function() {
+		$("body.show-breadcrumb.show-nav-tabs").on("scroll", function() {
 			// sticky page actions IE
 			var sidebarStatus = $("body").hasClass("sidebar-mini");
 			var sidebarWidth = 0;

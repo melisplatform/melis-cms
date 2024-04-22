@@ -18,7 +18,7 @@
         if(keycode == '13'){
             startTreeSearch();
         }
-    }).focus();
+    }).trigger("focus");
     
     $body.on("click", "#searchTreeView", function(e){
         startTreeSearch();
