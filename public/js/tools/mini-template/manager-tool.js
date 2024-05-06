@@ -16,7 +16,7 @@ $(function () {
 
     $body.on('keypress', '#miniTemplateName', function (e) {
         // when enter is pressed
-        if (e.keyCode === 13) {
+        if (e.key === 'Enter') {
             e.preventDefault();
         }
     });
@@ -254,7 +254,7 @@ $(function () {
     $body.on('change', table_site_select, function() {
         $(dataTable).DataTable().ajax.reload();
         $(header_add_btn).removeClass('disabled');
-        $(header_add_btn).removeAttr('disabled');
+        $(header_add_btn).prop('disabled', false);
     });
 
     var miniTemplateManagerTool = {
@@ -282,7 +282,7 @@ window.miniTemplateManagerToolTableCallback = function () {
     waitForEl('#mini-template-manager-tool-table-filter-sites-select', function (element) {
         if (element.val() < 1) {
             element.find(':first-child').remove();
-            element.val(element.find('option').val()).change();
+            element.val(element.find('option').val()).trigger("change");
         }
     });
 };

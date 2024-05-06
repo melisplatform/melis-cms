@@ -100,16 +100,15 @@ var melisCms = (function() {
 
 	// SAVE PAGE
 	function savePage(idPage) {
-		var pageNumber =
-				typeof idPage === "string" ? idPage : $(this).data("pagenumber"),
+		var pageNumber = typeof idPage === "string" ? idPage : $(this).data("pagenumber"),
 			fatherPageId = $(this).data("fatherpageid");
 
-		// convert the serialized form values into an array
-		var datastring = $(
-			"#" + pageNumber + "_id_meliscms_page form"
-		).serializeArray();
+			console.log(`melisCms.js savePage() pageNumber: `, pageNumber);
 
-		if ($("#" + pageNumber + "_id_page_taxonomy").length) {
+		// convert the serialized form values into an array
+		var datastring = $("#" + pageNumber + "_id_meliscms_page form").serializeArray();
+
+		if ( $("#" + pageNumber + "_id_page_taxonomy").length ) {
 			var pageTags = $("#" + pageNumber + "_id_page_taxonomy")
 				.data("tags")
 				.toString();
@@ -126,86 +125,83 @@ var melisCms = (function() {
 
 		$.ajax({
 			type: "POST",
-			url:
-				"/melis/MelisCms/Page/savePage?idPage=" +
-				pageNumber +
-				"&fatherPageId=" +
-				fatherPageId,
+			url: "/melis/MelisCms/Page/savePage?idPage=" + pageNumber + "&fatherPageId=" + fatherPageId,
 			data: datastring,
 			dataType: "json",
 			encode: true,
 		})
-			.done(function(data) {
-				if (data.success === 1) {
-					// reload and expand the treeview
-					refreshTreeview(data.datas.idPage);
+		.done(function(data) {
+			if (data.success === 1) {
+				console.log(`melisCms.js savePage() data.datas.idPage: `, data.datas.idPage);
+				// reload and expand the treeview
+				refreshTreeview(data.datas.idPage);
 
-					// call melisOkNotification
-					melisHelper.melisOkNotification(
-						data.textTitle,
-						data.textMessage,
-						"#72af46"
+				// call melisOkNotification
+				melisHelper.melisOkNotification(
+					data.textTitle,
+					data.textMessage,
+					"#72af46"
+				);
+
+				// update red colored label when successful
+				colorRedError(data.success, data.errors, data.datas.item_zoneid);
+
+				// get page creation ID
+				var pageCreationId = data.datas.item_zoneid;
+
+				// IF ITS PAGE CREATION
+				if (pageCreationId === "0_id_meliscms_page") {
+					// close page creation page and tab
+					melisHelper.tabClose(pageCreationId);
+
+					//remove first char on the zoneID and replace with newly create id
+					var newPageZoneId =
+						data.datas.idPage +
+						pageCreationId.substring(1, pageCreationId.length);
+					var item_icon =
+						data.datas.item_icon !== "" ? data.datas.item_icon : "fa-file-o";
+					//open newly opened page
+					var pageName = data.datas.idPage + " - " + data.datas.item_name;
+					melisHelper.tabOpen(
+						pageName,
+						item_icon,
+						newPageZoneId,
+						data.datas.item_melisKey,
+						{ idPage: data.datas.idPage }
 					);
-
-					// update red colored label when successful
-					colorRedError(data.success, data.errors, data.datas.item_zoneid);
-
-					// get page creation ID
-					var pageCreationId = data.datas.item_zoneid;
-
-					// IF ITS PAGE CREATION
-					if (pageCreationId === "0_id_meliscms_page") {
-						// close page creation page and tab
-						melisHelper.tabClose(pageCreationId);
-
-						//remove first char on the zoneID and replace with newly create id
-						var newPageZoneId =
-							data.datas.idPage +
-							pageCreationId.substring(1, pageCreationId.length);
-						var item_icon =
-							data.datas.item_icon !== "" ? data.datas.item_icon : "fa-file-o";
-						//open newly opened page
-						var pageName = data.datas.idPage + " - " + data.datas.item_name;
-						melisHelper.tabOpen(
-							pageName,
-							item_icon,
-							newPageZoneId,
-							data.datas.item_melisKey,
-							{ idPage: data.datas.idPage }
-						);
-					} else {
-						// reload the preview in edition tab
-						melisHelper.zoneReload(
-							pageNumber + "_id_meliscms_page",
-							"meliscms_page",
-							{ idPage: pageNumber },
-							() => {
-								// show page loader
-								window.parent.loader.addActivePageEditionLoading(
-									pageNumber + "_id_meliscms_page"
-								);
-							}
-						);
-					}
 				} else {
-					// error modal
-					melisHelper.melisKoNotification(
-						data.textTitle,
-						data.textMessage,
-						data.errors,
-						"#000"
+					// reload the preview in edition tab
+					melisHelper.zoneReload(
+						pageNumber + "_id_meliscms_page",
+						"meliscms_page",
+						{ idPage: pageNumber },
+						() => {
+							// show page loader
+							window.parent.loader.addActivePageEditionLoading(
+								pageNumber + "_id_meliscms_page"
+							);
+						}
 					);
-
-					//color the error field in red
-					colorRedError(data.success, data.errors, data.datas.item_zoneid);
 				}
+			} else {
+				// error modal
+				melisHelper.melisKoNotification(
+					data.textTitle,
+					data.textMessage,
+					data.errors,
+					"#000"
+				);
 
-				// update flash messenger values
-				melisCore.flashMessenger();
-			})
-			.fail(function(xhr, textStatus, errorThrown) {
-				alert(translations.tr_meliscore_error_message);
-			});
+				//color the error field in red
+				colorRedError(data.success, data.errors, data.datas.item_zoneid);
+			}
+
+			// update flash messenger values
+			melisCore.flashMessenger();
+		})
+		.fail(function(xhr, textStatus, errorThrown) {
+			alert(translations.tr_meliscore_error_message);
+		});
 	}
 
 	// PUBLISH PAGE
@@ -240,119 +236,42 @@ var melisCms = (function() {
 			dataType: "json",
 			encode: true,
 		})
-			.done(function(data) {
-				if (data.success === 1) {
-					// reload and expand the treeview
-					refreshTreeview(data.datas.idPage);
+		.done(function(data) {
+			if (data.success === 1) {
+				// reload and expand the treeview
+				refreshTreeview(data.datas.idPage);
 
-					// set the online/offline button to 'online'
-					$(
-						'.page-publishunpublish[data-pagenumber="' + pageNumber + '"]'
-					).bootstrapSwitch("setState", true, true);
+				// set the online/offline button to 'online'
+				$('.page-publishunpublish[data-pagenumber="' + pageNumber + '"]').bootstrapSwitch("setState", true, true);
 
-					// call melisOkNotification
-					melisHelper.melisOkNotification(
-						data.textTitle,
-						data.textMessage,
-						"#72af46"
-					);
+				// call melisOkNotification
+				melisHelper.melisOkNotification(
+					data.textTitle,
+					data.textMessage,
+					"#72af46"
+				);
 
-					// update red colored label when successful
-					colorRedError(data.success, data.errors, data.datas.item_zoneid);
-
-					// update flash messenger values
-					melisCore.flashMessenger();
-
-					// update page name tabname if page name is changed
-					$("#" + data.datas.item_zoneid + " .page-title h1:not('span')").text(
-						data.datas.item_name
-					);
-
-					$(
-						".tabsbar a[data-id='" +
-							data.datas.item_zoneid +
-							"'] .navtab-pagename"
-					).text(pageNumber + " - " + data.datas.item_name);
-
-					// hide the saved version text of the page once its published
-					$(
-						"#" + data.datas.item_zoneid + " .page-title .saved-version-notif"
-					).fadeOut();
-
-					// reload the preview in edition tab
-					melisHelper.zoneReload(
-						pageNumber + "_id_meliscms_page",
-						"meliscms_page",
-						{ idPage: pageNumber },
-						() => {
-							// show page loader
-							window.parent.loader.addActivePageEditionLoading(
-								pageNumber + "_id_meliscms_page"
-							);
-						}
-					);
-
-					$openedPageIds.push(data.datas.idPage);
-				} else {
-					// error modal
-					melisHelper.melisKoNotification(
-						data.textTitle,
-						data.textMessage,
-						data.errors,
-						"#000"
-					);
-
-					//color the error field in red
-					colorRedError(data.success, data.errors, data.datas.item_zoneid);
-				}
+				// update red colored label when successful
+				colorRedError(data.success, data.errors, data.datas.item_zoneid);
 
 				// update flash messenger values
 				melisCore.flashMessenger();
-			})
-			.fail(function(xhr, textStatus, errorThrown) {
-				alert(translations.tr_meliscore_error_message);
-			});
-	}
 
-	// UNPUBLISH PAGE
-	function unpublishPage(idPage) {
-		var pageNumber =
-			typeof idPage === "string" ? idPage : $(this).data("pagenumber");
+				// update page name tabname if page name is changed
+				$("#" + data.datas.item_zoneid + " .page-title h1:not('span')").text(
+					data.datas.item_name
+				);
 
-		$.ajax({
-			type: "GET",
-			url: "/melis/MelisCms/Page/unpublishPage?idPage=" + pageNumber,
-			dataType: "json",
-			encode: true,
-		})
-			.done(function(data) {
-				if (data.success === 1) {
-					// reload and expand the treeview
-					refreshTreeview(pageNumber);
+				$(
+					".tabsbar a[data-id='" +
+						data.datas.item_zoneid +
+						"'] .navtab-pagename"
+				).text(pageNumber + " - " + data.datas.item_name);
 
-					// call melisOkNotification
-					melisHelper.melisOkNotification(
-						data.textTitle,
-						data.textMessage,
-						"#72af46"
-					);
-
-					// update flash messenger values
-					melisCore.flashMessenger();
-
-					$openedPageIds.push(pageNumber);
-				} else {
-					// show error modal
-					melisHelper.melisKoNotification(
-						data.textTitle,
-						data.textMessage,
-						data.errors,
-						"#000"
-					);
-				}
-
-				// update flash messenger values
-				melisCore.flashMessenger();
+				// hide the saved version text of the page once its published
+				$(
+					"#" + data.datas.item_zoneid + " .page-title .saved-version-notif"
+				).fadeOut();
 
 				// reload the preview in edition tab
 				melisHelper.zoneReload(
@@ -366,10 +285,85 @@ var melisCms = (function() {
 						);
 					}
 				);
-			})
-			.fail(function(xhr, textStatus, errorThrown) {
-				alert(translations.tr_meliscore_error_message);
-			});
+
+				$openedPageIds.push(data.datas.idPage);
+			} else {
+				// error modal
+				melisHelper.melisKoNotification(
+					data.textTitle,
+					data.textMessage,
+					data.errors,
+					"#000"
+				);
+
+				//color the error field in red
+				colorRedError(data.success, data.errors, data.datas.item_zoneid);
+			}
+
+			// update flash messenger values
+			melisCore.flashMessenger();
+		})
+		.fail(function(xhr, textStatus, errorThrown) {
+			alert(translations.tr_meliscore_error_message);
+		});
+	}
+
+	// UNPUBLISH PAGE
+	function unpublishPage(idPage) {
+		var pageNumber =
+			typeof idPage === "string" ? idPage : $(this).data("pagenumber");
+
+		$.ajax({
+			type: "GET",
+			url: "/melis/MelisCms/Page/unpublishPage?idPage=" + pageNumber,
+			dataType: "json",
+			encode: true,
+		})
+		.done(function(data) {
+			if (data.success === 1) {
+				// reload and expand the treeview
+				refreshTreeview(pageNumber);
+
+				// call melisOkNotification
+				melisHelper.melisOkNotification(
+					data.textTitle,
+					data.textMessage,
+					"#72af46"
+				);
+
+				// update flash messenger values
+				melisCore.flashMessenger();
+
+				$openedPageIds.push(pageNumber);
+			} else {
+				// show error modal
+				melisHelper.melisKoNotification(
+					data.textTitle,
+					data.textMessage,
+					data.errors,
+					"#000"
+				);
+			}
+
+			// update flash messenger values
+			melisCore.flashMessenger();
+
+			// reload the preview in edition tab
+			melisHelper.zoneReload(
+				pageNumber + "_id_meliscms_page",
+				"meliscms_page",
+				{ idPage: pageNumber },
+				() => {
+					// show page loader
+					window.parent.loader.addActivePageEditionLoading(
+						pageNumber + "_id_meliscms_page"
+					);
+				}
+			);
+		})
+		.fail(function(xhr, textStatus, errorThrown) {
+			alert(translations.tr_meliscore_error_message);
+		});
 	}
 
 	function clearPage() {
@@ -391,45 +385,45 @@ var melisCms = (function() {
 					url: "/melis/MelisCms/Page/clearSavedPage?idPage=" + idPage,
 					encode: true,
 				})
-					.done(function(data) {
-						if (data.success === 1) {
-							// notify deleted page
-							melisHelper.melisOkNotification(
-								data.textTitle,
-								data.textMessage,
-								"#72af46"
-							);
+				.done(function(data) {
+					if (data.success === 1) {
+						// notify deleted page
+						melisHelper.melisOkNotification(
+							data.textTitle,
+							data.textMessage,
+							"#72af46"
+						);
 
-							// reload and expand the treeview
-							melisCms.refreshTreeview(idPage);
+						// reload and expand the treeview
+						melisCms.refreshTreeview(idPage);
 
-							// update flash messenger values
-							melisCore.flashMessenger();
+						// update flash messenger values
+						melisCore.flashMessenger();
 
-							// reload the preview in edition tab
-							melisHelper.zoneReload(
-								idPage + "_id_meliscms_page",
-								"meliscms_page",
-								{ idPage: idPage },
-								() => {
-									// show page loader
-									window.parent.loader.addActivePageEditionLoading(
-										idPage + "_id_meliscms_page"
-									);
-								}
-							);
-						} else {
-							melisHelper.melisKoNotification(
-								data.textTitle,
-								data.textMessage,
-								data.errors,
-								"#000"
-							);
-						}
-					})
-					.fail(function(xhr, textStatus, errorThrown) {
-						alert(translations.tr_meliscore_error_message);
-					});
+						// reload the preview in edition tab
+						melisHelper.zoneReload(
+							idPage + "_id_meliscms_page",
+							"meliscms_page",
+							{ idPage: idPage },
+							() => {
+								// show page loader
+								window.parent.loader.addActivePageEditionLoading(
+									idPage + "_id_meliscms_page"
+								);
+							}
+						);
+					} else {
+						melisHelper.melisKoNotification(
+							data.textTitle,
+							data.textMessage,
+							data.errors,
+							"#000"
+						);
+					}
+				})
+				.fail(function(xhr, textStatus, errorThrown) {
+					alert(translations.tr_meliscore_error_message);
+				});
 			}
 		);
 	}
@@ -508,18 +502,15 @@ var melisCms = (function() {
 		optionalArg = typeof self === "undefined" ? 0 : self;
 
 		$.ajax({
-			url:
-				"/melis/MelisCms/TreeSites/getPageIdBreadcrumb?idPage=" +
-				pageNumber +
-				"&includeSelf=" +
-				optionalArg,
+			url: "/melis/MelisCms/TreeSites/getPageIdBreadcrumb?idPage=" + pageNumber + "&includeSelf=" + optionalArg,
 			encode: true,
 			dataType: "json",
 		})
-			.done(function(data) {
-				//process array to add to make this format '1/3/5/6...'
-				var newData = [],
-					parentNode;
+		.done(function(data) {
+			console.log(`melisCms.js refreshTreeview() data: `, data);
+			//process array to add to make this format '1/3/5/6...'
+			var newData = [],
+				parentNode;
 
 				$.each(data, function(key, value) {
 					newData.push("/" + value);
@@ -530,41 +521,36 @@ var melisCms = (function() {
 
 				newData = newData.toString();
 				newData = newData.replace(/,/g, "");
-
-				var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
-
-				// reload tree pages
-				tree
-					.reload({
-						url: "/melis/MelisCms/TreeSites/get-tree-pages-by-page-id",
-					})
-					.done(function() {
-						tree
-							.loadKeyPath(newData, function(node, status) {
-								if (status == "ok") {
-									node.setActive(true).done(function() {
-										node.setExpanded(true);
-									});
-								}
-							})
-							.done(function() {
-								tree.clearFilter();
-								// remove duplicated brach of the tree while rapidly refreshing the tree [ plugin bug fix ]
-								if (
-									$(
-										"#id-mod-menu-dynatree .ui-fancytree > li:last-child"
-									).hasClass("fancytree-lastsib") === false
-								) {
-									$(
-										"#id-mod-menu-dynatree .ui-fancytree > li:last-child"
-									).remove();
-								}
-							});
-					});
-			})
-			.fail(function(xhr, textStatus, errorThrown) {
-				alert(translations.tr_meliscore_error_message);
-			});
+				console.log(`newData: `, newData);
+				// $("#id-mod-menu-dynatree").fancytree("getTree"), deprecated 2.38.3
+				var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
+					console.log(`melisCms.js refreshTreeview() tree: `, tree);
+					// reload tree pages
+					// {url: "/melis/MelisCms/TreeSites/get-tree-pages-by-page-id"}
+					tree
+						.reload()
+						.done(function() {
+							console.log("fancytree reloaded, tree.loadKeyPath");
+							/* tree.loadKeyPath(newData, function(node, status) {
+									console.log(`status: `, status);
+									if (status == "ok") {
+										node.setActive(true).done(function() {
+											node.setExpanded(true);
+										});
+									}
+								})
+								.done(function() {
+									tree.clearFilter();
+									// remove duplicated brach of the tree while rapidly refreshing the tree [ plugin bug fix ]
+									if ( $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").hasClass("fancytree-lastsib") === false) {
+										$("#id-mod-menu-dynatree .ui-fancytree > li:last-child").remove();
+									}
+								}); */
+						});
+		})
+		.fail(function(xhr, textStatus, errorThrown) {
+			alert(translations.tr_meliscore_error_message);
+		});
 	}
 
 	// DISPLAY SETTING FOR PAGES
@@ -572,38 +558,38 @@ var melisCms = (function() {
 		var displayWidth = 0,
 			displaySettings = $(this).data("display");
 
-		$(".displaysettingsicon span.fa").removeClass();
-		$(".displaysettingsicon span:first-child").addClass(displaySettings);
+			$(".displaysettingsicon span.fa").removeClass();
+			$(".displaysettingsicon span:first-child").addClass(displaySettings);
 
-		if (displaySettings === "fa fa-desktop") {
-			displayWidth = "100%";
-		} else if (displaySettings === "fa fa-tablet") {
-			displayWidth = "980px";
-		} else {
-			displayWidth = "480px";
-		}
+			if (displaySettings === "fa fa-desktop") {
+				displayWidth = "100%";
+			} else if (displaySettings === "fa fa-tablet") {
+				displayWidth = "980px";
+			} else {
+				displayWidth = "480px";
+			}
 
-		$(this)
-			.parents(".page-head-container")
-			.next(".page-content-container")
-			.find(".melis-iframe")
-			.animate(
-				{
-					width: displayWidth,
-				},
-				300,
-				function() {
-					// temporarily give the iframe height so it doensn't look bad when it animates the width
-					$("#" + activeTabId + " .melis-iframe").css("height", "1000px");
+			$(this)
+				.parents(".page-head-container")
+				.next(".page-content-container")
+				.find(".melis-iframe")
+				.animate(
+					{
+						width: displayWidth,
+					},
+					300,
+					function() {
+						// temporarily give the iframe height so it doensn't look bad when it animates the width
+						$("#" + activeTabId + " .melis-iframe").css("height", "1000px");
 
-					// give iframe the calculated height based from the content
-					var iHeight =
-						$("#" + activeTabId + " .melis-iframe")
-							.contents()
-							.height() + 50;
-					$("#" + activeTabId + " .melis-iframe").css("height", iHeight);
-				}
-			);
+						// give iframe the calculated height based from the content
+						var iHeight =
+							$("#" + activeTabId + " .melis-iframe")
+								.contents()
+								.height() + 50;
+						$("#" + activeTabId + " .melis-iframe").css("height", iHeight);
+					}
+				);
 	}
 
 	// PUBLISH - UNPUBLISH TOGGLE BUTTON
@@ -734,67 +720,68 @@ var melisCms = (function() {
 			url: "/melis/MelisCms/TreeSites/canEditPages",
 			encode: true,
 		})
-			.done(function(data) {
-				var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
-				// has no access
-				if (data.edit === 0) {
+		.done(function(data) {
+			//var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
+			var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
+			// has no access
+			if (data.edit === 0) {
+				$(".meliscms-search-box.sidebar-treeview-search").hide();
+				$("#id-mod-menu-dynatree").prepend(
+					"<div class='create-newpage'><span class='no-access'>" +
+						translations.tr_meliscms_no_access +
+						"</span></div>"
+				);
+			}
+			// has access
+			else {
+				if (tree.count() === 0) {
 					$(".meliscms-search-box.sidebar-treeview-search").hide();
 					$("#id-mod-menu-dynatree").prepend(
-						"<div class='create-newpage'><span class='no-access'>" +
-							translations.tr_meliscms_no_access +
+						"<div class='create-newpage'><span class='btn btn-success'>" +
+							translations.tr_meliscms_create_page +
 							"</span></div>"
 					);
+				} else {
+					$(".meliscms-search-box.sidebar-treeview-search").show();
+					$("#id-mod-menu-dynatree .create-newpage").remove();
 				}
-				// has access
-				else {
-					if (tree.count() === 0) {
-						$(".meliscms-search-box.sidebar-treeview-search").hide();
-						$("#id-mod-menu-dynatree").prepend(
-							"<div class='create-newpage'><span class='btn btn-success'>" +
-								translations.tr_meliscms_create_page +
-								"</span></div>"
-						);
-					} else {
-						$(".meliscms-search-box.sidebar-treeview-search").show();
-						$("#id-mod-menu-dynatree .create-newpage").remove();
-					}
-				}
-			})
-			.fail(function(xhr, textStatus, errorThrown) {
-				alert(translations.tr_meliscore_error_message);
-			});
+			}
+		})
+		.fail(function(xhr, textStatus, errorThrown) {
+			alert(translations.tr_meliscore_error_message);
+		});
 
 		// SAVE user rights checking
 		$.ajax({
 			url: "/melis/MelisCms/Page/isActionActive?actionwanted=save",
 			encode: true,
 		})
-			.done(function(data) {
-				if (data.active === 0) {
-					$("body").addClass("disable-create");
-				} else {
-					$("body").removeClass("disable-create");
-				}
-			})
-			.fail(function(xhr, textStatus, errorThrown) {
-				alert(translations.tr_meliscore_error_message);
-			});
+		.done(function(data) {
+			if (data.active === 0) {
+				$("body").addClass("disable-create");
+			} else {
+				$("body").removeClass("disable-create");
+			}
+		})
+		.fail(function(xhr, textStatus, errorThrown) {
+			alert(translations.tr_meliscore_error_message);
+		});
 
 		// DELETE user rights checking
 		$.ajax({
 			url: "/melis/MelisCms/Page/isActionActive?actionwanted=delete",
 			encode: true,
 		})
-			.done(function(data) {
-				if (data.active === 0) {
-					$("body").addClass("disable-delete");
-				} else {
-					$("body").removeClass("disable-delete");
-				}
-			})
-			.fail(function(xhr, textStatus, errorThrown) {
-				alert(translations.tr_meliscore_error_message);
-			});
+		.done(function(data) {
+			if (data.active === 0) {
+				$("body").addClass("disable-delete");
+			} else {
+				$("body").removeClass("disable-delete");
+			}
+		})
+		.fail(function(xhr, textStatus, errorThrown) {
+			alert(translations.tr_meliscore_error_message);
+		});
 	}
 
 	/**
@@ -874,13 +861,11 @@ var melisCms = (function() {
 					left: sidebarWidth,
 				});
 			} else {
-				$("#" + activeTabId + " .page-head-container").removeAttr("style");
+				$("#" + activeTabId + " .page-head-container").prop("style", null);
 				$("#" + activeTabId + " .page-head-container > .innerAll").removeClass(
 					"sticky-pageactions"
 				);
-				$("#" + activeTabId + " .page-head-container > .innerAll").removeAttr(
-					"style"
-				);
+				$("#" + activeTabId + " .page-head-container > .innerAll").prop("style", null);
 			}
 		});
 
@@ -925,13 +910,11 @@ var melisCms = (function() {
 					left: sidebarWidth,
 				});
 			} else {
-				$("#" + activeTabId + " .page-head-container").removeAttr("style");
+				$("#" + activeTabId + " .page-head-container").prop("style", null);
 				$("#" + activeTabId + " .page-head-container > .innerAll").removeClass(
 					"sticky-pageactions"
 				);
-				$("#" + activeTabId + " .page-head-container > .innerAll").removeAttr(
-					"style"
-				);
+				$("#" + activeTabId + " .page-head-container > .innerAll").prop("style", null);
 			}
 		});
 	}

@@ -13,7 +13,7 @@ $data_melisKey = 'data-melisKey="' . $this->melisKey . '"';
                     <ul class="nav nav-tabs">
                         <li class="active">
                             <a href="#<?= $id ?>" class="glyphicons <?= ($this->pids_id) ? 'pencil' : 'plus' ?>"
-                              data-toggle="tab" aria-expanded="true"><i></i> <?= $this->translate($this->tabTitle) ?></a>
+                              data-bs-toggle="tab" aria-expanded="true"><i></i> <?= $this->translate($this->tabTitle) ?></a>
                         </li>
                     </ul>
                 </div>
@@ -33,7 +33,7 @@ $data_melisKey = 'data-melisKey="' . $this->melisKey . '"';
                                             echo $this->form()->closeTag();
                                         ?>
                                         <div class="footer-modal d-flex flex-row justify-content-between">
-                                            <a data-dismiss="modal" class="btn btn-danger float-left"><i
+                                            <a data-bs-dismiss="modal" class="btn btn-danger float-left"><i
                                                         class="fa fa-times"></i> <?= $this->translate('tr_meliscms_common_close') ?>
                                             </a>
                                             <a class="btn btn-success btnSavePlatfomrRange"
@@ -46,7 +46,7 @@ $data_melisKey = 'data-melisKey="' . $this->melisKey . '"';
                                             <?= $this->translate('tr_meliscms_tool_platform_modal_info_assigned_page_ids'); ?>
                                         </div>
                                         <div class="footer-modal d-flex flex-row justify-content-between">
-                                            <a data-dismiss="modal" class="btn btn-danger float-left">
+                                            <a data-bs-dismiss="modal" class="btn btn-danger float-left">
                                                 <i class="fa fa-times"></i> <?= $this->translate('tr_meliscms_common_close') ?>
                                             </a>
                                         </div>

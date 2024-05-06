@@ -125,7 +125,7 @@ $(document).ready(function(){
     }
 
     function submitImportForm (form) {
-        form.unbind("submit");
+        form.off("submit");
         form.on("submit", function(e) {
             e.preventDefault();
             var formData = new FormData(this);
@@ -157,7 +157,7 @@ $(document).ready(function(){
             });
         });
 
-        form.submit();
+        form.trigger("submit");
     }
 
     function importTest(formData) {

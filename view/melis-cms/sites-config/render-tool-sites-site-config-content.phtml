@@ -27,7 +27,7 @@ $data_melisKey = $this->melisKey;
                     <ul class="nav-tabs product-text-tab meliscms-site-language-homepage-list">
                         <!-- GENERAL TAB START -->
                         <li class="">
-                            <a class="clearfix" data-toggle="tab" href="#general-config-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="general">
+                            <a class="clearfix" data-bs-toggle="tab" href="#general-config-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="general">
                                 <span><?= $this->translate('tr_melis_cms_sites_tool_general') ?></span>
                             </a>
                         </li>
@@ -35,7 +35,7 @@ $data_melisKey = $this->melisKey;
                         <!-- OTHER LANGUAGES START -->
                         <?php foreach($this->activeSiteLangs as $lang) :?>
                             <li class="">
-                                <a class="clearfix" data-toggle="tab" id="news_cms_lang_<?= $lang['slang_lang_id'] ?>" href="#<?= $lang['lang_cms_locale']; ?>-config-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $lang['slang_lang_id'] ?>">
+                                <a class="clearfix" data-bs-toggle="tab" id="news_cms_lang_<?= $lang['slang_lang_id'] ?>" href="#<?= $lang['lang_cms_locale']; ?>-config-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $lang['slang_lang_id'] ?>">
                                     <span class="float-right">
                                         <img src="<?= $this->serverUrl() . '/MelisCms/images/lang-flags/' . $lang['lang_cms_locale'] . '.png' ?>" class="float-right">
                                     </span>

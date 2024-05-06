@@ -70,7 +70,7 @@ var melisDragnDrop = (function($, window) {
 
                 // detect if browser is in desktop
                 if( $(window).width() >= 768) {
-                    $(window).mousemove(function (e) {
+                    $(window).on("mousemove", function (e) {
                         var top;
                         var frameTop = window.parent.$("#" + parent.activeTabId).find(".melis-iframe").offset().top + 10;
 
@@ -238,7 +238,7 @@ var melisDragnDrop = (function($, window) {
             },
         });
 
-        $(".melis-cms-plugin-snippets").hover(function() {
+        $(".melis-cms-plugin-snippets").on("mouseenter mouseleave", function() {
             var $this = $(this);
                 $this.children(".melis-plugin-tooltip").fadeIn();
         });
@@ -345,7 +345,7 @@ var melisDragnDrop = (function($, window) {
                                 melisPluginID               = typeof pluginToolBox.data("plugin-id") != "undefined" ? pluginToolBox.data("plugin-id") : '',
                                 melisPluginTag              = typeof pluginToolBox.data("melis-tag") != "undefined" ? pluginToolBox.data("melis-tag") : '',
                                 melisSiteModule             = typeof pluginToolBox.data("site-module"),
-                                melisPluginHardCodedConfig  = $.trim(pluginHardCodedConfigEl.text());
+                                melisPluginHardCodedConfig  = String.prototype.trim(pluginHardCodedConfigEl.text());
 
                             // dataPluginID = pluginToolBox.next().attr("id");
                             var pluginOutlined = pluginToolBox.closest(".melis-ui-outlined");
@@ -472,7 +472,7 @@ var melisDragnDrop = (function($, window) {
                     $(".melis-cms-dnd-box").css("height", "100vh" ); // default height
 
                     // Chrome, Firefox etc browser
-                    $(window.parent).scroll(function() {
+                    $(window.parent).on("scroll", function() {
                         if( (stickyHead.offset().top + stickyHead.height() + 30) >= currentFrame.offset().top ) {
                             $(".melis-cms-dnd-box").css("top", stickyHead.offset().top - currentFrame.offset().top + stickyHead.height() + 30);
                             dndHeight = $(window.parent).height() - stickyHead.height() - widgetHeight.height() - 15;
@@ -500,7 +500,7 @@ var melisDragnDrop = (function($, window) {
 
                     // For IE scroll giving different value
                     if (window.parent) {
-                        window.parent.$("body").scroll(function() {
+                        window.parent.$("body").on("scroll", function() {
                             if( (stickyHead.offset().top + stickyHead.height() + 30) >= currentFrame.offset().top ) {
                                 $(".melis-cms-dnd-box").css("top", stickyHead.offset().top - currentFrame.offset().top + stickyHead.height() + 30);
                             } else {

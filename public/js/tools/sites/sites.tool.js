@@ -21,8 +21,8 @@ $(function() {
             var currentEnabledModule = $("#"+currentTabId+"_currentEnabledModule").val(),
                 sitesUsingModules = $("#"+currentTabId+"_sitesUsingModules").val();
 
-                currentEnabledModule = jQuery.parseJSON(currentEnabledModule);
-                sitesUsingModules = jQuery.parseJSON(sitesUsingModules);
+                currentEnabledModule = JSON.parse(currentEnabledModule);
+                sitesUsingModules = JSON.parse(sitesUsingModules);
 
                 var sitesUsingModulesStr = "";
 
@@ -89,7 +89,7 @@ $(function() {
                 //refresh table tool sites
                 $("#tableToolSites").DataTable().ajax.reload();
 
-                //refresh site tree view
+                //refresh site tree view, fancytree
                 $("input[name=left_tree_search]").val('');
                 $("#id-mod-menu-dynatree").fancytree("destroy");
                 mainTree();
@@ -162,7 +162,7 @@ $(function() {
             var $input      = $("#" + container + " #" + key),
                 lang        = $input.data('lang'),
                 label       = $input.siblings('label').text(),
-                lastChar    = label.substr(label.length - 1),
+                lastChar    = label.substring(label.length - 1),
                 exploded    = key.split('_');
 
             if ( lang != undefined ) {
@@ -615,7 +615,7 @@ $(function() {
                 $.each(data.siteIds, function(i, id){
                     openSiteEditTab(updateSiteTitle(id, data.siteName, data.siteModuleName), id,data.siteModuleName);
                 });
-                //refresh site tree view
+                //refresh site tree view, fancytree
                 $("input[name=left_tree_search]").val('');
                 $("#id-mod-menu-dynatree").fancytree("destroy");
                 mainTree();
@@ -1126,7 +1126,7 @@ $(function() {
      * @param attr
      */
     function removeAttribute(elem, attr) {
-        elem.removeAttr(attr);
+        elem.prop(attr, null);
     }
 
     // Disable enter on step 3 domains

@@ -34,7 +34,7 @@
                                                   
                                             ?>
                                             <li <?php if ($key == 0) echo 'class="active"'; ?>>
-                                                <a href="#plugin_modal_id_tab_<?= $key; ?>" class="f-awesome" data-toggle="tab" aria-expanded="true" title="<?= $tabName ?>"><?= $icon; ?><?= $tabName; ?></a>
+                                                <a href="#plugin_modal_id_tab_<?= $key; ?>" class="f-awesome" data-bs-toggle="tab" aria-expanded="true" title="<?= $tabName ?>"><?= $icon; ?><?= $tabName; ?></a>
                                             </li>    
                                             <?php 
                                               }    
@@ -70,7 +70,7 @@
                                     <br>
                                     <br>
                                     <div class="clearfix">
-                                        <button data-dismiss="modal" class="btn btn-danger float-left"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscms_plugins_modal_cancel')?></button>
+                                        <button data-bs-dismiss="modal" class="btn btn-danger float-left"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscms_plugins_modal_cancel')?></button>
                                         <?php 
                                             if (empty($this->tabs[0]['empty']) || !$this->tabs[0]['empty'])
                                             {

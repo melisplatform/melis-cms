@@ -3,15 +3,17 @@ $(function() {
 
 	$body.on("click", "a.melis-pageduplicate", function() {
 		var pagenumber = $(this).data().pagenumber;
-		$.ajax({
-			type: "POST",
-			url: "/melis/MelisCms/PageDuplication/duplicate-page",
-			data: { id: pagenumber },
-			dataType: "json",
-			encode: true,
-		})
+			
+			$.ajax({
+				type: "POST",
+				url: "/melis/MelisCms/PageDuplication/duplicate-page",
+				data: { id: pagenumber },
+				dataType: "json",
+				encode: true,
+			})
 			.done(function(data) {
 				if (data.success) {
+					console.log(`page-duplicate.tool.js data.response.pageId: `, data.response.pageId);
 					melisCms.refreshTreeview(data.response.pageId);
 					if (data.response.openPageAfterDuplicate) {
 						// open page

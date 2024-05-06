@@ -14,8 +14,8 @@
     
     // Filter Search
     $(document).on("keyup", "input[name=tree_search]", function(event){
-        var keycode = (event.keyCode ? event.keyCode : event.which);
-        if(keycode == '13'){
+        var keycode = (event.key ? event.key : event.which);
+        if(keycode === 'Enter'){
             startTreeSearch();
         }
     }).trigger("focus");
@@ -99,14 +99,13 @@
                     dataType    : 'json',
                     encode      : true
                 }).done(function(data) {
-                    if ( !$.trim(data) ) {
+                    if ( !data.trim() ) {
                         searchContainer.append("<div class='melis-search-overlay'>Not Found</div>").hide().fadeIn(600);
                         setTimeout(function() {
                             $(".melis-search-overlay").fadeOut(600, function() {
                                 $(this).remove();
                             });
                             $("input[name=tree_search]").prop('disabled', false);
-                            //$("input[name=tree_search]").focus();
                             $("input[name=tree_search]").trigger("focus");
                         }, 1000);
                     } else {

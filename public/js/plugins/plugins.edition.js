@@ -66,7 +66,7 @@ var melisPluginEdition = (function($, window) {
             melisSiteModule     = $this.closest("#id_meliscms_plugin_modal_container").data("melis-site-module"),
             dataString          = $this.closest('.modal-content').find("form");
 
-            pluginHardcodedConfig = $.trim($this.closest("#id_meliscms_plugin_modal_container").find(".plugin-hardcoded-conf").text());
+            pluginHardcodedConfig = String.prototype.trim($this.closest("#id_meliscms_plugin_modal_container").find(".plugin-hardcoded-conf").text());
 
             // Construct data string
             var datastring = dataString.serializeArray();
@@ -588,14 +588,14 @@ var melisPluginEdition = (function($, window) {
     }
 
     function disableLinks(e) {
-        $(e).click(function(event) { event.preventDefault(); });
+        $(e).on("click", function(event) { event.preventDefault(); });
     }
 
     function createPluginModal() {
         var $this               = $(this),
             toolBox             = $this.closest(".melis-plugin-tools-box"),
             pluginContainer     = toolBox.parent(".melis-ui-outlined"),
-            pluginFrontConfig   = $.trim(pluginContainer.find(".plugin-hardcoded-conf").text()),
+            pluginFrontConfig   = String.prototype.trim(pluginContainer.find(".plugin-hardcoded-conf").text()),
             module              = toolBox.data("module"),
             pluginName          = toolBox.data("plugin"),
             pluginId            = toolBox.data("plugin-id"),
@@ -716,7 +716,7 @@ var melisPluginEdition = (function($, window) {
                 if( $(editable).length ) {
                     // trigger focus to saveSession
                     var data = $(editable).data();
-                        $(editable).focus().removeClass("mce-edit-focus");
+                        $(editable).trigger("focus").removeClass("mce-edit-focus");
 
                     // hide tinymce option while resizing
                     var inst = tinyMCE.EditorManager.get(data.pluginId);

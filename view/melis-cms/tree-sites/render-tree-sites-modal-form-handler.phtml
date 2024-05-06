@@ -11,7 +11,7 @@ $data_melisKey = $this->melisKey;
                 <div class="widget-head">
                     <ul class="nav nav-tabs">
                         <li class="active">
-                            <a href="#<?php echo $this->zoneconfig['conf']['id'] ?>" class="glyphicons notes" data-toggle="tab"
+                            <a href="#<?php echo $this->zoneconfig['conf']['id'] ?>" class="glyphicons notes" data-bs-toggle="tab"
                                aria-expanded="true"><i></i><?php echo $this->zoneconfig['conf']['name']; ?>
                             </a>
                         </li>
@@ -34,7 +34,7 @@ $data_melisKey = $this->melisKey;
                                     </script>
                                     <br>
                                     <div class="footer-modal d-flex flex-row justify-content-between">
-                                        <button data-dismiss="modal" class="btn btn-danger float-left">
+                                        <button data-bs-dismiss="modal" class="btn btn-danger float-left">
                                             <i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscms_menu_cancel') ?>
                                         </button>
                                         <button class="btn btn-success" id="duplicatePageTree" data-style-id="<?= $this->styleId ?>">

@@ -15,7 +15,7 @@ $data_melisKey = $this->melisKey;
                 <div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none">
                     <div class="widget-head">
                         <ul class="nav nav-tabs">
-                            <li class="active"><a href="#" class="glyphicons pencil" data-toggle="tab" aria-expanded="true"><i></i> <?php echo $this->translate('tr_melis_site_translation_edit_translation') ?></a></li>
+                            <li class="active"><a href="#" class="glyphicons pencil" data-bs-toggle="tab" aria-expanded="true"><i></i> <?php echo $this->translate('tr_melis_site_translation_edit_translation') ?></a></li>
                         </ul>
                     </div>
                     <div class="widget-body innerAll inner-2x">
@@ -31,7 +31,7 @@ $data_melisKey = $this->melisKey;
                                             <ul class="nav-tabs product-text-tab">
                                                 <?php foreach($this->siteLangs as $key => $transLang) { ?>
                                                     <li class="">
-                                                        <a class="clearfix" data-toggle="tab" id="sites_translation_lang_<?= $transLang['lang_cms_id'] ?>" href="#<?= $transLang['lang_cms_locale']; ?>-log-type-details-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $transLang['lang_cms_id'] ?>">
+                                                        <a class="clearfix" data-bs-toggle="tab" id="sites_translation_lang_<?= $transLang['lang_cms_id'] ?>" href="#<?= $transLang['lang_cms_locale']; ?>-log-type-details-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $transLang['lang_cms_id'] ?>">
                                                             <span class="float-right">
                                                                 <img src="<?= $this->serverUrl() . '/MelisCms/images/lang-flags/' . $transLang['lang_cms_locale'] . '.png' ?>" class="float-right">
                                                             </span>
@@ -92,7 +92,7 @@ $data_melisKey = $this->melisKey;
                                     </div>
                                 </div>
                                 <div class="footer-modal d-flex flex-row justify-content-between">
-                                    <a data-dismiss="modal" class="btn btn-danger float-left"><i class="fa fa-times"></i> <?= $this->translate('tr_melis_site_translation_close_btn')?></a>
+                                    <a data-bs-dismiss="modal" class="btn btn-danger float-left"><i class="fa fa-times"></i> <?= $this->translate('tr_melis_site_translation_close_btn')?></a>
                                     <a class="btn btn-success btnSaveSiteTranslation"><i class="fa fa-save"></i>  <?= $this->translate('tr_melis_site_translation_save_btn'); ?></a>
                                 </div>
                             </div>

@@ -11,7 +11,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                 <div class="widget-head">
                     <ul class="nav nav-tabs">
                         <li class="active">
-                            <a href="#<?php echo $this->zoneconfig['conf']['id'] ?>" class="glyphicons notes" data-toggle="tab" aria-expanded="true"><i></i>
+                            <a href="#<?php echo $this->zoneconfig['conf']['id'] ?>" class="glyphicons notes" data-bs-toggle="tab" aria-expanded="true"><i></i>
                                 <?= $this->translate('tr_melis_cms_page_tree_import') ?>
                             </a>
                         </li>
@@ -64,10 +64,10 @@ if (!empty($this->zoneconfig['conf']['id']))
                     </div>
                     <div align="right">
                         <?php if ($this->isAdmin) : ?>
-                            <button type="button" id="test-btnbtn" data-dismiss="modal" class="btn btn-danger pull-left"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
+                            <button type="button" id="test-btnbtn" data-bs-dismiss="modal" class="btn btn-danger pull-left"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
                             <button type="button" class="btn btn-success" id="page-tree-import-test" disabled><?= $this->translate('tr_melis_cms_page_tree_import_modal_test_file'); ?></button>
                         <?php else : ?>
-                            <button type="button" data-dismiss="modal" class="btn btn-danger pull-left"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
+                            <button type="button" data-bs-dismiss="modal" class="btn btn-danger pull-left"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
                             <div style="display: block; clear: both;"></div>
                         <?php endif; ?>
                     </div>

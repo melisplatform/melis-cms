@@ -7,7 +7,7 @@ $(function() {
                 if(status === 'on'){
                     $('div[data-siteModule-name='+moduleName+'].'+currentTabId+'_module_switch>div>input').attr("checked",true);
                 }else{
-                    $('div[data-siteModule-name='+moduleName+'].'+currentTabId+'_module_switch>div>input').removeAttr("checked");
+                    $('div[data-siteModule-name='+moduleName+'].'+currentTabId+'_module_switch>div>input').prop("checked", false);
                 }
         }
 
