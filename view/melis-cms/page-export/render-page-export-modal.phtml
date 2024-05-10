@@ -46,7 +46,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                                             $typeField = $form->get('page_export_type');
                                             $inputLabel = $typeField->getLabelAttributes();                                          
                                             $typeField->setLabelAttributes(array('class' => ''));
-                                            $label = $typeField->getLabel().'<i class="fa fa-info-circle fa-lg float-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
+                                            $label = $typeField->getLabel().'<i class="fa fa-info-circle fa-lg float-right tip-info" data-bs-toggle="tooltip" data-bs-placement="left" title="" data-bs-title="'.$typeField->getOption('tooltip').'"></i>';
                                             $typeField->setLabel($label);
                                             echo $this->formLabel($typeField);
                                             $typeField->setLabelAttributes($inputLabel);
@@ -58,7 +58,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                                             $typeField = $form->get('export_page_resources');
                                             $inputLabel = $typeField->getLabelAttributes();                                            
                                             $typeField->setLabelAttributes(array('class' => ''));
-                                            $label = $typeField->getLabel().'<i class="fa fa-info-circle fa-lg float-right tip-info" data-toggle="tooltip" data-placement="left" title="" data-original-title="'.$typeField->getOption('tooltip').'"></i>';
+                                            $label = $typeField->getLabel().'<i class="fa fa-info-circle fa-lg float-right tip-info" data-bs-toggle="tooltip" data-bs-placement="left" title="" data-bs-title="'.$typeField->getOption('tooltip').'"></i>';
                                             $typeField->setLabel($label);
                                             echo $this->formLabel($typeField);
                                             $typeField->setLabelAttributes($inputLabel);
@@ -75,7 +75,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                                                         }
                                                         var attribTooltip = '';
                                                         if (typeof $(this).data("tooltip") != 'undefined') {
-                                                            attribTooltip = '<i class="fa fa-info-circle fa-lg float-right" data-toggle="tooltip" data-placement="left" title="" data-original-title="' + $(this).data("tooltip") + '"></i>';
+                                                            attribTooltip = '<i class="fa fa-info-circle fa-lg float-right" data-bs-toggle="tooltip" data-bs-placement="left" title="" data-bs-title="' + $(this).data("tooltip") + '"></i>';
                                                         }
                                                         var switchBtn = '<label for="' + $(this).attr("name") + '">' + $(this).data("label") + attribRequired + attribTooltip + '</label>'
                                                             + '<div class="make-switch export_page_resources_switch" data-label-icon="glyphicon glyphicon-resize-horizontal" data-on-label="' + translations.tr_meliscore_common_yes + '" data-off-label="' + translations.tr_meliscore_common_nope + '" style="display: block;">'

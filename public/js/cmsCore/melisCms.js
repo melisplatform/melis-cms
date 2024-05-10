@@ -103,7 +103,7 @@ var melisCms = (function() {
 		var pageNumber = typeof idPage === "string" ? idPage : $(this).data("pagenumber"),
 			fatherPageId = $(this).data("fatherpageid");
 
-			console.log(`melisCms.js savePage() pageNumber: `, pageNumber);
+			//console.log(`melisCms.js savePage() pageNumber: `, pageNumber);
 
 		// convert the serialized form values into an array
 		var datastring = $("#" + pageNumber + "_id_meliscms_page form").serializeArray();
@@ -132,7 +132,7 @@ var melisCms = (function() {
 		})
 		.done(function(data) {
 			if (data.success === 1) {
-				console.log(`melisCms.js savePage() data.datas.idPage: `, data.datas.idPage);
+				//console.log(`melisCms.js savePage() data.datas.idPage: `, data.datas.idPage);
 				// reload and expand the treeview
 				refreshTreeview(data.datas.idPage);
 
@@ -507,7 +507,7 @@ var melisCms = (function() {
 			dataType: "json",
 		})
 		.done(function(data) {
-			console.log(`melisCms.js refreshTreeview() data: `, data);
+			//console.log(`melisCms.js refreshTreeview() data: `, data);
 			//process array to add to make this format '1/3/5/6...'
 			var newData = [],
 				parentNode;
@@ -521,32 +521,30 @@ var melisCms = (function() {
 
 				newData = newData.toString();
 				newData = newData.replace(/,/g, "");
-				console.log(`newData: `, newData);
+				//console.log(`newData: `, newData);
 				// $("#id-mod-menu-dynatree").fancytree("getTree"), deprecated 2.38.3
 				var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
-					console.log(`melisCms.js refreshTreeview() tree: `, tree);
-					// reload tree pages
-					// {url: "/melis/MelisCms/TreeSites/get-tree-pages-by-page-id"}
 					tree
-						.reload()
-						.done(function() {
-							console.log("fancytree reloaded, tree.loadKeyPath");
-							/* tree.loadKeyPath(newData, function(node, status) {
-									console.log(`status: `, status);
-									if (status == "ok") {
-										node.setActive(true).done(function() {
-											node.setExpanded(true);
-										});
-									}
-								})
-								.done(function() {
-									tree.clearFilter();
-									// remove duplicated brach of the tree while rapidly refreshing the tree [ plugin bug fix ]
-									if ( $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").hasClass("fancytree-lastsib") === false) {
-										$("#id-mod-menu-dynatree .ui-fancytree > li:last-child").remove();
-									}
-								}); */
-						});
+					.reload({
+						url: "/melis/MelisCms/TreeSites/get-tree-pages-by-page-id",
+					})
+					.done(function() {
+						tree
+							.loadKeyPath(newData, function(node, status) {
+								if (status == "ok") {
+									node.setActive(true).done(function() {
+										node.setExpanded(true);
+									});
+								}
+							})
+							.done(function() {
+								tree.clearFilter();
+								// remove duplicated brach of the tree while rapidly refreshing the tree [ plugin bug fix ]
+								if ( $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").hasClass("fancytree-lastsib") === false ) {
+									$("#id-mod-menu-dynatree .ui-fancytree > li:last-child").remove();
+								}
+							});
+					});
 		})
 		.fail(function(xhr, textStatus, errorThrown) {
 			alert(translations.tr_meliscore_error_message);

@@ -58,10 +58,10 @@ $data_melisKey = $this->melisKey;
                 <div class="row">
                     <div class="col-xs-12 col-md-2">
                         <div class="product-text-tab-container" >
-                            <ul class="nav-tabs product-text-tab meliscms-site-language-homepage-list">
+                            <ul class="nav nav-tabs product-text-tab meliscms-site-language-homepage-list">
                                 <?php foreach($this->activeSiteLangs as $lang) :?>
-                                    <li class="">
-                                        <a class="clearfix" data-bs-toggle="tab" id="cms_homepages_lang_<?= $lang['slang_lang_id'] ?>" href="#<?= $lang['lang_cms_locale']; ?>-log-type-details-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $lang['slang_lang_id'] ?>">
+                                    <li class="nav-item">
+                                        <a class="nav-link clearfix" data-bs-toggle="tab" data-bs-target="#<?= $lang['lang_cms_locale']; ?>-log-type-details-<?= $this->siteId; ?>" id="cms_homepages_lang_<?= $lang['slang_lang_id'] ?>" href="#<?= $lang['lang_cms_locale']; ?>-log-type-details-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $lang['slang_lang_id'] ?>">
                                             <span class="float-right">
                                                 <img src="<?= $this->serverUrl() . '/MelisCms/images/lang-flags/' . $lang['lang_cms_locale'] . '.png' ?>" class="float-right">
                                             </span>

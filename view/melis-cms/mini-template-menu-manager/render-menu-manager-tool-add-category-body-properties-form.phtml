@@ -33,12 +33,13 @@
                 </h4>
             </div>
             <div class="product-text-tab-container">
-                <ul class="nav-tabs product-text-tab menu-manager-tab">
+                <ul class="nav nav-tabs product-text-tab menu-manager-tab">
                     <?php foreach ($this->languages as $language) { ?>
-                        <li class="">
+                        <li class="nav-item">
                             <a
-                                class="clearfix"
+                                class="nav-link clearfix"
                                 data-bs-toggle="tab"
+                                data-bs-target="#<?= $language['lang_cms_id'].'-mini-template-menu-manager-category' ?>"
                                 href="#<?= $language['lang_cms_id'].'-mini-template-menu-manager-category' ?>"
                                 aria-expanded="false"
                             >

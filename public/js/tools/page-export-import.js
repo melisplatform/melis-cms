@@ -177,7 +177,7 @@ $(document).ready(function(){
                 $body.find('#importPageValidated .tab-content .tab-pane').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + formData.page_tree_import.name + '</p>');
                 $body.find('#importPageValidated .tab-content .tab-pane').append('<p>' + translations.tr_melis_cms_page_tree_import_validated +': <span style="color: green;">' + translations.tr_meliscms_common_yes + '</span></p>');
 
-                var btnCancel = '<button type="button" data-dismiss="modal" class="btn btn-danger pull-left">' + translations.tr_meliscms_tool_sites_cancel + '</button>';
+                var btnCancel = '<button type="button" data-bs-dismiss="modal" class="btn btn-danger pull-left">' + translations.tr_meliscms_tool_sites_cancel + '</button>';
                 var btnImport = '<button type="button" class="btn btn-success" id="page-tree-import">' + translations.tr_melis_cms_page_tree_import_file + '</button>';
 
                 $body.find('#importPageValidated .btn-container').append(btnCancel);
@@ -224,7 +224,7 @@ $(document).ready(function(){
                         $body.find('#pageImportConsole').append('<div id="pageImportProcessing"><p>' + translations.tr_melis_cms_page_tree_import_modal_processing + ' <i class="fa fa-spinner fa-spin"></i></p></div>');
                     }
                 }).done(function (data) {
-                    var btnClose = '<button type="button" id="importPageDoneClose" data-dismiss="modal" class="btn btn-danger pull-left" style="margin-top: -15px; margin-left: -15px;">' + translations.tr_melis_cms_page_tree_import_close + '</button>';
+                    var btnClose = '<button type="button" id="importPageDoneClose" data-bs-dismiss="modal" class="btn btn-danger pull-left" style="margin-top: -15px; margin-left: -15px;">' + translations.tr_melis_cms_page_tree_import_close + '</button>';
 
                     $body.find('#importPageValidated').css('display', 'none');
                     $body.find('#importPageDone').css('display', '');

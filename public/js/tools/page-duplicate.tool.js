@@ -13,7 +13,7 @@ $(function() {
 			})
 			.done(function(data) {
 				if (data.success) {
-					console.log(`page-duplicate.tool.js data.response.pageId: `, data.response.pageId);
+					//console.log(`page-duplicate.tool.js data.response.pageId: `, data.response.pageId);
 					melisCms.refreshTreeview(data.response.pageId);
 					if (data.response.openPageAfterDuplicate) {
 						// open page

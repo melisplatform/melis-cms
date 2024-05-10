@@ -238,9 +238,14 @@ var melisDragnDrop = (function($, window) {
             },
         });
 
-        $(".melis-cms-plugin-snippets").on("mouseenter mouseleave", function() {
+        $(".melis-cms-plugin-snippets")
+        .on("mouseenter", function() {
             var $this = $(this);
                 $this.children(".melis-plugin-tooltip").fadeIn();
+        })
+        .on("mouseleave", function() {
+            var $this = $(this);
+                $this.children(".melis-plugin-tooltip").fadeOut();
         });
 
         $body.on('click', ".melis-cms-filter-btn-sub-category", function(){

@@ -10,10 +10,10 @@ $data_melisKey = $this->melisKey;
     <div class="row">
         <div class="col-xs-12 col-md-2">
             <div class="product-text-tab-container">
-                <ul class="nav-tabs product-text-tab">
+                <ul class="nav nav-tabs product-text-tab">
                     <?php foreach($this->languages as $idx => $lang) :?>
-                        <li class="mcms-gdpr-banner-lang">
-                            <a class="clearfix mcms-gdpr-banner-language" data-bs-toggle="tab" id="cms-gdpr-lang-<?= $lang['lang_cms_id']; ?>" href="#<?= $lang['lang_cms_name']; ?>-banner-details" aria-expanded="true" data-lang-id="<?= $lang['lang_cms_id'] ?>">
+                        <li class="nav-item mcms-gdpr-banner-lang">
+                            <a class="nav-link clearfix mcms-gdpr-banner-language" data-bs-toggle="tab" data-bs-target="#<?= $lang['lang_cms_name']; ?>-banner-details" id="cms-gdpr-lang-<?= $lang['lang_cms_id']; ?>" href="#<?= $lang['lang_cms_name']; ?>-banner-details" aria-expanded="true" data-lang-id="<?= $lang['lang_cms_id'] ?>">
                                 <span><?= $lang['lang_cms_name'] ?></span>
 
                                 <span class="float-right"><img src="/MelisCms/images/lang-flags/<?= $lang['lang_cms_locale']; ?>.png" class="imgDisplay float-right"/></span>

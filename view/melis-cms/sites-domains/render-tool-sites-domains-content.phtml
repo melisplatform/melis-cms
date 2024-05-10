@@ -21,10 +21,10 @@ $data_melisKey = $this->melisKey;
                 <div class="row">
                     <div class="col-xs-12 col-md-2">
                         <div class="product-text-tab-container">
-                            <ul class="nav-tabs product-text-tab meliscms-site-domains-list">
+                            <ul class="nav nav-tabs product-text-tab meliscms-site-domains-list">
                                 <?php foreach($this->siteEnvs as $idx => $siteEnv) :?>
-                                    <li class="">
-                                        <a class="clearfix" data-bs-toggle="tab" id="news_cms_lang_<?= $siteEnv['plf_id'] ?>" href="#<?= $siteEnv['plf_name']; ?>-log-type-details-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $siteEnv['plf_id'] ?>">
+                                    <li class="nav-item">
+                                        <a class="nav-link clearfix" data-bs-toggle="tab" data-bs-target="#<?= $siteEnv['plf_name']; ?>-log-type-details-<?= $this->siteId; ?>" id="news_cms_lang_<?= $siteEnv['plf_id'] ?>" href="#<?= $siteEnv['plf_name']; ?>-log-type-details-<?= $this->siteId; ?>" aria-expanded="true" data-env-id="<?= $siteEnv['plf_id'] ?>">
                                             <span><?= $siteEnv['plf_name'] ?></span>
                                         </a>
                                     </li>
