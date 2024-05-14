@@ -267,6 +267,7 @@ $(function() {
 
     $body.on('click', "#btn-new-meliscms-tool-sites", function () {
         melisCoreTool.pending("#btn-new-meliscms-tool-sites");
+        //zoneId,melisKey,hasCloseBtn,parameters,modalUrl,modalBackDrop,callback
         melisHelper.createModal('id_meliscms_tool_sites_modal_container','meliscms_tool_sites_modal_add_content',true,[],modalUrl,function () {
             melisCoreTool.done("#btn-new-meliscms-tool-sites");
             currentStepForm = '';
