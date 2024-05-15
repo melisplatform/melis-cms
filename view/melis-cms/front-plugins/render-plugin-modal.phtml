@@ -33,8 +33,8 @@
                                                       $icon = '<i class="' . $tab['icon'] . '"></i>';
                                                   
                                             ?>
-                                            <li <?php if ($key == 0) echo 'class="active"'; ?>>
-                                                <a href="#plugin_modal_id_tab_<?= $key; ?>" class="f-awesome" data-bs-toggle="tab" aria-expanded="true" title="<?= $tabName ?>"><?= $icon; ?><?= $tabName; ?></a>
+                                            <li class="nav-item <?php if ($key == 0) echo 'active'; ?>">
+                                                <a data-bs-target="#plugin_modal_id_tab_<?= $key; ?>" href="#plugin_modal_id_tab_<?= $key; ?>" class="nav-link f-awesome" data-bs-toggle="tab" aria-expanded="true" title="<?= $tabName ?>"><?= $icon; ?><?= $tabName; ?></a>
                                             </li>    
                                             <?php 
                                               }    

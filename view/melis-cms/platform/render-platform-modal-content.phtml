@@ -11,8 +11,8 @@ $data_melisKey = 'data-melisKey="' . $this->melisKey . '"';
             <div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none">
                 <div class="widget-head">
                     <ul class="nav nav-tabs">
-                        <li class="active">
-                            <a href="#<?= $id ?>" class="glyphicons <?= ($this->pids_id) ? 'pencil' : 'plus' ?>"
+                        <li class="nav-item active">
+                            <a data-bs-target="#<?= $id ?>" href="#<?= $id ?>" class="nav-link glyphicons <?= ($this->pids_id) ? 'pencil' : 'plus' ?>"
                               data-bs-toggle="tab" aria-expanded="true"><i></i> <?= $this->translate($this->tabTitle) ?></a>
                         </li>
                     </ul>

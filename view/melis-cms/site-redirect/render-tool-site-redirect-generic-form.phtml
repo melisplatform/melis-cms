@@ -14,7 +14,9 @@
 			<div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none">
                 <div class="widget-head">
                 	<ul class="nav nav-tabs">
-                		<li class="active"><a href="#<?php echo $id ?>" class="glyphicons <?php echo ($this->s301Id) ? 'pencil' : 'plus' ?>" data-bs-toggle="tab" aria-expanded="true"><i></i> <?php echo $this->translate($this->title) ?></a></li>
+                		<li class="nav-item active">
+							<a data-bs-target="#<?php echo $id ?>" href="#<?php echo $id ?>" class="nav-link glyphicons <?php echo ($this->s301Id) ? 'pencil' : 'plus' ?>" data-bs-toggle="tab" aria-expanded="true"><i></i> <?php echo $this->translate($this->title) ?></a>
+						</li>
             		</ul>
         		</div>
         		<div class="widget-body innerAll inner-2x">

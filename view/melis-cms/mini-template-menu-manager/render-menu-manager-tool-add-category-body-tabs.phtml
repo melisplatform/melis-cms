@@ -4,7 +4,7 @@
     class="widget widget-tabs widget-tabs-double-2 widget-tabs-responsive"
 >
     <div class="widget-head nav">
-        <ul class="tabs-label nav-tabs">
+        <ul class="tabs-label nav-tabs nav">
             <?php if(! empty($this->zoneconfig['interface'])) : ?>
                 <?php foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig) : ?>
                     <?php if ($this->formType == 'add') : ?>
@@ -18,10 +18,11 @@
                             $broken_id[$length - 1] = 'content';
                             $target = implode('_', $broken_id);
                         ?>
-                        <li>
+                        <li class="nav-item">
                             <a
-                                class="<?= $menuConfig['conf']['icon'] ?>"
+                                class="nav-link <?= $menuConfig['conf']['icon'] ?>"
                                 data-bs-toggle="tab"
+                                data-bs-target="#<?= $target ?>"
                                 href="#<?= $target ?>"
                                 aria-expanded="true"
                             >
