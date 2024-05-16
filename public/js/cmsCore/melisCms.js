@@ -521,17 +521,21 @@ var melisCms = (function() {
 
 				newData = newData.toString();
 				newData = newData.replace(/,/g, "");
-				//console.log(`newData: `, newData);
-				// $("#id-mod-menu-dynatree").fancytree("getTree"), deprecated 2.38.3
-				var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
+				
+				// deprecated 2.38.3
+				var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
+				
+				// var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
+				//var tree = $.ui.fancytree.getTree();
+
 					tree
 					.reload({
-						url: "/melis/MelisCms/TreeSites/get-tree-pages-by-page-id",
+						url: "/melis/MelisCms/TreeSites/get-tree-pages-by-page-id"
 					})
 					.done(function() {
 						tree
 							.loadKeyPath(newData, function(node, status) {
-								if (status == "ok") {
+								if (status === "ok") {
 									node.setActive(true).done(function() {
 										node.setExpanded(true);
 									});
