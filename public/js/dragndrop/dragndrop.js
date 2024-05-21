@@ -148,13 +148,13 @@ var melisDragnDrop = (function($, window) {
 
                             var dataKeysfromdragdropzone = $(ui.helper[0]).data("melis-fromdragdropzone");
                             var dropLocation = ui.helper[0];
+                            
                             // remove Clone
                             // ui.helper[0].remove();
                             setTimeout(function() {
                                 if(moduleName !== undefined) {
                                     requestPlugin(moduleName, pluginName, dropzone, tabId, dropLocation, siteModule);
                                 }
-
                             }, 300);
                         });
 
@@ -350,18 +350,18 @@ var melisDragnDrop = (function($, window) {
                                 melisPluginID               = typeof pluginToolBox.data("plugin-id") != "undefined" ? pluginToolBox.data("plugin-id") : '',
                                 melisPluginTag              = typeof pluginToolBox.data("melis-tag") != "undefined" ? pluginToolBox.data("melis-tag") : '',
                                 melisSiteModule             = typeof pluginToolBox.data("site-module"),
-                                melisPluginHardCodedConfig  = String.prototype.trim(pluginHardCodedConfigEl.text());
-
+                                melisPluginHardCodedConfig  = pluginHardCodedConfigEl.text().trim();
+                            
                             // dataPluginID = pluginToolBox.next().attr("id");
                             var pluginOutlined = pluginToolBox.closest(".melis-ui-outlined");
 
                                 dataPluginID = pluginOutlined.find("[id*='"+melisPluginID+"']").attr("id");
-
+                                
                                 if ( typeof dataPluginID !== "undefined" ) {
                                     // get plugin id
                                     idPlugin = dataPluginID;
                                 }
-
+                                
                                 // create array of objects
                                 var datastring          = [],
                                     uiPlaceHolderWidth  = placeholderWidth.css('width');
@@ -400,15 +400,15 @@ var melisDragnDrop = (function($, window) {
                                     datastring.push({name: "melisPluginMobileWidth", value: 100 });
                                     datastring.push({name: "melisPluginTabletWidth", value: 100 });
                                     datastring.push({name: "melisPluginDesktopWidth", value: 100});
-
+                                   
                                     // pass it in savePluginUpdate
                                     melisPluginEdition.savePluginUpdate(datastring, siteModule);
                                 }
 
                                 // adding plugin in dropzone
-                                // $('div[data-dragdropzone-id='+ dropzone +']').append(plugin.html);
+                                //$('div[data-dragdropzone-id='+ dropzone +']').append(plugin.html);
                                 var dropPlugin = $(plugin.html).insertAfter(dropLocation);
-
+                                
                                     // Processing the plugin resources and initialization
                                     melisPluginEdition.processPluginResources(plugin.init, idPlugin);
                                     // Init Resizable

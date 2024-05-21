@@ -1,4 +1,4 @@
-$(document).ready(function(){
+$(function(){
     var $body = $("body");
     var importFormData;
     var idsMap;

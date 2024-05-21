@@ -34,6 +34,12 @@ var melisPluginEdition = (function($, window) {
 
     $body.on("click", "button[id='pluginModalBtnApply'][data-page-id='"+melisActivePageId+"']", submitPluginForms); // $body because it is modal and it's located in parent
 
+    $body.on("click", ".meliscms-plugin-modal-cancel-btn", function(e) {
+        e.preventDefault();
+
+        removeParentBodyPropStyle();
+    });
+
     $_body.on("focus", ".melis-ui-outlined .melis-editable", function() {
         $(this).closest(".melis-ui-outlined").addClass("melis-focus");
     });
@@ -41,6 +47,15 @@ var melisPluginEdition = (function($, window) {
     $_body.on("blur", ".melis-ui-outlined.melis-focus", function() {
         $(this).removeClass("melis-focus");
     });
+
+    // window.parent.$body.prop("style")
+    function removeParentBodyPropStyle() {
+        setTimeout(function() {
+            if ( $body.prop("style", "overflow: hidden").length ) {
+                window.parent.melisCoreTool.removeOverflowHidden();
+            }
+        }, 1000);
+    }
 
     // run when .melis-ui-outlined loses focus and run getPluginData() to include the width related data
     //$_body.on("blur", ".melis-ui-outlined", melisUiOutlinedLosesFocus);
@@ -66,7 +81,7 @@ var melisPluginEdition = (function($, window) {
             melisSiteModule     = $this.closest("#id_meliscms_plugin_modal_container").data("melis-site-module"),
             dataString          = $this.closest('.modal-content').find("form");
 
-            pluginHardcodedConfig = String.prototype.trim($this.closest("#id_meliscms_plugin_modal_container").find(".plugin-hardcoded-conf").text());
+            pluginHardcodedConfig = $this.closest("#id_meliscms_plugin_modal_container").find(".plugin-hardcoded-conf").text().trim();
 
             // Construct data string
             var datastring = dataString.serializeArray();
@@ -90,6 +105,9 @@ var melisPluginEdition = (function($, window) {
             catch (e) {
                console.log(e);
             }
+            
+            // window.parent.$body.prop("style")
+            removeParentBodyPropStyle();
     }
 
     // Validate form in modal
@@ -114,7 +132,6 @@ var melisPluginEdition = (function($, window) {
                         checkToolSize();
                     }, 300);
                     window.parent.$("#id_meliscms_plugin_modal_container").modal('hide');
-
                 }, 300);
             } else {
                 melisCmsFormHelper.melisMultiKoNotification(data.errors);
@@ -595,7 +612,7 @@ var melisPluginEdition = (function($, window) {
         var $this               = $(this),
             toolBox             = $this.closest(".melis-plugin-tools-box"),
             pluginContainer     = toolBox.parent(".melis-ui-outlined"),
-            pluginFrontConfig   = String.prototype.trim(pluginContainer.find(".plugin-hardcoded-conf").text()),
+            pluginFrontConfig   = pluginContainer.find(".plugin-hardcoded-conf").text().trim(),
             module              = toolBox.data("module"),
             pluginName          = toolBox.data("plugin"),
             pluginId            = toolBox.data("plugin-id"),
