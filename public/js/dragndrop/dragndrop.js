@@ -43,7 +43,6 @@ var melisDragnDrop = (function($, window) {
             placeholder: "ui-state-highlight",
             tolerance: "pointer",
             items: ".melis-ui-outlined",
-
             start: function(event, ui) {
                 $(".melis-dragdropzone").sortable("refresh");
 
@@ -152,21 +151,22 @@ var melisDragnDrop = (function($, window) {
                             // remove Clone
                             // ui.helper[0].remove();
                             setTimeout(function() {
-                                if(moduleName !== undefined) {
+                                if ( moduleName !== undefined ) {
                                     requestPlugin(moduleName, pluginName, dropzone, tabId, dropLocation, siteModule);
                                 }
                             }, 300);
                         });
 
-                    // bind on bootstrap hidden modal event
-                    window.parent.$('body').on('hidden.bs.modal', window.parent.$('.modal.bootstrap-dialog.in'), function (e) {
-
-                        // check if loader exists
-                        if( !$(ui.helper[0]).parent().find('.overlay-loader').length ) {
-
-                            // remove clone element
-                            ui.helper[0].remove();
-                        }
+                    // bind on bootstrap hidden modal event, .modal.bootstrap-dialog.in
+                    // commented, issue on: ui.helper[0].remove() get removed before adding the plugin on dropzone @ line: 411 
+                    window.parent.$('body').on('hidden.bs.modal', window.parent.$('.modal.bootstrap-dialog'), function (e) {
+                        setTimeout(function() {
+                            // check if loader exists
+                            if( !$(ui.helper[0]).parent().find('.overlay-loader').length ) {
+                                // remove clone element
+                                ui.helper[0].remove();
+                            }
+                        }, 500);
                     });
                 }
 
@@ -407,7 +407,8 @@ var melisDragnDrop = (function($, window) {
 
                                 // adding plugin in dropzone
                                 //$('div[data-dragdropzone-id='+ dropzone +']').append(plugin.html);
-                                var dropPlugin = $(plugin.html).insertAfter(dropLocation);
+                                //var dropPlugin = $(plugin.html).insertAfter(dropLocation); 
+                                $(plugin.html).insertAfter( dropLocation ); 
                                 
                                     // Processing the plugin resources and initialization
                                     melisPluginEdition.processPluginResources(plugin.init, idPlugin);
@@ -415,8 +416,10 @@ var melisDragnDrop = (function($, window) {
                                     if ( parent.pluginResizable == 1 ) {
                                         melisPluginEdition.initResizable();
                                     }
+
                                     // remove plugin
                                     $(dropLocation).remove();
+                                    
                                     // send new plugin list
                                     melisPluginEdition.sendDragnDropList(dropzone, pageId);
 
