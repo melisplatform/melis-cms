@@ -1,7 +1,7 @@
  var melisSearchPageTree = (function($, window) {
     // cache DOM
     var $body = $('body');
-	    $body.on("click", "#leftSearchTreeView", function(e){
+	    $body.on("click", "#leftSearchTreeView", function(e) {
 	    	startTreeSearch();
 		});
 
@@ -74,6 +74,7 @@
 				//tree 		= $("#id-mod-menu-dynatree").fancytree("getTree"),
 				tree 		= $.ui.fancytree.getTree("#id-mod-menu-dynatree"),
 				filterFunc 	= tree.filterNodes;
+				
 				if ( match.length ) {
 					var opts 	= {},
 						tmp 	= '';
@@ -99,7 +100,8 @@
 							dataType    : 'json',
 							encode		: true
 						}).done(function(data) {
-							if(!Array.isArray(data)) {
+							// match value already trim()
+							if(! Array.isArray(data) ) {
 								searchContainer.append("<div class='melis-search-overlay'>"+translations.tr_meliscms_form_search_not_found+"</div>").hide().fadeIn(600);
 								setTimeout(function() {
 									$(".melis-search-overlay").fadeOut(600, function() {
@@ -113,22 +115,22 @@
 								}, 1000);
 							} else {
 								var arr = $.map(data, function(el) { return el });
-								tree.loadKeyPath(arr, function(node, status) {
-									switch( status ) {
-										case "loaded":	
-											node.makeVisible();     
-											break;
-										case "ok":    
-											node.makeVisible();     
-											break;
-									}
+									tree.loadKeyPath(arr, function(node, status) {
+										switch( status ) {
+											case "loaded":	
+												node.makeVisible();     
+												break;
+											case "ok":    
+												node.makeVisible();     
+												break;
+										}
 
-									filterFunc.call(tree, match, opts);
-								}).done(function(){
-									$("input[name=left_tree_search]").prop('disabled', false);
-									$(".meliscms-search-box.sidebar-treeview-search .melis-overlay-loading").remove();
-									$("input[name=left_tree_search]").trigger("focus");
-								});	
+										filterFunc.call(tree, match, opts);
+									}).done(function(){
+										$("input[name=left_tree_search]").prop('disabled', false);
+										$(".meliscms-search-box.sidebar-treeview-search .melis-overlay-loading").remove();
+										$("input[name=left_tree_search]").trigger("focus");
+									});	
 							}
 						}).fail(function(xhr, textStatus, errorThrown) {
 							alert( translations.tr_meliscore_error_message );

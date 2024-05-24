@@ -322,25 +322,28 @@ $(function(){
             newData = newData.toString();
             newData = newData.replace(/,/g,'');
 
-            var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
+            //var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
+            var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
 
             // reload tree pages
             tree.reload({
                 url: '/melis/MelisCms/TreeSites/get-tree-pages-by-page-id'
             }).done(function(){
-                tree.loadKeyPath(newData, function(node, status){
+                /* tree.loadKeyPath(newData, function(node, status){
                     if (status == "ok"){
                         node.setActive(true).done(function(){
                             node.setExpanded(true);
                         });
                     }
                 }).done(function(){
-                    tree.clearFilter();
-                    // remove duplicated brach of the tree while rapidly refreshing the tree [ plugin bug fix ]
-                    if ( $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").hasClass("fancytree-lastsib") === false){
-                        $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").remove();
-                    }
-                });
+                    
+                }); */
+                tree.clearFilter();
+
+                // remove duplicated brach of the tree while rapidly refreshing the tree [ plugin bug fix ]
+                if ( $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").hasClass("fancytree-lastsib") === false){
+                    $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").remove();
+                }
             });
 
         }).fail(function(xhr, textStatus, errorThrown){
