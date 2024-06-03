@@ -539,7 +539,7 @@ var melisCms = (function() {
 						}).done(function(){
 							
 						}); */
-						tree.clearFilter();
+						//tree.clearFilter();
 
 						// remove duplicated branch of the tree while rapidly refreshing the tree [ plugin bug fix ]
 						if ( $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").hasClass("fancytree-lastsib") === false ) {
@@ -928,6 +928,18 @@ var melisCms = (function() {
 	$body.on("click", ".melis-unpublishpage", unpublishPage);
 	$body.on("click", ".melis-deletepage", deletePage);
 	/* $body.on("load", "iframe", saveToSession); */
+
+	//disable successive click which creates multiple pages
+	$body.on("click", ".melis-savepage", function(e) {
+		e.preventDefault();
+
+		var $btn = $(this);
+			$btn.prop("disabled", true);
+			
+			setTimeout(function() {
+				$btn.prop("disabled", false);
+			}, 3000);
+	});
 
 	// page display settings desktop - tablet - mobile
 	$body.on("click", ".display-settings", displaySettings);
