@@ -929,3 +929,16 @@ ul#select2-id_mcgdprbanner_site_id-results {
 #tableMiniTemplateManager.dataTable thead tr th {
     text-align: left !important;
 }
+.mtpl-menu-buttons > div {
+	display: inline-block;
+	width: auto;
+	margin-left: 0;
+	padding-right: 0;
+}
+.mini-template-menu-manager-lang {
+	width: 165px !important;
+}
+.mtpl-menu-add-template button,
+.add-m-tpl-category button {
+	font-size: 0.875rem;
+}
