@@ -693,94 +693,90 @@ var melisCms = (function() {
 
 	// IFRAME HEIGHT CONTROLS (for onload, displaySettings & sidebar collapse)
 	function iframeLoad(id) {
-		var $body = $("body"),
-			$melisIframe = $("#" + id + "_id_meliscms_page").find(".melis-iframe"),
-			height = $melisIframe.contents().height(),
-			$loader = $melisIframe
-				.closest(".meliscms-page-tab-edition")
-				.find("#loader");
+		var $melisIframe = $("#" + id + "_id_meliscms_page").find(".melis-iframe"),
+			height = $melisIframe.contents().height();
 
-		$melisIframe.css("height", height);
-		$melisIframe.css("min-height", "700px");
+			$melisIframe.css("height", height);
+			$melisIframe.css("min-height", "700px");
 
-		// Activating page edition button action
-		enableCmsButtons(id);
+			// Activating page edition button action
+			enableCmsButtons(id);
 
-		// remove page loader
-		window.parent.loader.removeActivePageEditionLoading(
-			id + "_id_meliscms_page"
-		);
+			// remove page loader
+			window.parent.loader.removeActivePageEditionLoading(
+				id + "_id_meliscms_page"
+			);
 
-		//clear the opened tab pages id
-		$openedPageIds = [];
+			//clear the opened tab pages id
+			$openedPageIds = [];
 
-		// PAGE ACCESS user rights checking
-		$.ajax({
-			url: "/melis/MelisCms/TreeSites/canEditPages",
-			encode: true,
-		})
-		.done(function(data) {
-			//var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
-			var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
-			// has no access
-			if (data.edit === 0) {
-				$(".meliscms-search-box.sidebar-treeview-search").hide();
-				$("#id-mod-menu-dynatree").prepend(
-					"<div class='create-newpage'><span class='no-access'>" +
-						translations.tr_meliscms_no_access +
-						"</span></div>"
-				);
-			}
-			// has access
-			else {
-				if (tree.count() === 0) {
+			// PAGE ACCESS user rights checking
+			$.ajax({
+				url: "/melis/MelisCms/TreeSites/canEditPages",
+				encode: true,
+			})
+			.done(function(data) {
+				//var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
+				var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
+				// has no access
+				if (data.edit === 0) {
 					$(".meliscms-search-box.sidebar-treeview-search").hide();
 					$("#id-mod-menu-dynatree").prepend(
-						"<div class='create-newpage'><span class='btn btn-success'>" +
-							translations.tr_meliscms_create_page +
+						"<div class='create-newpage'><span class='no-access'>" +
+							translations.tr_meliscms_no_access +
 							"</span></div>"
 					);
-				} else {
-					$(".meliscms-search-box.sidebar-treeview-search").show();
-					$("#id-mod-menu-dynatree .create-newpage").remove();
 				}
-			}
-		})
-		.fail(function(xhr, textStatus, errorThrown) {
-			alert(translations.tr_meliscore_error_message);
-		});
+				// has access
+				else {
+					if (tree.count() === 0) {
+						$(".meliscms-search-box.sidebar-treeview-search").hide();
+						$("#id-mod-menu-dynatree").prepend(
+							"<div class='create-newpage'><span class='btn btn-success'>" +
+								translations.tr_meliscms_create_page +
+								"</span></div>"
+						);
+					} else {
+						$(".meliscms-search-box.sidebar-treeview-search").show();
+						$("#id-mod-menu-dynatree .create-newpage").remove();
+					}
+				}
+			})
+			.fail(function(xhr, textStatus, errorThrown) {
+				alert(translations.tr_meliscore_error_message);
+			});
 
-		// SAVE user rights checking
-		$.ajax({
-			url: "/melis/MelisCms/Page/isActionActive?actionwanted=save",
-			encode: true,
-		})
-		.done(function(data) {
-			if (data.active === 0) {
-				$("body").addClass("disable-create");
-			} else {
-				$("body").removeClass("disable-create");
-			}
-		})
-		.fail(function(xhr, textStatus, errorThrown) {
-			alert(translations.tr_meliscore_error_message);
-		});
+			// SAVE user rights checking
+			$.ajax({
+				url: "/melis/MelisCms/Page/isActionActive?actionwanted=save",
+				encode: true,
+			})
+			.done(function(data) {
+				if (data.active === 0) {
+					$("body").addClass("disable-create");
+				} else {
+					$("body").removeClass("disable-create");
+				}
+			})
+			.fail(function(xhr, textStatus, errorThrown) {
+				alert(translations.tr_meliscore_error_message);
+			});
 
-		// DELETE user rights checking
-		$.ajax({
-			url: "/melis/MelisCms/Page/isActionActive?actionwanted=delete",
-			encode: true,
-		})
-		.done(function(data) {
-			if (data.active === 0) {
-				$("body").addClass("disable-delete");
-			} else {
-				$("body").removeClass("disable-delete");
-			}
-		})
-		.fail(function(xhr, textStatus, errorThrown) {
-			alert(translations.tr_meliscore_error_message);
-		});
+			// DELETE user rights checking
+			$.ajax({
+				url: "/melis/MelisCms/Page/isActionActive?actionwanted=delete",
+				encode: true,
+			})
+			.done(function(data) {
+				if (data.active === 0) {
+					$("body").addClass("disable-delete");
+				} else {
+					$("body").removeClass("disable-delete");
+				}
+			})
+			.fail(function(xhr, textStatus, errorThrown) {
+				alert(translations.tr_meliscore_error_message);
+			});
 	}
 
 	/**
@@ -796,7 +792,7 @@ var melisCms = (function() {
 		//store the opened pages id
 		$openedPageIds.push(pageId);
 
-		/* 
+			/* 
 			if ( height !== 0 ) {
 				$iframe.css("height", height);
 			}
@@ -826,12 +822,12 @@ var melisCms = (function() {
 			$iframe = $id.find(".iframe-container .tab-content .melis-iframe"),
 			height = $iframe.contents()[0].body.scrollHeight;
 
-		$iframe.css("height", height);
+			$iframe.css("height", height);
 	}
 
 	// WINDOW SCROLL FUNCTIONALITIES ========================================================================================================
 	if (melisCore.screenSize >= 768) {
-		jQuery(window).on("scroll", function() {
+		$(window).on("scroll", function() {
 			// sticky page actions
 			var sidebarStatus = $("body").hasClass("sidebar-mini"),
 				sidebarWidth = 0;
@@ -840,30 +836,15 @@ var melisCms = (function() {
 				sidebarWidth = $("#id_meliscore_leftmenu").outerWidth();
 			}
 
-			var activateFixed = $(
-				"#" + activeTabId + " div.page-title"
-			).outerHeight();
-
-			if (
-				jQuery(window).scrollTop() > activateFixed &&
-				melisCore.screenSize > 1120
-			) {
-				$("#" + activeTabId + " .page-head-container").css(
-					"padding-top",
-					"72px"
-				);
-				$("#" + activeTabId + " .page-head-container > .innerAll").addClass(
-					"sticky-pageactions"
-				);
-				$("#" + activeTabId + " .page-head-container > .innerAll").css({
-					width: $body.width() - sidebarWidth,
-					left: sidebarWidth,
-				});
+			var activateFixed = $("#" + activeTabId + " div.page-title").outerHeight();
+			
+			if ( $(window).scrollTop() > activateFixed && melisCore.screenSize > 1120 ) {
+				$("#" + activeTabId + " .page-head-container").css("padding-top", "72px");
+				$("#" + activeTabId + " .page-head-container > .innerAll").addClass("sticky-pageactions");
+				$("#" + activeTabId + " .page-head-container > .innerAll").css({ width: $body.width() - sidebarWidth, left: sidebarWidth });
 			} else {
 				$("#" + activeTabId + " .page-head-container").prop("style", null);
-				$("#" + activeTabId + " .page-head-container > .innerAll").removeClass(
-					"sticky-pageactions"
-				);
+				$("#" + activeTabId + " .page-head-container > .innerAll").removeClass("sticky-pageactions");
 				$("#" + activeTabId + " .page-head-container > .innerAll").prop("style", null);
 			}
 		});
@@ -879,40 +860,25 @@ var melisCms = (function() {
 
 			// var currentTitle = Math.abs($("#"+ activeTabId + " div.page-title").offset().top);
 			var currentTitle = $("#" + activeTabId + " div.page-title");
-			var pageTitle = $(
-				"#" + activeTabId + " div[data-meliskey='meliscms_pagehead_title']"
-			);
+			var pageTitle = $("#" + activeTabId + " div[data-meliskey='meliscms_pagehead_title']");
 
 			if (currentTitle.length) {
 				currentTitle = Math.abs(currentTitle.offset().top);
 			}
 
 			if (pageTitle.length) {
-				pageTitle = $(
-					"#" + activeTabId + " div[data-meliskey='meliscms_pagehead_title']"
-				).offset().top;
+				pageTitle = $("#" + activeTabId + " div[data-meliskey='meliscms_pagehead_title']").offset().top;
 			}
 
-			var activateFixed = $(
-				"#" + activeTabId + " div.page-title"
-			).outerHeight();
+			var activateFixed = $("#" + activeTabId + " div.page-title").outerHeight();
+
 			if (pageTitle <= 0 && melisCore.screenSize > 1120) {
-				$("#" + activeTabId + " .page-head-container").css(
-					"padding-top",
-					"61px"
-				);
-				$("#" + activeTabId + " .page-head-container > .innerAll").addClass(
-					"sticky-pageactions"
-				);
-				$("#" + activeTabId + " .page-head-container > .innerAll").css({
-					width: $body.width() - sidebarWidth,
-					left: sidebarWidth,
-				});
+				$("#" + activeTabId + " .page-head-container").css("padding-top", "61px");
+				$("#" + activeTabId + " .page-head-container > .innerAll").addClass("sticky-pageactions");
+				$("#" + activeTabId + " .page-head-container > .innerAll").css({width: $body.width() - sidebarWidth, left: sidebarWidth});
 			} else {
 				$("#" + activeTabId + " .page-head-container").prop("style", null);
-				$("#" + activeTabId + " .page-head-container > .innerAll").removeClass(
-					"sticky-pageactions"
-				);
+				$("#" + activeTabId + " .page-head-container > .innerAll").removeClass("sticky-pageactions");
 				$("#" + activeTabId + " .page-head-container > .innerAll").prop("style", null);
 			}
 		});
