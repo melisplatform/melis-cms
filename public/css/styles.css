@@ -926,3 +926,6 @@ ul#select2-id_mcgdprbanner_site_id-results {
 .group-span-filestyle label {
 	padding-top: 0.375rem;
 }
+#tableMiniTemplateManager.dataTable thead tr th {
+    text-align: left !important;
+}
