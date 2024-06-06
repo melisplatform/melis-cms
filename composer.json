@@ -32,9 +32,9 @@
 	},
 	"require": {
 		"php": "^8.1|^8.3",
-		"melisplatform/melis-core": "^5.1",
-		"melisplatform/melis-engine": "^5.1",
-		"melisplatform/melis-front": "^5.1"
+		"melisplatform/melis-core": "^5.2",
+		"melisplatform/melis-engine": "^5.2",
+		"melisplatform/melis-front": "^5.2"
 	},
 	"minimum-stability": "dev",
 	"autoload": {
