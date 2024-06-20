@@ -25,7 +25,35 @@ class FrontPluginsController extends MelisAbstractActionController
     private $modulesHasNewPlugins = [];
     private $subsectionHasNewPlugins = [];
 
+    /**
+     * @return ViewModel
+     */
     public function renderPluginsMenuAction()
+    {
+        $siteModule = $this->params()->fromRoute('siteModule');
+        // melis plugin service
+        $pluginSvc = $this->getServiceManager()->get('MelisCorePluginsService');
+        // check for new plugins or manually installed and insert in db or fresh plugins
+        $pluginSvc->checkTemplatingPlugins();
+        // get the latest plugin installed
+        $latesPlugin = $pluginSvc->getLatestPlugin($pluginSvc::TEMPLATING_PLUGIN_TYPE);
+        // for new plugin notifications
+        $pluginMenuHandler = $pluginSvc->getNewPluginMenuHandlerNotifDuration();
+
+        $view = new ViewModel();
+       // $view->pluginsConfig = $finalPluginList;
+        $view->siteModule              = $siteModule;
+        $view->latestPlugin            = $latesPlugin;
+        $view->sectionNewPlugins       = array_unique($this->sectionHasNewPlugins);
+        $view->newPluginNotification   = $pluginMenuHandler;
+
+        return $view;
+    }
+
+    /**
+     * @return JsonModel
+     */
+    public function renderPluginsMenuContentAction()
     {
         $config = $this->getServiceManager()->get('config');
         $pluginsConfig = array();
@@ -42,21 +70,36 @@ class FrontPluginsController extends MelisAbstractActionController
         // add categories for the mini-templates
         $newPluginList = $this->categorizeMiniTemplates($newPluginList, $pageId);
         // get the latest plugin installed
-        $latesPlugin = $pluginSvc->getLatestPlugin($pluginSvc::TEMPLATING_PLUGIN_TYPE);
-        // for new plugin notifications
-        $pluginMenuHandler = $pluginSvc->getNewPluginMenuHandlerNotifDuration();
+//        $latesPlugin = $pluginSvc->getLatestPlugin($pluginSvc::TEMPLATING_PLUGIN_TYPE);
+//        // for new plugin notifications
+//        $pluginMenuHandler = $pluginSvc->getNewPluginMenuHandlerNotifDuration();
+
+//        $view = new ViewModel();
+//        // $view->pluginsConfig = $finalPluginList;
+//        $view->siteModule              = $siteModule;
+//        $view->newPluginList           = $newPluginList;
+//        $view->latestPlugin            = $latesPlugin;
+//        $view->sectionNewPlugins       = array_unique($this->sectionHasNewPlugins);
+//        $view->modulesHasNewPlugins    = array_unique($this->modulesHasNewPlugins);
+//        $view->subsectionHasNewPlugins = $this->subsectionHasNewPlugins;
+
+//        $view->newPluginNotification   = $pluginMenuHandler;
 
         $view = new ViewModel();
-       // $view->pluginsConfig = $finalPluginList;
-        $view->siteModule              = $siteModule;
-        $view->newPluginList           = $newPluginList;
-        $view->latestPlugin            = $latesPlugin;
-        $view->sectionNewPlugins       = array_unique($this->sectionHasNewPlugins);
-        $view->modulesHasNewPlugins    = array_unique($this->modulesHasNewPlugins);
-        $view->subsectionHasNewPlugins = $this->subsectionHasNewPlugins;
-        $view->newPluginNotification   = $pluginMenuHandler;
+        $view->setTemplate('melis-cms/plugins-menu-content')->setVariables([
+            'siteModule' => $siteModule,
+            'newPluginList' => $newPluginList,
+            'sectionNewPlugins' => array_unique($this->sectionHasNewPlugins),
+            'modulesHasNewPlugins' => array_unique($this->modulesHasNewPlugins),
+            'subsectionHasNewPlugins' => $this->subsectionHasNewPlugins,
+        ]);
 
-        return $view;
+        $renderer       = $this->getServiceManager()->get('ViewRenderer');
+        $renderedView = $renderer->render($view);
+
+        return new JsonModel([
+            'view' => $renderedView
+        ]);
     }
 
     /**

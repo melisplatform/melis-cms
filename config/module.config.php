@@ -170,6 +170,8 @@ return [
             'melis-cms/index/index'                 => __DIR__ . '/../view/melis-cms/index/index.phtml',
             // Dashboard plugin templates
             'melis-cms/dashboard/page-indicators'   => __DIR__ . '/../view/melis-cms/dashboard-plugins/page-indicators.phtml',
+
+            'melis-cms/plugins-menu-content'   => __DIR__ . '/../view/melis-cms/front-plugins/render-plugins-menu-content.phtml',
         ],
         'template_path_stack' => [
             __DIR__ . '/../view',
