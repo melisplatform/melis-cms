@@ -439,7 +439,8 @@ var melisDragnDrop = (function($, window) {
             /**
              * This will request a plugin menu content
              */
-            var _this = $("#melisPluginBtn");
+            var _this = $("#melisPluginBtn"),
+                pageId = window.parent.activeTabId.split("_")[0];
 
             if(_this.closest(".melis-cms-dnd-box").hasClass("show")){
                 if(!_this.closest(".melis-cms-dnd-box").hasClass("hasCached")) {
@@ -447,12 +448,14 @@ var melisDragnDrop = (function($, window) {
                         type: 'GET',
                         url: '/melis/MelisCms/FrontPlugins/renderPluginsMenuContent',
                         beforeSend: function () {
-                            // window.parent.loader.addLoadingCmsPluginMenu();
+                            window.parent.loader.addLoadingCmsPluginMenu(pageId+"_id_meliscms_page");
                         }
                     }).done(function (data) {
                         $("#cmsPluginsMenuContent").html(data.view);
-                        setTimeout(function () {
 
+                        window.parent.loader.removeLoadingCmsPluginMenu(pageId+"_id_meliscms_page");
+
+                        setTimeout(function () {
                             $(".melis-cms-plugin-snippets").draggable({
                                 connectWith: ".melis-draggable",
                                 connectToSortable: ".melis-dragdropzone",
