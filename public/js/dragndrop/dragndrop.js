@@ -453,7 +453,7 @@ var melisDragnDrop = (function($, window) {
                     }).done(function (data) {
                         $("#cmsPluginsMenuContent").html(data.view);
 
-                        window.parent.loader.removeLoadingCmsPluginMenu(pageId+"_id_meliscms_page");
+
 
                         setTimeout(function () {
                             $(".melis-cms-plugin-snippets").draggable({
@@ -476,7 +476,8 @@ var melisDragnDrop = (function($, window) {
 
                             _this.closest(".melis-cms-dnd-box").addClass("hasCached");
                         }, 1000);
-                        // window.top.loader.removeLoadingCmsPluginMenu();
+
+                        window.parent.loader.removeLoadingCmsPluginMenu(pageId+"_id_meliscms_page");
                     });
                 }
             }
