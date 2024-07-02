@@ -71,7 +71,7 @@ class FrontPluginsController extends MelisAbstractActionController
          */
         $renderer       = $this->getServiceManager()->get('ViewRenderer');
         $newView = $view;
-        $newView->setTemplate($view->getTemplate());
+        $newView->setTemplate('melis-cms/plugins-menu');
         $renderedView = $renderer->render($newView);
         $melisCoreCacheSystem->setCacheByKey($cacheKey, PluginViewController::cacheConfig, $renderedView);
 
