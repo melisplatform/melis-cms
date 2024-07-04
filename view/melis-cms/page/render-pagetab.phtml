@@ -29,8 +29,8 @@
 								$icon = $menuConfig['conf']['icon'];
 
 							?>
-							<li class="nav-item"> <!-- <?php //$id; ?> -->
-								<a class="nav-link glyphicons <?= $icon; ?>" data-page-id="<?= $this->idPage ?>" data-bs-toggle="tab" data-bs-target="#<?= $this->idPage; ?>_<?= !empty($menuConfig['conf']['id']) ? $menuConfig['conf']['id'] : ''; ?>" href="#<?= $this->idPage; ?>_<?= !empty($menuConfig['conf']['id']) ? $menuConfig['conf']['id'] : ''; ?>">
+							<li class="nav-item">
+								<a class="nav-link glyphicons <?= $icon; ?>" data-page-id="<?= $this->idPage ?>" data-bs-toggle="tab" href="#<?= $this->idPage; ?>_<?= !empty($menuConfig['conf']['id']) ? $menuConfig['conf']['id'] : ''; ?>">
 									<i> </i>
 									<span><?= $tabname; ?></span>
 								</a>

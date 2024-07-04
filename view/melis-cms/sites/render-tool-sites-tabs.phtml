@@ -13,7 +13,7 @@ $data_melisKey = $this->melisKey;
             <ul class="tabs-label nav-tabs nav">
                 <?php foreach($this->zoneconfig['interface'] AS $configKey => $configVal) { ?>
                     <li role="presentation" class="nav-item">
-                        <a class="nav-link glyphicons <?= $configVal['conf']['icon'] ?> cs-fa" data-bs-toggle="tab" data-bs-target="#<?=$this->siteId.'_'.$configVal['conf']['id']?>" href="#<?=$this->siteId.'_'.$configVal['conf']['id']?>" aria-expanded="true">
+                        <a class="nav-link glyphicons <?= $configVal['conf']['icon'] ?> cs-fa" data-bs-toggle="tab" href="#<?=$this->siteId.'_'.$configVal['conf']['id']?>" aria-expanded="true">
                             <i></i>
                             <span><?=$this->translate($configVal['conf']['name']); ?></span>
                         </a>

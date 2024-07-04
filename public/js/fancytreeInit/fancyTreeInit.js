@@ -255,7 +255,7 @@
 					click: function(event, data) {
 						targetType = data.targetType;
 							if (targetType === "title") {
-								// open page on click on mobile . desktop is double click
+								// open page on click on mobile and desktop is double click
 								if (melisCore.screenSize <= 1024) {
 									var data = data.node.data;
 									var pageName =
@@ -279,8 +279,10 @@
 											}
 										);
 								}
-
-								data.node.setExpanded();
+								
+								if ( !melisCore.screenSize <= 767 ) {
+									data.node.setExpanded();
+								}
 							}
 	
 							$(".hasNiceScroll")
