@@ -279,10 +279,8 @@
 											}
 										);
 								}
-								
-								if ( !melisCore.screenSize <= 767 ) {
-									data.node.setExpanded();
-								}
+
+								data.node.setExpanded();
 							}
 	
 							$(".hasNiceScroll")

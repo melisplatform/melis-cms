@@ -665,12 +665,12 @@ var melisCms = (function() {
 
 	// REFRESH PAGE TAB (historic, versionining etc)
 	function refreshPageTable() {
-		var zoneParent = $(this).parents(".melis-page-table-cont"),
-			zoneId = zoneParent.attr("id"),
-			melisKey = zoneParent.data("meliskey"),
-			pageId = zoneParent.data("page-id");
+		var zoneParent 	= $(this).parents(".melis-page-table-cont"),
+			zoneId 		= zoneParent.attr("id"),
+			melisKey 	= zoneParent.data("meliskey"),
+			pageId 		= zoneParent.data("page-id");
 
-		melisHelper.zoneReload(zoneId, melisKey, { idPage: pageId });
+			melisHelper.zoneReload(zoneId, melisKey, { idPage: pageId });
 	}
 
 	function disableCmsButtons(id) {
@@ -804,13 +804,15 @@ var melisCms = (function() {
 	 * issue: http://mantis.melistechnology.fr/view.php?id=4447
 	 */
 	function showHistoryVersioningTableResponsive() {
-		var $this = $(this),
-			href = $this.attr("href"),
+		var $this 		= $(this),
+			href 		= $this.attr("href"),
 			$tabContent = $(href);
 
-		if (melisCore.screenSize <= 767) {
-			$tabContent.find(".melis-refreshPageTable").trigger("click");
-		}
+			// && $this.hasClass("history") || $this.hasClass("more_windows")
+			if ( melisCore.screenSize <= 767 ) {
+				// refreshPageTable()
+				$tabContent.find(".melis-refreshPageTable").trigger("click");
+			}
 	}
 
 	/**
@@ -938,6 +940,9 @@ var melisCms = (function() {
 
 	// refresh page tab (historic, versionining etc)
 	$body.on("shown.bs.tab", ".melis-refreshPageTable", refreshPageTable);
+
+	// added click events as data-bs-toggle="tab", triggers error double invocation error from bootstrap 5.3.3
+	$body.on("click", ".melis-refreshPageTable", refreshPageTable);
 
 	// click on history tab / for newsletter dataTables
 	$body.on(
