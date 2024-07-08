@@ -279,8 +279,9 @@
 											}
 										);
 								}
-
-								data.node.setExpanded();
+								
+								// commented as it triggers error on mobile responsive, undefined setExpanded()
+								//data.node.setExpanded();
 							}
 	
 							$(".hasNiceScroll")

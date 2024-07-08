@@ -269,6 +269,27 @@ $(function () {
             );
         }
     };
+
+    /* $body.on("click", ".dt-paging-button .page-link", function() {
+        if ( melisCore.screenSize <= 767 ) {
+            var $this           = $(this),
+                dtContainer     = $this.closest(".dt-container").attr("id"),
+                $refreshBtn     = $("#"+dtContainer).find(".mini-template-manager-tool-table-refresh .melis-mini-template-manager-table-refresh");
+
+                var refreshTo = setTimeout(function() {
+                    if ( $refreshBtn.length ) {
+                        setTimeout(function() {
+                            $refreshBtn.trigger("click");
+                        }, 3000);
+                    
+                        clearTimeout( refreshTo );
+                    }
+                }, 1000);
+        }
+    }); */
+    /* $body.on("click", ".dt-paging-button .page-link", function() {
+        $("#tableMiniTemplateManager").DataTable().columns.adjust().responsive.recalc();
+    }); */
 });
 
 window.initMiniTemplateManagerToolTableSites = function (data, tableSettings) {
