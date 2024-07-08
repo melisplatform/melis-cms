@@ -531,3 +531,15 @@ var melisDragnDrop = (function($, window) {
             pluginScrollPos         :       pluginScrollPos,
         }
 })(jQuery, window);
+
+$(function() {
+    var $pluginToolsBox = $(".melis-plugin-tools-box"),
+        $optionsHandle  = $pluginToolsBox.find(".m-plugin-sub-tools .m-options-handle");
+
+        if ( $optionsHandle.length ) {
+            $optionsHandle.closest(".melis-plugin-tools-box").removeClass("d-none");
+        }
+        else {
+            $pluginToolsBox.addClass("d-none");
+        }
+});
