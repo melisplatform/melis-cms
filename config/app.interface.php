@@ -1041,7 +1041,7 @@ return array(
                         'id' => 'id_meliscms_page_creation_actions',
                         'name' => 'tr_meliscms_page_creation_actions',
                         'melisKey' => 'meliscms_page_creation_actions',
-                        'rightsDisplay' => 'referencesonly',
+                        'rightsDisplay' => 'none',
                     ),
                     'forward' => array(
                         'module' => 'MelisCms',
@@ -1264,7 +1264,8 @@ return array(
                             'conf' => array(
                                 'id' => 'id_meliscms_center_page_tabs',
                                 'name' => 'tr_meliscms_pages_Page Tabs',
-                                'melisKey' => 'meliscms_tabs'
+                                'melisKey' => 'meliscms_tabs',
+                                'rightsDisplay' => 'none',
                             ),
                             'forward' => array(
                                 'module' => 'MelisCms',
