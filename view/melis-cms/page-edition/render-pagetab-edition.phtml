@@ -19,9 +19,9 @@
     </div>
     <?php endif; ?>
     <iframe id="cms_iframe_<?= $this->idPage; ?>" scrolling="no" data-iframe-id="<?= $this->idPage; ?>" onload="melisCms.iframeLoad(<?php echo $this->idPage ?>);" class="melis-iframe" style="min-height: 700px;"></iframe>
-<!--    apply src value separately so it won't call twice-->
+    <!-- apply src value separately so it won't call twice-->
     <script type="application/javascript">
-        $(document).ready(function(){
+        $(function(){
             $("#cms_iframe_<?= $this->idPage; ?>").attr("src", "/id/<?= $this->idPage; ?>/renderMode/melis?melisSite=<?= $this->namespace; ?>");
         });
     </script>
