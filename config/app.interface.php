@@ -170,6 +170,24 @@ return array(
 
             ),
             'datas' => array(
+                /**
+                 * Used to copy necessary file to
+                 * main public/bundles-generated folder
+                 */
+                'bundle_all_needed_files' => [
+                    //will be put inside css folder
+                    'css' => [
+                        '/build/css/fonts',
+                        '/build/css/30px.png',
+                        '/build/css/32px.png',
+                        '/build/css/40px.png',
+                        '/build/css/throbber.gif',
+                    ],
+                    //will be put inside js folder
+                    'js' => [
+
+                    ]
+                ]
             ),
             'interface' => array(
                 'meliscms_sitetree' =>  array(

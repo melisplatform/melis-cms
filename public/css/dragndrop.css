@@ -1011,6 +1011,9 @@ span.melis-cms-filter-btn-mini-tpl-category.active i {
 .melis-plugin-indicator i.fa.fa-plug {
     line-height: 40px;
 }
+#cmsPluginsMenuLoader #loader.overlay-loader {
+    background: rgba(0, 0, 0, .6);
+}
 /* jQuery migration */
 @media (max-width: 767px) {
     .melis-ui-outlined:hover .melis-plugin-tools-box {
