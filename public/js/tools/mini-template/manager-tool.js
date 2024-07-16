@@ -287,8 +287,10 @@ $(function () {
                 }, 1000);
         }
     }); */
-    /* $body.on("click", ".dt-paging-button .page-link", function() {
-        $("#tableMiniTemplateManager").DataTable().columns.adjust().responsive.recalc();
+
+    /* $body.on("click", "#tableMiniTemplateManager .dt-paging-button .page-link", function() {
+        //$("#tableMiniTemplateManager").DataTable().columns.adjust().responsive.recalc();
+        $("#tableMiniTemplateManager").DataTable().ajax.reload();
     }); */
 });
 
