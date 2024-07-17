@@ -1,5 +1,5 @@
 $(function() {
-    $body = $("body");
+    var $body = $("body");
 
         function switchButtonWithoutEvent(moduleName, status) {
             var currentTabId = activeTabId.split("_")[0];
