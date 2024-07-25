@@ -1,6 +1,5 @@
 (function($, window, document) {
 	var $body = $("body");
-
 		// On Load
 		$(window).on("load", function() {
 			window.mainTree = function(completeEvent) {
@@ -39,7 +38,7 @@
 					},
 					source: {
 						url: "/melis/MelisCms/TreeSites/get-tree-pages-by-page-id",
-						cache: true,
+						cache: true
 					},
 					contextMenu: {
 						menu: {

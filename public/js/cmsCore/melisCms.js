@@ -674,6 +674,8 @@ var melisCms = (function() {
 	}
 
 	function disableCmsButtons(id) {
+		//console.log(`melisCms.js disableCmsButtons()`);
+
 		$("#" + id + "_id_meliscms_page .page-publishunpublish").append(
 			"<div class='overlay-switch' style='width: 100%;height: 100%;" +
 				"position: absolute;top: 0;" +
