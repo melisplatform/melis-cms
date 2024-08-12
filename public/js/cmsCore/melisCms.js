@@ -731,7 +731,7 @@ var melisCms = (function() {
 				}
 				// has access
 				else {
-					if (tree.count() === 0) {
+					if (tree?.count() === 0) {
 						$(".meliscms-search-box.sidebar-treeview-search").hide();
 						$("#id-mod-menu-dynatree").prepend(
 							"<div class='create-newpage'><span class='btn btn-success'>" +
