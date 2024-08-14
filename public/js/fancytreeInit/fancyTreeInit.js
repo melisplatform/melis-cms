@@ -1,7 +1,7 @@
 (function($, window, document) {
 	var $body = $("body");
 		// On Load
-		$(window).on("load", function() {
+		$(function() {
 			window.mainTree = function(completeEvent) {
 				var melisExtensions;
 				var $tabArrowTop = $("#tab-arrow-top");
@@ -227,7 +227,7 @@
 						//var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
 						var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
 	
-						if (tree.count() === 0) {
+						if (tree?.count() === 0) {
 							$(".meliscms-search-box.sidebar-treeview-search").hide();
 							// Checking if the user has a Page rights to access
 							// -1 is the value for creating new page right
@@ -252,8 +252,11 @@
 						}
 					},
 					click: function(event, data) {
-						targetType = data.targetType;
+						var targetType = data.targetType;
 							if (targetType === "title") {
+								// this triggers error on mobile responsive, undefined setExpanded()
+								data.node.setExpanded();
+
 								// open page on click on mobile and desktop is double click
 								if (melisCore.screenSize <= 1024) {
 									var data = data.node.data;
@@ -278,9 +281,6 @@
 											}
 										);
 								}
-								
-								// commented as it triggers error on mobile responsive, undefined setExpanded()
-								//data.node.setExpanded();
 							}
 	
 							$(".hasNiceScroll")
@@ -298,29 +298,16 @@
 						 */
 	
 						// open tab and page
-						var data = data.node.data,
-							pageName =
-								data.melisData.page_id + " - " + data.melisData.page_title;
+						var data 		= data.node.data,
+							pageName 	= data.melisData.page_id + " - " + data.melisData.page_title;
 	
-						melisHelper.tabOpen(
-							pageName,
-							data.iconTab,
-							data.melisData.item_zoneid,
-							data.melisData.item_melisKey,
-							{
-								idPage: data.melisData.page_id,
-							},
-							null,
-							() => {
+							melisHelper.tabOpen(pageName, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,{ idPage: data.melisData.page_id, }, null, () => {
 								melisCms.pageTabOpenCallback(data.melisData.page_id);
 								// show page loader
 								loader.addActivePageEditionLoading(data.melisData.item_zoneid);
-							}
-						);
-	
-						$(".hasNiceScroll")
-							.getNiceScroll()
-							.resize();
+							});
+		
+							$(".hasNiceScroll").getNiceScroll().resize();
 	
 						return false;
 					},
