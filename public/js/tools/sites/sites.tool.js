@@ -91,8 +91,12 @@ $(function() {
 
                     //refresh site tree view, fancytree
                     $("input[name=left_tree_search]").val('');
-                    $("#id-mod-menu-dynatree").fancytree("destroy");
-                    mainTree();
+
+                    /* $("#id-mod-menu-dynatree").fancytree("destroy");
+                    mainTree(); */
+                    
+                    var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
+                        tree.reload();
                 } else {
                     var container = currentTabId + "_id_meliscms_tool_sites_edit_site";
                     var errors = prepareErrs(data.errors, container);
@@ -618,8 +622,12 @@ $(function() {
                     });
                     //refresh site tree view, fancytree
                     $("input[name=left_tree_search]").val('');
-                    $("#id-mod-menu-dynatree").fancytree("destroy");
-                    mainTree();
+
+                    /* $("#id-mod-menu-dynatree").fancytree("destroy");
+                    mainTree(); */
+
+                    var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
+                        tree.reload();
                 }else{
                     melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
                 }

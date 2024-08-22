@@ -795,9 +795,9 @@ var melisCms = (function() {
 		$openedPageIds.push(pageId);
 
 			/* 
-			if ( height !== 0 ) {
-				$iframe.css("height", height);
-			}
+				if ( height !== 0 ) {
+					$iframe.css("height", height);
+				}
 			*/
 	}
 

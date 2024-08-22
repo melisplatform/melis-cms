@@ -205,16 +205,16 @@
 					lazyLoad: function(event, data) {
 						// get the page ID and pass it to lazyload
 						var pageId = data.node.data.melisData.page_id;
-						data.result = {
-							url:
-								"/melis/MelisCms/TreeSites/get-tree-pages-by-page-id?nodeId=" +
-								pageId,
-							data: {
-								mode: "children",
-								parent: data.node.key,
-							},
-							cache: false,
-						};
+							/* console.log(`fancyTreeInit.js lazyLoad: pageId: `, pageId);
+							console.log(`fancyTreeInit.js lazyLoad: data.node.key: `, data.node.key); */
+							data.result = {
+								url: "/melis/MelisCms/TreeSites/get-tree-pages-by-page-id?nodeId=" + pageId,
+								data: {
+									mode: "children",
+									parent: data.node.key,
+								},
+								cache: false,
+							};
 					},
 					create: function(event, data) {
 						melisHelper.loadingZone($("#treeview-container"));
@@ -254,33 +254,34 @@
 					click: function(event, data) {
 						var targetType = data.targetType;
 							if (targetType === "title") {
-								// this triggers error on mobile responsive, undefined setExpanded()
-								data.node.setExpanded();
-
-								// open page on click on mobile and desktop is double click
-								if (melisCore.screenSize <= 1024) {
-									var data = data.node.data;
-									var pageName =
-										data.melisData.page_id + " - " + data.melisData.page_title;
-										melisHelper.tabOpen(
-											pageName,
-											data.iconTab,
-											data.melisData.item_zoneid,
-											data.melisData.item_melisKey,
-											{
-												idPage: data.melisData.page_id,
-											},
-											null,
-											() => {
-												melisCms.pageTabOpenCallback(data.melisData.page_id);
-	
-												// show page loader
-												loader.addActivePageEditionLoading(
-													data.melisData.item_zoneid
-												);
-											}
-										);
-								}
+								// this triggers error on mobile responsive, data.node.setExpanded()
+								var node = data.node;
+									node.setExpanded(true);
+								
+									// open page on click on mobile and desktop is double click
+									if (melisCore.screenSize <= 1024) {
+										var data = data.node.data;
+										var pageName =
+											data.melisData.page_id + " - " + data.melisData.page_title;
+											melisHelper.tabOpen(
+												pageName,
+												data.iconTab,
+												data.melisData.item_zoneid,
+												data.melisData.item_melisKey,
+												{
+													idPage: data.melisData.page_id,
+												},
+												null,
+												() => {
+													melisCms.pageTabOpenCallback(data.melisData.page_id);
+		
+													// show page loader
+													loader.addActivePageEditionLoading(
+														data.melisData.item_zoneid
+													);
+												}
+											);
+									}
 							}
 	
 							$(".hasNiceScroll")
@@ -300,7 +301,7 @@
 						// open tab and page
 						var data 		= data.node.data,
 							pageName 	= data.melisData.page_id + " - " + data.melisData.page_title;
-	
+							// title, icon, zoneId, melisKey, parameters, navTabsGroup, callback
 							melisHelper.tabOpen(pageName, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,{ idPage: data.melisData.page_id, }, null, () => {
 								melisCms.pageTabOpenCallback(data.melisData.page_id);
 								// show page loader
@@ -521,12 +522,12 @@
 		);
 
 		/**
-			 * Commented for this issue: https://mantis2.uat.melistechnology.fr/view.php?id=894
-			 * Replaced #destinationPageIdFindPageTree .input-button-hover-pointer
-			 * /
-			/* $body.on("click", '#destinationPageIdFindPageTree', function() {
-				melisLinkTree.createInputTreeModal('#destinationPageId');
-			}); */
+		 * Commented for this issue: https://mantis2.uat.melistechnology.fr/view.php?id=894
+		 * Replaced #destinationPageIdFindPageTree .input-button-hover-pointer
+		 * /
+		/* $body.on("click", '#destinationPageIdFindPageTree', function() {
+			melisLinkTree.createInputTreeModal('#destinationPageId');
+		}); */
 
 		$body.on(
 			"click",
@@ -557,9 +558,13 @@
 
 		// use this callback to re-initialize the tree when its zoneReloaded
 		window.treeCallBack = function() {
-			if ($("#id-mod-menu-dynatree").children().length == 0) {
-				mainTree();
-			}
+			var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
+				if ( tree.count() == 0 ) {
+					mainTree();
+				}
+				/* if ( $("#id-mod-menu-dynatree").children().length == 0 ) {
+					mainTree();
+				} */
 		};
 
 		$body.on("click", "#duplicatePageTree", function() {

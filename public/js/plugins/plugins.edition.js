@@ -26,13 +26,17 @@ var melisPluginEdition = (function($, window) {
      */
     $.each( $._data($body.get(0), "events"), function( i, val ) {
         try {
+            console.log(`val.selector: `, val.selector);
             if (val.selector == "#pluginModalBtnApply") {
                 $body.off("click", "#pluginModalBtnApply");
             }
-        } catch(error) {}
+        } catch(error) {
+            console.log(e);
+        }
     });
 
-    $body.on("click", "button[id='pluginModalBtnApply'][data-page-id='"+melisActivePageId+"']", submitPluginForms); // $body because it is modal and it's located in parent
+    // $body because it is modal and it's located in parent
+    $body.on("click", "button[id='pluginModalBtnApply'][data-page-id='"+melisActivePageId+"']", submitPluginForms); 
 
     $body.on("click", ".meliscms-plugin-modal-cancel-btn", function(e) {
         e.preventDefault();
@@ -62,10 +66,10 @@ var melisPluginEdition = (function($, window) {
 
     // $("body").on("dblclick", ".ui-resizable-e", changeWidth); // disable for now
 
-    function melisUiOutlinedLosesFocus() {
+    /* function melisUiOutlinedLosesFocus() {
         var $this = $(this);
 
-    }
+    } */
 
     // Submit form in modal
     function submitPluginForms(e) {
@@ -241,7 +245,7 @@ var melisPluginEdition = (function($, window) {
                         var uiOutlined = $(".melis-dragdropzone .melis-ui-outlined");
                         try {
                             uiOutlined.resizable("destroy"); // disable for now
-                        }catch(e){
+                        } catch(e) {
                             uiOutlined.resizable();
                         }
 
@@ -862,11 +866,11 @@ var melisPluginEdition = (function($, window) {
     }
 
     // remove inline width when changing viewport
-    // window.parent.$("#"+ parent.activeTabId).find('iframe').on("resize", function() {
-    //     $(this).contents().find(".melis-dragdropzone .melis-ui-outlined").each(function() {
-    //         $(this).css("width", "");
-    //     });
-    // });
+    /* window.parent.$("#"+ parent.activeTabId).find('iframe').on("resize", function() {
+        $(this).contents().find(".melis-dragdropzone .melis-ui-outlined").each(function() {
+            $(this).css("width", "");
+        });
+    }); */
 
     // init resize
     if ( parent.pluginResizable == 1 ) {
@@ -875,10 +879,6 @@ var melisPluginEdition = (function($, window) {
 
     moveResponsiveClass();
     pluginDetector();
-
-    $(window).on("load", function() {
-        calcFrameHeight();
-    });
     
     return {
         submitPluginForms       :       submitPluginForms,
@@ -900,6 +900,16 @@ var melisPluginEdition = (function($, window) {
     }
 
 })(jQuery, window);
+
+/** 
+ * Transferred from inside melisPluginEdition, jQuery migration 3.7.1, jQuery(window).on('load'...) called after load event occurred
+ * https://stackoverflow.com/questions/38585373/why-is-my-load-event-function-not-beeing-executed-after-switching-to-jquery-3
+ * https://github.com/jquery/jquery/issues/3194
+ * Try $(window.parent)
+ */
+$(window.parent).on("load", function() {
+    melisPluginEdition.calcFrameHeight();
+});
 
 var melisCmsFormHelper = (function($, window) {
     var $body = window.parent.$("body");
