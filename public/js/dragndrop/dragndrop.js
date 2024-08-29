@@ -170,7 +170,6 @@ var melisDragnDrop = (function ($, window) {
 							var moduleName = $(ui.helper[0]).data("module-name");
 							var pluginName = $(ui.helper[0]).data("plugin-name");
 							var siteModule = $(ui.helper[0]).data("plugin-site-module");
-
 							// get id of current dragzone
 							var dropzone = $(event.target).data("dragdropzone-id");
 							tabId = window.parent
@@ -246,7 +245,6 @@ var melisDragnDrop = (function ($, window) {
 	}
 
 	setDragDropZone();
-
 	// set plugin container width by placeholder
 	function setPluginWidth(ui) {
 		var data = $(ui.item[0]).data();
@@ -570,6 +568,7 @@ var melisDragnDrop = (function ($, window) {
 			if (!_this.closest(".melis-cms-dnd-box").hasClass("hasCached")) {
 				$.ajax({
 					type: "GET",
+					data: { data },
 					url: "/melis/MelisCms/FrontPlugins/renderPluginsMenuContent",
 					beforeSend: function () {
 						window.parent.loader.addLoadingCmsPluginMenu(
