@@ -568,7 +568,7 @@ var melisDragnDrop = (function ($, window) {
 			if (!_this.closest(".melis-cms-dnd-box").hasClass("hasCached")) {
 				$.ajax({
 					type: "GET",
-					data: { data },
+					data: { pageId },
 					url: "/melis/MelisCms/FrontPlugins/renderPluginsMenuContent",
 					beforeSend: function () {
 						window.parent.loader.addLoadingCmsPluginMenu(
