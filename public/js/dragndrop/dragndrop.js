@@ -549,7 +549,7 @@ var melisDragnDrop = (function ($, window) {
 				$.ajax({
 					type: "GET",
 					data: { pageId },
-					url: "/melis/MelisCms/FrontPlugins/renderPluginsMenuContent",
+					url: "/MelisCms/FrontPlugins/renderPluginsMenuContent",
 					beforeSend: function () {
 						window.parent.loader.addLoadingCmsPluginMenu(
 							pageId + "_id_meliscms_page"
