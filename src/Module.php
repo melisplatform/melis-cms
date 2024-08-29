@@ -33,6 +33,7 @@ use MelisCms\Listener\MelisCmsPageDefaultUrlsListener;
 use MelisCms\Listener\MelisCmsPageGetterListener;
 use MelisCms\Listener\MelisCmsPageEditionSavePluginSessionListener;
 use MelisCms\Listener\MelisCmsAddPluginContainerListener;
+use MelisCms\Listener\MelisCmsDeletePluginMenuCachedListener;
 
 /**
  * Class Module
@@ -87,6 +88,7 @@ class Module
                     (new MelisCmsPageEditionSavePluginSessionListener())->attach($eventManager);
                     // Saving Plugin Tag values, Melis Side
                     (new MelisCmsPluginSaveEditionSessionListener())->attach($eventManager);
+                    (new MelisCmsDeletePluginMenuCachedListener)->attach($eventManager);
                 }
                 
                 // Page Cache Listener
