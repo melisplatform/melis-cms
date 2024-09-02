@@ -55,7 +55,6 @@
 	    // Filter Search
 	    $(document).on("keyup", "input[name=left_tree_search]", function(event) {
 	    	var keycode = (event.key ? event.key : event.which);
-				
 		    	if ( keycode === 'Enter' ) {
 		    		startTreeSearch();
 		    	}   
@@ -74,7 +73,7 @@
 				//tree 		= $("#id-mod-menu-dynatree").fancytree("getTree"),
 				tree 		= $.ui.fancytree.getTree("#id-mod-menu-dynatree"),
 				filterFunc 	= tree.filterNodes;
-				
+
 				if ( match.length ) {
 					var opts 	= {},
 						tmp 	= '';
@@ -100,8 +99,8 @@
 							dataType    : 'json',
 							encode		: true
 						}).done(function(data) {
-							// match value already trim()
-							if(! Array.isArray(data) ) {
+							// trim here not applicable as data is object
+							if (!data) {
 								searchContainer.append("<div class='melis-search-overlay'>"+translations.tr_meliscms_form_search_not_found+"</div>").hide().fadeIn(600);
 								setTimeout(function() {
 									$(".melis-search-overlay").fadeOut(600, function() {
@@ -113,8 +112,10 @@
 									
 									$(".meliscms-search-box.sidebar-treeview-search .melis-overlay-loading").remove();
 								}, 1000);
-							} else {
+							} 
+							else {
 								var arr = $.map(data, function(el) { return el });
+
 									tree.loadKeyPath(arr, function(node, status) {
 										switch( status ) {
 											case "loaded":	

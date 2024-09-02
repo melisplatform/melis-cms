@@ -254,9 +254,9 @@
 					click: function(event, data) {
 						var targetType = data.targetType;
 							if (targetType === "title") {
-								// this triggers error on mobile responsive, data.node.setExpanded()
-								var node = data.node;
-									node.setExpanded(true);
+								// This triggers error: Fancytree assertion failed: only init supported, data.node.setExpanded()
+								// data.node.setExpanded();
+								data.node.toggleExpanded();
 								
 									// open page on click on mobile and desktop is double click
 									if (melisCore.screenSize <= 1024) {
