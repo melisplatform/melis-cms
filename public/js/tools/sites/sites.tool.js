@@ -1312,7 +1312,7 @@ $(function() {
             });
         });
 
-        var meliscmsSiteSelectorInputDom = '';
+    var meliscmsSiteSelectorInputDom = '';
         // to solved console DOM non-unique id
         $body.on("click", ".meliscms-site-selector", function() {
             // initialation of local variable

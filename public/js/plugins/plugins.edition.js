@@ -55,10 +55,11 @@ var melisPluginEdition = (function($, window) {
     // window.parent.$body.prop("style")
     function removeParentBodyPropStyle() {
         setTimeout(function() {
+            //console.log(`$body.prop("style", "overflow: hidden").length: `, $body.prop("style", "overflow: hidden").length);
             if ( $body.prop("style", "overflow: hidden").length ) {
                 window.parent.melisCoreTool.removeOverflowHidden();
             }
-        }, 1000);
+        }, 500);
     }
 
     // run when .melis-ui-outlined loses focus and run getPluginData() to include the width related data
@@ -110,8 +111,8 @@ var melisPluginEdition = (function($, window) {
                console.log(e);
             }
             
-            // window.parent.$body.prop("style")
-            removeParentBodyPropStyle();
+            // window.parent.$body.prop("style");
+            // removeParentBodyPropStyle();
     }
 
     // Validate form in modal

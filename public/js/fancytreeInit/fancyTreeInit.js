@@ -1,7 +1,8 @@
 (function($, window, document) {
 	var $body = $("body");
 		// On Load
-		$(function() {
+		// $(function() {
+		$(window).on("load", function() {
 			window.mainTree = function(completeEvent) {
 				var melisExtensions;
 				var $tabArrowTop = $("#tab-arrow-top");
@@ -312,11 +313,11 @@
 	
 						return false;
 					},
-					loadChildren: function(event, data) {
+					/* loadChildren: function(event, data) {
 						//RUNS ONLY ONCE
 						// if there is no/empty pages in the treeview
 						//var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
-						/* // PAGE ACCESS user rights checking
+						// PAGE ACCESS user rights checking
 							$.ajax({
 								url         : '/melis/MelisCms/TreeSites/canEditPages',
 								encode		: true
@@ -370,8 +371,8 @@
 								}
 							}).fail(function(xhr, textStatus, errorThrown){
 								alert( translations.tr_meliscore_error_message );
-							}); */
-					},
+							});
+					}, */
 					renderNode: function(event, data) {
 						// removed .fancytree-icon class and replace it with font-awesome icons
 						$(data.node.span)
