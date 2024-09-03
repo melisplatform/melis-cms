@@ -212,7 +212,7 @@ var melisDragnDrop = (function ($, window) {
 							function (e) {
 								setTimeout(function () {
 									// check if loader exists
-									//console.log(`$(ui.helper[0]).parent().find(".overlay-loader").length: `, $(ui.helper[0]).parent().find(".overlay-loader").length);
+									console.log(`$(ui.helper[0]).parent().find(".overlay-loader").length: `, $(ui.helper[0]).parent().find(".overlay-loader").length);
 									if (
 										!$(ui.helper[0]).parent().find(".overlay-loader").length
 									) {
