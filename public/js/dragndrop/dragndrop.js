@@ -205,23 +205,25 @@ var melisDragnDrop = (function ($, window) {
 					 */
 					// .modal found
 					// console.log(`window.parent.$(".modal.bootstrap-dialog.show"): `, window.parent.$(".modal.bootstrap-dialog.show") );
-					window.parent
-						.$("body")
-						.on(
-							"hidden.bs.modal",
-							window.parent.$(".modal.bootstrap-dialog.show"),
-							function() {
-								setTimeout(function () {
-									// check if loader exists
-									if (
-										!$(ui.helper[0]).parent().find(".overlay-loader").length
-									) {
-										// remove clone element
-										ui.helper[0].remove();
-									}
-								}, 1000);
-							}
-						);
+					if ( window.parent.$(".modal.bootstrap-dialog.show").length ) {
+						window.parent
+							.$("body")
+							.on(
+								"hidden.bs.modal",
+								window.parent.$(".modal.bootstrap-dialog.show"),
+								function() {
+									setTimeout(function () {
+										// check if loader exists
+										if (
+											!$(ui.helper[0]).parent().find(".overlay-loader").length
+										) {
+											// remove clone element
+											ui.helper[0].remove();
+										}
+									}, 1000);
+								}
+							);
+					}
 				}
 
 				if (ui.sender[0]) {
