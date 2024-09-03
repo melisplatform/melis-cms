@@ -166,7 +166,7 @@ var melisDragnDrop = (function ($, window) {
 						translations.tr_meliscms_common_no,
 						translations.tr_meliscms_drag_and_drop_modal_title, // title
 						translations.tr_meliscms_drag_and_drop_modal_content, // message
-						function () {
+						function() {
 							var moduleName = $(ui.helper[0]).data("module-name");
 							var pluginName = $(ui.helper[0]).data("plugin-name");
 							var siteModule = $(ui.helper[0]).data("plugin-site-module");
@@ -203,13 +203,14 @@ var melisDragnDrop = (function ($, window) {
 					 * Delayed execution with setTimeout(), as it removes dropLocation or ui.helper[0]
 					 * that is still being used in requestPlugin() in the callback function on modal dialog confirm
 					 */
-
+					console.log(`window.parent.$("body"): `, window.parent.$("body"));
+					console.log(`window.parent.$(".modal.bootstrap-dialog.show"): `, window.parent.$(".modal.bootstrap-dialog.show") );
 					window.parent
 						.$("body")
 						.on(
 							"hidden.bs.modal",
 							window.parent.$(".modal.bootstrap-dialog.show"),
-							function (e) {
+							function() {
 								setTimeout(function () {
 									// check if loader exists
 									if (
@@ -240,11 +241,14 @@ var melisDragnDrop = (function ($, window) {
 			},
 			change: function (event, ui) {
 				setPluginWidth(ui);
-			},
+			}
 		});
+
+		console.log(`calling setDragDropZone()!!!`);
 	}
 
 	setDragDropZone();
+
 	// set plugin container width by placeholder
 	function setPluginWidth(ui) {
 		var data = $(ui.item[0]).data();
