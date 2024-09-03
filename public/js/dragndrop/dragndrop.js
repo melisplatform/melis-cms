@@ -203,8 +203,8 @@ var melisDragnDrop = (function ($, window) {
 					 * Delayed execution with setTimeout(), as it removes dropLocation or ui.helper[0]
 					 * that is still being used in requestPlugin() in the callback function on modal dialog confirm
 					 */
-					console.log(`window.parent.$("body"): `, window.parent.$("body"));
-					console.log(`window.parent.$(".modal.bootstrap-dialog.show"): `, window.parent.$(".modal.bootstrap-dialog.show") );
+					// .modal found
+					// console.log(`window.parent.$(".modal.bootstrap-dialog.show"): `, window.parent.$(".modal.bootstrap-dialog.show") );
 					window.parent
 						.$("body")
 						.on(
@@ -244,7 +244,7 @@ var melisDragnDrop = (function ($, window) {
 			}
 		});
 
-		console.log(`calling setDragDropZone()!!!`);
+		//console.log(`.`);
 	}
 
 	setDragDropZone();
