@@ -245,8 +245,6 @@ var melisDragnDrop = (function ($, window) {
 				setPluginWidth(ui);
 			}
 		});
-
-		//console.log(`.`);
 	}
 
 	setDragDropZone();
