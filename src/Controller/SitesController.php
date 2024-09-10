@@ -230,7 +230,7 @@ class SitesController extends MelisAbstractActionController
             $loweredModuleName = strtolower($moduleName);
             $steps = $config['plugins'][$loweredModuleName]['datas']['site_creation_steps_order'] ?? [];
             if (!empty($steps)) {
-                $stepsOrder = array_merge($steps, $stepsOrder);
+                $stepsOrder = array_merge_recursive($steps, $stepsOrder);
             }
         }
 
@@ -257,8 +257,8 @@ class SitesController extends MelisAbstractActionController
                 $otherSteps[$keyConfig] = [
                     'position' => --$largestPos,
                     'title' => $translator->translate($config['conf']['name']),
-                    'beforeMove' => null,
-                    'afterMove' => null,
+                    'beforeMove' => [],
+                    'afterMove' => [],
                 ];
             }
 
@@ -269,10 +269,11 @@ class SitesController extends MelisAbstractActionController
 
                 //set empty value it not provided
                 if(empty($stepsOrder[$keyConfig]['beforeMove'])){
-                    $stepsOrder[$keyConfig]['beforeMove'] = null;
+                    $stepsOrder[$keyConfig]['beforeMove'] = [];
                 }
+                //set empty value it not provided
                 if(empty($stepsOrder[$keyConfig]['afterMove'])){
-                    $stepsOrder[$keyConfig]['afterMove'] = null;
+                    $stepsOrder[$keyConfig]['afterMove'] = [];
                 }
             }
         }
@@ -518,8 +519,6 @@ class SitesController extends MelisAbstractActionController
 
         if ($this->getRequest()->isPost()) {
             $sitesData = $this->getRequest()->getPost('data');
-
-//            print_r($sitesData);exit;
 
             if(!empty($sitesData)) {
                 $createNewFile = false;

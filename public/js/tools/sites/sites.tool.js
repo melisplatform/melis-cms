@@ -299,16 +299,23 @@ $(function() {
             itemsDesktop : false,
             afterMove: function (elem) {
                 var current = this.currentItem,
-                    functionToCall    = elem.find(".item").eq(current).attr("data-afterMove");;
-                    //hide the prev button when we are on the first step
-                    if ( current === 0 ) {
-                        hideElement("#btn-prev-step");
-                    } else {
-                        showElement("#btn-prev-step");
-                    }
+                    functionToCall    = elem.find(".item").eq(current).attr("data-afterMove");
 
-                if(functionToCall != undefined && functionToCall != "") {
-                    eval(functionToCall + "()");
+                //hide the prev button when we are on the first step
+                if ( current === 0 ) {
+                    hideElement("#btn-prev-step");
+                } else {
+                    showElement("#btn-prev-step");
+                }
+
+                /**
+                 * call function one by one
+                 */
+                functionToCall = $.parseJSON(functionToCall);
+                if(!Array.isArray(functionToCall)){
+                    $.each(functionToCall, function(i, funcName){
+                        executeFunction(funcName);
+                    });
                 }
             },
             beforeMove: function(elem) {
@@ -316,8 +323,16 @@ $(function() {
                     step    = elem.find(".item").eq(current).attr("data-step"),
                     functionToCall    = elem.find(".item").eq(current).attr("data-beforeMove");
 
-                    checkStep(functionToCall);
-                    updateActiveStep(step);
+                /**
+                 * call function one by one
+                 */
+                functionToCall = $.parseJSON(functionToCall);
+                if(Array.isArray(functionToCall)){
+                    $.each(functionToCall, function(i, funcName){
+                        executeFunction(funcName);
+                    });
+                }
+                updateActiveStep(step);
             },
             afterInit: function(){
                 $(".sites-steps-owl .tool-sites_container_fixed_width").find("label").not(":has(input)").removeClass("melis-radio-box");
@@ -377,8 +392,7 @@ $(function() {
      * BEFORE proceeding to next slide
      * @param functionToCall
      */
-    function checkStep(functionToCall) {
-
+    function executeFunction(functionToCall) {
         if(functionToCall != undefined && functionToCall != "") {
             eval(functionToCall + "()");
         }

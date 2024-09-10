@@ -26,28 +26,28 @@ return array(
                     'meliscms_tool_sites_modal_add_step_multi_lingual' => [
                         'position' => 1,//the position in which it will be put
                         'title' => 'tr_melis_cms_sites_tool_add_header_title_multi_lingual',//step title
-                        'beforeMove' => 'multiLingualProcess',//a javascript function that we call before move event
-                        'afterMove' => '',//a javascript function that we call after after move event
+                        'beforeMove' => ['multiLingualProcess'],//an array of javascript function that we call before move event
+                        'afterMove' => [],//an array of javascript function that we call after after move event
                     ],
                     'meliscms_tool_sites_modal_add_step_languages' => [
                         'position' => 2,
                         'title' => 'tr_melis_cms_sites_tool_add_header_title_lang',
-                        'beforeMove' => 'languagesProcess',
+                        'beforeMove' => ['languagesProcess'],
                     ],
                     'meliscms_tool_sites_modal_add_step_domains' => [
                         'position' => 3,
                         'title' => 'tr_melis_cms_sites_tool_add_header_title_domains',
-                        'beforeMove' => 'domainsProcess',
+                        'beforeMove' => ['domainsProcess'],
                     ],
                     'meliscms_tool_sites_modal_add_step_modules' => [
                         'position' => 4,
                         'title' => 'tr_melis_cms_sites_tool_add_header_title_modules',
-                        'beforeMove' => 'modulesProcess',
+                        'beforeMove' => ['modulesProcess'],
                     ],
                     'meliscms_tool_sites_modal_add_step_summary' => [
                         'position' => 100,//we make it big because this must be always at the end since its the summary
                         'title' => 'tr_melis_cms_sites_tool_add_header_title_site_summary',
-                        'beforeMove' => 'summaryProcess',
+                        'beforeMove' => ['summaryProcess'],
                     ],
                 ]
             ],

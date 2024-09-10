@@ -95,9 +95,10 @@ class MelisCmsSiteService extends MelisGeneralService
      * @param bool $createModule
      * @param bool $isNewSite
      * @param bool $genSingleLangSite
+     * @param int $fatherId
      * @return mixed
      */
-    public function saveSite($siteData, $domainData, $siteLanguages, $site404, $siteModuleName = null, $createModule = false, $isNewSite = false, $genSingleLangSite = false)
+    public function saveSite($siteData, $domainData, $siteLanguages, $site404, $siteModuleName = null, $createModule = false, $isNewSite = false, $genSingleLangSite = false, $fatherId = -1)
 	{
 	    // Event parameters prepare
 	    $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
@@ -244,7 +245,7 @@ class MelisCmsSiteService extends MelisGeneralService
                                     $pageId, $arrayParameters['siteLanguages'],
                                     $siteModuleName, $siteLabel,
                                     $platformId, $createSiteAndDomain,
-                                    $siteLangConfig, $pageId);
+                                    $siteLangConfig, $pageId, $arrayParameters['fatherId']);
 
                                 $siteLangConfig = $data['siteLangConfig'];
 
@@ -349,7 +350,7 @@ class MelisCmsSiteService extends MelisGeneralService
                                         $pageId, $langId,
                                         $siteModuleName, $siteLabel,
                                         $platformId, $createSiteAndDomain,
-                                        $siteLangConfig, $pageIdInitial);
+                                        $siteLangConfig, $pageIdInitial, $arrayParameters['fatherId']);
 
                                     $siteLangConfig = $data['siteLangConfig'];
 
@@ -423,8 +424,8 @@ class MelisCmsSiteService extends MelisGeneralService
             $results['message'] = 'tr_meliscore_error_message';
             $hasError = true;
         }
-        
-        
+
+
         // Checking if error occured
         if (!$hasError)
         {
@@ -457,13 +458,14 @@ class MelisCmsSiteService extends MelisGeneralService
      * @param $createSiteAndDomain
      * @param $siteLangConfig
      * @param $pageIdInitial
+     * @param $fatherId
      * @return array
      */
 	private function saveSiteOtherDatas($savedSiteId, $tplId,
                                        $pageId, $langId,
                                        $siteModuleName, $siteLabel,
                                        $platformId, $createSiteAndDomain,
-                                        $siteLangConfig, $pageIdInitial)
+                                        $siteLangConfig, $pageIdInitial, $fatherId = -1)
     {
         $site404Table = $this->getServiceManager()->get('MelisEngineTableSite404');
         $siteHomeTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteHome');
@@ -482,7 +484,7 @@ class MelisCmsSiteService extends MelisGeneralService
          */
         //Creating Site Homepage page and template
         $this->createSitePageTemplate($tplId, $savedSiteId, $siteModuleName, 'Home', 'Home', 'index', $platformId);
-        $this->createSitePage($siteLabel, -1, $langId, 'SITE', $pageId, $tplId, $platformId, $pageIdInitial);
+        $this->createSitePage($siteLabel, $fatherId, $langId, 'SITE', $pageId, $tplId, $platformId, $pageIdInitial);
 
         /**
          * Create site config per site and language

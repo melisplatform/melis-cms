@@ -32,7 +32,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                             if (!empty($this->stepsOrder)) {
                                 $step = 1;
                                 foreach ($this->stepsOrder as $melisKey => $info) {
-                                    echo '<div data-afterMove="'.$info['afterMove'].'" data-beforeMove="'.$info['beforeMove'].'" data-step="step_' . $step . '" id="step_'.$step.'_container" class="item">' . $this->$melisKey . '</div>';
+                                    echo "<div data-afterMove='".json_encode($info['afterMove'])."' data-beforeMove='".json_encode($info['beforeMove'])."' data-step='step_" . $step . "' id='step_".$step."_container' class='item'>" . $this->$melisKey . "</div>";
                                     $step++;
                                 }
                             }
