@@ -14,6 +14,43 @@ return array(
                 ),
 
             ),
+            'datas' => [
+                /**
+                 * This is the default steps and order when making a site,
+                 * you can add a new step by overriding this in you config
+                 */
+                'site_creation_steps_order' => [
+                    /**
+                     * Key is the melisKey in you interface config
+                     */
+                    'meliscms_tool_sites_modal_add_step_multi_lingual' => [
+                        'position' => 1,//the position in which it will be put
+                        'title' => 'tr_melis_cms_sites_tool_add_header_title_multi_lingual',//step title
+                        'beforeMove' => 'multiLingualProcess',//a javascript function that we call before move event
+                        'afterMove' => '',//a javascript function that we call after after move event
+                    ],
+                    'meliscms_tool_sites_modal_add_step_languages' => [
+                        'position' => 2,
+                        'title' => 'tr_melis_cms_sites_tool_add_header_title_lang',
+                        'beforeMove' => 'languagesProcess',
+                    ],
+                    'meliscms_tool_sites_modal_add_step_domains' => [
+                        'position' => 3,
+                        'title' => 'tr_melis_cms_sites_tool_add_header_title_domains',
+                        'beforeMove' => 'domainsProcess',
+                    ],
+                    'meliscms_tool_sites_modal_add_step_modules' => [
+                        'position' => 4,
+                        'title' => 'tr_melis_cms_sites_tool_add_header_title_modules',
+                        'beforeMove' => 'modulesProcess',
+                    ],
+                    'meliscms_tool_sites_modal_add_step_summary' => [
+                        'position' => 100,//we make it big because this must be always at the end since its the summary
+                        'title' => 'tr_melis_cms_sites_tool_add_header_title_site_summary',
+                        'beforeMove' => 'summaryProcess',
+                    ],
+                ]
+            ],
             'interface' => array(
                 'meliscms_toolstree' => array(
                     'interface' => array(
@@ -115,72 +152,72 @@ return array(
                                         'jsdatas' => array()
                                     ),
                                     'interface' => array (
-                                        'meliscms_tool_sites_modal_add_step1' => array(
+                                        'meliscms_tool_sites_modal_add_step_multi_lingual' => array(
                                             'conf' => array(
-                                                'id'   => 'id_meliscms_tool_sites_modal_add_step1',
-                                                'name' => 'tr_meliscms_tool_sites_modal_add_step1',
-                                                'melisKey' => 'meliscms_tool_sites_modal_add_step1',
+                                                'id'   => 'id_meliscms_tool_sites_modal_add_step_multi_lingual',
+                                                'name' => 'tr_meliscms_tool_sites_modal_add_step_multi_lingual',
+                                                'melisKey' => 'meliscms_tool_sites_modal_add_step_multi_lingual',
                                             ),
                                             'forward' => array(
                                                 'module' => 'MelisCms',
                                                 'controller' => 'Sites',
-                                                'action' => 'render-tool-sites-modal-add-step1',
+                                                'action' => 'render-tool-sites-modal-add-step-multi-lingual',
                                                 'jscallback' => '',
                                                 'jsdatas' => array()
                                             ),
                                         ),
-                                        'meliscms_tool_sites_modal_add_step2' => array(
+                                        'meliscms_tool_sites_modal_add_step_languages' => array(
                                             'conf' => array(
-                                                'id'   => 'id_meliscms_tool_sites_modal_add_step2',
-                                                'name' => 'tr_meliscms_tool_sites_modal_add_step2',
-                                                'melisKey' => 'meliscms_tool_sites_modal_add_step2',
+                                                'id'   => 'id_meliscms_tool_sites_modal_add_step_languages',
+                                                'name' => 'tr_meliscms_tool_sites_modal_add_step_languages',
+                                                'melisKey' => 'meliscms_tool_sites_modal_add_step_languages',
                                             ),
                                             'forward' => array(
                                                 'module' => 'MelisCms',
                                                 'controller' => 'Sites',
-                                                'action' => 'render-tool-sites-modal-add-step2',
+                                                'action' => 'render-tool-sites-modal-add-step-languages',
                                                 'jscallback' => '',
                                                 'jsdatas' => array()
                                             ),
                                         ),
-                                        'meliscms_tool_sites_modal_add_step3' => array(
+                                        'meliscms_tool_sites_modal_add_step_domains' => array(
                                             'conf' => array(
-                                                'id'   => 'id_meliscms_tool_sites_modal_add_step3',
-                                                'name' => 'tr_meliscms_tool_sites_modal_add_step3',
-                                                'melisKey' => 'meliscms_tool_sites_modal_add_step3',
+                                                'id'   => 'id_meliscms_tool_sites_modal_add_step_domains',
+                                                'name' => 'tr_meliscms_tool_sites_modal_add_step_domains',
+                                                'melisKey' => 'meliscms_tool_sites_modal_add_step_domains',
                                             ),
                                             'forward' => array(
                                                 'module' => 'MelisCms',
                                                 'controller' => 'Sites',
-                                                'action' => 'render-tool-sites-modal-add-step3',
+                                                'action' => 'render-tool-sites-modal-add-step-domains',
                                                 'jscallback' => '',
                                                 'jsdatas' => array()
                                             ),
                                         ),
-                                        'meliscms_tool_sites_modal_add_step4' => array(
+                                        'meliscms_tool_sites_modal_add_step_modules' => array(
                                             'conf' => array(
-                                                'id'   => 'id_meliscms_tool_sites_modal_add_step4',
-                                                'name' => 'tr_meliscms_tool_sites_modal_add_step4',
-                                                'melisKey' => 'meliscms_tool_sites_modal_add_step4',
+                                                'id'   => 'id_meliscms_tool_sites_modal_add_step_modules',
+                                                'name' => 'tr_meliscms_tool_sites_modal_add_step_modules',
+                                                'melisKey' => 'meliscms_tool_sites_modal_add_step_modules',
                                             ),
                                             'forward' => array(
                                                 'module' => 'MelisCms',
                                                 'controller' => 'Sites',
-                                                'action' => 'render-tool-sites-modal-add-step4',
+                                                'action' => 'render-tool-sites-modal-add-step-modules',
                                                 'jscallback' => '',
                                                 'jsdatas' => array()
                                             ),
                                         ),
-                                        'meliscms_tool_sites_modal_add_step5' => array(
+                                        'meliscms_tool_sites_modal_add_step_summary' => array(
                                             'conf' => array(
-                                                'id'   => 'id_meliscms_tool_sites_modal_add_step5',
-                                                'name' => 'tr_meliscms_tool_sites_modal_add_step5',
-                                                'melisKey' => 'meliscms_tool_sites_modal_add_step5',
+                                                'id'   => 'id_meliscms_tool_sites_modal_add_step_summary',
+                                                'name' => 'tr_meliscms_tool_sites_modal_add_step_summary',
+                                                'melisKey' => 'meliscms_tool_sites_modal_add_step_summary',
                                             ),
                                             'forward' => array(
                                                 'module' => 'MelisCms',
                                                 'controller' => 'Sites',
-                                                'action' => 'render-tool-sites-modal-add-step5',
+                                                'action' => 'render-tool-sites-modal-add-step-summary',
                                                 'jscallback' => '',
                                                 'jsdatas' => array()
                                             ),

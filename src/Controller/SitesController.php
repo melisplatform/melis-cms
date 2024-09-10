@@ -216,15 +216,80 @@ class SitesController extends MelisAbstractActionController
      */
     public function renderToolSitesModalAddAction()
     {
-        // declare the Tool service that we will be using to completely create our tool.
+        $translator = $this->getServiceManager()->get('translator');
+        /**
+         * This will get steps order in every module
+         */
+        $coreConfig = $this->getServiceManager()->get('MelisCoreConfig');
+        $stepsOrder = [];
+        $moduleService = $this->getServiceManager()->get('MelisAssetManagerModulesService');
+        $activeModules = $moduleService->getMelisActiveModules();
+
+        $config = $this->getServiceManager()->get('config');
+        foreach ($activeModules as $moduleName) {
+            $loweredModuleName = strtolower($moduleName);
+            $steps = $config['plugins'][$loweredModuleName]['datas']['site_creation_steps_order'] ?? [];
+            if (!empty($steps)) {
+                $stepsOrder = array_merge($steps, $stepsOrder);
+            }
+        }
+
+        /**
+         * Get all site creation steps
+         */
+        $allStepsInterfaces = $coreConfig->getItem('/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_sites_modal_container/interface/meliscms_tool_sites_modal_add/interface');
+
+        //detect the largest position
+        $largestPos = 1;
+        foreach($stepsOrder as $val){
+            if($val['position'] > $largestPos)
+                $largestPos = $val['position'];
+        }
+
+        //detect not included in the order to be put on last(before summary)
+        $otherSteps = [];
+        foreach ($allStepsInterfaces as $keyConfig => $config) {
+            /**
+             * check not included in the order
+             * to be displayed at the last step
+             */
+            if(!array_key_exists($keyConfig, $stepsOrder)){
+                $otherSteps[$keyConfig] = [
+                    'position' => --$largestPos,
+                    'title' => $translator->translate($config['conf']['name']),
+                    'beforeMove' => null,
+                    'afterMove' => null,
+                ];
+            }
+
+            //set title if not provided
+            if(array_key_exists($keyConfig, $stepsOrder)){
+//                if(empty($stepsOrder[$keyConfig]['title'])){
+                    $stepsOrder[$keyConfig]['title'] = empty($stepsOrder[$keyConfig]['title']) ? $translator->translate($config['conf']['name']) : $translator->translate($stepsOrder[$keyConfig]['title']);
+
+                //set empty value it not provided
+                if(empty($stepsOrder[$keyConfig]['beforeMove'])){
+                    $stepsOrder[$keyConfig]['beforeMove'] = null;
+                }
+                if(empty($stepsOrder[$keyConfig]['afterMove'])){
+                    $stepsOrder[$keyConfig]['afterMove'] = null;
+                }
+            }
+        }
+        //merge two arrays to include other steps
+        $stepsOrder = array_merge($stepsOrder, $otherSteps);
+        //sort order to display the right steps
+        uasort($stepsOrder, fn($a, $b) => $a['position'] <=> $b['position']);
+
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
         $view->setTerminal(false);
         $view->melisKey  = $melisKey;
+        $view->stepsOrder  = $stepsOrder;
         return $view;
     }
 
-    public function renderToolSitesModalAddStep1Action()
+    public function renderToolSitesModalAddStepMultiLingualAction()
     {
         $melisKey = $this->getMelisKey();
 
@@ -234,7 +299,7 @@ class SitesController extends MelisAbstractActionController
         // tell the Tool what configuration in the app.tools.php that will be used.
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
         //prepare the user profile form
-        $form = $melisTool->getForm('meliscms_tool_sites_modal_add_step1_form');
+        $form = $melisTool->getForm('meliscms_tool_sites_modal_add_step_multi_lingual_form');
 
         $view = new ViewModel();
         $view->setVariable('step1_form', $form);
@@ -242,7 +307,7 @@ class SitesController extends MelisAbstractActionController
 
         return $view;
     }
-    public function renderToolSitesModalAddStep2Action()
+    public function renderToolSitesModalAddStepLanguagesAction()
     {
         $melisKey = $this->getMelisKey();
 
@@ -267,7 +332,7 @@ class SitesController extends MelisAbstractActionController
 
         return $view;
     }
-    public function renderToolSitesModalAddStep3Action()
+    public function renderToolSitesModalAddStepDomainsAction()
     {
         $melisKey = $this->getMelisKey();
 
@@ -286,7 +351,7 @@ class SitesController extends MelisAbstractActionController
         $view->melisKey  = $melisKey;
         return $view;
     }
-    public function renderToolSitesModalAddStep4Action()
+    public function renderToolSitesModalAddStepModulesAction()
     {
         $melisKey = $this->getMelisKey();
 
@@ -303,7 +368,7 @@ class SitesController extends MelisAbstractActionController
         $view->melisKey = $melisKey;
         return $view;
     }
-    public function renderToolSitesModalAddStep5Action()
+    public function renderToolSitesModalAddStepSummaryAction()
     {
         $melisKey = $this->getMelisKey();
         $view = new ViewModel();
@@ -453,6 +518,9 @@ class SitesController extends MelisAbstractActionController
 
         if ($this->getRequest()->isPost()) {
             $sitesData = $this->getRequest()->getPost('data');
+
+//            print_r($sitesData);exit;
+
             if(!empty($sitesData)) {
                 $createNewFile = false;
                 $isNewSIte = false;

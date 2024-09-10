@@ -9,22 +9,17 @@ if (!empty($this->zoneconfig['conf']['id']))
     <div class="modal-body padding-none" id="modal-site-creation">
         <div class="wizard">
             <div class="widget widget-tabs widget-wizard-pills widget-tabs-gray">
-<!--                <div class="widget-head">-->
-<!--                    <ul class="nav nav-tabs">-->
-<!--                        <li class="active"><a href="#--><?php //echo $this->zoneconfig['conf']['id'] ?><!--" class="glyphicons --><?php //echo ($this->id) ? 'pencil' : 'plus'?><!--" data-toggle="tab" aria-expanded="true"><i></i> --><?php //echo $this->translate('tr_melis_cms_sites_tool_create'); ?><!--</a></li>-->
-<!--                    </ul>-->
-<!--                </div>-->
                 <!-- Widget heading -->
                 <div class="widget-head bg-gray">
                     <ul class="create-site-step">
                         <li class="status">
-                            <span class="r">Step <span class="step-current">1</span> of <span class="steps-total">5</span></span><span class="r text-primary step-name"><?= $this->translate('tr_melis_cms_sites_tool_add_header_title_multi_lingual');?></span>
+                            <span class="r">Step <span class="step-current">1</span> of <span class="steps-total"><?= count($this->stepsOrder);?></span></span><span class="r text-primary step-name"><?= $this->translate('tr_melis_cms_sites_tool_add_header_title_multi_lingual');?></span>
                         </li>
-                        <li class="step_1 active steps_number_indicator" data-stepName="<?= $this->translate('tr_melis_cms_sites_tool_add_header_title_multi_lingual');?>"><a>1</a></li>
-                        <li class="step_2 steps_number_indicator" data-stepName="<?= $this->translate('tr_melis_cms_sites_tool_add_header_title_lang');?>"><a>2</a></li>
-                        <li class="step_3 steps_number_indicator" data-stepName="<?= $this->translate('tr_melis_cms_sites_tool_add_header_title_domains');?>"><a>3</a></li>
-                        <li class="step_4 steps_number_indicator" data-stepName="Modules"><a>4</a></li>
-                        <li class="step_5 steps_number_indicator" data-stepName="<?= $this->translate('tr_melis_cms_sites_tool_add_header_title_site_summary');?>"><a>5</a></li>
+                        <?php
+                        $stp = 1;
+                        foreach($this->stepsOrder as $melisKey => $info) { ?>
+                            <li class="step_<?= $stp; ?> active steps_number_indicator" data-stepName="<?= $info['title'];?>"><a><?= $stp; ?></a></li>
+                        <?php $stp++; } ?>
                     </ul>
                 </div>
                 <!-- // Widget heading END -->
@@ -34,10 +29,10 @@ if (!empty($this->zoneconfig['conf']['id']))
                     </div>
                     <div class="owl-carousel owl-theme owl-loaded sites-steps-owl">
                         <?php
-                            if (!empty($this->zoneconfig['interface'])) {
+                            if (!empty($this->stepsOrder)) {
                                 $step = 1;
-                                foreach ($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
-                                    echo  '<div data-step="step_'.$step.'" class="item">' . $this->$keyConfig . '</div>';
+                                foreach ($this->stepsOrder as $melisKey => $info) {
+                                    echo '<div data-afterMove="'.$info['afterMove'].'" data-beforeMove="'.$info['beforeMove'].'" data-step="step_' . $step . '" id="step_'.$step.'_container" class="item">' . $this->$melisKey . '</div>';
                                     $step++;
                                 }
                             }

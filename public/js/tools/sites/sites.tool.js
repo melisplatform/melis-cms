@@ -1,3 +1,6 @@
+var formData = {},
+    currentStepForm = "";
+
 $(function() {
     $body = $("body");
 
@@ -211,13 +214,13 @@ $(function() {
      * =============================== START CREATE SITES ===================================
      * ======================================================================================
      */
-    var formData                    = {},
-        selectedLanguages           = '',
+    // var formData                    = {},
+     var selectedLanguages           = '',
         domainType                  = '',
         createFile                  = true,
         newSite                     = true,
         owlStep                     = null,
-        currentStepForm             = '',
+        // currentStepForm             = '',
         siteName                    = '',
         siteLabel                   = '',
         selectedDomainValue         = [],
@@ -295,19 +298,25 @@ $(function() {
             itemsDesktopSmall : false,
             itemsDesktop : false,
             afterMove: function (elem) {
-                var current = this.currentItem;
+                var current = this.currentItem,
+                    functionToCall    = elem.find(".item").eq(current).attr("data-afterMove");;
                     //hide the prev button when we are on the first step
                     if ( current === 0 ) {
                         hideElement("#btn-prev-step");
                     } else {
                         showElement("#btn-prev-step");
                     }
+
+                if(functionToCall != undefined && functionToCall != "") {
+                    eval(functionToCall + "()");
+                }
             },
             beforeMove: function(elem) {
                 var current = this.currentItem,
-                    step    = elem.find(".item").eq(current).attr("data-step");
+                    step    = elem.find(".item").eq(current).attr("data-step"),
+                    functionToCall    = elem.find(".item").eq(current).attr("data-beforeMove");
 
-                    checkStep(step);
+                    checkStep(functionToCall);
                     updateActiveStep(step);
             },
             afterInit: function(){
@@ -366,226 +375,265 @@ $(function() {
     /**
      * This will process each step
      * BEFORE proceeding to next slide
-     * @param step
+     * @param functionToCall
      */
-    function checkStep(step) {
+    function checkStep(functionToCall) {
+
+        if(functionToCall != undefined && functionToCall != "") {
+            eval(functionToCall + "()");
+        }
+    }
+
+    /**
+     * Multi lingual step on creating site
+     */
+    function multiLingualProcess()
+    {
+        //skip step 1 form
+        cmsSiteHelper.setCurrentStepForm('skip');
+        // currentStepForm = 'skip';
+        /**
+         * Hide the step 2 forms
+         */
+        hideElement(".step2-forms .sites_step2-multi-language");
+        hideElement(".step2-forms .sites_step2-single-language");
+    }
+
+    /**
+     * Language step on creating site
+     */
+    function languagesProcess()
+    {
         //check if multi language
         var isMultiLang = $('#is_multi_language').bootstrapSwitch('status');
-        //process step
-        switch(step){
-            case "step_1":
-                //skip step 1 form
-                currentStepForm = 'skip';
-                /**
-                 * Hide the step 2 forms
-                 */
-                hideElement(".step2-forms .sites_step2-multi-language");
-                hideElement(".step2-forms .sites_step2-single-language");
-                break;
-            case "step_2":
-                //include the from in step1
-                var step1Obj = {};
-                step1Obj.isMultiLang = isMultiLang ? true : false;
-                step1Obj.data = getSerializedForm("#step2form-is_multi_lingual");
-                formData.multiLang = step1Obj;
-                /**
-                 * determine what should we display
-                 * depending if multi language or not
-                 */
-                if(isMultiLang){
-                    showElement(".step2-forms .sites_step2-multi-language");
-                    hideElement(".step2-forms .sites_step2-single-language");
+        //include the from in step1
+        var step1Obj = {};
+        step1Obj.isMultiLang = isMultiLang ? true : false;
+        step1Obj.data = getSerializedForm("#step2form-is_multi_lingual");
+        // formData.multiLang = step1Obj;
+        cmsSiteHelper.setSitesStepData(step1Obj, 'multiLang');
+        /**
+         * determine what should we display
+         * depending if multi language or not
+         */
+        if(isMultiLang){
+            showElement(".step2-forms .sites_step2-multi-language");
+            hideElement(".step2-forms .sites_step2-single-language");
 
-                    currentStepForm = "#step2form-multi_language";
-                }else{
-                    showElement(".step2-forms .sites_step2-single-language");
-                    hideElement(".step2-forms .sites_step2-multi-language");
+            // currentStepForm = "#step2form-multi_language";
+            cmsSiteHelper.setCurrentStepForm("#step2form-multi_language");
+        }else{
+            showElement(".step2-forms .sites_step2-single-language");
+            hideElement(".step2-forms .sites_step2-multi-language");
 
-                    currentStepForm = "#step2form-single_language";
-                }
-                /**
-                 * Hide the step 3 forms
-                 */
-                hideElement(".sites_step3-single-domain");
-                hideElement(".sites_step3-multi-domain");
-
-                domainSingleOpt = "";
-                break;
-            case "step_3":
-                //clear selected languages
-                var lang = '';
-                selectedLanguages = '';
-                /**
-                 * On this step, we are in step 3
-                 * but we are still processing the data from
-                 * the step 2 so that we can determine what
-                 * we are displaying on step 3
-                 */
-
-                var langData = {};
-                var domainData = {};
-                /**
-                 * check if site is multi lingual
-                 */
-                if(isMultiLang){
-                    /**
-                     * Load the multi lingual form
-                     */
-                    var multiLangFormData = getSerializedForm("#step2form-multi_language");
-                    //include the step2 data into the object
-                    langData = processSiteLanguage(multiLangFormData, lang);
-
-                    var multiDomainsContainer = $(".sites_step3-multi-domain #multi-domains_container");
-                    var div = $("<div/>",{
-                        class: "form-group"
-                    });
-
-                    multiDomainsContainer.empty();
-                    $.each(multiLangFormData, function(){
-                        if(this.name == "site_selected_lang"){
-                            var langData = this.value.split("-");
-                            /**
-                             * prepare lang info
-                             */
-                            if(lang == ""){
-                                lang = langData[2];
-                            }else {
-                                lang = lang + " / " + langData[2];
-                            }
-                            /**
-                             * This will create a text input for language
-                             * depending the selected language
-                             * of the user
-                             */
-                            var label = $("<label/>").html(langData[2]+"<sup>*</sup>").addClass("err_site-domain-"+this.value);
-                            div.append(label);
-                            var domainName = "site-domain-"+this.value;
-                            var input = $("<input/>",{
-                                type: "text",
-                                class: "form-control",
-                                name: domainName,
-                                value: applyDomainValue(domainName),
-                                required: "required",
-                                title: ''
-                            }).attr("data-langId", langData[0]);
-                            div.append(input);
-                            multiDomainsContainer.append(div);
-                        }else if(this.name == "sites_url_setting"){
-                            /**
-                             * get the value of the site url setting to
-                             * determine whether it is multi domain
-                             * or not
-                             */
-                            if(this.value == 2){
-                                //this will load the multi domain form
-                                showElement(".sites_step3-multi-domain");
-                                hideElement(".sites_step3-single-domain");
-                                domainData.isMultiDomain = true;
-
-                                currentStepForm = "#step3form-multi_domain";
-
-                                domainSingleOpt = '';
-                            }else{
-                                //load the single domain form
-                                showElement(".sites_step3-single-domain");
-                                hideElement(".sites_step3-multi-domain");
-                                domainData.isMultiDomain= false;
-
-                                currentStepForm = "#step3form-single_domain";
-
-                                if(this.value == 1){
-                                    domainSingleOpt = " ("+translations.tr_melis_cms_sites_tool_add_step5_single_dom_opt_1_msg+")";
-                                }else if(this.value == 3){
-                                    domainSingleOpt = " ("+translations.tr_melis_cms_sites_tool_add_step5_single_dom_opt_3_msg+")";
-                                }
-                            }
-                        }
-                    });
-                }else{
-                    currentStepForm = "#step3form-single_domain";
-                    /**
-                     * Load the single domain if the site is not
-                     * multi lingual
-                     */
-                    showElement(".sites_step3-single-domain");
-                    hideElement(".sites_step3-multi-domain");
-
-                    domainData.isMultiDomain = false;
-                    //add step  2 data
-                    var singLangFormData = getSerializedForm("#step2form-single_language");
-                    langData = processSiteLanguage(singLangFormData, lang);
-                    lang = langData.langDetails;
-                }
-                formData.languages = langData.data;
-                formData.domains = domainData;
-
-                selectedLanguages = '- '+translations.tr_melis_cms_sites_tool_add_header_title_lang+' : ' + lang;
-
-                /**
-                 * hide the step 4 forms
-                 */
-                hideElement('.step-4-datas');
-                break;
-            case "step_4":
-                showElement('.step-4-datas');
-                currentStepForm = "#step4form_module";
-                /**
-                 * Process the domain form
-                 * to get the data
-                 * @type {string}
-                 */
-                var domain = '';
-                var domainFormData = {};
-                if(formData.domains.isMultiDomain){
-                    domainFormData = getSerializedForm("#step3form-multi_domain");
-                    domain = 'Multiple';
-                }else{
-                    domainFormData = getSerializedForm("#step3form-single_domain");
-                    domain = 'Single'+domainSingleOpt;
-                }
-
-                domainType = '- '+translations.tr_melis_cms_sites_tool_add_header_title_domains+' : ' + domain;
-                formData.domains.data = processSiteDomain(domainFormData);
-
-                /**
-                 * Hide the finish button when
-                 * your are on step4 ang below
-                 */
-                showElement("#btn-next-step");
-                hideElement("#btn-finish-step");
-                break;
-            case "step_5":
-                //get the data of step4
-                var step4Obj = {};
-                step4Obj.data = processSiteModule();
-                step4Obj.newSite = newSite;
-                step4Obj.createFile = createFile;
-                formData.module = step4Obj;
-
-                /**
-                 * Hide the next button and
-                 * show the finish button
-                 * when you are on the last
-                 * step
-                 */
-                showElement("#btn-finish-step");
-                hideElement("#btn-next-step");
-
-                /**
-                 * prepare to display the user selected
-                 * options on site creation
-                 */
-                var text = translations.tr_melis_cms_sites_tool_add_step5_new_site_using_existing_module;
-                if(newSite){
-                    text = translations.tr_melis_cms_sites_tool_add_step5_new_site_using_new_module;
-                }
-                var siteSumText = text.replace(/%siteModule/g, siteName).replace(/%siteName/g, siteLabel);
-                $(".site_creation_info").empty().append(selectedLanguages, "<br />",domainType,
-                    "<br/><p class='step5-message'>"+siteSumText+"</p>");
-                break;
-            default:
-                break;
+            // currentStepForm = "#step2form-single_language";
+            cmsSiteHelper.setCurrentStepForm("#step2form-single_language");
         }
+        /**
+         * Hide the step 3 forms
+         */
+        hideElement(".sites_step3-single-domain");
+        hideElement(".sites_step3-multi-domain");
+
+        domainSingleOpt = "";
+    }
+
+    /**
+     * Domain step on creating site
+     */
+    function domainsProcess()
+    {
+        //check if multi language
+        var isMultiLang = $('#is_multi_language').bootstrapSwitch('status');
+        //clear selected languages
+        var lang = '';
+        selectedLanguages = '';
+        /**
+         * On this step, we are in step 3
+         * but we are still processing the data from
+         * the step 2 so that we can determine what
+         * we are displaying on step 3
+         */
+
+        var langData = {};
+        var domainData = {};
+        /**
+         * check if site is multi lingual
+         */
+        if(isMultiLang){
+            /**
+             * Load the multi lingual form
+             */
+            var multiLangFormData = getSerializedForm("#step2form-multi_language");
+            //include the step2 data into the object
+            langData = processSiteLanguage(multiLangFormData, lang);
+
+            var multiDomainsContainer = $(".sites_step3-multi-domain #multi-domains_container");
+            var div = $("<div/>",{
+                class: "form-group"
+            });
+
+            multiDomainsContainer.empty();
+            $.each(multiLangFormData, function(){
+                if(this.name == "site_selected_lang"){
+                    var langData = this.value.split("-");
+                    /**
+                     * prepare lang info
+                     */
+                    if(lang == ""){
+                        lang = langData[2];
+                    }else {
+                        lang = lang + " / " + langData[2];
+                    }
+                    /**
+                     * This will create a text input for language
+                     * depending the selected language
+                     * of the user
+                     */
+                    var label = $("<label/>").html(langData[2]+"<sup>*</sup>").addClass("err_site-domain-"+this.value);
+                    div.append(label);
+                    var domainName = "site-domain-"+this.value;
+                    var input = $("<input/>",{
+                        type: "text",
+                        class: "form-control",
+                        name: domainName,
+                        value: applyDomainValue(domainName),
+                        required: "required",
+                        title: ''
+                    }).attr("data-langId", langData[0]);
+                    div.append(input);
+                    multiDomainsContainer.append(div);
+                }else if(this.name == "sites_url_setting"){
+                    /**
+                     * get the value of the site url setting to
+                     * determine whether it is multi domain
+                     * or not
+                     */
+                    if(this.value == 2){
+                        //this will load the multi domain form
+                        showElement(".sites_step3-multi-domain");
+                        hideElement(".sites_step3-single-domain");
+                        domainData.isMultiDomain = true;
+
+                        // currentStepForm = "#step3form-multi_domain";
+                        cmsSiteHelper.setCurrentStepForm("#step3form-multi_domain");
+
+                        domainSingleOpt = '';
+                    }else{
+                        //load the single domain form
+                        showElement(".sites_step3-single-domain");
+                        hideElement(".sites_step3-multi-domain");
+                        domainData.isMultiDomain= false;
+
+                        // currentStepForm = "#step3form-single_domain";
+                        cmsSiteHelper.setCurrentStepForm("#step3form-single_domain");
+
+                        if(this.value == 1){
+                            domainSingleOpt = " ("+translations.tr_melis_cms_sites_tool_add_step5_single_dom_opt_1_msg+")";
+                        }else if(this.value == 3){
+                            domainSingleOpt = " ("+translations.tr_melis_cms_sites_tool_add_step5_single_dom_opt_3_msg+")";
+                        }
+                    }
+                }
+            });
+        }else{
+            // currentStepForm = "#step3form-single_domain";
+            cmsSiteHelper.setCurrentStepForm("#step3form-single_domain");
+            /**
+             * Load the single domain if the site is not
+             * multi lingual
+             */
+            showElement(".sites_step3-single-domain");
+            hideElement(".sites_step3-multi-domain");
+
+            domainData.isMultiDomain = false;
+            //add step  2 data
+            var singLangFormData = getSerializedForm("#step2form-single_language");
+            langData = processSiteLanguage(singLangFormData, lang);
+            lang = langData.langDetails;
+        }
+        // formData.languages = langData.data;
+        // formData.domains = domainData;
+        cmsSiteHelper.setSitesStepData(langData.data,"languages");
+        cmsSiteHelper.setSitesStepData(domainData,"domains");
+
+        selectedLanguages = '- '+translations.tr_melis_cms_sites_tool_add_header_title_lang+' : ' + lang;
+
+        /**
+         * hide the step 4 forms
+         */
+        hideElement('.step-4-datas');
+    }
+
+    /**
+     * Modules step on creating site
+     */
+    function modulesProcess()
+    {
+        showElement('.step-4-datas');
+        // currentStepForm = "#step4form_module";
+        cmsSiteHelper.setCurrentStepForm("#step4form_module");
+        /**
+         * Process the domain form
+         * to get the data
+         * @type {string}
+         */
+        var domain = '';
+        var domainFormData = {};
+        if(formData.domains.isMultiDomain){
+            domainFormData = getSerializedForm("#step3form-multi_domain");
+            domain = 'Multiple';
+        }else{
+            domainFormData = getSerializedForm("#step3form-single_domain");
+            domain = 'Single'+domainSingleOpt;
+        }
+
+        domainType = '- '+translations.tr_melis_cms_sites_tool_add_header_title_domains+' : ' + domain;
+        // formData.domains.data = processSiteDomain(domainFormData);
+        cmsSiteHelper.setSitesStepData(processSiteDomain(domainFormData), "domains.data");
+
+        /**
+         * Hide the finish button when
+         * your are on step4 ang below
+         */
+        showElement("#btn-next-step");
+        hideElement("#btn-finish-step");
+    }
+
+    /**
+     * Summary step on creating site
+     * It should be the final step
+     */
+    function summaryProcess()
+    {
+        //get the data of step4
+        var step4Obj = {};
+        step4Obj.data = processSiteModule();
+        step4Obj.newSite = newSite;
+        step4Obj.createFile = createFile;
+        // formData.module = step4Obj;
+        cmsSiteHelper.setSitesStepData(step4Obj, "module");
+
+        /**
+         * Hide the next button and
+         * show the finish button
+         * when you are on the last
+         * step
+         */
+        showElement("#btn-finish-step");
+        hideElement("#btn-next-step");
+
+        /**
+         * prepare to display the user selected
+         * options on site creation
+         */
+        var text = translations.tr_melis_cms_sites_tool_add_step5_new_site_using_existing_module;
+        if(newSite){
+            text = translations.tr_melis_cms_sites_tool_add_step5_new_site_using_new_module;
+        }
+        var siteSumText = text.replace(/%siteModule/g, siteName).replace(/%siteName/g, siteLabel);
+        $(".site_creation_info").empty().append(selectedLanguages, "<br />",domainType,
+            "<br/><p class='step5-message'>"+siteSumText+"</p>");
     }
 
     /**
@@ -1377,6 +1425,9 @@ $(function() {
     });
 });
 
+/**
+ * Sites table callback
+ */
 window.sitesTableCallback = function(){
     /**
      * Disable the minify button if
@@ -1387,3 +1438,30 @@ window.sitesTableCallback = function(){
     minifBtn.attr("disabled", true);
     minifBtn.attr("title", translations.tr_melis_cms_minify_assets_no_module_button_title);
 };
+
+var cmsSiteHelper = (function() {
+    /**
+     * This function is used in creating sites,
+     * so we can validated a certain form before it goes
+     * to the next step
+     * @param formId
+     */
+    function setCurrentStepForm(formId){
+        currentStepForm = formId;
+    }
+
+    /**
+     * This function is used to set steps data
+     * when creating site
+     * @param data
+     * @param key
+     */
+    function setSitesStepData(data, key){
+        formData[key] = data;
+    }
+
+    return {
+        setCurrentStepForm: setCurrentStepForm,
+        setSitesStepData: setSitesStepData
+    };
+})();

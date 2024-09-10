@@ -842,7 +842,7 @@ return array(
 
                     ),
                     'forms' => array(
-                        'meliscms_tool_sites_modal_add_step1_form' => array(
+                        'meliscms_tool_sites_modal_add_step_multi_lingual_form' => array(
                             'attributes' => array(
                                 'name' => 'toolsitesadd_step1form',
                                 'id' => 'step1form-is_multi_lingual',

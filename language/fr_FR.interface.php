@@ -550,6 +550,7 @@
         'tr_melis_cms_sites_tool_add_step4_site_label' => 'Nom du site',
         'tr_melis_cms_sites_tool_add_header_title_lang' => 'Langages',
         'tr_melis_cms_sites_tool_add_header_title_domains' => 'Domaines',
+        'tr_melis_cms_sites_tool_add_header_title_modules' => 'Modules',
         'tr_melis_cms_sites_tool_add_header_title_multi_lingual' => 'Multilingue',
         'tr_melis_cms_sites_tool_add_header_title_site_summary' => 'Résumé',
 
