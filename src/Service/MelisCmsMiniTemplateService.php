@@ -637,8 +637,16 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
      * @return array
      */
     public function saveTree($site_id, $tree_data) {
+
+        $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
+        $arrayParameters = $this->sendEvent('meliscms_mini_template_service_save_tree_start', $arrayParameters);
+
+        $site_id = $arrayParameters['site_id'];
+        $tree_data = $arrayParameters['tree_data'];
+
         $site_category_table = $this->getServiceManager()->get('MelisCmsMiniTplSiteCategoryTable');
         $category_template_table = $this->getServiceManager()->get('MelisCmsMiniTplCategoryTemplateTable');
+
         $category_counter = 1;
         $last_category_flag = '';
         $mtpl_counter = 1;
@@ -731,10 +739,13 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             $success = 0;
         }
 
-        return [
+        $arrayParameters['results'] = [
             'errors' => $errors,
             'success' => $success
         ];
+
+        $arrayParameters = $this->sendEvent('meliscms_mini_template_service_save_tree_end', $arrayParameters);
+        return $arrayParameters['results'];
     }
 
     /**
