@@ -99,8 +99,18 @@ class FrontPluginsController extends MelisAbstractActionController
         }
 
         $config = $this->getServiceManager()->get('config');
-        $siteModule = $this->params()->fromRoute('siteModule');
-        $pageId = $this->params()->fromRoute('pageId');
+        // $siteModule = $this->params()->fromRoute('siteModule', '');
+        $pageId = $this->params()->fromQuery('pageId');
+
+        $pageTreeService = $this->getServiceManager()->get('MelisEngineTree');
+        $site = $pageTreeService->getSiteByPageId($pageId);
+        if (empty($site))
+            $site = $pageTreeService->getSiteByPageId($pageId, 'saved');
+    
+        $siteModule = null;
+        if ($site)
+            $siteModule = $site->site_name;
+
         // melis plugin service
         $pluginSvc = $this->getServiceManager()->get('MelisCorePluginsService');
         // check for new plugins or manually installed and insert in db or fresh plugins
