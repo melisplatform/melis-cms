@@ -765,7 +765,7 @@ return array(
                     'table' => array(
                         'target' => '#tableToolSites',
                         'ajaxUrl' => '/melis/MelisCms/Sites/getSiteData',
-                        'dataFunction' => '',
+                        'dataFunction' => 'initSitesList',
                         'ajaxCallback' => 'sitesTableCallback()',
                         'filters' => array(
                             'left' => array(
@@ -780,6 +780,11 @@ return array(
                                     'module' => 'MelisCms',
                                     'controller' => 'Sites',
                                     'action' => 'render-tool-sites-content-filter-search',
+                                ),
+                                'site-tool-table-site-variety' => array(
+                                    'module' => 'MelisCms',
+                                    'controller' => 'Sites',
+                                    'action' => 'render-tool-sites-content-filter-site-variety',
                                 ),
                             ),
                             'right' => array(
@@ -796,6 +801,11 @@ return array(
                                 'css' => array('width' => '1%', 'padding-right' => '0'),
                                 'sortable' => true,
 
+                            ),
+                            'site_variety' => array(
+                                'text' => 'tr_meliscms_site_variety',
+                                'css' => array('width' => '20%', 'padding-right' => '0'),
+                                'sortable' => true,
                             ),
                             'site_label' => array(
                                 'text' => 'Site',
@@ -817,8 +827,7 @@ return array(
                             'melis_cms_site.site_id',
                             'melis_cms_site.site_name',
                             'melis_cms_site.site_label',
-                            'site_langs'
-
+                            'site_langs', 'site_variety'
                         ),
                         'actionButtons' => array(
                             'minify' => array(

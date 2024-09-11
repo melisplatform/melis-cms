@@ -1437,6 +1437,10 @@ $(function() {
             melisHelper.melisKoNotification("tr_meliscms_menu_sitetree_Name", "tr_meliscms_page_tree_no_selected_page");
         }
     });
+
+    $body.on("change", "#siteVarietySelect", function() {
+        $("#tableToolSites").DataTable().ajax.reload();
+    });
 });
 
 /**
@@ -1452,6 +1456,13 @@ window.sitesTableCallback = function(){
     minifBtn.attr("disabled", true);
     minifBtn.attr("title", translations.tr_melis_cms_minify_assets_no_module_button_title);
 };
+
+window.initSitesList = function(data, tblSettings) {
+    var $siteVarietySelect = $('#siteVarietySelect');
+    if ( $siteVarietySelect.length ) {
+        data.site_variety = $siteVarietySelect.val();
+    }
+}
 
 var cmsSiteHelper = (function() {
     /**

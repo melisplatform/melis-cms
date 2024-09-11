@@ -221,7 +221,8 @@
 	    'tr_meliscms_common_yes' => 'Yes',
             'tr_meliscms_page_tree_save' => 'Save',
 	    'tr_meliscms_common_no' => 'No',
-	    
+	    'tr_meliscms_common_all' => 'All',
+
 	    'tr_meliscms_common_add' => 'Add',
 	    'tr_meliscms_common_apply' => 'Apply',
 	    'tr_meliscms_common_apply_language' => 'Switch the current language to ',
@@ -861,6 +862,9 @@
 
 		'tr_meliscms_page_export_modal_handler' => 'Page Import/Export',
 		'tr_meliscms_page_import_modal' => 'Import modal',
-		'tr_meliscms_page_export_modal' => 'Export modal'
+		'tr_meliscms_page_export_modal' => 'Export modal',
+
+		'tr_meliscms_site_variety' => 'Variety',
+		'tr_meliscms_site_variety_SITE' => 'Site',
     );
 ?>

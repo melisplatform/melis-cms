@@ -9,6 +9,7 @@
 
 namespace MelisCms\Controller;
 
+use Laminas\View\View;
 use MelisCore\Controller\MelisAbstractActionController;
 use MelisFront\Service\MelisSiteConfigService;
 use Laminas\View\Model\ViewModel;
@@ -147,6 +148,28 @@ class SitesController extends MelisAbstractActionController
     public function renderToolSitesContentFilterLimitAction()
     {
         return new ViewModel();
+    }
+
+    /**
+     * Renders to the limit selection in the table filter bar
+     * @return \Laminas\View\Model\ViewModel
+     */
+    public function renderToolSitesContentFilterSiteVarietyAction()
+    {
+        $siteService = $this->getServiceManager()->get('MelisCmsSiteService');
+        $translator = $this->getServiceManager()->get('translator');
+        $siteVariety = $siteService->getSiteVariety();
+
+        $var = [];
+        $var[] = '<option value="">'. $translator->translate('tr_meliscms_common_all') .'</option>';
+
+        foreach($siteVariety as $key => $variety){
+            $var[] = '<option value="'.$key.'">'. $variety .'</option>';
+        }
+
+        $view = new ViewModel();
+        $view->siteVariety = $var;
+        return $view;
     }
     
     /**
@@ -457,10 +480,12 @@ class SitesController extends MelisAbstractActionController
             $search = $this->getRequest()->getPost('search');
             $search = $search['value'];
 
+            $siteVariety = $this->getRequest()->getPost('site_variety');
+
             $dataCount = $siteTable->getTotalData();
 
-            $getData = $siteTable->getSitesData($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length);
-            $dataFilter = $siteTable->getSitesData($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder, null, null);
+            $getData = $siteTable->getSitesData($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length, $siteVariety);
+            $dataFilter = $siteTable->getSitesData($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder, null, null, $siteVariety);
 
             $tableData = $getData->toArray();
             for ($ctr = 0; $ctr < count($tableData); $ctr++) {
@@ -485,6 +510,8 @@ class SitesController extends MelisAbstractActionController
                 }else{
                     $attrArray = array('data-mod-found'   => false);
                 }
+
+                $tableData[$ctr]['site_variety'] = $translator->translate('tr_meliscms_site_variety_'.$tableData[$ctr]['site_variety']);
 
                 //assign attribute data to table row
                 $tableData[$ctr]['DT_RowAttr'] = $attrArray;

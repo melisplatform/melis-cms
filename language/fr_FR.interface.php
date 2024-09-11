@@ -223,6 +223,7 @@
 	    'tr_meliscms_page_tree_save' => 'Enregistrer',
 	    'tr_meliscms_common_yes' => 'Oui',
 	    'tr_meliscms_common_no' => 'Non',
+        'tr_meliscms_common_all' => 'Tous',
 	    
 	    'tr_meliscms_common_add' => 'Ajouter',
 	    'tr_meliscms_common_apply' => 'Apply',
@@ -862,6 +863,9 @@
 
         'tr_meliscms_page_export_modal_handler' => 'Import/Export pages',
         'tr_meliscms_page_import_modal' => 'Modal d\'import',
-        'tr_meliscms_page_export_modal' => 'Modal d\'export'
+        'tr_meliscms_page_export_modal' => 'Modal d\'export',
+
+        'tr_meliscms_site_variety' => 'Variety',
+        'tr_meliscms_site_variety_SITE' => 'Site',
     );
 ?>

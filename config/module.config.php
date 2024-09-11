@@ -162,6 +162,7 @@ return [
             'MelisCmsLanguageSelect'            => \MelisCms\Form\Factory\MelisCmsLanguageSelectFactory::class,
             'MelisCmsPageLanguagesSelect'       => \MelisCms\Form\Factory\MelisCmsPageLanguagesSelectFactory::class,
             'MelisCmsSiteModuleSelect'          => \MelisCms\Form\Factory\MelisCmsSiteModuleSelectFactory::class,
+            'MelisCmsSiteVarietySelect'          => \MelisCms\Form\Factory\MelisCmsSiteVarietySelectFactory::class,
         ],
     ],
     'view_manager' => [

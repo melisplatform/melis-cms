@@ -9,6 +9,47 @@ use MelisCore\Service\MelisGeneralService;
 class MelisCmsSiteService extends MelisGeneralService
 {
     /**
+     * Get site variety
+     *
+     * @return mixed
+     */
+    public function getSiteVariety()
+    {
+        $results = [];
+
+        // Event parameters prepare
+        $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
+
+        // Sending service start event
+        $arrayParameters = $this->sendEvent('meliscmssite_service_get_site_variety_start', $arrayParameters);
+
+        // Service implementation start
+        $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
+        //translator
+        $translator = $this->getServiceManager()->get('translator');
+
+        $site = $siteTable->fetchAll()->toArray();
+
+        if (!empty($site))
+        {
+            foreach($site as $key => $val){
+                $results[$val['site_variety']] = $translator->translate('tr_meliscms_site_variety_'.$val['site_variety']);
+            }
+        }else{//set default variety
+            $results['SITE'] = $translator->translate('tr_meliscms_site_variety_SITE');;
+        }
+
+        // Service implementation end
+
+        // Adding results to parameters for events treatment if needed
+        $arrayParameters['results'] = $results;
+        // Sending service end event
+        $arrayParameters = $this->sendEvent('meliscmssite_service_get_site_variety_end', $arrayParameters);
+
+        return $arrayParameters['results'];
+    }
+
+    /**
      * This method will return the page of a site
      * @param Int $siteId
      * @return mixed
