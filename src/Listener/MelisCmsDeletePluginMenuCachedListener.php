@@ -28,8 +28,9 @@ class MelisCmsDeletePluginMenuCachedListener extends MelisGeneralListener implem
 			[
 				'meliscms_mini_template_service_create_template_end',
 				'meliscms_mini_template_service_update_template_end',
-				'meliscms_mini_template_service_delete_template_end'
-			], 
+				'meliscms_mini_template_service_delete_template_end',
+				'meliscms_mini_template_service_save_tree_end'
+			],
 			function($event) {
 				$sm = $event->getTarget()->getServiceManager();
 
