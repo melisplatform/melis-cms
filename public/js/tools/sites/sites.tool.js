@@ -312,7 +312,7 @@ $(function() {
                  * call function one by one
                  */
                 functionToCall = $.parseJSON(functionToCall);
-                if(!Array.isArray(functionToCall)){
+                if(Array.isArray(functionToCall)){
                     $.each(functionToCall, function(i, funcName){
                         executeFunction(funcName);
                     });
@@ -883,7 +883,9 @@ $(function() {
         curForm.each(function(){
             if($(this).prop('required')){
                 var inputName = $(this).attr("name");
-                var errlabel = $(this).closest("form").find("label.err_" + inputName).not(":has(input)");
+                var inputId = $(this).attr("id");
+                // var errlabel = $(this).closest("form").find("label.err_" + inputName).not(":has(input)");
+                var errlabel = $(this).closest("div.form-group").find("label:first");
                 if (jQuery.inArray(inputName, fieldNames) === -1) {
                     errlabel.addClass("fieldErrorColor");
                     errCtr++;
@@ -1485,8 +1487,19 @@ var cmsSiteHelper = (function() {
         formData[key] = data;
     }
 
+    /**
+     * Function to get all provided sites data
+     * in every step
+     *
+     * @returns {{}}
+     */
+    function getSitesStepData(){
+        return formData;
+    }
+
     return {
         setCurrentStepForm: setCurrentStepForm,
-        setSitesStepData: setSitesStepData
+        setSitesStepData: setSitesStepData,
+        getSitesStepData: getSitesStepData
     };
 })();
