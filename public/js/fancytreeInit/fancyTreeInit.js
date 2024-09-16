@@ -559,13 +559,9 @@
 
 		// use this callback to re-initialize the tree when its zoneReloaded
 		window.treeCallBack = function() {
-			var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
-				if ( tree.count() == 0 ) {
-					mainTree();
-				}
-				/* if ( $("#id-mod-menu-dynatree").children().length == 0 ) {
-					mainTree();
-				} */
+			if ( $("#id-mod-menu-dynatree").children().length == 0 ) {
+				mainTree();
+			}
 		};
 
 		$body.on("click", "#duplicatePageTree", function() {
