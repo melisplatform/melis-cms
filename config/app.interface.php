@@ -150,7 +150,7 @@ return array(
                     '/MelisCms/css/fancytree.custom.css',
                     '/MelisCms/css/styles.css',
                     //jstree
-                    '/MelisCms/assets/jstree/dist/themes/proton/style.min.css',
+                    '/MelisCms/assets/jstree/dist/themes/default/style.min.css',
                 ),
                 /**
                  * the "build" configuration compiles all assets into one file to make
@@ -178,10 +178,11 @@ return array(
                     //will be put inside css folder
                     'css' => [
                         '/build/css/fonts',
-                        '/build/css/30px.png',
+                        /* '/build/css/30px.png',
                         '/build/css/32px.png',
                         '/build/css/40px.png',
-                        '/build/css/throbber.gif',
+                        '/build/css/throbber.gif', */
+                        '/assets/jstree/dist/themes/default/'
                     ],
                     //will be put inside js folder
                     'js' => [
