@@ -27,9 +27,12 @@
     $body.on("click", "#resetTreeView", function(e){
         melisHelper.loadingZone($('.page-evolution-content'));
         $("input[name=tree_search]").val('');
-        var tree = $("#find-page-dynatree").fancytree("getTree");
+        // var tree = $("#find-page-dynatree").fancytree("getTree");
+        var tree = $.ui.fancytree.getTree("#find-page-dynatree");
+        
         tree.clearFilter();
-        $("#find-page-dynatree").fancytree("getRootNode").visit(function(node){
+        // $("#find-page-dynatree").fancytree("getRootNode")
+        tree.getRootNode().visit(function(node){
             node.setExpanded(false);
         });
         setTimeout(function(){
