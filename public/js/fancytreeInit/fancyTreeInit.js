@@ -216,8 +216,6 @@
 								},
 								cache: false,
 							};
-
-							console.log(`typeof data.result: `, typeof data.result);
 					},
 					create: function(event, data) {
 						melisHelper.loadingZone($("#treeview-container"));
