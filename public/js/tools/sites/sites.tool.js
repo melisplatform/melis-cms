@@ -678,6 +678,10 @@ $(function() {
                     openSiteEditTab(updateSiteTitle(id, data.siteName, data.siteModuleName), id,data.siteModuleName);
                 });
                 //refresh site tree view
+                $("input[name=left_tree_search]").val('');
+                $("#id-mod-menu-dynatree").fancytree("destroy");
+                mainTree();
+                //execute callback
                 cmsSiteHelper.finishCallback();
             }else{
                 melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
@@ -1497,13 +1501,9 @@ var cmsSiteHelper = (function() {
 
     /**
      * This function is called after site is successfully created
+     * You can override this inside your js file to execute a certain command
      */
-    function finishCallback()
-    {
-        $("input[name=left_tree_search]").val('');
-        $("#id-mod-menu-dynatree").fancytree("destroy");
-        mainTree();
-    }
+    function finishCallback(){}
 
     return {
         setCurrentStepForm: setCurrentStepForm,
