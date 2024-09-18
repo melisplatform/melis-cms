@@ -678,9 +678,7 @@ $(function() {
                     openSiteEditTab(updateSiteTitle(id, data.siteName, data.siteModuleName), id,data.siteModuleName);
                 });
                 //refresh site tree view
-                $("input[name=left_tree_search]").val('');
-                $("#id-mod-menu-dynatree").fancytree("destroy");
-                mainTree();
+                cmsSiteHelper.finishCallback();
             }else{
                 melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors);
             }
@@ -1497,9 +1495,20 @@ var cmsSiteHelper = (function() {
         return formData;
     }
 
+    /**
+     * This function is called after site is successfully created
+     */
+    function finishCallback()
+    {
+        $("input[name=left_tree_search]").val('');
+        $("#id-mod-menu-dynatree").fancytree("destroy");
+        mainTree();
+    }
+
     return {
         setCurrentStepForm: setCurrentStepForm,
         setSitesStepData: setSitesStepData,
-        getSitesStepData: getSitesStepData
+        getSitesStepData: getSitesStepData,
+        finishCallback: finishCallback
     };
 })();
