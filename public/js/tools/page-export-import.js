@@ -269,14 +269,14 @@ $(function(){
                                 url: '/melis/MelisCms/PageImport/exportCsv',
                                 data: {
                                     idsMap: idsMap
-                                },
-                                success: function (data, textStatus, request) {
-                                    if (data) {
-                                        var fileName = request.getResponseHeader("fileName");
-                                        var mime = request.getResponseHeader("Content-Type");
-                                        var blob = new Blob([request.responseText], {type: mime});
-                                        saveAs(blob, fileName);
-                                    }
+                                }
+                            })
+                            .done(function (data, textStatus, request) {
+                                if (data) {
+                                    var fileName = request.getResponseHeader("fileName");
+                                    var mime = request.getResponseHeader("Content-Type");
+                                    var blob = new Blob([request.responseText], {type: mime});
+                                    saveAs(blob, fileName);
                                 }
                             });
                         }
@@ -329,23 +329,21 @@ $(function(){
             tree.reload({
                 url: '/melis/MelisCms/TreeSites/get-tree-pages-by-page-id'
             }).done(function(){
-                /* tree.loadKeyPath(newData, function(node, status){
+                tree.loadKeyPath(newData, function(node, status){
                     if (status == "ok"){
                         node.setActive(true).done(function(){
                             node.setExpanded(true);
                         });
                     }
                 }).done(function(){
-                    
-                }); */
-                tree.clearFilter();
+                    tree.clearFilter();
 
-                // remove duplicated brach of the tree while rapidly refreshing the tree [ plugin bug fix ]
-                if ( $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").hasClass("fancytree-lastsib") === false){
-                    $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").remove();
-                }
+                    // remove duplicated brach of the tree while rapidly refreshing the tree [ plugin bug fix ]
+                    if ( $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").hasClass("fancytree-lastsib") === false){
+                        $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").remove();
+                    }
+                });
             });
-
         }).fail(function(xhr, textStatus, errorThrown){
             // error modal
             alert( translations.tr_meliscore_error_message );
