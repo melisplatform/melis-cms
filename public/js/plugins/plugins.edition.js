@@ -26,7 +26,6 @@ var melisPluginEdition = (function($, window) {
      */
     $.each( $._data($body.get(0), "events"), function( i, val ) {
         try {
-            console.log(`val.selector: `, val.selector);
             if (val.selector == "#pluginModalBtnApply") {
                 $body.off("click", "#pluginModalBtnApply");
             }
@@ -38,11 +37,11 @@ var melisPluginEdition = (function($, window) {
     // $body because it is modal and it's located in parent
     $body.on("click", "button[id='pluginModalBtnApply'][data-page-id='"+melisActivePageId+"']", submitPluginForms); 
 
-    $body.on("click", ".meliscms-plugin-modal-cancel-btn", function(e) {
+    /* $body.on("click", ".meliscms-plugin-modal-cancel-btn", function(e) {
         e.preventDefault();
 
         removeParentBodyPropStyle();
-    });
+    }); */
 
     $_body.on("focus", ".melis-ui-outlined .melis-editable", function() {
         $(this).closest(".melis-ui-outlined").addClass("melis-focus");
@@ -53,14 +52,13 @@ var melisPluginEdition = (function($, window) {
     });
 
     // window.parent.$body.prop("style")
-    function removeParentBodyPropStyle() {
+    /* function removeParentBodyPropStyle() {
         setTimeout(function() {
-            //console.log(`$body.prop("style", "overflow: hidden").length: `, $body.prop("style", "overflow: hidden").length);
             if ( $body.prop("style", "overflow: hidden").length ) {
                 window.parent.melisCoreTool.removeOverflowHidden();
             }
         }, 500);
-    }
+    } */
 
     // run when .melis-ui-outlined loses focus and run getPluginData() to include the width related data
     //$_body.on("blur", ".melis-ui-outlined", melisUiOutlinedLosesFocus);

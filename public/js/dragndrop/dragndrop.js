@@ -201,30 +201,22 @@ var melisDragnDrop = (function ($, window) {
 					/**
 					 * Bind on bootstrap hidden modal event,
 					 * Delayed execution with setTimeout(), as it removes dropLocation or ui.helper[0]
-					 * that is still being used in requestPlugin() in the callback function on modal dialog confirm
 					 */
-					// .modal found
-					// console.log(`window.parent.$(".modal.bootstrap-dialog.show"): `, window.parent.$(".modal.bootstrap-dialog.show") );
-					if ( window.parent.$(".modal.bootstrap-dialog.show").length ) {
-						window.parent
-							.$("body")
-							.on(
-								"hidden.bs.modal",
-								window.parent.$(".modal.bootstrap-dialog.show"),
-								function() {
-									setTimeout(function () {
-										// check if loader exists
-										if (
-											!$(ui.helper[0]).parent().find(".overlay-loader").length
-										) {
-											// remove clone element
-											ui.helper[0].remove();
-										}
-									}, 1000);
+					var modalId = window.parent.$(".modal.bootstrap-dialog.show").attr("id");
+					const modalEl = window.parent.document.getElementById(modalId);
+					
+						modalEl.addEventListener('hidden.bs.modal', event => {
+							var uiTimeout = setTimeout(function() {
+								// check if loader exists
+								if (!$(ui.helper[0]).parent().find(".overlay-loader").length) {
+									// remove clone element
+									ui.helper[0].remove();
+
+									clearTimeout( uiTimeout );
 								}
-							);
-					}
-				}
+							}, 1000);
+						});
+				} // check ui.helper
 
 				if (ui.sender[0]) {
 					var dragZoneSender = ui.sender[0];
