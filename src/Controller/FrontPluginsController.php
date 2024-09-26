@@ -240,6 +240,7 @@ class FrontPluginsController extends MelisAbstractActionController
         $errors = '';
         $tag = '';
         $tabs = array();
+        $errorsTabs = [];
         $config = $this->getServiceManager()->get('config');
         if (empty($module) || empty($pluginName) || empty($pageId) || empty($pluginId))
         {
@@ -280,13 +281,12 @@ class FrontPluginsController extends MelisAbstractActionController
             $finalErrors = array('general' => $errors);
         }
 
-        foreach($errorsTabs as $response) {
-            if(!$response['success']) {
-                $success = 0;
+        if(!empty($errorsTabs)) {
+            foreach ($errorsTabs as $response) {
+                if (!$response['success']) {
+                    $success = 0;
+                }
             }
-
-
-
         }
         $finalErrors = $errorsTabs;
 
