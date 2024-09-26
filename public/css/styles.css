@@ -945,3 +945,6 @@ ul#select2-id_mcgdprbanner_site_id-results {
 .pagecomment .widget-body .media .media-object {
 	margin-right: 1rem;
 }
+#gen_id_meliscms_tool_sites_siteconfig_form .input-group .form-control {
+	width: 100%;
+}

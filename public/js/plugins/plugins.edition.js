@@ -37,11 +37,11 @@ var melisPluginEdition = (function($, window) {
     // $body because it is modal and it's located in parent
     $body.on("click", "button[id='pluginModalBtnApply'][data-page-id='"+melisActivePageId+"']", submitPluginForms); 
 
-    /* $body.on("click", ".meliscms-plugin-modal-cancel-btn", function(e) {
+    $body.on("click", ".meliscms-plugin-modal-cancel-btn", function(e) {
         e.preventDefault();
 
         removeParentBodyPropStyle();
-    }); */
+    });
 
     $_body.on("focus", ".melis-ui-outlined .melis-editable", function() {
         $(this).closest(".melis-ui-outlined").addClass("melis-focus");
@@ -52,13 +52,13 @@ var melisPluginEdition = (function($, window) {
     });
 
     // window.parent.$body.prop("style")
-    /* function removeParentBodyPropStyle() {
+    function removeParentBodyPropStyle() {
         setTimeout(function() {
             if ( $body.prop("style", "overflow: hidden").length ) {
                 window.parent.melisCoreTool.removeOverflowHidden();
             }
         }, 500);
-    } */
+    }
 
     // run when .melis-ui-outlined loses focus and run getPluginData() to include the width related data
     //$_body.on("blur", ".melis-ui-outlined", melisUiOutlinedLosesFocus);
@@ -134,7 +134,9 @@ var melisPluginEdition = (function($, window) {
                     setTimeout(function(){
                         checkToolSize();
                     }, 300);
-                    window.parent.$("#id_meliscms_plugin_modal_container").modal('hide');
+
+                    // window.parent.$("#id_meliscms_plugin_modal_container").modal('hide');
+                    window.parent.melisCoreTool.hideModal("id_meliscms_plugin_modal_container");
                 }, 300);
             } else {
                 melisCmsFormHelper.melisMultiKoNotification(data.errors);

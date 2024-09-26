@@ -1,8 +1,8 @@
 (function($, window, document) {
 	var $body = $("body");
 		// On Load
-		// $(function() {
-		$(window).on("load", function() {
+		//$(function() {
+		// $(window).on("load", function() {
 			window.mainTree = function(completeEvent) {
 				var melisExtensions;
 				var $tabArrowTop = $("#tab-arrow-top");
@@ -206,8 +206,6 @@
 					lazyLoad: function(event, data) {
 						// get the page ID and pass it to lazyload
 						var pageId = data.node.data.melisData.page_id;
-							/* console.log(`fancyTreeInit.js lazyLoad: pageId: `, pageId);
-							console.log(`fancyTreeInit.js lazyLoad: data.node.key: `, data.node.key); */
 							data.result = {
 								url: "/melis/MelisCms/TreeSites/get-tree-pages-by-page-id?nodeId=" + pageId,
 								data: {
@@ -253,17 +251,25 @@
 						}
 					},
 					click: function(event, data) {
-						var targetType = data.targetType;
+						var targetType = data.targetType,
+							dataNode = data.node;
+
 							if (targetType === "title") {
 								// This triggers error: Fancytree assertion failed: only init supported, data.node.setExpanded()
 								// data.node.setExpanded();
-								data.node.toggleExpanded();
-								
+								// data.node.toggleExpanded();
+								// dataNode.setExpanded(!dataNode.isExpanded());
+
+								event.preventDefault();
+
+									$(dataNode.li).find(".fancytree-expander").trigger("click");
+
 									// open page on click on mobile and desktop is double click
 									if (melisCore.screenSize <= 1024) {
 										var data = data.node.data;
 										var pageName =
 											data.melisData.page_id + " - " + data.melisData.page_title;
+
 											melisHelper.tabOpen(
 												pageName,
 												data.iconTab,
@@ -494,7 +500,7 @@
 
 			// initialize the tree
 			mainTree();
-		});
+		//});
 
 		// create page if treeview page is empty
 		$body.on("click", "#id-mod-menu-dynatree .create-newpage .btn", function() {
@@ -560,7 +566,9 @@
 		// use this callback to re-initialize the tree when its zoneReloaded
 		window.treeCallBack = function() {
 			if ( $("#id-mod-menu-dynatree").children().length == 0 ) {
-				mainTree();
+				// mainTree();
+				var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
+					tree.reload();
 			}
 		};
 
