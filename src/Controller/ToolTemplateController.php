@@ -685,7 +685,8 @@ class ToolTemplateController extends MelisAbstractActionController
                 // apply text limits
                 foreach($tableData[$ctr] as $vKey => $vValue)
                 {
-                    $tableData[$ctr][$vKey] = $melisTool->limitedText($vValue);
+                    if($vKey != 'tpl_zf2_website_folder')
+                        $tableData[$ctr][$vKey] = $melisTool->limitedText($vValue);
                 }
 
                 // Turn the text color of Template Type to red if templating module is disabled/not installed
