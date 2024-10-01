@@ -491,7 +491,8 @@ class SitesController extends MelisAbstractActionController
             for ($ctr = 0; $ctr < count($tableData); $ctr++) {
                 // apply text limits
                 foreach ($tableData[$ctr] as $vKey => $vValue) {
-                    $tableData[$ctr][$vKey] = $melisTool->limitedText($melisTool->escapeHtml($vValue));
+                    if($vKey != 'site_name')
+                        $tableData[$ctr][$vKey] = $melisTool->limitedText($melisTool->escapeHtml($vValue));
                 }
 
                 // manually modify value of the desired row
