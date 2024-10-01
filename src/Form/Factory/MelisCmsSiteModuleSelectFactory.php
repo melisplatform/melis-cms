@@ -20,12 +20,12 @@ class MelisCmsSiteModuleSelectFactory extends MelisSelectFactory
 {
     protected function loadValueOptions(ServiceManager $serviceManager)
     {
-        $table = $serviceManager->get('MelisEngineTableSite');
-        $cmsSiteData = $table->fetchAll();
+        $table = $serviceManager->get('MelisAssetManagerModulesService');
+        $sites = $table->getSitesModules();
 
         $valueoptions = [];
-        foreach($cmsSiteData as $lang => $val) {
-            $valueoptions[$val->site_name] = !empty($val->site_name) ? $val->site_name : $val->site_label;
+        foreach($sites as $key => $val) {
+            $valueoptions[$val] = $val;
         }
 
         return $valueoptions;
