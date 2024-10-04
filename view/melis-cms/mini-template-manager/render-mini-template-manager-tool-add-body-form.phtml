@@ -115,7 +115,9 @@
         }
     );
     var tinyMceOption = {
-        height: 500
+        height: 500,
+        // added also here eventhough it is already on tool.php in melis-core
+        promotion: false
     };
     melisTinyMCE.createTinyMCE("tool", "textarea[data-tinymce-id='<?= $tinymceId ?>']", tinyMceOption);
 </script>
