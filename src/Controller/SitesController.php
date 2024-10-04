@@ -231,7 +231,46 @@ class SitesController extends MelisAbstractActionController
         $tool = $config->getItem('/meliscms/interface/meliscms_toolstree/interface/meliscms_tool_sites/interface/meliscms_tool_sites_modals');
         return new ViewModel();
     }
-    
+
+    /**
+     * Function to validate form during site creations
+     *
+     * @return JsonModel
+     */
+    public function validateSiteCreationFormAction()
+    {
+        $postData = $this->request->getPost()->toArray();
+        $errors = [];
+        $success = true;
+        if(!empty($postData['form_config_path'])){
+            $formPath = $postData['form_config_path'];
+            $formNameArr = explode('/', $formPath);
+            $formName = end($formNameArr);
+            //remove since its not part of form fields
+            unset($postData['form_config_path']);
+            //get form
+            $form = $this->getForm($formPath, $formName);
+            $form->setData($postData);
+            if(!$form->isValid()){
+                $appConfigForm = $this->getConfigForm($formPath, $formName);
+                $errors = $form->getMessages();
+                foreach ($errors as $keyError => $valueError)
+                {
+                    foreach ($appConfigForm['elements'] as $keyForm => $valueForm)
+                    {
+                        if ($valueForm['spec']['name'] == $keyError &&
+                            !empty($valueForm['spec']['options']['label']))
+                            $errors[$keyError]['label'] = $valueForm['spec']['options']['label'];
+                    }
+                }
+                $success = false;
+            }
+        }
+        return new JsonModel([
+            'success' => $success,
+            'errors' => $errors
+        ]);
+    }
 
     /**
      * Displays the add form in the modal
@@ -282,6 +321,7 @@ class SitesController extends MelisAbstractActionController
                     'title' => $translator->translate($config['conf']['name']),
                     'beforeMove' => [],
                     'afterMove' => [],
+                    'form_path' => '',
                 ];
             }
 
@@ -297,6 +337,10 @@ class SitesController extends MelisAbstractActionController
                 //set empty value it not provided
                 if(empty($stepsOrder[$keyConfig]['afterMove'])){
                     $stepsOrder[$keyConfig]['afterMove'] = [];
+                }
+                //set empty value it not provided
+                if(empty($stepsOrder[$keyConfig]['form_path'])){
+                    $stepsOrder[$keyConfig]['form_path'] = '';
                 }
             }
         }
@@ -1764,4 +1808,30 @@ class SitesController extends MelisAbstractActionController
         foreach($cacheKeys as $preFix)
             $melisEngineCacheSystem->deleteCacheByPrefix($preFix, $cacheConfig);
     }
+
+    /**
+     * @param $formName
+     * @param $formPath
+     * @return \Laminas\Form\FormInterface
+     */
+    private function getForm($formPath, $formName)
+    {
+        $appConfigForm = $this->getConfigForm($formPath, $formName);
+        $factory = new \Laminas\Form\Factory();
+        $formElements = $this->getServiceManager()->get('FormElementManager');
+        $factory->setFormElementManager($formElements);
+        return $factory->createForm($appConfigForm);
+    }
+
+    /**
+     * @param $formPath
+     * @param $formName
+     * @return mixed
+     */
+    private function getConfigForm($formPath, $formName)
+    {
+        $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
+        return $melisMelisCoreConfig->getFormMergedAndOrdered($formPath, $formName);
+    }
+
 }

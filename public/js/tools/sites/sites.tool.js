@@ -1,5 +1,6 @@
 var formData = {},
-    currentStepForm = "";
+    currentStepForm = "",
+    configFormPath = "";
 
 $(function() {
     $body = $("body");
@@ -322,6 +323,8 @@ $(function() {
                 var current = this.currentItem,
                     step    = elem.find(".item").eq(current).attr("data-step"),
                     functionToCall    = elem.find(".item").eq(current).attr("data-beforeMove");
+                //set config form path
+                configFormPath = elem.find(".item").eq(current).attr("data-form-path");
 
                 /**
                  * call function one by one
@@ -358,7 +361,7 @@ $(function() {
              */
             if ( currentStepForm != "" && currentStepForm != "skip" ) {
                 var form = getSerializedForm(currentStepForm);
-                if ( isFormEmpty(form, currentStepForm) ) {
+                if ( isFormEmpty(form, currentStepForm)) {
                     // $("#siteAddAlert").removeClass("hidden");
                 } else {
                     $("#siteAddAlert").addClass("hidden");
@@ -646,8 +649,10 @@ $(function() {
             text = translations.tr_melis_cms_sites_tool_add_step5_new_site_using_new_module;
         }
         var siteSumText = text.replace(/%siteModule/g, siteName).replace(/%siteName/g, siteLabel);
-        $(".site_creation_info").empty().append(selectedLanguages, "<br />",domainType,
-            "<br/><p class='step5-message'>"+siteSumText+"</p>");
+        var sumText = selectedLanguages + "<br />" + domainType + "<br/><p class='step5-message'>"+siteSumText+"</p>";
+        cmsSiteHelper.setSummaryStepText(sumText, 'append', true);
+        // $(".site_creation_info").empty().append(selectedLanguages, "<br />",domainType,
+        //     "<br/><p class='step5-message'>"+siteSumText+"</p>");
     }
 
     /**
@@ -839,13 +844,58 @@ $(function() {
      * @returns {boolean}
      */
     function isFormEmpty(form, currentStepForm) {
-        var fromInputNames = [];
-        $.each(form, function(i, v){
-            if(v.value != ""){
-                fromInputNames.push(v.name)
-            }
-        });
-        return showFormError(currentStepForm, fromInputNames);
+        if(configFormPath != "") {
+            /**
+             * Send ajax to validate form
+             */
+            form.push({ name: "form_config_path", value: configFormPath});
+            $.ajax({
+                type : 'POST',
+                url : '/melis/MelisCms/Sites/validateSiteCreationForm',
+                data : form,
+                beforeSend : function () {
+                    melisCoreTool.pending("#btn-next-step");
+                    $("#siteAddAlert").empty().addClass("hidden");
+                }
+            }).done(function(data){
+                $("#siteAddAlert").text(translations.tr_melis_cms_sites_tool_add_create_site_required_field);
+                melisCoreTool.done("#btn-next-step");
+                if(!data.success){
+                    melisHelper.highlightMultiErrors(data.success, data.errors, currentStepForm);
+                    //display errors
+                    $("#siteAddAlert").removeClass("hidden");
+                    $.each(data.errors, function (key, fieldErrors) {
+                        $.each(fieldErrors, function(k, errMsg){
+                            if(k !== 'label'){
+                                $("#siteAddAlert").append("<br/><span>"+fieldErrors.label+": <small>"+errMsg+"</small></span>");
+                            }
+                        });
+                    });
+
+                    return true;
+                }else{
+                    owlStep.trigger('owl.next');
+                    return false;
+                }
+            }).fail(function(){
+                melisCoreTool.done("#btn-next-step");
+                alert( translations.tr_meliscore_error_message );
+                return false;
+            });
+            return true;
+        }else{
+            /**
+             * Custom js validation
+             * @type {Array}
+             */
+            var fromInputNames = [];
+            $.each(form, function (i, v) {
+                if (v.value != "") {
+                    fromInputNames.push(v.name)
+                }
+            });
+            return showFormError(currentStepForm, fromInputNames);
+        }
     }
 
     /**
@@ -1500,6 +1550,45 @@ var cmsSiteHelper = (function() {
     }
 
     /**
+     * This function will return the summary
+     * text in the summary step when creating site
+     *
+     * @returns {jQuery}
+     */
+    function getSummarySteText()
+    {
+        return $(".site_creation_info").text();
+    }
+
+    /**
+     * This function will set a summary text
+     * in the summary step when creating site
+     * @param text
+     * @param type
+     * @param empty
+     */
+    function setSummaryStepText(text, type, empty)
+    {
+        type = (type == undefined) ? 'append' : type;
+        empty = (empty == undefined) ? false : empty;
+
+        // siteCreationSummaryText += text;
+        if(type == 'append') {
+            if(empty) {
+                $(".site_creation_info").empty().append(text);
+            }else{
+                $(".site_creation_info").append(text);
+            }
+        }else{
+            if(empty) {
+                $(".site_creation_info").empty().prepend(text);
+            }else{
+                $(".site_creation_info").prepend(text);
+            }
+        }
+    }
+
+    /**
      * This function is called after site is successfully created
      * You can override this inside your js file to execute a certain command
      */
@@ -1509,6 +1598,8 @@ var cmsSiteHelper = (function() {
         setCurrentStepForm: setCurrentStepForm,
         setSitesStepData: setSitesStepData,
         getSitesStepData: getSitesStepData,
-        finishCallback: finishCallback
+        finishCallback: finishCallback,
+        getSummarySteText: getSummarySteText,
+        setSummaryStepText: setSummaryStepText
     };
 })();
