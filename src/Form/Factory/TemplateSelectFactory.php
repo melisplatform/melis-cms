@@ -26,6 +26,7 @@ class TemplateSelectFactory extends MelisSelectFactory
         //page id is empty, maybe its a new page, we try to look for its father page id
         if(empty($idPage)) {
             $idPage = (int) $request->getQuery('fatherPageId', $request->getPost('fatherPageId', ''));
+            $idPage = empty($idPage) ? (int) $request->getQuery('idFatherPage', $request->getPost('idFatherPage', '')) : $idPage;
         }
 
         $engineTree = $serviceManager->get('MelisEngineTree');

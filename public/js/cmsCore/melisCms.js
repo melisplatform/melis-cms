@@ -187,6 +187,9 @@ var melisCms = (function() {
 							}
 						);
 					}
+
+					//execute callback
+					melisCms.afterSavePageCallback();
 				} else {
 					// error modal
 					melisHelper.melisKoNotification(
@@ -1007,6 +1010,11 @@ var melisCms = (function() {
      * You can override this inside your js file to execute a certain command
      */
     function afterUnPublishCallback(){}
+    /**
+     * This function is called after page save
+     * You can override this inside your js file to execute a certain command
+     */
+    function afterSavePageCallback(){}
 
 	/*
 	 * RETURN ========================================================================================================================
@@ -1023,6 +1031,7 @@ var melisCms = (function() {
 		unpublishPage: unpublishPage,
         afterPublishCallback: afterPublishCallback,
         afterUnPublishCallback: afterUnPublishCallback,
+        afterSavePageCallback: afterSavePageCallback,
 		//refreshPageTable 								: 			refreshPageTable,
 
 		//refresh treeview
