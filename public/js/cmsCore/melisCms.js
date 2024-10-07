@@ -293,6 +293,9 @@ var melisCms = (function() {
 					);
 
 					$openedPageIds.push(data.datas.idPage);
+
+					//execute callback
+					melisCms.afterPublishCallback();
 				} else {
 					// error modal
 					melisHelper.melisKoNotification(
@@ -341,6 +344,8 @@ var melisCms = (function() {
 					melisCore.flashMessenger();
 
 					$openedPageIds.push(pageNumber);
+					//execute unpublish callback
+                    melisCms.afterUnPublishCallback();
 				} else {
 					// show error modal
 					melisHelper.melisKoNotification(
@@ -992,6 +997,17 @@ var melisCms = (function() {
 		loadPageIframe
 	);
 
+    /**
+     * This function is called after page publish
+     * You can override this inside your js file to execute a certain command
+     */
+    function afterPublishCallback(){}
+    /**
+     * This function is called after page unpublish
+     * You can override this inside your js file to execute a certain command
+     */
+    function afterUnPublishCallback(){}
+
 	/*
 	 * RETURN ========================================================================================================================
 	 * include your newly created functions inside the array so it will be accessable in the outside scope
@@ -1005,6 +1021,8 @@ var melisCms = (function() {
 		savePage: savePage,
 		publishPage: publishPage,
 		unpublishPage: unpublishPage,
+        afterPublishCallback: afterPublishCallback,
+        afterUnPublishCallback: afterUnPublishCallback,
 		//refreshPageTable 								: 			refreshPageTable,
 
 		//refresh treeview
