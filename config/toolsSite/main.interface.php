@@ -28,6 +28,7 @@ return array(
                         'title' => 'tr_melis_cms_sites_tool_add_header_title_multi_lingual',//step title
                         'beforeMove' => ['multiLingualProcess'],//an array of javascript function that we call before move event
                         'afterMove' => [],//an array of javascript function that we call after after move event
+                        'form_path' => '', //form path to validate (ex: 'meliscms/forms/my_config_form')
                     ],
                     'meliscms_tool_sites_modal_add_step_languages' => [
                         'position' => 2,
