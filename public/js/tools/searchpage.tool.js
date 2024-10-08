@@ -109,7 +109,7 @@
 							$(".meliscms-search-box.sidebar-treeview-search .melis-overlay-loading").remove();
 						}, 1000);
 					} else {
-						var arr = $.map(data, function(el) { return el });
+						var arr = $.map(data, function(el) { return String(el) });
 						tree.loadKeyPath(arr, function(node, status) {
 							switch( status ) {
 								case "loaded":	
