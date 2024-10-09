@@ -119,7 +119,7 @@ var melisPluginSortable = (function($, window) {
     window.parent.$("body").on("click", ".widget-melis-tabnext", modalSlideNext);
 
 
-	$(window.parent).resize(function () {
+	$(window.parent).on("resize", function () {
 	    checkedModalSlider();
 	});
 

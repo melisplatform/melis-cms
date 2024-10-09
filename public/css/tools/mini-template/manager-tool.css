@@ -8,6 +8,9 @@
     .melis-cms-minitemplate-edit-btn {
         width: 100%;
     }
+    .btn-success {
+        margin: 0 !important;
+    }
 }
 
 @media (max-width: 991.98px) {

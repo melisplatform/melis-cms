@@ -9,7 +9,7 @@
 ?>
 
 <ul id="<?= $this->idPage; ?>_id_meliscms_page_publish_unpublish_switch" class="menubar menu-bar-options">
-	<li<?= $id; ?> data-melisKey='<?= $data_melisKey; ?>' >
+	<li <?= $id; ?> data-melisKey='<?= $data_melisKey; ?>' >
 		<div data-pagenumber="<?= $this->idPage; ?>" class="make-switch page-publishunpublish title-switch" data-on-label="<on><?= $this->translate('tr_meliscms_page_published_text'); ?></on>" data-off-label="<off><?= $this->translate('tr_meliscms_page_unpublished_text'); ?></off>" data-text-label="<?= $this->translate('tr_meliscms_page_status_text'); ?>">
 			<input type="checkbox" data-pagenumber="<?= $this->idPage; ?>" <?= $status; ?>>
 		</div>

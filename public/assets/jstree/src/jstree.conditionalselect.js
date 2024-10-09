@@ -7,10 +7,10 @@
 (function (factory) {
 	"use strict";
 	if (typeof define === 'function' && define.amd) {
-		define('jstree.conditionalselect', ['jquery','jstree'], factory);
+		define('jstree.conditionalselect', ['jquery','./jstree.js'], factory);
 	}
 	else if(typeof exports === 'object') {
-		factory(require('jquery'), require('jstree'));
+		factory(require('jquery'), require('./jstree.js'));
 	}
 	else {
 		factory(jQuery, jQuery.jstree);
@@ -30,7 +30,7 @@
 		// own function
 		this.activate_node = function (obj, e) {
 			if(this.settings.conditionalselect.call(this, this.get_node(obj), e)) {
-				parent.activate_node.call(this, obj, e);
+				return parent.activate_node.call(this, obj, e);
 			}
 		};
 	};

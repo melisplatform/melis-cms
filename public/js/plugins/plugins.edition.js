@@ -29,10 +29,19 @@ var melisPluginEdition = (function($, window) {
             if (val.selector == "#pluginModalBtnApply") {
                 $body.off("click", "#pluginModalBtnApply");
             }
-        } catch(error) {}
+        } catch(error) {
+            console.log(e);
+        }
     });
 
-    $body.on("click", "button[id='pluginModalBtnApply'][data-page-id='"+melisActivePageId+"']", submitPluginForms); // $body because it is modal and it's located in parent
+    // $body because it is modal and it's located in parent
+    $body.on("click", "button[id='pluginModalBtnApply'][data-page-id='"+melisActivePageId+"']", submitPluginForms); 
+
+    $body.on("click", ".meliscms-plugin-modal-cancel-btn", function(e) {
+        e.preventDefault();
+
+        removeParentBodyPropStyle();
+    });
 
     $_body.on("focus", ".melis-ui-outlined .melis-editable", function() {
         $(this).closest(".melis-ui-outlined").addClass("melis-focus");
@@ -42,15 +51,24 @@ var melisPluginEdition = (function($, window) {
         $(this).removeClass("melis-focus");
     });
 
+    // window.parent.$body.prop("style")
+    function removeParentBodyPropStyle() {
+        setTimeout(function() {
+            if ( $body.prop("style", "overflow: hidden").length ) {
+                window.parent.melisCoreTool.removeOverflowHidden();
+            }
+        }, 500);
+    }
+
     // run when .melis-ui-outlined loses focus and run getPluginData() to include the width related data
     //$_body.on("blur", ".melis-ui-outlined", melisUiOutlinedLosesFocus);
 
     // $("body").on("dblclick", ".ui-resizable-e", changeWidth); // disable for now
 
-    function melisUiOutlinedLosesFocus() {
+    /* function melisUiOutlinedLosesFocus() {
         var $this = $(this);
 
-    }
+    } */
 
     // Submit form in modal
     function submitPluginForms(e) {
@@ -66,7 +84,7 @@ var melisPluginEdition = (function($, window) {
             melisSiteModule     = $this.closest("#id_meliscms_plugin_modal_container").data("melis-site-module"),
             dataString          = $this.closest('.modal-content').find("form");
 
-            pluginHardcodedConfig = $.trim($this.closest("#id_meliscms_plugin_modal_container").find(".plugin-hardcoded-conf").text());
+            pluginHardcodedConfig = $this.closest("#id_meliscms_plugin_modal_container").find(".plugin-hardcoded-conf").text().trim();
 
             // Construct data string
             var datastring = dataString.serializeArray();
@@ -90,6 +108,9 @@ var melisPluginEdition = (function($, window) {
             catch (e) {
                console.log(e);
             }
+            
+            // window.parent.$body.prop("style");
+            // removeParentBodyPropStyle();
     }
 
     // Validate form in modal
@@ -113,8 +134,9 @@ var melisPluginEdition = (function($, window) {
                     setTimeout(function(){
                         checkToolSize();
                     }, 300);
-                    window.parent.$("#id_meliscms_plugin_modal_container").modal('hide');
 
+                    // window.parent.$("#id_meliscms_plugin_modal_container").modal('hide');
+                    window.parent.melisCoreTool.hideModal("id_meliscms_plugin_modal_container");
                 }, 300);
             } else {
                 melisCmsFormHelper.melisMultiKoNotification(data.errors);
@@ -224,7 +246,7 @@ var melisPluginEdition = (function($, window) {
                         var uiOutlined = $(".melis-dragdropzone .melis-ui-outlined");
                         try {
                             uiOutlined.resizable("destroy"); // disable for now
-                        }catch(e){
+                        } catch(e) {
                             uiOutlined.resizable();
                         }
 
@@ -588,14 +610,14 @@ var melisPluginEdition = (function($, window) {
     }
 
     function disableLinks(e) {
-        $(e).click(function(event) { event.preventDefault(); });
+        $(e).on("click", function(event) { event.preventDefault(); });
     }
 
     function createPluginModal() {
         var $this               = $(this),
             toolBox             = $this.closest(".melis-plugin-tools-box"),
             pluginContainer     = toolBox.parent(".melis-ui-outlined"),
-            pluginFrontConfig   = $.trim(pluginContainer.find(".plugin-hardcoded-conf").text()),
+            pluginFrontConfig   = pluginContainer.find(".plugin-hardcoded-conf").text().trim(),
             module              = toolBox.data("module"),
             pluginName          = toolBox.data("plugin"),
             pluginId            = toolBox.data("plugin-id"),
@@ -716,7 +738,7 @@ var melisPluginEdition = (function($, window) {
                 if( $(editable).length ) {
                     // trigger focus to saveSession
                     var data = $(editable).data();
-                        $(editable).focus().removeClass("mce-edit-focus");
+                        $(editable).trigger("focus").removeClass("mce-edit-focus");
 
                     // hide tinymce option while resizing
                     var inst = tinyMCE.EditorManager.get(data.pluginId);
@@ -845,11 +867,11 @@ var melisPluginEdition = (function($, window) {
     }
 
     // remove inline width when changing viewport
-    // window.parent.$("#"+ parent.activeTabId).find('iframe').on("resize", function() {
-    //     $(this).contents().find(".melis-dragdropzone .melis-ui-outlined").each(function() {
-    //         $(this).css("width", "");
-    //     });
-    // });
+    /* window.parent.$("#"+ parent.activeTabId).find('iframe').on("resize", function() {
+        $(this).contents().find(".melis-dragdropzone .melis-ui-outlined").each(function() {
+            $(this).css("width", "");
+        });
+    }); */
 
     // init resize
     if ( parent.pluginResizable == 1 ) {
@@ -858,10 +880,6 @@ var melisPluginEdition = (function($, window) {
 
     moveResponsiveClass();
     pluginDetector();
-
-    $(window).on("load", function() {
-        calcFrameHeight();
-    });
     
     return {
         submitPluginForms       :       submitPluginForms,
@@ -883,6 +901,16 @@ var melisPluginEdition = (function($, window) {
     }
 
 })(jQuery, window);
+
+/** 
+ * Transferred from inside melisPluginEdition, jQuery migration 3.7.1, jQuery(window).on('load'...) called after load event occurred
+ * https://stackoverflow.com/questions/38585373/why-is-my-load-event-function-not-beeing-executed-after-switching-to-jquery-3
+ * https://github.com/jquery/jquery/issues/3194
+ * Try $(window.parent)
+ */
+$(window.parent).on("load", function() {
+    melisPluginEdition.calcFrameHeight();
+});
 
 var melisCmsFormHelper = (function($, window) {
     var $body = window.parent.$("body");

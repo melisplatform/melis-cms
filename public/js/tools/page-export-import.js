@@ -1,4 +1,4 @@
-$(document).ready(function(){
+$(function(){
     var $body = $("body");
     var importFormData;
     var idsMap;
@@ -125,7 +125,7 @@ $(document).ready(function(){
     }
 
     function submitImportForm (form) {
-        form.unbind("submit");
+        form.off("submit");
         form.on("submit", function(e) {
             e.preventDefault();
             var formData = new FormData(this);
@@ -157,7 +157,7 @@ $(document).ready(function(){
             });
         });
 
-        form.submit();
+        form.trigger("submit");
     }
 
     function importTest(formData) {
@@ -177,7 +177,7 @@ $(document).ready(function(){
                 $body.find('#importPageValidated .tab-content .tab-pane').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + formData.page_tree_import.name + '</p>');
                 $body.find('#importPageValidated .tab-content .tab-pane').append('<p>' + translations.tr_melis_cms_page_tree_import_validated +': <span style="color: green;">' + translations.tr_meliscms_common_yes + '</span></p>');
 
-                var btnCancel = '<button type="button" data-dismiss="modal" class="btn btn-danger pull-left">' + translations.tr_meliscms_tool_sites_cancel + '</button>';
+                var btnCancel = '<button type="button" data-bs-dismiss="modal" class="btn btn-danger pull-left">' + translations.tr_meliscms_tool_sites_cancel + '</button>';
                 var btnImport = '<button type="button" class="btn btn-success" id="page-tree-import">' + translations.tr_melis_cms_page_tree_import_file + '</button>';
 
                 $body.find('#importPageValidated .btn-container').append(btnCancel);
@@ -224,7 +224,7 @@ $(document).ready(function(){
                         $body.find('#pageImportConsole').append('<div id="pageImportProcessing"><p>' + translations.tr_melis_cms_page_tree_import_modal_processing + ' <i class="fa fa-spinner fa-spin"></i></p></div>');
                     }
                 }).done(function (data) {
-                    var btnClose = '<button type="button" id="importPageDoneClose" data-dismiss="modal" class="btn btn-danger pull-left" style="margin-top: -15px; margin-left: -15px;">' + translations.tr_melis_cms_page_tree_import_close + '</button>';
+                    var btnClose = '<button type="button" id="importPageDoneClose" data-bs-dismiss="modal" class="btn btn-danger pull-left" style="margin-top: -15px; margin-left: -15px;">' + translations.tr_melis_cms_page_tree_import_close + '</button>';
 
                     $body.find('#importPageValidated').css('display', 'none');
                     $body.find('#importPageDone').css('display', '');
@@ -269,14 +269,14 @@ $(document).ready(function(){
                                 url: '/melis/MelisCms/PageImport/exportCsv',
                                 data: {
                                     idsMap: idsMap
-                                },
-                                success: function (data, textStatus, request) {
-                                    if (data) {
-                                        var fileName = request.getResponseHeader("fileName");
-                                        var mime = request.getResponseHeader("Content-Type");
-                                        var blob = new Blob([request.responseText], {type: mime});
-                                        saveAs(blob, fileName);
-                                    }
+                                }
+                            })
+                            .done(function (data, textStatus, request) {
+                                if (data) {
+                                    var fileName = request.getResponseHeader("fileName");
+                                    var mime = request.getResponseHeader("Content-Type");
+                                    var blob = new Blob([request.responseText], {type: mime});
+                                    saveAs(blob, fileName);
                                 }
                             });
                         }
@@ -322,7 +322,8 @@ $(document).ready(function(){
             newData = newData.toString();
             newData = newData.replace(/,/g,'');
 
-            var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
+            //var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
+            var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
 
             // reload tree pages
             tree.reload({
@@ -336,13 +337,13 @@ $(document).ready(function(){
                     }
                 }).done(function(){
                     tree.clearFilter();
+
                     // remove duplicated brach of the tree while rapidly refreshing the tree [ plugin bug fix ]
                     if ( $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").hasClass("fancytree-lastsib") === false){
                         $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").remove();
                     }
                 });
             });
-
         }).fail(function(xhr, textStatus, errorThrown){
             // error modal
             alert( translations.tr_meliscore_error_message );

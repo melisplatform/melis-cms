@@ -19,7 +19,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                         $stp = 1;
                         foreach($this->stepsOrder as $melisKey => $info) { ?>
                             <li class="step_<?= $stp; ?> active steps_number_indicator" data-stepName="<?= $info['title'];?>"><a><?= $stp; ?></a></li>
-                        <?php $stp++; } ?>
+                            <?php $stp++; } ?>
                     </ul>
                 </div>
                 <!-- // Widget heading END -->
@@ -29,17 +29,17 @@ if (!empty($this->zoneconfig['conf']['id']))
                     </div>
                     <div class="owl-carousel owl-theme owl-loaded sites-steps-owl">
                         <?php
-                            if (!empty($this->stepsOrder)) {
-                                $step = 1;
-                                foreach ($this->stepsOrder as $melisKey => $info) {
-                                    echo "<div data-form-path='".$info['form_path']."' data-afterMove='".json_encode($info['afterMove'])."' data-beforeMove='".json_encode($info['beforeMove'])."' data-step='step_" . $step . "' id='step_".$step."_container' class='item'>" . $this->$melisKey . "</div>";
-                                    $step++;
-                                }
+                        if (!empty($this->stepsOrder)) {
+                            $step = 1;
+                            foreach ($this->stepsOrder as $melisKey => $info) {
+                                echo "<div data-form-path='".$info['form_path']."' data-afterMove='".json_encode($info['afterMove'])."' data-beforeMove='".json_encode($info['beforeMove'])."' data-step='step_" . $step . "' id='step_".$step."_container' class='item'>" . $this->$melisKey . "</div>";
+                                $step++;
                             }
+                        }
                         ?>
                     </div>
                     <div class="footer-modal d-flex flex-row justify-content-between">
-                        <button type="button" data-dismiss="modal" class="btn btn-danger"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
+                        <button type="button" data-bs-dismiss="modal" class="btn btn-danger"><?php echo $this->translate('tr_meliscms_tool_sites_cancel')?></button>
                         <div class="prev-next-finish">
                             <button type="button" class="btn btn-success" id="btn-prev-step"><?php echo $this->translate('tr_meliscms_tool_sites_prev') ?></button>
                             <button type="button" class="btn btn-success" id="btn-next-step"><?php echo $this->translate('tr_meliscms_tool_sites_next') ?></button>

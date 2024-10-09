@@ -922,3 +922,29 @@ ul#select2-id_mcgdprbanner_site_id-results {
 .page-content-container .widget.widget-tabs-double-2>.widget-head ul {
 	height: auto;
 }
+/* jQuery migration */
+.group-span-filestyle label {
+	padding-top: 0.375rem;
+}
+#tableMiniTemplateManager.dataTable thead tr th {
+    text-align: left !important;
+}
+.mtpl-menu-buttons > div {
+	display: inline-block;
+	width: auto;
+	margin-left: 0;
+	padding-right: 0;
+}
+.mini-template-menu-manager-lang {
+	width: 165px !important;
+}
+.mtpl-menu-add-template button,
+.mtpl-menu-add-category button {
+	font-size: 0.875rem;
+}
+.pagecomment .widget-body .media .media-object {
+	margin-right: 1rem;
+}
+#gen_id_meliscms_tool_sites_siteconfig_form .input-group .form-control {
+	width: 100%;
+}

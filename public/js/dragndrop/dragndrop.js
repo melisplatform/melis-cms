@@ -45,7 +45,6 @@ var melisDragnDrop = (function ($, window) {
 			placeholder: "ui-state-highlight",
 			tolerance: "pointer",
 			items: ".melis-ui-outlined",
-
 			start: function (event, ui) {
 				$(".melis-dragdropzone").sortable("refresh");
 
@@ -75,7 +74,7 @@ var melisDragnDrop = (function ($, window) {
 
 				// detect if browser is in desktop
 				if ($(window).width() >= 768) {
-					$(window).mousemove(function (e) {
+					$(window).on("mousemove", function (e) {
 						var top;
 						var frameTop =
 							window.parent
@@ -159,7 +158,6 @@ var melisDragnDrop = (function ($, window) {
 			},
 			receive: function (event, ui) {
 				var tabId;
-
 				// check if ui is from pluginMenu
 				if (ui.helper && $(ui.helper).hasClass("melis-cms-plugin-snippets")) {
 					// modal confirmation
@@ -168,7 +166,7 @@ var melisDragnDrop = (function ($, window) {
 						translations.tr_meliscms_common_no,
 						translations.tr_meliscms_drag_and_drop_modal_title, // title
 						translations.tr_meliscms_drag_and_drop_modal_content, // message
-						function () {
+						function() {
 							var moduleName = $(ui.helper[0]).data("module-name");
 							var pluginName = $(ui.helper[0]).data("plugin-name");
 							var siteModule = $(ui.helper[0]).data("plugin-site-module");
@@ -200,21 +198,25 @@ var melisDragnDrop = (function ($, window) {
 						}
 					);
 
-					// bind on bootstrap hidden modal event
-					window.parent
-						.$("body")
-						.on(
-							"hidden.bs.modal",
-							window.parent.$(".modal.bootstrap-dialog.in"),
-							function (e) {
+					/**
+					 * Bind on bootstrap hidden modal event,
+					 * Delayed execution with setTimeout(), as it removes dropLocation or ui.helper[0]
+					 */
+					var modalId = window.parent.$(".modal.bootstrap-dialog.show").attr("id");
+					const modalEl = window.parent.document.getElementById(modalId);
+					
+						modalEl.addEventListener('hidden.bs.modal', event => {
+							var uiTimeout = setTimeout(function() {
 								// check if loader exists
 								if (!$(ui.helper[0]).parent().find(".overlay-loader").length) {
 									// remove clone element
 									ui.helper[0].remove();
+
+									clearTimeout( uiTimeout );
 								}
-							}
-						);
-				}
+							}, 1000);
+						});
+				} // check ui.helper
 
 				if (ui.sender[0]) {
 					var dragZoneSender = ui.sender[0];
@@ -233,11 +235,12 @@ var melisDragnDrop = (function ($, window) {
 			},
 			change: function (event, ui) {
 				setPluginWidth(ui);
-			},
+			}
 		});
 	}
 
 	setDragDropZone();
+
 	// set plugin container width by placeholder
 	function setPluginWidth(ui) {
 		var data = $(ui.item[0]).data();
@@ -295,10 +298,15 @@ var melisDragnDrop = (function ($, window) {
 		},
 	});
 
-	$(".melis-cms-plugin-snippets").hover(function () {
-		var $this = $(this);
-		$this.children(".melis-plugin-tooltip").fadeIn();
-	});
+	$(".melis-cms-plugin-snippets")
+		.on("mouseenter", function () {
+			var $this = $(this);
+			$this.children(".melis-plugin-tooltip").fadeIn();
+		})
+		.on("mouseleave", function () {
+			var $this = $(this);
+			$this.children(".melis-plugin-tooltip").fadeOut();
+		});
 
 	$body.on("click", ".melis-cms-filter-btn-sub-category", function () {
 		var elem = $(this),
@@ -433,7 +441,8 @@ var melisDragnDrop = (function ($, window) {
 								? pluginToolBox.data("melis-tag")
 								: "",
 						melisSiteModule = typeof pluginToolBox.data("site-module"),
-						melisPluginHardCodedConfig = $.trim(pluginHardCodedConfigEl.text());
+						//melisPluginHardCodedConfig  = $.trim(pluginHardCodedConfigEl.text());
+						melisPluginHardCodedConfig = pluginHardCodedConfigEl.text().trim();
 
 					// dataPluginID = pluginToolBox.next().attr("id");
 					var pluginOutlined = pluginToolBox.closest(".melis-ui-outlined");
@@ -507,8 +516,11 @@ var melisDragnDrop = (function ($, window) {
 					}
 
 					// adding plugin in dropzone
-					// $('div[data-dragdropzone-id='+ dropzone +']').append(plugin.html);
-					var dropPlugin = $(plugin.html).insertAfter(dropLocation);
+					// working, but append() function will add the plugin, always at the bottom, prepend() will always be on top
+					//$('div[data-dragdropzone-id='+ dropzone +']').append(plugin.html);
+
+					//var dropPlugin = $(plugin.html).insertAfter(dropLocation); // not working
+					$(plugin.html).insertAfter(dropLocation);
 
 					// Processing the plugin resources and initialization
 					melisPluginEdition.processPluginResources(plugin.init, idPlugin);
@@ -516,8 +528,10 @@ var melisDragnDrop = (function ($, window) {
 					if (parent.pluginResizable == 1) {
 						melisPluginEdition.initResizable();
 					}
+
 					// remove plugin
 					$(dropLocation).remove();
+
 					// send new plugin list
 					melisPluginEdition.sendDragnDropList(dropzone, pageId);
 
@@ -529,6 +543,9 @@ var melisDragnDrop = (function ($, window) {
 					melisPluginEdition.pluginDetector();
 					melisPluginEdition.moveResponsiveClass(); // disable for now
 				}
+			})
+			.always(function () {
+				$("#loader").remove();
 			})
 			.fail(function (xhr, textStatus, errorThrown) {
 				alert(translations.tr_meliscore_error_message);
@@ -543,7 +560,6 @@ var melisDragnDrop = (function ($, window) {
 		 */
 		var _this = $("#melisPluginBtn"),
 			pageId = window.parent.activeTabId.split("_")[0];
-
 		if (_this.closest(".melis-cms-dnd-box").hasClass("show")) {
 			if (!_this.closest(".melis-cms-dnd-box").hasClass("hasCached")) {
 				$.ajax({
@@ -557,7 +573,6 @@ var melisDragnDrop = (function ($, window) {
 					},
 				}).done(function (data) {
 					$("#cmsPluginsMenuContent").html(data.view);
-
 					setTimeout(function () {
 						$(".melis-cms-plugin-snippets").draggable({
 							connectWith: ".melis-draggable",
@@ -657,7 +672,7 @@ var melisDragnDrop = (function ($, window) {
 		$(".melis-cms-dnd-box").css("height", "100vh"); // default height
 
 		// Chrome, Firefox etc browser
-		$(window.parent).scroll(function () {
+		$(window.parent).on("scroll", function () {
 			if (
 				stickyHead.offset().top + stickyHead.height() + 30 >=
 				currentFrame.offset().top
@@ -712,7 +727,7 @@ var melisDragnDrop = (function ($, window) {
 
 		// For IE scroll giving different value
 		if (window.parent) {
-			window.parent.$("body").scroll(function () {
+			window.parent.$("body").on("scroll", function () {
 				if (
 					stickyHead.offset().top + stickyHead.height() + 30 >=
 					currentFrame.offset().top
@@ -750,3 +765,16 @@ var melisDragnDrop = (function ($, window) {
 		pluginScrollPos: pluginScrollPos,
 	};
 })(jQuery, window);
+
+$(function () {
+	var $pluginToolsBox = $(".melis-plugin-tools-box"),
+		$optionsHandle = $pluginToolsBox.find(
+			".m-plugin-sub-tools .m-options-handle"
+		);
+
+	if ($optionsHandle.length) {
+		$optionsHandle.closest(".melis-plugin-tools-box").removeClass("d-none");
+	} else {
+		$pluginToolsBox.addClass("d-none");
+	}
+});

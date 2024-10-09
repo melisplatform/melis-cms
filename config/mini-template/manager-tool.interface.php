@@ -11,6 +11,7 @@ return [
                         'icon' => 'fa-tasks',
                         'rights_checkbox_disable' => false,
                         'follow_regular_rendering' => false,
+                        'rightsDisplay' => 'none',
                     ],
                     'interface' => [
                         // Mini template manager tool

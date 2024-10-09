@@ -16,37 +16,37 @@ return array(
                         ),
                         'meliscms_toolstree_section' =>  array(
                             'interface' => array(
-//                                'meliscms_sitetree' =>  array(
-//                                    'conf' => array(
-//                                        'id' => 'id_meliscms_menu_sitetree',
-//                                        'name' => 'tr_meliscms_menu_sitetree_Name',
-//                                        'melisKey' => 'meliscms_sitetree',
-//                                    ),
-//                                    'forward' => array(
-//                                        'module' => 'MelisCms',
-//                                        'controller' => 'TreeSites',
-//                                        'action' => 'get-tree-pages-by-page-id',
-//                                        'jscallback' => 'treeCallBack();',
-//                                        'jsdatas' => array()
-//                                    ),
-//                                    'interface' => [
-//                                        'meliscms_sitetree' =>  array(
-//                                            'conf' => array(
-//                                                'id' => 'id_meliscms_menu_sitetree',
-//                                                'name' => 'tr_meliscms_menu_sitetree_Name',
-//                                                'melisKey' => 'meliscms_sitetree',
-//                                                'rightsDisplay' => 'referencesonly',
-//                                            ),
-//                                            'forward' => array(
-//                                                'module' => 'MelisCms',
-//                                                'controller' => 'TreeSites',
-//                                                'action' => 'get-tree-pages-by-page-id',
-//                                                'jscallback' => 'treeCallBack();',
-//                                                'jsdatas' => array()
-//                                            ),
-//                                        ),
-//                                    ]
-//                                ),
+                               /* 'meliscms_sitetree' =>  array(
+                                   'conf' => array(
+                                       'id' => 'id_meliscms_menu_sitetree',
+                                       'name' => 'tr_meliscms_menu_sitetree_Name',
+                                       'melisKey' => 'meliscms_sitetree',
+                                   ),
+                                   'forward' => array(
+                                       'module' => 'MelisCms',
+                                       'controller' => 'TreeSites',
+                                       'action' => 'get-tree-pages-by-page-id',
+                                       'jscallback' => 'treeCallBack();',
+                                       'jsdatas' => array()
+                                   ),
+                                   'interface' => [
+                                       'meliscms_sitetree' =>  array(
+                                           'conf' => array(
+                                               'id' => 'id_meliscms_menu_sitetree',
+                                               'name' => 'tr_meliscms_menu_sitetree_Name',
+                                               'melisKey' => 'meliscms_sitetree',
+                                               'rightsDisplay' => 'referencesonly',
+                                           ),
+                                           'forward' => array(
+                                               'module' => 'MelisCms',
+                                               'controller' => 'TreeSites',
+                                               'action' => 'get-tree-pages-by-page-id',
+                                               'jscallback' => 'treeCallBack();',
+                                               'jsdatas' => array()
+                                           ),
+                                       ),
+                                   ]
+                               ), */
                                 'meliscms_site_tools' => array(
                                     'conf' => array(
                                         'id' => 'id_meliscms_menu_sitetree',
@@ -150,7 +150,7 @@ return array(
                     '/MelisCms/css/fancytree.custom.css',
                     '/MelisCms/css/styles.css',
                     //jstree
-                    '/MelisCms/assets/jstree/dist/themes/proton/style.min.css',
+                    '/MelisCms/assets/jstree/dist/themes/default/style.min.css',
                 ),
                 /**
                  * the "build" configuration compiles all assets into one file to make
@@ -178,10 +178,11 @@ return array(
                     //will be put inside css folder
                     'css' => [
                         '/build/css/fonts',
-                        '/build/css/30px.png',
+                        /* '/build/css/30px.png',
                         '/build/css/32px.png',
                         '/build/css/40px.png',
-                        '/build/css/throbber.gif',
+                        '/build/css/throbber.gif', */
+                        '/assets/jstree/dist/themes/default/'
                     ],
                     //will be put inside js folder
                     'js' => [
@@ -1059,7 +1060,7 @@ return array(
                         'id' => 'id_meliscms_page_creation_actions',
                         'name' => 'tr_meliscms_page_creation_actions',
                         'melisKey' => 'meliscms_page_creation_actions',
-                        'rightsDisplay' => 'referencesonly',
+                        'rightsDisplay' => 'none',
                     ),
                     'forward' => array(
                         'module' => 'MelisCms',
@@ -1282,7 +1283,8 @@ return array(
                             'conf' => array(
                                 'id' => 'id_meliscms_center_page_tabs',
                                 'name' => 'tr_meliscms_pages_Page Tabs',
-                                'melisKey' => 'meliscms_tabs'
+                                'melisKey' => 'meliscms_tabs',
+                                'rightsDisplay' => 'none',
                             ),
                             'forward' => array(
                                 'module' => 'MelisCms',

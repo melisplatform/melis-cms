@@ -125,7 +125,7 @@ $(function(){
          * adjust table column to make it responsive on mobile
          * when the user click on sites translation tab
          */
-        $body.on("shown.bs.tab", ".sites-tool-tabs a[data-toggle='tab']", function(){
+        $body.on("shown.bs.tab", ".sites-tool-tabs a[data-bs-toggle='tab']", function(){
             if ($(window).width() <= 768) {
                 var target = $(this).attr("href");
                 target = target.replace("#", "");

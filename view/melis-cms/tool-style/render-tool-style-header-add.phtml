@@ -5,6 +5,7 @@ $openAddNewTemplateButton = $this->melisModalInvoker()->render(array(
     'class' => 'btn btn-success',
     'text' => '<i class="fa fa-plus"></i> '.$this->translate($this->zoneconfig['conf']['name']),
     'data-melisKey' => $this->melisKey,
+    'data-bs-toggle' => ''
 ), 'invoke');
 echo $openAddNewTemplateButton;
 

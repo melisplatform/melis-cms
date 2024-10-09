@@ -7,10 +7,10 @@
 (function (factory) {
 	"use strict";
 	if (typeof define === 'function' && define.amd) {
-		define('jstree.types', ['jquery','jstree'], factory);
+		define('jstree.types', ['jquery','./jstree.js'], factory);
 	}
 	else if(typeof exports === 'object') {
-		factory(require('jquery'), require('jstree'));
+		factory(require('jquery'), require('./jstree.js'));
 	}
 	else {
 		factory(jQuery, jQuery.jstree);
@@ -66,7 +66,7 @@
 		};
 		this.bind = function () {
 			this.element
-				.on('model.jstree', $.proxy(function (e, data) {
+				.on('model.jstree', function (e, data) {
 						var m = this._model.data,
 							dpc = data.nodes,
 							t = this.settings.types,
@@ -118,7 +118,7 @@
 							}
 						}
 						m[$.jstree.root].type = $.jstree.root;
-					}, this));
+					}.bind(this));
 			parent.bind.call(this);
 		};
 		this.get_json = function (obj, options, flat) {
@@ -127,9 +127,9 @@
 				opt = options ? $.extend(true, {}, options, {no_id:false}) : {},
 				tmp = parent.get_json.call(this, obj, opt, flat);
 			if(tmp === false) { return false; }
-			if($.isArray(tmp)) {
+			if($.vakata.is_array(tmp)) {
 				for(i = 0, j = tmp.length; i < j; i++) {
-					tmp[i].type = tmp[i].id && m[tmp[i].id] && m[tmp[i].id].type ? m[tmp[i].id].type : "default";
+					tmp[i].type = (tmp[i].id || tmp[i].id === 0) && m[tmp[i].id] && m[tmp[i].id].type ? m[tmp[i].id].type : "default";
 					if(options && options.no_id) {
 						delete tmp[i].id;
 						if(tmp[i].li_attr && tmp[i].li_attr.id) {
@@ -142,7 +142,7 @@
 				}
 			}
 			else {
-				tmp.type = tmp.id && m[tmp.id] && m[tmp.id].type ? m[tmp.id].type : "default";
+				tmp.type = (tmp.id || tmp.id === 0) && m[tmp.id] && m[tmp.id].type ? m[tmp.id].type : "default";
 				if(options && options.no_id) {
 					tmp = this._delete_ids(tmp);
 				}
@@ -150,7 +150,7 @@
 			return tmp;
 		};
 		this._delete_ids = function (tmp) {
-			if($.isArray(tmp)) {
+			if($.vakata.is_array(tmp)) {
 				for(var i = 0, j = tmp.length; i < j; i++) {
 					tmp[i] = this._delete_ids(tmp[i]);
 				}
@@ -163,16 +163,16 @@
 			if(tmp.a_attr && tmp.a_attr.id) {
 				delete tmp.a_attr.id;
 			}
-			if(tmp.children && $.isArray(tmp.children)) {
+			if(tmp.children && $.vakata.is_array(tmp.children)) {
 				tmp.children = this._delete_ids(tmp.children);
 			}
 			return tmp;
 		};
 		this.check = function (chk, obj, par, pos, more) {
 			if(parent.check.call(this, chk, obj, par, pos, more) === false) { return false; }
-			obj = obj && obj.id ? obj : this.get_node(obj);
-			par = par && par.id ? par : this.get_node(par);
-			var m = obj && obj.id ? (more && more.origin ? more.origin : $.jstree.reference(obj.id)) : null, tmp, d, i, j;
+			obj = obj && (obj.id || obj.id === 0) ? obj : this.get_node(obj);
+			par = par && (par.id || par.id === 0) ? par : this.get_node(par);
+			var m = obj && (obj.id || obj.id === 0) ? (more && more.origin ? more.origin : $.jstree.reference(obj.id)) : null, tmp, d, i, j;
 			m = m && m._model && m._model.data ? m._model.data : null;
 			switch(chk) {
 				case "create_node":
@@ -181,11 +181,11 @@
 					if(chk !== 'move_node' || $.inArray(obj.id, par.children) === -1) {
 						tmp = this.get_rules(par);
 						if(tmp.max_children !== undefined && tmp.max_children !== -1 && tmp.max_children === par.children.length) {
-							this._data.core.last_error = { 'error' : 'check', 'plugin' : 'types', 'id' : 'types_01', 'reason' : 'max_children prevents function: ' + chk, 'data' : JSON.stringify({ 'chk' : chk, 'pos' : pos, 'obj' : obj && obj.id ? obj.id : false, 'par' : par && par.id ? par.id : false }) };
+							this._data.core.last_error = { 'error' : 'check', 'plugin' : 'types', 'id' : 'types_01', 'reason' : 'max_children prevents function: ' + chk, 'data' : JSON.stringify({ 'chk' : chk, 'pos' : pos, 'obj' : obj && (obj.id || obj.id === 0) ? obj.id : false, 'par' : par && (par.id || par.id === 0) ? par.id : false }) };
 							return false;
 						}
 						if(tmp.valid_children !== undefined && tmp.valid_children !== -1 && $.inArray((obj.type || 'default'), tmp.valid_children) === -1) {
-							this._data.core.last_error = { 'error' : 'check', 'plugin' : 'types', 'id' : 'types_02', 'reason' : 'valid_children prevents function: ' + chk, 'data' : JSON.stringify({ 'chk' : chk, 'pos' : pos, 'obj' : obj && obj.id ? obj.id : false, 'par' : par && par.id ? par.id : false }) };
+							this._data.core.last_error = { 'error' : 'check', 'plugin' : 'types', 'id' : 'types_02', 'reason' : 'valid_children prevents function: ' + chk, 'data' : JSON.stringify({ 'chk' : chk, 'pos' : pos, 'obj' : obj && (obj.id || obj.id === 0) ? obj.id : false, 'par' : par && (par.id || par.id === 0) ? par.id : false }) };
 							return false;
 						}
 						if(m && obj.children_d && obj.parents) {
@@ -198,7 +198,7 @@
 						if(d <= 0 || d === undefined) { d = 1; }
 						do {
 							if(tmp.max_depth !== undefined && tmp.max_depth !== -1 && tmp.max_depth < d) {
-								this._data.core.last_error = { 'error' : 'check', 'plugin' : 'types', 'id' : 'types_03', 'reason' : 'max_depth prevents function: ' + chk, 'data' : JSON.stringify({ 'chk' : chk, 'pos' : pos, 'obj' : obj && obj.id ? obj.id : false, 'par' : par && par.id ? par.id : false }) };
+								this._data.core.last_error = { 'error' : 'check', 'plugin' : 'types', 'id' : 'types_03', 'reason' : 'max_depth prevents function: ' + chk, 'data' : JSON.stringify({ 'chk' : chk, 'pos' : pos, 'obj' : obj && (obj.id || obj.id === 0) ? obj.id : false, 'par' : par && (par.id || par.id === 0) ? par.id : false }) };
 								return false;
 							}
 							par = this.get_node(par.parent);
@@ -247,7 +247,7 @@
 		 */
 		this.set_type = function (obj, type) {
 			var m = this._model.data, t, t1, t2, old_type, old_icon, k, d, a;
-			if($.isArray(obj)) {
+			if($.vakata.is_array(obj)) {
 				obj = obj.slice();
 				for(t1 = 0, t2 = obj.length; t1 < t2; t1++) {
 					this.set_type(obj[t1], type);
@@ -264,12 +264,12 @@
 			old_type = obj.type;
 			old_icon = this.get_icon(obj);
 			obj.type = type;
-			if(old_icon === true || (t[old_type] && t[old_type].icon !== undefined && old_icon === t[old_type].icon)) {
+			if(old_icon === true || !t[old_type] || (t[old_type].icon !== undefined && old_icon === t[old_type].icon)) {
 				this.set_icon(obj, t[type].icon !== undefined ? t[type].icon : true);
 			}
 
 			// remove old type props
-			if(t[old_type].li_attr !== undefined && typeof t[old_type].li_attr === 'object') {
+			if(t[old_type] && t[old_type].li_attr !== undefined && typeof t[old_type].li_attr === 'object') {
 				for (k in t[old_type].li_attr) {
 					if (t[old_type].li_attr.hasOwnProperty(k)) {
 						if (k === 'id') {
@@ -286,7 +286,7 @@
 					}
 				}
 			}
-			if(t[old_type].a_attr !== undefined && typeof t[old_type].a_attr === 'object') {
+			if(t[old_type] && t[old_type].a_attr !== undefined && typeof t[old_type].a_attr === 'object') {
 				for (k in t[old_type].a_attr) {
 					if (t[old_type].a_attr.hasOwnProperty(k)) {
 						if (k === 'id') {

@@ -7,10 +7,10 @@
 (function (factory) {
 	"use strict";
 	if (typeof define === 'function' && define.amd) {
-		define('jstree.state', ['jquery','jstree'], factory);
+		define('jstree.state', ['jquery','./jstree.js'], factory);
 	}
 	else if(typeof exports === 'object') {
-		factory(require('jquery'), require('jstree'));
+		factory(require('jquery'), require('./jstree.js'));
 	}
 	else {
 		factory(jQuery, jQuery.jstree);
@@ -50,16 +50,22 @@
 		 * @name $.jstree.defaults.state.filter
 		 * @plugin state
 		 */
-		filter	: false
+		filter	: false,
+		/**
+		 * Should loaded nodes be restored (setting this to true means that it is possible that the whole tree will be loaded for some users - use with caution). Defaults to `false`
+		 * @name $.jstree.defaults.state.preserve_loaded
+		 * @plugin state
+		 */
+		preserve_loaded : false
 	};
 	$.jstree.plugins.state = function (options, parent) {
 		this.bind = function () {
 			parent.bind.call(this);
-			var bind = $.proxy(function () {
-				this.element.on(this.settings.state.events, $.proxy(function () {
+			var bind = function () {
+				this.element.on(this.settings.state.events, function () {
 					if(to) { clearTimeout(to); }
-					to = setTimeout($.proxy(function () { this.save_state(); }, this), 100);
-				}, this));
+					to = setTimeout(function () { this.save_state(); }.bind(this), 100);
+				}.bind(this));
 				/**
 				 * triggered when the state plugin is finished restoring the state (and immediately after ready if there is no state to restore).
 				 * @event
@@ -67,12 +73,12 @@
 				 * @plugin state
 				 */
 				this.trigger('state_ready');
-			}, this);
+			}.bind(this);
 			this.element
-				.on("ready.jstree", $.proxy(function (e, data) {
+				.on("ready.jstree", function (e, data) {
 						this.element.one("restore_state.jstree", bind);
 						if(!this.restore_state()) { bind(); }
-					}, this));
+					}.bind(this));
 		};
 		/**
 		 * save the state
@@ -80,7 +86,11 @@
 		 * @plugin state
 		 */
 		this.save_state = function () {
-			var st = { 'state' : this.get_state(), 'ttl' : this.settings.state.ttl, 'sec' : +(new Date()) };
+			var tm = this.get_state();
+			if (!this.settings.state.preserve_loaded) {
+				delete tm.core.loaded;
+			}
+			var st = { 'state' : tm, 'ttl' : this.settings.state.ttl, 'sec' : +(new Date()) };
 			$.vakata.storage.set(this.settings.state.key, JSON.stringify(st));
 		};
 		/**
@@ -93,8 +103,11 @@
 			if(!!k) { try { k = JSON.parse(k); } catch(ex) { return false; } }
 			if(!!k && k.ttl && k.sec && +(new Date()) - k.sec > k.ttl) { return false; }
 			if(!!k && k.state) { k = k.state; }
-			if(!!k && $.isFunction(this.settings.state.filter)) { k = this.settings.state.filter.call(this, k); }
+			if(!!k && $.vakata.is_function(this.settings.state.filter)) { k = this.settings.state.filter.call(this, k); }
 			if(!!k) {
+				if (!this.settings.state.preserve_loaded) {
+					delete k.core.loaded;
+				}
 				this.element.one("set_state.jstree", function (e, data) { data.instance.trigger('restore_state', { 'state' : $.extend(true, {}, k) }); });
 				this.set_state(k);
 				return true;

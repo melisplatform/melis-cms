@@ -11,8 +11,8 @@ if (!empty($this->zoneconfig['conf']['id']))
 			<div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none">
                 <div class="widget-head">
                 	<ul class="nav nav-tabs">
-                		<li class="active">
-                			<a href="#<?php echo $this->zoneconfig['conf']['id'] ?>" class="f-awesome" data-toggle="tab" aria-expanded="true"><i></i><?= $this->zoneconfig['conf']['name']?>
+                		<li class="nav-item active">
+                			<a href="#<?php echo $this->zoneconfig['conf']['id'] ?>" class="nav-link f-awesome" data-bs-toggle="tab" aria-expanded="true"><i></i><?= $this->zoneconfig['conf']['name']?>
                                 <i class="fa fa-sitemap"></i>
                     		</a>
                 		</li>                		
@@ -37,7 +37,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                                     </div> 
                                     <br> 	                
                                     <div class="footer-modal d-flex flex-row justify-content-between">
-                                 		<button data-dismiss="modal" class="btn btn-danger float-left"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscms_menu_cancel')?></button>
+                                 		<button data-bs-dismiss="modal" class="btn btn-danger float-left" id="meliscms_pagetree_modal_cancel_btn"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscms_menu_cancel')?></button>
                                  		<button class="btn btn-success" id="selectPageId"><i class="fa fa-check"></i>  <?php echo $this->translate('tr_meliscms_form_btn_select') ?></button>
                                  	</div>                                 	
                             	</div>

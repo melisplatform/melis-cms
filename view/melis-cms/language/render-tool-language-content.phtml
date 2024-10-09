@@ -31,14 +31,10 @@ if (!empty($this->zoneconfig['conf']['id']))
 		
 		?>
 		<script type="text/javascript">
-		// render table to DataTable plugin
-		$(document).ready(function() {
-			<?= $this->getToolDataTableConfig; ?>
-		});
+			// render table to DataTable plugin
+			$(function() {
+				<?= $this->getToolDataTableConfig; ?>
+			});
 		</script>
-
-		
-		
-		
 	</div> 
 </div>

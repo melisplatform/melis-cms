@@ -677,7 +677,7 @@ class ToolTemplateController extends MelisAbstractActionController
 
             $activeTypes = $this->getActiveTypes();
             $activeTypes = empty($activeTypes) ? [] : array_keys($activeTypes);
-            $toolTipKO =  'data-toggle="tooltip" data-placement="top" title="" data-original-title="' . $translator->translate('tr_meliscms_tool_templates_tpl_typ_module_ko') . '"';
+            $toolTipKO =  'data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-title="' . $translator->translate('tr_meliscms_tool_templates_tpl_typ_module_ko') . '"';
             $tplTypKO = "<span $toolTipKO class='text-danger'>%TPL_TYPE%</span>";
 
             for($ctr = 0; $ctr < count($tableData); $ctr++)

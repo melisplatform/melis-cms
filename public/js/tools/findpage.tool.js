@@ -14,11 +14,11 @@
     
     // Filter Search
     $(document).on("keyup", "input[name=tree_search]", function(event){
-        var keycode = (event.keyCode ? event.keyCode : event.which);
-        if(keycode == '13'){
+        var keycode = (event.key ? event.key : event.which);
+        if(keycode === 'Enter'){
             startTreeSearch();
         }
-    }).focus();
+    }).trigger("focus");
     
     $body.on("click", "#searchTreeView", function(e){
         startTreeSearch();
@@ -27,9 +27,12 @@
     $body.on("click", "#resetTreeView", function(e){
         melisHelper.loadingZone($('.page-evolution-content'));
         $("input[name=tree_search]").val('');
-        var tree = $("#find-page-dynatree").fancytree("getTree");
+        // var tree = $("#find-page-dynatree").fancytree("getTree");
+        var tree = $.ui.fancytree.getTree("#find-page-dynatree");
+        
         tree.clearFilter();
-        $("#find-page-dynatree").fancytree("getRootNode").visit(function(node){
+        // $("#find-page-dynatree").fancytree("getRootNode")
+        tree.getRootNode().visit(function(node){
             node.setExpanded(false);
         });
         setTimeout(function(){
@@ -75,15 +78,16 @@
     });
     
     function startTreeSearch() {
-        var match       = $("input[name=tree_search]").val(),
-            tree        = $("#find-page-dynatree").fancytree("getTree"),
+        var match       = $("input[name=tree_search]").val().trim(),
+            tree        = $.ui.fancytree.getTree("#find-page-dynatree"), //$("#find-page-dynatree").fancytree("getTree"),
             filterFunc  = tree.filterNodes,
             opts        = {},
             tmp         = '';
 
             tree.clearFilter();
-
-            $("#find-page-dynatree").fancytree("getRootNode").visit(function(node){
+            
+            //$("#find-page-dynatree").fancytree("getRootNode")
+            tree.getRootNode().visit(function(node) {
                 node.resetLazy();
             });
 
@@ -99,19 +103,19 @@
                     dataType    : 'json',
                     encode      : true
                 }).done(function(data) {
-                    if ( !$.trim(data) ) {
+                    // match value already trim()
+                    if ( ! Array.isArray(data) ) {
                         searchContainer.append("<div class='melis-search-overlay'>Not Found</div>").hide().fadeIn(600);
                         setTimeout(function() {
                             $(".melis-search-overlay").fadeOut(600, function() {
                                 $(this).remove();
                             });
                             $("input[name=tree_search]").prop('disabled', false);
-                            //$("input[name=tree_search]").focus();
                             $("input[name=tree_search]").trigger("focus");
                         }, 1000);
-                    } else {
+                    } 
+                    else {
                         var arr = $.map(data, function(el) { return el });
-
                             tree.loadKeyPath(arr, function(node, status){
 
                                 if ( !node.isVisible() ) {

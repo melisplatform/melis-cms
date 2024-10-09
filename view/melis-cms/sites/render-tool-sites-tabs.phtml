@@ -10,10 +10,10 @@ $data_melisKey = $this->melisKey;
 <div <?= $id; ?> data-melisKey='<?= $data_melisKey; ?>' class="page-content-container iframe-container">
     <div class="widget widget-tabs widget-tabs-double-2 widget-tabs-responsive">
         <div class="widget-head nav sites-tool-tabs">
-            <ul class="tabs-label nav-tabs">
+            <ul class="tabs-label nav-tabs nav">
                 <?php foreach($this->zoneconfig['interface'] AS $configKey => $configVal) { ?>
-                    <li role="presentation">
-                        <a class="glyphicons <?= $configVal['conf']['icon'] ?> cs-fa" data-toggle="tab" href="#<?=$this->siteId.'_'.$configVal['conf']['id']?>" aria-expanded="true">
+                    <li role="presentation" class="nav-item">
+                        <a class="nav-link glyphicons <?= $configVal['conf']['icon'] ?> cs-fa" data-bs-toggle="tab" href="#<?=$this->siteId.'_'.$configVal['conf']['id']?>" aria-expanded="true">
                             <i></i>
                             <span><?=$this->translate($configVal['conf']['name']); ?></span>
                         </a>

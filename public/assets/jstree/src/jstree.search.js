@@ -7,10 +7,10 @@
 (function (factory) {
 	"use strict";
 	if (typeof define === 'function' && define.amd) {
-		define('jstree.search', ['jquery','jstree'], factory);
+		define('jstree.search', ['jquery','./jstree.js'], factory);
 	}
 	else if(typeof exports === 'object') {
-		factory(require('jquery'), require('jstree'));
+		factory(require('jquery'), require('./jstree.js'));
 	}
 	else {
 		factory(jQuery, jQuery.jstree);
@@ -95,7 +95,7 @@
 			this._data.search.hdn = [];
 
 			this.element
-				.on("search.jstree", $.proxy(function (e, data) {
+				.on("search.jstree", function (e, data) {
 						if(this._data.search.som && data.res.length) {
 							var m = this._model.data, i, j, p = [], k, l;
 							for(i = 0, j = data.res.length; i < j; i++) {
@@ -116,13 +116,13 @@
 							this.show_node(p, true);
 							this.redraw(true);
 						}
-					}, this))
-				.on("clear_search.jstree", $.proxy(function (e, data) {
+					}.bind(this))
+				.on("clear_search.jstree", function (e, data) {
 						if(this._data.search.som && data.res.length) {
 							this.show_node(this._data.search.hdn, true);
 							this.redraw(true);
 						}
-					}, this));
+					}.bind(this));
 		};
 		/**
 		 * used to search the tree nodes for a given string
@@ -136,11 +136,11 @@
 		 * @trigger search.jstree
 		 */
 		this.search = function (str, skip_async, show_only_matches, inside, append, show_only_matches_children) {
-			if(str === false || $.trim(str.toString()) === "") {
+			if(str === false || $.vakata.trim(str.toString()) === "") {
 				return this.clear_search();
 			}
 			inside = this.get_node(inside);
-			inside = inside && inside.id ? inside.id : null;
+			inside = inside && (inside.id || inside.id === 0) ? inside.id : null;
 			str = str.toString();
 			var s = this.settings.search,
 				a = s.ajax ? s.ajax : false,
@@ -158,13 +158,13 @@
 				show_only_matches_children = s.show_only_matches_children;
 			}
 			if(!skip_async && a !== false) {
-				if($.isFunction(a)) {
-					return a.call(this, str, $.proxy(function (d) {
+				if($.vakata.is_function(a)) {
+					return a.call(this, str, function (d) {
 							if(d && d.d) { d = d.d; }
-							this._load_nodes(!$.isArray(d) ? [] : $.vakata.array_unique(d), function () {
-								this.search(str, true, show_only_matches, inside, append);
+							this._load_nodes(!$.vakata.is_array(d) ? [] : $.vakata.array_unique(d), function () {
+								this.search(str, true, show_only_matches, inside, append, show_only_matches_children);
 							});
-						}, this), inside);
+						}.bind(this), inside);
 				}
 				else {
 					a = $.extend({}, a);
@@ -173,17 +173,21 @@
 					if(inside) {
 						a.data.inside = inside;
 					}
-					return $.ajax(a)
-						.fail($.proxy(function () {
+					if (this._data.search.lastRequest) {
+						this._data.search.lastRequest.abort();
+					}
+					this._data.search.lastRequest = $.ajax(a)
+						.fail(function () {
 							this._data.core.last_error = { 'error' : 'ajax', 'plugin' : 'search', 'id' : 'search_01', 'reason' : 'Could not load search parents', 'data' : JSON.stringify(a) };
 							this.settings.core.error.call(this, this._data.core.last_error);
-						}, this))
-						.done($.proxy(function (d) {
+						}.bind(this))
+						.done(function (d) {
 							if(d && d.d) { d = d.d; }
-							this._load_nodes(!$.isArray(d) ? [] : $.vakata.array_unique(d), function () {
-								this.search(str, true, show_only_matches, inside, append);
+							this._load_nodes(!$.vakata.is_array(d) ? [] : $.vakata.array_unique(d), function () {
+								this.search(str, true, show_only_matches, inside, append, show_only_matches_children);
 							});
-						}, this));
+						}.bind(this));
+					return this._data.search.lastRequest;
 				}
 			}
 			if(!append) {
@@ -324,7 +328,7 @@
 				};
 			}
 			search = function (text) {
-				text = options.caseSensitive ? text : text.toLowerCase();
+				text = options.caseSensitive ? text.toString() : text.toString().toLowerCase();
 				if(pattern === text || text.indexOf(pattern) !== -1) {
 					return {
 						isMatch: true,

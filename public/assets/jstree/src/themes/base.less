@@ -35,6 +35,11 @@
 }
 
 // base contextmenu
+.jstree-contextmenu .jstree-anchor {
+	-webkit-user-select: none; /* disable selection/Copy of UIWebView */
+	-webkit-touch-callout: none; /* disable the IOS popup when long-press on a link */
+	user-select: none;
+}
 .vakata-context {
 	display:none;
 	&, ul { margin:0; padding:2px; position:absolute; background:#f5f5f5; border:1px solid #979797; box-shadow:2px 2px 2px #999999; }
@@ -49,12 +54,14 @@
 		}
 		> a:focus { outline:0; }
 	}
+	.vakata-context-no-icons { margin-left:0; }
 	.vakata-context-hover > a { position:relative; background-color:#e8eff7; box-shadow:0 0 2px #0a6aa1; }
 	.vakata-context-separator {
 		> a, > a:hover { background:white; border:0; border-top:1px solid #e2e3e3; height:1px; min-height:1px; max-height:1px; padding:0; margin:0 0 0 2.4em; border-left:1px solid #e0e0e0; text-shadow:0 0 0 transparent; box-shadow:0 0 0 transparent; border-radius:0; }
 	}
 	.vakata-contextmenu-disabled {
 		a, a:hover { color:silver; background-color:transparent; border:0; box-shadow:0 0 0; }
+		> a > i { filter: grayscale(100%); }
 	}
 	li > a {
 		> i { text-decoration:none; display:inline-block; width:2.4em; height:2.4em; background:transparent; margin:0 0 0 -2em; vertical-align:top; text-align:center; line-height:2.4em; }

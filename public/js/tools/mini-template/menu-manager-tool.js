@@ -33,7 +33,7 @@ $(function () {
                 isHidden: false
             },
             function () {
-                $('#id_meliscms_mini_template_menu_manager_tool_header a').click();
+                $('#id_meliscms_mini_template_menu_manager_tool_header a').trigger("click");
             }
         );
     });
@@ -44,7 +44,7 @@ $(function () {
 
         var checkTab = setInterval(function() {
             if (alreadyOpen.length) {
-                $(".close.close-tab[data-id='new_template_id_meliscms_mini_template_manager_tool_add']").click();
+                $(".close.close-tab[data-id='new_template_id_meliscms_mini_template_manager_tool_add']").trigger("click");
 
                 melisHelper.tabOpen(
                     translations.tr_meliscms_mini_template_manager_tool_header_add_btn,
@@ -173,7 +173,7 @@ $(function () {
                     },
                     function () {
                         if ($('#id_meliscms_mini_template_menu_manager_tool_header a').hasClass('collapsed'))
-                            $('#id_meliscms_mini_template_menu_manager_tool_header a').click();
+                            $('#id_meliscms_mini_template_menu_manager_tool_header a').trigger("click");
                     }
                 );
 
@@ -331,9 +331,9 @@ $(function () {
                     $("#mini-template-tree-no-data").css("display","none");
                 }
 
-                $('.add-m-tpl-category').removeAttr('disabled');
+                $('.add-m-tpl-category').prop('disabled', false);
                 $('.add-m-tpl-category').attr('title', '');
-                $('.add-m-tpl-plugin').removeAttr('disabled');
+                $('.add-m-tpl-plugin').prop('disabled', false);
                 $('.add-m-tpl-plugin').attr('title', '');
                 $('.mini-template-menu-manager-lang').find('a').removeClass('disabled');
                 $('.mini-template-menu-manager-lang').find('a').attr('title', '');
@@ -357,7 +357,7 @@ $(function () {
                             status: selected.original.status
                         },
                         function () {
-                            $('#id_meliscms_mini_template_menu_manager_tool_header a').click();
+                            $('#id_meliscms_mini_template_menu_manager_tool_header a').trigger("click");
                         }
                     );
                 } else if (selected.type == 'mini-template') {
@@ -424,7 +424,7 @@ $(function () {
 
                                     var checkTab = setInterval(function() {
                                         if (alreadyOpen.length) {
-                                            $(".close.close-tab[data-id='new_template_id_meliscms_mini_template_manager_tool_add']").click();
+                                            $(".close.close-tab[data-id='new_template_id_meliscms_mini_template_manager_tool_add']").trigger("click");
 
                                             melisHelper.tabOpen(
                                                 translations.tr_meliscms_mini_template_manager_tool_header_add_btn,
@@ -462,7 +462,7 @@ $(function () {
                                             status: node.original.status
                                         },
                                         function () {
-                                            $('#id_meliscms_mini_template_menu_manager_tool_header a').click();
+                                            $('#id_meliscms_mini_template_menu_manager_tool_header a').trigger("click");
                                         }
                                     );
                                 }

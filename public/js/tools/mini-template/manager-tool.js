@@ -16,7 +16,7 @@ $(function () {
 
     $body.on('keypress', '#miniTemplateName', function (e) {
         // when enter is pressed
-        if (e.keyCode === 13) {
+        if (e.key === 'Enter') {
             e.preventDefault();
         }
     });
@@ -254,7 +254,7 @@ $(function () {
     $body.on('change', table_site_select, function() {
         $(dataTable).DataTable().ajax.reload();
         $(header_add_btn).removeClass('disabled');
-        $(header_add_btn).removeAttr('disabled');
+        $(header_add_btn).prop('disabled', false);
     });
 
     var miniTemplateManagerTool = {
@@ -269,6 +269,29 @@ $(function () {
             );
         }
     };
+
+    /* $body.on("click", ".dt-paging-button .page-link", function() {
+        if ( melisCore.screenSize <= 767 ) {
+            var $this           = $(this),
+                dtContainer     = $this.closest(".dt-container").attr("id"),
+                $refreshBtn     = $("#"+dtContainer).find(".mini-template-manager-tool-table-refresh .melis-mini-template-manager-table-refresh");
+
+                var refreshTo = setTimeout(function() {
+                    if ( $refreshBtn.length ) {
+                        setTimeout(function() {
+                            $refreshBtn.trigger("click");
+                        }, 3000);
+                    
+                        clearTimeout( refreshTo );
+                    }
+                }, 1000);
+        }
+    }); */
+
+    /* $body.on("click", "#tableMiniTemplateManager .dt-paging-button .page-link", function() {
+        //$("#tableMiniTemplateManager").DataTable().columns.adjust().responsive.recalc();
+        $("#tableMiniTemplateManager").DataTable().ajax.reload();
+    }); */
 });
 
 window.initMiniTemplateManagerToolTableSites = function (data, tableSettings) {
@@ -282,7 +305,7 @@ window.miniTemplateManagerToolTableCallback = function () {
     waitForEl('#mini-template-manager-tool-table-filter-sites-select', function (element) {
         if (element.val() < 1) {
             element.find(':first-child').remove();
-            element.val(element.find('option').val()).change();
+            element.val(element.find('option').val()).trigger("change");
         }
     });
 };
