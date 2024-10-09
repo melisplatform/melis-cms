@@ -77,7 +77,7 @@
 				if ( match.length ) {
 					var opts 	= {},
 						tmp 	= '';
-					
+
 						$(".meliscms-search-box.sidebar-treeview-search").append("<div class='melis-overlay-loading'></div>");
 
 						tree.clearFilter();
@@ -87,13 +87,13 @@
 								node.resetLazy();
 							}
 						});
-			
+
 						// disable searchbar while searchig
 						$("input[name=left_tree_search]").prop('disabled', true);
 						var searchContainer = $("input[name=left_tree_search]").closest(".meliscms-search-box");
-						
+
 						$.ajax({
-							type        : 'POST', 
+							type        : 'POST',
 							url         : 'melis/MelisCms/Page/searchTreePages',
 							data		: {name: 'value', value: match},
 							dataType    : 'json',
@@ -106,23 +106,23 @@
 									$(".melis-search-overlay").fadeOut(600, function() {
 										$(this).remove();
 									});
-									
+
 									$("input[name=left_tree_search]").prop('disabled', false);
 									$("input[name=left_tree_search]").trigger("focus");
-									
+
 									$(".meliscms-search-box.sidebar-treeview-search .melis-overlay-loading").remove();
 								}, 1000);
-							} 
+							}
 							else {
 								var arr = $.map(data, function(el) { return el });
 
 									tree.loadKeyPath(arr, function(node, status) {
 										switch( status ) {
-											case "loaded":	
-												node.makeVisible();     
+											case "loaded":
+												node.makeVisible();
 												break;
-											case "ok":    
-												node.makeVisible();     
+											case "ok":
+												node.makeVisible();
 												break;
 										}
 
@@ -131,7 +131,7 @@
 										$("input[name=left_tree_search]").prop('disabled', false);
 										$(".meliscms-search-box.sidebar-treeview-search .melis-overlay-loading").remove();
 										$("input[name=left_tree_search]").trigger("focus");
-									});	
+									});
 							}
 						}).fail(function(xhr, textStatus, errorThrown) {
 							alert( translations.tr_meliscore_error_message );

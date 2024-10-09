@@ -52,7 +52,9 @@ class TemplateSelectFactory extends MelisSelectFactory
         $site = $serviceManager->get('MelisEngineTableSite')->getEntryById($siteId)->current();
         if(!empty($site)) {
             foreach ($templates as $key => $tpl) {
-                $valueoptions[$tpl['tpl_id']] = $site->site_name. ' - ' . $tpl['tpl_name'] . ' (' . $tpl['tpl_id'] . ')';
+                if ($tpl['tpl_site_id'] == $site->site_id) {
+                    $valueoptions[$tpl['tpl_id']] = $site->site_name . ' - ' . $tpl['tpl_name'] . ' (' . $tpl['tpl_id'] . ')';
+                }
             }
         }
 //        $siteNames = [];
