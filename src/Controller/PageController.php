@@ -987,6 +987,7 @@ class PageController extends MelisAbstractActionController
     public function publishPageAction()
     {
         $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $siteVariety = $this->params()->fromRoute('site_variety', $this->params()->fromQuery('site_variety', 'SITE'));
         $translator = $this->getServiceManager()->get('translator');
 
         $eventDatas = array('idPage' => $idPage);
@@ -1110,6 +1111,7 @@ class PageController extends MelisAbstractActionController
             'textMessage' => $textMessage,
             'errors' => $errors,
             'datas' => $datas,
+            'site_variety' => $siteVariety,
         );
 
 
@@ -1128,6 +1130,7 @@ class PageController extends MelisAbstractActionController
     public function unpublishPublishedPageAction()
     {
         $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $siteVariety = $this->params()->fromRoute('site_variety', $this->params()->fromQuery('site_variety', 'SITE'));
         $translator = $this->getServiceManager()->get('translator');
         $melisPagePublishedTable = $this->getServiceManager()->get('MelisEngineTablePagePublished');
 
@@ -1178,6 +1181,8 @@ class PageController extends MelisAbstractActionController
             );
         }
 
+        $result['site_variety'] = $siteVariety;
+
         return new JsonModel($result);
     }
 
@@ -1189,6 +1194,7 @@ class PageController extends MelisAbstractActionController
     public function unpublishPageAction()
     {
         $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $siteVariety = $this->params()->fromRoute('site_variety', $this->params()->fromQuery('site_variety', 'SITE'));
         $translator = $this->getServiceManager()->get('translator');
 
         // Checking if user has page access rights
@@ -1253,6 +1259,7 @@ class PageController extends MelisAbstractActionController
             'textMessage' => $textMessage,
             'errors' => $errors,
             'datas' => array($datas),
+            'site_variety' => $siteVariety
         );
 
         $this->getEventManager()->trigger('meliscms_page_unpublish_end', $this, array_merge($response, array('typeCode' => 'CMS_PAGE_UNPUBLISH', 'itemId' => $idPage)));
