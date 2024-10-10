@@ -35,7 +35,9 @@ class TemplateSelectFactory extends MelisSelectFactory
             //try form page saved
             $pageFatherInfo = $engineTree->getSiteByPageId($idPage, '');
         //get site id
-        $siteId = $pageFatherInfo->site_id;
+        $siteId = null;
+        if(!empty($pageFatherInfo))
+            $siteId = $pageFatherInfo->site_id;
 
 		$tableTemplate = $serviceManager->get('MelisEngineTableTemplate');
 		$templates = $tableTemplate->getSortedTemplates()->toArray();
