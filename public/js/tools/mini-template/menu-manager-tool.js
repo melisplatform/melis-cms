@@ -404,12 +404,12 @@ $(function () {
                 });
             })
             .on('#mini-template-category-tree select_node.jstree', function (e, data) {
-                // if (selectedNode === data.node.text) {
-                //     $(tree).jstree().deselect_all();
-                //     selectedNode = '';
-                // } else {
-                //     selectedNode = data.node.text;
-                // }
+                /* if (selectedNode === data.node.text) {
+                    $(tree).jstree().deselect_all();
+                    selectedNode = '';
+                } else {
+                    selectedNode = data.node.text;
+                } */
             })
             .jstree({
                 "contextmenu" : {
@@ -555,31 +555,31 @@ $(function () {
                 "core" : {
                     "multiple": false,
                     "check_callback": function (operation, node, node_parent, node_position, more) {
-                        // if (
-                        //     more
-                        //     && more.dnd
-                        //     && (operation === 'move_node' || operation === 'copy_node')
-                        //     && node.type == 'mini-template'
-                        //     && node_parent.id == '#'
-                        // )  {
-                        //     return false;
-                        // }
-                        // if (
-                        //     more
-                        //     && more.dnd
-                        //     && (operation === 'move_node' || operation === 'copy_node')
-                        //     && node.type == 'category'
-                        //     && $(tree).jstree(true).get_node(
-                        //         $(tree).jstree(true).get_node('#').children[node_position]
-                        //     ).type == 'mini-template'
-                        //     ){
-                        //     return false;
-                        // }
-                        // return true;
+                        /* if (
+                            more
+                            && more.dnd
+                            && (operation === 'move_node' || operation === 'copy_node')
+                            && node.type == 'mini-template'
+                            && node_parent.id == '#'
+                        )  {
+                            return false;
+                        }
+                        if (
+                            more
+                            && more.dnd
+                            && (operation === 'move_node' || operation === 'copy_node')
+                            && node.type == 'category'
+                            && $(tree).jstree(true).get_node(
+                                $(tree).jstree(true).get_node('#').children[node_position]
+                            ).type == 'mini-template'
+                            ){
+                            return false;
+                        }
+                        return true; */
                     },
                     "animation" : 500,
                     "themes": {
-                        "name": "proton",
+                        "name": "default",
                         "responsive": false
                     },
                     "dblclick_toggle" : false,
