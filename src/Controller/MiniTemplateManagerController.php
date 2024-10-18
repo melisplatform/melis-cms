@@ -70,12 +70,14 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
 
         if ($params['templateName'] !== 'new_template') {
             $site_service = $this->getServiceManager()->get('MelisCmsSiteService');
-            $path = $site_service->getModulePath($params['module']) . '/public/miniTemplatesTinyMce/';
+            //$path = $site_service->getModulePath($params['module']) . '/public/miniTemplatesTinyMce/';
+            $mtpl_service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
+            $path = $mtpl_service->getMiniTemplatePathByTemplateName($params['module'], $params['templateName']);
 
             $data = [
                 'miniTemplateSiteModule' => $params['module'],
                 'miniTemplateName' => $params['templateName'],
-                'miniTemplateHtml' => file_get_contents($path . $params['templateName'] . '.phtml')
+                'miniTemplateHtml' => file_get_contents($path . '/'. $params['templateName'] . '.phtml')
             ];
 
             $form->setAttribute('id', 'id_mini_template_manager_tool_update');
@@ -142,23 +144,27 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
         }
 
         if (! empty($post['site_name'])) {
+            $mtpl_service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
             $site_service = $this->getServiceManager()->get('MelisCmsSiteService');
-            $path = $site_service->getModulePath($post['site_name']) . '/public/miniTemplatesTinyMce';
+            $modulePath = $site_service->getModulePath($post['site_name']) . '/public/miniTemplatesTinyMce'; //default folder inside the site module
 
-            if (file_exists($path)) {
-                $mtpl_service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
+            $rootPublicPath = $mtpl_service->getRootMiniTemplatePath($post['site_name']); //the minitemplate folder inside the public root
+            if (file_exists($modulePath) || file_exists($rootPublicPath)) {               
                 $mini_templates_temp = $mtpl_service->getMiniTemplates($post['site_name']);
                 $mini_templates = [];
 
                 foreach ($mini_templates_temp as $mini_template) {
                     $exploded = explode('.', $mini_template);
                     $templateName = $exploded[0];
+                    //identify the path if from root or module          
+                    $path = file_exists($rootPublicPath . '/' . $templateName . '.phtml') ? $rootPublicPath :  $modulePath;
                     $thumbnail = $mtpl_service->getMiniTemplateThumbnail($path, $templateName);
                     $thumbnail_file = '';
 
                     if (! empty($thumbnail)) {
-                        $thumbnail_file = '/' . $post['site_name'] . '/miniTemplatesTinyMce/' . $thumbnail['file'];
-                        $thumbnail = '<img class="mini-template-tool-table-image" src="' . '/' . $post['site_name'] . '/miniTemplatesTinyMce/' . $thumbnail['file'] . '?rand=' . uniqid('', true) . '" width=100 height=100>';
+                        //$thumbnail_file = '/' . $post['site_name'] . '/miniTemplatesTinyMce/' . $thumbnail['file'];
+                        $thumbnail_file = $path == $rootPublicPath ? ('/miniTemplatesTinyMce/' .$post['site_name'] .'/'. $thumbnail['file']) : ('/' . $post['site_name'] . '/miniTemplatesTinyMce/' . $thumbnail['file']);
+                        $thumbnail = '<img class="mini-template-tool-table-image" src="' . $thumbnail_file . '?rand=' . uniqid('', true) . '" width=100 height=100>';
                     } else {
                         $thumbnail = '<img class="mini-template-tool-table-image" src="/MelisFront/plugins/images/default.jpg" width=100 height=100>';
                     }

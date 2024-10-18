@@ -43,7 +43,8 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
 
         // initialize variables
         $translator = $this->getServiceManager()->get('translator');
-        $path = $this->getModuleMiniTemplatePath($module);
+        //$path = $this->getModuleMiniTemplatePath($module);
+        $path = $this->getRootMiniTemplatePath($module);
         $thumbnail = '';
         $success = 0;
         $errors = [];
@@ -65,7 +66,8 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                     $path_without_extension.'.'.$arrayParameters['img_ext']
                 );
 
-                $thumbnail = $module.'/miniTemplatesTinyMce/'.$arrayParameters['name'].'.'. $arrayParameters['img_ext'];
+                //$thumbnail = $module.'/miniTemplatesTinyMce/'.$arrayParameters['name'].'.'. $arrayParameters['img_ext'];
+                $thumbnail = $path . '/'. $arrayParameters['name'] . '.' . $arrayParameters['img_ext'];
             }
 
             // if category id is passed, we will link the template into a category
@@ -752,10 +754,36 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
      * @param $module
      * @return array
      */
+    // public function getMiniTemplates($module) {
+    //     $path = $this->getModuleMiniTemplatePath($module);
+    //     $templates = [];
+    //     if (! is_array($path)) {
+    //         $files = array_diff(scandir($path), ['..', '.']);
+    //         foreach ($files as $file) {
+    //             $exploded = explode('.', $file);
+    //             $templateName = $exploded[0];
+    //             if (! empty($exploded[1])) {
+    //                 $extension = $exploded[1];
+    //                 if (in_array($extension, ['phtml'])) {
+    //                     array_push($templates, $templateName);
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     return $templates;
+    // }
+    /**
+     * @param $module
+     * @return array
+     */
     public function getMiniTemplates($module) {
-        $path = $this->getModuleMiniTemplatePath($module);
+        $modulePath = $this->getModuleMiniTemplatePath($module);
+        $rootPublicPath = $this->getRootMiniTemplatePath($module); 
         $templates = [];
 
+        //scan from root minitemplates folder and inside module
+        $miniTemplatePaths = [$modulePath, $rootPublicPath];
+        foreach ($miniTemplatePaths as $path) {
         if (! is_array($path)) {
             $files = array_diff(scandir($path), ['..', '.']);
 
@@ -768,6 +796,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
 
                     if (in_array($extension, ['phtml'])) {
                         array_push($templates, $templateName);
+                        }
                     }
                 }
             }
@@ -1175,4 +1204,38 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             ]
         );
     }
+    /**
+     * @param $module
+     * @return string
+     */
+    public function getRootMiniTemplatePath($module)
+    {        
+        $publicPath = $_SERVER['DOCUMENT_ROOT'] . '/../public';
+        if (! file_exists($publicPath))
+            return $this->getErrorMessage('e3');
+        if (! is_writable($publicPath))
+            return $this->getErrorMessage('e14');
+        $mtplPath = $publicPath . '/miniTemplatesTinyMce/'.$module;
+        if (! file_exists($mtplPath)) {
+            if (! mkdir($mtplPath, 0777, true)) {
+                return $this->getErrorMessage('e4');
 }
+        }
+        if (! is_writable($mtplPath))
+            return $this->getErrorMessage('e14');       
+        return $mtplPath;             
+    }
+    /**
+     * Returns the template upload path given the site and template name
+     * @param $siteName|$moduleName
+     * @param $templateName
+     * @return string
+     */
+    public function getMiniTemplatePathByTemplateName($siteName, $templateName) 
+    {
+        $site_service = $this->getServiceManager()->get('MelisCmsSiteService');
+        $modulePath = $site_service->getModulePath($siteName) . '/public/miniTemplatesTinyMce'; //default folder inside the site module
+        $rootPublicPath = $this->getRootMiniTemplatePath($siteName); //the minitemplate folder inside the public root
+        return file_exists($rootPublicPath . '/' . $templateName . '.phtml') ? $rootPublicPath : $modulePath;
+    }
+} 
