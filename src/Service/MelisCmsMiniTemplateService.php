@@ -123,17 +123,21 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         $table = $this->getServiceManager()->get('MelisCmsMiniTplCategoryTemplateTable');
 
         $current_module = $current_data['miniTemplateSiteModule'];
-        $current_site_path = $this->getModuleMiniTemplatePath($current_module);
+        //$current_site_path = $this->getModuleMiniTemplatePath($current_module);
+        //get the current mini template path directory (either root public or default module)
+        $current_site_path = $this->getMiniTemplatePathByTemplateName($current_module, $current_data['miniTemplateName']);
         $current_template_name = $current_data['miniTemplateName'];
 
         $new_site_module = $new_data['miniTemplateSiteModule'];
-        $new_site_path = $this->getModuleMiniTemplatePath($new_site_module);
+        //$new_site_path = $this->getModuleMiniTemplatePath($new_site_module);
+        $new_site_path = $this->getRootMiniTemplatePath($new_site_module);
 
         $success = 1;
         $errors = [];
 
         // check if path has errors
         if (is_array($new_site_path)) {
+            //echo "error new site";
             $errors[] = [
                 'error' => $new_site_path['error'],
                 'label' => $translator->translate('tr_meliscms_mini_template_error')
@@ -141,6 +145,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         }
 
         if (!is_writable($current_site_path . '/' . $current_template_name . '.phtml')) {
+            // echo "error current site: " . $current_site_path . '/' . $current_template_name . '.phtml';
             $errors[] = [
                 'error' => $translator->translate('tr_meliscms_mini_template_error_rights_phtml'),
                 'label' => $translator->translate('tr_meliscms_mini_template_error')
@@ -224,8 +229,11 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             'data' => [
                 'module' => $current_module,
                 'template_name' => $current_template_name,
+                // 'thumbnail' => (! empty($thumbnail_file))
+                //     ? $current_module . '/miniTemplatesTinyMce/' . $thumbnail_file['file']
+                //     : '',
                 'thumbnail' => (! empty($thumbnail_file))
-                    ? $current_module . '/miniTemplatesTinyMce/' . $thumbnail_file['file']
+                    ? '/miniTemplatesTinyMce/'. $current_module.'/'. $thumbnail_file['file']
                     : '',
             ]
         ];
