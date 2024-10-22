@@ -65,12 +65,8 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                     $arrayParameters['image_tmp_path'],
                     $path_without_extension.'.'.$arrayParameters['img_ext']
                 );
-
-                //$thumbnail = $module.'/miniTemplatesTinyMce/'.$arrayParameters['name'].'.'. $arrayParameters['img_ext'];
-                //$rootPublicPath = $this->getRootMiniTemplatePath($module);
-                //$thumbnail = $path == $rootPublicPath ? ('/miniTemplatesTinyMce/' . $module . '/' .$arrayParameters['name'] . '.' . $arrayParameters['img_ext']) : ('/' . $module . '/miniTemplatesTinyMce/' .$arrayParameters['name'] . '.' . $arrayParameters['img_ext']);
-                $thumbnail = $this->getSrcThumbnail($module, $arrayParameters['name'], $arrayParameters['name'] . '.' . $arrayParameters['img_ext']);
-                //$thumbnail = $path . '/'. $arrayParameters['name'] . '.' . $arrayParameters['img_ext'];
+                       
+                $thumbnail = $this->getSrcThumbnail($module, $arrayParameters['name'], $arrayParameters['name'] . '.' . $arrayParameters['img_ext']);               
             }
 
             // if category id is passed, we will link the template into a category
@@ -472,8 +468,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         $category_site = $site_category_table->getEntryByField('mtplsc_category_id', $cat_id)->current();
         $site_table = $this->getServiceManager()->get('MelisEngineTableSite');
         $site = $site_table->getEntryById($category_site->mtplsc_site_id)->current();
-        $site_path = $this->getModuleMiniTemplatePath($site->site_name);
-        //$rootPublicPath = $this->getRootMiniTemplatePath($site->site_name);
+        $site_path = $this->getModuleMiniTemplatePath($site->site_name);      
         $mini_templates = $this->getMiniTemplates($site->site_name);
         $templates = [];
         $final_mini_templates = [];
@@ -485,9 +480,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                 $template = $this->getMiniTemplateFiles($site_path, $cat_mini_template['mtplct_template_name']);
                 $thumbnail_file = '';
 
-                if (!empty($template['image'])) {
-                    //$thumbnail_file = '/' . $site->site_name . '/miniTemplatesTinyMce/' . $template['image']['file'];
-                   // $thumbnail_file = $site_path == $rootPublicPath ? ('/miniTemplatesTinyMce/' . $site->site_name. '/' . $template['image']['file']) : ('/' . $site->site_name . '/miniTemplatesTinyMce/' . $template['image']['file']);
+                if (!empty($template['image'])) {                                  
                     $thumbnail_file = $this->getSrcThumbnail($site->site_name, $cat_mini_template['mtplct_template_name'], $template['image']['file']);
                     $image = '<img data-image="test" src="' . $thumbnail_file . '?rand=' . uniqid('', true) . '" width=100 height=100>';
                 } else {
@@ -628,14 +621,11 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                             $template = $this->getMiniTemplateFiles($site_path, $item['mtplct_template_name']);
                      
                             if (!empty($template['image']['file'])) {
-                                $image = $this->getSrcThumbnail($module, $item['mtplct_template_name'], $template['image']['file']);
-                                //$image = $site_path == $rootPublicPath ? ('/miniTemplatesTinyMce/' . $module . '/' . $template['image']['file']) : ('/' . $module . '/miniTemplatesTinyMce/' . $template['image']['file']);
-                                //$image = '/' . $module . '/miniTemplatesTinyMce/' . $template['image']['file'];
+                                $image = $this->getSrcThumbnail($module, $item['mtplct_template_name'], $template['image']['file']);  
                             }  else {
                                 $image = '/MelisFront/plugins/images/default.jpg';
                             }
                                
-
                             if (!empty($item['category_id'])) {
                                 $this->insertDbMiniTemplateToTheCategory($item['category_id'], $item, $module, $image, $tree);
                             } else {
@@ -648,9 +638,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                     $template = $this->getMiniTemplateFiles($site_path, $item);                    
 
                     if (!empty($template['image']['file'])) {
-                        $image = $this->getSrcThumbnail($module, $item, $template['image']['file']);
-                        //$image = $site_path == $rootPublicPath ? ('/miniTemplatesTinyMce/' . $module . '/' . $template['image']['file']) : ('/' . $module . '/miniTemplatesTinyMce/' . $template['image']['file']);
-                        //$image = '/' . $module . '/miniTemplatesTinyMce/' . $template['image']['file'];
+                        $image = $this->getSrcThumbnail($module, $item, $template['image']['file']);                       
                     }  else {
                         $image = '/MelisFront/plugins/images/default.jpg';
                     }
@@ -780,28 +768,6 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         return $arrayParameters['results'];
     }
 
-    /**
-     * @param $module
-     * @return array
-     */
-    // public function getMiniTemplates($module) {
-    //     $path = $this->getModuleMiniTemplatePath($module);
-    //     $templates = [];
-    //     if (! is_array($path)) {
-    //         $files = array_diff(scandir($path), ['..', '.']);
-    //         foreach ($files as $file) {
-    //             $exploded = explode('.', $file);
-    //             $templateName = $exploded[0];
-    //             if (! empty($exploded[1])) {
-    //                 $extension = $exploded[1];
-    //                 if (in_array($extension, ['phtml'])) {
-    //                     array_push($templates, $templateName);
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     return $templates;
-    // }
     /**
      * @param $module
      * @return array
@@ -1264,14 +1230,17 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             return $this->getErrorMessage('e3');
         if (! is_writable($publicPath))
             return $this->getErrorMessage('e14');
+
         $mtplPath = $publicPath . '/miniTemplatesTinyMce/'.$module;
         if (! file_exists($mtplPath)) {
             if (! mkdir($mtplPath, 0777, true)) {
                 return $this->getErrorMessage('e4');
             }
         }
+
         if (! is_writable($mtplPath))
-            return $this->getErrorMessage('e14');       
+            return $this->getErrorMessage('e14');  
+             
         return $mtplPath;             
     }
 
