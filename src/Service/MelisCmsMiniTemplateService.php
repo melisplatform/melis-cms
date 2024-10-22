@@ -67,7 +67,10 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                 );
 
                 //$thumbnail = $module.'/miniTemplatesTinyMce/'.$arrayParameters['name'].'.'. $arrayParameters['img_ext'];
-                $thumbnail = $path . '/'. $arrayParameters['name'] . '.' . $arrayParameters['img_ext'];
+                $rootPublicPath = $this->getRootMiniTemplatePath($module);
+                $thumbnail = $path == $rootPublicPath ? ('/miniTemplatesTinyMce/' . $module . '/' .$arrayParameters['name'] . '.' . $arrayParameters['img_ext']) 
+                                                            : ('/' . $module . '/miniTemplatesTinyMce/' .$arrayParameters['name'] . '.' . $arrayParameters['img_ext']);
+                //$thumbnail = $path . '/'. $arrayParameters['name'] . '.' . $arrayParameters['img_ext'];
             }
 
             // if category id is passed, we will link the template into a category
@@ -188,19 +191,21 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             }
            
             // remove link to category if there is any
-            $table->deleteByField('mtplct_template_name', $current_template_name);
+            if ($current_data['miniTemplateSiteModule'] != $new_data['miniTemplateSiteModule']) {
+                $table->deleteByField('mtplct_template_name', $current_template_name);
+            } else {
+                // update entry to category template table
+                $table->update(
+                    [
+                        'mtplct_template_name' => $new_data['miniTemplateName']
+                    ],
+                    'mtplct_template_name',
+                    $current_template_name
+                );
+            }
+          
             // $current_site_path = $new_site_path;
-            // $current_module = $new_site_module;         
-
-            // update entry to category template table
-            $table->update(
-                [
-                    'mtplct_template_name' => $new_data['miniTemplateName']
-                ],
-                'mtplct_template_name',
-                $current_template_name
-            );
-
+            // $current_module = $new_site_module;                    
             //$current_template_name = $new_data['miniTemplateName'];
 
 
@@ -277,8 +282,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                     
             // Update thumbnail
             if (! empty($new_data['miniTemplateThumbnail']['name'])) {
-
-                //if already in the root public, remove files
+                //if already in the root public, remove old thumbnail
                 if (str_starts_with($current_site_path, $rootPublicPath)) {
                     if (!empty($thumbnail_file))
                         unlink($thumbnail_file['path']);
@@ -291,7 +295,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                 );
               
             } else {
-                //echo "empty image";
+               
                 // if (! empty($image)) {
                 //     if (!empty($thumbnail_file['path'])) {
                 //         if (file_exists($thumbnail_file['path']))
@@ -299,17 +303,15 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
                 //     }
                 // }
                
-                if (!empty($thumbnail_file['path'])) {
-                    if (file_exists($thumbnail_file['path'])) {
-                        $extension = explode('.', $thumbnail_file['file'])[1];
+                if (!empty($thumbnail_file['path']) && file_exists($thumbnail_file['path'])) {                   
+                    $extension = explode('.', $thumbnail_file['file'])[1];
 
-                        //if already in the public root, move files
-                        if (str_starts_with($current_site_path, $rootPublicPath)) {
-                            rename($thumbnail_file['path'], $new_site_path . '/' . $new_data['miniTemplateName']. '.' . $extension); 
-                        } else {
-                            copy($thumbnail_file['path'], $new_site_path . '/' . $new_data['miniTemplateName'] . '.' . $extension); 
-                        }                       
-                    }                                                                 
+                    //if already in the public root, move files
+                    if (str_starts_with($current_site_path, $rootPublicPath)) {
+                        rename($thumbnail_file['path'], $new_site_path . '/' . $new_data['miniTemplateName']. '.' . $extension); 
+                    } else {
+                        copy($thumbnail_file['path'], $new_site_path . '/' . $new_data['miniTemplateName'] . '.' . $extension); 
+                    }                                                                                                          
                 }               
             }
         } else {

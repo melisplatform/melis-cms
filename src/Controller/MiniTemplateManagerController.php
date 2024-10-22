@@ -153,8 +153,6 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
                 $mini_templates_temp = $mtpl_service->getMiniTemplates($post['site_name']);
                 $mini_templates = [];
 
-                //dump($mini_templates_temp);
-
                 foreach ($mini_templates_temp as $mini_template) {
                     $exploded = explode('.', $mini_template);
                     $templateName = $exploded[0];

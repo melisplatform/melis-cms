@@ -116,6 +116,7 @@ class FrontPluginsController extends MelisAbstractActionController
         // check for new plugins or manually installed and insert in db or fresh plugins
         $pluginSvc->checkTemplatingPlugins();
         $pluginList_ = $this->putSectionOnPlugins($config['plugins'], $siteModule);
+
         $newPluginList = $this->organizedPluginsBySection($pluginList_);
         // remove section that has no child under on it
         $newPluginList = array_filter($newPluginList);
@@ -130,6 +131,14 @@ class FrontPluginsController extends MelisAbstractActionController
             'modulesHasNewPlugins' => array_unique($this->modulesHasNewPlugins),
             'subsectionHasNewPlugins' => $this->subsectionHasNewPlugins,
         ]);
+
+        print_r([
+            'siteModule' => $siteModule,
+            'newPluginList' => $newPluginList,
+            'sectionNewPlugins' => array_unique($this->sectionHasNewPlugins),
+            'modulesHasNewPlugins' => array_unique($this->modulesHasNewPlugins),
+            'subsectionHasNewPlugins' => $this->subsectionHasNewPlugins,
+        ]);  
         /**
          * Save cache
          */
