@@ -40,7 +40,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                     <?php foreach ($plugin as $moduleName => $templatingPlugins) : ?>
                         <?php
                         $firstLevelMaxWidth = "";
-                        $moduleText = $this->boTranslate('tr_PluginSection_' . $moduleName). 'test';
+                        $moduleText = $this->boTranslate('tr_PluginSection_' . $moduleName);
                         // regular rendering of menu
                         ?>
                         <?php if ($sectionChildrenCtr > 1) : ?>
@@ -128,7 +128,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                                                                     <span class="melis-plugins-icon-new new-plugin-indicator">NEW!</span>
                                                                                                 </div>
                                                                                             <?php endif; ?>
-                                                                                            <span class="melis-cms-plugin-title"><?= $this->boTranslate($name); ?> test here 5</span>
+                                                                                            <span class="melis-cms-plugin-title"><?= $this->boTranslate($name); ?></span>
                                                                                         </div>
                                                                                     <?php endif ?>
                                                                                 <?php endif ?>
@@ -163,7 +163,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                                                     <span class="melis-plugins-icon-new new-plugin-indicator">NEW!</span>
                                                                                 </div>
                                                                             <?php }?>
-                                                                            <span class="melis-cms-plugin-title"><?= $this->boTranslate($name); ?> test here 4</span>
+                                                                            <span class="melis-cms-plugin-title"><?= $this->boTranslate($name); ?></span>
                                                                         </div>
                                                                     <?php } }
                                                             }
@@ -197,7 +197,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                             <span class="melis-plugins-icon-new new-plugin-indicator">NEW!</span>
                                                         </div>
                                                     <?php }?>
-                                                    <span class="melis-cms-plugin-title"><?= $this->boTranslate($name); ?> test here</span>
+                                                    <span class="melis-cms-plugin-title"><?= $this->boTranslate($name); ?></span>
                                                 </div>
                                             <?php } ?>
                                         <?php }
@@ -264,7 +264,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                                         <span class="melis-plugins-icon-new new-plugin-indicator">NEW!</span>
                                                                     </div>
                                                                 <?php endif ?>
-                                                                <span class="melis-cms-plugin-title"><?= $this->boTranslate($name); ?> test here 1</span>
+                                                                <span class="melis-cms-plugin-title"><?= $this->boTranslate($name); ?></span>
                                                             </div>
                                                         <?php endif ?>
                                                     <?php endforeach ?>
@@ -299,7 +299,7 @@ $subsectionHasNewPlugins = $this->subsectionHasNewPlugins ?? [];
                                                     <span class="melis-plugins-icon-new new-plugin-indicator">NEW!</span>
                                                 </div>
                                             <?php endif ?>
-                                            <span class="melis-cms-plugin-title"><?= $this->boTranslate($name) ?> test here 2</span>
+                                            <span class="melis-cms-plugin-title"><?= $this->boTranslate($name) ?></span>
                                         </div>
                                     <?php endif ?>
                                 <?php endforeach ?>
