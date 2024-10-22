@@ -579,7 +579,7 @@ $(function () {
                     },
                     "animation" : 500,
                     "themes": {
-                        "name": "proton",
+                        "name": "default",
                         "responsive": false
                     },
                     "dblclick_toggle" : false,
