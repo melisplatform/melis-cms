@@ -409,7 +409,6 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
 
         //get the path of the template if from root public or module       
         $path = $mtpl_service->getMiniTemplatePathByTemplateName($data['module'], $data['template']);
-
         $minitemplate = $path . '/' . $data['template'] . '.phtml';
         $minitemplate_thumbnail = $mtpl_service->getMiniTemplateThumbnail($path, $data['template']);
         $thumbnail_path = null;
