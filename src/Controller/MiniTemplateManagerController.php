@@ -147,17 +147,20 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
             $mtpl_service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
             $site_service = $this->getServiceManager()->get('MelisCmsSiteService');
             $modulePath = $site_service->getModulePath($post['site_name']) . '/public/miniTemplatesTinyMce'; //default folder inside the site module
-
             $rootPublicPath = $mtpl_service->getRootMiniTemplatePath($post['site_name']); //the minitemplate folder inside the public root
+                    
             if (file_exists($modulePath) || file_exists($rootPublicPath)) {               
                 $mini_templates_temp = $mtpl_service->getMiniTemplates($post['site_name']);
                 $mini_templates = [];
+
+                //dump($mini_templates_temp);
 
                 foreach ($mini_templates_temp as $mini_template) {
                     $exploded = explode('.', $mini_template);
                     $templateName = $exploded[0];
                     //identify the path if from root or module          
-                    $path = file_exists($rootPublicPath . '/' . $templateName . '.phtml') ? $rootPublicPath :  $modulePath;
+                    //$path = file_exists($rootPublicPath . '/' . $templateName . '.phtml') ? $rootPublicPath :  $modulePath;
+                    $path = $mtpl_service->getMiniTemplatePathByTemplateName($post['site_name'], $templateName);
                     $thumbnail = $mtpl_service->getMiniTemplateThumbnail($path, $templateName);
                     $thumbnail_file = '';
 
@@ -338,29 +341,56 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
      */
     private function checkUpdateErrors($form, $current_data, $new_data) {
         $site_service = $this->getServiceManager()->get('MelisCmsSiteService');
-        $current_site_path = $site_service->getModulePath($current_data['miniTemplateSiteModule']) . '/public/miniTemplatesTinyMce';
-        $new_site_path = $site_service->getModulePath($new_data['miniTemplateSiteModule']) . '/public/miniTemplatesTinyMce';
+        //$current_site_path = $site_service->getModulePath($current_data['miniTemplateSiteModule']) . '/public/miniTemplatesTinyMce';
+        $mtpl_service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
+        $current_site_path = $mtpl_service->getMiniTemplatePathByTemplateName($current_data['miniTemplateSiteModule'], $current_data['miniTemplateName']);
+        //$new_site_path = $site_service->getModulePath($new_data['miniTemplateSiteModule']) . '/public/miniTemplatesTinyMce';
+        $new_site_path = $mtpl_service->getRootMiniTemplatePath($new_data['miniTemplateSiteModule']);
+
         $translator = $this->getServiceManager()->get('translator');
         $errors = [];
 
         if ($form->isValid()) {
-            if ($current_data['miniTemplateSiteModule'] != $new_data['miniTemplateSiteModule']) {
+            // if ($current_data['miniTemplateSiteModule'] != $new_data['miniTemplateSiteModule']) {
+            //     if (file_exists($new_site_path . '/' . $new_data['miniTemplateName'] . '.phtml')) {
+            //         $errors['miniTemplateName'] = [
+            //             'error' => $translator->translate('tr_meliscms_mini_template_manager_tool_form_create_error_file_already_exists'),
+            //             'label' => $form->get('miniTemplateName')->getLabel()
+            //         ];
+            //     }
+            // } else {
+            //     if ($current_data['miniTemplateName'] !== $new_data['miniTemplateName']) {
+            //         if (file_exists($current_site_path . '/' . $new_data['miniTemplateName'] . '.phtml')) {
+            //             $errors['miniTemplateName'] = [
+            //                 'error' => $translator->translate('tr_meliscms_mini_template_manager_tool_form_create_error_file_already_exists'),
+            //                 'label' => $form->get('miniTemplateName')->getLabel()
+            //             ];
+            //         }
+            //     }
+            // }
+
+            if ($current_data['miniTemplateSiteModule'] != $new_data['miniTemplateSiteModule'] 
+                || $current_data['miniTemplateName'] !== $new_data['miniTemplateName']) {
+
+                $flaggedTable = $this->getServiceManager()->get('MelisEngineTableFlaggedTemplate');
+                $flaggedData = $flaggedTable->getFlaggedTemplate($new_data['miniTemplateSiteModule'], $new_data['miniTemplateName'])->current();
+                $site_service = $this->getServiceManager()->get('MelisCmsSiteService');
+                $modulePath = $site_service->getModulePath($new_data['miniTemplateSiteModule']) . '/public/miniTemplatesTinyMce'; //default folder inside the site module
+
+                //check duplicates in the public root and inside module(if not flagged)
                 if (file_exists($new_site_path . '/' . $new_data['miniTemplateName'] . '.phtml')) {
                     $errors['miniTemplateName'] = [
                         'error' => $translator->translate('tr_meliscms_mini_template_manager_tool_form_create_error_file_already_exists'),
                         'label' => $form->get('miniTemplateName')->getLabel()
                     ];
+                } elseif (file_exists($modulePath . '/' . $new_data['miniTemplateName'] . '.phtml') && empty($flaggedData)) {
+                    $errors['miniTemplateName'] = [
+                        'error' => $translator->translate('tr_meliscms_mini_template_manager_tool_form_create_error_file_already_exists'),
+                        'label' => $form->get('miniTemplateName')->getLabel()
+                    ];
                 }
-            } else {
-                if ($current_data['miniTemplateName'] !== $new_data['miniTemplateName']) {
-                    if (file_exists($current_site_path . '/' . $new_data['miniTemplateName'] . '.phtml')) {
-                        $errors['miniTemplateName'] = [
-                            'error' => $translator->translate('tr_meliscms_mini_template_manager_tool_form_create_error_file_already_exists'),
-                            'label' => $form->get('miniTemplateName')->getLabel()
-                        ];
-                    }
-                }
-            }
+            }           
+         
         } else {
             $errors = $this->getFormErrors($form->getMessages(), $form);
         }
@@ -377,7 +407,13 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
         $this->getEventManager()->trigger('meliscms_mini_template_manager_delete_start', $this, $data);
         $mtpl_service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
         $site_service = $this->getServiceManager()->get('MelisCmsSiteService');
-        $path = $site_service->getModulePath($data['module']) . '/public/miniTemplatesTinyMce';
+        //$path = $site_service->getModulePath($data['module']) . '/public/miniTemplatesTinyMce';
+
+        //get the path of the template if from root public or module
+        $modulePath = $site_service->getModulePath($data['module']) . '/public/miniTemplatesTinyMce'; //default folder inside the site module
+        $rootPublicPath = $mtpl_service->getRootMiniTemplatePath($data['module']); //the minitemplate folder inside the public root                    
+        $path = file_exists($rootPublicPath . '/' . $data['template'] . '.phtml') ? $rootPublicPath :  $modulePath;
+
         $minitemplate = $path . '/' . $data['template'] . '.phtml';
         $minitemplate_thumbnail = $mtpl_service->getMiniTemplateThumbnail($path, $data['template']);
         $thumbnail_path = null;
