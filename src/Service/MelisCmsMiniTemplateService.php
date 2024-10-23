@@ -1272,4 +1272,18 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
         return $site_path == $rootPublicPath ? ('/miniTemplatesTinyMce/' . $siteName . '/' . $thumbnailFile)
             : ('/' . $siteName . '/miniTemplatesTinyMce/' . $thumbnailFile);
     }
+    
+    /**
+     * Returns the relative html path to be used in src attrib
+     * @param $siteName|$moduleName
+     * @param $templateName
+     * @return string
+     */
+    public function getSrcHtml($siteName, $templateName): string
+    {
+        $site_path = $this->getMiniTemplatePathByTemplateName($siteName, $templateName);
+        $rootPublicPath = $this->getRootMiniTemplatePath($siteName);
+        return $site_path == $rootPublicPath ? ('/miniTemplatesTinyMce/' . $siteName . '/' . $templateName.'.phtml')
+            : ('/' . $siteName . '/miniTemplatesTinyMce/' .$templateName . '.phtml');
+    }
 } 

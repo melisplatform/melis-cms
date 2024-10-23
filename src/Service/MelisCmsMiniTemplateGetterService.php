@@ -152,7 +152,8 @@ class MelisCmsMiniTemplateGetterService extends MelisGeneralService
      */
     private function addPhtmlUrl($template)
     {
-        return DIRECTORY_SEPARATOR . $template['module'] . DIRECTORY_SEPARATOR . self::MINI_TEMPLATE_FOLDER . DIRECTORY_SEPARATOR . $template['text'] . '.phtml';
+        return $this->getService('MelisCmsMiniTemplateService')->getSrcHtml($template['module'], $template['text']);
+        //return DIRECTORY_SEPARATOR . $template['module'] . DIRECTORY_SEPARATOR . self::MINI_TEMPLATE_FOLDER . DIRECTORY_SEPARATOR . $template['text'] . '.phtml';
     }
 
     /**
