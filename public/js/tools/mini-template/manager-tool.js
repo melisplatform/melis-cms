@@ -162,7 +162,7 @@ $(function () {
                 $body.find('.melis-mini-template-menu-manager-table-refresh').trigger('click');
                 melisHelper.melisOkNotification(response.textTitle, response.textMessage);
             } else {
-                melisHelper.melisKoNotification(translations.tr_melis_cms_page_tree_import, '', response.errors);
+                melisHelper.melisKoNotification(response.textTitle, '', response.errors);
                 melisCoreTool.highlightErrors(response.success, response.errors, 'id_mini_template_manager_tool_update');
             }
 

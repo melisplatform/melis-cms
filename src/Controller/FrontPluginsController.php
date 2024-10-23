@@ -83,20 +83,22 @@ class FrontPluginsController extends MelisAbstractActionController
      */
     public function renderPluginsMenuContentAction()
     {
+        //echo "render plugins menu content";
+
         /**
          * Check if cache exist
          */
         // Get Current User ID
-        $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
-        $userAuthDatas = $melisCoreAuth->getStorage()->read();
-        $melisCoreCacheSystem = $this->getServiceManager()->get('MelisCoreCacheSystemService');
-        $cacheKey = 'meliscms_plugins_menu_content_'.(int)$userAuthDatas->usr_id;
-        $results = $melisCoreCacheSystem->getCacheByKey($cacheKey, PluginViewController::cacheConfig);
-        if (!empty($results)) {
-            return new JsonModel([
-                'view' => $results
-            ]);
-        }
+        // $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
+        // $userAuthDatas = $melisCoreAuth->getStorage()->read();
+        // $melisCoreCacheSystem = $this->getServiceManager()->get('MelisCoreCacheSystemService');
+        // $cacheKey = 'meliscms_plugins_menu_content_'.(int)$userAuthDatas->usr_id;
+        // $results = $melisCoreCacheSystem->getCacheByKey($cacheKey, PluginViewController::cacheConfig);
+        // if (!empty($results)) {
+        //     return new JsonModel([
+        //         'view' => $results
+        //     ]);
+        // }
 
         $config = $this->getServiceManager()->get('config');
         // $siteModule = $this->params()->fromRoute('siteModule', '');
@@ -116,11 +118,15 @@ class FrontPluginsController extends MelisAbstractActionController
         // check for new plugins or manually installed and insert in db or fresh plugins
         $pluginSvc->checkTemplatingPlugins();
         $pluginList_ = $this->putSectionOnPlugins($config['plugins'], $siteModule);
+
         $newPluginList = $this->organizedPluginsBySection($pluginList_);
         // remove section that has no child under on it
         $newPluginList = array_filter($newPluginList);
         // add categories for the mini-templates
         $newPluginList = $this->categorizeMiniTemplates($newPluginList, $pageId);
+
+        // echo "new plugin list";
+        // dump($newPluginList);
 
         $view = new ViewModel();
         $view->setTemplate('melis-cms/plugins-menu-content')->setVariables([
@@ -130,12 +136,22 @@ class FrontPluginsController extends MelisAbstractActionController
             'modulesHasNewPlugins' => array_unique($this->modulesHasNewPlugins),
             'subsectionHasNewPlugins' => $this->subsectionHasNewPlugins,
         ]);
+
+ 
+
+        // print_r([
+        //     'siteModule' => $siteModule,
+        //     'newPluginList' => $newPluginList,
+        //     'sectionNewPlugins' => array_unique($this->sectionHasNewPlugins),
+        //     'modulesHasNewPlugins' => array_unique($this->modulesHasNewPlugins),
+        //     'subsectionHasNewPlugins' => $this->subsectionHasNewPlugins,
+        // ]);  
         /**
          * Save cache
          */
         $renderer       = $this->getServiceManager()->get('ViewRenderer');
         $renderedView = $renderer->render($view);
-        $melisCoreCacheSystem->setCacheByKey($cacheKey, PluginViewController::cacheConfig, $renderedView);
+        // $melisCoreCacheSystem->setCacheByKey($cacheKey, PluginViewController::cacheConfig, $renderedView);
 
         return new JsonModel([
             'view' => $renderedView
@@ -605,6 +621,8 @@ class FrontPluginsController extends MelisAbstractActionController
                 }
             }
         }
+
+        //dump($plugin_list);
 
         return $plugin_list;
     }
