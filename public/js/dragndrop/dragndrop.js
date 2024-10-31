@@ -560,11 +560,17 @@ var melisDragnDrop = (function ($, window) {
 		 */
 		var _this = $("#melisPluginBtn"),
 			pageId = window.parent.activeTabId.split("_")[0];
+			
+		//get the melisSite value from the iframe's src
+        let queryString = window.frameElement.getAttribute("src").split("?")[1];
+        let params = new URLSearchParams(queryString);
+        let melisSite = params.get("melisSite");
+
 		if (_this.closest(".melis-cms-dnd-box").hasClass("show")) {
 			if (!_this.closest(".melis-cms-dnd-box").hasClass("hasCached")) {
 				$.ajax({
 					type: "GET",
-					data: { pageId },
+                    data: { pageId, melisSite },
 					url: "/MelisCms/FrontPlugins/renderPluginsMenuContent",
 					beforeSend: function () {
 						window.parent.loader.addLoadingCmsPluginMenu(
