@@ -29,7 +29,9 @@ $(function(){
 			        encode		: true
 			    }).done(function(data) {
 			    	if(data.success) {
-			    		$("#id_meliscms_tool_site_301_generic_form_container").modal("hide");
+			    		// $("#id_meliscms_tool_site_301_generic_form_container").modal("hide");
+						melisCoreTool.hideModal("id_meliscms_tool_site_301_generic_form_container");
+
 			    		// Notifications
 						melisHelper.melisOkNotification(data.textTitle, data.textMessage);
 						melisHelper.zoneReload("id_meliscms_tool_site_301_content", "meliscms_tool_site_301_content");

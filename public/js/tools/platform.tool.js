@@ -34,7 +34,9 @@ $(function(){
 	    	    encode		: true
 	    	}).done(function(data){
 	    		if ( data.success ) {
-					$('#platform_tool_modal_container').modal('hide');
+					// $('#platform_tool_modal_container').modal('hide');
+					melisCoreTool.hideModal("platform_tool_modal_container");
+
 					melisHelper.zoneReload("id_meliscms_tool_platform_ids", "meliscms_tool_platform_ids");
 					melisHelper.melisOkNotification(data.textTitle, data.textMessage);
 				} else {

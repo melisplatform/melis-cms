@@ -583,9 +583,9 @@
 			})
 			.done(function(data) {
 				if (data.success) {
-					$("#id_meliscms_tools_tree_modal_form_handler_container").modal(
-						"hide"
-					);
+					// $("#id_meliscms_tools_tree_modal_form_handler_container").modal("hide");
+					melisCoreTool.hideModal("id_meliscms_tools_tree_modal_form_handler_container");
+
 					melisCms.refreshTreeview(parentNode, 1);
 					// clear Add Form
 					melisHelper.melisOkNotification(data.textTitle, data.textMessage);
