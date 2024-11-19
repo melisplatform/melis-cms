@@ -113,6 +113,9 @@ body {
     -webkit-transform: scale(0.8);
     -moz-transform: scale(0.8);
 }
+.melis-cms-plugin-snippets img {
+    max-width: 100%;
+}
 .melis-cms-plugin-snippets {
     margin:0 4px 4px 0;
 }
