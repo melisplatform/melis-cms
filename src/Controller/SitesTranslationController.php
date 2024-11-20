@@ -482,6 +482,9 @@ class SitesTranslationController extends MelisAbstractActionController
                     $indicator = '<i class="fa fa-database fa-lg" aria-hidden="true" title="From DB (Overrided)"></i>';
                 }
                 $data[$i]['mst_trans_indicator'] = $indicator;
+                
+                $data[$i]['mst_key'] = $this->truncateString($data[$i]['mst_key'], 64);
+                $data[$i]['mstt_text'] = $this->truncateString($data[$i]['mstt_text'], 64);
 
                 //check if search is not empty(to filter by search)
                 if (!empty($search)) {
@@ -510,7 +513,7 @@ class SitesTranslationController extends MelisAbstractActionController
             $data = array_splice($data, $start, $length);
             //sort the result by module name
             usort($data, function($a, $b){
-                return strcasecmp($a['module'], $b['module']);
+                return strcasecmp($a['module'] ?? '', $b['module'] ?? '');
             });
         }
 
@@ -520,6 +523,15 @@ class SitesTranslationController extends MelisAbstractActionController
             'recordsFiltered' =>  count($recordsFiltered),
             'data' => $data,
         ));
+    }
+
+    private function truncateString($string, $maxLength, $ellipsis = '...') {
+        // Check if the string needs truncation
+        if (mb_strlen($string) > $maxLength) {
+            // Truncate the string and add the ellipsis
+            return mb_substr($string, 0, $maxLength - mb_strlen($ellipsis)) . $ellipsis;
+        }
+        return $string; // Return the original string if no truncation is needed
     }
     
     /**
