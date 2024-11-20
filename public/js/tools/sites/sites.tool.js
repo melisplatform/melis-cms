@@ -115,6 +115,9 @@ $(function() {
                 // update flash messenger values
                 melisCore.flashMessenger();
                 melisCoreTool.done("#btn-save-meliscms-tool-sites");
+
+                //run callback
+                cmsSiteHelper.siteSaveCallback();
             }).fail(function(xhr, textStatus, errorThrown) {
                 alert( translations.tr_meliscore_error_message );
             });
@@ -1608,12 +1611,19 @@ var cmsSiteHelper = (function() {
      */
     function finishCallback(){}
 
+    /**
+     * This function is called after site is successfully saved/edited
+     * You can override this inside your js file to execute a certain command
+     */
+    function siteSaveCallback(){}
+
     return {
         setCurrentStepForm: setCurrentStepForm,
         setSitesStepData: setSitesStepData,
         getSitesStepData: getSitesStepData,
         finishCallback: finishCallback,
         getSummarySteText: getSummarySteText,
-        setSummaryStepText: setSummaryStepText
+        setSummaryStepText: setSummaryStepText,
+        siteSaveCallback: siteSaveCallback
     };
 })();
