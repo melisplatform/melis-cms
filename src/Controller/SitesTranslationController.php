@@ -482,24 +482,32 @@ class SitesTranslationController extends MelisAbstractActionController
                     $indicator = '<i class="fa fa-database fa-lg" aria-hidden="true" title="From DB (Overrided)"></i>';
                 }
                 $data[$i]['mst_trans_indicator'] = $indicator;
-                
-                $data[$i]['mst_key'] = $this->truncateString($data[$i]['mst_key'], 64);
-                $data[$i]['mstt_text'] = $this->truncateString($data[$i]['mstt_text'], 64);
 
                 //check if search is not empty(to filter by search)
                 if (!empty($search)) {
                     $hasFilter = true;
                     //loop through each field to get its text, and check if has contain the $search value
                     foreach ($colId as $key => $val) {
-                        if (isset($data[$i][$val])) {
-                            if (strpos(strtolower($data[$i][$val]), strtolower($search)) !== false) {
-                                //if found push the data
-                                array_push($a, $data[$i]);
-                                break;
+                        if($val != 'mst_trans_indicator') {
+                            if (isset($data[$i][$val])) {
+                                // decode for accented characters
+                                $decodedString = html_entity_decode($data[$i][$val], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                                if (str_contains(mb_strtolower($decodedString), mb_strtolower($search))) {
+                                    // truncate key and label
+                                    $data[$i]['mst_key'] = $this->truncateString($data[$i]['mst_key'], 64);
+                                    $data[$i]['mstt_text'] = $this->truncateString($data[$i]['mstt_text'], 64);
+                                    //if found push the data
+                                    array_push($a, $data[$i]);
+                                    break;
+                                }
                             }
                         }
                     }
                 }
+
+                // truncate key and label
+                $data[$i]['mst_key'] = $this->truncateString($data[$i]['mst_key'], 64);
+                $data[$i]['mstt_text'] = $this->truncateString($data[$i]['mstt_text'], 64);
             }
 
             if($hasFilter){
