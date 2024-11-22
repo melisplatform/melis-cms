@@ -9,6 +9,7 @@
 
 namespace MelisCms\Controller;
 
+use Laminas\Session\Container;
 use Laminas\View\View;
 use MelisCore\Controller\MelisAbstractActionController;
 use MelisFront\Service\MelisSiteConfigService;
@@ -158,7 +159,11 @@ class SitesController extends MelisAbstractActionController
     {
         $siteService = $this->getServiceManager()->get('MelisCmsSiteService');
         $translator = $this->getServiceManager()->get('translator');
-        $siteVariety = $siteService->getSiteVariety();
+
+        $container = new Container('meliscore');
+        $langId = $container['melis-lang-id'];
+
+        $siteVariety = $siteService->getSiteVariety($langId);
 
         $var = [];
         $var[] = '<option value="">'. $translator->translate('tr_meliscms_common_all') .'</option>';
@@ -506,6 +511,9 @@ class SitesController extends MelisAbstractActionController
         $draw = 0;
         $tableData = array();
 
+        $container = new Container('meliscore');
+        $langId = $container['melis-lang-id'];
+
         if($this->getRequest()->isPost())
         {
             $colId = array_keys($melisTool->getColumns());
@@ -556,7 +564,7 @@ class SitesController extends MelisAbstractActionController
                     $attrArray = array('data-mod-found'   => false);
                 }
 
-                $tableData[$ctr]['site_variety'] = $translator->translate('tr_meliscms_site_variety_'.$tableData[$ctr]['site_variety']);
+                $tableData[$ctr]['site_variety'] = $cmsSiteSrv->getSiteVariety($langId)[$tableData[$ctr]['site_variety']];
 
                 //assign attribute data to table row
                 $tableData[$ctr]['DT_RowAttr'] = $attrArray;

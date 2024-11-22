@@ -11,9 +11,10 @@ class MelisCmsSiteService extends MelisGeneralService
     /**
      * Get site variety
      *
+     * @param null $langId
      * @return mixed
      */
-    public function getSiteVariety()
+    public function getSiteVariety($langId = null)
     {
         $results = [];
 
@@ -24,20 +25,36 @@ class MelisCmsSiteService extends MelisGeneralService
         $arrayParameters = $this->sendEvent('meliscmssite_service_get_site_variety_start', $arrayParameters);
 
         // Service implementation start
-        $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
+        $siteVarietiesTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteVarieties');
         //translator
         $translator = $this->getServiceManager()->get('translator');
 
-        $site = $siteTable->fetchAll()->toArray();
+        $varieties = $siteVarietiesTable->getSiteVarieties($arrayParameters['langId'])->toArray();
 
-        if (!empty($site))
+        $tracker = [];
+        if (!empty($varieties))
         {
-            foreach($site as $key => $val){
-                $results[$val['site_variety']] = $translator->translate('tr_meliscms_site_variety_'.$val['site_variety']);
+            foreach($varieties as $key => $val){
+                if($arrayParameters['langId'] == $val['mcsvt_lang_id']) {
+                    $results[$val['mcsv_code']] = $translator->translate($val['mcsvt_variety_name']);
+                    //add to tracker
+                    $tracker[] = $val['mcsv_id'];
+                }
             }
+            //if text doesnt have data on current language
+            //we use data of any language we find first
+            foreach($varieties as $key => $val){
+                if(!in_array($val['mcsv_id'], $tracker)) {
+                    $results[$val['mcsv_code']] = $translator->translate($val['mcsvt_variety_name']);
+                    $tracker2[] = $val['mcsv_id'];
+                }
+            }
+
+            asort($results);
         }else{//set default variety
-            $results['SITE'] = $translator->translate('tr_meliscms_site_variety_SITE');;
+            $results['SITE'] = $translator->translate('tr_meliscms_site_variety_SITE');
         }
+
 
         // Service implementation end
 
