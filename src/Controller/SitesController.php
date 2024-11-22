@@ -63,10 +63,25 @@ class SitesController extends MelisAbstractActionController
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $melisKey = $this->getMelisKey();
 
+        $siteService = $this->getServiceManager()->get('MelisCmsSiteService');
+        $container = new Container('meliscore');
+        $langId = $container['melis-lang-id'];
+
+        $siteVariety = $siteService->getSiteVariety($langId);
+
+        $siteLabel = '';
+        $siteData = $this->getSiteDataById($siteId);
+        if(!empty($siteData)){
+            $siteLabel = $siteData['site_label'];
+            if($siteData['site_variety'] != 'SITE'){
+                $siteLabel .= ' ('.$siteVariety[$siteData['site_variety']].')';
+            }
+        }
+
         $view = new ViewModel();
         $view->melisKey = $melisKey;
         $view->siteId = $siteId;
-        $view->siteLabel = $this->getSiteDataById($siteId)['site_label'] ?? '';
+        $view->siteLabel = $siteLabel;
 
         return $view;
     }

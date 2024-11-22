@@ -208,9 +208,9 @@ $(function() {
         $body.on("click", ".btnEditSites", function() {
             var $this       = $(this),
                 tableId     = $this.closest('tr').attr('id'),
-                name        = $this.closest('tr').find("td:nth-child(2)").text(),
-                siteLang    = $this.closest('tr').find("td:nth-child(4)").text(),
-                siteModule  = $this.closest('tr').find("td:nth-child(3)").text(),
+                name        = $this.closest('tr').find("td:nth-child(3)").text(),
+                siteLang    = $this.closest('tr').find("td:nth-child(5)").text(),
+                siteModule  = $this.closest('tr').find("td:nth-child(4)").text(),
                 selId       = $this.closest('tr').attr("id");
 
                 openSiteEditTab(updateSiteTitle(selId, name, siteModule, siteLang), tableId, siteModule);
@@ -1154,7 +1154,7 @@ $(function() {
          */
         function openSiteEditTab(name, siteId, moduleName) {
             melisHelper.tabOpen(name, 'fa-book', siteId+'_id_meliscms_tool_sites_edit_site', 'meliscms_tool_sites_edit_site',  { siteId : siteId, moduleName : moduleName }, 'id_meliscms_tool_sites', function(){
-                $("#" + siteId + "_id_meliscms_tool_sites_edit_site_header site-title-tag").text(" / " + name);
+                // $("#" + siteId + "_id_meliscms_tool_sites_edit_site_header site-title-tag").text(" / " + name);
             });
         }
 
