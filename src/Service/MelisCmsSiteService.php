@@ -4,6 +4,7 @@ namespace MelisCms\Service;
 
 use Laminas\Config\Config;
 use Laminas\Config\Writer\PhpArray;
+use Laminas\Filter\Boolean;
 use MelisCore\Service\MelisGeneralService;
 
 class MelisCmsSiteService extends MelisGeneralService
@@ -558,7 +559,7 @@ class MelisCmsSiteService extends MelisGeneralService
          */
         if ($createSiteAndDomain) {
             $nxtTplId = ++$tplId;
-            $this->createSitePageTemplate($nxtTplId, $savedSiteId, $siteModuleName, '404', 'Page404', 'index', $platformId);
+            $this->createSitePageTemplate($nxtTplId, $savedSiteId, $siteModuleName, '404', 'Page404', 'index', $platformId, true);
             $page404Id = $pageId + 1;
             $this->createSitePage('404', $pageId, $langId, 'PAGE', $page404Id, $nxtTplId, $platformId);
 
@@ -884,26 +885,34 @@ class MelisCmsSiteService extends MelisGeneralService
 	 * @param Int $siteId
 	 * @param String $siteName
 	 * @param String $tempName
-	 * @param String $controler
+	 * @param String $controller
 	 * @param String $action
 	 * @param Int $platformId
+	 * @param Boolean $is404
 	 * @return Int
 	 */
-	private function createSitePageTemplate($tplId, $siteId, $siteName, $tempName, $controler, $action, $platformId)
+	private function createSitePageTemplate($tplId, $siteId, $siteName, $tempName, $controller, $action, $platformId, $is404 = false)
 	{
+        // Event parameters prepare
+        $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
+
+        // Sending service start event
+        $arrayParameters = $this->sendEvent('meliscmssite_service_create_site_page_template_start', $arrayParameters);
+
+
 	    $cmsTemplateTbl = $this->getServiceManager()->get('MelisEngineTableTemplate');
 	    $cmsPlatformTable = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
 	    
 	    // Template data
 	    $template = array(
-	        'tpl_id' => $tplId,
-	        'tpl_site_id' => $siteId,
-	        'tpl_name' => $tempName,
+	        'tpl_id' => $arrayParameters['tplId'],
+	        'tpl_site_id' => $arrayParameters['siteId'],
+	        'tpl_name' => $arrayParameters['tempName'],
 	        'tpl_type' => 'ZF2',
-	        'tpl_zf2_website_folder' => $siteName,
+	        'tpl_zf2_website_folder' => $arrayParameters['siteName'],
 	        'tpl_zf2_layout' => 'defaultLayout',
-	        'tpl_zf2_controller' => $controler,
-	        'tpl_zf2_action' => $action,
+	        'tpl_zf2_controller' => $arrayParameters['controller'],
+	        'tpl_zf2_action' => $arrayParameters['action'],
 	        'tpl_php_path' => '',
 	        'tpl_creation_date' => date('Y-m-d H:i:s'),
 	    );
@@ -913,21 +922,35 @@ class MelisCmsSiteService extends MelisGeneralService
 	    
 	    // Updating platform ids after site pages creation
 	    $platform = array(
-	        'pids_tpl_id_current' => ++$tplId
+	        'pids_tpl_id_current' => ++$arrayParameters['tplId']
 	    );
-	    $cmsPlatformTable->save($platform, $platformId);
-	    
-	    return $templateId;
+	    $cmsPlatformTable->save($platform, $arrayParameters['platformId']);
+
+        // Adding results to parameters for events treatment if needed
+        $arrayParameters['results'] = $templateId;
+        // Sending service end event
+        $arrayParameters = $this->sendEvent('meliscmssite_service_create_site_page_template_end', $arrayParameters);
+
+        return $arrayParameters['results'];
 	}
 	
 	/**
 	 * Creating the Site module on /module/MelisSites directory
 	 * 
 	 * @param String $siteName, the name of the result Site module
+	 * @param String $moduleName, module name that holds the sample module files (inside etc folder)
 	 * @return Array
 	 */
-	private function createSiteModule($siteName)
+	private function createSiteModule($siteName, $moduleName = 'MelisCms')
 	{
+        // Event parameters prepare
+        $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
+
+        // Sending service start event
+        $arrayParameters = $this->sendEvent('meliscmssite_service_create_site_module_start', $arrayParameters);
+
+        $siteName = $arrayParameters['siteName'];
+
 	    $results = array(
 	        'success' => false,
 	        'message' => null,
@@ -940,7 +963,7 @@ class MelisCmsSiteService extends MelisGeneralService
 	        {
 	            $moduleSvc = $this->getServiceManager()->get('ModulesService');
 	            
-	            $melisCmsDir = $moduleSvc->getModulePath('MelisCms');
+	            $melisCmsDir = $moduleSvc->getModulePath($arrayParameters['moduleName']);
 	            
 	            $siteSampleDir = $melisCmsDir.'/etc/SiteSample';
 	            
@@ -976,8 +999,13 @@ class MelisCmsSiteService extends MelisGeneralService
 	        // MelisSites directory not exist
 	        $results['message'] = 'tr_meliscms_tool_site_melissites_directory_not_exist';
 	    }
-	    
-	    return $results;
+
+        // Adding results to parameters for events treatment if needed
+        $arrayParameters['results'] = $results;
+        // Sending service end event
+        $arrayParameters = $this->sendEvent('meliscmssite_service_create_site_module_end', $arrayParameters);
+
+        return $arrayParameters['results'];
 	    
 	}
 	
