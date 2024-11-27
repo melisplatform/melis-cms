@@ -833,9 +833,11 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             } else {
                 if (! in_array($category['mtplc_id'], $cat_ids)) {
                     $category_lang = $lang_table->getEntryById($category['mtplct_lang_id'])->current();
-                    $category['mtplct_name'] .= ' (' . $category_lang->lang_cms_name . ')';
-                    $final_categories[] = $category;
-                    $cat_ids[] = $category['mtplc_id'];
+                    if($category_lang) {
+                        $category['mtplct_name'] .= ' (' . $category_lang->lang_cms_name . ')';
+                        $final_categories[] = $category;
+                        $cat_ids[] = $category['mtplc_id'];
+                    }
                 }
             }
         }
