@@ -705,8 +705,8 @@ var melisCms = (function() {
 	function iframeLoad(id) {
 		var $melisIframe = $("#" + id + "_id_meliscms_page").find(".melis-iframe"),
 			height = $melisIframe.contents().height();
-
-			$melisIframe.css("height", height);
+			
+			$melisIframe.css("height", height);			
 			$melisIframe.css("min-height", "700px");
 
 			// Activating page edition button action

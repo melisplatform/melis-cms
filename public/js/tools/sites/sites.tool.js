@@ -320,7 +320,7 @@ $(function() {
                 /**
                  * call function one by one
                  */
-                functionToCall = $.parseJSON(functionToCall);
+                functionToCall = JSON.parse(functionToCall);
                 if(Array.isArray(functionToCall)){
                     $.each(functionToCall, function(i, funcName){
                         executeFunction(funcName);
@@ -337,7 +337,7 @@ $(function() {
                 /**
                  * call function one by one
                  */
-                functionToCall = $.parseJSON(functionToCall);
+                functionToCall = JSON.parse(functionToCall);
                 if(Array.isArray(functionToCall)){
                     $.each(functionToCall, function(i, funcName){
                         executeFunction(funcName);
