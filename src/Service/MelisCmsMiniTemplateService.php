@@ -280,6 +280,9 @@ class MelisCmsMiniTemplateService extends MelisGeneralService {
             if (! empty($arrayParameters['mini_template_name'])) {
                 $table = $this->getServiceManager()->get('MelisCmsMiniTplCategoryTemplateTable');
                 $table->deleteByField('mtplct_template_name', $arrayParameters['mini_template_name']);
+
+                $flaggedTplTable = $this->getServiceManager()->get('MelisEngineTableFlaggedTemplate');
+                $flaggedTplTable->deleteByField('mtpft_template_name', $arrayParameters['mini_template_name']);
             }
 
             $success = 1;
