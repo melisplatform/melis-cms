@@ -703,9 +703,10 @@ var melisCms = (function() {
 
 	// IFRAME HEIGHT CONTROLS (for onload, displaySettings & sidebar collapse)
 	function iframeLoad(id) {
+		// if issues arise on iframeLoad and content gets cut out, see: melis-cms-documentation-site1/public/js/custom.js
 		var $melisIframe = $("#" + id + "_id_meliscms_page").find(".melis-iframe"),
 			height = $melisIframe.contents().height();
-			
+
 			$melisIframe.css("height", height);			
 			$melisIframe.css("min-height", "700px");
 
