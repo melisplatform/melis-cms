@@ -14,7 +14,7 @@
 			glyph: {
 				map: {
 					loading: "fa fa-spinner fa-pulse",
-					//loading: "glyphicon-refresh fancytree-helper-spin" // edited by junry
+					//loading: "glyphicon-refresh fancytree-helper-spin"
 				},
 			},
 			persist: {
@@ -197,7 +197,7 @@
 							);
 						}
 					}
-				},
+				}
 			},
 			lazyLoad: function(event, data) {
 				// get the page ID and pass it to lazyload
@@ -489,7 +489,7 @@
 					});
 					// end
 				},
-			},
+			}
 		});
 
 		// create page if treeview page is empty
