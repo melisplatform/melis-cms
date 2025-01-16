@@ -172,7 +172,7 @@ return array(
             'datas' => array(
                 /**
                  * Used to copy necessary file to
-                 * main public/bundles-generated folder
+                 * main public/ folder (image/font/icon only)
                  */
                 'bundle_all_needed_files' => [
                     //will be put inside css folder
@@ -182,7 +182,9 @@ return array(
                         '/build/css/32px.png',
                         '/build/css/40px.png',
                         '/build/css/throbber.gif', */
-                        '/assets/jstree/dist/themes/default/'
+                        '/assets/jstree/dist/themes/default/32px.png',
+                        '/assets/jstree/dist/themes/default/40px.png',
+                        '/assets/jstree/dist/themes/default/throbber.gif',
                     ],
                     //will be put inside js folder
                     'js' => [
