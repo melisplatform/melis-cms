@@ -367,6 +367,10 @@ class PageEditionController extends MelisAbstractActionController
 		$success = 1;
 		$tinyTemplates = array();
 
+        if((is_null($idPage) || empty($idPage) || !is_numeric($idPage))){
+            return new JsonModel($tinyTemplates);
+        }
+
 		// No pageId, return empty array 
 		if (!empty($idPage))
 		{
