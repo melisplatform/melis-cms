@@ -611,7 +611,9 @@ $(function() {
                     // call melisOkNotification
                     melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46' );
 
-                    $('#id_meliscms_tool_sites_modal_container_container').modal('hide');
+                    // $('#id_meliscms_tool_sites_modal_container_container').modal('hide');
+                    melisCoreTool.hideModal("id_meliscms_tool_sites_modal_container_container");
+
                     //re init variables
                     initVariables();
                     //refresh site table
@@ -1385,7 +1387,11 @@ $(function() {
                         }
 
                         // Close modal
-                        $(this).closest(".modal").modal("hide");
+                        // $(this).closest(".modal").modal("hide");
+                        var modalId = $(this).closest(".modal").attr("id");
+                            if (modalId != "" && modalId != "undefined") {
+                                melisCoreTool.hideModal(modalId);
+                            }
                     }
                     else {
                         melisHelper.melisKoNotification("tr_meliscms_menu_sitetree_Name", "tr_meliscore_error_message");

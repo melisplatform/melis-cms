@@ -14,7 +14,7 @@
 			glyph: {
 				map: {
 					loading: "fa fa-spinner fa-pulse",
-					//loading: "glyphicon-refresh fancytree-helper-spin" // edited by junry
+					//loading: "glyphicon-refresh fancytree-helper-spin"
 				},
 			},
 			persist: {
@@ -197,7 +197,7 @@
 							);
 						}
 					}
-				},
+				}
 			},
 			lazyLoad: function(event, data) {
 				// get the page ID and pass it to lazyload
@@ -489,7 +489,7 @@
 					});
 					// end
 				},
-			},
+			}
 		});
 
 		// create page if treeview page is empty
@@ -583,9 +583,9 @@
 			})
 			.done(function(data) {
 				if (data.success) {
-					$("#id_meliscms_tools_tree_modal_form_handler_container").modal(
-						"hide"
-					);
+					// $("#id_meliscms_tools_tree_modal_form_handler_container").modal("hide");
+					melisCoreTool.hideModal("id_meliscms_tools_tree_modal_form_handler_container");
+
 					melisCms.refreshTreeview(parentNode, 1);
 					// clear Add Form
 					melisHelper.melisOkNotification(data.textTitle, data.textMessage);

@@ -54,7 +54,9 @@
                         }).done(function(data) {
                             dataUrl = data.link;
                             showUrl(dataUrl);
-                            $("#id_meliscms_find_page_tree_container").modal("hide");
+
+                            // $("#id_meliscms_find_page_tree_container").modal("hide");
+                            melisCoreTool.hideModal("id_meliscms_find_page_tree_container");
                         }).fail(function(xhr, textStatus, errorThrown) {
                             alert( translations.tr_meliscore_error_message );
                         });
@@ -72,7 +74,8 @@
 
         $(inputId).val(id);
 
-        $('#id_meliscms_input_page_tree_container').modal("hide");
+        // $('#id_meliscms_input_page_tree_container').modal("hide");
+        melisCoreTool.hideModal("id_meliscms_input_page_tree_container");
 
         melisCoreTool.done('#generateTreePageLink');
     });

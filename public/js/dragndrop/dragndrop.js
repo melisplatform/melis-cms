@@ -216,6 +216,16 @@ var melisDragnDrop = (function ($, window) {
 								}
 							}, 1000);
 						});
+
+						/* window.parent.$('body').on('hidden.bs.modal', window.parent.$('.modal.bootstrap-dialog.show'), function (e) {
+							// check if loader exists
+							if( !$(ui.helper[0]).parent().find('.overlay-loader').length ) {
+	
+								// remove clone element
+								ui.helper[0].remove();
+							}
+							console.log(`window.parent.$('.modal.bootstrap-dialog.show')!!!`);
+						}); */
 				} // check ui.helper
 
 				if (ui.sender[0]) {
@@ -225,7 +235,6 @@ var melisDragnDrop = (function ($, window) {
 					melisPluginEdition.sendDragnDropList(dragZoneSenderPluginId, tabId);
 				}
 			},
-
 			update: function (event, ui) {
 				$(".ui-sortable-helper").remove();
 			},

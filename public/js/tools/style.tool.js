@@ -52,7 +52,9 @@ var melisStyleTool = (function($, window) {
 	        encode		: true
 	    }).done(function(data) {
 	    	if(data.success) {
-	    		$('#id_meliscms_tool_styles_modal_form_handler_container').modal('hide');
+	    		//$('#id_meliscms_tool_styles_modal_form_handler_container').modal('hide');
+				melisCoreTool.hideModal("id_meliscms_tool_styles_modal_form_handler_container");
+
 	    		melisStyleTool.refreshTable();
 	    		// clear Add Form
 	    		melisHelper.melisOkNotification( data.textTitle, data.textMessage );

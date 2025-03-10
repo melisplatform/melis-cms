@@ -488,15 +488,26 @@ class SitesTranslationController extends MelisAbstractActionController
                     $hasFilter = true;
                     //loop through each field to get its text, and check if has contain the $search value
                     foreach ($colId as $key => $val) {
-                        if (isset($data[$i][$val])) {
-                            if (strpos(strtolower($data[$i][$val]), strtolower($search)) !== false) {
-                                //if found push the data
-                                array_push($a, $data[$i]);
-                                break;
+                        if($val != 'mst_trans_indicator') {
+                            if (isset($data[$i][$val])) {
+                                // decode for accented characters
+                                $decodedString = html_entity_decode($data[$i][$val], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                                if (str_contains(mb_strtolower($decodedString), mb_strtolower($search))) {
+                                    // truncate key and label
+                                    $data[$i]['mst_key'] = $this->truncateString($data[$i]['mst_key'], 64);
+                                    $data[$i]['mstt_text'] = $this->truncateString($data[$i]['mstt_text'], 64);
+                                    //if found push the data
+                                    array_push($a, $data[$i]);
+                                    break;
+                                }
                             }
                         }
                     }
                 }
+
+                // truncate key and label
+                $data[$i]['mst_key'] = $this->truncateString($data[$i]['mst_key'], 64);
+                $data[$i]['mstt_text'] = $this->truncateString($data[$i]['mstt_text'], 64);
             }
 
             if($hasFilter){
@@ -510,7 +521,7 @@ class SitesTranslationController extends MelisAbstractActionController
             $data = array_splice($data, $start, $length);
             //sort the result by module name
             usort($data, function($a, $b){
-                return strcasecmp($a['module'], $b['module']);
+                return strcasecmp($a['module'] ?? '', $b['module'] ?? '');
             });
         }
 
@@ -520,6 +531,15 @@ class SitesTranslationController extends MelisAbstractActionController
             'recordsFiltered' =>  count($recordsFiltered),
             'data' => $data,
         ));
+    }
+
+    private function truncateString($string, $maxLength, $ellipsis = '...') {
+        // Check if the string needs truncation
+        if (mb_strlen($string) > $maxLength) {
+            // Truncate the string and add the ellipsis
+            return mb_substr($string, 0, $maxLength - mb_strlen($ellipsis)) . $ellipsis;
+        }
+        return $string; // Return the original string if no truncation is needed
     }
     
     /**

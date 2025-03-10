@@ -20,7 +20,9 @@ $(function() {
 			encode		: true
 	    }).done(function(data) {
 	    	if ( data.success ) {
-				$('#modal-language-cms').modal('hide');
+				// $('#modal-language-cms').modal('hide');
+				melisCoreTool.hideModal("modal-language-cms");
+
 				melisHelper.zoneReload("id_meliscms_tool_language", "meliscms_tool_language");
 				melisHelper.melisOkNotification(data.textTitle, data.textMessage);
 			}
@@ -78,8 +80,10 @@ $(function() {
 	        dataType    : 'json',
 	        encode		: true
 		}).done(function(data) {
-			if(data.success) { //alert("success!");
-				$('#modal-language-cms').modal('hide');
+			if(data.success) {
+				// $('#modal-language-cms').modal('hide');
+				melisCoreTool.hideModal("modal-language-cms");
+
 				melisHelper.zoneReload("id_meliscms_tool_language", "meliscms_tool_language");
 				// Show Pop-up Notification
 	    		melisHelper.melisOkNotification(data.textTitle, data.textMessage);

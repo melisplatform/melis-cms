@@ -74,7 +74,9 @@ var toolTemplate = {
 		    }).done(function(data) {
 		    	
 		    	if(data.success) {
-		    		$("#modal-template-manager-actions").modal('hide');
+		    		//$("#modal-template-manager-actions").modal('hide');
+					melisCoreTool.hideModal("modal-template-manager-actions");
+
 		    		toolTemplate.refreshTable();
 		    		// clear Add Form
 		    		melisCoreTool.clearForm("id_tool_template_generic_form");
@@ -113,7 +115,9 @@ var toolTemplate = {
 		        encode		: true
 		    }).done(function(data){
 		    	if ( data.success ) {
-		    		$("#modal-template-manager-actions").modal('hide');
+		    		// $("#modal-template-manager-actions").modal('hide');
+					melisCoreTool.hideModal("modal-template-manager-actions");
+
 		    		toolTemplate.refreshTable();
 		    		// clear Edit Form
 		    		melisCoreTool.clearForm("id_tool_template_generic_form");

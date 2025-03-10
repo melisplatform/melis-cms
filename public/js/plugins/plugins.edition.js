@@ -743,7 +743,7 @@ var melisPluginEdition = (function($, window) {
                     // hide tinymce option while resizing
                     var inst = tinyMCE.EditorManager.get(data.pluginId);
                         inst.fire("blur");
-                        iframe.blur();
+                        iframe.trigger("blur");
 
                         $(editable).map(function() {
                             var $this = $(this);
