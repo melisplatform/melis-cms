@@ -476,6 +476,10 @@
 	    'tr_meliscms_drag_and_drop_modal_title' => 'Drag\'n\'Drop confirmation',
 	    'tr_meliscms_drag_and_drop_modal_content' => 'Are you sure you want to add this plugin to the page?',
 
+		// Delete cms plugins
+		'tr_meliscms_delete_cms_plugin_modal_title' => 'Delete CMS plugin confirmation',
+		'tr_meliscms_delete_cms_plugin_modal_content' => 'Are you sure you want to delete this plugin to the page?',
+
         /** Banner */
         'tr_PluginSection_MelisCmsGdprBanner' => 'Melis Cms GDPR Banner',
         'tr_melis_cms_gdpr_banner_tabname' => 'Banners',

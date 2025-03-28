@@ -160,72 +160,32 @@ var melisDragnDrop = (function ($, window) {
 				var tabId;
 				// check if ui is from pluginMenu
 				if (ui.helper && $(ui.helper).hasClass("melis-cms-plugin-snippets")) {
-					// modal confirmation
-					window.parent.melisCoreTool.confirm(
-						translations.tr_meliscms_common_yes,
-						translations.tr_meliscms_common_no,
-						translations.tr_meliscms_drag_and_drop_modal_title, // title
-						translations.tr_meliscms_drag_and_drop_modal_content, // message
-						function() {
-							var moduleName = $(ui.helper[0]).data("module-name");
-							var pluginName = $(ui.helper[0]).data("plugin-name");
-							var siteModule = $(ui.helper[0]).data("plugin-site-module");
-							// get id of current dragzone
-							var dropzone = $(event.target).data("dragdropzone-id");
-							tabId = window.parent
-								.$("#" + parent.activeTabId)
-								.find(".melis-iframe")
-								.data("iframe-id");
 
-							var dataKeysfromdragdropzone = $(ui.helper[0]).data(
-								"melis-fromdragdropzone"
-							);
-							var dropLocation = ui.helper[0];
-							// remove Clone
-							// ui.helper[0].remove();
-							setTimeout(function () {
-								if (moduleName !== undefined) {
-									requestPlugin(
-										moduleName,
-										pluginName,
-										dropzone,
-										tabId,
-										dropLocation,
-										siteModule
-									);
-								}
-							}, 300);
-						}
-					);
-
-					/**
-					 * Bind on bootstrap hidden modal event,
-					 * Delayed execution with setTimeout(), as it removes dropLocation or ui.helper[0]
-					 */
-					var modalId = window.parent.$(".modal.bootstrap-dialog.show").attr("id");
-					const modalEl = window.parent.document.getElementById(modalId);
+					var moduleName = $(ui.helper[0]).data("module-name");
+					var pluginName = $(ui.helper[0]).data("plugin-name");
+					var siteModule = $(ui.helper[0]).data("plugin-site-module");
 					
-						modalEl.addEventListener('hidden.bs.modal', event => {
-							var uiTimeout = setTimeout(function() {
-								// check if loader exists
-								if (!$(ui.helper[0]).parent().find(".overlay-loader").length) {
-									// remove clone element
-									ui.helper[0].remove();
+					// get id of current dragzone
+					var dropzone = $(event.target).data("dragdropzone-id");
+						tabId = window.parent.$("#" + parent.activeTabId).find(".melis-iframe").data("iframe-id");
 
-									clearTimeout( uiTimeout );
-								}
-							}, 1000);
-						});
+					var dataKeysfromdragdropzone = $(ui.helper[0]).data("melis-fromdragdropzone");
+					var dropLocation = ui.helper[0];
 
-						/* window.parent.$('body').on('hidden.bs.modal', window.parent.$('.modal.bootstrap-dialog.show'), function (e) {
-							// check if loader exists
-							if( !$(ui.helper[0]).parent().find('.overlay-loader').length ) {
-	
-								// remove clone element
-								ui.helper[0].remove();
-							}
-							console.log(`window.parent.$('.modal.bootstrap-dialog.show')!!!`);
-						}); */
+					// remove Clone
+					// ui.helper[0].remove();
+					setTimeout(function () {
+						if (moduleName !== undefined) {
+							requestPlugin(
+								moduleName,
+								pluginName,
+								dropzone,
+								tabId,
+								dropLocation,
+								siteModule
+							);
+						}
+					}, 300);
 				} // check ui.helper
 
 				if (ui.sender[0]) {
