@@ -442,7 +442,7 @@ var melisPluginEdition = (function($, window) {
             pluginListContainer['melisModule']                   = $(parentDragndropContainer).data("module");
             pluginListContainer['melisPluginName']               = $(parentDragndropContainer).data("plugin");
             pluginListContainer['melisPluginId']                 = $(parentDragndropContainer).data("plugin-id");
-            pluginListContainer['melisPluginTag']                = $(parentDragndropContainer).data("site-module");
+            pluginListContainer['melisPluginTag']                = $(parentDragndropContainer).data("melis-tag");
             pluginListContainer['children']                      = new Object();
 
             var ctr = 0;
@@ -460,7 +460,7 @@ var melisPluginEdition = (function($, window) {
                     pluginList['melisModule'] = $(v).data("module");
                     pluginList['melisPluginName'] = $(v).data("plugin");
                     pluginList['melisPluginId'] = $(v).data("plugin-id");
-                    pluginList['melisPluginTag'] = $(v).data("site-module");
+                    pluginList['melisPluginTag'] = $(v).data("melis-tag");
                     pluginList['melisDragDropZoneListPlugin'] = new Object();
 
                     // loop all plugins in dropzone
