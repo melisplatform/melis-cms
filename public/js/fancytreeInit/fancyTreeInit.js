@@ -122,7 +122,7 @@
 		window.mainTree = function() {
 			var melisExtensions;
 			var $tabArrowTop = $("#tab-arrow-top");
-
+			
 			if (melisCore.screenSize <= 767) {
 				melisExtensions = ["contextMenu", "filter", "glyph"];
 			} else {
@@ -138,12 +138,12 @@
 						//loading: "glyphicon-refresh fancytree-helper-spin"
 					},
 				},
-				// persist: {
-				// 	cookiePrefix: "fancytree-1-",
-				// 	expandLazy: true,
-				// 	overrideSource: true, // true: cookie takes precedence over `source` data attributes.
-				// 	store: "auto", // 'cookie', 'local': use localStore, 'session': sessionStore
-				// },
+				/* persist: {
+					cookiePrefix: "fancytree-1-",
+					expandLazy: true,
+					overrideSource: true, // true: cookie takes precedence over `source` data attributes.
+					store: "auto", // 'cookie', 'local': use localStore, 'session': sessionStore
+				}, */
 				activeVisible: false,
 				debugLevel: 0,
 				autoScroll: true,
@@ -342,43 +342,38 @@
 
 					//var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
 					var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
-
-					if (tree?.count() === 0) {
-						$(".meliscms-search-box.sidebar-treeview-search").hide();
-						// Checking if the user has a Page rights to access
-						// -1 is the value for creating new page right
-						$.get(
-							"/melis/MelisCms/TreeSites/checkUserPageTreeAccress",
-							{
-								idPage: -1,
-							},
-							function(res) {
-								if (res.isAccessible) {
-									$("#id-mod-menu-dynatree").prepend(
-										"<div class='create-newpage'><span class='btn btn-success'>" +
-											translations.tr_meliscms_create_page +
-											"</span></div>"
-									);
+						if (tree?.count() === 0) {
+							$(".meliscms-search-box.sidebar-treeview-search").hide();
+							// Checking if the user has a Page rights to access
+							// -1 is the value for creating new page right
+							$.get(
+								"/melis/MelisCms/TreeSites/checkUserPageTreeAccress",
+								{
+									idPage: -1,
+								},
+								function(res) {
+									if (res.isAccessible) {
+										$("#id-mod-menu-dynatree").prepend(
+											"<div class='create-newpage'><span class='btn btn-success'>" +
+												translations.tr_meliscms_create_page +
+												"</span></div>"
+										);
+									}
 								}
-							}
-						);
-					} else {
-						$(".meliscms-search-box.sidebar-treeview-search").show();
-						$("#id-mod-menu-dynatree .create-newpage").remove();
-					}
+							);
+						} else {
+							$(".meliscms-search-box.sidebar-treeview-search").show();
+							$("#id-mod-menu-dynatree .create-newpage").remove();
+						}
 				},
 				click: function(event, data) {
 					var targetType = data.targetType,
 						dataNode = data.node;
 
 						if (targetType === "title") {
-							// This triggers error: Fancytree assertion failed: only init supported, data.node.setExpanded()
 							// data.node.setExpanded();
-							// data.node.toggleExpanded();
-							// dataNode.setExpanded(!dataNode.isExpanded());
-							$(dataNode.li).find(".fancytree-expander").trigger("click");
-
-							// event.preventDefault();
+							dataNode.toggleExpanded();
+							// $(dataNode.li).find(".fancytree-expander").trigger("click");
 
 							// open page on click on mobile and desktop is double click
 							if (melisCore.screenSize <= 1024) {
@@ -420,81 +415,22 @@
 					 * Get eventType to know what was clicked the 'expander (+-)' or the title
 					 * targetType = data.targetType;
 					 */
-
 					// open tab and page
 					var data 		= data.node.data,
 						pageName 	= data.melisData.page_id + " - " + data.melisData.page_title;
-						// title, icon, zoneId, melisKey, parameters, navTabsGroup, callback
+
+						// title, icon, zoneId, melisKey, parameters, navTabsGroup, callback			
 						melisHelper.tabOpen(pageName, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,{ idPage: data.melisData.page_id, }, null, () => {
 							melisCms.pageTabOpenCallback(data.melisData.page_id);
+
 							// show page loader
-							loader.addActivePageEditionLoading(data.melisData.item_zoneid);
+							loader.addActivePageEditionLoading(data.melisData.item_zoneid);									
 						});
 
 						$(".hasNiceScroll").getNiceScroll().resize();
 
-					return false;
+						return false;
 				},
-				/* loadChildren: function(event, data) {
-					//RUNS ONLY ONCE
-					// if there is no/empty pages in the treeview
-					//var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
-					// PAGE ACCESS user rights checking
-						$.ajax({
-							url         : '/melis/MelisCms/TreeSites/canEditPages',
-							encode		: true
-						}).done(function(data){
-							// has no access
-							if(data.edit === 0){
-								$(".meliscms-search-box.sidebar-treeview-search").hide();
-								$("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='no-access'>" + translations.tr_meliscms_no_access + "</span></div>");
-							}
-							// has access
-							else{
-									if(tree.count() === 0){
-								$(".meliscms-search-box.sidebar-treeview-search").hide();
-								$("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='btn btn-success'>"+ translations.tr_meliscms_create_page +"</span></div>");
-									}
-									else{
-								$(".meliscms-search-box.sidebar-treeview-search").show();
-									$("#id-mod-menu-dynatree .create-newpage").remove();
-									}
-							}
-						}).fail(function(xhr, textStatus, errorThrown){
-							alert( translations.tr_meliscore_error_message );
-						});
-
-
-						// SAVE user rights checking
-						$.ajax({
-							url         : '/melis/MelisCms/Page/isActionActive?actionwanted=save',
-							encode		: true
-						}).done(function(data){
-							if(data.active === 0){
-								$("body").addClass('disable-create');
-							}
-							else{
-								$("body").removeClass('disable-create');
-							}
-						}).fail(function(xhr, textStatus, errorThrown){
-							alert( translations.tr_meliscore_error_message );
-						});
-						
-						// DELETE user rights checking
-						$.ajax({
-							url         : '/melis/MelisCms/Page/isActionActive?actionwanted=delete',
-							encode		: true
-						}).done(function(data){
-							if(data.active === 0){
-								$("body").addClass('disable-delete');
-							}
-							else{
-								$("body").removeClass('disable-delete');
-							}
-						}).fail(function(xhr, textStatus, errorThrown){
-							alert( translations.tr_meliscore_error_message );
-						});
-				}, */
 				renderNode: function(event, data) {
 					// removed .fancytree-icon class and replace it with font-awesome icons
 					$(data.node.span)
