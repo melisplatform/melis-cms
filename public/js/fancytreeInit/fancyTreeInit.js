@@ -6,7 +6,8 @@
 		if (melisCore.screenSize <= 767) {
 			melisExtensions = ["contextMenu", "filter", "glyph"];
 		} else {
-			melisExtensions = ["contextMenu", "dnd", "filter", "glyph", "persist"];
+			// melisExtensions = ["contextMenu", "dnd", "filter", "glyph", "persist"];
+			melisExtensions = ["contextMenu", "dnd", "filter", "glyph"];
 		}
 
 		$("#id-mod-menu-dynatree").fancytree({
@@ -17,12 +18,12 @@
 					//loading: "glyphicon-refresh fancytree-helper-spin"
 				},
 			},
-			persist: {
+			/* persist: {
 				cookiePrefix: "fancytree-1-",
 				expandLazy: true,
 				overrideSource: true, // true: cookie takes precedence over `source` data attributes.
 				store: "auto", // 'cookie', 'local': use localStore, 'session': sessionStore
-			},
+			}, */
 			activeVisible: false,
 			debugLevel: 0,
 			autoScroll: true,
@@ -251,13 +252,12 @@
 					dataNode = data.node;
 
 					if (targetType === "title") {
-						// This triggers error: Fancytree assertion failed: only init supported, data.node.setExpanded()
-						// data.node.setExpanded();
-						// data.node.toggleExpanded();
-						// dataNode.setExpanded(!dataNode.isExpanded());
-						$(dataNode.li).find(".fancytree-expander").trigger("click");
+						// dataNode.setExpanded();
 
-						// event.preventDefault();
+						// prevent expansion when node is still loading, avoid triggering fancytree assertion failures during illegal state transitions
+						if (!dataNode.isLoading() && dataNode.isExpanded() !== null) {
+							dataNode.setExpanded(!dataNode.isExpanded(), { noEvents: true });
+						}
 
 						// open page on click on mobile and desktop is double click
 						if (melisCore.screenSize <= 1024) {
@@ -314,66 +314,6 @@
 
 				return false;
 			},
-			/* loadChildren: function(event, data) {
-				//RUNS ONLY ONCE
-				// if there is no/empty pages in the treeview
-				//var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
-				// PAGE ACCESS user rights checking
-					$.ajax({
-						url         : '/melis/MelisCms/TreeSites/canEditPages',
-						encode		: true
-					}).done(function(data){
-						// has no access
-						if(data.edit === 0){
-							$(".meliscms-search-box.sidebar-treeview-search").hide();
-							$("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='no-access'>" + translations.tr_meliscms_no_access + "</span></div>");
-						}
-						// has access
-						else{
-								if(tree.count() === 0){
-							$(".meliscms-search-box.sidebar-treeview-search").hide();
-							$("#id-mod-menu-dynatree").prepend("<div class='create-newpage'><span class='btn btn-success'>"+ translations.tr_meliscms_create_page +"</span></div>");
-								}
-								else{
-							$(".meliscms-search-box.sidebar-treeview-search").show();
-								$("#id-mod-menu-dynatree .create-newpage").remove();
-								}
-						}
-					}).fail(function(xhr, textStatus, errorThrown){
-						alert( translations.tr_meliscore_error_message );
-					});
-
-
-					// SAVE user rights checking
-					$.ajax({
-						url         : '/melis/MelisCms/Page/isActionActive?actionwanted=save',
-						encode		: true
-					}).done(function(data){
-						if(data.active === 0){
-							$("body").addClass('disable-create');
-						}
-						else{
-							$("body").removeClass('disable-create');
-						}
-					}).fail(function(xhr, textStatus, errorThrown){
-						alert( translations.tr_meliscore_error_message );
-					});
-					
-					// DELETE user rights checking
-					$.ajax({
-						url         : '/melis/MelisCms/Page/isActionActive?actionwanted=delete',
-						encode		: true
-					}).done(function(data){
-						if(data.active === 0){
-							$("body").addClass('disable-delete');
-						}
-						else{
-							$("body").removeClass('disable-delete');
-						}
-					}).fail(function(xhr, textStatus, errorThrown){
-						alert( translations.tr_meliscore_error_message );
-					});
-			}, */
 			renderNode: function(event, data) {
 				// removed .fancytree-icon class and replace it with font-awesome icons
 				$(data.node.span)
@@ -553,15 +493,6 @@
 			}
 		});
 
-		// use this callback to re-initialize the tree when its zoneReloaded
-		window.treeCallBack = function() {
-			if ( $("#id-mod-menu-dynatree").children().length == 0 ) {
-				// mainTree();
-				var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
-					tree.reload();
-			}
-		};
-
 		$body.on("click", "#duplicatePageTree", function() {
 			var dataString = $("#duplicatePageTreeForm").serializeArray();
 			var parentNode = $(
@@ -614,4 +545,13 @@
 				alert(translations.tr_meliscore_error_message);
 			});
 		});
+
+		// use this callback to re-initialize the tree when its zoneReloaded
+		window.treeCallBack = function() {
+			if ( $("#id-mod-menu-dynatree").children().length == 0 ) {
+				// mainTree();
+				var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
+					tree.reload();
+			}
+		};
 })(jQuery, window);
