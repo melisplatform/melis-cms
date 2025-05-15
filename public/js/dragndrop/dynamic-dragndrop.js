@@ -1,12 +1,26 @@
 var melisDynamicDragnDrop = (function($, window) {
-    let $body = $("body"),
-        $buttons = $(".dnd-layout-buttons .column-icon");
+    let $body           = $("body"),
+        $iconButtons    = $(".dnd-layout-buttons .column-icon"),
+        $dndWrapper     = $(".melis-dragdropzone-container .dnd-layout-wrapper"),
+        $dndButtons     = $('.dnd-layout-buttons, .dnd-plus-button');
+
+        // .dnd-layout-wrapper
+        $dndWrapper
+            .on("mouseenter", function(e) {
+                e.stopPropagation();
+
+                $dndButtons.removeClass("show-buttons");
+
+                $(this).children(".dnd-layout-buttons, .dnd-plus-button").addClass("show-buttons");
+            })
+            .on("mouseleave", function() {
+                $(this).children(".dnd-layout-buttons, .dnd-plus-button").removeClass("show-buttons");
+            });
 
         // .dnd-layout-buttons
-        $.each($buttons, function(i, v) {
-            let $this = $(v);
-            
-                $this
+        $.each($iconButtons, function(i, v) {
+            let $iconButton = $(v);
+                $iconButton
                     .on("mouseenter", function() {
                         $(this).find(".icon-col-bg").removeClass("bg-white").addClass("bg-red");
                     })
