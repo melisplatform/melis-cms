@@ -426,75 +426,209 @@ var melisPluginEdition = (function($, window) {
 
     // Send the list of plugin inside DragnDropzone
     function sendDragnDropList(dropzone, pageId) {
-        var $dropzone               = $('div[data-dragdropzone-id='+ dropzone +']'),
-            parentDragndropContainer= $dropzone.closest(".melis-dragdropzone-container"),
+        var $dropzone = $('div[data-dragdropzone-id=' + dropzone + ']'),
+            // parentDragndropContainer= $dropzone.closest(".melis-dragdropzone-container"),
+            parentDragndropContainer = $dropzone.parents(".melis-dragdropzone-container").last(),
+
             // dragdropzoneModule      = $dropzone.data("module"),
             // dragdropzonePlugin      = $dropzone.data("plugin"),
             // dragdropzonePluginId    = $dropzone.data("plugin-id"),
             // dragdropzoneMelisTag    = $dropzone.data("melis-tag"),
-            siteModule              = $dropzone.data("site-module"),
-            dropzoneList            = parentDragndropContainer.find(".melis-dragdropzone"),
+            siteModule = $dropzone.data("site-module"),
+            dropzoneList = parentDragndropContainer.find(".melis-dragdropzone"),
             // pluginListEl            = parentDragndropContainer.find(".melis-ui-outlined"),
-            dragzone                = [],
-            pluginListContainer        = new Object();
+            dragzone = [],
+            pluginListContainer = new Object();
 
-            pluginListContainer['melisIdPage']                   = pageId;
-            pluginListContainer['melisModule']                   = $(parentDragndropContainer).data("module");
-            pluginListContainer['melisPluginName']               = $(parentDragndropContainer).data("plugin");
-            pluginListContainer['melisPluginId']                 = $(parentDragndropContainer).data("plugin-id");
-            pluginListContainer['melisPluginTag']                = $(parentDragndropContainer).data("melis-tag");
-            pluginListContainer['children']                      = new Object();
+        pluginListContainer['melisIdPage'] = pageId;
+        pluginListContainer['melisModule'] = $(parentDragndropContainer).data("module");
+        pluginListContainer['melisPluginName'] = $(parentDragndropContainer).data("plugin");
+        pluginListContainer['melisPluginId'] = $(parentDragndropContainer).data("plugin-id");
+        pluginListContainer['melisPluginTag'] = $(parentDragndropContainer).data("melis-tag");
+        pluginListContainer['children'] = new Object();
 
-            var ctr = 0;
-            $.each(dropzoneList, function(k, v){
-                var pluginListEl = $(v).find(".melis-ui-outlined");
-                console.log(pluginListEl);
-                if($(pluginListEl).length) {
-                    pluginListContainer['children'][ctr] = new Object();
-                    var pluginList              = new Object();
 
-                    // var toolBox = $('div[data-dragdropzone-id=' + dropzone + ']');
-                    // var toolBox = $(pluginListEl).find(".melis-plugin-tools-box");
+        // var dndContainer = parentDragndropContainer.find(".melis-dragdropzone-container");
+        var list = new Object();
+        pluginListContainer['children'] = getDNDList(parentDragndropContainer, pageId);
 
-                    pluginList['melisIdPage'] = pageId;
-                    pluginList['melisModule'] = $(v).data("module");
-                    pluginList['melisPluginName'] = $(v).data("plugin");
-                    pluginList['melisPluginId'] = $(v).data("plugin-id");
-                    pluginList['melisPluginTag'] = $(v).data("melis-tag");
-                    pluginList['melisDragDropZoneListPlugin'] = new Object();
+        // var ctr = 0;
+        // $.each(dropzoneList, function (k, v) {
+        //     var pluginListEl = $(v).find(".melis-ui-outlined");
+        //     if ($(pluginListEl).length) {
+        //         pluginListContainer['children'][ctr] = new Object();
+        //         var pluginList = new Object();
+        //
+        //         // var toolBox = $('div[data-dragdropzone-id=' + dropzone + ']');
+        //         // var toolBox = $(pluginListEl).find(".melis-plugin-tools-box");
+        //
+        //         pluginList['melisIdPage'] = pageId;
+        //         pluginList['melisModule'] = $(v).data("module");
+        //         pluginList['melisPluginName'] = $(v).data("plugin");
+        //         pluginList['melisPluginId'] = $(v).data("plugin-id");
+        //         pluginList['melisPluginTag'] = $(v).data("melis-tag");
+        //         pluginList['melisDragDropZoneListPlugin'] = new Object();
+        //
+        //         // loop all plugins in dropzone
+        //         $.each(pluginListEl, function (key, value) {
+        //             pluginList['melisDragDropZoneListPlugin'][key] = new Object();
+        //
+        //             var plugins = $(value).find(".melis-plugin-tools-box"),
+        //                 melisPluginModuleName = $(plugins).data("module"),
+        //                 melisPluginName = $(plugins).data("plugin"),
+        //                 melisPluginID = $(plugins).data("plugin-id"),
+        //                 melisPluginTag = $(plugins).data("melis-tag"),
+        //                 melisPluginContainer = $(plugins).data("plugin-container"),
+        //                 melisPluginContainerId = $(pluginListEl).attr("id");
+        //
+        //             pluginList['melisDragDropZoneListPlugin'][key]['melisModule'] = melisPluginModuleName;
+        //             pluginList['melisDragDropZoneListPlugin'][key]['melisPluginName'] = melisPluginName;
+        //             pluginList['melisDragDropZoneListPlugin'][key]['melisPluginId'] = melisPluginID;
+        //             pluginList['melisDragDropZoneListPlugin'][key]['melisPluginTag'] = melisPluginTag;
+        //
+        //             if ($("#" + melisPluginContainerId).length) {
+        //                 pluginList['melisDragDropZoneListPlugin'][key]['melisPluginContainer'] = melisPluginContainer;
+        //             } else {
+        //                 pluginList['melisDragDropZoneListPlugin'][key]['melisPluginContainer'] = " ";
+        //             }
+        //         });
+        //
+        //         pluginListContainer['children'][ctr] = pluginList;
+        //         ctr++;
+        //     }
+        // });
+console.log(pluginListContainer);
+        if (typeof siteModule !== "undefined") {
+            savePluginUpdate(pluginListContainer, siteModule);
+        }
+    }
 
-                    // loop all plugins in dropzone
-                    $.each(pluginListEl, function (key, value) {
-                        pluginList['melisDragDropZoneListPlugin'][key] = new Object();
+    function getDNDList(dndContainer, pageId)
+    {
+        //check if container has dnd zone
+        // var container = $(dndContainer).find(".melis-dragdropzone-container");
+        // var ctr = 0;
+        // $.each(container, function(i, el){
+        //     list[ctr] = new Object();
+        //     list[ctr]['melisIdPage'] = pageId;
+        //     list[ctr]['melisModule'] = $(el).data("module");
+        //     list[ctr]['melisPluginName'] = $(el).data("plugin");
+        //     list[ctr]['melisPluginId'] = $(el).data("plugin-id");
+        //     list[ctr]['melisPluginTag'] = $(el).data("melis-tag");
+        //
+        //     if($(el).hasClass("melis-dragdropzone-container")){
+        //         list[ctr]['children'] = new Object();
+        //         list[ctr]['children'] = getDNDList($(el), list, pageId);
+        //     }
+        //
+        //     // var dropzoneList = $(el).find(".melis-dragdropzone");
+        //     // if(dropzoneList.length){
+        //     //     var ctr = 0;
+        //     //     $.each(dropzoneList, function (k, v) {
+        //     //         list[ctr] = new Object();
+        //     //         var pluginList = new Object();
+        //     //
+        //     //         // var toolBox = $('div[data-dragdropzone-id=' + dropzone + ']');
+        //     //         // var toolBox = $(pluginListEl).find(".melis-plugin-tools-box");
+        //     //
+        //     //         pluginList['melisIdPage'] = pageId;
+        //     //         pluginList['melisModule'] = $(v).data("module");
+        //     //         pluginList['melisPluginName'] = $(v).data("plugin");
+        //     //         pluginList['melisPluginId'] = $(v).data("plugin-id");
+        //     //         pluginList['melisPluginTag'] = $(v).data("melis-tag");
+        //     //         pluginList['melisDragDropZoneListPlugin'] = new Object();
+        //     //
+        //     //         list[ctr] = pluginList;
+        //     //         ctr++;
+        //     //     });
+        //     // }else{
+        //     //     if($(el).find(".melis-dragdropzone-container").length) {
+        //     //         //find if it has a dnd container
+        //     //         list['children'] = new Object();
+        //     //         list['children'] = getDNDList(dndContainer, list, pageId);
+        //     //     }
+        //     // }
+        //
+        //     ctr++;
+        // });
+        // return list;
 
-                        var plugins = $(value).find(".melis-plugin-tools-box"),
-                            melisPluginModuleName = $(plugins).data("module"),
-                            melisPluginName = $(plugins).data("plugin"),
-                            melisPluginID = $(plugins).data("plugin-id"),
-                            melisPluginTag = $(plugins).data("melis-tag"),
-                            melisPluginContainer = $(plugins).data("plugin-container"),
-                            melisPluginContainerId = $(pluginListEl).attr("id");
 
-                        pluginList['melisDragDropZoneListPlugin'][key]['melisModule'] = melisPluginModuleName;
-                        pluginList['melisDragDropZoneListPlugin'][key]['melisPluginName'] = melisPluginName;
-                        pluginList['melisDragDropZoneListPlugin'][key]['melisPluginId'] = melisPluginID;
-                        pluginList['melisDragDropZoneListPlugin'][key]['melisPluginTag'] = melisPluginTag;
+        const result = [];
 
-                        if ($("#" + melisPluginContainerId).length) {
-                            pluginList['melisDragDropZoneListPlugin'][key]['melisPluginContainer'] = melisPluginContainer;
-                        } else {
-                            pluginList['melisDragDropZoneListPlugin'][key]['melisPluginContainer'] = " ";
-                        }
+        // Find all immediate .test2 children (anywhere under this node, but only one level down)
+        dndContainer.children().each(function () {
+            const $child = $(this);
+
+            // Check if this child is a .test2
+            if ($child.hasClass('melis-dragdropzone-container')) {
+                result.push({
+                    melisIdPage: pageId,
+                    melisModule: $($child).data("module"),
+                    melisPluginName: $($child).data("plugin"),
+                    melisPluginId: $($child).data("plugin-id"),
+                    melisPluginTag: $($child).data("melis-tag"),
+                    melisDragDropZoneListPlugin: getPluginLists($($child).children(".melis-dragdropzone")),
+                    children: getDNDList($child)
+                });
+            } else {
+                // Otherwise, look inside it for immediate .test2 children
+                $child.children('.melis-dragdropzone-container').each(function () {
+                    const $subChild = $(this);
+                    result.push({
+                        mmelisIdPage: pageId,
+                        melisModule: $($subChild).data("module"),
+                        melisPluginName: $($subChild).data("plugin"),
+                        melisPluginId: $($subChild).data("plugin-id"),
+                        melisPluginTag: $($subChild).data("melis-tag"),
+                        melisDragDropZoneListPlugin: getPluginLists($($subChild).children(".melis-dragdropzone")),
+                        children: getDNDList($subChild)
                     });
-
-                    pluginListContainer['children'][ctr] = pluginList;
-                    ctr++;
-                }
-            });
-
-            if (typeof siteModule !== "undefined"){
-                savePluginUpdate(pluginListContainer, siteModule);
+                });
             }
+        });
+
+        return result;
+    }
+
+    function getPluginLists(dropzoneList)
+    {
+        var list = new Object();
+        var ctr = 0;
+        $.each(dropzoneList, function (k, v) {
+            var pluginListEl = $(v).find(".melis-ui-outlined");
+            if ($(pluginListEl).length) {
+                // list = new Object();
+                var pluginList = new Object();
+                // loop all plugins in dropzone
+                $.each(pluginListEl, function (key, value) {
+                    pluginList[key] = new Object();
+
+                    var plugins = $(value).find(".melis-plugin-tools-box"),
+                        melisPluginModuleName = $(plugins).data("module"),
+                        melisPluginName = $(plugins).data("plugin"),
+                        melisPluginID = $(plugins).data("plugin-id"),
+                        melisPluginTag = $(plugins).data("melis-tag"),
+                        melisPluginContainer = $(plugins).data("plugin-container"),
+                        melisPluginContainerId = $(pluginListEl).attr("id");
+
+                    pluginList[key]['melisModule'] = melisPluginModuleName;
+                    pluginList[key]['melisPluginName'] = melisPluginName;
+                    pluginList[key]['melisPluginId'] = melisPluginID;
+                    pluginList[key]['melisPluginTag'] = melisPluginTag;
+
+                    if ($("#" + melisPluginContainerId).length) {
+                        pluginList[key]['melisPluginContainer'] = melisPluginContainer;
+                    } else {
+                        pluginList[key]['melisPluginContainer'] = " ";
+                    }
+                });
+
+                list = pluginList;
+                ctr++;
+            }
+        });
+        return list;
     }
 
     function checkFunctionExists(functionName, idPlugin) {
