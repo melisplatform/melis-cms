@@ -138,19 +138,10 @@
 }
 /*end drag n drop zone buttons*/
 
+.dnd-layout-wrapper,
 .melis-dragdropzone-container {
     position: relative;
-    border: 2px solid #e61c23;
 }
-.dnd-layout-wrapper {
-    position: relative;
-}
-.dnd-layout-wrapper>* {
-	pointer-events: auto;
-}
-/* .dnd-layout-wrapper:hover {
-	outline: 2px dashed limegreen;
-} */
 .dnd-layout-buttons {
     width: fit-content;
 
@@ -165,8 +156,6 @@
     z-index: 999;
     opacity: 0;
 
-    pointer-events: none;
-
     transition: opacity 0.4s;
     -webkit-transition: opacity 0.4s;
     -ms-transition: opacity 0.4s;
@@ -178,7 +167,6 @@
 }
 .show-buttons {
     opacity: 1 !important;
-    pointer-events: auto;
 }
 button.dnd-plus-button {
     width: 60px;
