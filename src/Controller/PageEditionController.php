@@ -263,9 +263,17 @@ class PageEditionController extends MelisAbstractActionController
             
             // removing plugin from session
             $container = new Container('meliscms');
-            if (!empty($container['content-pages'][$pageId][$pluginTag][$pluginId]))
+            if (!empty($container['content-pages'][$pageId][$pluginTag][$pluginId])) {
                 unset($container['content-pages'][$pageId][$pluginTag][$pluginId]);
-            
+
+                //remove plugin inside dnd
+                foreach($container['content-pages'][$pageId] as $key => $dndList){
+                    foreach($dndList as $k => $xml){
+                        $container['content-pages'][$pageId][$key][$k] = $this->removeFromXML($pluginId, $xml);
+                    }
+                }
+            }
+
             $this->getEventManager()->trigger('meliscms_page_removesession_plugin_end', null, $parameters);
             
             $result = array(
@@ -275,6 +283,28 @@ class PageEditionController extends MelisAbstractActionController
         }
          
         return new JsonModel($result);
+    }
+
+    private function removeFromXML($pluginId, $xmlString)
+    {
+        $xml = simplexml_load_string($xmlString);
+
+        $xpath = '//plugin[@id="'.$pluginId.'"]';
+        $plugins = $xml->xpath($xpath);
+
+        foreach ($plugins as $plugin) {
+            $dom = dom_import_simplexml($plugin);
+            $dom->parentNode->removeChild($dom);
+        }
+
+// Convert SimpleXML to DOMDocument for clean output
+        $dom = new \DOMDocument();
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($xml->asXML());
+
+// Save without XML declaration
+        return $dom->saveXML($dom->documentElement);
     }
 
     /**
