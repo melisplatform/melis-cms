@@ -440,12 +440,12 @@ var melisPluginEdition = (function($, window) {
             dragzone = [],
             pluginListContainer = new Object();
 
-        pluginListContainer['melisIdPage'] = pageId;
-        pluginListContainer['melisModule'] = $(parentDragndropContainer).data("module");
-        pluginListContainer['melisPluginName'] = $(parentDragndropContainer).data("plugin");
-        pluginListContainer['melisPluginId'] = $(parentDragndropContainer).data("plugin-id");
-        pluginListContainer['melisPluginTag'] = $(parentDragndropContainer).data("melis-tag");
-        pluginListContainer['children'] = new Object();
+        // pluginListContainer['melisIdPage'] = pageId;
+        // pluginListContainer['melisModule'] = $(parentDragndropContainer).data("module");
+        // pluginListContainer['melisPluginName'] = $(parentDragndropContainer).data("plugin");
+        // pluginListContainer['melisPluginId'] = $(parentDragndropContainer).data("plugin-id");
+        // pluginListContainer['melisPluginTag'] = $(parentDragndropContainer).data("melis-tag");
+        // pluginListContainer['children'] = new Object();
 
 
         // var dndContainer = parentDragndropContainer.find(".melis-dragdropzone-container");
@@ -499,7 +499,7 @@ var melisPluginEdition = (function($, window) {
         //     }
         // });
 
-        pluginListContainer['children'][0] = extractContainers(parentDragndropContainer, pageId);
+        pluginListContainer = extractContainers(parentDragndropContainer, pageId);
 
         if (typeof siteModule !== "undefined") {
             savePluginUpdate(pluginListContainer, siteModule);
