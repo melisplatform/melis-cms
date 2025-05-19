@@ -145,16 +145,26 @@
 .dnd-layout-buttons {
     width: fit-content;
 
-    top: -23px;
-    left: 0;
+    /* top: -23px;
+    left: 0; */
+    top: -40px;
+    left: 7px;
 }
-.dnd-layout-wrapper > .dnd-plus-button,
+.dnd-layout-wrapper {
+    outline: 1px dashed limegreen;
+    padding: 0.5rem 0;
+}
+.dnd-layout-wrapper .dnd-layout-wrapper {
+    outline: 1px dashed blueviolet;
+}
 .dnd-layout-wrapper > .dnd-layout-buttons {
     background-color: #e61c23;
-
+}
+.dnd-layout-wrapper > .dnd-bottom-buttons,
+.dnd-layout-wrapper > .dnd-layout-buttons {
     position: absolute;
     z-index: 999;
-    opacity: 0;
+    opacity: 1;
 
     transition: opacity 0.4s;
     -webkit-transition: opacity 0.4s;
@@ -168,13 +178,27 @@
 .show-buttons {
     opacity: 1 !important;
 }
-button.dnd-plus-button {
+.dnd-bottom-buttons {
+    /* right: 0;
+    bottom: -67px; */
+    right: 7px;
+    /* bottom: 1px; */
+    bottom: -25px;
+}
+button.dnd-plus-button,
+button.dnd-arrow-button {
+    background-color: #e61c23;
     width: 60px;
     height: 42px;
-
-    right: 0;
-    bottom: -67px;
 }
+button.dnd-arrow-button {
+    right: 62px;
+}
+button.dnd-plus-button {
+    right: 0;
+    margin-left: 2px;
+}
+button.dnd-arrow-button .fa,
 button.dnd-plus-button .fa {
     color: #fff;
 
@@ -183,6 +207,35 @@ button.dnd-plus-button .fa {
     align-items: center;
 
     height: 42px;
+}
+button.dnd-arrow-button .fa {
+    font-size: 25px;
+}
+button.dnd-arrow-button,
+button.dnd-plus-button {
+    border-color: transparent;
+}
+button.dnd-arrow-button:hover,
+button.dnd-plus-button:hover {
+    border-color: #e61c23;
+}
+button.dnd-arrow-button:hover .fa,
+button.dnd-plus-button:hover .fa {
+    color: #e61c23;
+}
+button.dnd-arrow-button:hover,
+button.dnd-plus-button:hover,
+button.column-icon:hover {
+    background-color: #fff;
+}
+button.column-icon:hover {
+    border-color: #fff;
+}
+button.column-icon:hover .icon-row {
+    border-color: #fff;
+}
+.melis-dragdropzone {
+    bottom: 0;
 }
 .melis-dragdropzone:hover {
     outline: 1px solid #e61c23;
@@ -203,20 +256,4 @@ button.dnd-plus-button .fa {
 .bg-red {
     background-color: #e61c23;
     border-color: #e61c23;
-}
-button.dnd-plus-button {
-    border: 0;
-}
-button.dnd-plus-button:hover,
-button.column-icon:hover {
-    background-color: #fff;
-}
-button.column-icon:hover {
-    border-color: #fff;
-}
-button.column-icon:hover .icon-row {
-    border-color: #fff;
-}
-button.dnd-plus-button:hover .fa {
-    color: #e61c23;
 }
