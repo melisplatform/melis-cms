@@ -269,7 +269,9 @@ class PageEditionController extends MelisAbstractActionController
                 //remove plugin inside dnd
                 foreach($container['content-pages'][$pageId] as $key => $dndList){
                     foreach($dndList as $k => $xml){
-                        $container['content-pages'][$pageId][$key][$k] = $this->removeFromXML($pluginId, $xml);
+                        if($this->isWellFormedXml($xml)) {
+                            $container['content-pages'][$pageId][$key][$k] = $this->removeFromXML($pluginId, $xml);
+                        }
                     }
                 }
             }
@@ -285,6 +287,11 @@ class PageEditionController extends MelisAbstractActionController
         return new JsonModel($result);
     }
 
+    /**
+     * @param $pluginId
+     * @param $xmlString
+     * @return string
+     */
     private function removeFromXML($pluginId, $xmlString)
     {
         $xml = simplexml_load_string($xmlString);
@@ -305,6 +312,23 @@ class PageEditionController extends MelisAbstractActionController
 
 // Save without XML declaration
         return $dom->saveXML($dom->documentElement);
+    }
+
+    /**
+     * @param $xmlString
+     * @return mixed
+     */
+    private function isWellFormedXml($xmlString)
+    {
+        libxml_use_internal_errors(true); // Suppress standard XML errors
+
+        $doc = new \DOMDocument();
+        $isValid = $doc->loadXML($xmlString);
+
+        libxml_clear_errors(); // Clear any collected errors
+        libxml_use_internal_errors(false); // Restore previous setting
+
+        return $isValid;
     }
 
     /**
