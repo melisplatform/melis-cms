@@ -6,7 +6,7 @@ var melisDynamicDragnDrop = (function($, window) {
         $dndzoneContainer = $(".body_wrapper .melis-dragdropzone-container");
 
         // .dnd-layout-wrapper
-        $dndWrapper
+        /* $dndWrapper
             .on("mouseenter", function(e) {
                 e.stopPropagation();
 
@@ -17,7 +17,7 @@ var melisDynamicDragnDrop = (function($, window) {
             .on("mouseleave", function() {
                 $(this).children(".dnd-layout-buttons, .dnd-bottom-buttons").removeClass("show-buttons");
             });
-
+ */
         // .dnd-layout-buttons
         $.each($iconButtons, function(i, v) {
             let $iconButton = $(v);
@@ -29,10 +29,4 @@ var melisDynamicDragnDrop = (function($, window) {
                         $(this).find(".icon-col-bg").addClass("bg-white").removeClass("bg-red");
                     });
         });        
-
-        /* function dndZoneContainer() {
-            if ($dndzoneContainer.length > 1) {
-
-            }
-        } */
 })(jQuery, window);
