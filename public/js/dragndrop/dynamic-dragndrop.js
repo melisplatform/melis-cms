@@ -2,7 +2,8 @@ var melisDynamicDragnDrop = (function($, window) {
     let $body           = $("body"),
         $iconButtons    = $(".dnd-layout-buttons .column-icon"),
         $dndWrapper     = $(".melis-dragdropzone-container .dnd-layout-wrapper"),
-        $dndButtons     = $('.dnd-layout-buttons, .dnd-plus-button');
+        $dndButtons     = $('.dnd-layout-buttons, .dnd-bottom-buttons'),
+        $dndzoneContainer = $(".body_wrapper .melis-dragdropzone-container");
 
         // .dnd-layout-wrapper
         $dndWrapper
@@ -11,10 +12,10 @@ var melisDynamicDragnDrop = (function($, window) {
 
                 $dndButtons.removeClass("show-buttons");
 
-                $(this).children(".dnd-layout-buttons, .dnd-plus-button").addClass("show-buttons");
+                $(this).children(".dnd-layout-buttons, .dnd-bottom-buttons").addClass("show-buttons");
             })
             .on("mouseleave", function() {
-                $(this).children(".dnd-layout-buttons, .dnd-plus-button").removeClass("show-buttons");
+                $(this).children(".dnd-layout-buttons, .dnd-bottom-buttons").removeClass("show-buttons");
             });
 
         // .dnd-layout-buttons
@@ -27,8 +28,11 @@ var melisDynamicDragnDrop = (function($, window) {
                     .on("mouseleave", function() {
                         $(this).find(".icon-col-bg").addClass("bg-white").removeClass("bg-red");
                     });
-        });
+        });        
 
-        // .dnd-plus-buttons
-        
+        /* function dndZoneContainer() {
+            if ($dndzoneContainer.length > 1) {
+
+            }
+        } */
 })(jQuery, window);
