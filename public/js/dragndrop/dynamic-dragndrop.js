@@ -16,8 +16,8 @@ var melisDynamicDragnDrop = (function($, window) {
             })
             .on("mouseleave", function() {
                 $(this).children(".dnd-layout-buttons, .dnd-bottom-buttons").removeClass("show-buttons");
-            });
- */
+            }); */
+
         // .dnd-layout-buttons
         $.each($iconButtons, function(i, v) {
             let $iconButton = $(v);

@@ -164,7 +164,7 @@
 .dnd-layout-wrapper > .dnd-layout-buttons {
     position: absolute;
     z-index: 999;
-    opacity: 0;
+    opacity: 1;
 
     transition: opacity 0.4s;
     -webkit-transition: opacity 0.4s;
