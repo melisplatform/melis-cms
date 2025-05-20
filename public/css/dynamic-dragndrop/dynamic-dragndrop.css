@@ -167,11 +167,10 @@
 .dnd-layout-wrapper > .dnd-layout-buttons {
     background-color: #e61c23;
 }
-.dnd-layout-wrapper > .dnd-bottom-buttons,
-.dnd-layout-wrapper > .dnd-layout-buttons {
+.dnd-layout-wrapper .dnd-bottom-buttons,
+.dnd-layout-wrapper .dnd-layout-buttons {
     position: absolute;
     z-index: 999;
-    opacity: 1;
 
     transition: opacity 0.4s;
     -webkit-transition: opacity 0.4s;
@@ -182,10 +181,13 @@
     -o-transition-delay: 0.1s;
     transition-delay: 0.1s;
 }
-/* .dnd-layout-wrapper:hover > .dnd-bottom-buttons,
-.dnd-layout-wrapper:hover > .dnd-layout-buttons {
-    opacity: 1 !important;
-} */
+.dnd-layout-wrapper .dnd-layout-buttons {
+    display: none;
+}
+.dnd-layout-wrapper .dnd-bottom-buttons {
+    opacity: 0;
+    visibility: hidden;
+}
 .show-buttons {
     opacity: 1 !important;
 }
