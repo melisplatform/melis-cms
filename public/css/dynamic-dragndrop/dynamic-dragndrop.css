@@ -175,8 +175,6 @@
     -moz-transition-delay: 0.1s;
     -o-transition-delay: 0.1s;
     transition-delay: 0.1s;
-
-    pointer-events: auto;
 }
 /* .dnd-layout-wrapper:hover > .dnd-bottom-buttons,
 .dnd-layout-wrapper:hover > .dnd-layout-buttons {
@@ -184,7 +182,6 @@
 } */
 .show-buttons {
     opacity: 1 !important;
-    pointer-events: auto;
 }
 .dnd-bottom-buttons {
     /* right: 0;

@@ -4,19 +4,18 @@ var melisDynamicDragnDrop = (function($, window) {
             $dndButtons     = $('.dnd-layout-buttons, .dnd-bottom-buttons'),
             $dndWrapper     = $(".melis-dragdropzone-container .dnd-layout-wrapper");
             
-            // .dnd-layout-wrapper
+            // .dnd-layout-wrapper, mouseenter & mouseleave, mouseover & mouseout
             $dndWrapper
-                // mouseenter
-                .on("mouseover", function(e) {
+                .on("mouseenter", function(e) {
                     //e.stopPropagation();
 
                     $dndButtons.removeClass("show-buttons");
 
                     $(this).children(".dnd-layout-buttons, .dnd-bottom-buttons").addClass("show-buttons");
-                });
-                /* .on("mouseout", function() {
+                })
+                .on("mouseleave", function() {
                     $(this).children(".dnd-layout-buttons, .dnd-bottom-buttons").removeClass("show-buttons");
-                }); */
+                });
 
             // .dnd-layout-buttons
             $.each($iconButtons, function(i, v) {
@@ -45,11 +44,12 @@ $(function() {
     melisDynamicDragnDrop.init();
 
     let $body = $("body");
-    $body.on("click", ".dnd-plus-button", function(){
-        let _this = $(this);
-        let pluginId = _this.data("pluginid");
-        let parentDNDId = _this.closest("melis-dragdropzone-container").last();
-        console.log(pluginId);
-        console.log(parentDNDId);
-    });
+        $body.on("click", ".dnd-plus-button", function() {
+            console.log(`.dnd-plus-button clicked!!!`);
+            let _this = $(this);
+            let pluginId = _this.data("pluginId");
+            let parentDNDId = _this.closest("melis-dragdropzone-container").last();
+            console.log(pluginId);
+            console.log(parentDNDId);
+        });
 });
