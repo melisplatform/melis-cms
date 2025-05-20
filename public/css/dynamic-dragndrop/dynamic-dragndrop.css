@@ -147,15 +147,16 @@
 
     /* top: -23px;
     left: 0; */
-    top: -40px;
-    left: 7px;
+    /* top: -40px; */
+    top: -46px;
+    left: 0;
 }
 .dnd-layout-wrapper {
     outline: 1px dashed limegreen;
-    padding: 0.5rem 0;
+    padding: 2rem 0;
 }
 .dnd-layout-wrapper .dnd-layout-wrapper {
-    outline: 1px dashed blueviolet;
+    outline: 1px dashed violet;
 }
 .dnd-layout-wrapper > .dnd-layout-buttons {
     background-color: #e61c23;
@@ -164,7 +165,7 @@
 .dnd-layout-wrapper > .dnd-layout-buttons {
     position: absolute;
     z-index: 999;
-    opacity: 1;
+    opacity: 0;
 
     transition: opacity 0.4s;
     -webkit-transition: opacity 0.4s;
@@ -174,15 +175,22 @@
     -moz-transition-delay: 0.1s;
     -o-transition-delay: 0.1s;
     transition-delay: 0.1s;
+
+    pointer-events: auto;
 }
+/* .dnd-layout-wrapper:hover > .dnd-bottom-buttons,
+.dnd-layout-wrapper:hover > .dnd-layout-buttons {
+    opacity: 1 !important;
+} */
 .show-buttons {
     opacity: 1 !important;
+    pointer-events: auto;
 }
 .dnd-bottom-buttons {
     /* right: 0;
     bottom: -67px; */
-    right: 7px;
-    /* bottom: 1px; */
+    
+    right: 0;
     bottom: -25px;
 }
 button.dnd-plus-button,
@@ -245,7 +253,7 @@ button.column-icon:hover .icon-row {
     -ms-box-shadow: 0 0 0 1px #e61c23;
     z-index: 999999;
 }
-.dnd-layout-wrapper:hover .melis-plugin-indicator {
+.dnd-layout-wrapper:hover .dnd-layout-indicator {
     opacity: 0;
 
     transform: translate3d(-100%, 0, 0);
