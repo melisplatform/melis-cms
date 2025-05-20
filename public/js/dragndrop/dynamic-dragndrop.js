@@ -43,4 +43,13 @@ var melisDynamicDragnDrop = (function($, window) {
 
 $(function() {
     melisDynamicDragnDrop.init();
+
+    let $body = $("body");
+    $body.on("click", ".dnd-plus-button", function(){
+        let _this = $(this);
+        let pluginId = _this.data("pluginid");
+        let parentDNDId = _this.closest("melis-dragdropzone-container").last();
+        console.log(pluginId);
+        console.log(parentDNDId);
+    });
 });
