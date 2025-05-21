@@ -833,45 +833,52 @@ var melisPluginEdition = (function($, window) {
     function initResizable() {
         var totalWidth, parentWidth,
             percentTotalWidth,
-            iframe = window.parent.$("#"+ parent.activeTabId).find('iframe');
+            iframe = window.parent.$("#"+ parent.activeTabId).find('iframe'),
+            $melisUiOutlined = $(".melis-dragdropzone .melis-ui-outlined");
 
             // check if melis-ui-outlined element is available in preview page
-            if( $(".melis-dragdropzone .melis-ui-outlined").length ) {
-                $(".melis-dragdropzone .melis-ui-outlined").resizable({
-                    containment: ".melis-dragdropzone",
-                    start: function(event, ui){
-                        var widthIndicator =  '<div class="ui-resize-indicator"></div>';
-                        parentWidth = ui.originalElement.parent().outerWidth();
-                        // width indicator
-                        $(ui.originalElement).append(widthIndicator);
+            if( $melisUiOutlined.length ) {
+                $.each($melisUiOutlined, function(i, v) {
+                    $(v).resizable({
+                        containment: ".melis-dragdropzone",
+                        start: function(event, ui){
+                            var widthIndicator =  '<div class="ui-resize-indicator"></div>';
+                                parentWidth = ui.originalElement.parent().outerWidth();
+                                
+                                // width indicator
+                                $(ui.originalElement).append(widthIndicator);
 
-                        if($(ui.originalElement).find(".ui-resize-input")) {
-                            $(ui.originalElement).find(".ui-resize-input").remove();
+                                if($(ui.originalElement).find(".ui-resize-input")) {
+                                    $(ui.originalElement).find(".ui-resize-input").remove();
+                                }
+                        },
+                        resize: function(event, ui) {
+                            totalWidth = ui.size.width;
+                            ui.originalElement.css('height', 'auto');
+                            
+                            // convert px to percent
+                            percentTotalWidth = (100 * totalWidth / parentWidth);
+                            percentTotalWidth = percentTotalWidth.toFixed(2);
+
+                            ui.originalElement.css('width', percentTotalWidth + '%');
+                            $(ui.originalElement).find(".ui-resize-indicator").text(percentTotalWidth + " %");
+                        },
+                        stop: function(event, ui) {
+                            // get all data attributes
+                            var toolBox = $(ui.originalElement).children(".melis-plugin-tools-box");
+
+                            getPluginData(toolBox, percentTotalWidth);
+
+                            // get the function
+                            var owlCheck = $(ui.originalElement).find(".owl-carousel");
+                            if( $(owlCheck).length ) {
+                                $(owlCheck).trigger('refresh.owl.carousel');
+                            }
+
+                            // remove indicator
+                            $(ui.originalElement).find(".ui-resize-indicator").remove();
                         }
-                    },
-                    resize: function(event, ui) {
-                        totalWidth = ui.size.width;
-                        ui.originalElement.css('height', 'auto');
-                        // convert px to percent
-                        percentTotalWidth = (100 * totalWidth / parentWidth);
-                        percentTotalWidth = percentTotalWidth.toFixed(2);
-                        ui.originalElement.css('width', percentTotalWidth + '%');
-                        $(ui.originalElement).find(".ui-resize-indicator").text(percentTotalWidth + " %");
-                    },
-                    stop: function(event, ui) {
-                        // get all data attributes
-                        var toolBox = $(ui.originalElement).children(".melis-plugin-tools-box");
-
-                        getPluginData(toolBox, percentTotalWidth);
-                        // get the function
-                        var owlCheck = $(ui.originalElement).find(".owl-carousel");
-                        if( $(owlCheck).length ) {
-                            $(owlCheck).trigger('refresh.owl.carousel');
-                        }
-
-                        // remove indicator
-                        $(ui.originalElement).find(".ui-resize-indicator").remove();
-                    }
+                    });
                 });
             }
     }
@@ -908,7 +915,13 @@ var melisPluginEdition = (function($, window) {
 
                     // hide tinymce option while resizing
                     var inst = tinyMCE.EditorManager.get(data.pluginId);
-                        inst.fire("blur");
+                        if (inst) {
+                            inst.fire("blur");
+                        }
+                        else {
+                            console.error('No editor found for ID:', data.pluginId);
+                        }
+
                         iframe.trigger("blur");
 
                         $(editable).map(function() {
@@ -958,6 +971,7 @@ var melisPluginEdition = (function($, window) {
                     var strPercentTotalWidth = percentTotalWidth;
                     // newClass = "plugin-width-lg-"+Math.floor(percentTotalWidth); // removed when css is ready
                     newClass = "plugin-width-lg-" + strPercentTotalWidth.replace(".", "-"); // removed when css is ready
+                    
                     $.each(classes, function(key, value) {
                         if( value.indexOf(currentClass) != -1 ) {
                             parentOutlined.removeClass(value).addClass(newClass);
@@ -970,6 +984,7 @@ var melisPluginEdition = (function($, window) {
                 pluginList['melisPluginTabletWidth'] = tabletWidth;
                 pluginList['melisPluginDesktopWidth'] = desktopWidth;
                 pluginList['resize'] = true;
+                
                 // pass is to savePageSession
                 savePluginUpdate(pluginList, toolBox.data("site-module"));
 

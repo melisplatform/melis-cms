@@ -155,77 +155,41 @@ var melisDragnDrop = (function ($, window) {
 				} else {
 					$(".melis-cms-dnd-box").removeClass("show");
 				}
+
+				console.log(`setDragDropZone() .melis-dragdropzone sortable start !!!`);
 			},
 			receive: function (event, ui) {
 				var tabId;
 				// check if ui is from pluginMenu
 				if (ui.helper && $(ui.helper).hasClass("melis-cms-plugin-snippets")) {
-					// modal confirmation
-					window.parent.melisCoreTool.confirm(
-						translations.tr_meliscms_common_yes,
-						translations.tr_meliscms_common_no,
-						translations.tr_meliscms_drag_and_drop_modal_title, // title
-						translations.tr_meliscms_drag_and_drop_modal_content, // message
-						function() {
-							var moduleName = $(ui.helper[0]).data("module-name");
-							var pluginName = $(ui.helper[0]).data("plugin-name");
-							var siteModule = $(ui.helper[0]).data("plugin-site-module");
-							// get id of current dragzone
-							var dropzone = $(event.target).data("dragdropzone-id");
-							tabId = window.parent
-								.$("#" + parent.activeTabId)
-								.find(".melis-iframe")
-								.data("iframe-id");
+					var moduleName = $(ui.helper[0]).data("module-name");
+					var pluginName = $(ui.helper[0]).data("plugin-name");
+					var siteModule = $(ui.helper[0]).data("plugin-site-module");
+					// get id of current dragzone
+					var dropzone = $(event.target).data("dragdropzone-id");
+					tabId = window.parent
+						.$("#" + parent.activeTabId)
+						.find(".melis-iframe")
+						.data("iframe-id");
 
-							var dataKeysfromdragdropzone = $(ui.helper[0]).data(
-								"melis-fromdragdropzone"
-							);
-							var dropLocation = ui.helper[0];
-							// remove Clone
-							// ui.helper[0].remove();
-							setTimeout(function () {
-								if (moduleName !== undefined) {
-									requestPlugin(
-										moduleName,
-										pluginName,
-										dropzone,
-										tabId,
-										dropLocation,
-										siteModule
-									);
-								}
-							}, 300);
-						}
+					var dataKeysfromdragdropzone = $(ui.helper[0]).data(
+						"melis-fromdragdropzone"
 					);
-
-					/**
-					 * Bind on bootstrap hidden modal event,
-					 * Delayed execution with setTimeout(), as it removes dropLocation or ui.helper[0]
-					 */
-					var modalId = window.parent.$(".modal.bootstrap-dialog.show").attr("id");
-					const modalEl = window.parent.document.getElementById(modalId);
-					
-						modalEl.addEventListener('hidden.bs.modal', event => {
-							var uiTimeout = setTimeout(function() {
-								// check if loader exists
-								if (!$(ui.helper[0]).parent().find(".overlay-loader").length) {
-									// remove clone element
-									ui.helper[0].remove();
-
-									clearTimeout( uiTimeout );
-								}
-							}, 1000);
-						});
-
-						/* window.parent.$('body').on('hidden.bs.modal', window.parent.$('.modal.bootstrap-dialog.show'), function (e) {
-							// check if loader exists
-							if( !$(ui.helper[0]).parent().find('.overlay-loader').length ) {
-	
-								// remove clone element
-								ui.helper[0].remove();
-							}
-							console.log(`window.parent.$('.modal.bootstrap-dialog.show')!!!`);
-						}); */
+					var dropLocation = ui.helper[0];
+					// remove Clone
+					// ui.helper[0].remove();
+					setTimeout(function () {
+						if (moduleName !== undefined) {
+							requestPlugin(
+								moduleName,
+								pluginName,
+								dropzone,
+								tabId,
+								dropLocation,
+								siteModule
+							);
+						}
+					}, 300);
 				} // check ui.helper
 
 				if (ui.sender[0]) {
@@ -234,6 +198,8 @@ var melisDragnDrop = (function ($, window) {
 					// send dragndrop list
 					melisPluginEdition.sendDragnDropList(dragZoneSenderPluginId, tabId);
 				}
+
+				console.log(`setDragDropZone() .melis-dragdropzone sortable receive !!!`);
 			},
 			update: function (event, ui) {
 				$(".ui-sortable-helper").remove();
@@ -534,6 +500,7 @@ var melisDragnDrop = (function ($, window) {
 					// Processing the plugin resources and initialization
 					melisPluginEdition.processPluginResources(plugin.init, idPlugin);
 					// Init Resizable
+
 					if (parent.pluginResizable == 1) {
 						melisPluginEdition.initResizable();
 					}

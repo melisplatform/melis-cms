@@ -151,6 +151,18 @@
     top: -46px;
     left: 0;
 }
+.dnd-layout-buttons .fa {
+    color: #fff;
+}
+.dnd-layout-buttons .btn {
+    padding: 0 0.3rem;
+}
+.dnd-layout-buttons .btn:hover {
+    background-color: #fff;
+}
+.dnd-layout-buttons .btn:hover .fa {
+    color: #e61c23;
+}
 .dnd-layout-wrapper {
     outline: 1px dashed transparent;
     padding: 1rem 0;
@@ -169,6 +181,7 @@
 }
 .dnd-layout-wrapper .dnd-bottom-buttons,
 .dnd-layout-wrapper .dnd-layout-buttons {
+    display: none;
     position: absolute;
     z-index: 999;
 
@@ -180,13 +193,6 @@
     -moz-transition-delay: 0.1s;
     -o-transition-delay: 0.1s;
     transition-delay: 0.1s;
-}
-.dnd-layout-wrapper .dnd-layout-buttons {
-    display: none;
-}
-.dnd-layout-wrapper .dnd-bottom-buttons {
-    opacity: 0;
-    visibility: hidden;
 }
 .show-buttons {
     opacity: 1 !important;
@@ -204,13 +210,14 @@ button.dnd-arrow-button {
     background-color: #e61c23;
     width: 60px;
     height: 42px;
+    position: relative;
 }
 button.dnd-arrow-button {
-    right: 62px;
+    float: left;
 }
 button.dnd-plus-button {
-    right: 0;
     margin-left: 2px;
+    float: right;
 }
 button.dnd-arrow-button .fa,
 button.dnd-plus-button .fa {
