@@ -426,7 +426,10 @@ var melisPluginEdition = (function($, window) {
     }
 
     // Send the list of plugin inside DragnDropzone
-    function sendDragnDropList(dropzone, pageId) {
+    function sendDragnDropList(dropzone, pageId, reference) {
+
+        reference = (typeof reference !== 'undefined') ? reference : '';
+
         var $dropzone = $('div[data-dragdropzone-id=' + dropzone + ']'),
             // parentDragndropContainer= $dropzone.closest(".melis-dragdropzone-container"),
             parentDragndropContainer = $dropzone.parents(".melis-dragdropzone-container").last(),
@@ -500,20 +503,21 @@ var melisPluginEdition = (function($, window) {
         //     }
         // });
 
-        pluginListContainer = extractContainers(parentDragndropContainer, pageId);
+        pluginListContainer = extractContainers(parentDragndropContainer, pageId, reference);
 
         if (typeof siteModule !== "undefined") {
             savePluginUpdate(pluginListContainer, siteModule);
         }
     }
 
-    function extractContainers($container, pageId) {
+    function extractContainers($container, pageId, reference) {
         const result = {
             melisIdPage: pageId,
             melisModule: $container.data("module"),
             melisPluginName: $container.data("plugin"),
             melisPluginId: $container.data("plugin-id"),
             melisPluginTag: $container.data("melis-tag"),
+            reference: reference,
             // melisDragDropZoneListPlugin: getPluginLists($($container).children(".melis-dragdropzone")),
         };
 
