@@ -150,7 +150,7 @@
     top: -40px;
     left: 0;
 
-    padding: 0.4rem;
+    padding: 0.5rem 1rem;
     border-radius: 3px;
 }
 .dnd-layout-buttons .fa {
@@ -285,6 +285,7 @@ button.column-icon:hover .icon-row {
 }
 .dnd-layout-buttons-popover {
     border-radius: 3px;
+    max-width: 400px;
 }
 .dnd-layout-buttons-popover .popover-body {
     position: relative;
@@ -322,8 +323,13 @@ button.column-icon:hover .icon-row {
 }
 .dnd-layout-buttons-popover .column-icons {
     height: auto;
-    padding: 2rem;
+    padding: 1rem 2rem;
+}
+.dnd-layout-buttons-popover .column-icons {
+    display: block;
+    width: 400px;
 }
 .column-icons > div {
-    padding: 1rem;
+    margin: 1rem 2rem 1rem;
+    display: inline-block;
 }
