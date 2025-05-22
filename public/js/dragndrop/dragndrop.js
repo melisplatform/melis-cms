@@ -9,15 +9,15 @@ var melisDragnDrop = (function ($, window) {
 		);
 
 	/* ==================================
-         Binding Events
-         ====================================*/
+		Binding Events
+		====================================*/
 	$body.on("click", "#melisPluginBtn", showPluginMenu);
 	$body.on("click", ".melis-cms-filter-btn", showPlugLists);
 	$body.on("click", ".melis-cms-category-btn", showCatPlugLists);
 
 	/* ==================================
-         Drag & Drop
-         ====================================*/
+		Drag & Drop
+		====================================*/
 	$(".melis-cms-plugin-snippets").draggable({
 		connectWith: ".melis-draggable",
 		connectToSortable: ".melis-dragdropzone",
@@ -35,7 +35,7 @@ var melisDragnDrop = (function ($, window) {
 	});
 
 	function setDragDropZone() {
-		$(".melis-dragdropzone").sortable({
+		$("body .melis-dragdropzone").sortable({
 			connectWith: ".melis-float-plugins, .melis-dragdropzone",
 			connectToSortable: ".melis-float-plugins",
 			handle: ".m-move-handle",
@@ -46,12 +46,12 @@ var melisDragnDrop = (function ($, window) {
 			tolerance: "pointer",
 			items: ".melis-ui-outlined",
 			start: function (event, ui) {
-				$(".melis-dragdropzone").sortable("refresh");
+				$("body .melis-dragdropzone").sortable("refresh");
 
 				// hide tinyMCE panel
 				$(".mce-tinymce.mce-panel.mce-floatpanel").hide();
 				// highlight dragdropzone
-				$(".melis-dragdropzone").addClass("highlight");
+				$("body .melis-dragdropzone").addClass("highlight");
 				$(".ui-sortable-helper").css("z-index", "9999999");
 
 				// get item percentage width
@@ -199,7 +199,9 @@ var melisDragnDrop = (function ($, window) {
 					melisPluginEdition.sendDragnDropList(dragZoneSenderPluginId, tabId);
 				}
 
-				console.log(`setDragDropZone() .melis-dragdropzone sortable receive !!!`);
+				console.log(
+					`setDragDropZone() .melis-dragdropzone sortable receive !!!`
+				);
 			},
 			update: function (event, ui) {
 				$(".ui-sortable-helper").remove();
@@ -210,7 +212,7 @@ var melisDragnDrop = (function ($, window) {
 			},
 			change: function (event, ui) {
 				setPluginWidth(ui);
-			}
+			},
 		});
 	}
 
@@ -536,17 +538,17 @@ var melisDragnDrop = (function ($, window) {
 		 */
 		var _this = $("#melisPluginBtn"),
 			pageId = window.parent.activeTabId.split("_")[0];
-			
+
 		//get the melisSite value from the iframe's src
-        let queryString = window.frameElement.getAttribute("src").split("?")[1];
-        let params = new URLSearchParams(queryString);
-        let melisSite = params.get("melisSite");
+		let queryString = window.frameElement.getAttribute("src").split("?")[1];
+		let params = new URLSearchParams(queryString);
+		let melisSite = params.get("melisSite");
 
 		if (_this.closest(".melis-cms-dnd-box").hasClass("show")) {
 			if (!_this.closest(".melis-cms-dnd-box").hasClass("hasCached")) {
 				$.ajax({
 					type: "GET",
-                    data: { pageId, melisSite },
+					data: { pageId, melisSite },
 					url: "/MelisCms/FrontPlugins/renderPluginsMenuContent",
 					beforeSend: function () {
 						window.parent.loader.addLoadingCmsPluginMenu(
@@ -745,6 +747,7 @@ var melisDragnDrop = (function ($, window) {
 		requestPlugin: requestPlugin,
 		showPluginMenu: showPluginMenu,
 		pluginScrollPos: pluginScrollPos,
+		setDragDropZone: setDragDropZone,
 	};
 })(jQuery, window);
 

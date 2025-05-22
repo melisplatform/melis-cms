@@ -112,6 +112,7 @@ $(function() {
 					melisPluginEdition.moveResponsiveClass();
 					melisPluginEdition.pluginDetector();
 					melisPluginEdition.initResizable();
+					melisDragnDrop.setDragDropZone();
 
 					// save change to session
 					melisPluginEdition.sendDragnDropList(dndId, pageId);
