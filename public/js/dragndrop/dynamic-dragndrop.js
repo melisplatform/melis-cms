@@ -1,5 +1,6 @@
 $(function() {
-    let $body = $("body"),
+    let $document   = $(document),
+        $body       = $("body"),
         $dndButtons = $('.dnd-layout-buttons, .dnd-bottom-buttons');
 
         // .dnd-layout-wrapper
@@ -29,105 +30,13 @@ $(function() {
             });
 
         // .column-icons, button tag
-        $body
+        /* $body
             .on("mouseenter", ".column-icon", function() {
                 $(this).find(".icon-col-bg").removeClass("bg-white").addClass("bg-red");
             })
             .on("mouseleave", ".column-icon", function() {
                 $(this).find(".icon-col-bg").addClass("bg-white").removeClass("bg-red");
-            });
-
-        // .dnd-layout-buttons
-        $body.on("click", ".dnd-layout-buttons div[data-dnd-tpl]", function() {
-            let dndId = $(this).data("dndId");
-            let dndTpl = $(this).data("dndTpl");
-            let pageId = $(this).data("pageId");
-            let melisSite = $(this).data("melisSite");
-            var tempLoader = '<div id="loader" class="overlay-loader"><img class="loader-icon spinning-cog" src="/MelisCore/assets/images/cog12.svg" data-cog="cog12"></div>';
-
-            $(this).closest(".melis-dragdropzone-container").prepend(tempLoader);
-
-            let dndContainer = $(this).closest(".melis-dragdropzone-container");
-
-            let dndLayout = dndContainer.find(".melis-dragdropzone");
-            let dndCtr = dndLayout.length;
-
-            console.log({
-                dndCtr
-            });
-
-            $.get("/dnd-layout", {
-                pageId,
-                dndId,
-                dndTpl,
-                melisSite
-            }).done((res) => {
-                if (res.success) {
-
-                    dndContainer.find("#loader").remove();
-
-                    let newLayout = $(res.html);
-                    let newLayoutDnd = newLayout.find(".melis-dragdropzone");
-                    let newLayoutDndCtr = newLayoutDnd.length;
-
-                    console.log({
-                        newLayoutDndCtr
-                    })
-
-                    if (dndCtr != newLayoutDndCtr) {
-
-                        if (dndCtr == 1) {
-                            let dndContent = dndContainer.find(".melis-dragdropzone");
-
-                            $.each(dndContent.children(), (i, v) => {
-                                // filter dnd with contents
-                                if ($(v).text().trim() !== "") {
-                                    // move and append to new dnd layout
-                                    $(v).appendTo(newLayout.find(".melis-dragdropzone:first"));
-                                }
-                            });
-
-                            // replacing new layout
-                            $("body .melis-dragdropzone-container[data-plugin-id='" + dndId + "']").replaceWith(newLayout);
-
-                        } else {
-
-                            // comparing dnds to the new dnd layout
-                            $.each(dndLayout, (i, v) => {
-
-                                // checking if the plugin id not exist in the new layout
-                                let pluginExist = newLayout.find("div.melis-dragdropzone[data-plugin-id='" + $(v).data("pluginId") + "']");
-                                // all plugin no exist in the new layout will append to the last dnd in the new layout
-                                if (!pluginExist.length) {
-                                    let dndContents = $(v).children();
-
-                                    $.each(dndContents, (di, dv) => {
-                                        // filter dnd with contents
-                                        if ($(dv).text().trim() !== "") {
-                                            // move and append to new dnd layout
-                                            $(dv).appendTo(newLayout.find(".melis-dragdropzone:last"));
-                                        }
-                                    });
-                                }
-                            });
-
-                            // replacing new layout
-                            $("body .melis-dragdropzone-container[data-plugin-id='" + dndId + "']").replaceWith(newLayout);
-                        }
-                    }
-
-                    melisPluginEdition.moveResponsiveClass();
-                    melisPluginEdition.pluginDetector();
-                    melisPluginEdition.initResizable();
-
-                    // save change to session
-                    melisPluginEdition.sendDragnDropList(dndId, pageId);
-                }
-            }).always(() => {
-                $(this).find("#loader").remove();
-            });
-        });
-        });
+            }); */
 
         $body.on("click", ".dnd-plus-button", function() {
             let _this = $(this);
@@ -229,5 +138,111 @@ $(function() {
 
             //save sessions
             melisPluginEdition.sendDragnDropList(newDNDId, pageId, parent);
+        });
+
+        $('[data-bs-toggle="popover"]').each(function() {
+            let $trigger    = $(this),
+                contentId   = $trigger.data("bs-content-id"),
+                content     = $("#"+contentId).html();
+
+                console.log({contentId});
+
+                $trigger.closest(".dnd-layout-buttons").show();
+
+                $trigger.popover({
+                    html: true,
+                    sanitize: false,
+                    content: content,
+                    trigger: "manual",
+                    container: $trigger.closest(".dnd-layout-buttons"),
+                    template: '<div class="popover dnd-layout-buttons-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
+                });
+
+                // Disable trigger button when popover is shown
+                $trigger.on("shown.bs.popover", function() {
+                    $trigger.prop("disabled", true);
+                });
+
+                // Re-enable trigger button when popover is hidden
+                $trigger.on("hidden.bs.popover", function() {
+                    $trigger.prop("disabled", false);
+                });
+
+                // Toggle popover on click
+                $trigger.on("click", function() {
+                    console.log(`popover clicked !!!`);
+                    console.log($trigger.prop("disabled"));
+                    if ($trigger.prop("disabled")) {
+                        $trigger.popover("hide");
+                    } else {
+                        $('[data-bs-toggle="popover"]').popover("hide"); // Hide other popovers
+                        $trigger.popover("show");
+                    }
+                });
+        });
+
+        // .dnd-layout-buttons
+        $body.on("click", ".dnd-layout-buttons div[data-dnd-tpl]", function() {
+            let $this       = $(this),
+                dndId       = $this.data("dndId"),
+                dndTpl      = $this.data("dndTpl"),
+                pageId      = $this.data("pageId"),
+                melisSite   = $this.data("melisSite"),
+                tempLoader  = '<div id="loader" class="overlay-loader"><img class="loader-icon spinning-cog" src="/MelisCore/assets/images/cog12.svg" data-cog="cog12"></div>';
+
+                $this.closest(".melis-dragdropzone-container").prepend(tempLoader);
+                
+                $.get("/dnd-layout", {
+                    pageId,
+                    dndId,
+                    dndTpl,
+                    melisSite
+                }).done((res) => {
+                    console.log({res});
+                    if (res.success) {
+                        console.log({dndId});
+                        console.log($(".melis-dragdropzone-container[data-plugin-id='" + dndId + "']"));
+
+                        $(".melis-dragdropzone-container[data-plugin-id='" + dndId + "']").replaceWith(res.html);
+
+                        //$('[data-bs-toggle="popover"]').popover("hide");
+
+                        if (res.pluginsInitFiles) {
+                            setTimeout(() => {
+                                $.each(res.pluginsInitFiles, (i, v) => {
+                                    // reinitialize plugins
+                                    // melisPluginEdition.processPluginResources(v, i);
+                                });
+
+                                melisPluginEdition.moveResponsiveClass();
+                                melisPluginEdition.pluginDetector();
+                                melisPluginEdition.initResizable();
+
+                                melisPluginEdition.sendDragnDropList(dndId, pageId);
+
+                                // TODO 
+                                window.melistagHTML_init();
+
+                            }, 1000)
+                        }
+
+                        $(".melis-dragdropzone-container[data-plugin-id='" + dndId + "']").find("#loader").remove();
+                    }
+                }).always(() => {
+                    $(".melis-dragdropzone-container[data-plugin-id='" + dndId + "']").find("#loader").remove();
+                }).fail(() => {
+                    alert(translations.tr_meliscore_error_message);
+                });
+        });
+
+        $document.on("click", ".popover-body .close-btn", function() {
+            let $popoverTrigger = $(this).closest(".popover").prevAll('[data-bs-toggle="popover"]').first();
+                $popoverTrigger.popover("hide");
+        });
+
+        $document.on('click', function(e) {
+            if (!$(e.target).closest('.popover').length && !$(e.target).is('[data-bs-toggle="popover"]')) {
+                $('[data-bs-toggle="popover"]').popover('hide');
+            }
         });
 });

@@ -158,12 +158,12 @@
 }
 .dnd-layout-buttons .btn {
     padding: 0 0.5rem;
+    border-radius: 0;
+    position: relative;
+    z-index: inherit;
 }
 .dnd-layout-buttons .btn:hover {
-    background-color: #fff;
-}
-.dnd-layout-buttons .btn:hover .fa {
-    color: #e61c23;
+    background-color: #cf1d23;
 }
 .dnd-layout-buttons .layout-popover {
     display: none;
@@ -249,17 +249,17 @@ button.dnd-arrow-button:hover .fa,
 button.dnd-plus-button:hover .fa {
     color: #e61c23;
 }
+/* button.column-icon:hover */
 button.dnd-arrow-button:hover,
-button.dnd-plus-button:hover,
-button.column-icon:hover {
+button.dnd-plus-button:hover {
     background-color: #fff;
 }
-button.column-icon:hover {
+/* button.column-icon:hover {
     border-color: #fff;
 }
 button.column-icon:hover .icon-row {
     border-color: #fff;
-}
+} */
 .melis-dragdropzone {
     bottom: 0;
 }
@@ -282,4 +282,48 @@ button.column-icon:hover .icon-row {
 .bg-red {
     background-color: #e61c23;
     border-color: #e61c23;
+}
+.dnd-layout-buttons-popover {
+    border-radius: 3px;
+}
+.dnd-layout-buttons-popover .popover-body {
+    position: relative;
+    padding: 0;
+}
+.dnd-layout-buttons-popover .popover-arrow::after,
+.dnd-layout-buttons-popover .popover-arrow::before {
+    --bs-popover-bg: #373736;
+}
+.dnd-layout-buttons-popover header {
+    background-color: #373736;
+    padding: 0.5rem 1rem;
+}
+.dnd-layout-buttons-popover header h5,
+.dnd-layout-buttons-popover header .close-btn {
+    color: #fff;
+}
+.dnd-layout-buttons-popover header .close-btn {
+    margin-right: -0.5rem;
+}
+.dnd-layout-buttons-popover header .close-btn:active,
+.dnd-layout-buttons-popover header .close-btn {
+    border-color: transparent;
+}
+.dnd-layout-buttons-popover header .close-btn:hover {
+    color: #fff;
+}
+.dnd-layout-buttons-popover header h5 {
+    font-size: 1rem;
+    font-weight: normal;
+    margin-bottom: 0;
+
+    display: flex;
+    align-items: center;
+}
+.dnd-layout-buttons-popover .column-icons {
+    height: auto;
+    padding: 2rem;
+}
+.column-icons > div {
+    padding: 1rem;
 }
