@@ -89,102 +89,243 @@ $(function() {
         $body.on("click", ".dnd-plus-button", function() {
             let _this = $(this);
             let pluginId = _this.data("plugin-id");
+            let siteModule = _this.data("site-module");
             let parentDND = $(_this).parents(".melis-dragdropzone-container").last();
             let pageId = _this.data("page-id");
 
-            var parent = $(parentDND).attr("data-plugin-id");
-            // The source class you want to clone
-            var sourceId = pluginId;
+            let originalLayout = parentDND.data("layout-template");
 
-            // Find the main container
+            let parent = parentDND.attr("data-plugin-id");
+            let sourceId = pluginId;
 
-            var container = $('[data-dragdropzone-id^="' + parent + '"]');
-            var children = container.find('[data-dragdropzone-id^="' + parent + '_"]');
+            // Get the source container wrapper
+            let sourceContainer = $('.melis-dragdropzone-container[data-dragdropzone-id="' + sourceId + '"]');
+            //update template
+            $(sourceContainer).data("layout-template", 'MelisFront/dnd-2-cols-down-tpl');
 
-            // Find max index suffix used in dragdropzone IDs
-            var lastIndex = 0;
-            children.each(function () {
-                var id = $(this).attr('data-dragdropzone-id');
-                var match = id.match(new RegExp(parent + '_(\\d+)$'));
-                if (match) {
-                    lastIndex = Math.max(lastIndex, parseInt(match[1]));
-                }
-            });
-
-            var sourceDOM = $('.melis-dragdropzone-container[data-dragdropzone-id="' + sourceId + '"]');
-
-            var source = sourceDOM.first();
-
-            if (!source.length) {
-                console.warn("Source element '" + sourceId + "' not found.");
+            if (!sourceContainer.length) {
+                console.warn("Source container '" + sourceId + "' not found.");
                 return;
             }
 
-            var newIndex = lastIndex + 1;
-            var newId = parent + '_' + newIndex;
-            var newDNDId = newId;
+            // Ensure .row exists inside sourceContainer
+            let row = sourceContainer.children('.row');
+            if (!row.length) {
+                let existingContent = sourceContainer.children().not('.row');
 
-            var clone = source.clone(true, true);
-            clone.attr('data-dragdropzone-id', newId);
-            clone.attr('data-plugin-id', newId);
-            clone.attr('data-tag-id', newId);
-            clone.attr('id', newId);
+                // Wrap non-row content if necessary
+                if (!existingContent.hasClass('melis-dragdropzone-container')) {
 
-            clone.find("button.dnd-plus-button").attr('data-plugin-id', newId);
+                    if(sourceContainer.find(".melis-dragdropzone-container").length <= 1) {
+                        originalLayout = 'MelisFront/dnd-default-tpl';
+                    }
 
-            var originalId = sourceId;  // e.g. "centered_dragdrop_html_1"
-            // Update nested duplicates of the same data-dragdropzone-id
-            var ctr = 1;
-            clone.find('[data-dragdropzone-id="' + originalId + '"]').each(function(i) {
-                // var nestedNewId = newId + '_' + (i + 1);
-                $(this).attr('data-dragdropzone-id', newId);
-                $(this).attr('data-plugin-id', newId);
-                $(this).attr('data-tag-id', newId);
-                $(this).attr('id', newId);
+                    let wrapper = $('<div class="melis-dragdropzone-container"></div>')
+                        .attr({
+                            'data-dragdropzone-id': sourceId,
+                            'data-plugin-id': sourceId,
+                            'data-tag-id': sourceId,
+                            'id': sourceId,
+                            'data-site-module': siteModule,
+                            'data-layout-template': originalLayout
+                        });
+                    wrapper.append(existingContent);
+                    existingContent = wrapper;
+                }
 
-                $(this).find('[data-plugin="MelisFrontDragDropZonePlugin"]').each(function(i, el) {
-                    var nestedNewId = newId + '_' + (i + 1);
-                    $(el).attr('data-dragdropzone-id', nestedNewId);
-                    $(el).attr('data-plugin-id', nestedNewId);
-                    $(el).attr('data-tag-id', nestedNewId);
-                    $(el).attr('id', nestedNewId);
-                });
+                row = $('<div class="row"></div>');
+                let col = $('<div class="col-md-12"></div>').append(existingContent);
+                row.append(col);
+                sourceContainer.append(row);
+            }
 
-                ctr = i;
-            });
-
-            // Increment numeric suffix of any data-plugin-id by 1
-            clone.find('.melis-plugin-tools-box, .mce-content-body').each(function () {
-                var oldId = $(this).attr('data-plugin-id');
-                // Match prefix + numeric suffix at the end (digits)
-                var match = oldId.match(/^(.*?)(\d+)$/);
+            // Determine next hierarchical index
+            let lastIndex = 0;
+            sourceContainer.find('[data-dragdropzone-id]').each(function () {
+                let dndId = $(this).attr('data-dragdropzone-id');
+                let match = dndId.match(new RegExp('^' + sourceId + '_(\\d+)$'));
                 if (match) {
-                    var prefix = match[1]; // anything before the digits
-                    var num = parseInt(match[2], 10);
-                    var newNum = num + 1;
+                    lastIndex = Math.max(lastIndex, parseInt(match[1], 10));
+                }
+            });
+            let newIndex = lastIndex + 1;
+            let newDNDId = sourceId + '_' + newIndex;
 
-                    // Preserve zero-padding length of the original number
-                    var numStr = match[2];
-                    var newNumStr = newNum.toString().padStart(numStr.length, '0');
+            // Get the last .col-md-12 and clone the wrapper inside it
+            let lastCol = row.children('.col-md-12').last();
+            let wrapperToClone = lastCol.find('.melis-dragdropzone-container[data-dragdropzone-id="' + sourceId + '"]').first();
+            if (!wrapperToClone.length) {
+                console.warn("No wrapper with data-dragdropzone-id='" + sourceId + "' found.");
+                return;
+            }
 
-                    var newId = prefix + newNumStr;
-                    $(this).attr('data-plugin-id', newId);
-                    $(this).attr('data-tag-id', newId);
-                    $(this).attr('id', newId);
+            // Deep clone with events and data
+            let clonedWrapper = wrapperToClone.clone(true, true);
+
+            // Function to update IDs on wrapper and children (non-destructive)
+            clonedWrapper.find('[data-dragdropzone-id]').addBack().each(function () {
+                let el = $(this);
+                let oldId = el.attr('data-dragdropzone-id');
+
+                if (oldId && oldId.startsWith(sourceId)) {
+                    let suffix = oldId.substring(sourceId.length); // like _1, _1_2 etc.
+                    let newFullId = newDNDId + suffix;
+
+                    el.attr('data-dragdropzone-id', newFullId);
+
+                    // // Only update plugin/tag/id if they existed
+                    if (el.attr('data-plugin-id')) el.attr('data-plugin-id', newFullId);
+                    if (el.attr('data-tag-id')) el.attr('data-tag-id', newFullId);
+                    if (el.attr('id')) el.attr('id', newFullId);
+
+                    // el.attr({
+                    //     'data-plugin-id': newFullId,
+                    //     'data-tag-id': newFullId,
+                    //     'id': newFullId
+                    // });
                 }
             });
 
-            children.last().css("background", "green");
-            children.last().closest(".melis-dragdropzone-container").css("background", "blue");
+            var htmlInit = [];
+            var mediaInit = [];
+            var textAreaInit = [];
 
-            // children.last().closest(".melis-dragdropzone-container").after(clone);
-            // children.last().after(clone);
-            // parentDND.after(clone);
-            // container.parents('.melis-dragdropzone-container').last().parent().append(clone);
+            // Update plugin IDs inside the cloned wrapper
+            var latestPlId = 0;
+            clonedWrapper.find('[data-plugin-id]').each(function () {
+                let el = $(this);
+                let oldPluginId = el.attr('data-plugin-id');
+                let match = oldPluginId.match(/^(.*?)(\d+)$/);
 
-            sourceDOM.last().parent().append(clone);
+                if (match) {
+                    let prefix = match[1];
+                    let num = parseInt(match[2], 10) + 1;
+                    let newPluginId = prefix + num.toString().padStart(match[2].length, '0');
 
-            //save sessions
+                    if($(this).parent().hasClass('melis-ui-outlined')){
+                        let maxId = getNextPluginIndex(clonedWrapper);
+                        latestPlId = parseInt(maxId, 10) + 1;
+                        newPluginId = prefix + latestPlId.toString().padStart(maxId.length, '0');
+
+                        // Replace only the number at the end
+                        let oldId = $(this).parent().attr('id');
+                        let newId = oldId.replace(/_(\d+)$/, '_' + latestPlId.toString());
+                        // Set the new ID
+                        $(this).parent().attr('id', newId);
+                        $(this).parent().attr('data-plugin-id', newPluginId);
+                        $(this).parent().attr('data-tag-id', newPluginId);
+
+                        $(this).parent().children("[data-plugin-id]").each(function(i, el){
+                            $(el).attr({
+                                'data-plugin-id': newPluginId,
+                                'data-tag-id': newPluginId,
+                                'id': newPluginId
+                            });
+                        });
+
+                        //update encoded text
+                        let str = $(this).parent().children(".plugin-hardcoded-conf").text().trim();
+                        // Extract the ID using RegExp
+                        let match = str.match(/s:\d+:"(tag01_\d+)";/);
+                        if (match) {
+                            let oldId = match[1];
+                            let newId = newPluginId;
+                            let newSerializedId = `s:${newId.length}:"${newId}";`;
+
+                            // Replace old ID entry
+                            let updated = str.replace(/s:\d+:"tag01_\d+";/, newSerializedId);
+                            $(this).parent().children(".plugin-hardcoded-conf").text(updated);
+                        }
+
+                        if($(this).hasClass("textarea-editable")){
+                            textAreaInit.push(newPluginId);
+                        }
+                        if($(this).hasClass("media-editable")){
+                            mediaInit.push(newPluginId);
+                        }
+                        if($(this).hasClass("html-editable")){
+                            htmlInit.push(newPluginId);
+                        }
+
+                    }else {
+                        el.attr({
+                            'data-plugin-id': newPluginId,
+                            'data-tag-id': newPluginId,
+                            'id': newPluginId
+                        });
+                    }
+                }
+            });
+
+            // Wrap in a new .col-md-12 and append to the row
+            let newCol = $('<div class="col-md-12"></div>').append(clonedWrapper);
+            row.append(newCol);
+
+            // let baseId = sourceId.replace(/(_\d+)+$/, '');
+            // fixNestedDndIds(sourceId);
+
+            let root = $('[data-dragdropzone-id="'+sourceId+'"]').first();
+            updateNestedDragdropIds(root, sourceId);
+
+            // Save the session
             melisPluginEdition.sendDragnDropList(newDNDId, pageId, parent);
+            //re init tags
+            $.each(htmlInit, function(i, value){
+                melistagHTML_init(value);
+            });
+            $.each(textAreaInit, function(i, value){
+                window.melistagTEXTAREA_init(value);
+            });
+            $.each(mediaInit, function(i, value){
+                window.melistagMEDIA_init(value);
+            });
         });
+
+    function updateNestedDragdropIds($element, baseId) {
+        let index = 1;
+
+        // Find only the FIRST nested .melis-dragdropzone-container for each branch
+        $element.find('.melis-dragdropzone-container').each(function () {
+            const $child = $(this);
+
+            // Skip if it's already been renamed in a deeper recursion
+            if ($child.data('renamed')) return;
+
+            const newId = `${baseId}_${index}`;
+
+            // Update all attributes
+            $child.attr('data-dragdropzone-id', newId);
+            if ($child.attr('data-plugin-id')) $child.attr('data-plugin-id', newId);
+            if ($child.attr('data-tag-id')) $child.attr('data-tag-id', newId);
+            if ($child.attr('id')) $child.attr('id', newId);
+
+            // Mark as renamed to avoid renaming again in deeper recursions
+            $child.data('renamed', true);
+
+            // Recurse on this child to rename its descendants
+            updateNestedDragdropIds($child, newId);
+
+            index++;
+        });
+    }
+
+    function getNextPluginIndex(sourceContainer) {
+        let max = 0;
+        $(sourceContainer).find('[data-plugin-id]').each(function () {
+            let el = $(this);
+            if($(this).parent().hasClass('melis-ui-outlined')){
+                let pluginId = el.attr('data-plugin-id');
+                let match = pluginId.match(/^(.*?)(\d+)$/);
+
+                if(match){
+                    var tagId = parseInt(match[2], 10);
+                    if(max < tagId){
+                        max = tagId;
+                    }
+
+                }
+            }
+        });
+        return max;
+    }
 });
