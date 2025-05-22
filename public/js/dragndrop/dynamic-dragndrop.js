@@ -290,15 +290,15 @@ $(function () {
                             $(this).parent().children(".plugin-hardcoded-conf").text(updated);
                         }
 
-                        if($(this).hasClass("textarea-editable")){
-                            textAreaInit.push(newPluginId);
-                        }
-                        if($(this).hasClass("media-editable")){
-                            mediaInit.push(newPluginId);
-                        }
-                        if($(this).hasClass("html-editable")){
-                            htmlInit.push(newPluginId);
-                        }
+                        // if($(this).hasClass("textarea-editable")){
+                        //     textAreaInit.push(newPluginId);
+                        // }
+                        // if($(this).hasClass("media-editable")){
+                        //     mediaInit.push(newPluginId);
+                        // }
+                        // if($(this).hasClass("html-editable")){
+                        //     htmlInit.push(newPluginId);
+                        // }
 
                     }else {
                         el.attr({
@@ -323,15 +323,21 @@ $(function () {
             // Save the session
             melisPluginEdition.sendDragnDropList(newDNDId, pageId, parent);
             //re init tags
-            $.each(htmlInit, function(i, value){
-                melistagHTML_init(value);
-            });
-            $.each(textAreaInit, function(i, value){
-                window.melistagTEXTAREA_init(value);
-            });
-            $.each(mediaInit, function(i, value){
-                window.melistagMEDIA_init(value);
-            });
+            // $.each(htmlInit, function(i, value){
+                melistagHTML_init();
+            // });
+            // $.each(textAreaInit, function(i, value){
+                melistagTEXTAREA_init();
+            // });
+            // $.each(mediaInit, function(i, value){
+                melistagMEDIA_init();
+            // });
+
+            //init dnd zones
+            melisPluginEdition.moveResponsiveClass();
+            melisPluginEdition.pluginDetector();
+            melisPluginEdition.initResizable();
+            melisDragnDrop.setDragDropZone();
         });
 
     function updateNestedDragdropIds($element, baseId) {
