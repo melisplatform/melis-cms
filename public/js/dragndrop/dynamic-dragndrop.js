@@ -446,7 +446,9 @@ $(function () {
 
                 $uiOutlined.each(function() {
                     let $outlined = $(this);
-                        $outlined.resizable("destroy");
+                        if($outlined.data("resizable")) {
+                            $outlined.resizable("destroy");
+                        }
                 });
 
                 /* console.log(parent.pluginResizable);
