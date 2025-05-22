@@ -35,7 +35,7 @@ var melisDragnDrop = (function ($, window) {
 	});
 
 	function setDragDropZone() {
-		$("body .melis-dragdropzone").sortable({
+		$(".melis-dragdropzone").sortable({
 			connectWith: ".melis-float-plugins, .melis-dragdropzone",
 			connectToSortable: ".melis-float-plugins",
 			handle: ".m-move-handle",
@@ -46,12 +46,12 @@ var melisDragnDrop = (function ($, window) {
 			tolerance: "pointer",
 			items: ".melis-ui-outlined",
 			start: function (event, ui) {
-				$("body .melis-dragdropzone").sortable("refresh");
+				$(".melis-dragdropzone").sortable("refresh");
 
 				// hide tinyMCE panel
 				$(".mce-tinymce.mce-panel.mce-floatpanel").hide();
 				// highlight dragdropzone
-				$("body .melis-dragdropzone").addClass("highlight");
+				$(".melis-dragdropzone").addClass("highlight");
 				$(".ui-sortable-helper").css("z-index", "9999999");
 
 				// get item percentage width
@@ -198,6 +198,9 @@ var melisDragnDrop = (function ($, window) {
 					// send dragndrop list
 					melisPluginEdition.sendDragnDropList(dragZoneSenderPluginId, tabId);
 				}
+
+				$(".melis-dragdropzone").removeClass("highlight");
+				melisPluginEdition.pluginDetector();
 
 				console.log(
 					`setDragDropZone() .melis-dragdropzone sortable receive !!!`
