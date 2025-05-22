@@ -43,10 +43,18 @@ $(function() {
             let dndTpl = $(this).data("dndTpl");
             let pageId = $(this).data("pageId");
             let melisSite = $(this).data("melisSite");
-            
             var tempLoader = '<div id="loader" class="overlay-loader"><img class="loader-icon spinning-cog" src="/MelisCore/assets/images/cog12.svg" data-cog="cog12"></div>';
 
             $(this).closest(".melis-dragdropzone-container").prepend(tempLoader);
+
+            let dndContainer = $(this).closest(".melis-dragdropzone-container");
+
+            let dndLayout = dndContainer.find(".melis-dragdropzone");
+            let dndCtr = dndLayout.length;
+
+            console.log({
+                dndCtr
+            });
 
             $.get("/dnd-layout", {
                 pageId,
@@ -54,36 +62,71 @@ $(function() {
                 dndTpl,
                 melisSite
             }).done((res) => {
-                //console.log({res});
                 if (res.success) {
-                    $(this).find("#loader").remove();
 
-                    $(".melis-dragdropzone-container[data-plugin-id='" + dndId + "']").replaceWith(res.html);
+                    dndContainer.find("#loader").remove();
 
-                    if (res.pluginsInitFiles) {
+                    let newLayout = $(res.html);
+                    let newLayoutDnd = newLayout.find(".melis-dragdropzone");
+                    let newLayoutDndCtr = newLayoutDnd.length;
 
-                        setTimeout(() => {
-                            $.each(res.pluginsInitFiles, (i, v) => {
-                                // reinitialize plugins
-                                // melisPluginEdition.processPluginResources(v, i);
+                    console.log({
+                        newLayoutDndCtr
+                    })
+
+                    if (dndCtr != newLayoutDndCtr) {
+
+                        if (dndCtr == 1) {
+                            let dndContent = dndContainer.find(".melis-dragdropzone");
+
+                            $.each(dndContent.children(), (i, v) => {
+                                // filter dnd with contents
+                                if ($(v).text().trim() !== "") {
+                                    // move and append to new dnd layout
+                                    $(v).appendTo(newLayout.find(".melis-dragdropzone:first"));
+                                }
                             });
 
-                            melisPluginEdition.moveResponsiveClass();
-                            melisPluginEdition.pluginDetector();
-                            melisPluginEdition.initResizable();
+                            // replacing new layout
+                            $("body .melis-dragdropzone-container[data-plugin-id='" + dndId + "']").replaceWith(newLayout);
 
-                            melisPluginEdition.sendDragnDropList(dndId, pageId);
+                        } else {
 
-                            // TODO 
-                            window.melistagHTML_init();
+                            // comparing dnds to the new dnd layout
+                            $.each(dndLayout, (i, v) => {
 
-                        }, 1000)
+                                // checking if the plugin id not exist in the new layout
+                                let pluginExist = newLayout.find("div.melis-dragdropzone[data-plugin-id='" + $(v).data("pluginId") + "']");
+                                // all plugin no exist in the new layout will append to the last dnd in the new layout
+                                if (!pluginExist.length) {
+                                    let dndContents = $(v).children();
+
+                                    $.each(dndContents, (di, dv) => {
+                                        // filter dnd with contents
+                                        if ($(dv).text().trim() !== "") {
+                                            // move and append to new dnd layout
+                                            $(dv).appendTo(newLayout.find(".melis-dragdropzone:last"));
+                                        }
+                                    });
+                                }
+                            });
+
+                            // replacing new layout
+                            $("body .melis-dragdropzone-container[data-plugin-id='" + dndId + "']").replaceWith(newLayout);
+                        }
                     }
 
+                    melisPluginEdition.moveResponsiveClass();
+                    melisPluginEdition.pluginDetector();
+                    melisPluginEdition.initResizable();
+
+                    // save change to session
+                    melisPluginEdition.sendDragnDropList(dndId, pageId);
                 }
             }).always(() => {
                 $(this).find("#loader").remove();
             });
+        });
         });
 
         $body.on("click", ".dnd-plus-button", function() {
