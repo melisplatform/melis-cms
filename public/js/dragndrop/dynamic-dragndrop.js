@@ -1,33 +1,20 @@
-$(function () {
-	let $document = $(document),
-		$body = $("body"),
-		$dndButtons = $(".dnd-layout-buttons, .dnd-bottom-buttons");
+$(function() {
+    let $document   = $(document),
+        $body       = $("body"),
+        $dndButtons = $('.dnd-layout-buttons');
 
 	// .dnd-layout-wrapper
 	$body
 		.on("mouseenter", ".dnd-layout-wrapper", function (e) {
 			// e.stopPropagation();
 
-			//$dndButtons.removeClass("show-buttons");
-			$dndButtons.hide();
+                $dndButtons.hide();
 
-			//$(this).children(".dnd-layout-buttons, .dnd-bottom-buttons").addClass("show-buttons");
-			$(this).children(".dnd-layout-buttons, .dnd-bottom-buttons").show();
-
-			/* $(this).children(".dnd-bottom-buttons").css({
-                        "opacity" : "1",
-                        "visibility" : "visible"
-                    }); */
-		})
-		.on("mouseleave", ".dnd-layout-wrapper", function () {
-			//$(this).children(".dnd-layout-buttons, .dnd-bottom-buttons").removeClass("show-buttons");
-			$(this).children(".dnd-layout-buttons, .dnd-bottom-buttons").hide();
-
-			/* $(this).children(".dnd-bottom-buttons").css({
-                        "opacity" : "0",
-                        "visibility" : "hidden"
-                    }); */
-		});
+                $(this).children(".dnd-layout-buttons").show();
+            })
+            .on("mouseleave", ".dnd-layout-wrapper", function () {
+                $(this).children(".dnd-layout-buttons").hide();
+            });
 
 	// .column-icons, button tag
 	/* $body

@@ -203,6 +203,7 @@
     opacity: 1 !important;
 }
 .dnd-bottom-buttons {
+    display: none;
     /* right: 0;
     bottom: -67px; */
     
@@ -285,7 +286,7 @@ button.column-icon:hover .icon-row {
 }
 .dnd-layout-buttons-popover {
     border-radius: 3px;
-    max-width: 400px;
+    max-width: 355px;
 }
 .dnd-layout-buttons-popover .popover-body {
     position: relative;
@@ -298,6 +299,8 @@ button.column-icon:hover .icon-row {
 .dnd-layout-buttons-popover header {
     background-color: #373736;
     padding: 0.5rem 1rem;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
 }
 .dnd-layout-buttons-popover header h5,
 .dnd-layout-buttons-popover header .close-btn {
@@ -322,12 +325,10 @@ button.column-icon:hover .icon-row {
     align-items: center;
 }
 .dnd-layout-buttons-popover .column-icons {
-    height: auto;
-    padding: 1rem 2rem;
-}
-.dnd-layout-buttons-popover .column-icons {
     display: block;
-    width: 400px;
+    width: 355px;
+    height: auto;
+    padding: 1rem;
 }
 .column-icons > div {
     margin: 1rem 2rem 1rem;
