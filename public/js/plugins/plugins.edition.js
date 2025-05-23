@@ -835,14 +835,11 @@ var melisPluginEdition = (function($, window) {
             percentTotalWidth,
             iframe = window.parent.$("#"+ parent.activeTabId).find('iframe'),
             $melisUiOutlined = $(".melis-dragdropzone .melis-ui-outlined"); // need to check this part
-            
-            console.log({$melisUiOutlined});
+
             // check if melis-ui-outlined element is available in preview page
             if( $melisUiOutlined.length ) {
                 $melisUiOutlined.each(function() {
-                    console.log(`initResizable() initialized!!!`);
                     $(this).resizable({
-                        containment: ".melis-dragdropzone",
                         start: function(event, ui){
                             var widthIndicator =  '<div class="ui-resize-indicator"></div>';
                                 parentWidth = ui.originalElement.parent().outerWidth();
