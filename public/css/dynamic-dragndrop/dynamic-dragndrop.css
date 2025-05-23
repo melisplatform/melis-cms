@@ -354,3 +354,7 @@ button.column-icon:hover .icon-row {
     margin: 1rem 2rem 1rem;
     display: inline-block;
 }
+
+.melis-dragdropzone .col-12{
+    padding-right: 1px;
+}
