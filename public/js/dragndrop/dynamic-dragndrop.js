@@ -3,27 +3,18 @@ $(function () {
 		$body = $("body"),
 		$dndButtons = $(".dnd-layout-buttons");
 
-	// .dnd-layout-wrapper
-	$body
-		.on("mouseenter", ".dnd-layout-wrapper", function (e) {
-			// e.stopPropagation();
+        // .dnd-layout-wrapper
+        $body
+            .on("mouseenter", ".dnd-layout-wrapper", function (e) {
+                // e.stopPropagation();
 
-			$dndButtons.hide();
+                $dndButtons.hide();
 
-			$(this).children(".dnd-layout-buttons").show();
-		})
-		.on("mouseleave", ".dnd-layout-wrapper", function () {
-			$(this).children(".dnd-layout-buttons").hide();
-		});
-
-        // .column-icons, button tag
-        /* $body
-                .on("mouseenter", ".column-icon", function () {
-                    $(this).find(".icon-col-bg").removeClass("bg-white").addClass("bg-red");
-                })
-                .on("mouseleave", ".column-icon", function () {
-                    $(this).find(".icon-col-bg").addClass("bg-white").removeClass("bg-red");
-                }); */
+                $(this).children(".dnd-layout-buttons").show();
+            })
+            .on("mouseleave", ".dnd-layout-wrapper", function () {
+                $(this).children(".dnd-layout-buttons").hide();
+            });
 
         // .dnd-layout-buttons
         $body.on("click", ".dnd-layout-buttons div[data-dnd-tpl]", function () {
@@ -355,6 +346,14 @@ $(function () {
             popoverInit();
         });
 
+        $body.on("click", ".popover-body .close-btn", function () {
+            let $popoverTrigger = $(this)
+                .closest(".popover")
+                .prevAll('[data-bs-toggle="popover"]')
+                .first();
+            $popoverTrigger.popover("hide");
+        });
+
         function updateNestedDragdropIds($element, baseId) {
             let index = 1;
 
@@ -444,34 +443,22 @@ $(function () {
 
         popoverInit();
 
-        $body.on("click", ".popover-body .close-btn", function () {
-            let $popoverTrigger = $(this)
-                .closest(".popover")
-                .prevAll('[data-bs-toggle="popover"]')
-                .first();
-            $popoverTrigger.popover("hide");
-        });
-
-	    /* $body.on('click', function(e) {
-                if (!$(e.target).closest('.popover').length && !$(e.target).is('[data-bs-toggle="popover"]')) {
-                    $('[data-bs-toggle="popover"]').popover('hide');
-                }
-            }); */
         function reInitResize() {
-            //console.log(`reInitResize() executed!!!`);
+            console.log(`reInitResize() executed!!!`);
             // re init resize
             var $uiOutlined = $("body .melis-dragdropzone .melis-ui-outlined");
                 //console.log({uiOutlined});
 
                 $uiOutlined.each(function() {
                     let $outlined = $(this);
-                        if($outlined.data("resizable")) {
+                        console.log($outlined.data("uiResizable"));
+                        if($outlined.data("uiResizable")) {
                             $outlined.resizable("destroy");
                         }
                 });
 
-                /* console.log(parent.pluginResizable);
-                console.log(typeof melisPluginEdition); */
+                console.log(parent.pluginResizable);
+                console.log(typeof melisPluginEdition !== "undefined");
 
                 if (parent.pluginResizable == 1 && typeof melisPluginEdition !== "undefined") {
                     melisPluginEdition.initResizable();
