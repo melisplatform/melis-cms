@@ -840,6 +840,7 @@ var melisPluginEdition = (function($, window) {
             if( $melisUiOutlined.length ) {
                 $melisUiOutlined.each(function() {
                     $(this).resizable({
+                        containment: "parent",
                         start: function(event, ui){
                             var widthIndicator =  '<div class="ui-resize-indicator"></div>';
                                 parentWidth = ui.originalElement.parent().outerWidth();
