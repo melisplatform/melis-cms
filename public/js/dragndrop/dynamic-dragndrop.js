@@ -224,13 +224,13 @@ $(function () {
             });
         }
 
-        $body.on("click", ".popover-body .close-btn", function () {
+        /* $body.on("click", ".popover-body .close-btn", function () {
             let $popoverTrigger = $(this)
                 .closest(".popover")
                 .prevAll('[data-bs-toggle="popover"]')
                 .first();
             $popoverTrigger.popover("hide");
-        });
+        }); */
 
         function updateNestedDragdropIds($element, baseId) {
             let index = 1;
@@ -280,7 +280,7 @@ $(function () {
             return max;
         }
 
-        function popoverInit() {
+        /* function popoverInit() {
             $('[data-bs-toggle="popover"]').each(function () {
                 let $trigger = $(this),
                     contentId = $trigger.data("bs-content-id"),
@@ -294,32 +294,9 @@ $(function () {
                     container: $trigger.closest(".dnd-layout-buttons"),
                     template: '<div class="popover dnd-layout-buttons-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
                 });
-
-                // Disable trigger button when popover is shown
-                /* $trigger.on("shown.bs.popover", function() {
-                            $trigger.prop("disabled", true);
-                        });
-
-                        // Re-enable trigger button when popover is hidden
-                        $trigger.on("hidden.bs.popover", function() {
-                            $trigger.prop("disabled", false);
-                        });
-
-                        // Toggle popover on click
-                        $trigger.on("click", function() {
-                            //$trigger.closest(".dnd-layout-buttons").show();
-
-                            if ($trigger.prop("disabled")) {
-                                $trigger.popover("hide");
-                            } else {
-                                $('[data-bs-toggle="popover"]').popover("hide"); // Hide other popovers
-                                $trigger.popover("show");
-                            }
-                        }); */
 		});
-	    }
 
-        popoverInit();
+        popoverInit(); */
 
         function reInitResize() {
             console.log(`reInitResize() executed!!!`);

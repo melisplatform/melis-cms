@@ -138,29 +138,36 @@
 }
 /*end drag n drop zone buttons*/
 
+[dnd-layout-disable] button {
+    cursor: not-allowed;
+}
+[dnd-layout-disable] button .icon-col-bg {
+    opacity: 0.5;
+}
 .dnd-layout-wrapper,
 .melis-dragdropzone-container {
     position: relative;
 }
 .dnd-layout-buttons {
-    width: fit-content;
+    width: auto;
 
-    /* top: -23px;
-    left: 0; */
-    top: -40px;
+    top: -56px;
     left: 0;
 
     padding: 0.5rem 1rem;
     border-radius: 3px;
+    height: 56px;
 }
 .dnd-layout-buttons .fa {
     color: #fff;
 }
 .dnd-layout-buttons .btn {
-    padding: 0 0.5rem;
+    display: inline-block;
+    padding: 0;
     border-radius: 0;
     position: relative;
     z-index: inherit;
+    margin-top: -24px;
 }
 .dnd-layout-buttons .btn:hover {
     background-color: #cf1d23;
@@ -168,11 +175,40 @@
 .dnd-layout-buttons .layout-popover {
     display: none;
 }
-.dnd-layout-wrapper {
-    outline: 1px dashed transparent;
-    padding: 1rem 0;
+.melis-dragdropzone-container .dnd-layout-wrapper {
+    /* #2780c4 */
+    outline: 2px dashed #ce5459;
+    padding: 0.5rem 0;
+    margin: 0 0.5rem;
 }
-.dnd-layout-wrapper:hover {
+.dnd-layout-wrapper .dnd-layout-indicator {
+    background-color: #ce5459 !important;
+}
+/* .melis-dragdropzone-container .dnd-layout-wrapper > .dnd-layout-buttons {
+    display: block;
+    opacity: 1;
+} */
+.dnd-layout-wrapper .dnd-layout-wrapper {
+    outline: none;
+}
+.dnd-layout-wrapper .dnd-layout-wrapper .dnd-layout-buttons,
+.dnd-layout-wrapper .dnd-layout-wrapper .dnd-layout-indicator {
+    display: none;
+}
+.dnd-layout-buttons .melis-plugin-title-box {
+    vertical-align: top;
+}
+.dnd-layout-buttons .column-icons {
+    display: inline-block;
+    width: auto;
+    padding: 0;
+    margin: 0 1.5rem;
+}
+.column-icons > div {
+    display: inline-block;
+    height: 40px;
+}
+/* .dnd-layout-wrapper:hover {
     outline-color: #2b87da
 }
 .dnd-layout-wrapper .dnd-layout-wrapper {
@@ -180,9 +216,12 @@
 }
 .dnd-layout-wrapper .dnd-layout-wrapper:hover {
     outline-color: #4c5866;
-}
+} */
 .dnd-layout-wrapper > .dnd-layout-buttons {
     background-color: #e61c23;
+}
+.dnd-layout-wrapper .dnd-bottom-buttons {
+    opacity: 1;
 }
 .dnd-layout-wrapper .dnd-bottom-buttons,
 .dnd-layout-wrapper .dnd-layout-buttons {
@@ -291,13 +330,47 @@ button.column-icon:hover .icon-row {
 .dnd-layout-wrapper .m-plugin-sub-tools {
     background: transparent !important;
     margin-left: 0;
+    width: 40px;
+    position: relative;
+    top: -12px;
+}
+.dnd-layout-wrapper .m-plugin-sub-tools div {
+    width: 40px;
+    height: 40px;
+}
+.dnd-layout-wrapper .m-plugin-sub-tools div .fa {
+    top: auto;
+    left: auto;
+    right: auto;
+    position: relative;
+
+    transform: none;
+    -webkit-transform: none;
+    -moz-transform: none;
+    -ms-transform: none;
 }
 .dnd-layout-wrapper .m-plugin-sub-tools .m-move-handle {
     display: inline-block;
     float: none;
-}
-.dnd-layout-wrapper .m-plugin-sub-tools div .fa {
-    top: 65%;
+    opacity: 1;
+
+    transform: none;
+    -webkit-transform: none;
+    -moz-transform: none;
+    -ms-transform: none;
+
+    transition: none;
+    -webkit-transition: none;
+    -ms-transition: none;
+
+    -webkit-transition-delay: unset;
+    -moz-transition-delay: unset;
+    -o-transition-delay: unset;
+    transition-delay: unset;
+
+    transition-timing-function: unset;
+    -webkit-transition-timing-function: unset;
+    -moz-transition-timing-function: unset;
 }
 .bg-red {
     background-color: #e61c23;
@@ -349,12 +422,4 @@ button.column-icon:hover .icon-row {
     width: 355px;
     height: auto;
     padding: 1rem;
-}
-.column-icons > div {
-    margin: 1rem 2rem 1rem;
-    display: inline-block;
-}
-
-.melis-dragdropzone .col-12{
-    padding-right: 1px;
 }
