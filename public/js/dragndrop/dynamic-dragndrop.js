@@ -1,20 +1,20 @@
-$(function() {
-    let $document   = $(document),
-        $body       = $("body"),
-        $dndButtons = $('.dnd-layout-buttons');
+$(function () {
+	let $document = $(document),
+		$body = $("body"),
+		$dndButtons = $(".dnd-layout-buttons");
 
-        // .dnd-layout-wrapper
-        $body
-            .on("mouseenter", ".dnd-layout-wrapper", function (e) {
-                // e.stopPropagation();
+	// .dnd-layout-wrapper
+	$body
+		.on("mouseenter", ".dnd-layout-wrapper", function (e) {
+			// e.stopPropagation();
 
-                    $dndButtons.hide();
+			$dndButtons.hide();
 
-                    $(this).children(".dnd-layout-buttons").show();
-                })
-                .on("mouseleave", ".dnd-layout-wrapper", function () {
-                    $(this).children(".dnd-layout-buttons").hide();
-                });
+			$(this).children(".dnd-layout-buttons").show();
+		})
+		.on("mouseleave", ".dnd-layout-wrapper", function () {
+			$(this).children(".dnd-layout-buttons").hide();
+		});
 
         // .column-icons, button tag
         /* $body
@@ -350,6 +350,9 @@ $(function() {
             melisPluginEdition.pluginDetector();
             melisPluginEdition.initResizable();
             melisDragnDrop.setDragDropZone();
+            
+            // initialize popover after
+            popoverInit();
         });
 
         function updateNestedDragdropIds($element, baseId) {
@@ -412,8 +415,7 @@ $(function() {
                     content: content,
                     trigger: "click",
                     container: $trigger.closest(".dnd-layout-buttons"),
-                    template:
-                        '<div class="popover dnd-layout-buttons-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
+                    template: '<div class="popover dnd-layout-buttons-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
                 });
 
                 // Disable trigger button when popover is shown
@@ -437,8 +439,8 @@ $(function() {
                                 $trigger.popover("show");
                             }
                         }); */
-            });
-        }
+		});
+	    }
 
         popoverInit();
 
@@ -450,9 +452,31 @@ $(function() {
             $popoverTrigger.popover("hide");
         });
 
-        /* $body.on('click', function(e) {
+	    /* $body.on('click', function(e) {
                 if (!$(e.target).closest('.popover').length && !$(e.target).is('[data-bs-toggle="popover"]')) {
                     $('[data-bs-toggle="popover"]').popover('hide');
                 }
             }); */
+        function reInitResize() {
+            //console.log(`reInitResize() executed!!!`);
+            // re init resize
+            var $uiOutlined = $("body .melis-dragdropzone .melis-ui-outlined");
+                //console.log({uiOutlined});
+
+                $uiOutlined.each(function() {
+                    let $outlined = $(this);
+                        if($outlined.data("resizable")) {
+                            $outlined.resizable("destroy");
+                        }
+                });
+
+                /* console.log(parent.pluginResizable);
+                console.log(typeof melisPluginEdition); */
+
+                if (parent.pluginResizable == 1 && typeof melisPluginEdition !== "undefined") {
+                    melisPluginEdition.initResizable();
+                }
+        }
+
+        reInitResize();
 });

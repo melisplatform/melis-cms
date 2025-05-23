@@ -35,7 +35,7 @@ var melisDragnDrop = (function ($, window) {
 	});
 
 	function setDragDropZone() {
-		$("body .melis-dragdropzone").sortable({
+		$(".melis-dragdropzone").sortable({
 			connectWith: ".melis-float-plugins, .melis-dragdropzone",
 			connectToSortable: ".melis-float-plugins",
 			handle: ".m-move-handle",
@@ -46,12 +46,13 @@ var melisDragnDrop = (function ($, window) {
 			tolerance: "pointer",
 			items: ".melis-ui-outlined",
 			start: function (event, ui) {
-				$("body .melis-dragdropzone").sortable("refresh");
+				$(".melis-dragdropzone").sortable("refresh");
 
 				// hide tinyMCE panel
 				$(".mce-tinymce.mce-panel.mce-floatpanel").hide();
+
 				// highlight dragdropzone
-				$("body .melis-dragdropzone").addClass("highlight");
+				$(".melis-dragdropzone").addClass("highlight");
 				$(".ui-sortable-helper").css("z-index", "9999999");
 
 				// get item percentage width
@@ -155,8 +156,6 @@ var melisDragnDrop = (function ($, window) {
 				} else {
 					$(".melis-cms-dnd-box").removeClass("show");
 				}
-
-				console.log(`setDragDropZone() .melis-dragdropzone sortable start !!!`);
 			},
 			receive: function (event, ui) {
 				var tabId;
@@ -199,16 +198,24 @@ var melisDragnDrop = (function ($, window) {
 					melisPluginEdition.sendDragnDropList(dragZoneSenderPluginId, tabId);
 				}
 
-				console.log(
-					`setDragDropZone() .melis-dragdropzone sortable receive !!!`
-				);
+				$(".melis-dragdropzone").removeClass("highlight");
+				melisPluginEdition.pluginDetector();
 			},
 			update: function (event, ui) {
 				$(".ui-sortable-helper").remove();
 			},
 			over: function (event, ui) {
+				$("body .melis-dragdropzone").removeClass("highlight");
+      			$(this).addClass("highlight");
+
 				setPluginWidth(ui);
 				melisPluginEdition.pluginDetector();
+			},
+			out: function(event, ui) {
+				$(this).removeClass("highlight");
+			},
+			stop: function(event, ui) {
+				$("body .melis-dragdropzone").removeClass("highlight");
 			},
 			change: function (event, ui) {
 				setPluginWidth(ui);
