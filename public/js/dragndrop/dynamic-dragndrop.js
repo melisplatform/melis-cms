@@ -255,27 +255,42 @@ $(function() {
                         $(this).parent().attr('data-plugin-id', newPluginId);
                         $(this).parent().attr('data-tag-id', newPluginId);
 
-                        $(this).parent().children("[data-plugin-id]").each(function(i, el){
-                            $(el).attr({
-                                'data-plugin-id': newPluginId,
-                                'data-tag-id': newPluginId,
-                                'id': newPluginId
-                            });
+                        $(this).parent().children("[data-plugin-id], [data-pcache-plugin-id]").each(function(i, el){
+                            // $(el).attr({
+                            //     'data-plugin-id': newPluginId,
+                            //     'data-tag-id': newPluginId,
+                            //     'id': newPluginId
+                            // });
+
+                            if ($(el).attr('data-pcache-plugin-id')) $(el).attr('data-pcache-plugin-id', newPluginId);
+                            if ($(el).attr('data-plugin-id')) $(el).attr('data-plugin-id', newPluginId);
+                            if ($(el).attr('data-tag-id')) $(el).attr('data-tag-id', newPluginId);
+                            if ($(el).attr('id')) $(el).attr('id', newPluginId);
                         });
 
                         //update encoded text
                         let str = $(this).parent().children(".plugin-hardcoded-conf").text().trim();
+                        // console.log(str);
                         // Extract the ID using RegExp
-                        let match = str.match(/s:\d+:"(tag01_\d+)";/);
-                        if (match) {
-                            let oldId = match[1];
-                            let newId = newPluginId;
-                            let newSerializedId = `s:${newId.length}:"${newId}";`;
+                        // let match = str.match(/s:\d+:"(tag01_\d+)";/);
+                        // if (match) {
+                        //     let oldId = match[1];
+                        //     let newId = newPluginId;
+                        //     let newSerializedId = `s:${newId.length}:"${newId}";`;
+                        //
+                        //     // Replace old ID entry
+                        //     let updated = str.replace(/s:\d+:"tag01_\d+";/, newSerializedId);
+                        //     $(this).parent().children(".plugin-hardcoded-conf").text(updated);
+                        // }
 
-                            // Replace old ID entry
-                            let updated = str.replace(/s:\d+:"tag01_\d+";/, newSerializedId);
-                            $(this).parent().children(".plugin-hardcoded-conf").text(updated);
-                        }
+                        let updated = str.replace(
+                            /s:\d+:"[^"]+_\d+";/,
+                            `s:${newPluginId.length}:"${newPluginId}";`
+                        );
+
+                        $(this).parent().children(".plugin-hardcoded-conf").text(updated);
+
+                        if (el.attr('data-plugin-id')) el.attr('data-plugin-id', newPluginId);
 
                         // if($(this).hasClass("textarea-editable")){
                         //     textAreaInit.push(newPluginId);
@@ -288,11 +303,15 @@ $(function() {
                         // }
 
                     }else {
-                        el.attr({
-                            'data-plugin-id': newPluginId,
-                            'data-tag-id': newPluginId,
-                            'id': newPluginId
-                        });
+                        // el.attr({
+                        //     'data-plugin-id': newPluginId,
+                        //     'data-tag-id': newPluginId,
+                        //     'id': newPluginId
+                        // });
+
+                        if (el.attr('data-plugin-id')) el.attr('data-plugin-id', newPluginId);
+                        if (el.attr('data-tag-id')) el.attr('data-tag-id', newPluginId);
+                        if (el.attr('id')) el.attr('id', newPluginId);
                     }
                 }
             });
