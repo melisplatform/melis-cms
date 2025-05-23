@@ -194,166 +194,44 @@ $(function () {
             // Get the last .col-md-12 and clone the wrapper inside it
             let lastCol = row.children('.col-md-12').last();
             let wrapperToClone = lastCol.find('.melis-dragdropzone-container[data-dragdropzone-id="' + sourceId + '"]').first();
+
             if (!wrapperToClone.length) {
                 console.warn("No wrapper with data-dragdropzone-id='" + sourceId + "' found.");
                 return;
             }
 
-            // Deep clone with events and data
-            let clonedWrapper = wrapperToClone.clone(true, true);
-
-            // Function to update IDs on wrapper and children (non-destructive)
-            clonedWrapper.find('[data-dragdropzone-id]').addBack().each(function () {
-                let el = $(this);
-                let oldId = el.attr('data-dragdropzone-id');
-
-                if (oldId && oldId.startsWith(sourceId)) {
-                    let suffix = oldId.substring(sourceId.length); // like _1, _1_2 etc.
-                    let newFullId = newDNDId + suffix;
-
-                    el.attr('data-dragdropzone-id', newFullId);
-
-                    // // Only update plugin/tag/id if they existed
-                    if (el.attr('data-plugin-id')) el.attr('data-plugin-id', newFullId);
-                    if (el.attr('data-tag-id')) el.attr('data-tag-id', newFullId);
-                    if (el.attr('id')) el.attr('id', newFullId);
-
-                    // el.attr({
-                    //     'data-plugin-id': newFullId,
-                    //     'data-tag-id': newFullId,
-                    //     'id': newFullId
-                    // });
-                }
-            });
-
-            var htmlInit = [];
-            var mediaInit = [];
-            var textAreaInit = [];
-
-            // Update plugin IDs inside the cloned wrapper
-            var latestPlId = 0;
-            clonedWrapper.find('[data-plugin-id]').each(function () {
-                let el = $(this);
-                let oldPluginId = el.attr('data-plugin-id');
-                let match = oldPluginId.match(/^(.*?)(\d+)$/);
-
-                if (match) {
-                    let prefix = match[1];
-                    let num = parseInt(match[2], 10) + 1;
-                    let newPluginId = prefix + num.toString().padStart(match[2].length, '0');
-
-                    if($(this).parent().hasClass('melis-ui-outlined')){
-                        let maxId = getNextPluginIndex(clonedWrapper);
-                        latestPlId = parseInt(maxId, 10) + 1;
-                        newPluginId = prefix + latestPlId.toString().padStart(maxId.length, '0');
-
-                        // Replace only the number at the end
-                        let oldId = $(this).parent().attr('id');
-                        let newId = oldId.replace(/_(\d+)$/, '_' + latestPlId.toString());
-                        // Set the new ID
-                        $(this).parent().attr('id', newId);
-                        $(this).parent().attr('data-plugin-id', newPluginId);
-                        $(this).parent().attr('data-tag-id', newPluginId);
-
-                        $(this).parent().children("[data-plugin-id], [data-pcache-plugin-id]").each(function(i, el){
-                            // $(el).attr({
-                            //     'data-plugin-id': newPluginId,
-                            //     'data-tag-id': newPluginId,
-                            //     'id': newPluginId
-                            // });
-
-                            if ($(el).attr('data-pcache-plugin-id')) $(el).attr('data-pcache-plugin-id', newPluginId);
-                            if ($(el).attr('data-plugin-id')) $(el).attr('data-plugin-id', newPluginId);
-                            if ($(el).attr('data-tag-id')) $(el).attr('data-tag-id', newPluginId);
-                            if ($(el).attr('id')) $(el).attr('id', newPluginId);
-                        });
-
-                        //update encoded text
-                        let str = $(this).parent().children(".plugin-hardcoded-conf").text().trim();
-                        // console.log(str);
-                        // Extract the ID using RegExp
-                        // let match = str.match(/s:\d+:"(tag01_\d+)";/);
-                        // if (match) {
-                        //     let oldId = match[1];
-                        //     let newId = newPluginId;
-                        //     let newSerializedId = `s:${newId.length}:"${newId}";`;
-                        //
-                        //     // Replace old ID entry
-                        //     let updated = str.replace(/s:\d+:"tag01_\d+";/, newSerializedId);
-                        //     $(this).parent().children(".plugin-hardcoded-conf").text(updated);
-                        // }
-
-                        let updated = str.replace(
-                            /s:\d+:"[^"]+_\d+";/,
-                            `s:${newPluginId.length}:"${newPluginId}";`
-                        );
-
-                        $(this).parent().children(".plugin-hardcoded-conf").text(updated);
-
-                        if (el.attr('data-plugin-id')) el.attr('data-plugin-id', newPluginId);
-
-                        // if($(this).hasClass("textarea-editable")){
-                        //     textAreaInit.push(newPluginId);
-                        // }
-                        // if($(this).hasClass("media-editable")){
-                        //     mediaInit.push(newPluginId);
-                        // }
-                        // if($(this).hasClass("html-editable")){
-                        //     htmlInit.push(newPluginId);
-                        // }
-
-                    }else {
-                        // el.attr({
-                        //     'data-plugin-id': newPluginId,
-                        //     'data-tag-id': newPluginId,
-                        //     'id': newPluginId
-                        // });
-
-                        if (el.attr('data-plugin-id')) el.attr('data-plugin-id', newPluginId);
-                        if (el.attr('data-tag-id')) el.attr('data-tag-id', newPluginId);
-                        if (el.attr('id')) el.attr('id', newPluginId);
-                    }
-                }
-            });
-
             // Wrap in a new .col-md-12 and append to the row
-            let newCol = $('<div class="col-md-12"></div>').append(clonedWrapper);
-            row.append(newCol);
-
-            // let baseId = sourceId.replace(/(_\d+)+$/, '');
-            // fixNestedDndIds(sourceId);
-
-            let root = $('[data-dragdropzone-id="'+sourceId+'"]').first();
-            updateNestedDragdropIds(root, sourceId);
-
-            // Save the session
-            melisPluginEdition.sendDragnDropList(newDNDId, pageId, parent);
-            //re init tags
-            // $.each(htmlInit, function(i, value){
-                if (typeof melistagHTML_init !== "undefined") {
-                    melistagHTML_init();
-                }
-            // });
-            // $.each(textAreaInit, function(i, value){
-                if (typeof melistagTEXTAREA_init !== "undefined") {
-                    melistagTEXTAREA_init();
-                }
-            // });
-            // $.each(mediaInit, function(i, value){
-                if (typeof melistagMEDIA_init !== "undefined") {
-                    melistagMEDIA_init();
-                }
-            // });
-
-            //init dnd zones
-            melisPluginEdition.moveResponsiveClass();
-            melisPluginEdition.pluginDetector();
-            melisPluginEdition.initResizable();
-            melisDragnDrop.setDragDropZone();
+            requestDND(newDNDId, row, pageId, parent, sourceId);
             
             // initialize popover after
             popoverInit();
         });
+
+        /**
+         *
+         * @param id
+         * @param row
+         * @param pageId
+         * @param parent
+         * @param sourceId
+         */
+        function requestDND(id, row, pageId, parent, sourceId)
+        {
+            $.ajax({
+                'url' : '/dnd-layout',
+                'data' : {id : id},
+                'type' : 'GET'
+            }).done(function(data){
+                var newCol = $('<div class="col-md-12"></div>').append($(data['html']));
+                row.append(newCol);
+
+                let root = $('[data-dragdropzone-id="'+sourceId+'"]').first();
+                updateNestedDragdropIds(root, sourceId);
+
+                // Save the session
+                melisPluginEdition.sendDragnDropList(id, pageId, parent);
+            });
+        }
 
         function updateNestedDragdropIds($element, baseId) {
             let index = 1;
