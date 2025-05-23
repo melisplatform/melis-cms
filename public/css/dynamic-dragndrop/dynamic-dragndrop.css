@@ -144,6 +144,9 @@
 [dnd-layout-disable] button .icon-col-bg {
     opacity: 0.5;
 }
+[dnd-layout-disable] button:hover .icon-col-bg {
+    opacity: 0.9;
+}
 .dnd-layout-wrapper,
 .melis-dragdropzone-container {
     position: relative;
@@ -151,7 +154,8 @@
 .dnd-layout-buttons {
     width: auto;
 
-    top: -56px;
+    /* top: -56px; */
+    top: 0;
     left: 0;
 
     padding: 0.5rem 1rem;
@@ -176,24 +180,36 @@
     display: none;
 }
 .melis-dragdropzone-container .dnd-layout-wrapper {
-    /* #2780c4 */
     outline: 1px dashed #ce5459;
     padding: 1rem 0;
     margin: 0 0.5rem;
 }
-.dnd-layout-wrapper .dnd-layout-indicator {
-    background-color: #ce5459 !important;
+.melis-dragdropzone-container > .dnd-layout-wrapper:hover {
+    outline-width: 2px;
 }
-/* .melis-dragdropzone-container .dnd-layout-wrapper > .dnd-layout-buttons {
-    display: block;
-    opacity: 1;
-} */
 .dnd-layout-wrapper .dnd-layout-wrapper {
     outline: none;
 }
 .dnd-layout-wrapper .dnd-layout-wrapper .dnd-layout-buttons,
 .dnd-layout-wrapper .dnd-layout-wrapper .dnd-layout-indicator {
     display: none;
+}
+.melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator {
+    background-color: #ce5459 !important;
+    opacity: 0;
+
+    transform: translate3d(-100%, 0, 0);
+    -webkit-transform: translate3d(-100%, 0, 0);
+    -moz-transform: translate3d(-100%, 0, 0);
+    -ms-transform: translate3d(-100%, 0, 0);
+
+    transition: opacity 0.4s, transform 0.4s;
+    -webkit-transition: opacity 0.4s, transform 0.4s;
+    -ms-transition: opacity 0.4s, transform 0.4s;
+    
+    -webkit-transition-delay: 0.1s;
+    -moz-transition-delay: 0.1s;
+    -o-transition-delay: 0.1s;
 }
 .dnd-layout-buttons .melis-plugin-title-box {
     vertical-align: top;
@@ -208,24 +224,11 @@
     display: inline-block;
     height: 40px;
 }
-/* .dnd-layout-wrapper:hover {
-    outline-color: #2b87da
-}
-.dnd-layout-wrapper .dnd-layout-wrapper {
-    outline: 1px dashed transparent;
-}
-.dnd-layout-wrapper .dnd-layout-wrapper:hover {
-    outline-color: #4c5866;
-} */
 .dnd-layout-wrapper > .dnd-layout-buttons {
     background-color: #e61c23;
 }
 .dnd-layout-wrapper .dnd-layout-buttons {
-    opacity: 1;
-}
-.dnd-layout-wrapper .dnd-bottom-buttons,
-.dnd-layout-wrapper .dnd-layout-buttons {
-    display: none;
+    opacity: 0;
     position: absolute;
     z-index: 999;
 
@@ -243,11 +246,8 @@
 }
 .dnd-bottom-buttons {
     display: none;
-    /* right: 0;
-    bottom: -67px; */
     
     right: 0;
-    /* bottom: -25px; */
     bottom: -40px;
 }
 /* button.dnd-plus-button,
@@ -320,12 +320,12 @@ button.column-icon:hover .icon-row {
     -ms-transform: translate3d(0, 0, 0);
 }
 .dnd-layout-wrapper:hover > .melis-plugin-indicator {
-    opacity: 0;
+    opacity: 1;
 
-    transform: translate3d(-100%, 0, 0);
-    -webkit-transform: translate3d(-100%, 0, 0);
-    -moz-transform: translate3d(-100%, 0, 0);
-    -ms-transform: translate3d(-100%, 0, 0);
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+    -moz-transform: translate3d(0, 0, 0);
+    -ms-transform: translate3d(0, 0, 0);
 }
 .dnd-layout-wrapper .m-plugin-sub-tools {
     background: transparent !important;

@@ -1,23 +1,19 @@
 $(function () {
 	let $document = $(document),
-		$body = $("body"),
-		$dndButtons = $(".dnd-layout-wrapper > .dnd-layout-buttons");
+		$body = $("body");
 
-        // .dnd-layout-wrapper
         $body
-            .on("mouseenter", ".melis-dragdropzone-container .dnd-layout-wrapper", function() {
-                // Only proceed if THIS is a direct child of .melis-dragdropzone-container
-                if (!$(this).parent().is('.melis-dragdropzone-container')) return;
-
-                $(".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-buttons").hide();
-                $(this).children(".dnd-layout-buttons").show();
-                console.log(`mouseenter direct child`);
+            .on("mouseenter", ".dnd-layout-indicator", function() {
+                $(this).next(".dnd-layout-buttons").css({
+                    "opacity": "1",
+                    "display": "block"
+                });
             })
-            .on("mouseleave", ".melis-dragdropzone-container .dnd-layout-wrapper", function() {
-                if (!$(this).parent().is('.melis-dragdropzone-container')) return;
-
-                $(this).children(".dnd-layout-buttons").hide();
-                console.log(`mouseleave direct child`);
+            .on("mouseleave", ".dnd-layout-indicator", function() {
+                $(this).next(".dnd-layout-buttons").css({
+                    "opacity": "0",
+                    "display": "none"
+                });
             });
 
         // .dnd-layout-buttons
