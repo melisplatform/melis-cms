@@ -163,7 +163,7 @@
 }
 .dnd-layout-buttons .btn {
     display: inline-block;
-    padding: 0;
+    padding: 0.5rem 1rem;
     border-radius: 0;
     position: relative;
     z-index: inherit;
@@ -177,8 +177,8 @@
 }
 .melis-dragdropzone-container .dnd-layout-wrapper {
     /* #2780c4 */
-    outline: 2px dashed #ce5459;
-    padding: 0.5rem 0;
+    outline: 1px dashed #ce5459;
+    padding: 1rem 0;
     margin: 0 0.5rem;
 }
 .dnd-layout-wrapper .dnd-layout-indicator {
@@ -220,7 +220,7 @@
 .dnd-layout-wrapper > .dnd-layout-buttons {
     background-color: #e61c23;
 }
-.dnd-layout-wrapper .dnd-bottom-buttons {
+.dnd-layout-wrapper .dnd-layout-buttons {
     opacity: 1;
 }
 .dnd-layout-wrapper .dnd-bottom-buttons,

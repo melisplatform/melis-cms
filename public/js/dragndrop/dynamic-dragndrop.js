@@ -1,19 +1,23 @@
 $(function () {
 	let $document = $(document),
 		$body = $("body"),
-		$dndButtons = $(".dnd-layout-buttons");
+		$dndButtons = $(".dnd-layout-wrapper > .dnd-layout-buttons");
 
         // .dnd-layout-wrapper
         $body
-            .on("mouseenter", ".dnd-layout-wrapper", function (e) {
-                // e.stopPropagation();
+            .on("mouseenter", ".melis-dragdropzone-container .dnd-layout-wrapper", function() {
+                // Only proceed if THIS is a direct child of .melis-dragdropzone-container
+                if (!$(this).parent().is('.melis-dragdropzone-container')) return;
 
-                $dndButtons.hide();
-
+                $(".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-buttons").hide();
                 $(this).children(".dnd-layout-buttons").show();
+                console.log(`mouseenter direct child`);
             })
-            .on("mouseleave", ".dnd-layout-wrapper", function () {
+            .on("mouseleave", ".melis-dragdropzone-container .dnd-layout-wrapper", function() {
+                if (!$(this).parent().is('.melis-dragdropzone-container')) return;
+
                 $(this).children(".dnd-layout-buttons").hide();
+                console.log(`mouseleave direct child`);
             });
 
         // .dnd-layout-buttons
@@ -109,7 +113,7 @@ $(function () {
                         melisPluginEdition.sendDragnDropList(dndId, pageId);
 
                         // call popoverInit()
-                        popoverInit();
+                        //popoverInit();
                     }
                 })
                 .always(() => {
@@ -195,7 +199,7 @@ $(function () {
             requestDND(newDNDId, row, pageId, parent, sourceId);
 
             // initialize popover after
-            popoverInit();
+            //popoverInit();
         });
 
         /**
@@ -298,7 +302,7 @@ $(function () {
 
         popoverInit(); */
 
-        function reInitResize() {
+        /* function reInitResize() {
             console.log(`reInitResize() executed!!!`);
             // re init resize
             var $uiOutlined = $("body .melis-dragdropzone .melis-ui-outlined");
@@ -320,5 +324,5 @@ $(function () {
                 }
         }
 
-        reInitResize();
+        reInitResize(); */
 });
