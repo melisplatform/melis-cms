@@ -162,7 +162,7 @@ var melisPluginEdition = (function($, window) {
 
     // jQuery last dragdropzone for crossbrowser
     //$("div.melis-dragdropzone").last().css({"margin-bottom": "35px"});
-    //$("div.dnd-layout-wrapper").last().css("margin-bottom", "35px");
+    $("div.dnd-layout-wrapper").last().css("margin-bottom", "35px");
 
     // Saving Plugin
     function savePluginUpdate(data, siteModule){

@@ -144,7 +144,7 @@
 [dnd-layout-disable] button .icon-col-bg {
     opacity: 0.5;
 }
-[dnd-layout-disable] button:hover .icon-col-bg {
+button.column-icon:hover .icon-col-bg {
     opacity: 0.9;
 }
 .dnd-layout-wrapper,
