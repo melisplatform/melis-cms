@@ -2,19 +2,20 @@ $(function () {
 	let $document = $(document),
 		$body = $("body");
 
-        $body
-            .on("mouseenter", ".dnd-layout-indicator", function() {
-                $(this).next(".dnd-layout-buttons").css({
-                    "opacity": "1",
-                    "display": "block"
-                });
-            })
-            .on("mouseleave", ".dnd-layout-indicator", function() {
-                $(this).next(".dnd-layout-buttons").css({
-                    "opacity": "0",
-                    "display": "none"
-                });
+        $body.on("mouseenter", ".dnd-layout-wrapper", function() {
+            $(this).children("> .dnd-layout-indicator").fadeIn("slow");
+        });
+
+        $body.on("mouseenter", ".dnd-layout-indicator", function() {
+            $(this).next(".dnd-layout-buttons").css({
+                "opacity": 1,
+                "display": "block"
             });
+        });
+
+        $body.on("mouseleave", ".dnd-layout-buttons", function() {
+            $(this).fadeOut("slow").hide();
+        });
 
         // .dnd-layout-buttons
         $body.on("click", ".dnd-layout-buttons div[data-dnd-tpl]", function () {
@@ -224,14 +225,6 @@ $(function () {
             });
         }
 
-        /* $body.on("click", ".popover-body .close-btn", function () {
-            let $popoverTrigger = $(this)
-                .closest(".popover")
-                .prevAll('[data-bs-toggle="popover"]')
-                .first();
-            $popoverTrigger.popover("hide");
-        }); */
-
         function updateNestedDragdropIds($element, baseId) {
             let index = 1;
 
@@ -279,46 +272,4 @@ $(function () {
             });
             return max;
         }
-
-        /* function popoverInit() {
-            $('[data-bs-toggle="popover"]').each(function () {
-                let $trigger = $(this),
-                    contentId = $trigger.data("bs-content-id"),
-                    content = $("#" + contentId).html();
-
-                $trigger.popover({
-                    html: true,
-                    sanitize: false,
-                    content: content,
-                    trigger: "click",
-                    container: $trigger.closest(".dnd-layout-buttons"),
-                    template: '<div class="popover dnd-layout-buttons-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
-                });
-		});
-
-        popoverInit(); */
-
-        /* function reInitResize() {
-            console.log(`reInitResize() executed!!!`);
-            // re init resize
-            var $uiOutlined = $("body .melis-dragdropzone .melis-ui-outlined");
-                //console.log({uiOutlined});
-
-                $uiOutlined.each(function() {
-                    let $outlined = $(this);
-                        console.log($outlined.data("uiResizable"));
-                        if($outlined.data("uiResizable")) {
-                            $outlined.resizable("destroy");
-                        }
-                });
-
-                console.log(parent.pluginResizable);
-                console.log(typeof melisPluginEdition !== "undefined");
-
-                if (parent.pluginResizable == 1 && typeof melisPluginEdition !== "undefined") {
-                    melisPluginEdition.initResizable();
-                }
-        }
-
-        reInitResize(); */
 });
