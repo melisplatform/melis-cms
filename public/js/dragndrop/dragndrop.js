@@ -511,7 +511,13 @@ var melisDragnDrop = (function ($, window) {
 					// Init Resizable
 
 					if (parent.pluginResizable == 1) {
-						melisPluginEdition.initResizable();
+						// melisPluginEdition.initResizable();
+                        // waitForAjaxAndInitResizable();
+                        allTinyMCEEditorsLoaded(function(allLoaded) {
+                            if (allLoaded) {
+                                melisPluginEdition.initResizable();
+                            }
+                        });
 					}
 
 					// remove plugin
@@ -536,6 +542,29 @@ var melisDragnDrop = (function ($, window) {
 				alert(translations.tr_meliscore_error_message);
 			});
 	}
+
+    function allTinyMCEEditorsLoaded(callback) {
+        var checkInterval = 100; // ms
+        var maxWaitTime = 10000; // max 10 seconds
+        var waited = 0;
+
+        var interval = setInterval(function () {
+            var editors = tinymce.editors;
+            var allReady = editors.length > 0 && editors.every(function (editor) {
+                return editor.initialized && !editor.removed;
+            });
+
+            if (allReady) {
+                clearInterval(interval);
+                callback(true);
+            } else if (waited >= maxWaitTime) {
+                clearInterval(interval);
+                callback(false);
+            }
+
+            waited += checkInterval;
+        }, checkInterval);
+    }
 
 	function showPluginMenu() {
 		$(this).parent().toggleClass("show");
