@@ -1059,35 +1059,56 @@ var melisPluginEdition = (function($, window) {
         console.log('x');
         // initResizable(); // disable for now
 
-        allTinyMCEEditorsLoaded(function(allLoaded) {
+        waitForTinyMCELoadedAndReady(function(allLoaded) {
             if (allLoaded) {
                 console.log('awerawer');
                 initResizable();
+            }
+            else {
+                console.warn("TinyMCE editors did not load within the expected time.");
             }
         });
     }
 
     function allTinyMCEEditorsLoaded(callback) {
-        var checkInterval = 100; // ms
-        var maxWaitTime = 10000; // max 10 seconds
+        var checkInterval = 100; // milliseconds
+        var maxWaitTime = 10000; // 10 seconds
         var waited = 0;
 
         var interval = setInterval(function () {
-            var editors = tinymce.editors;
-            var allReady = editors.length > 0 && editors.every(function (editor) {
-                return editor.initialized && !editor.removed;
-            });
+            // Check if tinymce and tinymce.editors are defined
+            if (window.tinymce && Array.isArray(tinymce.editors)) {
+                var editors = tinymce.editors;
 
-            if (allReady) {
-                clearInterval(interval);
-                callback(true);
-            } else if (waited >= maxWaitTime) {
+                // Check if all editors are initialized
+                var allReady = editors.length > 0 && editors.every(function (editor) {
+                    return editor.initialized && !editor.removed;
+                });
+
+                if (allReady) {
+                    clearInterval(interval);
+                    callback(true);
+                    return;
+                }
+            }
+
+            // Stop checking after max wait time
+            waited += checkInterval;
+            if (waited >= maxWaitTime) {
                 clearInterval(interval);
                 callback(false);
             }
 
-            waited += checkInterval;
         }, checkInterval);
+    }
+
+    function waitForTinyMCELoadedAndReady(callback) {
+        var checkTinyMCEInterval = setInterval(function () {
+            if (window.tinymce && typeof tinymce.init === 'function') {
+                clearInterval(checkTinyMCEInterval);
+                allTinyMCEEditorsLoaded(callback);
+            }
+        }, 100);
     }
 
     moveResponsiveClass();
