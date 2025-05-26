@@ -929,7 +929,7 @@ var melisPluginEdition = (function($, window) {
 
                                 pluginList['tagType']   =   $this.data("tag-type");
                                 pluginList['tagId']     =   $this.data("tag-id");
-                                pluginList['tagValue']  =   tinyMCE.activeEditor.getContent({format : 'html'});
+                                pluginList['tagValue']  =   tinyMCE.activeEditor?.getContent({format : 'html'});
                         });
                 }
 
@@ -1056,7 +1056,38 @@ var melisPluginEdition = (function($, window) {
 
     // init resize
     if ( parent.pluginResizable == 1 ) {
-        initResizable(); // disable for now
+        console.log('x');
+        // initResizable(); // disable for now
+
+        allTinyMCEEditorsLoaded(function(allLoaded) {
+            if (allLoaded) {
+                console.log('awerawer');
+                initResizable();
+            }
+        });
+    }
+
+    function allTinyMCEEditorsLoaded(callback) {
+        var checkInterval = 100; // ms
+        var maxWaitTime = 10000; // max 10 seconds
+        var waited = 0;
+
+        var interval = setInterval(function () {
+            var editors = tinymce.editors;
+            var allReady = editors.length > 0 && editors.every(function (editor) {
+                return editor.initialized && !editor.removed;
+            });
+
+            if (allReady) {
+                clearInterval(interval);
+                callback(true);
+            } else if (waited >= maxWaitTime) {
+                clearInterval(interval);
+                callback(false);
+            }
+
+            waited += checkInterval;
+        }, checkInterval);
     }
 
     moveResponsiveClass();
