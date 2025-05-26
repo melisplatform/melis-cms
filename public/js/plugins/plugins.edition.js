@@ -1056,60 +1056,66 @@ var melisPluginEdition = (function($, window) {
 
     // init resize
     if ( parent.pluginResizable == 1 ) {
-        console.log('x');
         // initResizable(); // disable for now
 
-        waitForTinyMCELoadedAndReady(function(allLoaded) {
-            if (allLoaded) {
-                console.log('awerawer');
+        // waitForTinyMCELoadedAndReady(function(allLoaded) {
+        //     if (allLoaded) {
+        //         console.log('awerawer');
+        //         initResizable();
+        //     }
+        //     else {
+        //         console.warn("TinyMCE editors did not load within the expected time.");
+        //     }
+        // });
+
+        const interval = setInterval(function () {
+            if ($.active === 0) {
+                clearInterval(interval);
                 initResizable();
             }
-            else {
-                console.warn("TinyMCE editors did not load within the expected time.");
-            }
-        });
+        }, 100); // Check every 100ms
     }
 
-    function allTinyMCEEditorsLoaded(callback) {
-        var checkInterval = 100; // milliseconds
-        var maxWaitTime = 10000; // 10 seconds
-        var waited = 0;
+    // function allTinyMCEEditorsLoaded(callback) {
+    //     var checkInterval = 100; // milliseconds
+    //     var maxWaitTime = 10000; // 10 seconds
+    //     var waited = 0;
+    //
+    //     var interval = setInterval(function () {
+    //         // Check if tinymce and tinymce.editors are defined
+    //         if (window.tinymce && Array.isArray(tinymce.editors)) {
+    //             var editors = tinymce.editors;
+    //
+    //             // Check if all editors are initialized
+    //             var allReady = editors.length > 0 && editors.every(function (editor) {
+    //                 return editor.initialized && !editor.removed;
+    //             });
+    //
+    //             if (allReady) {
+    //                 clearInterval(interval);
+    //                 callback(true);
+    //                 return;
+    //             }
+    //         }
+    //
+    //         // Stop checking after max wait time
+    //         waited += checkInterval;
+    //         if (waited >= maxWaitTime) {
+    //             clearInterval(interval);
+    //             callback(false);
+    //         }
+    //
+    //     }, checkInterval);
+    // }
 
-        var interval = setInterval(function () {
-            // Check if tinymce and tinymce.editors are defined
-            if (window.tinymce && Array.isArray(tinymce.editors)) {
-                var editors = tinymce.editors;
-
-                // Check if all editors are initialized
-                var allReady = editors.length > 0 && editors.every(function (editor) {
-                    return editor.initialized && !editor.removed;
-                });
-
-                if (allReady) {
-                    clearInterval(interval);
-                    callback(true);
-                    return;
-                }
-            }
-
-            // Stop checking after max wait time
-            waited += checkInterval;
-            if (waited >= maxWaitTime) {
-                clearInterval(interval);
-                callback(false);
-            }
-
-        }, checkInterval);
-    }
-
-    function waitForTinyMCELoadedAndReady(callback) {
-        var checkTinyMCEInterval = setInterval(function () {
-            if (window.tinymce && typeof tinymce.init === 'function') {
-                clearInterval(checkTinyMCEInterval);
-                allTinyMCEEditorsLoaded(callback);
-            }
-        }, 100);
-    }
+    // function waitForTinyMCELoadedAndReady(callback) {
+    //     var checkTinyMCEInterval = setInterval(function () {
+    //         if (window.tinymce && typeof tinymce.init === 'function') {
+    //             clearInterval(checkTinyMCEInterval);
+    //             allTinyMCEEditorsLoaded(callback);
+    //         }
+    //     }, 100);
+    // }
 
     moveResponsiveClass();
     pluginDetector();
