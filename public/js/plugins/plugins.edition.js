@@ -1072,12 +1072,36 @@ var melisPluginEdition = (function($, window) {
         //     }
         // });
 
-        const interval = setInterval(function () {
-            if ($.active === 0) {
-                clearInterval(interval);
-                initResizable();
-            }
-        }, 100); // Check every 100ms
+        // const interval = setInterval(function () {
+        //     if ($.active === 0) {
+        //         clearInterval(interval);
+        //         initResizable();
+        //     }
+        // }, 100); // Check every 100ms
+
+        onParentFullyLoaded(() => {
+            console.log('✅ Parent page is fully loaded');
+            initResizable();
+        });
+    }
+
+    function onParentFullyLoaded(callback) {
+        if (!window.parent || window.parent === window) {
+            // Not inside an iframe
+            return;
+        }
+
+        const parentDoc = window.parent.document;
+
+        if (parentDoc.readyState === 'complete') {
+            // Parent is already fully loaded
+            callback();
+        } else {
+            // Wait until the parent is fully loaded
+            window.parent.addEventListener('load', () => {
+                callback();
+            });
+        }
     }
 
     // function allTinyMCEEditorsLoaded(callback) {
