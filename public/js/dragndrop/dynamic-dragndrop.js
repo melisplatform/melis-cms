@@ -129,6 +129,7 @@ $(function () {
 			let btn = $(this);
 			let pageId = $(this).data("pageId");
 			let dndId = $(this).data("dndId");
+
 			let melisSite = $(this).data("melisSite");
 			let dndTpl = "default";
 			let pluginContent = btn.closest(".dnd-plugins-content");
@@ -136,8 +137,13 @@ $(function () {
 			btn.attr("disabled", true);
 
             let dndContainer = $(this).closest(".melis-dragdropzone-container");
-			let tempLoader = dndContainer.find("#loader");
-            $(this).closest(".melis-dragdropzone-container").prepend(tempLoader.removeClass("hidden"));
+			let pluginReferer = dndContainer.data("pluginReferer");
+
+			if (pluginReferer)
+				dndId = pluginReferer;
+
+			// let tempLoader = dndContainer.find("#dnd-loader");
+            // $(this).closest(".melis-dragdropzone-container").prepend(tempLoader.removeClass("hidden"));
 
 			$.get("/dnd-layout", {
 				pageId,
@@ -158,13 +164,13 @@ $(function () {
 					//     scrollTop: newDnd.offset().top
 					// }, 2000);
 
+					// TODO 
 					let boHeader = 47;
 					let pageEditionHeader = 72;
 					let newDndTop = newDnd.offset().top;
 					let xtra = 100;
 
 					$(parent.document).scrollTop(newDndTop + xtra);
-
 
 					let newDndId = newDnd.find(".melis-dragdropzone-container").data("pluginId");
 
@@ -176,12 +182,13 @@ $(function () {
 					// save change to session
 					melisPluginEdition.sendDragnDropList(newDndId, pageId);
 
-				} else
-					dndContainer.find("#loader").remove();
+				} else {
+					// dndContainer.find("#loader").remove();
+				}
 
 			})
 			.always(() => {
-				dndContainer.find("#loader").remove();
+				// dndContainer.find("#loader").remove();
 			});
 		})
 
