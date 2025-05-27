@@ -2,16 +2,18 @@ $(function () {
 	let $body = $("body");
 
         $body
-            .on("mouseenter", ".dnd-layout-wrapper", function() {
+            .on("mouseenter", ".melis-dragdropzone-container > .dnd-layout-wrapper", function() {
                 //$(this).children("> .dnd-layout-indicator").fadeIn("slow");
-                $(this).children("> .dnd-layout-indicator").css("opacity", 1);
+                $(this).children(".dnd-layout-indicator").css("opacity", 1);
             })
-            .on("mouseleave", ".dnd-layout-wrapper", function() {
-                $(this).find("> .dnd-layout-buttons").css("opacity", 0);
+            .on("mouseleave", ".melis-dragdropzone-container > .dnd-layout-wrapper", function() {
+                $(this).children(".dnd-layout-indicator").css("opacity", 0);
+                $(this).children(".dnd-layout-buttons").css("opacity", 0);
             });
 
         $body.on("mouseenter", ".dnd-layout-indicator", function() {
             $(this).next(".dnd-layout-buttons").css("opacity", 1);
+            $(this).next(".dnd-layout-buttons").css("pointer-events", "auto");
             //$(this).next(".dnd-layout-buttons").fadeIn("slow");
         });
 
@@ -111,11 +113,14 @@ $(function () {
                         melisPluginEdition.initResizable();
                         melisDragnDrop.setDragDropZone();
 
+                        // added to update iframe height
+                        melisPluginEdition.calcFrameHeight();
+
                         // save change to session
                         melisPluginEdition.sendDragnDropList(dndId, pageId);
 
-                        // call popoverInit()
-                        //popoverInit();
+                        // re-position .dnd-layout-buttons after remove dnd
+                        topPositionlayoutButtons();
                     }
                 })
                 .always(() => {
@@ -186,6 +191,9 @@ $(function () {
 					// dndContainer.find("#loader").remove();
 				}
 
+                // re-position .dnd-layout-buttons after remove dnd
+                topPositionlayoutButtons();
+
 			})
 			.always(() => {
 				// dndContainer.find("#loader").remove();
@@ -207,9 +215,20 @@ $(function () {
 				pageId,
 				dndId,
 			}).done((res) => {
-				dndContainer.remove();
-			});
+                // modal confirmation
+                window.parent.melisCoreTool.confirm(
+                    translations.tr_meliscms_common_yes,
+                    translations.tr_meliscms_common_no,
+                    translations.tr_meliscms_drag_and_drop_modal_title, // title
+                    translations.tr_meliscms_drag_and_drop_modal_content, // message
+                    function() {
+                        dndContainer.remove();
 
+                        // re-position .dnd-layout-buttons after remove dnd
+                        topPositionlayoutButtons();        
+                    });
+			});
+            
 		});
 
         /**
@@ -220,8 +239,7 @@ $(function () {
          * @param parent
          * @param sourceId
          */
-        function requestDND(id, row, pageId, parent, sourceId)
-        {
+        function requestDND(id, row, pageId, parent, sourceId) {
             $.ajax({
                 'url' : '/dnd-layout',
                 'data' : {id : id},
@@ -286,10 +304,20 @@ $(function () {
             return max;
         }
 
-        // .dnd-layout-buttons offset top on .dnd-layout-wrapper
-    let $layoutButtons = $(".dnd-layout-buttons");
-        $layoutButtons.css("top", -($layoutButtons.outerHeight() - 1));
+        function topPositionlayoutButtons() {
+            // .dnd-layout-buttons offset top on .dnd-layout-wrapper
+            let $layoutButtons = $(".dnd-layout-buttons");
+                $layoutButtons.each(function() {
+                    let $layoutButton = $(this);
+                        $layoutButton.css("top", -($layoutButton.outerHeight() - 1));
+                });
+        }
+
+        // for easy top position based on .dnd-layout-buttons height
+        topPositionlayoutButtons();
 
         // .dnd-plugin-sub-tools on arrows
-        
+        /* function handleLayoutWrapperChangePosition() {
+
+        } */
 });

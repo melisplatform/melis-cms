@@ -10,21 +10,21 @@
 
     padding: 4px;
 }
-.column-icon:first-child {
+/* .column-icon:first-child {
     margin-left: 0;
-}
+} */
 .column-icon {
     background-color: #e61c23;
-    border: 2px solid #e61c23;
+    border: 1px solid #e61c23;
 
     display: inline-block;
 
-    margin-left: 2px;
+    /* margin-left: 1px; */
 
-    /* width: 40px;
-    height: 40px; */
-    width: 32px;
-	height: 32px;
+    /* width: 32px;
+	height: 32px; */
+    width: 30px;
+    height: 30px;
 
     padding: 0;
 }
@@ -152,7 +152,6 @@
 .half-1-col-left-w-right-2-col .icon-container {
     margin: -18px 0 0 0;
 }
-/*end drag n drop zone buttons*/
 
 [dnd-layout-disable] button {
     cursor: not-allowed;
@@ -160,14 +159,25 @@
 [dnd-layout-disable] button .icon-col-bg {
     opacity: 0.5;
 }
+button.column-icon {
+    border-radius: 3px;
+    /* outline: 1px solid white; */
+    margin: 0 1px;
+}
+/* button.column-icon:hover {
+    outline-color: rgba(255, 255, 255, 0.8);
+} */
 button.column-icon:hover .icon-col-bg {
     opacity: 0.8;
 }
 button.column-icon .icon-col-bg {
     border-radius: 3px;
 }
+/*end drag n drop zone buttons*/
+
 .melis-dragdropzone-container {
     position: relative;
+    margin-bottom: 15px;
 }
 .dnd-layout-buttons {
     /* top: -56px; */
@@ -208,6 +218,7 @@ button.column-icon .icon-col-bg {
 }
 .dnd-layout-wrapper .dnd-layout-wrapper {
     outline: none;
+    /* pointer-events: none; */
 }
 .dnd-layout-wrapper .dnd-layout-wrapper .dnd-layout-buttons,
 .dnd-layout-wrapper .dnd-layout-wrapper .dnd-layout-indicator {
@@ -216,7 +227,7 @@ button.column-icon .icon-col-bg {
 .melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator {
     background-color: #ce5459 !important;
     opacity: 0;
-    z-index: 998;
+    z-index: 990;
 
     transform: translate3d(-100%, 0, 0);
     -webkit-transform: translate3d(-100%, 0, 0);
@@ -236,13 +247,18 @@ button.column-icon .icon-col-bg {
 }
 .dnd-layout-buttons .column-icons {
     display: inline-block;
-    width: 128px;
+    width: 158px;
     padding: 0;
     margin: 0 1rem;
 }
+.column-icons > div:nth-child(5),
+.column-icons > div:first-child {
+    margin-left: 0;
+}
 .column-icons > div {
     display: inline-block;
-    height: 32px;
+    height: 30px;
+    margin-left: 10px;
     /* height: auto; */
 }
 .dnd-layout-wrapper > .dnd-layout-buttons {
@@ -358,18 +374,18 @@ button.column-icon:hover .icon-row {
     -moz-transform: translate3d(0, 0, 0);
     -ms-transform: translate3d(0, 0, 0);
 }
-.dnd-layout-wrapper .m-plugin-sub-tools {
+.dnd-layout-wrapper > .m-plugin-sub-tools {
     background: transparent !important;
     margin-left: 0;
     width: 40px;
     position: relative;
     top: -12px;
 }
-.dnd-layout-wrapper .m-plugin-sub-tools div {
+.dnd-layout-wrapper > .m-plugin-sub-tools div {
     width: 40px;
     height: 40px;
 }
-.dnd-layout-wrapper .m-plugin-sub-tools div .fa {
+.dnd-layout-wrapper > .m-plugin-sub-tools div .fa {
     top: auto;
     left: auto;
     right: auto;
@@ -380,7 +396,7 @@ button.column-icon:hover .icon-row {
     -moz-transform: none;
     -ms-transform: none;
 }
-.dnd-layout-wrapper .m-plugin-sub-tools .m-move-handle {
+.dnd-layout-wrapper > .m-plugin-sub-tools .m-move-handle {
     display: inline-block;
     float: none;
     opacity: 1;
