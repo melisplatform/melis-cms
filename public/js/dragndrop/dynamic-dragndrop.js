@@ -23,17 +23,19 @@ $(function () {
             let dndTpl = $(this).data("dndTpl");
             let pageId = $(this).data("pageId");
             let melisSite = $(this).data("melisSite");
-            var tempLoader =
-                '<div id="loader" class="overlay-loader"><img class="loader-icon spinning-cog" src="/MelisCore/assets/images/cog12.svg" data-cog="cog12"></div>';
+            // var tempLoader =
+                // '<div id="loader" class="overlay-loader"><img class="loader-icon spinning-cog" src="/MelisCore/assets/images/cog12.svg" data-cog="cog12"></div>';
 
-            $(this).closest(".melis-dragdropzone-container").prepend(tempLoader);
 
             let dndContainer = $(this).closest(".melis-dragdropzone-container");
+
+            let pluginReferer = dndContainer.data("pluginReferer");
 
             let dndLayout = dndContainer.find(".melis-dragdropzone");
             let dndCtr = dndLayout.length;
 
-            console.log({ dndCtr });
+			let tempLoader = dndContainer.find("#loader");
+            $(this).closest(".melis-dragdropzone-container").prepend(tempLoader.removeClass("hidden"));
 
             $.get("/dnd-layout", {
                 pageId,
@@ -49,7 +51,7 @@ $(function () {
                         let newLayoutDnd = newLayout.find(".melis-dragdropzone");
                         let newLayoutDndCtr = newLayoutDnd.length;
 
-                        console.log({ newLayoutDndCtr });
+                        newLayout.data("pluginReferer", pluginReferer);
 
                         // if (dndCtr != newLayoutDndCtr) {
                         if (dndCtr == 1) {
@@ -118,86 +120,87 @@ $(function () {
                 });
         });
 
-        $body.on("click", ".dnd-plus-button", function() {
-            let _this = $(this);
-            let pluginId = _this.data("plugin-id");
-            let siteModule = _this.data("site-module");
-            let parentDND = $(_this).parents(".melis-dragdropzone-container").last();
-            let pageId = _this.data("page-id");
+		// add new d&d
+		$body.on("click", ".dnd-plus-button", function () {
 
-            let originalLayout = parentDND.data("layout-template");
+			let btn = $(this);
+			let pageId = $(this).data("pageId");
+			let dndId = $(this).data("dndId");
+			let melisSite = $(this).data("melisSite");
+			let dndTpl = "default";
+			let pluginContent = btn.closest(".dnd-plugins-content");
 
-            let parent = parentDND.attr("data-plugin-id");
-            let sourceId = pluginId;
+			btn.attr("disabled", true);
 
-            // Get the source container wrapper
-            let sourceContainer = $('.melis-dragdropzone-container[data-dragdropzone-id="' + sourceId + '"]');
-            //update template
-            $(sourceContainer).data("layout-template", 'MelisFront/dnd-2-cols-down-tpl');
+            let dndContainer = $(this).closest(".melis-dragdropzone-container");
+			let tempLoader = dndContainer.find("#loader");
+            $(this).closest(".melis-dragdropzone-container").prepend(tempLoader.removeClass("hidden"));
 
-            if (!sourceContainer.length) {
-                console.warn("Source container '" + sourceId + "' not found.");
-                return;
-            }
+			$.get("/dnd-layout", {
+				pageId,
+				dndId,
+				dndTpl,
+				melisSite,
+				addAction: true
+			}).done((res) => {
 
-            // Ensure .row exists inside sourceContainer
-            let row = sourceContainer.children('.row');
-            if (!row.length) {
-                let existingContent = sourceContainer.children().not('.row');
+				btn.attr("disabled", false);
 
-                // Wrap non-row content if necessary
-                if (!existingContent.hasClass('melis-dragdropzone-container')) {
+				if (res.success) {
 
-                    if(sourceContainer.find(".melis-dragdropzone-container").length <= 1) {
-                        originalLayout = 'MelisFront/dnd-default-tpl';
-                    }
+					let newDnd = $(res.html);
+					newDnd.appendTo(pluginContent);
 
-                    let wrapper = $('<div class="melis-dragdropzone-container"></div>')
-                        .attr({
-                            'data-dragdropzone-id': sourceId,
-                            'data-plugin-id': sourceId,
-                            'data-tag-id': sourceId,
-                            'id': sourceId,
-                            'data-site-module': siteModule,
-                            'data-layout-template': originalLayout
-                        });
-                    wrapper.append(existingContent);
-                    existingContent = wrapper;
-                }
+					// $('html, body').animate({
+					//     scrollTop: newDnd.offset().top
+					// }, 2000);
 
-                row = $('<div class="row"></div>');
-                let col = $('<div class="col-md-12"></div>').append(existingContent);
-                row.append(col);
-                sourceContainer.append(row);
-            }
+					let boHeader = 47;
+					let pageEditionHeader = 72;
+					let newDndTop = newDnd.offset().top;
+					let xtra = 100;
 
-            // Determine next hierarchical index
-            let lastIndex = 0;
-            sourceContainer.find('[data-dragdropzone-id]').each(function () {
-                let dndId = $(this).attr('data-dragdropzone-id');
-                let match = dndId.match(new RegExp('^' + sourceId + '_(\\d+)$'));
-                if (match) {
-                    lastIndex = Math.max(lastIndex, parseInt(match[1], 10));
-                }
-            });
-            let newIndex = lastIndex + 1;
-            let newDNDId = sourceId + '_' + newIndex;
+					$(parent.document).scrollTop(newDndTop + xtra);
 
-            // Get the last .col-md-12 and clone the wrapper inside it
-            let lastCol = row.children('.col-md-12').last();
-            let wrapperToClone = lastCol.find('.melis-dragdropzone-container[data-dragdropzone-id="' + sourceId + '"]').first();
 
-            if (!wrapperToClone.length) {
-                console.warn("No wrapper with data-dragdropzone-id='" + sourceId + "' found.");
-                return;
-            }
+					let newDndId = newDnd.find(".melis-dragdropzone-container").data("pluginId");
 
-            // Wrap in a new .col-md-12 and append to the row
-            requestDND(newDNDId, row, pageId, parent, sourceId);
+					melisPluginEdition.moveResponsiveClass();
+					melisPluginEdition.pluginDetector();
+					melisPluginEdition.initResizable();
+					melisDragnDrop.setDragDropZone();
 
-            // initialize popover after
-            //popoverInit();
-        });
+					// save change to session
+					melisPluginEdition.sendDragnDropList(newDndId, pageId);
+
+				} else
+					dndContainer.find("#loader").remove();
+
+			})
+			.always(() => {
+				dndContainer.find("#loader").remove();
+			});
+		})
+
+		// remove d&d
+		$body.on("click", ".dnd-remove-button", function () {
+
+			let btn = $(this);
+			let pageId = $(this).data("pageId");
+			let dndId = $(this).data("dndId");
+
+			btn.attr("disabled", true);
+
+			let dndContainer = btn.closest(".melis-dragdropzone-container");
+
+			$.post("/dnd-remove", {
+				pageId,
+				dndId,
+			}).done((res) => {
+				dndContainer.remove();
+			});
+
+		});
 
         /**
          *

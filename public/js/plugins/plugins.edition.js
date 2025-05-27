@@ -525,6 +525,10 @@ var melisPluginEdition = (function($, window) {
             result.dndLayout = $container.data('layout-template');
         }
 
+		if ($container.data("layout-template")) {
+			result.pluginReferer = $container.data("plugin-referer");
+		}
+
         // Include plugin_list from this container only (not nested ones)
         const pluginBoxes = $container.find('.melis-plugin-tools-box').filter(function () {
             return $(this).closest('.melis-dragdropzone-container').is($container);
