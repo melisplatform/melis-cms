@@ -184,6 +184,9 @@ $(function () {
 					melisPluginEdition.initResizable();
 					melisDragnDrop.setDragDropZone();
 
+                    // added to update iframe height
+                    melisPluginEdition.calcFrameHeight();
+
 					// save change to session
 					melisPluginEdition.sendDragnDropList(newDndId, pageId);
 
@@ -223,13 +226,25 @@ $(function () {
                     translations.tr_meliscms_drag_and_drop_modal_content, // message
                     function() {
                         dndContainer.remove();
-
+                        
+                        // added to update iframe height
+                        melisPluginEdition.calcFrameHeight();
+                        
                         // re-position .dnd-layout-buttons after remove dnd
                         topPositionlayoutButtons();        
                     });
 			});
             
 		});
+
+        // .dnd-arrow-down
+        /* $body.on("click", ".dnd-arrow-down", function() {
+            let $arrowDownButton    = $(this),
+                $dndPluginContent   = $arrowDownButton.closest(".dnd-plugins-content"),
+                $element            = $dndPluginContent.children(".row"); // element to swap position
+
+                
+        }); */
 
         /**
          *
@@ -316,8 +331,54 @@ $(function () {
         // for easy top position based on .dnd-layout-buttons height
         topPositionlayoutButtons();
 
-        // .dnd-plugin-sub-tools on arrows
-        /* function handleLayoutWrapperChangePosition() {
+        // .dnd-arrow-down, .dnd-arrow-up
+        function handleArrowButtons() {
+            console.log(`handleArrowButtons() called !!!`);
+            let $wrapper    = $(".melis-dragdropzone-container > .dnd-layout-wrapper"),
+                $arrowDowns = $wrapper.find("> .dnd-layout-buttons .dnd-plugin-sub-tools .dnd-arrow-down"),
+                $arrowUps   = $wrapper.find("> .dnd-layout-buttons .dnd-plugin-sub-tools .dnd-arrow-up");
 
-        } */
+                console.log({$arrowDowns});
+                $arrowDowns.each(function() {
+                    let $arrowDown              = $(this),
+                        $downDndPluginContent   = $arrowDown.closest(".dnd-plugins-content"),
+                        $downRow                = $downDndPluginContent.children(".row");
+                        
+                        // check if there are other .row to swap position
+                        console.log({$downRow});
+                        if ($downRow.length >= 2) {
+                            showArrowButtons($arrowDown);
+                        }
+                        else {
+                            hideArrowButtons($arrowDown);
+                        }
+                });
+
+                console.log({$arrowUps});
+                $arrowUps.each(function() {
+                    let $arrowUp                = $(this),
+                        $upDndPluginContent     = $arrowUp.closest(".dnd-plugins-content"),
+                        $upRow                  = $upDndPluginContent.children(".row");
+                        
+                        // check if there are other .row to swap position
+                        console.log({$upRow});
+                        if ($upRow.length >= 2) {
+                            showArrowButtons($arrowUp);
+                        }
+                        else {
+                            hideArrowButtons($arrowUp);
+                        }
+                });
+        }
+
+        // call function
+        handleArrowButtons();
+
+        function hideArrowButtons($buttonElement) {
+            $buttonElement.addClass("d-none");
+        }
+
+        function showArrowButtons($buttonElement) {
+            $buttonElement.removeClass("d-none");
+        }
 });
