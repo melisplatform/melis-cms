@@ -1,10 +1,12 @@
 /*drag n drop zone buttons*/
 .column-icons {
-    display: flex;
+    /* display: flex; */
     position: relative;
 
-    width: fit-content;
-    height: 48px;
+    /* width: fit-content; */
+    /* height: 48px; */
+    /* height: 32px; */
+    height: auto;
 
     padding: 4px;
 }
@@ -19,8 +21,10 @@
 
     margin-left: 2px;
 
-    width: 40px;
-    height: 40px;
+    /* width: 40px;
+    height: 40px; */
+    width: 32px;
+	height: 32px;
 
     padding: 0;
 }
@@ -41,6 +45,10 @@
 .icon-col-12 {
     flex: 0 0 auto;
     width: 100%;
+}
+.icon-col-3 {
+    flex: 0 0 auto;
+    width: 19%;
 }
 .icon-col-4 {
     flex: 0 0 auto;
@@ -63,16 +71,19 @@
 .left-2-col-w-right-1-col .icon-col-6 .icon-row,
 .half-1-col-left-w-right-2-col .icon-row,
 .top-1-col-w-bottom-1-3-center .icon-row {
-    height: 18px;
+    /* height: 18px; */
+    height: 14px;
 }
 .four-col-equal-top-bottom .icon-row {
-    height: 9px;
+    /* height: 9px; */
+    height: 7px;
 }
 .three-col-equal-top-bottom .icon-row,
 .left-3-col-w-half-1-col-right .icon-col-6 .icon-row,
 .half-1-col-left-w-right-3-col .icon-col-6 .icon-row,
 .top-1-col-w-center-1-3-center-w-bottom-1-col .icon-row {
-    height: 12px;
+    /* height: 12px; */
+    height: 9.4px;
 }
 .four-col-equal .icon-row,
 .three-col-equal .icon-row,
@@ -81,8 +92,10 @@
 .half-1-col-left-w-right-3-col .icon-row,
 .left-2-col-w-right-1-col .icon-row,
 .whole-1-col .icon-row {
-    height: 36px;
+    /* height: 36px; */
+    height: 28px;
 }
+.four-col-equal .icon-col-3:first-child,
 .four-col-equal-square .icon-col-6:first-child,
 .four-col-equal .icon-col:first-child,
 .three-col-equal .icon-col-4:first-child,
@@ -94,6 +107,7 @@
 .half-1-col-left-w-right-2-col .icon-col-6:first-child {
     margin-left: 0;
 }
+.four-col-equal .icon-col-3,
 .four-col-equal-square .icon-col-6,
 .four-col-equal .icon-col,
 .three-col-equal .icon-col-4,
@@ -114,12 +128,14 @@
 .four-col-equal .icon-col-6,
 .left-2-col-w-right-1-col .icon-col-6,
 .half-1-col-left-w-right-2-col .icon-col-6 {
-    width: 47%;
+    /* width: 47%; */
+    width: 46%;
 }
 
 /* .icon-col-4 specifics */
 .three-col-equal .icon-col-4 {
-    width: 29.33333333%;
+    /* width: 29.33333333%; */
+    width: 28.33333333%;
 }
 /* .icon-col specifics */
 .four-col-equal-top-bottom .icon-col:first-child,
@@ -145,33 +161,36 @@
     opacity: 0.5;
 }
 button.column-icon:hover .icon-col-bg {
-    opacity: 0.9;
+    opacity: 0.8;
 }
-.dnd-layout-wrapper,
+button.column-icon .icon-col-bg {
+    border-radius: 3px;
+}
 .melis-dragdropzone-container {
     position: relative;
 }
 .dnd-layout-buttons {
-    width: auto;
+    /* top: -56px; */
+    top: 0;
+    left: 7px;
 
-    top: -56px;
-    /* top: 0; */
-    left: 0;
-
-    padding: 0.5rem 1rem;
+    padding: 4px 12px;
     border-radius: 3px;
-    height: 56px;
+
+    min-height: 32px;
+    height: auto;
+    width: fit-content;
 }
 .dnd-layout-buttons .fa {
     color: #fff;
 }
 .dnd-layout-buttons .btn {
     display: inline-block;
-    padding: 0.5rem 1rem;
+    padding: 0.2rem 0.5rem;
     border-radius: 0;
     position: relative;
-    z-index: inherit;
-    margin-top: -24px;
+    /* z-index: inherit;
+    margin-top: -24px; */
 }
 .dnd-layout-buttons .btn:hover {
     background-color: #cf1d23;
@@ -217,17 +236,28 @@ button.column-icon:hover .icon-col-bg {
 }
 .dnd-layout-buttons .column-icons {
     display: inline-block;
-    width: auto;
+    width: 128px;
     padding: 0;
-    margin: 0 1.5rem;
+    margin: 0 1rem;
 }
 .column-icons > div {
     display: inline-block;
-    height: 40px;
+    height: 32px;
+    /* height: auto; */
 }
 .dnd-layout-wrapper > .dnd-layout-buttons {
     background-color: #e61c23;
 }
+.dnd-plugin-sub-tools {
+    display: inline-block;
+    vertical-align: top;
+}
+
+/* .dnd-layout-wrapper .dnd-layout-wrapper > .dnd-layout-buttons,
+.dnd-layout-wrapper .dnd-layout-wrapper > .melis-plugin-indicator {
+    opacity: 0;
+} */
+
 .dnd-layout-wrapper .dnd-layout-buttons {
     opacity: 0;
     position: absolute;

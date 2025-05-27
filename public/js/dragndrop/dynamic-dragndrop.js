@@ -1,20 +1,23 @@
 $(function () {
-	let $document = $(document),
-		$body = $("body");
+	let $body = $("body");
 
-        $body.on("mouseenter", ".dnd-layout-wrapper", function() {
-            $(this).children("> .dnd-layout-indicator").fadeIn("slow");
-        });
+        $body
+            .on("mouseenter", ".dnd-layout-wrapper", function() {
+                //$(this).children("> .dnd-layout-indicator").fadeIn("slow");
+                $(this).children("> .dnd-layout-indicator").css("opacity", 1);
+            })
+            .on("mouseleave", ".dnd-layout-wrapper", function() {
+                $(this).find("> .dnd-layout-buttons").css("opacity", 0);
+            });
 
         $body.on("mouseenter", ".dnd-layout-indicator", function() {
-            $(this).next(".dnd-layout-buttons").css({
-                "opacity": 1,
-                "display": "block"
-            });
+            $(this).next(".dnd-layout-buttons").css("opacity", 1);
+            //$(this).next(".dnd-layout-buttons").fadeIn("slow");
         });
 
         $body.on("mouseleave", ".dnd-layout-buttons", function() {
-            $(this).fadeOut("slow").hide();
+            //$(this).fadeOut("slow");
+            $(this).css("opacity", 0);
         });
 
         // .dnd-layout-buttons
@@ -275,4 +278,11 @@ $(function () {
             });
             return max;
         }
+
+        // .dnd-layout-buttons offset top on .dnd-layout-wrapper
+    let $layoutButtons = $(".dnd-layout-buttons");
+        $layoutButtons.css("top", -($layoutButtons.outerHeight() - 1));
+
+        // .dnd-plugin-sub-tools on arrows
+        
 });
