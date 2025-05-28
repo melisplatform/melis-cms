@@ -228,6 +228,9 @@ button.column-icon .icon-col-bg {
 .dnd-layout-wrapper .dnd-layout-wrapper .dnd-layout-indicator {
     display: none;
 }
+.dnd-layout-wrapper .melis-dragdropzone:hover {
+    z-index: 999;
+}
 .melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator {
     background-color: #ce5459 !important;
     opacity: 0;

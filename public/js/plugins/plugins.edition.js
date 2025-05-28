@@ -1080,7 +1080,7 @@ var melisPluginEdition = (function($, window) {
         // }, 100); // Check every 100ms
 
         onParentFullyLoaded(() => {
-            console.log('✅ Parent page is fully loaded');
+            // console.log('✅ Parent page is fully loaded');
             initResizable();
         });
     }
