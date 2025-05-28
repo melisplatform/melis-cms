@@ -219,7 +219,7 @@
 	    'tr_meliscms_common_close' => 'Close',
 	    'tr_meliscms_common_save' => 'Save',
 	    'tr_meliscms_common_yes' => 'Yes',
-            'tr_meliscms_page_tree_save' => 'Save',
+        'tr_meliscms_page_tree_save' => 'Save',
 	    'tr_meliscms_common_no' => 'No',
 	    
 	    'tr_meliscms_common_add' => 'Add',
@@ -475,6 +475,10 @@
         // Drag and drop CMS
 	    'tr_meliscms_drag_and_drop_modal_title' => 'Drag\'n\'Drop confirmation',
 	    'tr_meliscms_drag_and_drop_modal_content' => 'Are you sure you want to add this plugin to the page?',
+
+		// Drag and drop CMS, dynamic dnd
+	    'tr_meliscms_drag_and_drop_delete_modal_title' => 'Confirmation deletion of zone',
+	    'tr_meliscms_drag_and_drop_delete_modal_content' => 'Are you sure you want to delete this zone?',
 
         /** Banner */
         'tr_PluginSection_MelisCmsGdprBanner' => 'Melis Cms GDPR Banner',

@@ -205,7 +205,6 @@ $(function () {
 
 		// remove d&d
 		$body.on("click", ".dnd-remove-button", function () {
-
 			let btn = $(this);
 			let pageId = $(this).data("pageId");
 			let dndId = $(this).data("dndId");
@@ -222,8 +221,8 @@ $(function () {
                 window.parent.melisCoreTool.confirm(
                     translations.tr_meliscms_common_yes,
                     translations.tr_meliscms_common_no,
-                    translations.tr_meliscms_drag_and_drop_modal_title, // title
-                    translations.tr_meliscms_drag_and_drop_modal_content, // message
+                    translations.tr_meliscms_drag_and_drop_delete_modal_title, // title
+                    translations.tr_meliscms_drag_and_drop_delete_modal_content, // message
                     function() {
                         dndContainer.remove();
                         
@@ -231,9 +230,11 @@ $(function () {
                         melisPluginEdition.calcFrameHeight();
                         
                         // re-position .dnd-layout-buttons after remove dnd
-                        topPositionlayoutButtons();        
+                        topPositionlayoutButtons();
                     });
-			});
+			}).always(() => {
+                btn.attr("disabled", false);
+            });
             
 		});
 

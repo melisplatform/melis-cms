@@ -46,6 +46,7 @@ var melisDragnDrop = (function ($, window) {
 			tolerance: "pointer",
 			items: ".melis-ui-outlined",
 			start: function (event, ui) {
+
 				$(".melis-dragdropzone").sortable("refresh");
 
 				// hide tinyMCE panel
@@ -389,7 +390,8 @@ var melisDragnDrop = (function ($, window) {
 					elAttribute;
 
 				// hide the loader
-				$(".loader-icon").removeClass("spinning-cog").addClass("shrinking-cog");
+				// $(".loader-icon").removeClass("spinning-cog").addClass("shrinking-cog");
+				$("#loader").remove();
 
 				if (plugins.success) {
 					var elType, dataPluginID, idPlugin, jsUrl;

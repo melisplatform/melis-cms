@@ -174,10 +174,14 @@ button.column-icon .icon-col-bg {
     border-radius: 3px;
 }
 /*end drag n drop zone buttons*/
-
+.dnd-plugins-content .row {
+    margin-bottom: 15px;
+}
+.dnd-plugins-content .row:last-child {
+    margin-bottom: 0;
+}
 .melis-dragdropzone-container {
     position: relative;
-    margin-bottom: 15px;
 }
 .dnd-layout-buttons {
     /* top: -56px; */
@@ -352,6 +356,7 @@ button.column-icon:hover .icon-row {
 } */
 .melis-dragdropzone {
     bottom: 0;
+    margin-bottom: 0;
 }
 .melis-dragdropzone:hover {
     outline: 1px solid #e61c23;
