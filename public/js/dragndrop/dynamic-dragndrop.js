@@ -163,7 +163,18 @@ $(function () {
 				if (res.success) {
 
 					let newDnd = $(res.html);
-					newDnd.appendTo(pluginContent);
+					// newDnd.appendTo(pluginContent);
+
+					// prepare animate 
+					newDnd.css("opacity", ".25");
+
+					// add to next position
+					let originDnd = dndContainer.parents(".row").after(newDnd);
+
+					// animate show
+					originDnd.next().animate({
+						opacity: 1,
+					}, 1500);
 
 					// $('html, body').animate({
 					//     scrollTop: newDnd.offset().top
@@ -178,6 +189,9 @@ $(function () {
 					$(parent.document).scrollTop(newDndTop + xtra);
 
 					let newDndId = newDnd.find(".melis-dragdropzone-container").data("pluginId");
+
+					// update dnd orders
+					updateDndOrder(pageId);
 
 					melisPluginEdition.moveResponsiveClass();
 					melisPluginEdition.pluginDetector();
@@ -225,6 +239,9 @@ $(function () {
                     translations.tr_meliscms_drag_and_drop_delete_modal_content, // message
                     function() {
                         dndContainer.remove();
+
+						// update dnd orders
+						updateDndOrder(pageId)
                         
                         // added to update iframe height
                         melisPluginEdition.calcFrameHeight();
@@ -322,4 +339,25 @@ $(function () {
 
         // for easy top position based on .dnd-layout-buttons height
         topPositionlayoutButtons();
+
+		function updateDndOrder(pageId) {
+
+			let dndIds = [];
+			$("body .dnd-plugins-content").each((i, v) => {
+
+				let dnd = $(v).find("> div > div > div.melis-dragdropzone-container");
+				let dnds = [];
+				dnd.each((k, data) => {
+					dnds.push($(data).data("dragdropzoneId"));
+				});
+
+				dndIds.push(dnds)
+			});
+
+			if (dndIds)
+				$.post("/dnd-update-order", {dndIds, pageId}).done((res) => {
+					// updated
+				});
+
+		}
 });
