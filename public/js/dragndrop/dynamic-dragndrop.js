@@ -255,6 +255,40 @@ $(function () {
             
 		});
 
+		$body.on("click", ".dnd-arrow-up", function() {
+			let btn = $(this);
+			let pageId = btn.data("pageId");
+			let currentContent = btn.parents(".row:first");
+
+			if (currentContent.prev().length) {
+				currentContent.prev().before(currentContent);
+	
+				btn.attr("disabled", true);
+	
+				updateDndOrder(pageId, function() {
+					btn.attr("disabled", false);
+				});
+			}
+		});
+
+		$body.on("click", ".dnd-arrow-down", function() {
+
+			let btn = $(this);
+			let pageId = btn.data("pageId");
+			let currentContent = btn.parents(".row:first");
+
+			if (currentContent.next().length) {
+				currentContent.next().after(currentContent);
+	
+				btn.attr("disabled", true);
+	
+				updateDndOrder(pageId, function() {
+					console.log(btn);
+					btn.attr("disabled", false);
+				});
+			}
+		});
+
         /**
          *
          * @param id
@@ -340,7 +374,7 @@ $(function () {
         // for easy top position based on .dnd-layout-buttons height
         topPositionlayoutButtons();
 
-		function updateDndOrder(pageId) {
+		function updateDndOrder(pageId, callback) {
 
 			let dndIds = [];
 			$("body .dnd-plugins-content").each((i, v) => {
@@ -355,9 +389,15 @@ $(function () {
 			});
 
 			if (dndIds)
-				$.post("/dnd-update-order", {dndIds, pageId}).done((res) => {
+				$.post("/dnd-update-order", {dndIds, pageId}).always(() => {
 					// updated
+
+					if (typeof callback == "function")
+						callback();
+
+					return;
 				});
 
+			return;
 		}
 });
