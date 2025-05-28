@@ -223,36 +223,43 @@ $(function () {
 			let pageId = $(this).data("pageId");
 			let dndId = $(this).data("dndId");
 
-			btn.attr("disabled", true);
+			// let dndContainer = btn.closest(".melis-dragdropzone-container");
 
-			let dndContainer = btn.closest(".melis-dragdropzone-container");
+			let dndContainer = btn.parents(".row:first");
 
-			$.post("/dnd-remove", {
-				pageId,
-				dndId,
-			}).done((res) => {
-                // modal confirmation
-                window.parent.melisCoreTool.confirm(
-                    translations.tr_meliscms_common_yes,
-                    translations.tr_meliscms_common_no,
-                    translations.tr_meliscms_drag_and_drop_delete_modal_title, // title
-                    translations.tr_meliscms_drag_and_drop_delete_modal_content, // message
-                    function() {
-                        dndContainer.remove();
+			// check number of dnds, should should remain atleast 1 dnd active 
+			let dnds = dndContainer.parents(".dnd-plugins-content").find("> div > div > div.melis-dragdropzone-container");
 
-						// update dnd orders
-						updateDndOrder(pageId)
-                        
-                        // added to update iframe height
-                        melisPluginEdition.calcFrameHeight();
-                        
-                        // re-position .dnd-layout-buttons after remove dnd
-                        topPositionlayoutButtons();
-                    });
-			}).always(() => {
-                btn.attr("disabled", false);
-            });
-            
+			if (dnds.length > 1) {
+
+				btn.attr("disabled", true);
+
+				$.post("/dnd-remove", {
+					pageId,
+					dndId,
+				}).done((res) => {
+					// modal confirmation
+					window.parent.melisCoreTool.confirm(
+						translations.tr_meliscms_common_yes,
+						translations.tr_meliscms_common_no,
+						translations.tr_meliscms_drag_and_drop_delete_modal_title, // title
+						translations.tr_meliscms_drag_and_drop_delete_modal_content, // message
+						function() {
+							dndContainer.remove();
+	
+							// update dnd orders
+							updateDndOrder(pageId)
+							
+							// added to update iframe height
+							melisPluginEdition.calcFrameHeight();
+							
+							// re-position .dnd-layout-buttons after remove dnd
+							topPositionlayoutButtons();
+						});
+				}).always(() => {
+					btn.attr("disabled", false);
+				});
+			}
 		});
 
 		$body.on("click", ".dnd-arrow-up", function() {
