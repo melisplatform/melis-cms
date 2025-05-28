@@ -227,6 +227,7 @@ button.column-icon .icon-col-bg {
 .melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator {
     background-color: #ce5459 !important;
     opacity: 0;
+    z-index: 9999;
     top: -5px !important;
     left: 5px !important;
 
