@@ -173,12 +173,16 @@ button.column-icon:hover .icon-col-bg {
 button.column-icon .icon-col-bg {
     border-radius: 3px;
 }
-/*end drag n drop zone buttons*/
+/*end drag n drop zone buttons*/ 
 .dnd-plugins-content .row {
     margin-bottom: 15px;
 }
 .dnd-plugins-content .row:last-child {
     margin-bottom: 0;
+}
+.dnd-plugins-content .row:last-child .dnd-arrow-down,
+.dnd-plugins-content .row:first-child .dnd-arrow-up {
+    display: none;
 }
 .melis-dragdropzone-container {
     position: relative;

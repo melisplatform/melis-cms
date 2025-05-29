@@ -283,7 +283,7 @@ $(function () {
 				});
 
                 // check display of arrow buttons after arrow up
-                // handleDisplayArrowButtons();
+                handleDisplayArrowButtons();
 			}
 		});
 
@@ -304,7 +304,7 @@ $(function () {
 				});
 
                 // check display of arrow buttons after arrow down
-                // handleDisplayArrowButtons();
+                handleDisplayArrowButtons();
 			}
 		});
 
@@ -428,42 +428,17 @@ $(function () {
             let $dndPluginsContent  = $("body .dnd-plugins-content");
                 
                 if ($dndPluginsContent.length) {
-                    $dndPluginsContent.each(function() {
+                    $dndPluginsContent.each(() => {
                         let $dndPluginContent   = $(this),
-                            $dndRow             = $dndPluginContent.find("> .row"),
-                            isRowFirst          = $dndRow.is(":first-child"),
-                            isRowLast           = $dndRow.is(":last-child");
-                            
-                            if ($dndRow.length > 1) {
-                                if (isRowFirst) {
-                                    let $firstDndRow        = $dndRow.first(),
-                                        $nextToFirstDndRow  = $firstDndRow.next(".row"),
-                                        $firstLayoutWrapper = $firstDndRow.find(".melis-dragdropzone-container > .dnd-layout-wrapper"),
-                                        $firstDndArrowUp    = $firstLayoutWrapper.find(".dnd-plugin-sub-tools .dnd-arrow-up"),
-                                        $firstDndArrow      = $firstLayoutWrapper.find(".dnd-plugin-sub-tools .dnd-arrow"); // both arrow buttons
+                            $dndRow             = $dndPluginContent.find(".row");
 
-                                        if ($nextToFirstDndRow.length) {
-                                            $firstDndArrowUp.addClass("d-none");
-                                        }
-                                        else {
-                                            $firstDndArrow.addClass("d-none");
-                                        }
-                                }
+                            $dndRow.each((index) => {
+                                let $row = $(this);
 
-                                if (isRowLast) {
-                                    let $lastDndRow         = $dndRow.last(),
-                                        $lastLayoutWrapper  = $lastDndRow.find(".melis-dragdropzone-container > .dnd-layout-wrapper"),
-                                        $lastDndArrowDown   = $lastLayoutWrapper.find(".dnd-plugin-sub-tools .dnd-arrow-down");
-
-                                        $lastDndArrowDown.addClass("d-none");
-                                }
-                            }
-                            else {
-                                let $dndRowLayoutWrapper    = $dndRow.find(".melis-dragdropzone-container > .dnd-layout-wrapper"),
-                                    $dndRowArrow            = $dndRowLayoutWrapper.find(".dnd-plugin-sub-tools .dnd-arrow");
-
-                                    $dndRowArrow.addClass("d-none");
-                            }
+                                    // show/hide button based on position
+                                    $row.find(".dnd-arrow-up").toggle(index !== 0);
+                                    $row.find(".dnd-arrow-down").toggle(index !== $dndRow.length - 1);
+                            });
                     });
                 }
         }
