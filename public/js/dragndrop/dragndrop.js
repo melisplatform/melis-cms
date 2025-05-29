@@ -195,8 +195,22 @@ var melisDragnDrop = (function ($, window) {
 				if (ui.sender[0]) {
 					var dragZoneSender = ui.sender[0];
 					var dragZoneSenderPluginId = $(dragZoneSender).data("plugin-id");
+
 					// send dragndrop list
 					melisPluginEdition.sendDragnDropList(dragZoneSenderPluginId, tabId);
+
+					if (typeof dragZoneSenderPluginId != "undefined") {
+						let parentOuterDnd = $(dragZoneSender).parents(".melis-dragdropzone-container:last");
+						parentOuterDndPluginId = parentOuterDnd.data("pluginId");
+
+						let currentPluginDnd = $(ui.item[0]).parents(".melis-dragdropzone-container:last");
+						let currentPluginDndId = currentPluginDnd.data("pluginId");
+
+						// saving data to session when plugin drag to another dnd
+						if (parentOuterDndPluginId != currentPluginDndId)
+							melisPluginEdition.sendDragnDropList(currentPluginDndId, tabId);
+
+					}
 				}
 
 				$(".melis-dragdropzone").removeClass("highlight");
