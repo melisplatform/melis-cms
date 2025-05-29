@@ -169,7 +169,7 @@ $(function () {
 					newDnd.css("opacity", ".25");
 
 					// add to next position
-					let originDnd = dndContainer.parents(".row").after(newDnd);
+					let originDnd = dndContainer.closest(".row").after(newDnd);
 
 					// animate show
 					originDnd.next().animate({
