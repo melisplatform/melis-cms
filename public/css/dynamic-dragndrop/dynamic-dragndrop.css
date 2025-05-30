@@ -18,6 +18,7 @@
     border: 1px solid #e61c23;
 
     display: inline-block;
+    vertical-align: middle;
 
     /* margin-left: 1px; */
 
@@ -150,7 +151,7 @@
 }
 
 .half-1-col-left-w-right-2-col .icon-container {
-    margin: -18px 0 0 0;
+    margin: -14px 0 0 0;
 }
 
 [dnd-layout-disable] button {
@@ -162,7 +163,7 @@
 button.column-icon {
     border-radius: 3px;
     /* outline: 1px solid white; */
-    margin: 0 1px;
+    /* margin: 0 1px; */
 }
 /* button.column-icon:hover {
     outline-color: rgba(255, 255, 255, 0.8);
@@ -197,18 +198,23 @@ button.column-icon .icon-col-bg {
 
     min-height: 32px;
     height: auto;
-    width: fit-content;
+    width: auto;
+}
+.dnd-layout-buttons > div {
+    vertical-align: middle;
 }
 .dnd-layout-buttons .fa {
     color: #fff;
+}
+.dnd-layout-buttons .btn:first-child {
+    margin-left: 0.5rem;
 }
 .dnd-layout-buttons .btn {
     display: inline-block;
     padding: 0.2rem 0.5rem;
     border-radius: 0;
     position: relative;
-    /* z-index: inherit;
-    margin-top: -24px; */
+    margin-right: 0.5rem;
 }
 .dnd-layout-buttons .btn:hover {
     background-color: #cf1d23;
@@ -255,24 +261,24 @@ button.column-icon .icon-col-bg {
     -moz-transition-delay: 0.1s;
     -o-transition-delay: 0.1s;
 }
-.dnd-layout-buttons .melis-plugin-title-box {
-    vertical-align: top;
-}
+.dnd-layout-buttons .dnd-column-layout,
 .dnd-layout-buttons .column-icons {
     display: inline-block;
-    width: 158px;
+    width: fit-content;
     padding: 0;
-    margin: 0 1rem;
+    /* margin: 0.5rem 1rem 0; */
+    margin-right: 1rem;
 }
-.column-icons > div:nth-child(5),
-.column-icons > div:first-child {
+/* .column-icons > div:nth-child(5), */
+/* .column-icons > div:first-child {
     margin-left: 0;
-}
+} */
+.dnd-layout-buttons .dnd-column-layout,
 .column-icons > div {
     display: inline-block;
     height: 30px;
-    margin-left: 10px;
-    /* height: auto; */
+    /* margin-left: 10px;
+    height: auto; */
 }
 .dnd-layout-wrapper > .dnd-layout-buttons {
     background-color: #e61c23;
@@ -310,57 +316,46 @@ button.column-icon .icon-col-bg {
     right: 0;
     bottom: -40px;
 }
-/* button.dnd-plus-button,
-button.dnd-arrow-button {
-    background-color: #e61c23;
-    width: 60px;
-    height: 42px;
-    position: relative;
+.dnd-4-cols-3-cols-left-w-1-col-right .row,
+.dnd-4-cols-1-col-left-w-3-cols-right .row {
+    height: 33.33%;
+    margin-bottom: 0;
 }
-button.dnd-arrow-button {
-    float: left;
+.dnd-3-cols-2-cols-left-w-1-col-right .row,
+.dnd-3-cols-1-col-left-w-2-cols-right .row {
+    height: 50%;
 }
-button.dnd-plus-button {
-    margin-left: 2px;
-    float: right;
+.dnd-3-cols-2-cols-left-w-1-col-right .row:first-child,
+.dnd-3-cols-1-col-left-w-2-cols-right .row:first-child {
+    margin-bottom: 9px;
 }
-button.dnd-arrow-button .fa,
-button.dnd-plus-button .fa {
-    color: #fff;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    height: 42px;
+.dnd-4-cols-3-cols-left-w-1-col-right .melis-dragdropzone,
+.dnd-4-cols-1-col-left-w-3-cols-right .melis-dragdropzone {
+    min-height: 62px;
 }
-button.dnd-arrow-button .fa {
-    font-size: 25px;
+.dnd-3-cols-2-cols-left-w-1-col-right .melis-dragdropzone,
+.dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone {
+    min-height: 100px;
 }
-button.dnd-arrow-button,
-button.dnd-plus-button {
-    border-color: transparent;
+.dnd-4-cols-3-cols-left-w-1-col-right .melis-dragdropzone::before,
+.dnd-4-cols-1-col-left-w-3-cols-right .melis-dragdropzone::before {
+    top: -20%;
 }
-button.dnd-arrow-button:hover,
-button.dnd-plus-button:hover {
-    border-color: #e61c23;
+.dnd-3-cols-2-cols-left-w-1-col-right .melis-dragdropzone::before,
+.dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone::before {
+    top: 5%;
 }
-button.dnd-arrow-button:hover .fa,
-button.dnd-plus-button:hover .fa {
-    color: #e61c23;
+.dnd-4-cols-3-cols-left-w-1-col-right .melis-dragdropzone::after,
+.dnd-4-cols-1-col-left-w-3-cols-right .melis-dragdropzone::after {
+    top: -20%;
+    height: 30px;
+    font-size: 20px;
 }
-
-button.dnd-arrow-button:hover,
-button.dnd-plus-button:hover {
-    background-color: #fff;
-} */
-/* button.column-icon:hover */
-/* button.column-icon:hover {
-    border-color: #fff;
+.dnd-3-cols-2-cols-left-w-1-col-right .melis-dragdropzone::after,
+.dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone::after {
+    top: 25%;
+    font-size: 20px;
 }
-button.column-icon:hover .icon-row {
-    border-color: #fff;
-} */
 .melis-dragdropzone {
     bottom: 0;
     margin-bottom: 0;
