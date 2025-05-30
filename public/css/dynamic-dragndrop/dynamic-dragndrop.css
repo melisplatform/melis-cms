@@ -269,6 +269,9 @@ button.column-icon .icon-col-bg {
     /* margin: 0.5rem 1rem 0; */
     margin-right: 1rem;
 }
+.dnd-layout-buttons .dnd-column-layout:last-child {
+    margin-right: 0;
+}
 /* .column-icons > div:nth-child(5), */
 /* .column-icons > div:first-child {
     margin-left: 0;
