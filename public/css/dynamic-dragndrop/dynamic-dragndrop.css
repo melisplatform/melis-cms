@@ -43,21 +43,48 @@
     display: flex;
     flex-wrap: wrap;
 }
+.four-col-equal .icon-col-3,
+.three-col-equal .icon-col-3 {
+    width: 19%;
+}
 .icon-col-12 {
     flex: 0 0 auto;
     width: 100%;
 }
+.icon-col-2 {
+    flex: 0 0 auto;
+    width: 9.66666667%;
+}
 .icon-col-3 {
     flex: 0 0 auto;
-    width: 19%;
+    width: 20%;
 }
 .icon-col-4 {
     flex: 0 0 auto;
-    width: 33.33333333%;
+    width: 34.33333333%;
+}
+.icon-col-5 {
+    flex: 0 0 auto;
+    width: 37.66666667%;
 }
 .icon-col-6 {
     flex: 0 0 auto;
-    width: 50%;
+    width: 45%;
+}
+.icon-col-7 {
+    flex: 0 0 auto;
+    width: 54.33333333%;
+}
+.icon-col-8 {
+    flex: 0 0 auto;
+    width: 57.66666667%;
+}
+.icon-col-10 {
+    flex: 0 0 auto;
+    width: 82.33333333%;
+}
+.five-col-equal .icon-col {
+    flex: 0 0 14%;
 }
 .icon-col {
     flex: 1 0 0;
@@ -86,6 +113,22 @@
     /* height: 12px; */
     height: 9.4px;
 }
+.cols4-6-2-2-2 .icon-row,
+.cols4-2-2-2-6 .icon-row,
+.cols3-8-2-2 .icon-row,
+.cols3-2-2-8 .icon-row,
+.cols3-2-8-2 .icon-row,
+.cols3-6-3-3 .icon-row,
+.cols3-3-3-6 .icon-row,
+.cols3-3-6-3 .icon-row,
+.cols-80-20 .icon-row,
+.cols-20-80 .icon-row,
+.cols-70-30 .icon-row,
+.cols-30-70 .icon-row,
+.cols-60-40 .icon-row,
+.cols-40-60 .icon-row,
+.six-col-equal .icon-row,
+.five-col-equal .icon-row,
 .four-col-equal .icon-row,
 .three-col-equal .icon-row,
 .half-col-equal .icon-row,
@@ -96,6 +139,42 @@
     /* height: 36px; */
     height: 28px;
 }
+.cols4-2-2-2-6 .icon-col-6:first-child,
+.cols4-2-2-2-6 .icon-col-2:first-child,
+.cols4-6-2-2-2 .icon-col-6:first-child,
+.cols4-6-2-2-2 .icon-col-2:first-child,
+
+.cols3-2-8-2 .icon-col-8:first-child,
+.cols3-2-8-2 .icon-col-2:first-child,
+.cols3-8-2-2 .icon-col-8:first-child,
+.cols3-8-2-2 .icon-col-2:first-child,
+.cols3-2-2-8 .icon-col-2:first-child,
+.cols3-2-2-8 .icon-col-8:first-child,
+
+.cols3-6-3-3 .icon-col-3:first-child,
+.cols3-6-3-3 .icon-col-6:first-child,
+.cols3-3-3-6 .icon-col-3:first-child,
+.cols3-3-3-6 .icon-col-6:first-child,
+.cols3-3-6-3 .icon-col-3:first-child,
+.cols3-3-6-3 .icon-col-6:first-child,
+
+.cols-20-80 .icon-col-10:first-child,
+.cols-80-20 .icon-col-2:first-child,
+.cols-80-20 .icon-col-10:first-child,
+.cols-20-80 .icon-col-2:first-child,
+
+.cols-70-30 .icon-col-8:first-child,
+.cols-70-30 .icon-col-4:first-child,
+.cols-30-70 .icon-col-8:first-child,
+.cols-30-70 .icon-col-4:first-child,
+
+.cols-60-40 .icon-col-7:first-child,
+.cols-60-40 .icon-col-5:first-child,
+.cols-40-60 .icon-col-7:first-child,
+.cols-40-60 .icon-col-5:first-child,
+
+.six-col-equal .icon-col-2:first-child,
+.five-col-equal .icon-col:first-child,
 .four-col-equal .icon-col-3:first-child,
 .four-col-equal-square .icon-col-6:first-child,
 .four-col-equal .icon-col:first-child,
@@ -108,6 +187,42 @@
 .half-1-col-left-w-right-2-col .icon-col-6:first-child {
     margin-left: 0;
 }
+
+.cols4-2-2-2-6 .icon-col-6,
+.cols4-2-2-2-6 .icon-col-2,
+.cols4-6-2-2-2 .icon-col-6,
+.cols4-6-2-2-2 .icon-col-2,
+
+.cols3-2-8-2 .icon-col-8,
+.cols3-2-8-2 .icon-col-2,
+.cols3-8-2-2 .icon-col-8,
+.cols3-8-2-2 .icon-col-2,
+.cols3-2-2-8 .icon-col-2,
+.cols3-2-2-8 .icon-col-8,
+
+.cols3-6-3-3 .icon-col-3,
+.cols3-6-3-3 .icon-col-6,
+.cols3-3-3-6 .icon-col-3,
+.cols3-3-3-6 .icon-col-6,
+.cols3-3-6-3 .icon-col-3,
+.cols3-3-6-3 .icon-col-6,
+
+.cols-20-80 .icon-col-10,
+.cols-80-20 .icon-col-2,
+.cols-80-20 .icon-col-10,
+.cols-20-80 .icon-col-2,
+
+.cols-70-30 .icon-col-8,
+.cols-70-30 .icon-col-4,
+.cols-30-70 .icon-col-8,
+.cols-30-70 .icon-col-4,
+
+.cols-60-40 .icon-col-7,
+.cols-60-40 .icon-col-5,
+.cols-40-60 .icon-col-7,
+.cols-40-60 .icon-col-5,
+.six-col-equal .icon-col-2,
+.five-col-equal .icon-col,
 .four-col-equal .icon-col-3,
 .four-col-equal-square .icon-col-6,
 .four-col-equal .icon-col,
@@ -200,6 +315,13 @@ button.column-icon .icon-col-bg {
     height: auto;
     width: auto;
 }
+.dnd-plugins-content .row:last-child .dnd-layout-buttons .dnd-plugin-title-and-sub-tools,
+.dnd-plugins-content .row:first-child .dnd-layout-buttons .dnd-plugin-title-and-sub-tools {
+    min-width: 145px;
+}
+.dnd-layout-buttons .dnd-plugin-title-and-sub-tools {
+    min-width: 225px;
+}
 .dnd-layout-buttons > div {
     vertical-align: middle;
 }
@@ -261,12 +383,19 @@ button.column-icon .icon-col-bg {
     -moz-transition-delay: 0.1s;
     -o-transition-delay: 0.1s;
 }
+.dnd-plugin-title-and-sub-tools {
+    display: inline-block;
+}
+.dnd-plugin-title-and-sub-tools .melis-plugin-title-box {
+    vertical-align: middle;
+}
 .dnd-layout-buttons .dnd-column-layout,
 .dnd-layout-buttons .column-icons {
     display: inline-block;
     width: fit-content;
     padding: 0;
-    /* margin: 0.5rem 1rem 0; */
+}
+.dnd-layout-buttons .dnd-column-layout {
     margin-right: 1rem;
 }
 .dnd-layout-buttons .dnd-column-layout:last-child {
@@ -288,7 +417,7 @@ button.column-icon .icon-col-bg {
 }
 .dnd-plugin-sub-tools {
     display: inline-block;
-    vertical-align: top;
+    vertical-align: middle;
 }
 
 /* .dnd-layout-wrapper .dnd-layout-wrapper > .dnd-layout-buttons,
@@ -481,4 +610,21 @@ button.column-icon .icon-col-bg {
     width: 355px;
     height: auto;
     padding: 1rem;
+}
+.no-content .row .col-12.col-md-2 .melis-dragdropzone::before {
+    top: 40%;
+}
+.no-content .row .col-12.col-md-2 .melis-dragdropzone::before,
+.no-content .row .col-12.col-md-2 .melis-dragdropzone::after {
+    width: 157px;
+}
+.no-content .row .col-12.col-md-2 .melis-dragdropzone::after {
+    top: 30%;
+}
+
+.dnd-plugin-title-and-sub-tools,
+.dnd-layout-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }

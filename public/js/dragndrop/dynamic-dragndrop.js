@@ -384,9 +384,15 @@ $(function () {
         function topPositionlayoutButtons() {
             // .dnd-layout-buttons offset top on .dnd-layout-wrapper
             let $layoutButtons = $(".dnd-layout-buttons");
+
                 $layoutButtons.each(function() {
-                    let $layoutButton = $(this);
-                        $layoutButton.css("top", -($layoutButton.outerHeight() - 1));
+                    let $layoutButton           = $(this),
+                        layoutButtonHeight      = $layoutButton.outerHeight(),
+                        $pluginTitleSubTools    = $layoutButton.find(".dnd-plugin-title-and-sub-tools");
+
+                        $layoutButton.css("top", -($layoutButton.outerHeight() - 4)); // - 4 to make sure it overlaps the .dnd-layout-buttons hoverable space
+
+                        $pluginTitleSubTools.css("height", layoutButtonHeight - 8); // 8 for padding top 4px and bottom 4px
                 });
         }
 
