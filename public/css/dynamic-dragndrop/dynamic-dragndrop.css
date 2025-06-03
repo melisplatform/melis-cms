@@ -337,7 +337,7 @@ button.column-icon .icon-col-bg {
 }
 .dnd-plugins-content .row:last-child .dnd-layout-buttons .dnd-plugin-title-and-sub-tools,
 .dnd-plugins-content .row:first-child .dnd-layout-buttons .dnd-plugin-title-and-sub-tools {
-    min-width: 185px;
+    min-width: 158px;
     /* min-width: 155px; */
 }
 .dnd-layout-buttons .dnd-plugin-title-and-sub-tools {
@@ -447,7 +447,8 @@ button.column-icon .icon-col-bg {
     display: inline-block;
     vertical-align: middle;
     /* width: 90px; */
-    width: 82px;
+    /* width: 82px; */
+    width: auto;
 }
 
 /* .dnd-layout-wrapper .dnd-layout-wrapper > .dnd-layout-buttons,
