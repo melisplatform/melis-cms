@@ -289,6 +289,25 @@ button.column-icon:hover .icon-col-bg {
 button.column-icon .icon-col-bg {
     border-radius: 3px;
 }
+.dnd-layout-indicator .column-icon {
+    background-color: transparent;
+    border-color: transparent;
+    width: 25px;
+    height: 25px;
+    cursor: default;
+}
+.dnd-layout-indicator .column-icon .icon-container {
+    margin-top: -12px;
+}
+.dnd-layout-indicator .column-icon:hover .icon-col-bg {
+    opacity: 1;
+}
+.dnd-layout-indicator .column-icon .icon-row {
+    height: 10px;
+}
+.dnd-layout-indicator .column-icon .icon-col-6 {
+    width: 45%;
+}
 /*end drag n drop zone buttons*/ 
 .dnd-plugins-content .row {
     margin-bottom: 15px;
@@ -308,7 +327,7 @@ button.column-icon .icon-col-bg {
     top: 0;
     left: 7px;
 
-    padding: 4px 12px;
+    padding: 4px 8px;
     border-radius: 3px;
 
     min-height: 32px;
@@ -317,10 +336,12 @@ button.column-icon .icon-col-bg {
 }
 .dnd-plugins-content .row:last-child .dnd-layout-buttons .dnd-plugin-title-and-sub-tools,
 .dnd-plugins-content .row:first-child .dnd-layout-buttons .dnd-plugin-title-and-sub-tools {
-    min-width: 145px;
+    /* min-width: 185px; */
+    min-width: 155px;
 }
 .dnd-layout-buttons .dnd-plugin-title-and-sub-tools {
-    min-width: 225px;
+    /* min-width: 225px; */
+    min-width: 158px;
 }
 .dnd-layout-buttons > div {
     vertical-align: middle;
@@ -329,7 +350,7 @@ button.column-icon .icon-col-bg {
     color: #fff;
 }
 .dnd-layout-buttons .btn:first-child {
-    margin-left: 0.5rem;
+    margin-left: 0;
 }
 .dnd-layout-buttons .btn {
     display: inline-block;
@@ -337,6 +358,7 @@ button.column-icon .icon-col-bg {
     border-radius: 0;
     position: relative;
     margin-right: 0.5rem;
+    width: 30px;
 }
 .dnd-layout-buttons .btn:hover {
     background-color: #cf1d23;
@@ -364,7 +386,7 @@ button.column-icon .icon-col-bg {
     z-index: 999;
 }
 .melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator {
-    background-color: #ce5459 !important;
+    background-color: #ce5459;
     opacity: 0;
     z-index: 9999;
     top: -5px !important;
@@ -387,7 +409,7 @@ button.column-icon .icon-col-bg {
     display: inline-block;
 }
 .dnd-plugin-title-and-sub-tools .melis-plugin-title-box {
-    vertical-align: middle;
+    vertical-align: top;
 }
 .dnd-layout-buttons .dnd-column-layout,
 .dnd-layout-buttons .column-icons {
@@ -418,6 +440,8 @@ button.column-icon .icon-col-bg {
 .dnd-plugin-sub-tools {
     display: inline-block;
     vertical-align: middle;
+    /* width: 90px; */
+    width: 84px;
 }
 
 /* .dnd-layout-wrapper .dnd-layout-wrapper > .dnd-layout-buttons,
@@ -494,6 +518,7 @@ button.column-icon .icon-col-bg {
 }
 .melis-dragdropzone:hover {
     outline: 1px solid #e61c23;
+
     box-shadow: 0 0 0 1px #e61c23;
     -webkit-box-shadow: 0 0 0 1px #e61c23;
     -moz-box-shadow: 0 0 0 1px #e61c23;
@@ -621,8 +646,7 @@ button.column-icon .icon-col-bg {
 .no-content .row .col-12.col-md-2 .melis-dragdropzone::after {
     top: 30%;
 }
-
-.dnd-plugin-title-and-sub-tools,
+/* .dnd-plugin-title-and-sub-tools, */
 .dnd-layout-buttons {
     display: flex;
     flex-direction: row;

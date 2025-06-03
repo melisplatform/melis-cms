@@ -14,12 +14,10 @@ $(function () {
         $body.on("mouseenter", ".dnd-layout-indicator", function() {
             $(this).next(".dnd-layout-buttons").css("opacity", 1);
             $(this).next(".dnd-layout-buttons").css("pointer-events", "auto");
-            //$(this).next(".dnd-layout-buttons").fadeIn("slow");
         });
 
         $body.on("mouseleave", ".dnd-layout-buttons", function() {
-            //$(this).fadeOut("slow");
-            $(this).css("opacity", 0);
+            $(this).delay(3000).css("opacity", 0);
         });
 
         // .dnd-layout-buttons
@@ -308,6 +306,16 @@ $(function () {
 			}
 		});
 
+        window.parent.$body.on("click", ".tab-element", function() {
+            let $tabElement = $(this),
+                melisKey    = $tabElement.closest(".nav-item").data("tool-meliskey");
+
+                if (melisKey === "meliscms_page") {
+                    // call to this function as it re-initialized top position of .dnd-layout-buttons
+                    topPositionlayoutButtons();
+                }
+        });
+
         /**
          *
          * @param id
@@ -388,11 +396,18 @@ $(function () {
                 $layoutButtons.each(function() {
                     let $layoutButton           = $(this),
                         layoutButtonHeight      = $layoutButton.outerHeight(),
-                        $pluginTitleSubTools    = $layoutButton.find(".dnd-plugin-title-and-sub-tools");
-
-                        $layoutButton.css("top", -($layoutButton.outerHeight() - 4)); // - 4 to make sure it overlaps the .dnd-layout-buttons hoverable space
+                        $pluginTitleSubTools    = $layoutButton.find(".dnd-plugin-title-and-sub-tools"),
+                        $subTools               = $layoutButton.find(".dnd-plugin-sub-tools"),
+                        $removeButton           = $subTools.find(".dnd-remove-button");
+                        
+                        $layoutButton.css("top", -(layoutButtonHeight - 4)); // - 4 to make sure it overlaps the .dnd-layout-buttons hoverable space
 
                         $pluginTitleSubTools.css("height", layoutButtonHeight - 8); // 8 for padding top 4px and bottom 4px
+
+                        // check .dnd-plugin-sub-tools width if .dnd-remove-button is present
+                        /* if ($removeButton.length) {
+                            $subTools.css("width", )
+                        } */
                 });
         }
 
