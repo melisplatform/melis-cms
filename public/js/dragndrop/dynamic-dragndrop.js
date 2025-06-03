@@ -467,3 +467,28 @@ $(function () {
         // function call
         handleDisplayArrowButtons();
 });
+
+/* function adjustLayoutButtonMargins() {
+    const $buttons = $(".dnd-layout-buttons .column-icons .dnd-column-layout");
+
+        if ($buttons.length === 0) return;
+
+        // clear previous states
+        $buttons.removeClass('no-margin-left');
+
+    const lineTops = new Set();
+
+        $buttons.each(function () {
+            const $btn = $(this);
+            const top = $btn.position().top;
+
+                // if this is the first button at this vertical offset, apply .no-margin
+                if (!lineTops.has(top)) {
+                    $btn.addClass('no-margin-left');
+                    lineTops.add(top);
+                }
+        });
+}
+
+// run on load and resize
+$(window).on('load resize', adjustLayoutButtonMargins); */

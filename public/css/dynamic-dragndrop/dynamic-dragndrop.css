@@ -337,8 +337,8 @@ button.column-icon .icon-col-bg {
 }
 .dnd-plugins-content .row:last-child .dnd-layout-buttons .dnd-plugin-title-and-sub-tools,
 .dnd-plugins-content .row:first-child .dnd-layout-buttons .dnd-plugin-title-and-sub-tools {
-    /* min-width: 185px; */
-    min-width: 155px;
+    min-width: 185px;
+    /* min-width: 155px; */
 }
 .dnd-layout-buttons .dnd-plugin-title-and-sub-tools {
     /* min-width: 225px; */
@@ -411,6 +411,7 @@ button.column-icon .icon-col-bg {
 }
 .dnd-plugin-title-and-sub-tools .melis-plugin-title-box {
     vertical-align: top;
+    margin-right: 1rem;
 }
 .dnd-layout-buttons .dnd-column-layout,
 .dnd-layout-buttons .column-icons {
@@ -419,10 +420,14 @@ button.column-icon .icon-col-bg {
     padding: 0;
 }
 .dnd-layout-buttons .dnd-column-layout {
-    margin-right: 1rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
 }
-.dnd-layout-buttons .dnd-column-layout:last-child {
-    margin-right: 0;
+/* .dnd-layout-buttons .dnd-column-layout:first-child {
+    margin-left: 0;
+} */
+.no-margin-left {
+    margin-left: 0 !important;
 }
 /* .column-icons > div:nth-child(5), */
 /* .column-icons > div:first-child {
@@ -442,7 +447,7 @@ button.column-icon .icon-col-bg {
     display: inline-block;
     vertical-align: middle;
     /* width: 90px; */
-    width: 84px;
+    width: 82px;
 }
 
 /* .dnd-layout-wrapper .dnd-layout-wrapper > .dnd-layout-buttons,
