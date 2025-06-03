@@ -304,6 +304,7 @@ button.column-icon .icon-col-bg {
 }
 .dnd-layout-indicator .column-icon .icon-row {
     height: 10px;
+    border-top-color: transparent;
 }
 .dnd-layout-indicator .column-icon .icon-col-6 {
     width: 45%;
