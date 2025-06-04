@@ -3,22 +3,39 @@ $(function () {
 
         $body
             .on("mouseenter", ".melis-dragdropzone-container > .dnd-layout-wrapper", function() {
-                //$(this).children("> .dnd-layout-indicator").fadeIn("slow");
-                $(this).children(".dnd-layout-indicator").css("opacity", 1);
+                $(this).find(".dnd-layout-indicator").css("opacity", 1);
+                $(this).find(".dnd-layout-indicator").css("pointer-events", "auto");
             })
             .on("mouseleave", ".melis-dragdropzone-container > .dnd-layout-wrapper", function() {
-                $(this).children(".dnd-layout-indicator").css("opacity", 0);
-                $(this).children(".dnd-layout-buttons").css("opacity", 0);
+                $(this).find(".dnd-layout-indicator").css("opacity", 0);
+                $(this).find(".dnd-layout-indicator").css("pointer-events", "none");
+
+                mouseLeaveDndLayoutButtons( $(this).find(".dnd-layout-buttons") );
             });
 
-        $body.on("mouseenter", ".dnd-layout-indicator", function() {
+        $body.on("mouseenter", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator", function() {
             $(this).next(".dnd-layout-buttons").css("opacity", 1);
             $(this).next(".dnd-layout-buttons").css("pointer-events", "auto");
         });
 
-        $body.on("mouseleave", ".dnd-layout-buttons", function() {
-            $(this).delay(3000).css("opacity", 0);
-        });
+        $body
+            .on("mouseenter", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-buttons", function() {
+                const $el = $(this);
+                //console.log("mouseenter: cancel fade");
+
+                const timeoutId = $el.data("fadeTimeout");
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+                    $el.removeData("fadeTimeout");
+                }
+
+                $el.css("opacity", 1);
+                $el.css("pointer-events", "auto");
+                // $el.show();
+            })
+            .on("mouseleave", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-buttons", function() {
+                mouseLeaveDndLayoutButtons( $(this) );
+            });
 
         // .dnd-layout-buttons
         $body.on("click", ".dnd-layout-buttons div[data-dnd-tpl]", function () {
@@ -297,7 +314,7 @@ $(function () {
 				btn.attr("disabled", true);
 	
 				updateDndOrder(pageId, function() {
-					console.log(btn);
+					//console.log(btn);
 					btn.attr("disabled", false);
 				});
 
@@ -315,6 +332,21 @@ $(function () {
                     topPositionlayoutButtons();
                 }
         });
+
+        function mouseLeaveDndLayoutButtons($element) {
+            const $el = $element;
+                //console.log("mouseleave: starting 3s delay");
+
+                const timeoutId = setTimeout(() => {
+                    //console.log("3s passed, fading out");
+                    $el.css("opacity", 0);
+                    $el.css("pointer-events", "none");
+                    //$el.hide();
+                    $el.removeData("fadeTimeout");
+                }, 3000);
+
+                $el.data("fadeTimeout", timeoutId);
+        }
 
         /**
          *
@@ -397,7 +429,9 @@ $(function () {
                     let $layoutButton           = $(this),
                         layoutButtonHeight      = $layoutButton.outerHeight(),
                         $pluginTitleSubTools    = $layoutButton.find(".dnd-plugin-title-and-sub-tools"),
+                        pluginTitleSubToolsWidth = $pluginTitleSubTools.width(),
                         $subTools               = $layoutButton.find(".dnd-plugin-sub-tools"),
+                        subToolsWidth           = $subTools.width(),
                         $removeButton           = $subTools.find(".dnd-remove-button");
                         
                         $layoutButton.css("top", -(layoutButtonHeight - 4)); // - 4 to make sure it overlaps the .dnd-layout-buttons hoverable space
@@ -405,9 +439,14 @@ $(function () {
                         $pluginTitleSubTools.css("height", layoutButtonHeight - 8); // 8 for padding top 4px and bottom 4px
 
                         // check .dnd-plugin-sub-tools width if .dnd-remove-button is present
-                        /* if ($removeButton.length) {
-                            $subTools.css("width", )
-                        } */
+                        if ($removeButton.length) {
+                            $pluginTitleSubTools.addClass("has-remove-button");
+                        }
+                        else {
+                            $pluginTitleSubTools.removeClass("has-remove-button");
+                        }
+
+                        $pluginTitleSubTools.css("min-width", pluginTitleSubToolsWidth);
                 });
         }
 
@@ -468,27 +507,34 @@ $(function () {
         handleDisplayArrowButtons();
 });
 
-/* function adjustLayoutButtonMargins() {
-    const $buttons = $(".dnd-layout-buttons .column-icons .dnd-column-layout");
+function adjustLayoutButtonMargins() {
+    const $buttons  = $(".dnd-layout-buttons .column-icons .dnd-column-layout"),
+        $subTools   = $(".dnd-layout-buttons .dnd-plugin-sub-tools");
 
         if ($buttons.length === 0) return;
 
         // clear previous states
-        $buttons.removeClass('no-margin-left');
+        $subTools.removeClass("layout-buttons-wrapped");
 
-    const lineTops = new Set();
+        const buttonTops = new Set();
+            $buttons.each(function() {
+                //const top = $(this).offset().top;
+                const top = Math.round($(this).position().top);
+                    //console.log({top});
+                    buttonTops.add(top);
+            });
 
-        $buttons.each(function () {
-            const $btn = $(this);
-            const top = $btn.position().top;
+            //console.log({buttonTops});
+            if (buttonTops.size > 1) {
+                //console.log('Buttons have wrapped to a second line.');
 
-                // if this is the first button at this vertical offset, apply .no-margin
-                if (!lineTops.has(top)) {
-                    $btn.addClass('no-margin-left');
-                    lineTops.add(top);
-                }
-        });
+                // Optional: add class to the container or take some action
+                $subTools.addClass('layout-buttons-wrapped');
+            } else {
+                //console.log('All buttons are on a single line.');
+                $subTools.removeClass("layout-buttons-wrapped");
+            }
 }
 
 // run on load and resize
-$(window).on('load resize', adjustLayoutButtonMargins); */
+$(window).on('load resize', adjustLayoutButtonMargins);

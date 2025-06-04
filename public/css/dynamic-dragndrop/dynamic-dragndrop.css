@@ -335,13 +335,11 @@ button.column-icon .icon-col-bg {
     height: auto;
     width: auto;
 }
-.dnd-plugins-content .row:last-child .dnd-layout-buttons .dnd-plugin-title-and-sub-tools,
+/* .dnd-plugins-content .row:last-child .dnd-layout-buttons .dnd-plugin-title-and-sub-tools,
 .dnd-plugins-content .row:first-child .dnd-layout-buttons .dnd-plugin-title-and-sub-tools {
-    min-width: 158px;
-    /* min-width: 155px; */
-}
+    min-width: 200px;
+} */
 .dnd-layout-buttons .dnd-plugin-title-and-sub-tools {
-    /* min-width: 225px; */
     min-width: 158px;
 }
 .dnd-layout-buttons > div {
@@ -465,10 +463,12 @@ button.column-icon .icon-col-bg {
     -webkit-transition: opacity 0.4s;
     -ms-transition: opacity 0.4s;
     
-    -webkit-transition-delay: 0.1s;
+    /* -webkit-transition-delay: 0.1s;
     -moz-transition-delay: 0.1s;
     -o-transition-delay: 0.1s;
-    transition-delay: 0.1s;
+    transition-delay: 0.1s; */
+
+    pointer-events: none;
 }
 .show-buttons {
     opacity: 1 !important;
@@ -653,9 +653,15 @@ button.column-icon .icon-col-bg {
 .no-content .row .col-12.col-md-2 .melis-dragdropzone::after {
     top: 30%;
 }
-/* .dnd-plugin-title-and-sub-tools, */
+/* .dnd-plugin-title-and-sub-tools */
 .dnd-layout-buttons {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+}
+.dnd-plugin-sub-tools > div {
+    display: inline-block;
+}
+.dnd-plugin-sub-tools.layout-buttons-wrapped > .dnd-arrow-buttons {
+    display: block;
 }
