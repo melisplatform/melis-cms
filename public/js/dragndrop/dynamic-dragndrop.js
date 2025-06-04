@@ -10,28 +10,26 @@ $(function () {
                 $(this).find(".dnd-layout-indicator").css("opacity", 0);
                 $(this).find(".dnd-layout-indicator").css("pointer-events", "none");
 
-                mouseLeaveDndLayoutButtons( $(this).find(".dnd-layout-buttons") );
+                //mouseLeaveDndLayoutButtons( $(this).find(".dnd-layout-buttons") );
             });
 
-        $body.on("mouseenter", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator", function() {
-            $(this).next(".dnd-layout-buttons").css("opacity", 1);
-            $(this).next(".dnd-layout-buttons").css("pointer-events", "auto");
-        });
+        $body
+            .on("mouseenter", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator", function() {
+                $(this).next(".dnd-layout-buttons").css("opacity", 1);
+                $(this).next(".dnd-layout-buttons").css("pointer-events", "auto");
+
+                //console.log(`.dnd-layout-indicator mouseenter !!!`);
+                mouseEnterDndLayoutButtons( $(this).next(".dnd-layout-buttons") );
+            })
+            .on("mouseleave", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator", function() {
+
+                //console.log(`.dnd-layout-indicator mouseleave !!!`);
+                mouseLeaveDndLayoutButtons( $(this).next(".dnd-layout-buttons") );
+            });
 
         $body
             .on("mouseenter", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-buttons", function() {
-                const $el = $(this);
-                //console.log("mouseenter: cancel fade");
-
-                const timeoutId = $el.data("fadeTimeout");
-                if (timeoutId) {
-                    clearTimeout(timeoutId);
-                    $el.removeData("fadeTimeout");
-                }
-
-                $el.css("opacity", 1);
-                $el.css("pointer-events", "auto");
-                // $el.show();
+                mouseEnterDndLayoutButtons($(this) );
             })
             .on("mouseleave", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-buttons", function() {
                 mouseLeaveDndLayoutButtons( $(this) );
@@ -224,7 +222,7 @@ $(function () {
 				}
 
                 // re-position .dnd-layout-buttons after remove dnd
-                topPositionlayoutButtons();
+                topPositionLayoutButtons();
 
                 // check display of arrow buttons after plus
                 handleDisplayArrowButtons();
@@ -272,7 +270,7 @@ $(function () {
 							melisPluginEdition.calcFrameHeight();
 							
 							// re-position .dnd-layout-buttons after remove dnd
-							topPositionlayoutButtons();
+							topPositionLayoutButtons();
 
                             // check display of arrow buttons after remove
                             handleDisplayArrowButtons();
@@ -329,9 +327,24 @@ $(function () {
 
                 if (melisKey === "meliscms_page") {
                     // call to this function as it re-initialized top position of .dnd-layout-buttons
-                    topPositionlayoutButtons();
+                    topPositionLayoutButtons();
                 }
         });
+
+        function mouseEnterDndLayoutButtons($element) {
+            const $el = $element;
+                //console.log("mouseenter: cancel fade");
+
+                const timeoutId = $el.data("fadeTimeout");
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+                    $el.removeData("fadeTimeout");
+                }
+
+                $el.css("opacity", 1);
+                $el.css("pointer-events", "auto");
+                // $el.show();
+        }
 
         function mouseLeaveDndLayoutButtons($element) {
             const $el = $element;
@@ -421,43 +434,6 @@ $(function () {
             return max;
         }
 
-        window.topPositionLayoutButtons = function() {
-            // .dnd-layout-buttons offset top on .dnd-layout-wrapper
-            let $layoutButtons = $(".dnd-layout-buttons");
-
-                $layoutButtons.each(function() {
-                    let $layoutButton           = $(this),
-                        layoutButtonHeight      = $layoutButton.outerHeight(),
-                        $pluginTitleSubTools    = $layoutButton.find(".dnd-plugin-title-and-sub-tools"),
-                        $subToolsWrapped        = $layoutButton.find(".dnd-plugin-sub-tools"),
-                        subToolsWrappedWidth    = $subToolsWrapped.outerWidth(),
-                        $subTools               = $layoutButton.find(".dnd-plugin-sub-tools.layout-buttons-wrapped"),
-                        subToolsWidth           = $subTools.outerWidth(),
-                        $pluginTitleBox         = $pluginTitleSubTools.find(".melis-plugin-title-box"),
-                        pluginTitleBoxWidth     = $pluginTitleBox.outerWidth(),
-                        $removeButton           = $subTools.find(".dnd-remove-button");
-                        
-                        $layoutButton.css("top", -(layoutButtonHeight - 4)); // - 4 to make sure it overlaps the .dnd-layout-buttons hoverable space
-
-                        //$pluginTitleSubTools.css("height", layoutButtonHeight - 8); // 8 for padding top 4px and bottom 4px
-
-                        // check .dnd-plugin-sub-tools width if .dnd-remove-button is present
-                        if ($removeButton.length) {
-                            $pluginTitleSubTools.addClass("has-remove-button");
-                        }
-                        else {
-                            $pluginTitleSubTools.removeClass("has-remove-button");
-                        }
-                        
-                        if (subToolsWidth < subToolsWrappedWidth) {
-                            $pluginTitleSubTools.css("min-width", subToolsWidth + pluginTitleBoxWidth + 23);
-                        }
-                        else {
-                            $pluginTitleSubTools.css("min-width", subToolsWrappedWidth + pluginTitleBoxWidth + 23);
-                        }
-                });
-        }
-
         // for easy top position based on .dnd-layout-buttons height
         topPositionLayoutButtons();
 
@@ -514,6 +490,43 @@ $(function () {
         // function call
         handleDisplayArrowButtons();
 });
+
+window.topPositionLayoutButtons = function() {
+    // .dnd-layout-buttons offset top on .dnd-layout-wrapper
+    let $layoutButtons = $(".dnd-layout-buttons");
+
+        $layoutButtons.each(function() {
+            let $layoutButton           = $(this),
+                layoutButtonHeight      = $layoutButton.outerHeight(),
+                $pluginTitleSubTools    = $layoutButton.find(".dnd-plugin-title-and-sub-tools"),
+                $subToolsWrapped        = $layoutButton.find(".dnd-plugin-sub-tools"),
+                subToolsWrappedWidth    = $subToolsWrapped.outerWidth(),
+                $subTools               = $layoutButton.find(".dnd-plugin-sub-tools.layout-buttons-wrapped"),
+                subToolsWidth           = $subTools.outerWidth(),
+                $pluginTitleBox         = $pluginTitleSubTools.find(".melis-plugin-title-box"),
+                pluginTitleBoxWidth     = $pluginTitleBox.outerWidth(),
+                $removeButton           = $subTools.find(".dnd-remove-button");
+                
+                $layoutButton.css("top", -(layoutButtonHeight - 4)); // - 4 to make sure it overlaps the .dnd-layout-buttons hoverable space
+
+                //$pluginTitleSubTools.css("height", layoutButtonHeight - 8); // 8 for padding top 4px and bottom 4px
+
+                // check .dnd-plugin-sub-tools width if .dnd-remove-button is present
+                if ($removeButton.length) {
+                    $pluginTitleSubTools.addClass("has-remove-button");
+                }
+                else {
+                    $pluginTitleSubTools.removeClass("has-remove-button");
+                }
+                
+                if (subToolsWidth < subToolsWrappedWidth) {
+                    $pluginTitleSubTools.css("min-width", subToolsWidth + pluginTitleBoxWidth + 23);
+                }
+                else {
+                    $pluginTitleSubTools.css("min-width", subToolsWrappedWidth + pluginTitleBoxWidth + 23);
+                }
+        });
+};
 
 function adjustLayoutButtonMargins() {
     const $buttons  = $(".dnd-layout-buttons .column-icons .dnd-column-layout"),
