@@ -328,7 +328,7 @@ button.column-icon .icon-col-bg {
     top: 0;
     left: 7px;
 
-    padding: 4px 8px;
+    padding: 4px 0 4px 8px;
     border-radius: 3px;
 
     min-height: 32px;
@@ -427,16 +427,10 @@ button.column-icon .icon-col-bg {
 .no-margin-left {
     margin-left: 0 !important;
 }
-/* .column-icons > div:nth-child(5), */
-/* .column-icons > div:first-child {
-    margin-left: 0;
-} */
 .dnd-layout-buttons .dnd-column-layout,
 .column-icons > div {
     display: inline-block;
     height: 30px;
-    /* margin-left: 10px;
-    height: auto; */
 }
 .dnd-layout-wrapper > .dnd-layout-buttons {
     background-color: #e61c23;
@@ -444,8 +438,6 @@ button.column-icon .icon-col-bg {
 .dnd-plugin-sub-tools {
     display: inline-block;
     vertical-align: middle;
-    /* width: 90px; */
-    /* width: 82px; */
     width: auto;
 }
 

@@ -135,7 +135,7 @@ $(function () {
                         melisPluginEdition.sendDragnDropList(dndId, pageId);
 
                         // re-position .dnd-layout-buttons after remove dnd
-                        topPositionlayoutButtons();
+                        topPositionLayoutButtons();
                     }
                 })
                 .always(() => {
@@ -421,7 +421,7 @@ $(function () {
             return max;
         }
 
-        function topPositionlayoutButtons() {
+        window.topPositionLayoutButtons = function() {
             // .dnd-layout-buttons offset top on .dnd-layout-wrapper
             let $layoutButtons = $(".dnd-layout-buttons");
 
@@ -429,9 +429,12 @@ $(function () {
                     let $layoutButton           = $(this),
                         layoutButtonHeight      = $layoutButton.outerHeight(),
                         $pluginTitleSubTools    = $layoutButton.find(".dnd-plugin-title-and-sub-tools"),
-                        pluginTitleSubToolsWidth = $pluginTitleSubTools.width(),
-                        $subTools               = $layoutButton.find(".dnd-plugin-sub-tools"),
-                        subToolsWidth           = $subTools.width(),
+                        $subToolsWrapped        = $layoutButton.find(".dnd-plugin-sub-tools"),
+                        subToolsWrappedWidth    = $subToolsWrapped.outerWidth(),
+                        $subTools               = $layoutButton.find(".dnd-plugin-sub-tools.layout-buttons-wrapped"),
+                        subToolsWidth           = $subTools.outerWidth(),
+                        $pluginTitleBox         = $pluginTitleSubTools.find(".melis-plugin-title-box"),
+                        pluginTitleBoxWidth     = $pluginTitleBox.outerWidth(),
                         $removeButton           = $subTools.find(".dnd-remove-button");
                         
                         $layoutButton.css("top", -(layoutButtonHeight - 4)); // - 4 to make sure it overlaps the .dnd-layout-buttons hoverable space
@@ -445,13 +448,18 @@ $(function () {
                         else {
                             $pluginTitleSubTools.removeClass("has-remove-button");
                         }
-
-                        $pluginTitleSubTools.css("min-width", pluginTitleSubToolsWidth);
+                        
+                        if (subToolsWidth < subToolsWrappedWidth) {
+                            $pluginTitleSubTools.css("min-width", subToolsWidth + pluginTitleBoxWidth + 23);
+                        }
+                        else {
+                            $pluginTitleSubTools.css("min-width", subToolsWrappedWidth + pluginTitleBoxWidth + 23);
+                        }
                 });
         }
 
         // for easy top position based on .dnd-layout-buttons height
-        topPositionlayoutButtons();
+        topPositionLayoutButtons();
 
 		function updateDndOrder(pageId, callback) {
 
@@ -534,6 +542,8 @@ function adjustLayoutButtonMargins() {
                 //console.log('All buttons are on a single line.');
                 $subTools.removeClass("layout-buttons-wrapped");
             }
+        
+        topPositionLayoutButtons();
 }
 
 // run on load and resize
