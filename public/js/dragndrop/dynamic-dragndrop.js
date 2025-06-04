@@ -297,6 +297,9 @@ $(function () {
 
                 // check display of arrow buttons after arrow up
                 handleDisplayArrowButtons();
+
+                // for .dnd-layout-buttons on the sub tools buttons
+                adjustLayoutButtonMargins();
 			}
 		});
 
@@ -318,6 +321,9 @@ $(function () {
 
                 // check display of arrow buttons after arrow down
                 handleDisplayArrowButtons();
+
+                // for .dnd-layout-buttons on the sub tools buttons
+                adjustLayoutButtonMargins();
 			}
 		});
 
@@ -555,7 +561,7 @@ function adjustLayoutButtonMargins() {
                 //console.log('All buttons are on a single line.');
                 $subTools.removeClass("layout-buttons-wrapped");
             }
-        
+        // for .dnd-layout-buttons top positioning
         topPositionLayoutButtons();
 }
 
