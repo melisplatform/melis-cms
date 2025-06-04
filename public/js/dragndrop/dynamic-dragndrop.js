@@ -439,7 +439,7 @@ $(function () {
                         
                         $layoutButton.css("top", -(layoutButtonHeight - 4)); // - 4 to make sure it overlaps the .dnd-layout-buttons hoverable space
 
-                        $pluginTitleSubTools.css("height", layoutButtonHeight - 8); // 8 for padding top 4px and bottom 4px
+                        //$pluginTitleSubTools.css("height", layoutButtonHeight - 8); // 8 for padding top 4px and bottom 4px
 
                         // check .dnd-plugin-sub-tools width if .dnd-remove-button is present
                         if ($removeButton.length) {
