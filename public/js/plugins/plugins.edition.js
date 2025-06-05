@@ -153,10 +153,9 @@ var melisPluginEdition = (function($, window) {
             var $this       = $(this),
                 parentSize  = $this.outerWidth(),
                 totalChild  = $this.find($(".melis-plugin-tools-box")).outerWidth() + $this.find($(".melis-plugin-title-box")).outerWidth();
-
-            if ( totalChild > parentSize ) {
-                $this.width(totalChild + 30);
-            }
+                if ( totalChild > parentSize ) {
+                    $this.width(totalChild + 30);
+                }
         });
     }
 

@@ -225,7 +225,7 @@ $(function () {
                 topPositionLayoutButtons();
 
                 // check display of arrow buttons after plus
-                handleDisplayArrowButtons();
+                handleDisplayRemoveArrowButtons();
 
 			})
 			.always(() => {
@@ -273,7 +273,7 @@ $(function () {
 							topPositionLayoutButtons();
 
                             // check display of arrow buttons after remove
-                            handleDisplayArrowButtons();
+                            handleDisplayRemoveArrowButtons();
 						});
 				}).always(() => {
 					btn.attr("disabled", false);
@@ -296,7 +296,7 @@ $(function () {
 				});
 
                 // check display of arrow buttons after arrow up
-                handleDisplayArrowButtons();
+                handleDisplayRemoveArrowButtons();
 
                 // for .dnd-layout-buttons on the sub tools buttons
                 adjustLayoutButtonMargins();
@@ -320,7 +320,7 @@ $(function () {
 				});
 
                 // check display of arrow buttons after arrow down
-                handleDisplayArrowButtons();
+                handleDisplayRemoveArrowButtons();
 
                 // for .dnd-layout-buttons on the sub tools buttons
                 adjustLayoutButtonMargins();
@@ -474,33 +474,44 @@ $(function () {
          * first row - up arrow not displayed
          * last row - arrow down not displayed 
          **/
-        function handleDisplayArrowButtons() {
-            let $dndPluginsContent  = $("body .dnd-plugins-content");
-                
+        function handleDisplayRemoveArrowButtons() {
+            let $dndPluginsContent  = $(".dnd-plugins-content");
                 if ($dndPluginsContent.length) {
-                    $dndPluginsContent.each(() => {
-                        let $dndPluginContent   = $(this),
-                            $dndRow             = $dndPluginContent.find(".row");
+                    $dndPluginsContent.each((i, v) => {
+                        let $dndPluginContent   = $(v),
+                            $dndRow             = $dndPluginContent.find("> .row");
 
-                            $dndRow.each((index) => {
-                                let $row = $(this);
+                            $dndRow.each((i, v) => {
+                                let $row = $(v);
+                                    //$row.find(".dnd-arrow-down").toggle(i !== $dndRow.length - 1);
 
-                                    // show/hide button based on position
-                                    $row.find(".dnd-arrow-up").toggle(index !== 0);
-                                    $row.find(".dnd-arrow-down").toggle(index !== $dndRow.length - 1);
+                                    //console.log(`$dndRow.length: `, $dndRow.length);
+                                    if ($dndRow.length === 1) {
+                                        // show/hide button based on position
+                                        $row.find(".dnd-arrow-up").toggle(i !== 0);
+                                        $row.find(".dnd-arrow-down").toggle(i !== 0);
+
+                                        $row.find(".dnd-remove-button").prop("disabled", true);
+                                        $row.find(".dnd-remove-button").prepend(`<i class="fa fa-ban"></i>`);
+                                    }
+                                    else {
+                                        $row.find(".dnd-arrow-down").toggle(i !== $dndRow.length - 1);
+
+                                        $row.find(".dnd-remove-button").prop("disabled", false);
+                                        $row.find(".dnd-remove-button .fa-ban").remove();
+                                    }
                             });
                     });
                 }
         }
         
         // function call
-        handleDisplayArrowButtons();
+        handleDisplayRemoveArrowButtons();
 });
 
+// .dnd-layout-buttons offset top on .dnd-layout-wrapper and other elements manipulation
 window.topPositionLayoutButtons = function() {
-    // .dnd-layout-buttons offset top on .dnd-layout-wrapper
     let $layoutButtons = $(".dnd-layout-buttons");
-
         $layoutButtons.each(function() {
             let $layoutButton           = $(this),
                 layoutButtonHeight      = $layoutButton.outerHeight(),
@@ -525,6 +536,7 @@ window.topPositionLayoutButtons = function() {
                     $pluginTitleSubTools.removeClass("has-remove-button");
                 }
                 
+                // add min-width on .dnd-plugin-sub-tools
                 if (subToolsWidth < subToolsWrappedWidth) {
                     $pluginTitleSubTools.css("min-width", subToolsWidth + pluginTitleBoxWidth + 23);
                 }

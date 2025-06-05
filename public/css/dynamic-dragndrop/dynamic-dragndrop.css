@@ -657,3 +657,27 @@ button.column-icon .icon-col-bg {
 .dnd-plugin-sub-tools.layout-buttons-wrapped > .dnd-arrow-buttons {
     display: block;
 }
+button:disabled.dnd-remove-button {
+    position: relative;
+    height: 30px;
+    border: 0;
+    cursor: not-allowed;
+    pointer-events: auto;
+}
+button:disabled.dnd-remove-button:hover {
+    background-color: transparent !important;
+}
+button:disabled.dnd-remove-button .fa-ban {
+    color: red;
+    transform: scale(.7) rotate(90deg);
+    position: absolute;
+    z-index: 1;
+    left: 30%;
+    top: 30%;
+}
+button:disabled.dnd-remove-button .fa-trash {
+    position: absolute;
+    z-index: 0;
+    top: 25%;
+    left: 30%;
+}
