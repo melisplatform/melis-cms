@@ -681,3 +681,6 @@ button:disabled.dnd-remove-button .fa-trash {
     top: 25%;
     left: 30%;
 }
+.melis-dragdropzone-container .melis-ui-outlined {
+    max-width: 100%;
+}
