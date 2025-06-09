@@ -616,6 +616,9 @@ class SitesController extends MelisAbstractActionController
                     $siteData['site_name'] = $siteName;
                 }
 
+                if(!isset($siteData['site_dnd_render_mode']))
+                    $siteData['site_dnd_render_mode'] = 'bootstrap';
+
                 /**
                  * Before proceeding to save the site
                  * check if it is a new site and
@@ -962,6 +965,10 @@ class SitesController extends MelisAbstractActionController
          * Check if there is data to be process
          */
         if(!empty($sitePropData)) {
+            //check if dnd zone mode is already apply, else make bootstrap as default css layout
+            if(!isset($sitePropData['site_dnd_render_mode']))
+                $sitePropData['site_dnd_render_mode'] = 'bootstrap';
+
             $form = $this->getTool()->getForm('meliscms_tool_sites_properties_form');
             $form->setData($sitePropData);
 
