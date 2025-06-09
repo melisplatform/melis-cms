@@ -599,6 +599,8 @@
         'tr_melis_cms_sites_homepages' => 'Homepages',
         'tr_melis_cms_sites_shome_page_id' => 'Home Page ID',
         'tr_melis_cms_sites_shome_page_id tooltip' => 'Identifier of the home page per language',
+        'tr_melis_cms_sites_site_dnd_render_mode' => 'DND Render Mode',
+        'tr_melis_cms_sites_site_dnd_render_mode tooltip' => 'DND Render Mode',
 
         #SITES TRANSLATION TAB
         'tr_melis_site_translation_name' => 'Melis Site Translation',

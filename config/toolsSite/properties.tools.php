@@ -114,6 +114,26 @@ return array(
                                         ),
                                     ),
                                 ),
+                                array(
+                                    'spec' => array(
+                                        'name' => 'site_dnd_render_mode',
+                                        'type' => 'Laminas\Form\Element\Select',
+                                        'options' => array(
+                                            'label' => 'tr_melis_cms_sites_site_dnd_render_mode',
+                                            'tooltip' => 'tr_melis_cms_sites_site_dnd_render_mode tooltip',
+                                            'empty_option' => 'tr_meliscms_form_common_Choose',
+                                            'value_options' => array(
+                                                'bootstrap' => 'Bootstrap',
+                                            ),
+                                            'disable_inarray_validator' => true,
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'site_dnd_render_mode',
+                                            'value' => '',
+                                            'required' => false
+                                        ),
+                                    ),
+                                ),
                             ),
                             'input_filter' => array(
                                 'site_id' => array(
@@ -235,6 +255,10 @@ return array(
                                         array('name' => 'StripTags'),
                                         array('name' => 'StringTrim'),
                                     ),
+                                ),
+                                'site_dnd_render_mode' => array(
+                                    'name' => 'site_dnd_render_mode',
+                                    'required' => false,
                                 ),
                             ),
                         ),
