@@ -3,24 +3,37 @@ $(function () {
 
         $body
             .on("mouseenter", ".melis-dragdropzone-container > .dnd-layout-wrapper", function() {
-                //$(this).children("> .dnd-layout-indicator").fadeIn("slow");
-                $(this).children(".dnd-layout-indicator").css("opacity", 1);
+                $(this).find(".dnd-layout-indicator").css("opacity", 1);
+                $(this).find(".dnd-layout-indicator").css("pointer-events", "auto");
             })
             .on("mouseleave", ".melis-dragdropzone-container > .dnd-layout-wrapper", function() {
-                $(this).children(".dnd-layout-indicator").css("opacity", 0);
-                $(this).children(".dnd-layout-buttons").css("opacity", 0);
+                $(this).find(".dnd-layout-indicator").css("opacity", 0);
+                $(this).find(".dnd-layout-indicator").css("pointer-events", "none");
+
+                //mouseLeaveDndLayoutButtons( $(this).find(".dnd-layout-buttons") );
             });
 
-        $body.on("mouseenter", ".dnd-layout-indicator", function() {
-            $(this).next(".dnd-layout-buttons").css("opacity", 1);
-            $(this).next(".dnd-layout-buttons").css("pointer-events", "auto");
-            //$(this).next(".dnd-layout-buttons").fadeIn("slow");
-        });
+        $body
+            .on("mouseenter", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator", function() {
+                $(this).next(".dnd-layout-buttons").css("opacity", 1);
+                $(this).next(".dnd-layout-buttons").css("pointer-events", "auto");
 
-        $body.on("mouseleave", ".dnd-layout-buttons", function() {
-            //$(this).fadeOut("slow");
-            $(this).css("opacity", 0);
-        });
+                //console.log(`.dnd-layout-indicator mouseenter !!!`);
+                mouseEnterDndLayoutButtons( $(this).next(".dnd-layout-buttons") );
+            })
+            .on("mouseleave", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator", function() {
+
+                //console.log(`.dnd-layout-indicator mouseleave !!!`);
+                mouseLeaveDndLayoutButtons( $(this).next(".dnd-layout-buttons") );
+            });
+
+        $body
+            .on("mouseenter", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-buttons", function() {
+                mouseEnterDndLayoutButtons($(this) );
+            })
+            .on("mouseleave", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-buttons", function() {
+                mouseLeaveDndLayoutButtons( $(this) );
+            });
 
         // .dnd-layout-buttons
         $body.on("click", ".dnd-layout-buttons div[data-dnd-tpl]", function () {
@@ -120,7 +133,7 @@ $(function () {
                         melisPluginEdition.sendDragnDropList(dndId, pageId);
 
                         // re-position .dnd-layout-buttons after remove dnd
-                        topPositionlayoutButtons();
+                        topPositionLayoutButtons();
                     }
                 })
                 .always(() => {
@@ -209,10 +222,10 @@ $(function () {
 				}
 
                 // re-position .dnd-layout-buttons after remove dnd
-                topPositionlayoutButtons();
+                topPositionLayoutButtons();
 
                 // check display of arrow buttons after plus
-                handleDisplayArrowButtons();
+                handleDisplayRemoveArrowButtons();
 
 			})
 			.always(() => {
@@ -257,10 +270,10 @@ $(function () {
 							melisPluginEdition.calcFrameHeight();
 							
 							// re-position .dnd-layout-buttons after remove dnd
-							topPositionlayoutButtons();
+							topPositionLayoutButtons();
 
                             // check display of arrow buttons after remove
-                            handleDisplayArrowButtons();
+                            handleDisplayRemoveArrowButtons();
 						});
 				}).always(() => {
 					btn.attr("disabled", false);
@@ -283,7 +296,10 @@ $(function () {
 				});
 
                 // check display of arrow buttons after arrow up
-                handleDisplayArrowButtons();
+                handleDisplayRemoveArrowButtons();
+
+                // for .dnd-layout-buttons on the sub tools buttons
+                adjustLayoutButtonMargins();
 			}
 		});
 
@@ -299,14 +315,57 @@ $(function () {
 				btn.attr("disabled", true);
 	
 				updateDndOrder(pageId, function() {
-					console.log(btn);
+					//console.log(btn);
 					btn.attr("disabled", false);
 				});
 
                 // check display of arrow buttons after arrow down
-                handleDisplayArrowButtons();
+                handleDisplayRemoveArrowButtons();
+
+                // for .dnd-layout-buttons on the sub tools buttons
+                adjustLayoutButtonMargins();
 			}
 		});
+
+        window.parent.$body.on("click", ".tab-element", function() {
+            let $tabElement = $(this),
+                melisKey    = $tabElement.closest(".nav-item").data("tool-meliskey");
+
+                if (melisKey === "meliscms_page") {
+                    // call to this function as it re-initialized top position of .dnd-layout-buttons
+                    topPositionLayoutButtons();
+                }
+        });
+
+        function mouseEnterDndLayoutButtons($element) {
+            const $el = $element;
+                //console.log("mouseenter: cancel fade");
+
+                const timeoutId = $el.data("fadeTimeout");
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+                    $el.removeData("fadeTimeout");
+                }
+
+                $el.css("opacity", 1);
+                $el.css("pointer-events", "auto");
+                // $el.show();
+        }
+
+        function mouseLeaveDndLayoutButtons($element) {
+            const $el = $element;
+                //console.log("mouseleave: starting 3s delay");
+
+                const timeoutId = setTimeout(() => {
+                    //console.log("3s passed, fading out");
+                    $el.css("opacity", 0);
+                    $el.css("pointer-events", "none");
+                    //$el.hide();
+                    $el.removeData("fadeTimeout");
+                }, 3000);
+
+                $el.data("fadeTimeout", timeoutId);
+        }
 
         /**
          *
@@ -381,23 +440,8 @@ $(function () {
             return max;
         }
 
-        function topPositionlayoutButtons() {
-            // .dnd-layout-buttons offset top on .dnd-layout-wrapper
-            let $layoutButtons = $(".dnd-layout-buttons");
-
-                $layoutButtons.each(function() {
-                    let $layoutButton           = $(this),
-                        layoutButtonHeight      = $layoutButton.outerHeight(),
-                        $pluginTitleSubTools    = $layoutButton.find(".dnd-plugin-title-and-sub-tools");
-
-                        $layoutButton.css("top", -($layoutButton.outerHeight() - 4)); // - 4 to make sure it overlaps the .dnd-layout-buttons hoverable space
-
-                        $pluginTitleSubTools.css("height", layoutButtonHeight - 8); // 8 for padding top 4px and bottom 4px
-                });
-        }
-
         // for easy top position based on .dnd-layout-buttons height
-        topPositionlayoutButtons();
+        topPositionLayoutButtons();
 
 		function updateDndOrder(pageId, callback) {
 
@@ -430,25 +474,108 @@ $(function () {
          * first row - up arrow not displayed
          * last row - arrow down not displayed 
          **/
-        function handleDisplayArrowButtons() {
-            let $dndPluginsContent  = $("body .dnd-plugins-content");
-                
+        function handleDisplayRemoveArrowButtons() {
+            let $dndPluginsContent  = $(".dnd-plugins-content");
                 if ($dndPluginsContent.length) {
-                    $dndPluginsContent.each(() => {
-                        let $dndPluginContent   = $(this),
-                            $dndRow             = $dndPluginContent.find(".row");
+                    $dndPluginsContent.each((i, v) => {
+                        let $dndPluginContent   = $(v),
+                            $dndRow             = $dndPluginContent.find("> .row");
 
-                            $dndRow.each((index) => {
-                                let $row = $(this);
+                            $dndRow.each((i, v) => {
+                                let $row = $(v);
+                                    //$row.find(".dnd-arrow-down").toggle(i !== $dndRow.length - 1);
 
-                                    // show/hide button based on position
-                                    $row.find(".dnd-arrow-up").toggle(index !== 0);
-                                    $row.find(".dnd-arrow-down").toggle(index !== $dndRow.length - 1);
+                                    //console.log(`$dndRow.length: `, $dndRow.length);
+                                    if ($dndRow.length === 1) {
+                                        // show/hide button based on position
+                                        $row.find(".dnd-arrow-up").toggle(i !== 0);
+                                        $row.find(".dnd-arrow-down").toggle(i !== 0);
+
+                                        $row.find(".dnd-remove-button").prop("disabled", true);
+                                        $row.find(".dnd-remove-button").prepend(`<i class="fa fa-ban"></i>`);
+                                    }
+                                    else {
+                                        $row.find(".dnd-arrow-down").toggle(i !== $dndRow.length - 1);
+
+                                        $row.find(".dnd-remove-button").prop("disabled", false);
+                                        $row.find(".dnd-remove-button .fa-ban").remove();
+                                    }
                             });
                     });
                 }
         }
         
         // function call
-        handleDisplayArrowButtons();
+        handleDisplayRemoveArrowButtons();
 });
+
+// .dnd-layout-buttons offset top on .dnd-layout-wrapper and other elements manipulation
+window.topPositionLayoutButtons = function() {
+    let $layoutButtons = $(".dnd-layout-buttons");
+        $layoutButtons.each(function() {
+            let $layoutButton           = $(this),
+                layoutButtonHeight      = $layoutButton.outerHeight(),
+                $pluginTitleSubTools    = $layoutButton.find(".dnd-plugin-title-and-sub-tools"),
+                $subToolsWrapped        = $layoutButton.find(".dnd-plugin-sub-tools"),
+                subToolsWrappedWidth    = $subToolsWrapped.outerWidth(),
+                $subTools               = $layoutButton.find(".dnd-plugin-sub-tools.layout-buttons-wrapped"),
+                subToolsWidth           = $subTools.outerWidth(),
+                $pluginTitleBox         = $pluginTitleSubTools.find(".melis-plugin-title-box"),
+                pluginTitleBoxWidth     = $pluginTitleBox.outerWidth(),
+                $removeButton           = $subTools.find(".dnd-remove-button");
+                
+                $layoutButton.css("top", -(layoutButtonHeight - 4)); // - 4 to make sure it overlaps the .dnd-layout-buttons hoverable space
+
+                //$pluginTitleSubTools.css("height", layoutButtonHeight - 8); // 8 for padding top 4px and bottom 4px
+
+                // check .dnd-plugin-sub-tools width if .dnd-remove-button is present
+                if ($removeButton.length) {
+                    $pluginTitleSubTools.addClass("has-remove-button");
+                }
+                else {
+                    $pluginTitleSubTools.removeClass("has-remove-button");
+                }
+                
+                // add min-width on .dnd-plugin-sub-tools
+                if (subToolsWidth < subToolsWrappedWidth) {
+                    $pluginTitleSubTools.css("min-width", subToolsWidth + pluginTitleBoxWidth + 23);
+                }
+                else {
+                    $pluginTitleSubTools.css("min-width", subToolsWrappedWidth + pluginTitleBoxWidth + 23);
+                }
+        });
+};
+
+function adjustLayoutButtonMargins() {
+    const $buttons  = $(".dnd-layout-buttons .column-icons .dnd-column-layout"),
+        $subTools   = $(".dnd-layout-buttons .dnd-plugin-sub-tools");
+
+        if ($buttons.length === 0) return;
+
+        // clear previous states
+        $subTools.removeClass("layout-buttons-wrapped");
+
+        const buttonTops = new Set();
+            $buttons.each(function() {
+                //const top = $(this).offset().top;
+                const top = Math.round($(this).position().top);
+                    //console.log({top});
+                    buttonTops.add(top);
+            });
+
+            //console.log({buttonTops});
+            if (buttonTops.size > 1) {
+                //console.log('Buttons have wrapped to a second line.');
+
+                // Optional: add class to the container or take some action
+                $subTools.addClass('layout-buttons-wrapped');
+            } else {
+                //console.log('All buttons are on a single line.');
+                $subTools.removeClass("layout-buttons-wrapped");
+            }
+        // for .dnd-layout-buttons top positioning
+        topPositionLayoutButtons();
+}
+
+// run on load and resize
+$(window).on('load resize', adjustLayoutButtonMargins);
