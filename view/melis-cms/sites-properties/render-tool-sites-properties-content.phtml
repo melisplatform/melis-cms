@@ -34,6 +34,10 @@ $data_melisKey = $this->melisKey;
                                 $el->setValue($this->siteId);
                             }
 
+                            if($element == 'site_dnd_render_mode'){
+                                $el->setAttribute("data-value", $el->getValue());
+                            }
+
                             $el->setName("siteprop_".$el->getName());
                             $el->setAttribute('id', $el->getName());
                         }

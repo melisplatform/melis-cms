@@ -1418,6 +1418,26 @@ $(function() {
                 removeParentBodyPropStyle();
             }
         });
+
+    $body.on("change", "#siteprop_site_dnd_render_mode", function(){
+        var _this = $(this);
+        var origValue = _this.attr("data-value");
+        // if($(this).val() == "" || $(this).val() == undefined){
+        if(_this.val() != origValue){
+            melisCoreTool.confirm(
+                translations.tr_meliscore_common_yes,
+                translations.tr_meliscore_common_no,
+                translations.tr_meliscms_site_properties_dnd_mode_confirmation_title,
+                translations.tr_meliscms_site_properties_dnd_mode_confirmation_msg,
+                function() {
+
+                },
+                function() {
+                    _this.val(origValue);
+                }
+            );
+        }
+    });
 });
 
 window.sitesTableCallback = function() {
