@@ -152,9 +152,6 @@ var melisPluginEdition = (function($, window) {
                 parentSize  = $this.outerWidth(),
                 totalChild  = $this.find($(".melis-plugin-tools-box")).outerWidth() + $this.find($(".melis-plugin-title-box")).outerWidth();
 
-                console.log({totalChild});
-                console.log({parentSize});
-
                 if ( totalChild > parentSize ) {
                     $this.width(totalChild + 30);
                 }

@@ -447,16 +447,16 @@ $(function () {
 
 			let dndIds = [];
 			$("body .dnd-plugins-content").each((i, v) => {
-
 				let dnd = $(v).find("> div > div > div.melis-dragdropzone-container");
 				let dnds = [];
+
 				dnd.each((k, data) => {
 					dnds.push($(data).data("dragdropzoneId"));
 				});
 
 				dndIds.push(dnds)
 			});
-
+            
 			if (dndIds)
 				$.post("/dnd-update-order", {dndIds, pageId}).always(() => {
 					// updated
