@@ -4,11 +4,10 @@ var melisPluginEdition = (function($, window) {
             Cache DOM
     ====================================*/
     // body tag overall
-    var $body                   = window.parent.$("body"),
+    var $body                   = window.parent.$("body"), // outmost parent window
         fromdragdropzone        = window.fromdragdropzone,
         iframe                  = window.parent.$("#"+parent.activeTabId).find(".melis-iframe"),
-        // inside iframe's body tag
-        $_body                  = $("body"),
+        $_body                  = $("body"), // inside iframe's body tag
         pluginHardcodedConfig;
 
     /* ==================================
@@ -18,6 +17,13 @@ var melisPluginEdition = (function($, window) {
 
     $_body.on("click", ".m-trash-handle", removePlugins);
 
+    $_body.on("focus", ".melis-ui-outlined .melis-editable", function() {
+        $(this).closest(".melis-ui-outlined").addClass("melis-focus");
+    });
+
+    $_body.on("blur", ".melis-ui-outlined.melis-focus", function() {
+        $(this).removeClass("melis-focus");
+    });
     
     /* 
      * Checking parent body events handler to avoid multiple events of the button
@@ -41,14 +47,6 @@ var melisPluginEdition = (function($, window) {
         e.preventDefault();
 
         removeParentBodyPropStyle();
-    });
-
-    $_body.on("focus", ".melis-ui-outlined .melis-editable", function() {
-        $(this).closest(".melis-ui-outlined").addClass("melis-focus");
-    });
-
-    $_body.on("blur", ".melis-ui-outlined.melis-focus", function() {
-        $(this).removeClass("melis-focus");
     });
 
     // window.parent.$body.prop("style")
@@ -153,6 +151,10 @@ var melisPluginEdition = (function($, window) {
             var $this       = $(this),
                 parentSize  = $this.outerWidth(),
                 totalChild  = $this.find($(".melis-plugin-tools-box")).outerWidth() + $this.find($(".melis-plugin-title-box")).outerWidth();
+
+                console.log({totalChild});
+                console.log({parentSize});
+
                 if ( totalChild > parentSize ) {
                     $this.width(totalChild + 30);
                 }
@@ -561,86 +563,86 @@ var melisPluginEdition = (function($, window) {
     }
 
 
-    // function getDNDList(dndContainer, pageId)
-    // {
-    //     const result = [];
-    //
-    //     // dndContainer = $(dndContainer).children(".dnd-layout-wrapper");
-    //
-    //     // Find all immediate children (anywhere under this node, but only one level down)
-    //     dndContainer.children().each(function () {
-    //         const $child = $(this);
-    //
-    //         // Check if this child is a melis-dragdropzone-container
-    //         if ($child.hasClass('melis-dragdropzone-container')) {
-    //             result.push({
-    //                 melisIdPage: pageId,
-    //                 melisModule: $($child).data("module"),
-    //                 melisPluginName: $($child).data("plugin"),
-    //                 melisPluginId: $($child).data("plugin-id"),
-    //                 melisPluginTag: $($child).data("melis-tag"),
-    //                 melisDragDropZoneListPlugin: getPluginLists($($child).children(".melis-dragdropzone")),
-    //                 children: getDNDList($child)
-    //             });
-    //         } else {
-    //             // Otherwise, look inside it for immediate children
-    //             $child.children('.melis-dragdropzone-container').each(function () {
-    //                 const $subChild = $(this);
-    //                 result.push({
-    //                     mmelisIdPage: pageId,
-    //                     melisModule: $($subChild).data("module"),
-    //                     melisPluginName: $($subChild).data("plugin"),
-    //                     melisPluginId: $($subChild).data("plugin-id"),
-    //                     melisPluginTag: $($subChild).data("melis-tag"),
-    //                     melisDragDropZoneListPlugin: getPluginLists($($subChild).children(".melis-dragdropzone")),
-    //                     children: getDNDList($subChild)
-    //                 });
-    //             });
-    //         }
-    //     });
-    //
-    //     return result;
-    // }
-    //
-    // function getPluginLists(dropzoneList)
-    // {
-    //     var list = new Object();
-    //     var ctr = 0;
-    //     $.each(dropzoneList, function (k, v) {
-    //         var pluginListEl = $(v).find(".melis-ui-outlined");
-    //         if ($(pluginListEl).length) {
-    //             // list = new Object();
-    //             var pluginList = new Object();
-    //             // loop all plugins in dropzone
-    //             $.each(pluginListEl, function (key, value) {
-    //                 pluginList[key] = new Object();
-    //
-    //                 var plugins = $(value).find(".melis-plugin-tools-box"),
-    //                     melisPluginModuleName = $(plugins).data("module"),
-    //                     melisPluginName = $(plugins).data("plugin"),
-    //                     melisPluginID = $(plugins).data("plugin-id"),
-    //                     melisPluginTag = $(plugins).data("melis-tag"),
-    //                     melisPluginContainer = $(plugins).data("plugin-container"),
-    //                     melisPluginContainerId = $(pluginListEl).attr("id");
-    //
-    //                 pluginList[key]['melisModule'] = melisPluginModuleName;
-    //                 pluginList[key]['melisPluginName'] = melisPluginName;
-    //                 pluginList[key]['melisPluginId'] = melisPluginID;
-    //                 pluginList[key]['melisPluginTag'] = melisPluginTag;
-    //
-    //                 if ($("#" + melisPluginContainerId).length) {
-    //                     pluginList[key]['melisPluginContainer'] = melisPluginContainer;
-    //                 } else {
-    //                     pluginList[key]['melisPluginContainer'] = " ";
-    //                 }
-    //             });
-    //
-    //             list = pluginList;
-    //             ctr++;
-    //         }
-    //     });
-    //     return list;
-    // }
+    /* function getDNDList(dndContainer, pageId)
+    {
+        const result = [];
+    
+        // dndContainer = $(dndContainer).children(".dnd-layout-wrapper");
+    
+        // Find all immediate children (anywhere under this node, but only one level down)
+        dndContainer.children().each(function () {
+            const $child = $(this);
+    
+            // Check if this child is a melis-dragdropzone-container
+            if ($child.hasClass('melis-dragdropzone-container')) {
+                result.push({
+                    melisIdPage: pageId,
+                    melisModule: $($child).data("module"),
+                    melisPluginName: $($child).data("plugin"),
+                    melisPluginId: $($child).data("plugin-id"),
+                    melisPluginTag: $($child).data("melis-tag"),
+                    melisDragDropZoneListPlugin: getPluginLists($($child).children(".melis-dragdropzone")),
+                    children: getDNDList($child)
+                });
+            } else {
+                // Otherwise, look inside it for immediate children
+                $child.children('.melis-dragdropzone-container').each(function () {
+                    const $subChild = $(this);
+                    result.push({
+                        mmelisIdPage: pageId,
+                        melisModule: $($subChild).data("module"),
+                        melisPluginName: $($subChild).data("plugin"),
+                        melisPluginId: $($subChild).data("plugin-id"),
+                        melisPluginTag: $($subChild).data("melis-tag"),
+                        melisDragDropZoneListPlugin: getPluginLists($($subChild).children(".melis-dragdropzone")),
+                        children: getDNDList($subChild)
+                    });
+                });
+            }
+        });
+    
+        return result;
+    }
+    
+    function getPluginLists(dropzoneList)
+    {
+        var list = new Object();
+        var ctr = 0;
+        $.each(dropzoneList, function (k, v) {
+            var pluginListEl = $(v).find(".melis-ui-outlined");
+            if ($(pluginListEl).length) {
+                // list = new Object();
+                var pluginList = new Object();
+                // loop all plugins in dropzone
+                $.each(pluginListEl, function (key, value) {
+                    pluginList[key] = new Object();
+    
+                    var plugins = $(value).find(".melis-plugin-tools-box"),
+                        melisPluginModuleName = $(plugins).data("module"),
+                        melisPluginName = $(plugins).data("plugin"),
+                        melisPluginID = $(plugins).data("plugin-id"),
+                        melisPluginTag = $(plugins).data("melis-tag"),
+                        melisPluginContainer = $(plugins).data("plugin-container"),
+                        melisPluginContainerId = $(pluginListEl).attr("id");
+    
+                    pluginList[key]['melisModule'] = melisPluginModuleName;
+                    pluginList[key]['melisPluginName'] = melisPluginName;
+                    pluginList[key]['melisPluginId'] = melisPluginID;
+                    pluginList[key]['melisPluginTag'] = melisPluginTag;
+    
+                    if ($("#" + melisPluginContainerId).length) {
+                        pluginList[key]['melisPluginContainer'] = melisPluginContainer;
+                    } else {
+                        pluginList[key]['melisPluginContainer'] = " ";
+                    }
+                });
+    
+                list = pluginList;
+                ctr++;
+            }
+        });
+        return list;
+    } */
 
     function checkFunctionExists(functionName, idPlugin) {
         if (typeof functionName === 'function') {
@@ -1103,46 +1105,46 @@ var melisPluginEdition = (function($, window) {
         }
     }
 
-    // function allTinyMCEEditorsLoaded(callback) {
-    //     var checkInterval = 100; // milliseconds
-    //     var maxWaitTime = 10000; // 10 seconds
-    //     var waited = 0;
-    //
-    //     var interval = setInterval(function () {
-    //         // Check if tinymce and tinymce.editors are defined
-    //         if (window.tinymce && Array.isArray(tinymce.editors)) {
-    //             var editors = tinymce.editors;
-    //
-    //             // Check if all editors are initialized
-    //             var allReady = editors.length > 0 && editors.every(function (editor) {
-    //                 return editor.initialized && !editor.removed;
-    //             });
-    //
-    //             if (allReady) {
-    //                 clearInterval(interval);
-    //                 callback(true);
-    //                 return;
-    //             }
-    //         }
-    //
-    //         // Stop checking after max wait time
-    //         waited += checkInterval;
-    //         if (waited >= maxWaitTime) {
-    //             clearInterval(interval);
-    //             callback(false);
-    //         }
-    //
-    //     }, checkInterval);
-    // }
+    /* function allTinyMCEEditorsLoaded(callback) {
+        var checkInterval = 100; // milliseconds
+        var maxWaitTime = 10000; // 10 seconds
+        var waited = 0;
+    
+        var interval = setInterval(function () {
+            // Check if tinymce and tinymce.editors are defined
+            if (window.tinymce && Array.isArray(tinymce.editors)) {
+                var editors = tinymce.editors;
+    
+                // Check if all editors are initialized
+                var allReady = editors.length > 0 && editors.every(function (editor) {
+                    return editor.initialized && !editor.removed;
+                });
+    
+                if (allReady) {
+                    clearInterval(interval);
+                    callback(true);
+                    return;
+                }
+            }
+    
+            // Stop checking after max wait time
+            waited += checkInterval;
+            if (waited >= maxWaitTime) {
+                clearInterval(interval);
+                callback(false);
+            }
+    
+        }, checkInterval);
+    } */
 
-    // function waitForTinyMCELoadedAndReady(callback) {
-    //     var checkTinyMCEInterval = setInterval(function () {
-    //         if (window.tinymce && typeof tinymce.init === 'function') {
-    //             clearInterval(checkTinyMCEInterval);
-    //             allTinyMCEEditorsLoaded(callback);
-    //         }
-    //     }, 100);
-    // }
+    /* function waitForTinyMCELoadedAndReady(callback) {
+        var checkTinyMCEInterval = setInterval(function () {
+            if (window.tinymce && typeof tinymce.init === 'function') {
+                clearInterval(checkTinyMCEInterval);
+                allTinyMCEEditorsLoaded(callback);
+            }
+        }, 100);
+    } */
 
     moveResponsiveClass();
     pluginDetector();

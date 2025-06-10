@@ -281,6 +281,9 @@
 										loader.addActivePageEditionLoading(
 											data.melisData.item_zoneid
 										);
+
+										// dynamic dnd, issue: https://mantis2.uat.melistechnology.fr/view.php?id=8466
+										reloadMelisIframe();
 									}
 								);
 						}
@@ -306,8 +309,12 @@
 					// title, icon, zoneId, melisKey, parameters, navTabsGroup, callback
 					melisHelper.tabOpen(pageName, data.iconTab, data.melisData.item_zoneid, data.melisData.item_melisKey,{ idPage: data.melisData.page_id, }, null, () => {
 						melisCms.pageTabOpenCallback(data.melisData.page_id);
+
 						// show page loader
 						loader.addActivePageEditionLoading(data.melisData.item_zoneid);
+						
+						// dynamic dnd, issue: https://mantis2.uat.melistechnology.fr/view.php?id=8466
+						reloadMelisIframe();
 					});
 
 					$(".hasNiceScroll").getNiceScroll().resize();
