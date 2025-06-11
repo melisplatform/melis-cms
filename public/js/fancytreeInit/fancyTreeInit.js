@@ -283,7 +283,7 @@
 										);
 
 										// dynamic dnd, issue: https://mantis2.uat.melistechnology.fr/view.php?id=8466
-										//reloadMelisIframe();
+										reloadMelisIframe();
 									}
 								);
 						}
@@ -314,7 +314,7 @@
 						loader.addActivePageEditionLoading(data.melisData.item_zoneid);
 						
 						// dynamic dnd, issue: https://mantis2.uat.melistechnology.fr/view.php?id=8466
-						//reloadMelisIframe();
+						reloadMelisIframe();
 					});
 
 					$(".hasNiceScroll").getNiceScroll().resize();
