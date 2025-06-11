@@ -827,6 +827,29 @@ class SitesController extends MelisAbstractActionController
                     //clear cache
                     $this->clearSiteConfigCache($siteId);
                     /**
+                     * this will update sites pages xml
+                     */
+                    if(!empty($sitePropData['site_id'])) {
+                        $engineSiteSerice = $this->getServiceManager()->get('MelisEngineSiteService');
+                        $dndRenderMode = $engineSiteSerice->getSiteDNDRenderMode($sitePropData['site_id']);
+                        //if its empty, then its deactivated and site dnd is not already empty
+                        if(empty($sitePropData['site_dnd_render_mode']) && !empty($dndRenderMode)) {
+                            $pageService = $this->getServiceManager()->get('MelisEnginePage');
+                            $treeService = $this->getServiceManager()->get('MelisEngineTree');
+                            //get main page info
+                            $mainpageInfo = (array)$pageService->getPageById(35);
+                            if (empty($mainpageInfo))
+                                $mainpageInfo = (array)$pageService->getPageById(35, 'saved');
+
+//                          $childrenPages = $treeService->getAllPages($siteMainPageId);
+//                          $mainpageInfo['children'] = $childrenPages['children'] ?? [];
+
+                            $allPages = [$mainpageInfo];
+
+                            $this->updateSitePagesXml($allPages);
+                        }
+                    }
+                    /**
                      * if no error, execute the saving
                      */
                     $con->commit();
@@ -872,6 +895,33 @@ class SitesController extends MelisAbstractActionController
         $this->getEventManager()->trigger('meliscms_site_save_end', $this, array_merge($response, array('typeCode' => $logTypeCode, 'itemId' => $siteId)));
 
         return new JsonModel($response);
+    }
+
+    /**
+     * @param $pages
+     */
+    private function updateSitePagesXml($pages)
+    {
+        foreach($pages as $pageInfo){
+            if(!empty($pageInfo['page_content'])) {
+//                $pageContent = simplexml_load_string($pageInfo['page_content']);
+
+                $dom = new \DOMDocument();
+                $dom->loadXML($pageInfo['page_content']);
+
+
+
+                $updatedXml = $dom->saveXML($dom);
+
+//                $pageTable->update([
+//                    'page_content' => $updatedXml
+//                ], 'page_id', $pageInfo['page_id']);
+            }
+
+            if(!empty($pageInfo['children']))
+                $this->updateSitePagesXml($pageInfo['children']);
+
+        }
     }
 
     /**

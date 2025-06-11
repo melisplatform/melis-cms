@@ -868,6 +868,7 @@
 		'tr_meliscms_page_import_modal' => 'Import modal',
 		'tr_meliscms_page_export_modal' => 'Export modal',
 
+		'tr_meliscms_site_properties_dnd_mode_deactivate' => 'Deactivate',
 		'tr_meliscms_site_properties_dnd_mode_confirmation_title' => 'Warning',
 		'tr_meliscms_site_properties_dnd_mode_confirmation_msg' => 'Deactivating this may lead to unexpected results. Are you sure you want to proceed?'
     );

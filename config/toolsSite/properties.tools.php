@@ -121,7 +121,7 @@ return array(
                                         'options' => array(
                                             'label' => 'tr_melis_cms_sites_site_dnd_render_mode',
                                             'tooltip' => 'tr_melis_cms_sites_site_dnd_render_mode tooltip',
-                                            'empty_option' => 'tr_meliscms_form_common_Choose',
+                                            'empty_option' => 'tr_meliscms_site_properties_dnd_mode_deactivate',
                                             'value_options' => array(
                                                 'bootstrap' => 'Bootstrap',
                                             ),
