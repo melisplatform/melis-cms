@@ -674,7 +674,7 @@ button:disabled.dnd-remove-button:hover {
 }
 button:disabled.dnd-remove-button .fa-ban {
     color: #e61c23;
-    transform: scale(.7) rotate(90deg);
+    transform: scale(.9) rotate(90deg);
     position: absolute;
     z-index: 1;
     left: 30%;
