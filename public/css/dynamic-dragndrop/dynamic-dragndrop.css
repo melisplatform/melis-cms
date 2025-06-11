@@ -663,23 +663,30 @@ button:disabled.dnd-remove-button {
     border: 0;
     cursor: not-allowed;
     pointer-events: auto;
+    opacity: 0.9 !important;
 }
 button:disabled.dnd-remove-button:hover {
     background-color: transparent !important;
+    opacity: .9 !important;
+}
+.firefox .dnd-plus-remove-buttons button:disabled.dnd-remove-button .fa-ban {
+    left: 33.5% !important;
 }
 button:disabled.dnd-remove-button .fa-ban {
-    color: red;
+    color: #e61c23;
     transform: scale(.7) rotate(90deg);
     position: absolute;
     z-index: 1;
     left: 30%;
-    top: 30%;
+    top: 28%;
 }
 button:disabled.dnd-remove-button .fa-trash {
     position: absolute;
     z-index: 0;
-    top: 25%;
+    top: 22%;
     left: 30%;
+
+    font-size: 18px;
 }
 .melis-dragdropzone-container .melis-ui-outlined {
     max-width: 100%;

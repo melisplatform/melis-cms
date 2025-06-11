@@ -1102,6 +1102,30 @@ var melisPluginEdition = (function($, window) {
         }
     }
 
+    function browserDetect() {
+        var $html   = $("html"),
+            ua      = navigator.userAgent;
+
+            console.log({$html});
+
+                /* MSIE used to detect old browsers and Trident used to newer ones, Edge for Microsoft Edge */
+                if ( ua.indexOf("MSIE ") > -1 || ua.indexOf("Trident/") > -1 || ua.indexOf("Edge/") > -1 ) {
+                    $html.addClass("ie_edge");
+                } else if ( ua.indexOf("Chrome/") > -1 ) {
+                    $html.addClass("chrome");
+                } else if ( ua.indexOf("Safari/") > -1 ) {
+                    $html.addClass("safari");
+                } else if ( ua.indexOf("Firefox/") > -1 ) {
+                    $html.addClass("firefox");
+                }
+
+            var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+
+                if ( isOpera ) {
+                    $html.addClass("opera");
+                }
+    }
+
     /* function allTinyMCEEditorsLoaded(callback) {
         var checkInterval = 100; // milliseconds
         var maxWaitTime = 10000; // 10 seconds
@@ -1145,6 +1169,7 @@ var melisPluginEdition = (function($, window) {
 
     moveResponsiveClass();
     pluginDetector();
+    browserDetect();
     
     return {
         submitPluginForms       :       submitPluginForms,
