@@ -657,6 +657,11 @@ button.column-icon .icon-col-bg {
 .dnd-plugin-sub-tools.layout-buttons-wrapped > .dnd-arrow-buttons {
     display: block;
 }
+/* button:disabled.dnd-remove-button {
+    background: url(../images/dnd-remove-button-disabled-icon.png) 0 0 no-repeat;
+    width: 30px;
+    height: 30px;
+} */
 button:disabled.dnd-remove-button {
     position: relative;
     height: 30px;
@@ -673,17 +678,27 @@ button:disabled.dnd-remove-button:hover {
     left: 33.5% !important;
 }
 button:disabled.dnd-remove-button .fa-ban {
-    color: #e61c23;
-    transform: scale(.9) rotate(90deg);
+    color: #808080;
+
+    transform: scale(1.6) rotate(90deg);
+
     position: absolute;
     z-index: 1;
-    left: 30%;
-    top: 28%;
+    left: 27%;
+    /* top: 28%; */
+    top: 22%;
+
+    filter: drop-shadow(0 0 0.5px rgba(0, 0, 0, 0.3));
 }
 button:disabled.dnd-remove-button .fa-trash {
+    color: #fff;
+
+    transform: scale(0.8);
+
     position: absolute;
     z-index: 0;
-    top: 22%;
+    /* top: 22%; */
+    top: 18%;
     left: 30%;
 
     font-size: 18px;
