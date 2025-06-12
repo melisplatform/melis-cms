@@ -675,7 +675,7 @@ button:disabled.dnd-remove-button:hover {
     opacity: .9 !important;
 }
 .firefox .dnd-plus-remove-buttons button:disabled.dnd-remove-button .fa-ban {
-    left: 33.5% !important;
+    left: 28% !important;
 }
 button:disabled.dnd-remove-button .fa-ban {
     color: #808080;
