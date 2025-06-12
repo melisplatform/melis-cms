@@ -14,8 +14,9 @@
     margin-left: 0;
 } */
 .column-icon {
-    background-color: #e61c23;
-    border: 1px solid #e61c23;
+    /* #e61c23 */
+    background-color: transparent;
+    border: 1px solid transparent;
 
     display: inline-block;
     vertical-align: middle;
@@ -39,7 +40,7 @@
     max-width: 100%;
 }
 .icon-row {
-    border-top: 2px solid #e61c23;
+    border-top: 2px solid transparent;
     display: flex;
     flex-wrap: wrap;
 }
@@ -360,13 +361,15 @@ button.column-icon .icon-col-bg {
     width: 30px;
 }
 .dnd-layout-buttons .btn:hover {
-    background-color: #cf1d23;
+    /* #cf1d23 */
+    background-color: transparent;
 }
 .dnd-layout-buttons .layout-popover {
     display: none;
 }
 .melis-dragdropzone-container .dnd-layout-wrapper {
-    outline: 1px dashed #ce5459;
+    /* #ce5459 */
+    outline: 1px dashed transparent;
     padding: 1rem 0;
     margin: 0 0.5rem;
 }
@@ -385,7 +388,8 @@ button.column-icon .icon-col-bg {
     z-index: 999;
 }
 .melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator {
-    background-color: #ce5459;
+    /* #ce5459 */
+    background-color: transparent;
     opacity: 0;
     z-index: 9999;
     top: -5px !important;
@@ -421,9 +425,6 @@ button.column-icon .icon-col-bg {
     margin-left: 0.5rem;
     margin-right: 0.5rem;
 }
-/* .dnd-layout-buttons .dnd-column-layout:first-child {
-    margin-left: 0;
-} */
 .no-margin-left {
     margin-left: 0 !important;
 }
@@ -433,18 +434,14 @@ button.column-icon .icon-col-bg {
     height: 30px;
 }
 .dnd-layout-wrapper > .dnd-layout-buttons {
-    background-color: #e61c23;
+    /* #e61c23 */
+    background-color: transparent;
 }
 .dnd-plugin-sub-tools {
     display: inline-block;
     vertical-align: middle;
     width: auto;
 }
-
-/* .dnd-layout-wrapper .dnd-layout-wrapper > .dnd-layout-buttons,
-.dnd-layout-wrapper .dnd-layout-wrapper > .melis-plugin-indicator {
-    opacity: 0;
-} */
 
 .dnd-layout-wrapper .dnd-layout-buttons {
     opacity: 0;
@@ -454,11 +451,6 @@ button.column-icon .icon-col-bg {
     transition: opacity 0.4s;
     -webkit-transition: opacity 0.4s;
     -ms-transition: opacity 0.4s;
-    
-    /* -webkit-transition-delay: 0.1s;
-    -moz-transition-delay: 0.1s;
-    -o-transition-delay: 0.1s;
-    transition-delay: 0.1s; */
 
     pointer-events: none;
 }
@@ -516,12 +508,13 @@ button.column-icon .icon-col-bg {
     margin-bottom: 0;
 }
 .melis-dragdropzone:hover {
-    outline: 1px solid #e61c23;
+    /* #e61c23 */
+    outline: 1px solid transparent;
 
-    box-shadow: 0 0 0 1px #e61c23;
-    -webkit-box-shadow: 0 0 0 1px #e61c23;
-    -moz-box-shadow: 0 0 0 1px #e61c23;
-    -ms-box-shadow: 0 0 0 1px #e61c23;
+    box-shadow: 0 0 0 1px transparent;
+    -webkit-box-shadow: 0 0 0 1px transparent;
+    -moz-box-shadow: 0 0 0 1px transparent;
+    -ms-box-shadow: 0 0 0 1px transparent;
     z-index: 999999;
 }
 .dnd-layout-wrapper:hover .m-plugin-sub-tools div {
@@ -585,8 +578,9 @@ button.column-icon .icon-col-bg {
     -moz-transition-timing-function: unset;
 }
 .bg-red {
-    background-color: #e61c23;
-    border-color: #e61c23;
+    /* #e61c23 */
+    background-color: transparent;
+    border-color: transparent;
 }
 .dnd-layout-buttons-popover {
     border-radius: 3px;
