@@ -695,11 +695,20 @@ var melisCms = (function() {
 
 	// IFRAME HEIGHT CONTROLS (for onload, displaySettings & sidebar collapse)
 	function iframeLoad(id) {
-		var $melisIframe = $("#" + id + "_id_meliscms_page").find(".melis-iframe"),
-			height = $melisIframe.contents().height();
+		let $melisIframe = $("#" + id + "_id_meliscms_page").find(".melis-iframe");
+			$melisIframe.on("load", (e) => {
+				let setTimeoutIframe = setTimeout(() => {
+					let $iframe = $(e.currentTarget);
+						if ($iframe.length && $iframe[0].contentDocument.body) {
+							let height 	= $iframe[0].contentDocument.body.scrollHeight;
 
-			$melisIframe.css("height", height);
-			$melisIframe.css("min-height", "700px");
+								$iframe.css("height", height);
+								$iframe.css("min-height", "700px");
+
+								clearTimeout(setTimeoutIframe);
+						}
+				}, 2000);
+			});
 
 			// Activating page edition button action
 			enableCmsButtons(id);
@@ -818,15 +827,24 @@ var melisCms = (function() {
 	}
 
 	/**
-	 * Load page with iframe
+	 * Update iframe height on clicking the main menu
 	 */
-	function loadPageIframe() {
-		var $this = $(this),
-			$id = $("#" + $this.data("id")),
-			$iframe = $id.find(".iframe-container .tab-content .melis-iframe"),
-			height = $iframe.contents()[0].body.scrollHeight;
+	function updateIframeHeight() {
+		let $melisCmsPage 	= $(`[data-meliskey="meliscms_page"]`),
+			$iFrames 		= $melisCmsPage.find(".iframe-container .tab-content .melis-iframe");
 
-			$iframe.css("height", height);
+			let setIntervalIframes = setInterval(() => {
+				if ($iFrames.length) {
+					$iFrames.each((i, v) => {
+						let $iFrame = $(v),
+							height 	= $iFrame.contents()[0].body.scrollHeight;
+							
+							$iFrame.css("height", height);
+					});
+
+					clearInterval(setIntervalIframes);
+				}
+			}, 500);
 	}
 
 	// WINDOW SCROLL FUNCTIONALITIES ========================================================================================================
@@ -955,8 +973,9 @@ var melisCms = (function() {
 
 	// click on page tab menu
 	$body.on(
+		"click",
 		"#melis-id-nav-bar-tabs [data-tool-meliskey='meliscms_page'] .tab-element",
-		loadPageIframe
+		updateIframeHeight
 	);
 
 	/*
@@ -982,6 +1001,8 @@ var melisCms = (function() {
 		iframeLoad: iframeLoad,
 
 		pageTabOpenCallback: pageTabOpenCallback,
+
+		updateIframeHeight: updateIframeHeight
 	};
 })();
 
