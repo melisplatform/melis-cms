@@ -361,16 +361,15 @@ button.column-icon .icon-col-bg {
     width: 30px;
 }
 .dnd-layout-buttons .btn:hover {
-    /* #cf1d23 */
     background-color: transparent;
 }
 .dnd-layout-buttons .layout-popover {
     display: none;
 }
 .melis-dragdropzone-container .dnd-layout-wrapper {
-    /* #ce5459 */
     outline: 1px dashed transparent;
-    padding: 1rem 0;
+    /* padding: 1rem 0; */
+    padding: 0;
     margin: 0 0.5rem;
 }
 .melis-dragdropzone-container > .dnd-layout-wrapper:hover {
@@ -378,7 +377,6 @@ button.column-icon .icon-col-bg {
 }
 .dnd-layout-wrapper .dnd-layout-wrapper {
     outline: none;
-    /* pointer-events: none; */
 }
 .dnd-layout-wrapper .dnd-layout-wrapper .dnd-layout-buttons,
 .dnd-layout-wrapper .dnd-layout-wrapper .dnd-layout-indicator {
@@ -388,7 +386,6 @@ button.column-icon .icon-col-bg {
     z-index: 999;
 }
 .melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator {
-    /* #ce5459 */
     background-color: transparent;
     opacity: 0;
     z-index: 9999;
@@ -503,12 +500,26 @@ button.column-icon .icon-col-bg {
     top: 25%;
     font-size: 20px;
 }
-.melis-dragdropzone {
+.dnd-layout-wrapper .melis-dragdropzone {
+    bottom: 0;
+}
+.melis-dragdropzone.no-content {
+    background: rgba(255, 245, 245, 0.8);
     bottom: 0;
     margin-bottom: 0;
 }
+.melis-dragdropzone.no-content:before,
+.melis-dragdropzone.no-content:after {
+    color: #e61c23;
+    text-shadow: none;
+}
+.melis-dragdropzone.no-content:before {
+    width: 254px;
+}
+/* .melis-dragdropzone.no-content:after {
+    content: url(/MelisFront/images/icons/square-plugin-icon.png);
+} */
 .melis-dragdropzone:hover {
-    /* #e61c23 */
     outline: 1px solid transparent;
 
     box-shadow: 0 0 0 1px transparent;
