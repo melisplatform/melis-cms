@@ -1106,8 +1106,6 @@ var melisPluginEdition = (function($, window) {
         var $html   = $("html"),
             ua      = navigator.userAgent;
 
-            console.log({$html});
-
                 /* MSIE used to detect old browsers and Trident used to newer ones, Edge for Microsoft Edge */
                 if ( ua.indexOf("MSIE ") > -1 || ua.indexOf("Trident/") > -1 || ua.indexOf("Edge/") > -1 ) {
                     $html.addClass("ie_edge");
