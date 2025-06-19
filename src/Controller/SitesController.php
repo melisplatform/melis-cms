@@ -297,9 +297,11 @@ class SitesController extends MelisAbstractActionController
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
         //prepare the step4 forms
         $moduleForm = $melisTool->getForm('meliscms_tool_sites_modal_add_step4_form_module');
+        $moduleOptionForm = $melisTool->getForm('meliscms_tool_sites_modal_add_step4_form_module_option');
 
         $view = new ViewModel();
         $view->setVariable('step4_form_module', $moduleForm);
+        $view->setVariable('step4_form_module_option', $moduleOptionForm);
         $view->melisKey = $melisKey;
         return $view;
     }
@@ -616,7 +618,7 @@ class SitesController extends MelisAbstractActionController
                     $siteData['site_name'] = $siteName;
                 }
 
-                if(!isset($siteData['site_dnd_render_mode']))
+                if(!empty($siteData['site_dnd_render_mode']))
                     $siteData['site_dnd_render_mode'] = 'bootstrap';
 
                 /**
