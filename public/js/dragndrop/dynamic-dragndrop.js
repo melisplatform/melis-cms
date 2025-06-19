@@ -511,7 +511,9 @@ $(function () {
 
 // .dnd-layout-buttons offset top on .dnd-layout-wrapper and other elements manipulation
 window.topPositionLayoutButtons = function() {
-    let $layoutButtons = $(".dnd-layout-buttons");
+    let $layoutButtons      = $(".dnd-layout-buttons"),
+        $melisDragDropZone  = $(".melis-dragdropzone");
+
         $layoutButtons.each(function() {
             let $layoutButton           = $(this),
                 layoutButtonHeight      = $layoutButton.outerHeight(),
@@ -544,6 +546,19 @@ window.topPositionLayoutButtons = function() {
                     $pluginTitleSubTools.css("min-width", subToolsWrappedWidth + pluginTitleBoxWidth + 23);
                 }
         });
+
+        /* $melisDragDropZone.each(function() {
+            let $zone           = $(this),
+                $uiOutlined     = $zone.find(".melis-ui-outlined"),
+                $toolsBox       = $uiOutlined.find(".melis-plugin-tools-box"),
+                $titleBox       = $toolsBox.find(".melis-plugin-title-box"),
+                $subTools       = $toolsBox.find(".m-plugin-sub-tools"),
+                toolsBoxWidth   = 0;
+
+                toolsBoxWidth = $titleBox.outerWidth() + $subTools.outerWidth();
+                
+                $toolsBox.css("width", toolsBoxWidth+`px`);
+        }); */
 };
 
 function adjustLayoutButtonMargins() {
