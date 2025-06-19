@@ -858,8 +858,8 @@ return array(
                                         'options' => array(
                                             'label' => 'tr_melis_cms_sites_tool_add_step1_is_multi_lang',
                                             'tooltip' => 'tr_melis_cms_sites_tool_add_step1_is_multi_lang tooltip',
-                                            'checked_value' => '1',
-                                            'unchecked_value' => '0',
+                                            'checked_value' => 'bootstrap',
+                                            'unchecked_value' => '',
                                             'switchOptions' => array(
                                                 'label-on' => 'tr_meliscms_common_yes',
                                                 'label-off' => 'tr_meliscms_common_no',
@@ -973,6 +973,38 @@ return array(
                         /**
                          * STEP 4 FORMS
                          */
+                        'meliscms_tool_sites_modal_add_step4_form_module_option' => array(
+                            'attributes' => array(
+                                'name' => 'toolsitesadd_step4form_module_option',
+                                'id' => 'step4form_module_option',
+                                'method' => 'POST',
+                                'action' => '',
+                            ),
+                            'hydrator'  => 'Laminas\Hydrator\ArraySerializableHydrator',
+                            'elements' => array(
+                                array(
+                                    'spec' => array(
+                                        'name' => 'site_dnd_render_mode',
+                                        'type' => 'Select',
+                                        'options' => array(
+                                            'label' => 'tr_melis_cms_sites_site_dnd_render_mode_value_select_msg',
+                                            'tooltip' => 'tr_melis_cms_sites_site_dnd_render_mode_value_select_msg tooltip',
+                                            'checked_value' => '1',
+                                            'unchecked_value' => '0',
+                                            'switchOptions' => array(
+                                                'label-on' => 'tr_meliscms_common_yes',
+                                                'label-off' => 'tr_meliscms_common_no',
+                                                'label' => "<i class='glyphicon glyphicon-resize-horizontal'></i>",
+                                            ),
+                                            'disable_inarray_validator' => true,
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'site_dnd_render_mode',
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
                         'meliscms_tool_sites_modal_add_step4_form_module' => array(
                             'attributes' => array(
                                 'name' => 'toolsitesadd_step4form_module',

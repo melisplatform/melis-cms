@@ -117,15 +117,18 @@ return array(
                                 array(
                                     'spec' => array(
                                         'name' => 'site_dnd_render_mode',
-                                        'type' => 'Laminas\Form\Element\Select',
+                                        'type' => 'Laminas\Form\Element\Radio',
                                         'options' => array(
                                             'label' => 'tr_melis_cms_sites_site_dnd_render_mode',
+                                            'label_attributes' => [
+                                                'class' => ''
+                                            ],
                                             'tooltip' => 'tr_melis_cms_sites_site_dnd_render_mode tooltip',
-                                            'empty_option' => 'tr_meliscms_site_properties_dnd_mode_deactivate',
                                             'value_options' => array(
-                                                'bootstrap' => 'Bootstrap',
+                                                '' => 'tr_melis_cms_sites_site_dnd_render_mode_value_standard',
+                                                'bootstrap' => 'tr_melis_cms_sites_site_dnd_render_mode_value_bootstrap',
                                             ),
-                                            'disable_inarray_validator' => true,
+//                                            'disable_inarray_validator' => true,
                                         ),
                                         'attributes' => array(
                                             'id' => 'site_dnd_render_mode',
