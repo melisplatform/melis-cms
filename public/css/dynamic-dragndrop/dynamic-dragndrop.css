@@ -265,11 +265,9 @@
 .half-col-top-bottom .icon-col {
     margin-top: 2px;
 }
-
 .half-1-col-left-w-right-2-col .icon-container {
     margin: -14px 0 0 0;
 }
-
 .melis-dragdropzone.no-content .dnd-4-cols-3-cols-left-w-1-col-right .row,
 .melis-dragdropzone.no-content .dnd-4-cols-1-col-left-w-3-cols-right .row {
     height: 33.33%;
@@ -279,9 +277,29 @@
 .melis-dragdropzone.no-content .dnd-3-cols-1-col-left-w-2-cols-right .row {
     height: 50%;
 }
-.dnd-3-cols-2-cols-left-w-1-col-right .row:first-child,
-.dnd-3-cols-1-col-left-w-2-cols-right .row:first-child {
-    margin-bottom: 9px;
+.dnd-3-cols-2-cols-left-w-1-col-right > .row:first-child,
+.dnd-3-cols-1-col-left-w-2-cols-right > .row:first-child {
+    margin-bottom: 34px;
+}
+/* .no-content .dnd-4-cols-3-cols-left-w-1-col-right .row,
+.no-content .dnd-4-cols-1-col-left-w-3-cols-right .row {
+    height: 33.33%;
+}
+.no-content .dnd-3-cols-2-cols-left-w-1-col-right .row,
+.no-content .dnd-3-cols-1-col-left-w-2-cols-right .row {
+    height: 50%;
+} */
+.dnd-4-cols-1-col-left-w-3-cols-right .row,
+.dnd-4-cols-3-cols-left-w-1-col-right .row {
+    margin-bottom: 6px;
+}
+.no-content .dnd-4-cols-1-col-left-w-3-cols-right .row,
+.no-content .dnd-4-cols-3-cols-left-w-1-col-right .row {
+    margin-bottom: 16px;
+}
+.dnd-4-cols-1-col-left-w-3-cols-right .row:last-child,
+.dnd-4-cols-3-cols-left-w-1-col-right .row:last-child {
+    margin-bottom: 0;
 }
 .dnd-4-cols-3-cols-left-w-1-col-right .melis-dragdropzone,
 .dnd-4-cols-1-col-left-w-3-cols-right .melis-dragdropzone {
@@ -301,9 +319,6 @@
 }
 .dnd-4-cols-3-cols-left-w-1-col-right .melis-dragdropzone::after,
 .dnd-4-cols-1-col-left-w-3-cols-right .melis-dragdropzone::after {
-    /* height: 30px;
-    width: 23px; */
-
     top: 30% !important;
     font-size: 20px;
 }
@@ -312,27 +327,6 @@
     top: 25% !important;
     font-size: 20px;
 }
-/* .dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone::after {
-    height: 40px !important;
-    width: 31px !important;
-}
-.dnd-4-cols-3-cols-left-w-1-col-right .melis-dragdropzone::after,
-.dnd-4-cols-1-col-left-w-3-cols-right .melis-dragdropzone::after,
-.dnd-3-cols-2-cols-left-w-1-col-right .melis-dragdropzone::after,
-.dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone::after {
-    content: "" !important;
-    background-image: url(/MelisFront/images/icons/square-plus-plugin-icon.png);
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-.dnd-3-cols-2-cols-left-w-1-col-right .melis-dragdropzone::after,
-.dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone::after {
-    top: 28% important;
-    height: 30px;
-    width: 23px;
-} */
-
 [dnd-layout-disable] button {
     cursor: not-allowed;
 }
@@ -521,19 +515,6 @@ button.column-icon .icon-col-bg {
     right: 0;
     bottom: -40px;
 }
-.no-content .dnd-4-cols-3-cols-left-w-1-col-right .row,
-.no-content .dnd-4-cols-1-col-left-w-3-cols-right .row {
-    height: 33.33%;
-    margin-bottom: 0;
-}
-.no-content .dnd-3-cols-2-cols-left-w-1-col-right .row,
-.no-content .dnd-3-cols-1-col-left-w-2-cols-right .row {
-    height: 50%;
-}
-.dnd-3-cols-2-cols-left-w-1-col-right .row:first-child,
-.dnd-3-cols-1-col-left-w-2-cols-right .row:first-child {
-    margin-bottom: 9px;
-}
 .dnd-layout-wrapper .melis-dragdropzone .melis-plugin-tools-box {
     height: auto;
 }
@@ -563,6 +544,10 @@ button.column-icon .icon-col-bg {
     top: 28% !important;
     font-size: 20px;
 }
+.no-content .dnd-4-cols-3-cols-left-w-1-col-right .melis-dragdropzone:not(.no-content)::after,
+.no-content .dnd-4-cols-1-col-left-w-3-cols-right .melis-dragdropzone:not(.no-content)::after,
+.no-content .dnd-3-cols-2-cols-left-w-1-col-right .melis-dragdropzone:not(.no-content)::after,
+.no-content .dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone:not(.no-content)::after,
 .content-added .dnd-4-cols-3-cols-left-w-1-col-right .melis-dragdropzone:not(.no-content)::after,
 .content-added .dnd-4-cols-1-col-left-w-3-cols-right .melis-dragdropzone:not(.no-content)::after,
 .content-added .dnd-3-cols-2-cols-left-w-1-col-right .melis-dragdropzone:not(.no-content)::after,

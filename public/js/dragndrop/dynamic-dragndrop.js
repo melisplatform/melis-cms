@@ -547,7 +547,7 @@ window.topPositionLayoutButtons = function() {
                 }
         });
 
-        // check dragdropzone with empty row
+        // check dragdropzone with empty row, related on updated dragdropzone icon
         $zones.each(function() {
             let $zone = $(this),
                 $col = $zone.find(".row .col-12");
@@ -560,7 +560,7 @@ window.topPositionLayoutButtons = function() {
                     $zone.parents(".no-content").removeClass("no-content").addClass("content-added");
                 }
                 else {
-                    $zone.parents(".no-content").removeClass("content-added").addClass("no-content");
+                    $zone.parents(".content-added").removeClass("content-added").addClass("no-content");
                 }
         });
 };

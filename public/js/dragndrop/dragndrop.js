@@ -214,6 +214,10 @@ var melisDragnDrop = (function ($, window) {
 				}
 
 				$(".melis-dragdropzone").removeClass("highlight");
+
+				// related on updated dragdropzone icon
+				$(".melis-dragdropzone").parents(".no-content").removeClass("no-content").addClass("content-added");
+
 				melisPluginEdition.pluginDetector();
 			},
 			update: function (event, ui) {
@@ -228,6 +232,9 @@ var melisDragnDrop = (function ($, window) {
 			},
 			out: function(event, ui) {
 				$(this).removeClass("highlight");
+
+				// related on updated dragdropzone icon
+				$(".melis-dragdropzone").parents(".content-added").removeClass("content-added").addClass("no-content");
 			},
 			stop: function(event, ui) {
 				$("body .melis-dragdropzone").removeClass("highlight");
