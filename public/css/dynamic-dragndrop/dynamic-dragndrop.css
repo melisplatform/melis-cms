@@ -420,11 +420,13 @@ button.column-icon .icon-col-bg {
 .dnd-layout-buttons .layout-popover {
     display: none;
 }
-.melis-dragdropzone-container .dnd-layout-wrapper {
-    outline: 1px dashed transparent;
+.melis-dragdropzone-container > .dnd-layout-wrapper {
+    outline: 1px dashed #ce5459;
     padding: 0.5rem 0;
-    /* padding: 0; */
-    margin: 0 0.5rem 15px;
+    margin: 0 0.5rem;
+}
+.dnd-plugins-content .row:last-child > .melis-dragdropzone-container > .dnd-layout-wrapper {
+    margin-bottom: 15px;
 }
 .melis-dragdropzone-container > .dnd-layout-wrapper:hover {
     outline-width: 2px;
@@ -514,8 +516,18 @@ button.column-icon .icon-col-bg {
     right: 0;
     bottom: -40px;
 }
-.dnd-layout-wrapper .melis-dragdropzone {
-    bottom: 0;
+.no-content .dnd-4-cols-3-cols-left-w-1-col-right .row,
+.no-content .dnd-4-cols-1-col-left-w-3-cols-right .row {
+    height: 33.33%;
+    margin-bottom: 0;
+}
+.no-content .dnd-3-cols-2-cols-left-w-1-col-right .row,
+.no-content .dnd-3-cols-1-col-left-w-2-cols-right .row {
+    height: 50%;
+}
+.dnd-3-cols-2-cols-left-w-1-col-right .row:first-child,
+.dnd-3-cols-1-col-left-w-2-cols-right .row:first-child {
+    margin-bottom: 9px;
 }
 .dnd-layout-wrapper .melis-dragdropzone .melis-plugin-tools-box {
     height: auto;
@@ -532,30 +544,65 @@ button.column-icon .icon-col-bg {
 .melis-dragdropzone.no-content.highlight:after {
     transition: none;
 }
-.dnd-layout-wrapper .melis-dragdropzone.no-content.highlight:after,
-.dnd-layout-wrapper .melis-dragdropzone.no-content.highlight:before {
+.dnd-4-cols-3-cols-left-w-1-col-right .melis-dragdropzone::after,
+.dnd-4-cols-1-col-left-w-3-cols-right .melis-dragdropzone::after {
+    top: 32% !important;
+    width: 23px;
+    height: 30px;
+    font-size: 20px;
+}
+.dnd-3-cols-2-cols-left-w-1-col-right .melis-dragdropzone::after,
+.dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone::after {
+    width: 31px;
+    height: 40px;
+    top: 28% !important;
+    font-size: 20px;
+}
+.content-added .dnd-4-cols-3-cols-left-w-1-col-right .melis-dragdropzone:not(.no-content)::after,
+.content-added .dnd-4-cols-1-col-left-w-3-cols-right .melis-dragdropzone:not(.no-content)::after,
+.content-added .dnd-3-cols-2-cols-left-w-1-col-right .melis-dragdropzone:not(.no-content)::after,
+.content-added .dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone:not(.no-content)::after {
+    width: auto;
+    height: auto;
+}
+.melis-dragdropzone {
+    bottom: 0;
+    margin-bottom: 0;
+}
+.melis-dragdropzone.no-content {
+    background: rgba(255, 245, 245, 0.8);
+    bottom: 0;
+    margin-bottom: 0;
+}
+.melis-dragdropzone.no-content.highlight {
+    background: #932e2a;
+}
+.melis-dragdropzone.no-content:after, 
+.melis-dragdropzone.no-content.highlight:after {
+    transition: none;
+}
+.melis-dragdropzone.no-content.highlight:after,
+.melis-dragdropzone.no-content.highlight:before {
     background-color: transparent;
     content: "";
 }
-.dnd-layout-wrapper .melis-dragdropzone.no-content.highlight:before,
-.dnd-layout-wrapper .melis-dragdropzone.no-content:before,
-.dnd-layout-wrapper .melis-dragdropzone.no-content:after {
+.melis-dragdropzone.no-content.highlight:before,
+.melis-dragdropzone.no-content:before,
+.melis-dragdropzone.no-content:after {
     color: #e61c23;
     text-shadow: none;
 }
-.dnd-layout-wrapper .melis-dragdropzone.no-content:before {
+.melis-dragdropzone.no-content:before {
     width: 254px;
 }
-/* .dnd-layout-wrapper .melis-dragdropzone.no-content:after {
-    content: url(/MelisFront/images/icons/square-plus-plugin-icon.png);
+.melis-dragdropzone.no-content:after {
+    content: "" !important;
+    background: url(/MelisFront/images/icons/square-plus-plugin-icon.png) no-repeat center;
+    background-size: contain;
     top: 40%;
-} */
-/* .melis-dragdropzone.ui-sortable::after,
-.melis-dragdropzone.ui-sortable::before {
-    content: "";
-    display: none;
-} */
-.dnd-layout-wrapper .melis-dragdropzone:hover {
+}
+.melis-dragdropzone:hover {
+    /* #e61c23 */
     outline: 1px solid transparent;
 
     box-shadow: 0 0 0 1px transparent;

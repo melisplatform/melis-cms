@@ -511,8 +511,8 @@ $(function () {
 
 // .dnd-layout-buttons offset top on .dnd-layout-wrapper and other elements manipulation
 window.topPositionLayoutButtons = function() {
-    let $layoutButtons      = $(".dnd-layout-buttons"),
-        $melisDragDropZone  = $(".melis-dragdropzone");
+    let $layoutButtons  = $(".dnd-layout-buttons"),
+        $zones          = $(".melis-dragdropzone.ui-sortable");
 
         $layoutButtons.each(function() {
             let $layoutButton           = $(this),
@@ -547,18 +547,22 @@ window.topPositionLayoutButtons = function() {
                 }
         });
 
-        /* $melisDragDropZone.each(function() {
-            let $zone           = $(this),
-                $uiOutlined     = $zone.find(".melis-ui-outlined"),
-                $toolsBox       = $uiOutlined.find(".melis-plugin-tools-box"),
-                $titleBox       = $toolsBox.find(".melis-plugin-title-box"),
-                $subTools       = $toolsBox.find(".m-plugin-sub-tools"),
-                toolsBoxWidth   = 0;
+        // check dragdropzone with empty row
+        $zones.each(function() {
+            let $zone = $(this),
+                $col = $zone.find(".row .col-12");
 
-                toolsBoxWidth = $titleBox.outerWidth() + $subTools.outerWidth();
-                
-                $toolsBox.css("width", toolsBoxWidth+`px`);
-        }); */
+                if ($col.is(":empty")) {
+                    $col.closest(".row").remove();
+                }
+
+                if ($zone.parents(".no-content").length) {
+                    $zone.parents(".no-content").removeClass("no-content").addClass("content-added");
+                }
+                else {
+                    $zone.parents(".no-content").removeClass("content-added").addClass("no-content");
+                }
+        });
 };
 
 function adjustLayoutButtonMargins() {
