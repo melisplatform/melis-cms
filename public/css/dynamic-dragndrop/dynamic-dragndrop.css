@@ -452,13 +452,18 @@ button.column-icon .icon-col-bg {
     -webkit-transform: translate3d(-100%, 0, 0);
     -moz-transform: translate3d(-100%, 0, 0);
     -ms-transform: translate3d(-100%, 0, 0);
+    -o-transform: translate3d(-100%, 0, 0);
 
     transition: opacity 0.4s, transform 0.4s;
     -webkit-transition: opacity 0.4s, transform 0.4s;
     -ms-transition: opacity 0.4s, transform 0.4s;
+    -moz-transition: opacity 0.4s, transform 0.4s;
+    -o-transition: opacity 0.4s, transform 0.4s;
     
+    transition-delay: 0.1s;
     -webkit-transition-delay: 0.1s;
     -moz-transition-delay: 0.1s;
+    -ms-transition-delay: 0.1s;
     -o-transition-delay: 0.1s;
 }
 .dnd-plugin-title-and-sub-tools {
