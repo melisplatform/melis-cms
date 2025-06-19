@@ -301,14 +301,37 @@
 }
 .dnd-4-cols-3-cols-left-w-1-col-right .melis-dragdropzone::after,
 .dnd-4-cols-1-col-left-w-3-cols-right .melis-dragdropzone::after {
-    top: -20%;
     height: 30px;
+    width: 23px;
+
+    top: 30% !important;
     font-size: 20px;
 }
 .dnd-3-cols-2-cols-left-w-1-col-right .melis-dragdropzone::after,
 .dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone::after {
-    top: 25%;
+    top: 25% !important;
     font-size: 20px;
+    
+}
+.dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone::after {
+    height: 40px !important;
+    width: 31px !important;
+}
+.dnd-4-cols-3-cols-left-w-1-col-right .melis-dragdropzone::after,
+.dnd-4-cols-1-col-left-w-3-cols-right .melis-dragdropzone::after,
+.dnd-3-cols-2-cols-left-w-1-col-right .melis-dragdropzone::after,
+.dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone::after {
+    content: "" !important;
+    background-image: url(/MelisFront/images/icons/square-plus-plugin-icon.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.dnd-3-cols-2-cols-left-w-1-col-right .melis-dragdropzone::after,
+.dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone::after {
+    top: 28% important;
+    height: 30px;
+    width: 23px;
 }
 
 [dnd-layout-disable] button {
@@ -400,7 +423,7 @@ button.column-icon .icon-col-bg {
 }
 .melis-dragdropzone-container .dnd-layout-wrapper {
     outline: 1px dashed transparent;
-    padding: 1rem 0;
+    padding: 0.5rem 0;
     /* padding: 0; */
     margin: 0 0.5rem 15px;
 }
@@ -503,6 +526,7 @@ button.column-icon .icon-col-bg {
     bottom: 0;
     margin-bottom: 0;
 }
+.dnd-layout-wrapper .melis-dragdropzone.no-content.highlight:after,
 .dnd-layout-wrapper .melis-dragdropzone.no-content.highlight:before {
     background-color: transparent;
 }
