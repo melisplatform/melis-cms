@@ -400,8 +400,8 @@ button.column-icon .icon-col-bg {
 }
 .melis-dragdropzone-container .dnd-layout-wrapper {
     outline: 1px dashed transparent;
-    /* padding: 1rem 0; */
-    padding: 0;
+    padding: 1rem 0;
+    /* padding: 0; */
     margin: 0 0.5rem 15px;
 }
 .melis-dragdropzone-container > .dnd-layout-wrapper:hover {
