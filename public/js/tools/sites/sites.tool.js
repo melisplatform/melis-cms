@@ -733,6 +733,8 @@ $(function() {
          */
         function processSiteModule() {
             var form = getSerializedForm("#step4form_module");
+            var form2 = getSerializedForm("#step4form_module_option");
+            form = form.concat(form2);
             $.each(form, function(i, v){
                 if(v.name == "create_sites_file"){
                     //we decide only to create a file if it is a new site

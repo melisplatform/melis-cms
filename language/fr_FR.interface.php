@@ -601,8 +601,12 @@
         'tr_melis_cms_sites_homepages' => 'Pages d\'accueil',
         'tr_melis_cms_sites_shome_page_id' => 'ID page d\'accueil',
         'tr_melis_cms_sites_shome_page_id tooltip' => 'Identifiant de la page d\'accueil par langue',
-        'tr_melis_cms_sites_site_dnd_render_mode' => 'DND Render Mode',
-        'tr_melis_cms_sites_site_dnd_render_mode tooltip' => 'DND Render Mode',
+        'tr_melis_cms_sites_site_dnd_render_mode' => 'Mode de Drag & Drop',
+        'tr_melis_cms_sites_site_dnd_render_mode tooltip' => 'Mode de Drag & Drop sélectionné pour le site',
+        'tr_melis_cms_sites_site_dnd_render_mode_value_standard' => 'Standard',
+        'tr_melis_cms_sites_site_dnd_render_mode_value_bootstrap' => 'Avancé (Bootstrap)',
+        'tr_melis_cms_sites_site_dnd_render_mode_value_select_msg' => 'Souhaitez-vous activer le Drag & Drop avancé ? (Bootstrap obligatoire)',
+        'tr_melis_cms_sites_site_dnd_render_mode_value_select_msg tooltip' => 'Sélectionnez si vous souhaitez utiliser la version avancée du Drag & Drop. Attention, celle-ci requiert Bootstrap pour fonctionner.',
 
         #SITE TRANSLATION TAB
         'tr_melis_site_translation_name' => 'Traduction du site Melis',
