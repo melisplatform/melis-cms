@@ -219,6 +219,9 @@ var melisDragnDrop = (function ($, window) {
 				$(".melis-dragdropzone").parents(".no-content").removeClass("no-content").addClass("content-added");
 
 				melisPluginEdition.pluginDetector();
+
+				// remove empty row inside .melis-dragdropzone
+				removeEmptyRow();
 			},
 			update: function (event, ui) {
 				$(".ui-sortable-helper").remove();
@@ -243,6 +246,14 @@ var melisDragnDrop = (function ($, window) {
 				setPluginWidth(ui);
 			},
 		});
+	}
+
+	// remove empty row inside .melis-dragdropzone
+	function removeEmptyRow() {
+		const $col = $(".melis-dragdropzone").find("> .row .col-12");
+			if ($col.is(":empty")) {
+				$col.closest(".row").remove();
+			}
 	}
 
 	setDragDropZone();
@@ -703,7 +714,6 @@ var melisDragnDrop = (function ($, window) {
 					stickyHead.height() -
 					widgetHeight.height() -
 					15;
-				//console.log("dndHeight: ", dndHeight);
 
 				$(".melis-cms-dnd-box").height(dndHeight);
 			} else {

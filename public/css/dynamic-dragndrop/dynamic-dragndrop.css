@@ -599,7 +599,7 @@ button.column-icon .icon-col-bg {
     -webkit-box-shadow: 0 0 0 1px transparent;
     -moz-box-shadow: 0 0 0 1px transparent;
     -ms-box-shadow: 0 0 0 1px transparent;
-    /* z-index: 999999; */
+    z-index: 999999;
 }
 .dnd-layout-wrapper:hover .m-plugin-sub-tools div {
     opacity: 1;

@@ -44,7 +44,6 @@ $(function () {
             // var tempLoader =
                 // '<div id="loader" class="overlay-loader"><img class="loader-icon spinning-cog" src="/MelisCore/assets/images/cog12.svg" data-cog="cog12"></div>';
 
-
             let dndContainer = $(this).closest(".melis-dragdropzone-container");
 
             let pluginReferer = dndContainer.data("pluginReferer");
@@ -61,84 +60,89 @@ $(function () {
                 dndTpl,
                 melisSite,
             })
-                .done((res) => {
-                    if (res.success) {
-                        dndContainer.find("#loader").remove();
-
-                        let newLayout = $(res.html);
-                        let newLayoutDnd = newLayout.find(".melis-dragdropzone");
-                        let newLayoutDndCtr = newLayoutDnd.length;
-
-                        newLayout.data("pluginReferer", pluginReferer);
-
-                        // if (dndCtr != newLayoutDndCtr) {
-                        if (dndCtr == 1) {
-                            let dndContent = dndContainer.find(".melis-dragdropzone");
-
-                            $.each(dndContent.children(), (i, v) => {
-                                // filter dnd with contents
-                                if ($(v).text().trim() !== "") {
-                                    // move and append to new dnd layout
-                                    $(v).appendTo(newLayout.find(".melis-dragdropzone:first"));
-                                }
-                            });
-
-                            // replacing new layout
-                            $(
-                                "body .melis-dragdropzone-container[data-plugin-id='" +
-                                    dndId +
-                                    "']"
-                            ).replaceWith(newLayout);
-                        } else {
-                            // comparing dnds to the new dnd layout
-                            $.each(dndLayout, (i, v) => {
-                                // checking if the plugin id not exist in the new layout
-                                let pluginExist = newLayout.find(
-                                    "div.melis-dragdropzone[data-plugin-id='" +
-                                        $(v).data("pluginId") +
-                                        "']"
-                                );
-                                // all plugin no exist in the new layout will append to the last dnd in the new layout
-                                if (!pluginExist.length) {
-                                    let dndContents = $(v).children();
-
-                                    $.each(dndContents, (di, dv) => {
-                                        // filter dnd with contents
-                                        if ($(dv).text().trim() !== "") {
-                                            // move and append to new dnd layout
-                                            $(dv).appendTo(newLayout.find(".melis-dragdropzone:last"));
-                                        }
-                                    });
-                                }
-                            });
-
-                            // replacing new layout
-                            $(
-                                "body .melis-dragdropzone-container[data-plugin-id='" +
-                                    dndId +
-                                    "']"
-                            ).replaceWith(newLayout);
-                        }
-                        // }
-
-                        melisPluginEdition.moveResponsiveClass();
-                        melisPluginEdition.pluginDetector();
-                        melisPluginEdition.initResizable();
-                        melisDragnDrop.setDragDropZone();
-
-                        // added to update iframe height
-                        melisPluginEdition.calcFrameHeight();
-
-                        // save change to session
-                        melisPluginEdition.sendDragnDropList(dndId, pageId);
-
-                        // re-position .dnd-layout-buttons after remove dnd
-                        topPositionLayoutButtons();
-                    }
-                })
-                .always(() => {
+            .done((res) => {
+                if (res.success) {
                     dndContainer.find("#loader").remove();
-                });
+
+                    let newLayout = $(res.html);
+                    let newLayoutDnd = newLayout.find(".melis-dragdropzone");
+                    let newLayoutDndCtr = newLayoutDnd.length;
+
+                    newLayout.data("pluginReferer", pluginReferer);
+
+                    // if (dndCtr != newLayoutDndCtr) {
+                    if (dndCtr == 1) {
+                        let dndContent = dndContainer.find(".melis-dragdropzone");
+
+                        $.each(dndContent.children(), (i, v) => {
+                            // filter dnd with contents
+                            if ($(v).text().trim() !== "") {
+                                // move and append to new dnd layout
+                                $(v).appendTo(newLayout.find(".melis-dragdropzone:first"));
+                            }
+                        });
+
+                        // replacing new layout
+                        $(
+                            "body .melis-dragdropzone-container[data-plugin-id='" +
+                                dndId +
+                                "']"
+                        ).replaceWith(newLayout);
+                    } else {
+                        // comparing dnds to the new dnd layout
+                        $.each(dndLayout, (i, v) => {
+                            // checking if the plugin id not exist in the new layout
+                            let pluginExist = newLayout.find(
+                                "div.melis-dragdropzone[data-plugin-id='" +
+                                    $(v).data("pluginId") +
+                                    "']"
+                            );
+                            // all plugin no exist in the new layout will append to the last dnd in the new layout
+                            if (!pluginExist.length) {
+                                let dndContents = $(v).children();
+
+                                $.each(dndContents, (di, dv) => {
+                                    // filter dnd with contents
+                                    if ($(dv).text().trim() !== "") {
+                                        // move and append to new dnd layout
+                                        $(dv).appendTo(newLayout.find(".melis-dragdropzone:last"));
+                                    }
+                                });
+                            }
+                        });
+
+                        // replacing new layout
+                        $(
+                            "body .melis-dragdropzone-container[data-plugin-id='" +
+                                dndId +
+                                "']"
+                        ).replaceWith(newLayout);
+                    }
+                    // }
+
+                    melisPluginEdition.moveResponsiveClass();
+                    melisPluginEdition.pluginDetector();
+                    melisPluginEdition.initResizable();
+                    melisDragnDrop.setDragDropZone();
+
+                    // added to update iframe height
+                    melisPluginEdition.calcFrameHeight();
+
+                    // save change to session
+                    melisPluginEdition.sendDragnDropList(dndId, pageId);
+
+                    // re-position .dnd-layout-buttons after remove dnd
+                    topPositionLayoutButtons();
+
+                    // reinitialize tinymce
+                    melistagHTML_init();
+                    melistagTEXTAREA_init();
+                    melistagMEDIA_init();
+                }
+            })
+            .always(() => {
+                dndContainer.find("#loader").remove();
+            });
         });
 
 		// add new d&d

@@ -18,7 +18,7 @@ var melisPluginEdition = (function($, window) {
     $_body.on("click", ".m-trash-handle", removePlugins);
 
     $_body.on("focus", ".melis-ui-outlined .melis-editable", function() {
-        $(this).closest(".melis-ui-outlined").addClass("melis-focus");
+        $(this).closest(".melis-ui-outlined").addClass("melis-focus");        
     });
 
     $_body.on("blur", ".melis-ui-outlined.melis-focus", function() {
@@ -157,10 +157,6 @@ var melisPluginEdition = (function($, window) {
                 }
         });
     }
-
-    // jQuery last dragdropzone for crossbrowser
-    //$("div.melis-dragdropzone").last().css({"margin-bottom": "35px"});
-    //$("div.dnd-layout-wrapper").last().css("margin-bottom", "35px");
 
     // Saving Plugin
     function savePluginUpdate(data, siteModule){
@@ -558,7 +554,6 @@ var melisPluginEdition = (function($, window) {
 
         return result;
     }
-
 
     /* function getDNDList(dndContainer, pageId)
     {
