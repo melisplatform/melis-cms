@@ -795,11 +795,18 @@ $(function () {
 	var $pluginToolsBox = $(".melis-plugin-tools-box"),
 		$optionsHandle = $pluginToolsBox.find(
 			".m-plugin-sub-tools .m-options-handle"
+		),
+		$pluginSubTools = $pluginToolsBox.find(
+			".m-plugin-sub-tools"
 		);
 
-	if ($optionsHandle.length) {
-		$optionsHandle.closest(".melis-plugin-tools-box").removeClass("d-none");
-	} else {
-		$pluginToolsBox.addClass("d-none");
-	}
+		if ($optionsHandle.length) {
+			$optionsHandle.closest(".melis-plugin-tools-box").removeClass("d-none");
+		} else {
+			if ($pluginSubTools.is(":empty")) {
+				$pluginToolsBox.addClass("d-none");
+
+				console.log(`.melis-plugin-tools-box added .d-none if .m-plugin-sub-tools is not empty !!!`);
+			}
+		}
 });
