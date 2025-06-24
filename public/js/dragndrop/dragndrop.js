@@ -803,8 +803,8 @@ $(function () {
 		if ($optionsHandle.length) {
 			$optionsHandle.closest(".melis-plugin-tools-box").removeClass("d-none");
 		} else {
-			console.log(`String.prototype.trim($pluginSubTools.html()) === "": `, String.prototype.trim($pluginSubTools.html()) === "");
-			if (String.prototype.trim($pluginSubTools.html()) === "") {
+			console.log(`$pluginSubTools.html().trim() === "": `, $pluginSubTools.html().trim() === "");
+			if ($pluginSubTools.html().trim() === "") {
 				$pluginToolsBox.addClass("d-none");
 			}
 			else {
