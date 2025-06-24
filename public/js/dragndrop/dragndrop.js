@@ -803,10 +803,8 @@ $(function () {
 		if ($optionsHandle.length) {
 			$optionsHandle.closest(".melis-plugin-tools-box").removeClass("d-none");
 		} else {
-			if ($pluginSubTools.is(":empty")) {
+			if (String.prototype.trim($pluginSubTools.html()) === "") {
 				$pluginToolsBox.addClass("d-none");
-
-				console.log(`.melis-plugin-tools-box added .d-none if .m-plugin-sub-tools is not empty !!!`);
 			}
 		}
 });
