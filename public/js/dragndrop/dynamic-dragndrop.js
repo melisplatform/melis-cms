@@ -135,9 +135,9 @@ $(function () {
                     topPositionLayoutButtons();
 
                     // reinitialize tinymce
-                    melistagHTML_init();
-                    melistagTEXTAREA_init();
-                    melistagMEDIA_init();
+                    waitForTagHtmlInit();
+                    waitForTagTextareaInit();
+                    waitForTagMediaInit();
                 }
             })
             .always(() => {
@@ -235,7 +235,7 @@ $(function () {
 			.always(() => {
 				// dndContainer.find("#loader").remove();
 			});
-		})
+		});
 
 		// remove d&d
 		$body.on("click", ".dnd-remove-button", function () {
@@ -340,6 +340,30 @@ $(function () {
                     topPositionLayoutButtons();
                 }
         });
+
+        function waitForTagTextareaInit(retries = 10) {
+            if (typeof melistagTEXTAREA_init === "function") {
+                melistagTEXTAREA_init();
+            } else if (retries > 0) {
+                setTimeout(() => waitForTagTextareaInit(retries - 1), 100);
+            }
+        }
+
+        function waitForTagHtmlInit(retries = 10) {
+            if (typeof melistagHTML_init === "function") {
+                melistagHTML_init();
+            } else if (retries > 0) {
+                setTimeout(() => waitForTagHtmlInit(retries - 1), 100);
+            }
+        }
+
+        function waitForTagMediaInit(retries = 10) {
+            if (typeof melistagMEDIA_init === "function") {
+                melistagMEDIA_init();
+            } else if (retries > 0) {
+                setTimeout(() => waitForTagMediaInit(retries - 1), 100);
+            }
+        }
 
         function mouseEnterDndLayoutButtons($element) {
             const $el = $element;
