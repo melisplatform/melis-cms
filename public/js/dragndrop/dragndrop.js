@@ -231,7 +231,10 @@ var melisDragnDrop = (function ($, window) {
       			$(this).addClass("highlight");
 
 				setPluginWidth(ui);
-				melisPluginEdition.pluginDetector();
+
+				if (typeof melisPluginEdition !== "undefined") {
+					melisPluginEdition.pluginDetector();
+				}
 			},
 			out: function(event, ui) {
 				$(this).removeClass("highlight");
@@ -613,7 +616,10 @@ var melisDragnDrop = (function ($, window) {
 							},
 							stop: function (event, ui) {
 								$(".melis-dragdropzone").removeClass("highlight");
-								melisPluginEdition.pluginDetector();
+
+								if (typeof melisPluginEdition !== "undefined") {
+									melisPluginEdition.pluginDetector();
+								}
 							},
 						});
 
@@ -803,10 +809,9 @@ $(function () {
 		if ($optionsHandle.length) {
 			$optionsHandle.closest(".melis-plugin-tools-box").removeClass("d-none");
 		} else {
-			if ($pluginSubTools.html().trim() === "") {
+			if (!$pluginSubTools.length || $pluginSubTools.html().trim() === "") {
 				$pluginToolsBox.addClass("d-none");
-			}
-			else {
+			} else {
 				$pluginToolsBox.removeClass("d-none");
 			}
 		}
