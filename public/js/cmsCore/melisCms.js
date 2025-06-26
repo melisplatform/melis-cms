@@ -693,21 +693,35 @@ var melisCms = (function() {
 		$("#" + id + "_id_meliscms_page .overlay-switch").remove();
 	}
 
+	function waitForIframeReady($iframe, callback) {
+		const interval = setInterval(() => {
+			try {
+				const doc = $iframe[0].contentDocument || $iframe[0].contentWindow.document;
+					if (doc && doc.readyState === "complete") {
+						clearInterval(interval);
+						callback();
+					}
+			} catch (e) {
+				// ignore cross-origin access errors
+			}
+		}, 1000);
+	}
+
 	// IFRAME HEIGHT CONTROLS (for onload, displaySettings & sidebar collapse)
 	function iframeLoad(id) {
 		let $melisIframe = $("#" + id + "_id_meliscms_page").find(".melis-iframe");
-			$melisIframe.on("load", (e) => {
+			waitForIframeReady($melisIframe, () => {
 				let setTimeoutIframe = setTimeout(() => {
-					let $iframe = $(e.currentTarget);
-						if ($iframe.length && $iframe[0].contentDocument.body) {
-							let height 	= $iframe[0].contentDocument.body.scrollHeight;
-
-								$iframe.css("height", height);
-								$iframe.css("min-height", "700px");
+					let	iframeBody = $melisIframe[0].contentDocument.body;
+						if (iframeBody) {
+							let height 	= $melisIframe[0].contentDocument.body.scrollHeight;
+								if (height > 0) {
+									$melisIframe.css("height", height);
+								}
 
 								clearTimeout(setTimeoutIframe);
 						}
-				}, 2000);
+				}, 3000);
 			});
 
 			// Activating page edition button action
@@ -839,12 +853,14 @@ var melisCms = (function() {
 						let $iFrame = $(v),
 							height 	= $iFrame.contents()[0].body.scrollHeight;
 							
-							$iFrame.css("height", height);
+							if(height > 0) {
+								$iFrame.css("height", height);
+							}
 					});
 
 					clearInterval(setIntervalIframes);
 				}
-			}, 500);
+			}, 1000);
 	}
 
 	// WINDOW SCROLL FUNCTIONALITIES ========================================================================================================
