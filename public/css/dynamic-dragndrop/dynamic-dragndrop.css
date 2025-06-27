@@ -342,6 +342,10 @@ button.column-icon:hover .icon-col-bg {
 button.column-icon .icon-col-bg {
     border-radius: 3px;
 }
+.dnd-plugins-content {
+    position: relative;
+    z-index: 21;
+}
 .dnd-layout-indicator .column-icon {
     background-color: transparent;
     border-color: transparent;
