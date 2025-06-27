@@ -518,6 +518,9 @@ button.column-icon .icon-col-bg {
 .dnd-layout-wrapper .melis-dragdropzone .melis-plugin-tools-box {
     height: auto;
 }
+.dnd-layout-wrapper .melis-dragdropzone .melis-plugin-tools-box.height-auto .m-plugin-sub-tools {
+    margin-left: 0;
+}
 .melis-dragdropzone.no-content {
     background: rgba(255, 245, 245, 0.8);
     bottom: 0;

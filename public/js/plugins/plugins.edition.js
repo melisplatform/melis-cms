@@ -24,6 +24,46 @@ var melisPluginEdition = (function($, window) {
     $_body.on("blur", ".melis-ui-outlined.melis-focus", function() {
         $(this).removeClass("melis-focus");
     });
+
+    $_body.on("mouseenter", ".melis-editable", function() {
+        let $editableEnter = $(this),
+            $toolsBoxEnter = $editableEnter.closest(".melis-ui-outlined").find(".melis-plugin-tools-box");
+
+            if($toolsBoxEnter.length) {
+                $toolsBoxEnter.addClass("height-auto");
+                $toolsBoxEnter.css("top", -$toolsBoxEnter.outerHeight());
+            }
+    }).on("mouseleave", ".melis-editable", function() {
+        let $editableLeave = $(this),
+            $toolsBoxLeave = $editableLeave.closest(".melis-ui-outlined").find(".melis-plugin-tools-box");
+
+            if($toolsBoxLeave.length) {
+                $toolsBoxLeave.removeClass("height-auto");
+                //$toolsBoxLeave.css("top", -40); // revert to default top value
+            }
+    });
+
+    $_body.on("mouseenter", ".melis-plugin-tools-box", function() {
+        let $toolsBoxHeightAutoEnter = $(this),
+            height = $toolsBoxHeightAutoEnter.outerHeight();
+
+            if ($toolsBoxHeightAutoEnter.length) {
+                if (!$toolsBoxHeightAutoEnter.hasClass("height-auto")) {
+                    $toolsBoxHeightAutoEnter.addClass("height-auto");
+                }
+                
+                $toolsBoxHeightAutoEnter.css("top", -height);
+            }
+    }).on("mouseleave", ".melis-plugin-tools-box", function() {
+        let $toolsBoxHeightAutoLeave = $(this);
+            if ($toolsBoxHeightAutoLeave.length) {
+                if ($toolsBoxHeightAutoLeave.hasClass("height-auto")) {
+                    $toolsBoxHeightAutoLeave.removeClass("height-auto");
+                }
+                $toolsBoxHeightAutoLeave.css("margin-left", 0);
+                //$toolsBoxHeightAutoLeave.css("top", -40); // revert to default top value
+            }
+    });
     
     /* 
      * Checking parent body events handler to avoid multiple events of the button
