@@ -418,6 +418,9 @@ button.column-icon .icon-col-bg {
     outline: 1px dashed #ce5459;
     padding: 0.5rem 0;
     margin: 0 0.5rem;
+
+    position: relative;
+    z-index: 1;
 }
 .dnd-plugins-content .row:last-child > .melis-dragdropzone-container > .dnd-layout-wrapper {
     margin-bottom: 15px;
