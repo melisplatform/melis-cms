@@ -342,16 +342,11 @@ button.column-icon:hover .icon-col-bg {
 button.column-icon .icon-col-bg {
     border-radius: 3px;
 }
-.dnd-plugins-content {
-    position: relative;
-    z-index: 21;
-}
 .dnd-layout-indicator .column-icon {
     background-color: transparent;
     border-color: transparent;
     width: 25px;
     height: 25px;
-    cursor: default;
 }
 .dnd-layout-indicator .column-icon .icon-container {
     margin-top: -12px;
@@ -381,9 +376,9 @@ button.column-icon .icon-col-bg {
     position: relative;
 }
 .dnd-layout-buttons {
-    /* top: -56px; */
     top: 0;
-    left: 7px;
+    /* left: 7px; */
+    left: 0;
 
     padding: 4px 0 4px 8px;
     border-radius: 3px;
@@ -447,7 +442,8 @@ button.column-icon .icon-col-bg {
     opacity: 0;
     z-index: 9999;
     top: -5px !important;
-    left: 5px !important;
+    /* left: 5px !important; */
+    left: -8px !important;
 
     transform: translate3d(-100%, 0, 0);
     -webkit-transform: translate3d(-100%, 0, 0);
@@ -501,7 +497,6 @@ button.column-icon .icon-col-bg {
     vertical-align: middle;
     width: auto;
 }
-
 .dnd-layout-wrapper .dnd-layout-buttons {
     opacity: 0;
     position: absolute;
@@ -618,7 +613,7 @@ button.column-icon .icon-col-bg {
     -moz-transform: translate3d(0, 0, 0);
     -ms-transform: translate3d(0, 0, 0);
 }
-.dnd-layout-wrapper:hover > .melis-plugin-indicator {
+.dnd-layout-wrapper:hover > .dnd-layout-indicator.melis-plugin-indicator {
     opacity: 1;
 
     transform: translate3d(0, 0, 0);
@@ -793,4 +788,7 @@ button:disabled.dnd-remove-button .fa-trash {
 }
 .melis-dragdropzone-container .melis-ui-outlined {
     max-width: 100%;
+}
+.melis-plugin-indicator {
+    left: 20px;
 }

@@ -9,30 +9,27 @@ $(function () {
             .on("mouseleave", ".melis-dragdropzone-container > .dnd-layout-wrapper", function() {
                 $(this).find(".dnd-layout-indicator").css("opacity", 0);
                 $(this).find(".dnd-layout-indicator").css("pointer-events", "none");
-
+                
                 //mouseLeaveDndLayoutButtons( $(this).find(".dnd-layout-buttons") );
             });
 
         $body
             .on("mouseenter", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator", function() {
-                $(this).next(".dnd-layout-buttons").css("opacity", 1);
-                $(this).next(".dnd-layout-buttons").css("pointer-events", "auto");
+                /* $(this).next(".dnd-layout-buttons").css("opacity", 1);
+                $(this).next(".dnd-layout-buttons").css("pointer-events", "auto"); */
 
-                //console.log(`.dnd-layout-indicator mouseenter !!!`);
-                mouseEnterDndLayoutButtons( $(this).next(".dnd-layout-buttons") );
+                mouseEnterDndLayoutButtons($(this).next(".dnd-layout-buttons"));
             })
             .on("mouseleave", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator", function() {
-
-                //console.log(`.dnd-layout-indicator mouseleave !!!`);
-                mouseLeaveDndLayoutButtons( $(this).next(".dnd-layout-buttons") );
+                mouseLeaveDndLayoutButtons($(this).next(".dnd-layout-buttons"));
             });
 
         $body
             .on("mouseenter", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-buttons", function() {
-                mouseEnterDndLayoutButtons($(this) );
+                mouseEnterDndLayoutButtons($(this));
             })
             .on("mouseleave", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-buttons", function() {
-                mouseLeaveDndLayoutButtons( $(this) );
+                mouseLeaveDndLayoutButtons($(this));
             });
 
         // .dnd-layout-buttons
@@ -378,6 +375,9 @@ $(function () {
                 $el.css("opacity", 1);
                 $el.css("pointer-events", "auto");
                 // $el.show();
+
+                // connected to dynamic-dragndrop.css .melis-dragdropzone-container > .dnd-layout-wrapper
+                $el.closest(".dnd-layout-wrapper").css("z-index", "unset"); // so that .dnd-layout-buttons are clickable
         }
 
         function mouseLeaveDndLayoutButtons($element) {
@@ -388,6 +388,10 @@ $(function () {
                     //console.log("3s passed, fading out");
                     $el.css("opacity", 0);
                     $el.css("pointer-events", "none");
+
+                    // connected to dynamic-dragndrop.css .melis-dragdropzone-container > .dnd-layout-wrapper
+                    $el.closest(".dnd-layout-wrapper").removeAttr("style");
+
                     //$el.hide();
                     $el.removeData("fadeTimeout");
                 }, 3000);
