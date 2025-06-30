@@ -448,7 +448,8 @@ body {
     padding: 4px 12px;
     width: auto;
     height: 40px;
-    left: -1px;
+    /* left: -1px; */
+    left: 12px;
     border-radius: 2px;
     opacity: 0;
     transition-property: opacity;

@@ -18,7 +18,7 @@ var melisPluginEdition = (function($, window) {
     $_body.on("click", ".m-trash-handle", removePlugins);
 
     $_body.on("focus", ".melis-ui-outlined .melis-editable", function() {
-        $(this).closest(".melis-ui-outlined").addClass("melis-focus");        
+        $(this).closest(".melis-ui-outlined").addClass("melis-focus");
     });
 
     $_body.on("blur", ".melis-ui-outlined.melis-focus", function() {
@@ -26,8 +26,8 @@ var melisPluginEdition = (function($, window) {
     });
 
     $_body.on("mouseenter", ".melis-editable", function() {
-        let $editableEnter = $(this),
-            $toolsBoxEnter = $editableEnter.closest(".melis-ui-outlined").find(".melis-plugin-tools-box");
+        let $editableEnter  = $(this),
+            $toolsBoxEnter  = $editableEnter.closest(".melis-ui-outlined").find(".melis-plugin-tools-box");
 
             if($toolsBoxEnter.length) {
                 $toolsBoxEnter.addClass("height-auto");
