@@ -791,6 +791,6 @@ button:disabled.dnd-remove-button .fa-trash {
 .melis-plugin-indicator {
     left: 20px;
 }
-.dnd-layout-wrapper .row .col-12:first-child .melis-ui-outlined:first-child .melis-plugin-tools-box {
+.dnd-layout-wrapper .row .col-12:first-child .dnd-layout-wrapper .melis-dragdropzone .melis-ui-outlined:first-child .melis-plugin-tools-box {
     left: 12px;
 }
