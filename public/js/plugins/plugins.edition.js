@@ -18,7 +18,27 @@ var melisPluginEdition = (function($, window) {
     $_body.on("click", ".m-trash-handle", removePlugins);
 
     $_body.on("focus", ".melis-ui-outlined .melis-editable", function() {
-        $(this).closest(".melis-ui-outlined").addClass("melis-focus");
+        let $this               = $(this);
+            $melisUiOutlined    = $this.closest(".melis-ui-outlined");
+
+            $melisUiOutlined.addClass("melis-focus");
+    });
+
+    $_body.on("mouseover", ".melis-editable", function() {
+        let $thisOver               = $(this),
+            $dndLayoutWrapperOver   = $thisOver.closest(".dnd-layout-wrapper");
+            $dndLayoutIndiOver      = $dndLayoutWrapperOver.find(".dnd-layout-indicator"),
+            $firstColOver           = $thisOver.parents(".dnd-layout-wrapper").last().find(".row .col-12").first(),
+            $zoneOver               = $firstColOver.find(".melis-dragdropzone"),
+            $melisUiOutlinedOver    = $zoneOver.find(".melis-ui-outlined").first(),
+            $toolsBoxOver           = $melisUiOutlinedOver.find(".melis-plugin-tools-box");
+
+            setTimeout(() => {
+                if($dndLayoutIndiOver.css("opacity") === "1") {
+                    $toolsBoxOver.css("left", "12px");
+                }
+            }, 500);
+
     });
 
     $_body.on("blur", ".melis-ui-outlined.melis-focus", function() {

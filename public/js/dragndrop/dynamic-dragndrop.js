@@ -15,13 +15,26 @@ $(function () {
 
         $body
             .on("mouseenter", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator", function() {
-                /* $(this).next(".dnd-layout-buttons").css("opacity", 1);
-                $(this).next(".dnd-layout-buttons").css("pointer-events", "auto"); */
+                let $thisEnter              = $(this),
+                    $dndLayoutWrapperEnter  = $thisEnter.closest(".dnd-layout-wrapper"),
+                    $zoneEnter              = $dndLayoutWrapperEnter.find(".melis-dragdropzone"),
+                    $uiOutlinedFirstEnter   = $zoneEnter.find(".melis-ui-outlined").first(),
+                    $toolBoxEnter           = $uiOutlinedFirstEnter.find(".melis-plugin-tools-box");
 
-                mouseEnterDndLayoutButtons($(this).next(".dnd-layout-buttons"));
+                    mouseEnterDndLayoutButtons($thisEnter.next(".dnd-layout-buttons"));
+
+                    //$toolBoxEnter.css("left", "12px");
             })
             .on("mouseleave", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator", function() {
-                mouseLeaveDndLayoutButtons($(this).next(".dnd-layout-buttons"));
+                let $thisLeave              = $(this),
+                    $dndLayoutWrapperLeave  = $thisLeave.closest(".dnd-layout-wrapper"),
+                    $zoneLeave              = $dndLayoutWrapperLeave.find(".melis-dragdropzone"),
+                    $uiOutlinedFirstLeave   = $zoneLeave.find(".melis-ui-outlined").first(),
+                    $toolBoxLeave           = $uiOutlinedFirstLeave.find(".melis-plugin-tools-box");
+
+                    mouseLeaveDndLayoutButtons($thisLeave.next(".dnd-layout-buttons"));
+
+                    //$toolBoxLeave.css("left", 0);
             });
 
         $body

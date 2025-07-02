@@ -237,10 +237,12 @@ var melisDragnDrop = (function ($, window) {
 				}
 			},
 			out: function(event, ui) {
-				$(this).removeClass("highlight");
+				let $this = $(this);
 
-				// related on updated dragdropzone icon
-				$(".melis-dragdropzone").parents(".content-added").removeClass("content-added").addClass("no-content");
+					$this.removeClass("highlight");
+
+					// related on updated dragdropzone icon
+					$this.parents(".content-added").removeClass("content-added").addClass("no-content");
 			},
 			stop: function(event, ui) {
 				$("body .melis-dragdropzone").removeClass("highlight");
