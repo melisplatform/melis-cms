@@ -1,5 +1,6 @@
 $(function () {
-	let $body = $("body");
+	let $body = $("body"),
+        indicatorHoverTimeout;
 
         $body
             .on("mouseenter", ".melis-dragdropzone-container > .dnd-layout-wrapper", function() {
@@ -15,6 +16,8 @@ $(function () {
 
         $body
             .on("mouseenter", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator", function() {
+                clearTimeout(indicatorHoverTimeout);
+
                 let $thisEnter              = $(this),
                     $dndLayoutWrapperEnter  = $thisEnter.closest(".dnd-layout-wrapper"),
                     $zoneEnter              = $dndLayoutWrapperEnter.find(".melis-dragdropzone"),
@@ -23,18 +26,20 @@ $(function () {
 
                     mouseEnterDndLayoutButtons($thisEnter.next(".dnd-layout-buttons"));
 
-                    //$toolBoxEnter.css("left", "12px");
+                    $thisEnter.addClass("hovering");
             })
             .on("mouseleave", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator", function() {
-                let $thisLeave              = $(this),
-                    $dndLayoutWrapperLeave  = $thisLeave.closest(".dnd-layout-wrapper"),
-                    $zoneLeave              = $dndLayoutWrapperLeave.find(".melis-dragdropzone"),
-                    $uiOutlinedFirstLeave   = $zoneLeave.find(".melis-ui-outlined").first(),
-                    $toolBoxLeave           = $uiOutlinedFirstLeave.find(".melis-plugin-tools-box");
+                indicatorHoverTimeout = setTimeout(() => {
+                    let $thisLeave              = $(this),
+                        $dndLayoutWrapperLeave  = $thisLeave.closest(".dnd-layout-wrapper"),
+                        $zoneLeave              = $dndLayoutWrapperLeave.find(".melis-dragdropzone"),
+                        $uiOutlinedFirstLeave   = $zoneLeave.find(".melis-ui-outlined").first(),
+                        $toolBoxLeave           = $uiOutlinedFirstLeave.find(".melis-plugin-tools-box");
 
-                    mouseLeaveDndLayoutButtons($thisLeave.next(".dnd-layout-buttons"));
+                        mouseLeaveDndLayoutButtons($thisLeave.next(".dnd-layout-buttons"));
 
-                    //$toolBoxLeave.css("left", 0);
+                        $thisLeave.removeClass("hovering");
+                }, 100); // delay for a probably prevents instant flicker
             });
 
         $body

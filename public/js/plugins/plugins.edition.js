@@ -8,7 +8,8 @@ var melisPluginEdition = (function($, window) {
         fromdragdropzone        = window.fromdragdropzone,
         iframe                  = window.parent.$("#"+parent.activeTabId).find(".melis-iframe"),
         $_body                  = $("body"), // inside iframe's body tag
-        pluginHardcodedConfig;
+        pluginHardcodedConfig,
+        editableHoverTimeout;
 
     /* ==================================
             Binding Events
@@ -18,7 +19,7 @@ var melisPluginEdition = (function($, window) {
     $_body.on("click", ".m-trash-handle", removePlugins);
 
     $_body.on("focus", ".melis-ui-outlined .melis-editable", function() {
-        let $this               = $(this);
+        let $this               = $(this),
             $melisUiOutlined    = $this.closest(".melis-ui-outlined");
 
             $melisUiOutlined.addClass("melis-focus");
@@ -38,7 +39,6 @@ var melisPluginEdition = (function($, window) {
                     $toolsBoxOver.css("left", "12px");
                 }
             }, 500);
-
     });
 
     $_body.on("blur", ".melis-ui-outlined.melis-focus", function() {
@@ -46,6 +46,8 @@ var melisPluginEdition = (function($, window) {
     });
 
     $_body.on("mouseenter", ".melis-editable", function() {
+        clearTimeout(editableHoverTimeout);
+
         let $editableEnter  = $(this),
             $toolsBoxEnter  = $editableEnter.closest(".melis-ui-outlined").find(".melis-plugin-tools-box");
 
@@ -53,14 +55,20 @@ var melisPluginEdition = (function($, window) {
                 $toolsBoxEnter.addClass("height-auto");
                 $toolsBoxEnter.css("top", -$toolsBoxEnter.outerHeight());
             }
-    }).on("mouseleave", ".melis-editable", function() {
-        let $editableLeave = $(this),
-            $toolsBoxLeave = $editableLeave.closest(".melis-ui-outlined").find(".melis-plugin-tools-box");
 
-            if($toolsBoxLeave.length) {
-                $toolsBoxLeave.removeClass("height-auto");
-                //$toolsBoxLeave.css("top", -40); // revert to default top value
-            }
+            $editableEnter.addClass("hovering");
+    }).on("mouseleave", ".melis-editable", function() {
+        editableHoverTimeout = setTimeout(() => {
+            let $editableLeave = $(this),
+                $toolsBoxLeave = $editableLeave.closest(".melis-ui-outlined").find(".melis-plugin-tools-box");
+
+                if($toolsBoxLeave.length) {
+                    $toolsBoxLeave.removeClass("height-auto");
+                    //$toolsBoxLeave.css("top", -40); // revert to default top value
+                }
+
+                $editableLeave.removeClass("hovering");
+        }, 100); // delay for a probably prevents instant flicker
     });
 
     $_body.on("mouseenter", ".melis-plugin-tools-box", function() {
