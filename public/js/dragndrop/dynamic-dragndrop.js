@@ -39,7 +39,7 @@ $(function () {
                         mouseLeaveDndLayoutButtons($thisLeave.next(".dnd-layout-buttons"));
 
                         $thisLeave.removeClass("hovering");
-                }, 50); // delay for a probably prevents instant flicker
+                }, 10); // delay for a probably prevents instant flicker
             });
 
         $body

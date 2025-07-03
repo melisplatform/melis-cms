@@ -68,7 +68,7 @@ var melisPluginEdition = (function($, window) {
                 }
 
                 $editableLeave.removeClass("hovering");
-        }, 50); // delay for a probably prevents instant flicker
+        }, 10); // delay for a probably prevents instant flicker
     });
 
     $_body.on("mouseenter", ".melis-plugin-tools-box", function() {
