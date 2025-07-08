@@ -16,8 +16,7 @@ $(function () {
 
         $body
             .on("mouseenter", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator", function() {
-                clearTimeout(indicatorHoverTimeout);
-
+                // clearTimeout(indicatorHoverTimeout);
                 let $thisEnter              = $(this),
                     $dndLayoutWrapperEnter  = $thisEnter.closest(".dnd-layout-wrapper"),
                     $zoneEnter              = $dndLayoutWrapperEnter.find(".melis-dragdropzone"),
@@ -26,9 +25,10 @@ $(function () {
 
                     mouseEnterDndLayoutButtons($thisEnter.next(".dnd-layout-buttons"));
 
-                    $thisEnter.addClass("hovering");
-            })
-            .on("mouseleave", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator", function() {
+                    // $thisEnter.addClass("hovering");
+            });
+            /* .on("mouseleave", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator", function() {
+                console.log(`.dnd-layout-indicator mouseleave !!!`);
                 indicatorHoverTimeout = setTimeout(() => {
                     let $thisLeave              = $(this),
                         $dndLayoutWrapperLeave  = $thisLeave.closest(".dnd-layout-wrapper"),
@@ -40,7 +40,7 @@ $(function () {
 
                         $thisLeave.removeClass("hovering");
                 }, 10); // delay for a probably prevents instant flicker
-            });
+            }); */
 
         $body
             .on("mouseenter", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-buttons", function() {
@@ -385,9 +385,10 @@ $(function () {
 
         function mouseEnterDndLayoutButtons($element) {
             const $el = $element;
-                console.log("mouseenter: cancel fade");
+                // console.log("mouseenter: cancel fade");
 
                 const timeoutId = $el.data("fadeTimeout");
+
                 if (timeoutId) {
                     clearTimeout(timeoutId);
                     $el.removeData("fadeTimeout");
@@ -403,15 +404,15 @@ $(function () {
 
         function mouseLeaveDndLayoutButtons($element) {
             const $el = $element;
-                console.log("mouseleave: starting 3s delay");
+                // console.log("mouseleave: starting 3s delay");
 
                 const timeoutId = setTimeout(() => {
-                    console.log("3s passed, fading out");
+                    // console.log("3s passed, fading out");
                     $el.css("opacity", 0);
                     $el.css("pointer-events", "none");
 
                     // connected to dynamic-dragndrop.css .melis-dragdropzone-container > .dnd-layout-wrapper
-                    $el.closest(".dnd-layout-wrapper").removeAttr("style");
+                    $el.closest(".dnd-layout-wrapper").attr("style", "");
 
                     //$el.hide();
                     $el.removeData("fadeTimeout");
