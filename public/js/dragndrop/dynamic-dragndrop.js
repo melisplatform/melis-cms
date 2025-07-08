@@ -149,6 +149,9 @@ $(function () {
                     // re-position .dnd-layout-buttons after remove dnd
                     topPositionLayoutButtons();
 
+                    // handle display remove arrow buttons with .fa .fa-ban icon
+                    handleDisplayRemoveArrowButtons();
+
                     // reinitialize tinymce
                     waitForTagHtmlInit();
                     waitForTagTextareaInit();
@@ -382,7 +385,7 @@ $(function () {
 
         function mouseEnterDndLayoutButtons($element) {
             const $el = $element;
-                //console.log("mouseenter: cancel fade");
+                console.log("mouseenter: cancel fade");
 
                 const timeoutId = $el.data("fadeTimeout");
                 if (timeoutId) {
@@ -400,10 +403,10 @@ $(function () {
 
         function mouseLeaveDndLayoutButtons($element) {
             const $el = $element;
-                //console.log("mouseleave: starting 3s delay");
+                console.log("mouseleave: starting 3s delay");
 
                 const timeoutId = setTimeout(() => {
-                    //console.log("3s passed, fading out");
+                    console.log("3s passed, fading out");
                     $el.css("opacity", 0);
                     $el.css("pointer-events", "none");
 
@@ -533,9 +536,7 @@ $(function () {
 
                             $dndRow.each((i, v) => {
                                 let $row = $(v);
-                                    //$row.find(".dnd-arrow-down").toggle(i !== $dndRow.length - 1);
 
-                                    //console.log(`$dndRow.length: `, $dndRow.length);
                                     if ($dndRow.length === 1) {
                                         // show/hide button based on position
                                         $row.find(".dnd-arrow-up").toggle(i !== 0);
@@ -576,9 +577,7 @@ window.topPositionLayoutButtons = function() {
                 pluginTitleBoxWidth     = $pluginTitleBox.outerWidth(),
                 $removeButton           = $subTools.find(".dnd-remove-button");
                 
-                $layoutButton.css("top", -(layoutButtonHeight - 4)); // - 4 to make sure it overlaps the .dnd-layout-buttons hoverable space
-
-                //$pluginTitleSubTools.css("height", layoutButtonHeight - 8); // 8 for padding top 4px and bottom 4px
+                $layoutButton.css("top", -layoutButtonHeight); // - 4 to make sure it overlaps the .dnd-layout-buttons hoverable space
 
                 // check .dnd-plugin-sub-tools width if .dnd-remove-button is present
                 if ($removeButton.length) {
@@ -642,6 +641,7 @@ function adjustLayoutButtonMargins() {
                 //console.log('All buttons are on a single line.');
                 $subTools.removeClass("layout-buttons-wrapped");
             }
+
         // for .dnd-layout-buttons top positioning
         topPositionLayoutButtons();
 }
