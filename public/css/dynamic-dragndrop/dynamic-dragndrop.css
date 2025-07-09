@@ -438,7 +438,7 @@ button.column-icon .icon-col-bg {
     z-index: 999;
 }
 .melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator {
-    background-color: transparent;
+    /* background-color: transparent; */
     opacity: 0;
     z-index: 9999;
     top: 0 !important;
@@ -487,10 +487,9 @@ button.column-icon .icon-col-bg {
     display: inline-block;
     height: 30px;
 }
-.dnd-layout-wrapper > .dnd-layout-buttons {
-    /* #e61c23 */
+/* .dnd-layout-wrapper > .dnd-layout-buttons {
     background-color: transparent;
-}
+} */
 .dnd-plugin-sub-tools {
     display: inline-block;
     vertical-align: middle;
