@@ -733,6 +733,8 @@ $(function() {
          */
         function processSiteModule() {
             var form = getSerializedForm("#step4form_module");
+            var form2 = getSerializedForm("#step4form_module_option");
+            form = form.concat(form2);
             $.each(form, function(i, v){
                 if(v.name == "create_sites_file"){
                     //we decide only to create a file if it is a new site
@@ -1418,6 +1420,26 @@ $(function() {
                 removeParentBodyPropStyle();
             }
         });
+
+    $body.on("change", "#siteprop_site_dnd_render_mode", function(){
+        var _this = $(this);
+        var origValue = _this.attr("data-value");
+        // if($(this).val() == "" || $(this).val() == undefined){
+        if(_this.val() != origValue){
+            melisCoreTool.confirm(
+                translations.tr_meliscore_common_yes,
+                translations.tr_meliscore_common_no,
+                translations.tr_meliscms_site_properties_dnd_mode_confirmation_title,
+                translations.tr_meliscms_site_properties_dnd_mode_confirmation_msg,
+                function() {
+
+                },
+                function() {
+                    _this.val(origValue);
+                }
+            );
+        }
+    });
 });
 
 window.sitesTableCallback = function() {

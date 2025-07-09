@@ -297,9 +297,11 @@ class SitesController extends MelisAbstractActionController
         $melisTool->setMelisToolKey(self::TOOL_INDEX, self::TOOL_KEY);
         //prepare the step4 forms
         $moduleForm = $melisTool->getForm('meliscms_tool_sites_modal_add_step4_form_module');
+        $moduleOptionForm = $melisTool->getForm('meliscms_tool_sites_modal_add_step4_form_module_option');
 
         $view = new ViewModel();
         $view->setVariable('step4_form_module', $moduleForm);
+        $view->setVariable('step4_form_module_option', $moduleOptionForm);
         $view->melisKey = $melisKey;
         return $view;
     }
@@ -616,6 +618,9 @@ class SitesController extends MelisAbstractActionController
                     $siteData['site_name'] = $siteName;
                 }
 
+                if(!empty($siteData['site_dnd_render_mode']))
+                    $siteData['site_dnd_render_mode'] = 'bootstrap';
+
                 /**
                  * Before proceeding to save the site
                  * check if it is a new site and
@@ -824,6 +829,29 @@ class SitesController extends MelisAbstractActionController
                     //clear cache
                     $this->clearSiteConfigCache($siteId);
                     /**
+                     * this will update sites pages xml
+                     */
+//                    if(!empty($sitePropData['site_id'])) {
+//                        $engineSiteSerice = $this->getServiceManager()->get('MelisEngineSiteService');
+//                        $dndRenderMode = $engineSiteSerice->getSiteDNDRenderMode($sitePropData['site_id']);
+//                        //if its empty, then its deactivated and site dnd is not already empty
+//                        if(empty($sitePropData['site_dnd_render_mode']) && !empty($dndRenderMode)) {
+//                            $pageService = $this->getServiceManager()->get('MelisEnginePage');
+//                            $treeService = $this->getServiceManager()->get('MelisEngineTree');
+//                            //get main page info
+//                            $mainpageInfo = (array)$pageService->getPageById(35);
+//                            if (empty($mainpageInfo))
+//                                $mainpageInfo = (array)$pageService->getPageById(35, 'saved');
+//
+////                          $childrenPages = $treeService->getAllPages($siteMainPageId);
+////                          $mainpageInfo['children'] = $childrenPages['children'] ?? [];
+//
+//                            $allPages = [$mainpageInfo];
+//
+//                            $this->updateSitePagesXml($allPages);
+//                        }
+//                    }
+                    /**
                      * if no error, execute the saving
                      */
                     $con->commit();
@@ -870,6 +898,33 @@ class SitesController extends MelisAbstractActionController
 
         return new JsonModel($response);
     }
+
+    /**
+     * @param $pages
+     */
+//    private function updateSitePagesXml($pages)
+//    {
+//        foreach($pages as $pageInfo){
+//            if(!empty($pageInfo['page_content'])) {
+////                $pageContent = simplexml_load_string($pageInfo['page_content']);
+//
+//                $dom = new \DOMDocument();
+//                $dom->loadXML($pageInfo['page_content']);
+//
+//
+//
+//                $updatedXml = $dom->saveXML($dom);
+//
+////                $pageTable->update([
+////                    'page_content' => $updatedXml
+////                ], 'page_id', $pageInfo['page_id']);
+//            }
+//
+//            if(!empty($pageInfo['children']))
+//                $this->updateSitePagesXml($pageInfo['children']);
+//
+//        }
+//    }
 
     /**
      * Function to delete site
@@ -962,6 +1017,10 @@ class SitesController extends MelisAbstractActionController
          * Check if there is data to be process
          */
         if(!empty($sitePropData)) {
+            //check if dnd zone mode is already apply, else make bootstrap as default css layout
+//            if(!isset($sitePropData['site_dnd_render_mode']))
+//                $sitePropData['site_dnd_render_mode'] = 'bootstrap';
+
             $form = $this->getTool()->getForm('meliscms_tool_sites_properties_form');
             $form->setData($sitePropData);
 

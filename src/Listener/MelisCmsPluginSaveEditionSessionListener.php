@@ -41,6 +41,10 @@ class MelisCmsPluginSaveEditionSessionListener extends MelisGeneralListener impl
         		$id         = isset($postValues['melisPluginId'])   ? $postValues['melisPluginId']   : null;
                 $fromResize = isset($postValues['resize']) ? $postValues['resize'] : null;
 
+
+        		if (empty($plugin) || empty($idPage) || empty($id))
+        		    return;
+
                 /**
                  * check if plugin is came from the mini template
                  * to get its original plugin name
@@ -52,9 +56,6 @@ class MelisCmsPluginSaveEditionSessionListener extends MelisGeneralListener impl
                     $plugin = $tplPlugin[0];
                 }
 
-        		if (empty($plugin) || empty($idPage) || empty($id))
-        		    return;
-        		    
         		$xml = '';
         		try  {
         		    $melisPlugin = $sm->get('ControllerPluginManager')->get($plugin);

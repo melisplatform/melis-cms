@@ -482,6 +482,10 @@
 		'tr_meliscms_delete_cms_plugin_modal_title' => 'Confirmation de suppression du plugin CMS',
 		'tr_meliscms_delete_cms_plugin_modal_content' => 'Êtes-vous sûr de vouloir supprimer ce plugin de la page ?',
 
+        // Drag and drop CMS, dynamic dnd
+	    'tr_meliscms_drag_and_drop_delete_modal_title' => 'Confirmation suppression de zone',
+	    'tr_meliscms_drag_and_drop_delete_modal_content' => 'Êtes-vous sûr(e) de vouloir supprimer cette zone ?',
+
         /** Banner */
         'tr_PluginSection_MelisCmsGdprBanner' => 'Melis Cms RGPD Bannière',
         'tr_melis_cms_gdpr_banner_tabname' => 'Bannières',
@@ -601,6 +605,12 @@
         'tr_melis_cms_sites_homepages' => 'Pages d\'accueil',
         'tr_melis_cms_sites_shome_page_id' => 'ID page d\'accueil',
         'tr_melis_cms_sites_shome_page_id tooltip' => 'Identifiant de la page d\'accueil par langue',
+        'tr_melis_cms_sites_site_dnd_render_mode' => 'Mode de Drag & Drop',
+        'tr_melis_cms_sites_site_dnd_render_mode tooltip' => 'Mode de Drag & Drop sélectionné pour le site',
+        'tr_melis_cms_sites_site_dnd_render_mode_value_standard' => 'Standard',
+        'tr_melis_cms_sites_site_dnd_render_mode_value_bootstrap' => 'Avancé (Bootstrap)',
+        'tr_melis_cms_sites_site_dnd_render_mode_value_select_msg' => 'Souhaitez-vous activer le Drag & Drop avancé ? (Bootstrap obligatoire)',
+        'tr_melis_cms_sites_site_dnd_render_mode_value_select_msg tooltip' => 'Sélectionnez si vous souhaitez utiliser la version avancée du Drag & Drop. Attention, celle-ci requiert Bootstrap pour fonctionner.',
 
         #SITE TRANSLATION TAB
         'tr_melis_site_translation_name' => 'Traduction du site Melis',
@@ -865,6 +875,10 @@
 
         'tr_meliscms_page_export_modal_handler' => 'Import/Export pages',
         'tr_meliscms_page_import_modal' => 'Modal d\'import',
-        'tr_meliscms_page_export_modal' => 'Modal d\'export'
+        'tr_meliscms_page_export_modal' => 'Modal d\'export',
+
+        'tr_meliscms_site_properties_dnd_mode_deactivate' => 'Deactivate',
+        'tr_meliscms_site_properties_dnd_mode_confirmation_title' => 'Warning',
+        'tr_meliscms_site_properties_dnd_mode_confirmation_msg' => 'Deactivating this may lead to unexpected results. Are you sure you want to proceed?'
     );
 ?>

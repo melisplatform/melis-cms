@@ -1,0 +1,800 @@
+/*drag n drop zone buttons*/
+.column-icons {
+    /* display: flex; */
+    position: relative;
+
+    /* width: fit-content; */
+    /* height: 48px; */
+    /* height: 32px; */
+    height: auto;
+
+    padding: 4px;
+}
+/* .column-icon:first-child {
+    margin-left: 0;
+} */
+.column-icon {
+    /* #e61c23 */
+    background-color: transparent;
+    border: 1px solid transparent;
+
+    display: inline-block;
+    vertical-align: middle;
+
+    /* margin-left: 1px; */
+
+    /* width: 32px;
+	height: 32px; */
+    width: 30px;
+    height: 30px;
+
+    padding: 0;
+}
+.icon-container {
+    width: 100%;
+}
+.icon-row:first-child {
+    border-top: 0;
+}
+.icon-row>* {
+    max-width: 100%;
+}
+.icon-row {
+    border-top: 2px solid transparent;
+    display: flex;
+    flex-wrap: wrap;
+}
+.four-col-equal .icon-col-3,
+.three-col-equal .icon-col-3 {
+    width: 19%;
+}
+.icon-col-12 {
+    flex: 0 0 auto;
+    width: 100%;
+}
+.icon-col-2 {
+    flex: 0 0 auto;
+    width: 9.66666667%;
+}
+.icon-col-3 {
+    flex: 0 0 auto;
+    width: 20%;
+}
+.icon-col-4 {
+    flex: 0 0 auto;
+    width: 34.33333333%;
+}
+.icon-col-5 {
+    flex: 0 0 auto;
+    width: 37.66666667%;
+}
+.icon-col-6 {
+    flex: 0 0 auto;
+    width: 45%;
+}
+.icon-col-7 {
+    flex: 0 0 auto;
+    width: 54.33333333%;
+}
+.icon-col-8 {
+    flex: 0 0 auto;
+    width: 57.66666667%;
+}
+.icon-col-10 {
+    flex: 0 0 auto;
+    width: 82.33333333%;
+}
+.five-col-equal .icon-col {
+    flex: 0 0 14%;
+}
+.icon-col {
+    flex: 1 0 0;
+}
+
+/* .icon-row specifics */
+.half-col-top-bottom .icon-row,
+.top-1-3-col-center-w-bottom-1-col .icon-row,
+.top-1-3-col-center .icon-row,
+.four-col-equal-square .icon-row,
+.four-col-equal .icon-row,
+.left-2-col-w-right-1-col .icon-col-6 .icon-row,
+.half-1-col-left-w-right-2-col .icon-row,
+.top-1-col-w-bottom-1-3-center .icon-row {
+    /* height: 18px; */
+    height: 14px;
+}
+.four-col-equal-top-bottom .icon-row {
+    /* height: 9px; */
+    height: 7px;
+}
+.three-col-equal-top-bottom .icon-row,
+.left-3-col-w-half-1-col-right .icon-col-6 .icon-row,
+.half-1-col-left-w-right-3-col .icon-col-6 .icon-row,
+.top-1-col-w-center-1-3-center-w-bottom-1-col .icon-row {
+    /* height: 12px; */
+    height: 9.4px;
+}
+.cols4-6-2-2-2 .icon-row,
+.cols4-2-2-2-6 .icon-row,
+.cols3-8-2-2 .icon-row,
+.cols3-2-2-8 .icon-row,
+.cols3-2-8-2 .icon-row,
+.cols3-6-3-3 .icon-row,
+.cols3-3-3-6 .icon-row,
+.cols3-3-6-3 .icon-row,
+.cols-80-20 .icon-row,
+.cols-20-80 .icon-row,
+.cols-70-30 .icon-row,
+.cols-30-70 .icon-row,
+.cols-60-40 .icon-row,
+.cols-40-60 .icon-row,
+.six-col-equal .icon-row,
+.five-col-equal .icon-row,
+.four-col-equal .icon-row,
+.three-col-equal .icon-row,
+.half-col-equal .icon-row,
+.left-3-col-w-half-1-col-right .icon-row,
+.half-1-col-left-w-right-3-col .icon-row,
+.left-2-col-w-right-1-col .icon-row,
+.whole-1-col .icon-row {
+    /* height: 36px; */
+    height: 28px;
+}
+.cols4-2-2-2-6 .icon-col-6:first-child,
+.cols4-2-2-2-6 .icon-col-2:first-child,
+.cols4-6-2-2-2 .icon-col-6:first-child,
+.cols4-6-2-2-2 .icon-col-2:first-child,
+
+.cols3-2-8-2 .icon-col-8:first-child,
+.cols3-2-8-2 .icon-col-2:first-child,
+.cols3-8-2-2 .icon-col-8:first-child,
+.cols3-8-2-2 .icon-col-2:first-child,
+.cols3-2-2-8 .icon-col-2:first-child,
+.cols3-2-2-8 .icon-col-8:first-child,
+
+.cols3-6-3-3 .icon-col-3:first-child,
+.cols3-6-3-3 .icon-col-6:first-child,
+.cols3-3-3-6 .icon-col-3:first-child,
+.cols3-3-3-6 .icon-col-6:first-child,
+.cols3-3-6-3 .icon-col-3:first-child,
+.cols3-3-6-3 .icon-col-6:first-child,
+
+.cols-20-80 .icon-col-10:first-child,
+.cols-80-20 .icon-col-2:first-child,
+.cols-80-20 .icon-col-10:first-child,
+.cols-20-80 .icon-col-2:first-child,
+
+.cols-70-30 .icon-col-8:first-child,
+.cols-70-30 .icon-col-4:first-child,
+.cols-30-70 .icon-col-8:first-child,
+.cols-30-70 .icon-col-4:first-child,
+
+.cols-60-40 .icon-col-7:first-child,
+.cols-60-40 .icon-col-5:first-child,
+.cols-40-60 .icon-col-7:first-child,
+.cols-40-60 .icon-col-5:first-child,
+
+.six-col-equal .icon-col-2:first-child,
+.five-col-equal .icon-col:first-child,
+.four-col-equal .icon-col-3:first-child,
+.four-col-equal-square .icon-col-6:first-child,
+.four-col-equal .icon-col:first-child,
+.three-col-equal .icon-col-4:first-child,
+.half-col-equal .icon-col-6:first-child,
+.left-3-col-w-half-1-col-right .icon-col-6:first-child,
+.half-1-col-left-w-right-3-col .icon-col-6:first-child,
+.four-col-equal .icon-col-6:first-child,
+.left-2-col-w-right-1-col .icon-col-6:first-child,
+.half-1-col-left-w-right-2-col .icon-col-6:first-child {
+    margin-left: 0;
+}
+
+.cols4-2-2-2-6 .icon-col-6,
+.cols4-2-2-2-6 .icon-col-2,
+.cols4-6-2-2-2 .icon-col-6,
+.cols4-6-2-2-2 .icon-col-2,
+
+.cols3-2-8-2 .icon-col-8,
+.cols3-2-8-2 .icon-col-2,
+.cols3-8-2-2 .icon-col-8,
+.cols3-8-2-2 .icon-col-2,
+.cols3-2-2-8 .icon-col-2,
+.cols3-2-2-8 .icon-col-8,
+
+.cols3-6-3-3 .icon-col-3,
+.cols3-6-3-3 .icon-col-6,
+.cols3-3-3-6 .icon-col-3,
+.cols3-3-3-6 .icon-col-6,
+.cols3-3-6-3 .icon-col-3,
+.cols3-3-6-3 .icon-col-6,
+
+.cols-20-80 .icon-col-10,
+.cols-80-20 .icon-col-2,
+.cols-80-20 .icon-col-10,
+.cols-20-80 .icon-col-2,
+
+.cols-70-30 .icon-col-8,
+.cols-70-30 .icon-col-4,
+.cols-30-70 .icon-col-8,
+.cols-30-70 .icon-col-4,
+
+.cols-60-40 .icon-col-7,
+.cols-60-40 .icon-col-5,
+.cols-40-60 .icon-col-7,
+.cols-40-60 .icon-col-5,
+.six-col-equal .icon-col-2,
+.five-col-equal .icon-col,
+.four-col-equal .icon-col-3,
+.four-col-equal-square .icon-col-6,
+.four-col-equal .icon-col,
+.three-col-equal .icon-col-4,
+.half-col-equal .icon-col-6,
+.left-3-col-w-half-1-col-right .icon-col-6,
+.half-1-col-left-w-right-3-col .icon-col-6,
+.four-col-equal .icon-col-6,
+.left-2-col-w-right-1-col .icon-col-6,
+.half-1-col-left-w-right-2-col .icon-col-6 {
+    margin-left: 2px;
+}
+
+/* .icon-col-6 specifics */
+.four-col-equal-square .icon-col-6,
+.half-col-equal .icon-col-6,
+.left-3-col-w-half-1-col-right .icon-col-6,
+.half-1-col-left-w-right-3-col .icon-col-6,
+.four-col-equal .icon-col-6,
+.left-2-col-w-right-1-col .icon-col-6,
+.half-1-col-left-w-right-2-col .icon-col-6 {
+    /* width: 47%; */
+    width: 46%;
+}
+
+/* .icon-col-4 specifics */
+.three-col-equal .icon-col-4 {
+    /* width: 29.33333333%; */
+    width: 28.33333333%;
+}
+/* .icon-col specifics */
+.four-col-equal-top-bottom .icon-col:first-child,
+.three-col-equal-top-bottom .icon-col:first-child,
+.half-col-top-bottom .icon-col:first-child {
+    margin-top: 0;
+}
+.four-col-equal-top-bottom .icon-col,
+.three-col-equal-top-bottom .icon-col,
+.half-col-top-bottom .icon-col {
+    margin-top: 2px;
+}
+.half-1-col-left-w-right-2-col .icon-container {
+    margin: -14px 0 0 0;
+}
+.melis-dragdropzone.no-content .dnd-4-cols-3-cols-left-w-1-col-right .row,
+.melis-dragdropzone.no-content .dnd-4-cols-1-col-left-w-3-cols-right .row {
+    height: 33.33%;
+    margin-bottom: 0;
+}
+.melis-dragdropzone.no-content .dnd-3-cols-2-cols-left-w-1-col-right .row,
+.melis-dragdropzone.no-content .dnd-3-cols-1-col-left-w-2-cols-right .row {
+    height: 50%;
+}
+.dnd-3-cols-2-cols-left-w-1-col-right > .row:first-child,
+.dnd-3-cols-1-col-left-w-2-cols-right > .row:first-child {
+    margin-bottom: 34px;
+}
+/* .no-content .dnd-4-cols-3-cols-left-w-1-col-right .row,
+.no-content .dnd-4-cols-1-col-left-w-3-cols-right .row {
+    height: 33.33%;
+}
+.no-content .dnd-3-cols-2-cols-left-w-1-col-right .row,
+.no-content .dnd-3-cols-1-col-left-w-2-cols-right .row {
+    height: 50%;
+} */
+.dnd-4-cols-1-col-left-w-3-cols-right .row,
+.dnd-4-cols-3-cols-left-w-1-col-right .row {
+    margin-bottom: 6px;
+}
+.no-content .dnd-4-cols-1-col-left-w-3-cols-right .row,
+.no-content .dnd-4-cols-3-cols-left-w-1-col-right .row {
+    margin-bottom: 16px;
+}
+.dnd-4-cols-1-col-left-w-3-cols-right .row:last-child,
+.dnd-4-cols-3-cols-left-w-1-col-right .row:last-child {
+    margin-bottom: 0;
+}
+.dnd-4-cols-3-cols-left-w-1-col-right .melis-dragdropzone,
+.dnd-4-cols-1-col-left-w-3-cols-right .melis-dragdropzone {
+    min-height: 62px;
+}
+.dnd-3-cols-2-cols-left-w-1-col-right .melis-dragdropzone,
+.dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone {
+    min-height: 100px;
+}
+.dnd-4-cols-3-cols-left-w-1-col-right .melis-dragdropzone::before,
+.dnd-4-cols-1-col-left-w-3-cols-right .melis-dragdropzone::before {
+    top: -20%;
+}
+.dnd-3-cols-2-cols-left-w-1-col-right .melis-dragdropzone::before,
+.dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone::before {
+    top: 5%;
+}
+.dnd-4-cols-3-cols-left-w-1-col-right .melis-dragdropzone::after,
+.dnd-4-cols-1-col-left-w-3-cols-right .melis-dragdropzone::after {
+    top: 30% !important;
+    font-size: 20px;
+}
+.dnd-3-cols-2-cols-left-w-1-col-right .melis-dragdropzone::after,
+.dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone::after {
+    top: 25% !important;
+    font-size: 20px;
+}
+[dnd-layout-disable] button {
+    cursor: not-allowed;
+}
+[dnd-layout-disable] button .icon-col-bg {
+    opacity: 0.5;
+}
+button.column-icon {
+    border-radius: 3px;
+}
+button.column-icon:hover .icon-col-bg {
+    opacity: 0.8;
+}
+button.column-icon .icon-col-bg {
+    border-radius: 3px;
+}
+.dnd-layout-indicator .column-icon {
+    background-color: transparent;
+    border-color: transparent;
+    width: 25px;
+    height: 25px;
+}
+.dnd-layout-indicator .column-icon .icon-container {
+    margin-top: -12px;
+}
+.dnd-layout-indicator .column-icon:hover .icon-col-bg {
+    opacity: 1;
+}
+.dnd-layout-indicator .column-icon .icon-row {
+    height: 10px;
+    border-top-color: transparent;
+}
+.dnd-layout-indicator .column-icon .icon-col-6 {
+    width: 45%;
+}
+/*end drag n drop zone buttons*/ 
+.dnd-plugins-content > .row {
+    margin-bottom: 15px;
+}
+.dnd-plugins-content > .row:last-child {
+    margin-bottom: 0;
+}
+.dnd-plugins-content > .row:last-child .dnd-arrow-down,
+.dnd-plugins-content > .row:first-child .dnd-arrow-up {
+    display: none;
+}
+.melis-dragdropzone-container {
+    position: relative;
+}
+.dnd-layout-buttons {
+    top: 0;
+    /* left: 7px; */
+    left: 0;
+
+    padding: 4px 0 4px 8px;
+    border-radius: 3px;
+
+    min-height: 32px;
+    height: auto;
+    width: auto;
+}
+.dnd-layout-buttons .dnd-plugin-title-and-sub-tools {
+    min-width: 158px;
+}
+.dnd-layout-buttons > div {
+    vertical-align: middle;
+}
+.dnd-layout-buttons .fa {
+    color: #fff;
+}
+.dnd-layout-buttons .btn:first-child {
+    margin-left: 0;
+}
+.dnd-layout-buttons .btn {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0;
+    position: relative;
+    margin-right: 0.5rem;
+    width: 30px;
+}
+.dnd-layout-buttons .btn:hover {
+    background-color: transparent;
+}
+.dnd-layout-buttons .layout-popover {
+    display: none;
+}
+.melis-dragdropzone-container > .dnd-layout-wrapper {
+    outline: 1px dashed #ce5459;
+    padding: 0.5rem 0;
+    margin: 0 0.5rem;
+
+    position: relative;
+    z-index: 1;
+}
+.dnd-plugins-content .row:last-child > .melis-dragdropzone-container > .dnd-layout-wrapper {
+    margin-bottom: 15px;
+}
+.melis-dragdropzone-container > .dnd-layout-wrapper:hover {
+    outline-width: 2px;
+}
+.dnd-layout-wrapper .dnd-layout-wrapper {
+    outline: none;
+}
+.dnd-layout-wrapper .dnd-layout-wrapper .dnd-layout-buttons,
+.dnd-layout-wrapper .dnd-layout-wrapper .dnd-layout-indicator {
+    display: none;
+}
+.dnd-layout-wrapper .melis-dragdropzone:hover {
+    z-index: 999;
+}
+.melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator {
+    background-color: transparent;
+    opacity: 0;
+    z-index: 9999;
+    top: 0 !important;
+    left: -8px !important;
+
+    transform: translate3d(-100%, 0, 0);
+    -webkit-transform: translate3d(-100%, 0, 0);
+    -moz-transform: translate3d(-100%, 0, 0);
+    -ms-transform: translate3d(-100%, 0, 0);
+    -o-transform: translate3d(-100%, 0, 0);
+
+    transition: opacity 0.4s, transform 0.4s;
+    -webkit-transition: opacity 0.4s, transform 0.4s;
+    -ms-transition: opacity 0.4s, transform 0.4s;
+    -moz-transition: opacity 0.4s, transform 0.4s;
+    -o-transition: opacity 0.4s, transform 0.4s;
+    
+    transition-delay: 0.1s;
+    -webkit-transition-delay: 0.1s;
+    -moz-transition-delay: 0.1s;
+    -ms-transition-delay: 0.1s;
+    -o-transition-delay: 0.1s;
+}
+.dnd-plugin-title-and-sub-tools {
+    display: inline-block;
+}
+.dnd-plugin-title-and-sub-tools .melis-plugin-title-box {
+    vertical-align: top;
+    margin-right: 1rem;
+}
+.dnd-layout-buttons .dnd-column-layout,
+.dnd-layout-buttons .column-icons {
+    display: inline-block;
+    width: fit-content;
+    padding: 0;
+}
+.dnd-layout-buttons .dnd-column-layout {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+}
+.no-margin-left {
+    margin-left: 0 !important;
+}
+.dnd-layout-buttons .dnd-column-layout,
+.column-icons > div {
+    display: inline-block;
+    height: 30px;
+}
+.dnd-layout-wrapper > .dnd-layout-buttons {
+    /* #e61c23 */
+    background-color: transparent;
+}
+.dnd-plugin-sub-tools {
+    display: inline-block;
+    vertical-align: middle;
+    width: auto;
+}
+.dnd-layout-wrapper .dnd-layout-buttons {
+    opacity: 0;
+    position: absolute;
+    z-index: 999;
+
+    transition: opacity 0.4s;
+    -webkit-transition: opacity 0.4s;
+    -ms-transition: opacity 0.4s;
+
+    pointer-events: none;
+}
+.show-buttons {
+    opacity: 1 !important;
+}
+.dnd-bottom-buttons {
+    display: none;
+    
+    right: 0;
+    bottom: -40px;
+}
+.dnd-layout-wrapper .melis-dragdropzone .melis-plugin-tools-box {
+    height: auto;
+}
+.dnd-layout-wrapper .melis-dragdropzone .melis-plugin-tools-box.height-auto .m-plugin-sub-tools {
+    margin-left: 0;
+}
+.melis-dragdropzone.no-content {
+    background: rgba(255, 245, 245, 0.8);
+    bottom: 0;
+    margin-bottom: 0;
+}
+.melis-dragdropzone.no-content.highlight {
+    background: #932e2a;
+}
+.melis-dragdropzone.no-content:after, 
+.melis-dragdropzone.no-content.highlight:after {
+    transition: none;
+}
+.dnd-4-cols-3-cols-left-w-1-col-right .melis-dragdropzone::after,
+.dnd-4-cols-1-col-left-w-3-cols-right .melis-dragdropzone::after {
+    top: 32% !important;
+    width: 23px;
+    height: 30px;
+    font-size: 20px;
+}
+.dnd-3-cols-2-cols-left-w-1-col-right .melis-dragdropzone::after,
+.dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone::after {
+    width: 31px;
+    height: 40px;
+    top: 28% !important;
+    font-size: 20px;
+}
+.no-content .dnd-4-cols-3-cols-left-w-1-col-right .melis-dragdropzone:not(.no-content)::after,
+.no-content .dnd-4-cols-1-col-left-w-3-cols-right .melis-dragdropzone:not(.no-content)::after,
+.no-content .dnd-3-cols-2-cols-left-w-1-col-right .melis-dragdropzone:not(.no-content)::after,
+.no-content .dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone:not(.no-content)::after,
+.content-added .dnd-4-cols-3-cols-left-w-1-col-right .melis-dragdropzone:not(.no-content)::after,
+.content-added .dnd-4-cols-1-col-left-w-3-cols-right .melis-dragdropzone:not(.no-content)::after,
+.content-added .dnd-3-cols-2-cols-left-w-1-col-right .melis-dragdropzone:not(.no-content)::after,
+.content-added .dnd-3-cols-1-col-left-w-2-cols-right .melis-dragdropzone:not(.no-content)::after {
+    width: auto;
+    height: auto;
+}
+.melis-dragdropzone {
+    bottom: 0;
+    margin-bottom: 0;
+}
+.melis-dragdropzone.no-content {
+    background: rgba(255, 245, 245, 0.8);
+    bottom: 0;
+    margin-bottom: 0;
+}
+.melis-dragdropzone.no-content.highlight {
+    background: #932e2a;
+}
+.melis-dragdropzone.no-content:after, 
+.melis-dragdropzone.no-content.highlight:after {
+    transition: none;
+}
+.melis-dragdropzone.no-content.highlight:after,
+.melis-dragdropzone.no-content.highlight:before {
+    background-color: transparent;
+    content: "";
+}
+.melis-dragdropzone.no-content.highlight:before,
+.melis-dragdropzone.no-content:before,
+.melis-dragdropzone.no-content:after {
+    color: #e61c23;
+    text-shadow: none;
+}
+.melis-dragdropzone.no-content:before {
+    width: 254px;
+}
+.melis-dragdropzone.no-content:after {
+    content: "" !important;
+    background: url(/MelisFront/images/icons/square-plus-plugin-icon.png) no-repeat center;
+    background-size: contain;
+    top: 40%;
+}
+.melis-dragdropzone:hover {
+    /* #e61c23 */
+    outline: 1px solid transparent;
+
+    box-shadow: 0 0 0 1px transparent;
+    -webkit-box-shadow: 0 0 0 1px transparent;
+    -moz-box-shadow: 0 0 0 1px transparent;
+    -ms-box-shadow: 0 0 0 1px transparent;
+    z-index: 999999;
+}
+.dnd-layout-wrapper:hover .m-plugin-sub-tools div {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+    -moz-transform: translate3d(0, 0, 0);
+    -ms-transform: translate3d(0, 0, 0);
+}
+.dnd-layout-wrapper:hover > .dnd-layout-indicator.melis-plugin-indicator {
+    opacity: 1;
+
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+    -moz-transform: translate3d(0, 0, 0);
+    -ms-transform: translate3d(0, 0, 0);
+}
+.dnd-layout-wrapper > .m-plugin-sub-tools {
+    background: transparent !important;
+    margin-left: 0;
+    width: 40px;
+    position: relative;
+    top: -12px;
+}
+.dnd-layout-wrapper > .m-plugin-sub-tools div {
+    width: 40px;
+    height: 40px;
+}
+.dnd-layout-wrapper > .m-plugin-sub-tools div .fa {
+    top: auto;
+    left: auto;
+    right: auto;
+    position: relative;
+
+    transform: none;
+    -webkit-transform: none;
+    -moz-transform: none;
+    -ms-transform: none;
+}
+.dnd-layout-wrapper > .m-plugin-sub-tools .m-move-handle {
+    display: inline-block;
+    float: none;
+    opacity: 1;
+
+    transform: none;
+    -webkit-transform: none;
+    -moz-transform: none;
+    -ms-transform: none;
+
+    transition: none;
+    -webkit-transition: none;
+    -ms-transition: none;
+
+    -webkit-transition-delay: unset;
+    -moz-transition-delay: unset;
+    -o-transition-delay: unset;
+    transition-delay: unset;
+
+    transition-timing-function: unset;
+    -webkit-transition-timing-function: unset;
+    -moz-transition-timing-function: unset;
+}
+.bg-red {
+    /* #e61c23 */
+    background-color: transparent;
+    border-color: transparent;
+}
+.dnd-layout-buttons-popover {
+    border-radius: 3px;
+    max-width: 355px;
+    z-index: 99999;
+}
+.dnd-layout-buttons-popover .popover-body {
+    position: relative;
+    padding: 0;
+}
+.dnd-layout-buttons-popover .popover-arrow::after,
+.dnd-layout-buttons-popover .popover-arrow::before {
+    --bs-popover-bg: #373736;
+}
+.dnd-layout-buttons-popover header {
+    background-color: #373736;
+    padding: 0.5rem 1rem;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.dnd-layout-buttons-popover header h5,
+.dnd-layout-buttons-popover header .close-btn {
+    color: #fff;
+}
+.dnd-layout-buttons-popover header .close-btn {
+    margin-right: -0.5rem;
+}
+.dnd-layout-buttons-popover header .close-btn:active,
+.dnd-layout-buttons-popover header .close-btn {
+    border-color: transparent;
+}
+.dnd-layout-buttons-popover header .close-btn:hover {
+    color: #fff;
+}
+.dnd-layout-buttons-popover header h5 {
+    font-size: 1rem;
+    font-weight: normal;
+    margin-bottom: 0;
+
+    display: flex;
+    align-items: center;
+}
+.dnd-layout-buttons-popover .column-icons {
+    display: block;
+    width: 355px;
+    height: auto;
+    padding: 1rem;
+}
+.no-content .row .col-12.col-md-2 .melis-dragdropzone::before {
+    top: 40%;
+}
+.no-content .row .col-12.col-md-2 .melis-dragdropzone::before,
+.no-content .row .col-12.col-md-2 .melis-dragdropzone::after {
+    width: 157px;
+}
+.no-content .row .col-12.col-md-2 .melis-dragdropzone::after {
+    top: 30%;
+}
+/* .dnd-plugin-title-and-sub-tools */
+.dnd-layout-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.dnd-plugin-sub-tools > div {
+    display: inline-block;
+}
+.dnd-plugin-sub-tools.layout-buttons-wrapped > .dnd-arrow-buttons {
+    display: block;
+}
+/* button:disabled.dnd-remove-button {
+    background: url(../images/dnd-remove-button-disabled-icon.png) 0 0 no-repeat;
+    width: 30px;
+    height: 30px;
+} */
+button:disabled.dnd-remove-button {
+    position: relative;
+    height: 30px;
+    border: 0;
+    cursor: not-allowed;
+    pointer-events: auto;
+    opacity: 0.9 !important;
+}
+button:disabled.dnd-remove-button:hover {
+    background-color: transparent !important;
+    opacity: .9 !important;
+}
+.firefox .dnd-plus-remove-buttons button:disabled.dnd-remove-button .fa-ban {
+    left: 28% !important;
+}
+button:disabled.dnd-remove-button .fa-ban {
+    color: #808080;
+
+    transform: scale(1.6) rotate(90deg);
+
+    position: absolute;
+    z-index: 1;
+    left: 27%;
+    /* top: 28%; */
+    top: 22%;
+
+    filter: drop-shadow(0 0 0.5px rgba(0, 0, 0, 0.3));
+}
+button:disabled.dnd-remove-button .fa-trash {
+    color: #fff;
+
+    transform: scale(0.8);
+
+    position: absolute;
+    z-index: 0;
+    /* top: 22%; */
+    top: 18%;
+    left: 30%;
+
+    font-size: 18px;
+}
+.melis-dragdropzone-container .melis-ui-outlined {
+    max-width: 100%;
+}
+.melis-plugin-indicator {
+    left: 20px;
+}
+.melis-dragdropzone .melis-ui-outlined:first-child .melis-plugin-tools-box,
+.melis-dragdropzone .row .col-12:first-child .melis-ui-outlined:first-child > .melis-plugin-tools-box {
+    left: 12px;
+}
+.dnd-layout-wrapper .row .col-12:not(:first-child) .melis-dragdropzone .melis-ui-outlined .melis-plugin-tools-box {
+    left: 0;
+}

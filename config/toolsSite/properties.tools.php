@@ -114,6 +114,29 @@ return array(
                                         ),
                                     ),
                                 ),
+                                array(
+                                    'spec' => array(
+                                        'name' => 'site_dnd_render_mode',
+                                        'type' => 'Laminas\Form\Element\Radio',
+                                        'options' => array(
+                                            'label' => 'tr_melis_cms_sites_site_dnd_render_mode',
+                                            'label_attributes' => [
+                                                'class' => ''
+                                            ],
+                                            'tooltip' => 'tr_melis_cms_sites_site_dnd_render_mode tooltip',
+                                            'value_options' => array(
+                                                '' => 'tr_melis_cms_sites_site_dnd_render_mode_value_standard',
+                                                'bootstrap' => 'tr_melis_cms_sites_site_dnd_render_mode_value_bootstrap',
+                                            ),
+//                                            'disable_inarray_validator' => true,
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'site_dnd_render_mode',
+                                            'value' => '',
+                                            'required' => false
+                                        ),
+                                    ),
+                                ),
                             ),
                             'input_filter' => array(
                                 'site_id' => array(
@@ -235,6 +258,10 @@ return array(
                                         array('name' => 'StripTags'),
                                         array('name' => 'StringTrim'),
                                     ),
+                                ),
+                                'site_dnd_render_mode' => array(
+                                    'name' => 'site_dnd_render_mode',
+                                    'required' => false,
                                 ),
                             ),
                         ),

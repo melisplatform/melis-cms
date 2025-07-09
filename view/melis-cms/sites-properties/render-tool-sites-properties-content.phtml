@@ -23,8 +23,12 @@ $data_melisKey = $this->melisKey;
                         <?php
                         $form = $this->propertiesForm;
                         $form->prepare();
-                        foreach($form->getElements() as $element => $attributes)  {
-                            $el =  $form->get((string) $element);
+                        $form->setAttribute('id', $form->getAttribute('id') . '_' . $this->siteId);
+                        echo $this->form()->openTag($form);
+//                        echo $this->melisFieldCollection($form);
+                        foreach ($form->getElements() As $key => $val)
+                        {
+                            $el =  $form->get($key);
 
                             if ($el->getName() == "site_id") {
                                 $el->setValue($this->siteId);
@@ -36,10 +40,40 @@ $data_melisKey = $this->melisKey;
 
                             $el->setName("siteprop_".$el->getName());
                             $el->setAttribute('id', $el->getName());
+
+
+                            $val->setAttribute('class', 'form-control');
+                            echo '<div class="form-group">';
+                            if ($val->getLabel() && $val->getAttribute('type') != 'hidden')
+                            {
+                                $required = '';
+                                if(!empty($val->getAttribute('required'))){
+                                    $required = ' <sup>*</sup>';
+                                }
+                                echo $this->formLabel()->openTag([
+                                    'for' => $val->getAttribute('id'),
+                                    'class' => 'd-flex flex-row justify-content-between'
+                                ]);
+                                echo '<div class="label-text">';
+                                echo $val->getLabel();
+                                echo $required;
+                                echo '</div>';
+                                echo '<div class="slider-open-tooltip"><i class="fa fa-info-circle fa-lg tip-info" data-bs-toggle="tooltip" data-bs-placement="left" title="'.$this->translate($val->getOptions()['tooltip']).'" data-bs-title="'.$this->translate($val->getOptions()['tooltip']).'"></i></div>';
+                                echo $this->formLabel()->closeTag();
+                            }
+
+                            if($key == 'site_dnd_render_mode'){
+                                foreach($val->getValueOptions() as $k => $v) {
+                                    $selected = ($k == $val->getValue()) ? "checked" : "";
+                                    echo '<div class="form-check form-check-inline"><input disabled class="form-check-input" type="radio" id="site_dnd_render_mode_' . $k . '" name="'.$key.'" value="' . $k . '"' . $selected . '>
+                                    <label class="form-check-label" for="site_dnd_render_mode_' . $k . '">' . $v . '</label>
+                                    </input></div>';
+                                }
+                            }else {
+                                echo $this->formElement($val);
+                            }
+                            echo '</div>';
                         }
-                        $form->setAttribute('id', $form->getAttribute('id') . '_' . $this->siteId);
-                        echo $this->form()->openTag($form);
-                        echo $this->melisFieldCollection($form);
                         echo $this->form()->closeTag();
                         ?>
                     </div>

@@ -191,7 +191,7 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisGeneralListener 
 
             if(preg_match('/'.$pattern.'/', $pluginContent, $matches)) {
                 $id = isset($matches[0]) ? $matches[0] : null;
-                
+
                 if($id) {
                     if($pluginSettings) {
                         /* $replacement   = $id .' width_desktop="'.$pluginDesktop.
@@ -293,8 +293,12 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisGeneralListener 
             $pluginContent = preg_replace($pluginContainerPattern, '', $pluginContent);
         }
 
-        $pattern    = '/'.$plugin.'\sid\=\"(.*?)\"/';
-        $replace    = $plugin . ' id="'.$pluginId.'" plugin_container_id="'.$pluginContainerId.'"';
+//        $pattern    = '/'.$plugin.'\sid\=\"(.*?)\"/';
+//        $replace    = $plugin . ' id="'.$pluginId.'" plugin_container_id="'.$pluginContainerId.'"';
+//        $newContent = $pluginContent;
+
+        $pattern = '/(' . preg_quote($plugin, '/') . '\s+id=")([^"]*)"/';
+        $replace = '${1}${2}" plugin_container_id="' . $pluginContainerId . '"';
         $newContent = $pluginContent;
 
         // add the plugin_container_id attribute

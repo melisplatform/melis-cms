@@ -4,12 +4,12 @@ var melisPluginEdition = (function($, window) {
             Cache DOM
     ====================================*/
     // body tag overall
-    var $body                   = window.parent.$("body"),
+    var $body                   = window.parent.$("body"), // outmost parent window
         fromdragdropzone        = window.fromdragdropzone,
         iframe                  = window.parent.$("#"+parent.activeTabId).find(".melis-iframe"),
-        // inside iframe's body tag
-        $_body                  = $("body"),
-        pluginHardcodedConfig;
+        $_body                  = $("body"), // inside iframe's body tag
+        pluginHardcodedConfig,
+        editableHoverTimeout;
 
     /* ==================================
             Binding Events
@@ -18,6 +18,80 @@ var melisPluginEdition = (function($, window) {
 
     $_body.on("click", ".m-trash-handle", removePlugins);
 
+    $_body.on("focus", ".melis-ui-outlined .melis-editable", function() {
+        let $this               = $(this),
+            $melisUiOutlined    = $this.closest(".melis-ui-outlined");
+
+            $melisUiOutlined.addClass("melis-focus");
+    });
+
+    $_body.on("mouseover", ".melis-editable", function() {
+        let $thisOver               = $(this),
+            $dndLayoutWrapperOver   = $thisOver.closest(".dnd-layout-wrapper");
+            $dndLayoutIndiOver      = $dndLayoutWrapperOver.find(".dnd-layout-indicator"),
+            $firstColOver           = $thisOver.parents(".dnd-layout-wrapper").last().find(".row .col-12").first(),
+            $zoneOver               = $firstColOver.find(".melis-dragdropzone"),
+            $melisUiOutlinedOver    = $zoneOver.find(".melis-ui-outlined").first(),
+            $toolsBoxOver           = $melisUiOutlinedOver.find(".melis-plugin-tools-box");
+
+            setTimeout(() => {
+                if($dndLayoutIndiOver.css("opacity") === "1") {
+                    $toolsBoxOver.css("left", "12px");
+                }
+            }, 500);
+    });
+
+    $_body.on("blur", ".melis-ui-outlined.melis-focus", function() {
+        $(this).removeClass("melis-focus");
+    });
+
+    $_body.on("mouseenter", ".melis-editable", function() {
+        clearTimeout(editableHoverTimeout);
+
+        let $editableEnter  = $(this),
+            $toolsBoxEnter  = $editableEnter.closest(".melis-ui-outlined").find(".melis-plugin-tools-box");
+
+            if($toolsBoxEnter.length) {
+                $toolsBoxEnter.addClass("height-auto");
+                $toolsBoxEnter.css("top", -$toolsBoxEnter.outerHeight());
+            }
+
+            $editableEnter.addClass("hovering");
+    }).on("mouseleave", ".melis-editable", function() {
+        editableHoverTimeout = setTimeout(() => {
+            let $editableLeave = $(this),
+                $toolsBoxLeave = $editableLeave.closest(".melis-ui-outlined").find(".melis-plugin-tools-box");
+
+                if($toolsBoxLeave.length) {
+                    $toolsBoxLeave.removeClass("height-auto");
+                    //$toolsBoxLeave.css("top", -40); // revert to default top value
+                }
+
+                $editableLeave.removeClass("hovering");
+        }, 10); // delay for a probably prevents instant flicker
+    });
+
+    $_body.on("mouseenter", ".melis-plugin-tools-box", function() {
+        let $toolsBoxHeightAutoEnter = $(this),
+            height = $toolsBoxHeightAutoEnter.outerHeight();
+
+            if ($toolsBoxHeightAutoEnter.length) {
+                if (!$toolsBoxHeightAutoEnter.hasClass("height-auto")) {
+                    $toolsBoxHeightAutoEnter.addClass("height-auto");
+                }
+                
+                $toolsBoxHeightAutoEnter.css("top", -height);
+            }
+    }).on("mouseleave", ".melis-plugin-tools-box", function() {
+        let $toolsBoxHeightAutoLeave = $(this);
+            if ($toolsBoxHeightAutoLeave.length) {
+                if ($toolsBoxHeightAutoLeave.hasClass("height-auto")) {
+                    $toolsBoxHeightAutoLeave.removeClass("height-auto");
+                }
+                $toolsBoxHeightAutoLeave.css("margin-left", 0);
+                //$toolsBoxHeightAutoLeave.css("top", -40); // revert to default top value
+            }
+    });
     
     /* 
      * Checking parent body events handler to avoid multiple events of the button
@@ -41,14 +115,6 @@ var melisPluginEdition = (function($, window) {
         e.preventDefault();
 
         removeParentBodyPropStyle();
-    });
-
-    $_body.on("focus", ".melis-ui-outlined .melis-editable", function() {
-        $(this).closest(".melis-ui-outlined").addClass("melis-focus");
-    });
-
-    $_body.on("blur", ".melis-ui-outlined.melis-focus", function() {
-        $(this).removeClass("melis-focus");
     });
 
     // window.parent.$body.prop("style")
@@ -154,14 +220,11 @@ var melisPluginEdition = (function($, window) {
                 parentSize  = $this.outerWidth(),
                 totalChild  = $this.find($(".melis-plugin-tools-box")).outerWidth() + $this.find($(".melis-plugin-title-box")).outerWidth();
 
-            if ( totalChild > parentSize ) {
-                $this.width(totalChild + 30);
-            }
+                if ( totalChild > parentSize ) {
+                    $this.width(totalChild + 30);
+                }
         });
     }
-
-    // jQuery last dragdropzone for crossbrowser
-    $("div.melis-dragdropzone").last().css({"margin-bottom": "35px"});
 
     // Saving Plugin
     function savePluginUpdate(data, siteModule){
@@ -425,53 +488,221 @@ var melisPluginEdition = (function($, window) {
     }
 
     // Send the list of plugin inside DragnDropzone
-    function sendDragnDropList(dropzone, pageId) {
-        var $dropzone               = $('div[data-dragdropzone-id='+ dropzone +']'),
-            dragdropzoneModule      = $dropzone.data("module"),
-            dragdropzonePlugin      = $dropzone.data("plugin"),
-            dragdropzonePluginId    = $dropzone.data("plugin-id"),
-            dragdropzoneMelisTag    = $dropzone.data("melis-tag"),
-            siteModule              = $dropzone.data("site-module"),
-            pluginListEl            = $dropzone.children(".melis-ui-outlined"),
-            dragzone                = [],
-            pluginList              = new Object();
+    function sendDragnDropList(dropzone, pageId, reference) {
 
-            pluginList['melisIdPage']                   = pageId;
-            pluginList['melisModule']                   = dragdropzoneModule;
-            pluginList['melisPluginName']               = dragdropzonePlugin;
-            pluginList['melisPluginId']                 = dragdropzonePluginId;
-            pluginList['melisPluginTag']                = dragdropzoneMelisTag;
-            pluginList['melisDragDropZoneListPlugin']   = new Object();
+        reference = (typeof reference !== 'undefined') ? reference : '';
 
-            // loop all plugins in dropzone
-            $.each(pluginListEl, function(key, value) {
+        var $dropzone = $('div[data-dragdropzone-id=' + dropzone + ']'),
+            // parentDragndropContainer= $dropzone.closest(".melis-dragdropzone-container"),
+            parentDragndropContainer = $dropzone.parents(".melis-dragdropzone-container").last(),
 
-                pluginList['melisDragDropZoneListPlugin'][key] = new Object();
+            // dragdropzoneModule      = $dropzone.data("module"),
+            // dragdropzonePlugin      = $dropzone.data("plugin"),
+            // dragdropzonePluginId    = $dropzone.data("plugin-id"),
+            // dragdropzoneMelisTag    = $dropzone.data("melis-tag"),
+            siteModule = $dropzone.data("site-module"),
+            dropzoneList = parentDragndropContainer.find(".melis-dragdropzone"),
+            // pluginListEl            = parentDragndropContainer.find(".melis-ui-outlined"),
+            dragzone = [],
+            pluginListContainer = new Object();
 
-                var plugins                 = $(value).find(".melis-plugin-tools-box"),
-                    melisPluginModuleName   = $(plugins).data("module"),
-                    melisPluginName         = $(plugins).data("plugin"),
-                    melisPluginID           = $(plugins).data("plugin-id"),
-                    melisPluginTag          = $(plugins).data("melis-tag"),
-                    melisPluginContainer    = $(plugins).data("plugin-container"),
-                    melisPluginContainerId  = $(pluginListEl).attr("id");
+        // pluginListContainer['melisIdPage'] = pageId;
+        // pluginListContainer['melisModule'] = $(parentDragndropContainer).data("module");
+        // pluginListContainer['melisPluginName'] = $(parentDragndropContainer).data("plugin");
+        // pluginListContainer['melisPluginId'] = $(parentDragndropContainer).data("plugin-id");
+        // pluginListContainer['melisPluginTag'] = $(parentDragndropContainer).data("melis-tag");
+        // pluginListContainer['children'] = new Object();
 
-                    pluginList['melisDragDropZoneListPlugin'][key]['melisModule']       = melisPluginModuleName;
-                    pluginList['melisDragDropZoneListPlugin'][key]['melisPluginName']   = melisPluginName;
-                    pluginList['melisDragDropZoneListPlugin'][key]['melisPluginId']     = melisPluginID;
-                    pluginList['melisDragDropZoneListPlugin'][key]['melisPluginTag']    = melisPluginTag;
 
-                    if ( $("#"+melisPluginContainerId).length ) {
-                        pluginList['melisDragDropZoneListPlugin'][key]['melisPluginContainer'] = melisPluginContainer;
-                    } else {
-                        pluginList['melisDragDropZoneListPlugin'][key]['melisPluginContainer'] = " ";
-                    }
-            });
+        // var dndContainer = parentDragndropContainer.find(".melis-dragdropzone-container");
+        var list = new Object();
+        // pluginListContainer['melisDragDropZoneListPlugin'] = getPluginLists($(parentDragndropContainer).find(".dnd-layout-wrapper").children(".melis-dragdropzone"));
+        // pluginListContainer['children'] = getDNDList(parentDragndropContainer, pageId);
 
-            if (typeof siteModule !== "undefined"){
-                savePluginUpdate(pluginList, siteModule);
-            }
+        // var ctr = 0;
+        // $.each(dropzoneList, function (k, v) {
+        //     var pluginListEl = $(v).find(".melis-ui-outlined");
+        //     if ($(pluginListEl).length) {
+        //         pluginListContainer['children'][ctr] = new Object();
+        //         var pluginList = new Object();
+        //
+        //         // var toolBox = $('div[data-dragdropzone-id=' + dropzone + ']');
+        //         // var toolBox = $(pluginListEl).find(".melis-plugin-tools-box");
+        //
+        //         pluginList['melisIdPage'] = pageId;
+        //         pluginList['melisModule'] = $(v).data("module");
+        //         pluginList['melisPluginName'] = $(v).data("plugin");
+        //         pluginList['melisPluginId'] = $(v).data("plugin-id");
+        //         pluginList['melisPluginTag'] = $(v).data("melis-tag");
+        //         pluginList['melisDragDropZoneListPlugin'] = new Object();
+        //
+        //         // loop all plugins in dropzone
+        //         $.each(pluginListEl, function (key, value) {
+        //             pluginList['melisDragDropZoneListPlugin'][key] = new Object();
+        //
+        //             var plugins = $(value).find(".melis-plugin-tools-box"),
+        //                 melisPluginModuleName = $(plugins).data("module"),
+        //                 melisPluginName = $(plugins).data("plugin"),
+        //                 melisPluginID = $(plugins).data("plugin-id"),
+        //                 melisPluginTag = $(plugins).data("melis-tag"),
+        //                 melisPluginContainer = $(plugins).data("plugin-container"),
+        //                 melisPluginContainerId = $(pluginListEl).attr("id");
+        //
+        //             pluginList['melisDragDropZoneListPlugin'][key]['melisModule'] = melisPluginModuleName;
+        //             pluginList['melisDragDropZoneListPlugin'][key]['melisPluginName'] = melisPluginName;
+        //             pluginList['melisDragDropZoneListPlugin'][key]['melisPluginId'] = melisPluginID;
+        //             pluginList['melisDragDropZoneListPlugin'][key]['melisPluginTag'] = melisPluginTag;
+        //
+        //             if ($("#" + melisPluginContainerId).length) {
+        //                 pluginList['melisDragDropZoneListPlugin'][key]['melisPluginContainer'] = melisPluginContainer;
+        //             } else {
+        //                 pluginList['melisDragDropZoneListPlugin'][key]['melisPluginContainer'] = " ";
+        //             }
+        //         });
+        //
+        //         pluginListContainer['children'][ctr] = pluginList;
+        //         ctr++;
+        //     }
+        // });
+
+        pluginListContainer = extractContainers(parentDragndropContainer, pageId, reference);
+
+        if (typeof siteModule !== "undefined") {
+            savePluginUpdate(pluginListContainer, siteModule);
+        }
     }
+
+    function extractContainers($container, pageId, reference) {
+        const result = {
+            melisIdPage: pageId,
+            melisModule: $container.data("module"),
+            melisPluginName: $container.data("plugin"),
+            melisPluginId: $container.data("plugin-id"),
+            melisPluginTag: $container.data("melis-tag"),
+            reference: reference,
+            // melisDragDropZoneListPlugin: getPluginLists($($container).children(".melis-dragdropzone")),
+        };
+
+        if ($container.data('layout-template')) {
+            result.dndLayout = $container.data('layout-template');
+        }
+
+		if ($container.data("layout-template")) {
+			result.pluginReferer = $container.data("plugin-referer");
+		}
+
+        // Include plugin_list from this container only (not nested ones)
+        const pluginBoxes = $container.find('.melis-plugin-tools-box').filter(function () {
+            return $(this).closest('.melis-dragdropzone-container').is($container);
+        });
+
+        if (pluginBoxes.length) {
+            result.melisDragDropZoneListPlugin = pluginBoxes.map(function () {
+                return {
+                    melisModule: $(this).data("module"),
+                    melisPluginName: $(this).data("plugin"),
+                    melisPluginId: $(this).data("plugin-id"),
+                    melisPluginTag: $(this).data("melis-tag"),
+                };
+            }).get();
+        }
+
+        // Get only direct nested .melis-dragdropzone-container children, skipping deeper ones
+        const childContainers = $container.children().find('.melis-dragdropzone-container').filter(function () {
+            // Only include if parent .melis-dragdropzone-container is the current one
+            return $(this).parents('.melis-dragdropzone-container').first().is($container);
+        });
+
+        if (childContainers.length) {
+            result.children = [];
+            childContainers.each(function () {
+                result.children.push(extractContainers($(this)));
+            });
+        }
+
+        return result;
+    }
+
+    /* function getDNDList(dndContainer, pageId)
+    {
+        const result = [];
+    
+        // dndContainer = $(dndContainer).children(".dnd-layout-wrapper");
+    
+        // Find all immediate children (anywhere under this node, but only one level down)
+        dndContainer.children().each(function () {
+            const $child = $(this);
+    
+            // Check if this child is a melis-dragdropzone-container
+            if ($child.hasClass('melis-dragdropzone-container')) {
+                result.push({
+                    melisIdPage: pageId,
+                    melisModule: $($child).data("module"),
+                    melisPluginName: $($child).data("plugin"),
+                    melisPluginId: $($child).data("plugin-id"),
+                    melisPluginTag: $($child).data("melis-tag"),
+                    melisDragDropZoneListPlugin: getPluginLists($($child).children(".melis-dragdropzone")),
+                    children: getDNDList($child)
+                });
+            } else {
+                // Otherwise, look inside it for immediate children
+                $child.children('.melis-dragdropzone-container').each(function () {
+                    const $subChild = $(this);
+                    result.push({
+                        mmelisIdPage: pageId,
+                        melisModule: $($subChild).data("module"),
+                        melisPluginName: $($subChild).data("plugin"),
+                        melisPluginId: $($subChild).data("plugin-id"),
+                        melisPluginTag: $($subChild).data("melis-tag"),
+                        melisDragDropZoneListPlugin: getPluginLists($($subChild).children(".melis-dragdropzone")),
+                        children: getDNDList($subChild)
+                    });
+                });
+            }
+        });
+    
+        return result;
+    }
+    
+    function getPluginLists(dropzoneList)
+    {
+        var list = new Object();
+        var ctr = 0;
+        $.each(dropzoneList, function (k, v) {
+            var pluginListEl = $(v).find(".melis-ui-outlined");
+            if ($(pluginListEl).length) {
+                // list = new Object();
+                var pluginList = new Object();
+                // loop all plugins in dropzone
+                $.each(pluginListEl, function (key, value) {
+                    pluginList[key] = new Object();
+    
+                    var plugins = $(value).find(".melis-plugin-tools-box"),
+                        melisPluginModuleName = $(plugins).data("module"),
+                        melisPluginName = $(plugins).data("plugin"),
+                        melisPluginID = $(plugins).data("plugin-id"),
+                        melisPluginTag = $(plugins).data("melis-tag"),
+                        melisPluginContainer = $(plugins).data("plugin-container"),
+                        melisPluginContainerId = $(pluginListEl).attr("id");
+    
+                    pluginList[key]['melisModule'] = melisPluginModuleName;
+                    pluginList[key]['melisPluginName'] = melisPluginName;
+                    pluginList[key]['melisPluginId'] = melisPluginID;
+                    pluginList[key]['melisPluginTag'] = melisPluginTag;
+    
+                    if ($("#" + melisPluginContainerId).length) {
+                        pluginList[key]['melisPluginContainer'] = melisPluginContainer;
+                    } else {
+                        pluginList[key]['melisPluginContainer'] = " ";
+                    }
+                });
+    
+                list = pluginList;
+                ctr++;
+            }
+        });
+        return list;
+    } */
 
     function checkFunctionExists(functionName, idPlugin) {
         if (typeof functionName === 'function') {
@@ -676,45 +907,52 @@ var melisPluginEdition = (function($, window) {
     function initResizable() {
         var totalWidth, parentWidth,
             percentTotalWidth,
-            iframe = window.parent.$("#"+ parent.activeTabId).find('iframe');
+            iframe = window.parent.$("#"+ parent.activeTabId).find('iframe'),
+            $melisUiOutlined = $(".melis-dragdropzone .melis-ui-outlined"); // need to check this part
 
             // check if melis-ui-outlined element is available in preview page
-            if( $(".melis-dragdropzone .melis-ui-outlined").length ) {
-                $(".melis-dragdropzone .melis-ui-outlined").resizable({
-                    containment: ".melis-dragdropzone",
-                    start: function(event, ui){
-                        var widthIndicator =  '<div class="ui-resize-indicator"></div>';
-                        parentWidth = ui.originalElement.parent().outerWidth();
-                        // width indicator
-                        $(ui.originalElement).append(widthIndicator);
+            if( $melisUiOutlined.length ) {
+                $melisUiOutlined.each(function() {
+                    $(this).resizable({
+                        containment: 'parent',
+                        start: function(event, ui){
+                            var widthIndicator =  '<div class="ui-resize-indicator"></div>';
+                                parentWidth = ui.originalElement.parent().outerWidth();
+                                
+                                // width indicator
+                                $(ui.originalElement).append(widthIndicator);
 
-                        if($(ui.originalElement).find(".ui-resize-input")) {
-                            $(ui.originalElement).find(".ui-resize-input").remove();
+                                if($(ui.originalElement).find(".ui-resize-input")) {
+                                    $(ui.originalElement).find(".ui-resize-input").remove();
+                                }
+                        },
+                        resize: function(event, ui) {
+                            totalWidth = ui.size.width;
+                            ui.originalElement.css('height', 'auto');
+                            
+                            // convert px to percent
+                            percentTotalWidth = (100 * totalWidth / parentWidth);
+                            percentTotalWidth = percentTotalWidth.toFixed(2);
+
+                            ui.originalElement.css('width', percentTotalWidth + '%');
+                            $(ui.originalElement).find(".ui-resize-indicator").text(percentTotalWidth + " %");
+                        },
+                        stop: function(event, ui) {
+                            // get all data attributes
+                            var toolBox = $(ui.originalElement).children(".melis-plugin-tools-box");
+
+                            getPluginData(toolBox, percentTotalWidth);
+
+                            // get the function
+                            var owlCheck = $(ui.originalElement).find(".owl-carousel");
+                            if( $(owlCheck).length ) {
+                                $(owlCheck).trigger('refresh.owl.carousel');
+                            }
+
+                            // remove indicator
+                            $(ui.originalElement).find(".ui-resize-indicator").remove();
                         }
-                    },
-                    resize: function(event, ui) {
-                        totalWidth = ui.size.width;
-                        ui.originalElement.css('height', 'auto');
-                        // convert px to percent
-                        percentTotalWidth = (100 * totalWidth / parentWidth);
-                        percentTotalWidth = percentTotalWidth.toFixed(2);
-                        ui.originalElement.css('width', percentTotalWidth + '%');
-                        $(ui.originalElement).find(".ui-resize-indicator").text(percentTotalWidth + " %");
-                    },
-                    stop: function(event, ui) {
-                        // get all data attributes
-                        var toolBox = $(ui.originalElement).children(".melis-plugin-tools-box");
-
-                        getPluginData(toolBox, percentTotalWidth);
-                        // get the function
-                        var owlCheck = $(ui.originalElement).find(".owl-carousel");
-                        if( $(owlCheck).length ) {
-                            $(owlCheck).trigger('refresh.owl.carousel');
-                        }
-
-                        // remove indicator
-                        $(ui.originalElement).find(".ui-resize-indicator").remove();
-                    }
+                    });
                 });
             }
     }
@@ -751,7 +989,13 @@ var melisPluginEdition = (function($, window) {
 
                     // hide tinymce option while resizing
                     var inst = tinyMCE.EditorManager.get(data.pluginId);
-                        inst.fire("blur");
+                        if (inst) {
+                            inst.fire("blur");
+                        }
+                        else {
+                            console.error('No editor found for ID:', data.pluginId);
+                        }
+
                         iframe.trigger("blur");
 
                         $(editable).map(function() {
@@ -759,7 +1003,7 @@ var melisPluginEdition = (function($, window) {
 
                                 pluginList['tagType']   =   $this.data("tag-type");
                                 pluginList['tagId']     =   $this.data("tag-id");
-                                pluginList['tagValue']  =   tinyMCE.activeEditor.getContent({format : 'html'});
+                                pluginList['tagValue']  =   tinyMCE.activeEditor?.getContent({format : 'html'});
                         });
                 }
 
@@ -801,6 +1045,7 @@ var melisPluginEdition = (function($, window) {
                     var strPercentTotalWidth = percentTotalWidth;
                     // newClass = "plugin-width-lg-"+Math.floor(percentTotalWidth); // removed when css is ready
                     newClass = "plugin-width-lg-" + strPercentTotalWidth.replace(".", "-"); // removed when css is ready
+                    
                     $.each(classes, function(key, value) {
                         if( value.indexOf(currentClass) != -1 ) {
                             parentOutlined.removeClass(value).addClass(newClass);
@@ -813,6 +1058,7 @@ var melisPluginEdition = (function($, window) {
                 pluginList['melisPluginTabletWidth'] = tabletWidth;
                 pluginList['melisPluginDesktopWidth'] = desktopWidth;
                 pluginList['resize'] = true;
+                
                 // pass is to savePageSession
                 savePluginUpdate(pluginList, toolBox.data("site-module"));
 
@@ -884,11 +1130,116 @@ var melisPluginEdition = (function($, window) {
 
     // init resize
     if ( parent.pluginResizable == 1 ) {
-        initResizable(); // disable for now
+        // initResizable(); // disable for now
+
+        // waitForTinyMCELoadedAndReady(function(allLoaded) {
+        //     if (allLoaded) {
+        //         console.log('awerawer');
+        //         initResizable();
+        //     }
+        //     else {
+        //         console.warn("TinyMCE editors did not load within the expected time.");
+        //     }
+        // });
+
+        // const interval = setInterval(function () {
+        //     if ($.active === 0) {
+        //         clearInterval(interval);
+        //         initResizable();
+        //     }
+        // }, 100); // Check every 100ms
+
+        onParentFullyLoaded(() => {
+            // console.log('✅ Parent page is fully loaded');
+            initResizable();
+        });
     }
+
+    function onParentFullyLoaded(callback) {
+        if (!window.parent || window.parent === window) {
+            // Not inside an iframe
+            return;
+        }
+
+        const parentDoc = window.parent.document;
+
+        if (parentDoc.readyState === 'complete') {
+            // Parent is already fully loaded
+            callback();
+        } else {
+            // Wait until the parent is fully loaded
+            window.parent.addEventListener('load', () => {
+                callback();
+            });
+        }
+    }
+
+    function browserDetect() {
+        var $html   = $("html"),
+            ua      = navigator.userAgent;
+
+                /* MSIE used to detect old browsers and Trident used to newer ones, Edge for Microsoft Edge */
+                if ( ua.indexOf("MSIE ") > -1 || ua.indexOf("Trident/") > -1 || ua.indexOf("Edge/") > -1 ) {
+                    $html.addClass("ie_edge");
+                } else if ( ua.indexOf("Chrome/") > -1 ) {
+                    $html.addClass("chrome");
+                } else if ( ua.indexOf("Safari/") > -1 ) {
+                    $html.addClass("safari");
+                } else if ( ua.indexOf("Firefox/") > -1 ) {
+                    $html.addClass("firefox");
+                }
+
+            var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+
+                if ( isOpera ) {
+                    $html.addClass("opera");
+                }
+    }
+
+    /* function allTinyMCEEditorsLoaded(callback) {
+        var checkInterval = 100; // milliseconds
+        var maxWaitTime = 10000; // 10 seconds
+        var waited = 0;
+    
+        var interval = setInterval(function () {
+            // Check if tinymce and tinymce.editors are defined
+            if (window.tinymce && Array.isArray(tinymce.editors)) {
+                var editors = tinymce.editors;
+    
+                // Check if all editors are initialized
+                var allReady = editors.length > 0 && editors.every(function (editor) {
+                    return editor.initialized && !editor.removed;
+                });
+    
+                if (allReady) {
+                    clearInterval(interval);
+                    callback(true);
+                    return;
+                }
+            }
+    
+            // Stop checking after max wait time
+            waited += checkInterval;
+            if (waited >= maxWaitTime) {
+                clearInterval(interval);
+                callback(false);
+            }
+    
+        }, checkInterval);
+    } */
+
+    /* function waitForTinyMCELoadedAndReady(callback) {
+        var checkTinyMCEInterval = setInterval(function () {
+            if (window.tinymce && typeof tinymce.init === 'function') {
+                clearInterval(checkTinyMCEInterval);
+                allTinyMCEEditorsLoaded(callback);
+            }
+        }, 100);
+    } */
 
     moveResponsiveClass();
     pluginDetector();
+    browserDetect();
     
     return {
         submitPluginForms       :       submitPluginForms,

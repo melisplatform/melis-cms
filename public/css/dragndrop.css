@@ -411,7 +411,8 @@ body {
     -webkit-box-shadow: 0 0 0 1px #e61c23;
     -moz-box-shadow: 0 0 0 1px #e61c23;
     -ms-box-shadow: 0 0 0 1px #e61c23;
-    z-index: 9999996 !important;
+    /* z-index: 9999996 !important; */
+    z-index: 999;
 }
 
 .melis-ui-outlined:hover .m-plugin-sub-tools {
@@ -1010,6 +1011,7 @@ span.melis-cms-filter-btn-mini-tpl-category.active i {
     color: #222f3e;
     cursor: pointer;
 }
+
 /*Added to fixed the problem on page edition plugin icon alignment*/
 .melis-plugin-indicator i.fa.fa-plug {
     line-height: 40px;

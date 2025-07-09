@@ -263,9 +263,19 @@ class PageEditionController extends MelisAbstractActionController
             
             // removing plugin from session
             $container = new Container('meliscms');
-            if (!empty($container['content-pages'][$pageId][$pluginTag][$pluginId]))
+            if (!empty($container['content-pages'][$pageId][$pluginTag][$pluginId])) {
                 unset($container['content-pages'][$pageId][$pluginTag][$pluginId]);
-            
+
+                //remove plugin inside dnd
+                foreach($container['content-pages'][$pageId] as $key => $dndList){
+                    foreach($dndList as $k => $xml){
+                        if($this->isWellFormedXml($xml)) {
+                            $container['content-pages'][$pageId][$key][$k] = $this->removeFromXML($pluginId, $xml);
+                        }
+                    }
+                }
+            }
+
             $this->getEventManager()->trigger('meliscms_page_removesession_plugin_end', null, $parameters);
             
             $result = array(
@@ -275,6 +285,50 @@ class PageEditionController extends MelisAbstractActionController
         }
          
         return new JsonModel($result);
+    }
+
+    /**
+     * @param $pluginId
+     * @param $xmlString
+     * @return string
+     */
+    private function removeFromXML($pluginId, $xmlString)
+    {
+        $xml = simplexml_load_string($xmlString);
+
+        $xpath = '//plugin[@id="'.$pluginId.'"]';
+        $plugins = $xml->xpath($xpath);
+
+        foreach ($plugins as $plugin) {
+            $dom = dom_import_simplexml($plugin);
+            $dom->parentNode->removeChild($dom);
+        }
+
+// Convert SimpleXML to DOMDocument for clean output
+        $dom = new \DOMDocument();
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($xml->asXML());
+
+// Save without XML declaration
+        return $dom->saveXML($dom->documentElement);
+    }
+
+    /**
+     * @param $xmlString
+     * @return mixed
+     */
+    private function isWellFormedXml($xmlString)
+    {
+        libxml_use_internal_errors(true); // Suppress standard XML errors
+
+        $doc = new \DOMDocument();
+        $isValid = $doc->loadXML($xmlString);
+
+        libxml_clear_errors(); // Clear any collected errors
+        libxml_use_internal_errors(false); // Restore previous setting
+
+        return $isValid;
     }
 
     /**
