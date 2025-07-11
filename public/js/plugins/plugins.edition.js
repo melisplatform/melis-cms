@@ -25,7 +25,11 @@ var melisPluginEdition = (function($, window) {
             $melisUiOutlined.addClass("melis-focus");
     });
 
-    $_body.on("mouseover", ".melis-editable", function() {
+    $_body.on("blur", ".melis-ui-outlined.melis-focus", function() {
+        $(this).removeClass("melis-focus");
+    });
+
+    /* $_body.on("mouseover", ".melis-editable", function() {
         let $thisOver               = $(this),
             $dndLayoutWrapperOver   = $thisOver.closest(".dnd-layout-wrapper");
             $dndLayoutIndiOver      = $dndLayoutWrapperOver.find(".dnd-layout-indicator"),
@@ -39,39 +43,33 @@ var melisPluginEdition = (function($, window) {
                     $toolsBoxOver.css("left", "12px");
                 }
             }, 500);
-    });
+    }); */
 
-    $_body.on("blur", ".melis-ui-outlined.melis-focus", function() {
-        $(this).removeClass("melis-focus");
-    });
-
-    $_body.on("mouseenter", ".melis-editable", function() {
+    /* $_body.on("mouseenter", ".melis-editable", function() {
         clearTimeout(editableHoverTimeout);
 
         let $editableEnter  = $(this),
             $toolsBoxEnter  = $editableEnter.closest(".melis-ui-outlined").find(".melis-plugin-tools-box");
 
             if($toolsBoxEnter.length) {
-                $toolsBoxEnter.addClass("height-auto");
+                $editableEnter.addClass("hovering");
+                // $toolsBoxEnter.addClass("height-auto");
                 $toolsBoxEnter.css("top", -$toolsBoxEnter.outerHeight());
             }
-
-            $editableEnter.addClass("hovering");
     }).on("mouseleave", ".melis-editable", function() {
         editableHoverTimeout = setTimeout(() => {
             let $editableLeave = $(this),
                 $toolsBoxLeave = $editableLeave.closest(".melis-ui-outlined").find(".melis-plugin-tools-box");
 
                 if($toolsBoxLeave.length) {
-                    $toolsBoxLeave.removeClass("height-auto");
+                    $editableLeave.removeClass("hovering");
+                    // $toolsBoxLeave.removeClass("height-auto");
                     //$toolsBoxLeave.css("top", -40); // revert to default top value
                 }
-
-                $editableLeave.removeClass("hovering");
         }, 10); // delay for a probably prevents instant flicker
-    });
+    }); */
 
-    $_body.on("mouseenter", ".melis-plugin-tools-box", function() {
+    /* $_body.on("mouseenter", ".melis-plugin-tools-box", function() {
         let $toolsBoxHeightAutoEnter = $(this),
             height = $toolsBoxHeightAutoEnter.outerHeight();
 
@@ -91,7 +89,7 @@ var melisPluginEdition = (function($, window) {
                 $toolsBoxHeightAutoLeave.css("margin-left", 0);
                 //$toolsBoxHeightAutoLeave.css("top", -40); // revert to default top value
             }
-    });
+    }); */
     
     /* 
      * Checking parent body events handler to avoid multiple events of the button

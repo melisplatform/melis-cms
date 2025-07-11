@@ -27,20 +27,6 @@ $(function () {
 
                     // $thisEnter.addClass("hovering");
             });
-            /* .on("mouseleave", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator", function() {
-                console.log(`.dnd-layout-indicator mouseleave !!!`);
-                indicatorHoverTimeout = setTimeout(() => {
-                    let $thisLeave              = $(this),
-                        $dndLayoutWrapperLeave  = $thisLeave.closest(".dnd-layout-wrapper"),
-                        $zoneLeave              = $dndLayoutWrapperLeave.find(".melis-dragdropzone"),
-                        $uiOutlinedFirstLeave   = $zoneLeave.find(".melis-ui-outlined").first(),
-                        $toolBoxLeave           = $uiOutlinedFirstLeave.find(".melis-plugin-tools-box");
-
-                        mouseLeaveDndLayoutButtons($thisLeave.next(".dnd-layout-buttons"));
-
-                        $thisLeave.removeClass("hovering");
-                }, 10); // delay for a probably prevents instant flicker
-            }); */
 
         $body
             .on("mouseenter", ".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-buttons", function() {
