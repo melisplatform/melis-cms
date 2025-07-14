@@ -340,6 +340,7 @@ button.column-icon:hover .icon-col-bg {
     opacity: 0.8;
 }
 button.column-icon .icon-col-bg {
+    background-color: #fff;
     border-radius: 3px;
 }
 .dnd-layout-indicator .column-icon {
