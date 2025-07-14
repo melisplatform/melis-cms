@@ -359,6 +359,10 @@ button.column-icon .icon-col-bg {
     height: 10px;
     border-top-color: transparent;
 }
+.dnd-layout-buttons .icon-row.justify-content-center {
+    display: flex;
+    justify-content: center;
+}
 .dnd-layout-indicator .column-icon .icon-col-6 {
     width: 45%;
 }
