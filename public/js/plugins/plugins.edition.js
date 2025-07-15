@@ -564,7 +564,6 @@ var melisPluginEdition = (function($, window) {
         // });
 
         pluginListContainer = extractContainers(parentDragndropContainer, pageId, reference);
-
         if (typeof siteModule !== "undefined") {
             savePluginUpdate(pluginListContainer, siteModule);
         }
@@ -590,19 +589,63 @@ var melisPluginEdition = (function($, window) {
 		}
 
         // Include plugin_list from this container only (not nested ones)
-        const pluginBoxes = $container.find('.melis-plugin-tools-box').filter(function () {
-            return $(this).closest('.melis-dragdropzone-container').is($container);
+        // const pluginBoxes = $container.find('.melis-plugin-tools-box').filter(function () {
+        //     return $(this).closest('.melis-dragdropzone-container').is($container);
+        // });
+
+        const $pluginBoxes = [];
+        $container.find('.melis-plugin-tools-box').each(function(i, el) {
+            const $this = $(this);
+            const uiOutlined = $this.parents('.melis-ui-outlined').last();
+            const plList = uiOutlined.find('.melis-ui-outlined');
+
+            if (plList.length > 0) {
+                const topBox = uiOutlined.children('.melis-plugin-tools-box').first();
+                console.log(topBox);
+                if (topBox.length) {
+                    $pluginBoxes.push(topBox);
+                }
+            } else {
+                $pluginBoxes.push($this);
+            }
         });
+        const pluginBoxes = $($.map($pluginBoxes, el => el.get(0))); // unified jQuery object
+
+        // if (pluginBoxes.length) {
+        //     result.melisDragDropZoneListPlugin = pluginBoxes.map(function () {
+        //         return {
+        //             melisModule: $(this).data("module"),
+        //             melisPluginName: $(this).data("plugin"),
+        //             melisPluginId: $(this).data("plugin-id"),
+        //             melisPluginTag: $(this).data("melis-tag"),
+        //         };
+        //     }).get();
+        // }
 
         if (pluginBoxes.length) {
+            const seenIds = new Set();
+            const seenTags = new Set();
+
             result.melisDragDropZoneListPlugin = pluginBoxes.map(function () {
+                const $el = $(this);
                 return {
-                    melisModule: $(this).data("module"),
-                    melisPluginName: $(this).data("plugin"),
-                    melisPluginId: $(this).data("plugin-id"),
-                    melisPluginTag: $(this).data("melis-tag"),
+                    melisModule: $el.data("module"),
+                    melisPluginName: $el.data("plugin"),
+                    melisPluginId: $el.data("plugin-id"),
+                    melisPluginTag: $el.data("melis-tag"),
                 };
-            }).get();
+            }).get().filter(function (plugin) {
+                const isIdUnique = !seenIds.has(plugin.melisPluginId);
+                const isTagUnique = !seenTags.has(plugin.melisPluginTag);
+
+                if (isIdUnique && isTagUnique) {
+                    seenIds.add(plugin.melisPluginId);
+                    seenTags.add(plugin.melisPluginTag);
+                    return true;
+                }
+                // duplicate found, skip
+                return false;
+            });
         }
 
         // Get only direct nested .melis-dragdropzone-container children, skipping deeper ones
