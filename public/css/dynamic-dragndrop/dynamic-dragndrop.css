@@ -363,6 +363,7 @@ button.column-icon .icon-col-bg {
     display: flex;
     justify-content: center;
 }
+.dnd-arrow-buttons .btn,
 .dnd-plus-remove-buttons .dnd-remove-button,
 .dnd-plus-remove-buttons .dnd-plus-button {
     background-color: transparent;
