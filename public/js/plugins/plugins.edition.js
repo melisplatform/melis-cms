@@ -25,7 +25,11 @@ var melisPluginEdition = (function($, window) {
             $melisUiOutlined.addClass("melis-focus");
     });
 
-    $_body.on("mouseover", ".melis-editable", function() {
+    $_body.on("blur", ".melis-ui-outlined.melis-focus", function() {
+        $(this).removeClass("melis-focus");
+    });
+
+    /* $_body.on("mouseover", ".melis-editable", function() {
         let $thisOver               = $(this),
             $dndLayoutWrapperOver   = $thisOver.closest(".dnd-layout-wrapper");
             $dndLayoutIndiOver      = $dndLayoutWrapperOver.find(".dnd-layout-indicator"),
@@ -39,39 +43,33 @@ var melisPluginEdition = (function($, window) {
                     $toolsBoxOver.css("left", "12px");
                 }
             }, 500);
-    });
+    }); */
 
-    $_body.on("blur", ".melis-ui-outlined.melis-focus", function() {
-        $(this).removeClass("melis-focus");
-    });
-
-    $_body.on("mouseenter", ".melis-editable", function() {
+    /* $_body.on("mouseenter", ".melis-editable", function() {
         clearTimeout(editableHoverTimeout);
 
         let $editableEnter  = $(this),
             $toolsBoxEnter  = $editableEnter.closest(".melis-ui-outlined").find(".melis-plugin-tools-box");
 
             if($toolsBoxEnter.length) {
-                $toolsBoxEnter.addClass("height-auto");
+                $editableEnter.addClass("hovering");
+                // $toolsBoxEnter.addClass("height-auto");
                 $toolsBoxEnter.css("top", -$toolsBoxEnter.outerHeight());
             }
-
-            $editableEnter.addClass("hovering");
     }).on("mouseleave", ".melis-editable", function() {
         editableHoverTimeout = setTimeout(() => {
             let $editableLeave = $(this),
                 $toolsBoxLeave = $editableLeave.closest(".melis-ui-outlined").find(".melis-plugin-tools-box");
 
                 if($toolsBoxLeave.length) {
-                    $toolsBoxLeave.removeClass("height-auto");
+                    $editableLeave.removeClass("hovering");
+                    // $toolsBoxLeave.removeClass("height-auto");
                     //$toolsBoxLeave.css("top", -40); // revert to default top value
                 }
-
-                $editableLeave.removeClass("hovering");
         }, 10); // delay for a probably prevents instant flicker
-    });
+    }); */
 
-    $_body.on("mouseenter", ".melis-plugin-tools-box", function() {
+    /* $_body.on("mouseenter", ".melis-plugin-tools-box", function() {
         let $toolsBoxHeightAutoEnter = $(this),
             height = $toolsBoxHeightAutoEnter.outerHeight();
 
@@ -91,7 +89,7 @@ var melisPluginEdition = (function($, window) {
                 $toolsBoxHeightAutoLeave.css("margin-left", 0);
                 //$toolsBoxHeightAutoLeave.css("top", -40); // revert to default top value
             }
-    });
+    }); */
     
     /* 
      * Checking parent body events handler to avoid multiple events of the button
@@ -566,7 +564,6 @@ var melisPluginEdition = (function($, window) {
         // });
 
         pluginListContainer = extractContainers(parentDragndropContainer, pageId, reference);
-
         if (typeof siteModule !== "undefined") {
             savePluginUpdate(pluginListContainer, siteModule);
         }
@@ -592,19 +589,63 @@ var melisPluginEdition = (function($, window) {
 		}
 
         // Include plugin_list from this container only (not nested ones)
-        const pluginBoxes = $container.find('.melis-plugin-tools-box').filter(function () {
-            return $(this).closest('.melis-dragdropzone-container').is($container);
+        // const pluginBoxes = $container.find('.melis-plugin-tools-box').filter(function () {
+        //     return $(this).closest('.melis-dragdropzone-container').is($container);
+        // });
+
+        const $pluginBoxes = [];
+        $container.find('.melis-plugin-tools-box').each(function(i, el) {
+            const $this = $(this);
+            const uiOutlined = $this.parents('.melis-ui-outlined').last();
+            const plList = uiOutlined.find('.melis-ui-outlined');
+
+            if (plList.length > 0) {
+                const topBox = uiOutlined.children('.melis-plugin-tools-box').first();
+                console.log(topBox);
+                if (topBox.length) {
+                    $pluginBoxes.push(topBox);
+                }
+            } else {
+                $pluginBoxes.push($this);
+            }
         });
+        const pluginBoxes = $($.map($pluginBoxes, el => el.get(0))); // unified jQuery object
+
+        // if (pluginBoxes.length) {
+        //     result.melisDragDropZoneListPlugin = pluginBoxes.map(function () {
+        //         return {
+        //             melisModule: $(this).data("module"),
+        //             melisPluginName: $(this).data("plugin"),
+        //             melisPluginId: $(this).data("plugin-id"),
+        //             melisPluginTag: $(this).data("melis-tag"),
+        //         };
+        //     }).get();
+        // }
 
         if (pluginBoxes.length) {
+            const seenIds = new Set();
+            const seenTags = new Set();
+
             result.melisDragDropZoneListPlugin = pluginBoxes.map(function () {
+                const $el = $(this);
                 return {
-                    melisModule: $(this).data("module"),
-                    melisPluginName: $(this).data("plugin"),
-                    melisPluginId: $(this).data("plugin-id"),
-                    melisPluginTag: $(this).data("melis-tag"),
+                    melisModule: $el.data("module"),
+                    melisPluginName: $el.data("plugin"),
+                    melisPluginId: $el.data("plugin-id"),
+                    melisPluginTag: $el.data("melis-tag"),
                 };
-            }).get();
+            }).get().filter(function (plugin) {
+                const isIdUnique = !seenIds.has(plugin.melisPluginId);
+                const isTagUnique = !seenTags.has(plugin.melisPluginTag);
+
+                if (isIdUnique && isTagUnique) {
+                    seenIds.add(plugin.melisPluginId);
+                    seenTags.add(plugin.melisPluginTag);
+                    return true;
+                }
+                // duplicate found, skip
+                return false;
+            });
         }
 
         // Get only direct nested .melis-dragdropzone-container children, skipping deeper ones

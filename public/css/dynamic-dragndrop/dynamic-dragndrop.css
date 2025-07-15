@@ -340,6 +340,7 @@ button.column-icon:hover .icon-col-bg {
     opacity: 0.8;
 }
 button.column-icon .icon-col-bg {
+    background-color: #fff;
     border-radius: 3px;
 }
 .dnd-layout-indicator .column-icon {
@@ -357,6 +358,19 @@ button.column-icon .icon-col-bg {
 .dnd-layout-indicator .column-icon .icon-row {
     height: 10px;
     border-top-color: transparent;
+}
+.dnd-layout-buttons .icon-row.justify-content-center {
+    display: flex;
+    justify-content: center;
+}
+.dnd-arrow-buttons .btn,
+.dnd-plus-remove-buttons .dnd-remove-button,
+.dnd-plus-remove-buttons .dnd-plus-button {
+    background-color: transparent;
+    position: relative;
+}
+.dnd-plus-remove-buttons .dnd-plus-button .fa {
+    color: #fff;
 }
 .dnd-layout-indicator .column-icon .icon-col-6 {
     width: 45%;
@@ -756,7 +770,8 @@ button:disabled.dnd-remove-button:hover {
     opacity: .9 !important;
 }
 .firefox .dnd-plus-remove-buttons button:disabled.dnd-remove-button .fa-ban {
-    left: 28% !important;
+    left: 6px !important;
+    top: 6px !important;
 }
 button:disabled.dnd-remove-button .fa-ban {
     color: #808080;
@@ -765,9 +780,11 @@ button:disabled.dnd-remove-button .fa-ban {
 
     position: absolute;
     z-index: 1;
-    left: 27%;
-    /* top: 28%; */
-    top: 22%;
+    /* left: 27%;
+    top: 22%; */
+
+    left: 5px;
+    top: 6px;
 
     filter: drop-shadow(0 0 0.5px rgba(0, 0, 0, 0.3));
 }
@@ -778,9 +795,11 @@ button:disabled.dnd-remove-button .fa-trash {
 
     position: absolute;
     z-index: 0;
-    /* top: 22%; */
-    top: 18%;
-    left: 30%;
+    /* top: 18%;
+    left: 30%; */
+
+    top: 5px;
+    left: 6px;
 
     font-size: 18px;
 }
@@ -790,10 +809,10 @@ button:disabled.dnd-remove-button .fa-trash {
 .melis-plugin-indicator {
     left: 20px;
 }
-.melis-dragdropzone .melis-ui-outlined:first-child .melis-plugin-tools-box,
-.melis-dragdropzone .row .col-12:first-child .melis-ui-outlined:first-child > .melis-plugin-tools-box {
+.dnd-plugins-content.dynamic .melis-dragdropzone > .melis-ui-outlined:first-child > .melis-plugin-tools-box,
+.dnd-plugins-content.dynamic .melis-dragdropzone .row .col-12:first-child .melis-ui-outlined:first-child > .melis-plugin-tools-box {
     left: 12px;
 }
-.dnd-layout-wrapper .row .col-12:not(:first-child) .melis-dragdropzone .melis-ui-outlined .melis-plugin-tools-box {
+.dnd-plugins-content.dynamic .dnd-layout-wrapper .row .col-12:not(:first-child) .melis-dragdropzone .melis-ui-outlined .melis-plugin-tools-box {
     left: 0;
 }
