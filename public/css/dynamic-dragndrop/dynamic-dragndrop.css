@@ -370,8 +370,6 @@ button.column-icon .icon-col-bg {
 }
 .dnd-plus-remove-buttons .dnd-plus-button .fa {
     color: #fff;
-    position: relative;
-    top: -2px;
 }
 .dnd-layout-indicator .column-icon .icon-col-6 {
     width: 45%;
@@ -784,8 +782,8 @@ button:disabled.dnd-remove-button .fa-ban {
     /* left: 27%;
     top: 22%; */
 
-    left: 7px;
-    top: 8px;
+    left: 5px;
+    top: 6px;
 
     filter: drop-shadow(0 0 0.5px rgba(0, 0, 0, 0.3));
 }
