@@ -366,9 +366,12 @@ button.column-icon .icon-col-bg {
 .dnd-plus-remove-buttons .dnd-remove-button,
 .dnd-plus-remove-buttons .dnd-plus-button {
     background-color: transparent;
+    position: relative;
 }
 .dnd-plus-remove-buttons .dnd-plus-button .fa {
     color: #fff;
+    position: relative;
+    top: -2px;
 }
 .dnd-layout-indicator .column-icon .icon-col-6 {
     width: 45%;
@@ -768,7 +771,8 @@ button:disabled.dnd-remove-button:hover {
     opacity: .9 !important;
 }
 .firefox .dnd-plus-remove-buttons button:disabled.dnd-remove-button .fa-ban {
-    left: 28% !important;
+    left: 6px !important;
+    top: 6px !important;
 }
 button:disabled.dnd-remove-button .fa-ban {
     color: #808080;
@@ -779,9 +783,9 @@ button:disabled.dnd-remove-button .fa-ban {
     z-index: 1;
     /* left: 27%;
     top: 22%; */
-    
+
     left: 7px;
-    top: 5px;
+    top: 8px;
 
     filter: drop-shadow(0 0 0.5px rgba(0, 0, 0, 0.3));
 }
@@ -795,8 +799,8 @@ button:disabled.dnd-remove-button .fa-trash {
     /* top: 18%;
     left: 30%; */
 
-    top: 4px;
-    left: 8px;
+    top: 5px;
+    left: 6px;
 
     font-size: 18px;
 }
