@@ -363,6 +363,13 @@ button.column-icon .icon-col-bg {
     display: flex;
     justify-content: center;
 }
+.dnd-plus-remove-buttons .dnd-remove-button,
+.dnd-plus-remove-buttons .dnd-plus-button {
+    background-color: transparent;
+}
+.dnd-plus-remove-buttons .dnd-plus-button .fa {
+    color: #fff;
+}
 .dnd-layout-indicator .column-icon .icon-col-6 {
     width: 45%;
 }
@@ -770,9 +777,11 @@ button:disabled.dnd-remove-button .fa-ban {
 
     position: absolute;
     z-index: 1;
-    left: 27%;
-    /* top: 28%; */
-    top: 22%;
+    /* left: 27%;
+    top: 22%; */
+    
+    left: 7px;
+    top: 5px;
 
     filter: drop-shadow(0 0 0.5px rgba(0, 0, 0, 0.3));
 }
@@ -783,9 +792,11 @@ button:disabled.dnd-remove-button .fa-trash {
 
     position: absolute;
     z-index: 0;
-    /* top: 22%; */
-    top: 18%;
-    left: 30%;
+    /* top: 18%;
+    left: 30%; */
+
+    top: 4px;
+    left: 8px;
 
     font-size: 18px;
 }
