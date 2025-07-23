@@ -478,7 +478,7 @@ class MelisCmsPageService extends MelisGeneralService
                 'name'   => $duplicatePageData['page_name'],
                 'pageId' => $pageId,
                 'openPageAfterDuplicate' => $openPageAfterDuplicate,
-                'icon' => $iconTypes[$pageTreeData->page_type]
+                'icon' => $iconTypes[$pageTreeData->page_type] ?? 'fa-file-o'
             );
             $success = 1;
             $message = $this->getTool()->getTranslation('tr_melis_cms_duplicate_success', [$pageTreeData->page_name]);
