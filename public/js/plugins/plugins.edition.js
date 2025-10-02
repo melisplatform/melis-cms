@@ -706,7 +706,6 @@ var melisPluginEdition = (function ($, window) {
 
 			if (plList.length > 0) {
 				const topBox = uiOutlined.children(".melis-plugin-tools-box").first();
-				console.log(topBox);
 				if (topBox.length) {
 					$pluginBoxes.push(topBox);
 				}

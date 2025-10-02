@@ -246,6 +246,14 @@ var melisDragnDrop = (function ($, window) {
 			},
 			stop: function(event, ui) {
 				$("body .melis-dragdropzone").removeClass("highlight");
+
+				var $dropzone = $(this);
+				var dropzoneId = $dropzone.data("dragdropzone-id");
+				var tabId = window.parent.$("#" + parent.activeTabId).find(".melis-iframe").data("iframe-id");
+				
+				if (typeof melisPluginEdition !== "undefined" && dropzoneId) {
+					melisPluginEdition.sendDragnDropList(dropzoneId, tabId);
+				}
 			},
 			change: function (event, ui) {
 				setPluginWidth(ui);
