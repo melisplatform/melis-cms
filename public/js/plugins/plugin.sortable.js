@@ -9,7 +9,6 @@ var melisPluginSortable = (function($, window) {
     	// when changing plugins order
     	stop: function(event, ui) {
             $(".melis-dragdropzone").removeClass("highlight");
-
             if ( ui.item[0] ) { 
             	// reset items index
 	            $(ui.item[0]).css({"z-index": "1"});
