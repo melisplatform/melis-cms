@@ -38,7 +38,7 @@ class FrontPluginsController extends MelisAbstractActionController
         $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
         $userAuthDatas = $melisCoreAuth->getStorage()->read();
         $melisCoreCacheSystem = $this->getServiceManager()->get('MelisCoreCacheSystemService');
-        $cacheKey = 'meliscms_plugins_menu_'.(int)$userAuthDatas->usr_id;
+        $cacheKey = 'meliscms_plugins_menu_' . (int)$userAuthDatas->usr_id;
         $results = $melisCoreCacheSystem->getCacheByKey($cacheKey, PluginViewController::cacheConfig);
         if (!empty($results)) {
             $newView = new ViewModel();
@@ -60,7 +60,7 @@ class FrontPluginsController extends MelisAbstractActionController
         $pluginMenuHandler = $pluginSvc->getNewPluginMenuHandlerNotifDuration();
 
         $view = new ViewModel();
-       // $view->pluginsConfig = $finalPluginList;
+        // $view->pluginsConfig = $finalPluginList;
         $view->siteModule              = $siteModule;
         $view->latestPlugin            = $latesPlugin;
         $view->sectionNewPlugins       = array_unique($this->sectionHasNewPlugins);
@@ -83,21 +83,6 @@ class FrontPluginsController extends MelisAbstractActionController
      */
     public function renderPluginsMenuContentAction()
     {
-        /**
-         * Check if cache exist
-         */
-        // Get Current User ID
-        $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
-        $userAuthDatas = $melisCoreAuth->getStorage()->read();
-        $melisCoreCacheSystem = $this->getServiceManager()->get('MelisCoreCacheSystemService');
-        $cacheKey = 'meliscms_plugins_menu_content_'.(int)$userAuthDatas->usr_id;
-        $results = $melisCoreCacheSystem->getCacheByKey($cacheKey, PluginViewController::cacheConfig);
-        if (!empty($results)) {
-            return new JsonModel([
-                'view' => $results
-            ]);
-        }
-
         $config = $this->getServiceManager()->get('config');
         // $siteModule = $this->params()->fromRoute('siteModule', '');
         $pageId = $this->params()->fromQuery('pageId');
@@ -106,10 +91,25 @@ class FrontPluginsController extends MelisAbstractActionController
         $site = $pageTreeService->getSiteByPageId($pageId);
         if (empty($site))
             $site = $pageTreeService->getSiteByPageId($pageId, 'saved');
-    
+
         $siteModule = null;
         if ($site)
             $siteModule = $site->site_name;
+
+        /**
+         * Check if cache exist
+         */
+        // Get Current User ID
+        $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
+        $userAuthDatas = $melisCoreAuth->getStorage()->read();
+        $melisCoreCacheSystem = $this->getServiceManager()->get('MelisCoreCacheSystemService');
+        $cacheKey = 'meliscms_plugins_menu_content_' . (int)$userAuthDatas->usr_id . '_' . $siteModule;
+        $results = $melisCoreCacheSystem->getCacheByKey($cacheKey, PluginViewController::cacheConfig);
+        if (!empty($results)) {
+            return new JsonModel([
+                'view' => $results
+            ]);
+        }
 
         // melis plugin service
         $pluginSvc = $this->getServiceManager()->get('MelisCorePluginsService');
@@ -172,28 +172,21 @@ class FrontPluginsController extends MelisAbstractActionController
 
         $pluginHardcodedConfig = html_entity_decode($pluginHardcodedConfig, ENT_QUOTES);
         $pluginHardcodedConfig = html_entity_decode($pluginHardcodedConfig, ENT_QUOTES);
-        $pluginHardcodedConfig = unserialize($pluginHardcodedConfig, ['allowed_classes' => false]);  
+        $pluginHardcodedConfig = unserialize($pluginHardcodedConfig, ['allowed_classes' => false]);
 
         $errors = '';
         $tag = '';
         $tabs = array();
         $config = $this->getServiceManager()->get('config');
-        if (empty($module) || empty($pluginName) || empty($pageId) || empty($pluginId))
-        {
+        if (empty($module) || empty($pluginName) || empty($pageId) || empty($pluginId)) {
             $errors = $translator->translate('tr_melisfront_generate_error_No module or plugin or idpage parameters');
-        }
-        else
-        {
-            if (empty($config['plugins'][$module]['plugins'][$pluginName]))
-            {
+        } else {
+            if (empty($config['plugins'][$module]['plugins'][$pluginName])) {
                 $errors = $translator->translate('tr_melisfront_generate_error_Plugin config not found');
-            }
-            else
-            {
+            } else {
                 $pluginConf = $config['plugins'][$module]['plugins'][$pluginName];
 
-                try
-                {
+                try {
                     $pluginHardcodedConfig['id'] = $pluginId;
                     $pluginHardcodedConfig['pageId'] = $pageId;
                     $melisPlugin = $this->getServiceManager()->get('ControllerPluginManager')->get($pluginName);
@@ -201,9 +194,7 @@ class FrontPluginsController extends MelisAbstractActionController
                     $melisPlugin->getPluginConfigs();
                     $tabs = $melisPlugin->createOptionsForms();
                     $tag = $melisPlugin->getPluginXmlDbKey();
-                }
-                catch (Exception $e)
-                {
+                } catch (Exception $e) {
                     $errors = $translator->translate('tr_melisfront_generate_error_Plugin cant be created');
                 }
             }
@@ -241,31 +232,22 @@ class FrontPluginsController extends MelisAbstractActionController
         $tag = '';
         $tabs = array();
         $config = $this->getServiceManager()->get('config');
-        if (empty($module) || empty($pluginName) || empty($pageId) || empty($pluginId))
-        {
+        if (empty($module) || empty($pluginName) || empty($pageId) || empty($pluginId)) {
             $errors = $translator->translate('tr_melisfront_generate_error_No module or plugin or idpage parameters');
-        }
-        else
-        {
-            if (empty($config['plugins'][$module]['plugins'][$pluginName]))
-            {
+        } else {
+            if (empty($config['plugins'][$module]['plugins'][$pluginName])) {
                 $errors = $translator->translate('tr_melisfront_generate_error_Plugin config not found');
-            }
-            else
-            {
+            } else {
                 $pluginConf = $config['plugins'][$module]['plugins'][$pluginName];
 
-                try
-                {
+                try {
                     $pluginHardcodedConfig['id'] = $pluginId;
                     $pluginHardcodedConfig['pageId'] = $pageId;
                     $melisPlugin = $this->getServiceManager()->get('ControllerPluginManager')->get($pluginName);
                     $melisPlugin->setUpdatesPluginConfig($pluginHardcodedConfig);
                     $melisPlugin->getPluginConfigs();
                     $errorsTabs = $melisPlugin->createOptionsForms();
-                }
-                catch (Exception $e)
-                {
+                } catch (Exception $e) {
                     $errors = $translator->translate('tr_melisfront_generate_error_Plugin cant be created');
                 }
             }
@@ -274,19 +256,15 @@ class FrontPluginsController extends MelisAbstractActionController
         $success = 1;
         $finalErrors = array();
 
-        if ($errors != '')
-        {
+        if ($errors != '') {
             $success = 0;
             $finalErrors = array('general' => $errors);
         }
 
-        foreach($errorsTabs as $response) {
-            if(!$response['success']) {
+        foreach ($errorsTabs as $response) {
+            if (!$response['success']) {
                 $success = 0;
             }
-
-
-
         }
         $finalErrors = $errorsTabs;
 
@@ -302,9 +280,9 @@ class FrontPluginsController extends MelisAbstractActionController
     public function checkSessionPageAction()
     {
         $container = new Container('meliscms');
-        $pages = $container->getArrayCopy();//$container['content-pages'];
+        $pages = $container->getArrayCopy(); //$container['content-pages'];
 
-//        \Zend\Debug\Debug::dump($pages);
+        //        \Zend\Debug\Debug::dump($pages);
         print_r($pages);
 
         die;
@@ -318,10 +296,10 @@ class FrontPluginsController extends MelisAbstractActionController
         $text = '<melisCmsSlider id="showslider_1507009618" plugin_container_id="plugin_container_id_1507009628" plugin_container_id="plugin_container_id_1507009628" plugin_container_id="plugin_container_id_1507009628" plugin_container_id="plugin_container_id_1507009628" plugin_container_id="plugin_container_id_1507009628">	';
         $pattern = '/\splugin_container_id\=\"(.*?)\"/';
 
-        $replace = $plugin . ' id="'.$pluginId.'" plugin_container_id="this_is_the_id_1823121"';
+        $replace = $plugin . ' id="' . $pluginId . '" plugin_container_id="this_is_the_id_1823121"';
 
         $newValue = $text;
-        if(preg_match($pattern, $text)) {
+        if (preg_match($pattern, $text)) {
             $newValue = preg_replace($pattern, '', $text);
         }
 
@@ -344,13 +322,13 @@ class FrontPluginsController extends MelisAbstractActionController
             // melis plugins configrations
             // this means the module has a templating plugins or plugins
             if (isset($melisPluginsConfig['plugins']) && ! empty($melisPluginsConfig['plugins'])) {
-                if (in_array((strtolower($moduleName)),$activeModules) || $moduleName == "MelisMiniTemplate" ) {
+                if (in_array((strtolower($moduleName)), $activeModules) || $moduleName == "MelisMiniTemplate") {
                     foreach ($melisPluginsConfig['plugins'] as $pluginName =>  $pluginConfig) {
                         // list of excluded plugins
                         $excludedPlugins = [
                             'MelisFrontDragDropZonePlugin'
                         ];
-                        if (!in_array($pluginName,$excludedPlugins)) {
+                        if (!in_array($pluginName, $excludedPlugins)) {
                             // put site_module key under ['melis'] key
                             $pluginConfig['melis']['site_module'] = $siteModule;
                             // put section key  under['melis'] key
@@ -390,7 +368,7 @@ class FrontPluginsController extends MelisAbstractActionController
          */
         if (empty($marketPlaceModuleSection)) {
             $fallbackSection = $configSvc->getItem('/meliscore/datas/fallBacksection');
-            $marketPlaceModuleSection= $fallbackSection;
+            $marketPlaceModuleSection = $fallbackSection;
         }
         //custom sections
         $customSection = [
@@ -401,7 +379,7 @@ class FrontPluginsController extends MelisAbstractActionController
         // merge all sections
         $melisSection = array_merge($marketPlaceModuleSection, $customSection);
         // remove MelisCore section because there is no melis-core in front or templating plugins
-        if (($key = array_search('MelisCore',$melisSection)) !== false) {
+        if (($key = array_search('MelisCore', $melisSection)) !== false) {
             unset($melisSection[$key]);
         }
         $newPluginList = [];
@@ -414,7 +392,7 @@ class FrontPluginsController extends MelisAbstractActionController
         if (! empty($pluginList)) {
             // get vendorModules
             $vendorModules = $engineComposer->getVendorModules();
-            $vendorModules = array_unique(array_merge($moduleSvc->getActiveModules(),$vendorModules));
+            $vendorModules = array_unique(array_merge($moduleSvc->getActiveModules(), $vendorModules));
 
             // convert string to lower
             foreach ($vendorModules as $idx => $moduleName) {
@@ -424,17 +402,17 @@ class FrontPluginsController extends MelisAbstractActionController
             /*
              * organized plugins with no subcategory
              */
-            $publicModules = array_change_key_case($melisPuginsSvc->getMelisPublicModules(true), CASE_LOWER); 
+            $publicModules = array_change_key_case($melisPuginsSvc->getMelisPublicModules(true), CASE_LOWER);
 
             foreach ($pluginList as $moduleName => $plugins) {
                 // double check moduleName if it exisit on composer to avoid showing plugins that doesnt exists
-                if (in_array(strtolower($moduleName),$vendorModules) || ($moduleName == "MelisMiniTemplate")) {                   
-                   /*
+                if (in_array(strtolower($moduleName), $vendorModules) || ($moduleName == "MelisMiniTemplate")) {
+                    /*
                     * check first if the module is public or not
                     *  if public we will based the section on what is set from marketplace
                     */
                     $moduleSection = "";
-                    if (array_key_exists($moduleName,$publicModules)) {
+                    if (array_key_exists($moduleName, $publicModules)) {
                         $moduleSection = $publicModules[$moduleName]['section'];
                     }
 
@@ -446,10 +424,9 @@ class FrontPluginsController extends MelisAbstractActionController
                             } else {
                                 // if it goes here means module is either private or there is no internet connection
                                 $pluginSection = $pluginConfig['melis']['section'];
-
                             }
-                            $module =  $moduleName ;
-                            if (in_array($pluginSection,$melisSection)) {
+                            $module =  $moduleName;
+                            if (in_array($pluginSection, $melisSection)) {
                                 // melis conifguration
                                 $melisConfig = $pluginConfig['melis'];
                                 if (isset($melisConfig['subcategory']) && ! empty($melisConfig['subcategory'])) {
@@ -519,7 +496,6 @@ class FrontPluginsController extends MelisAbstractActionController
         }
 
         return $newPluginList;
-
     }
 
     /**
@@ -530,7 +506,7 @@ class FrontPluginsController extends MelisAbstractActionController
      */
     private function categorizeMiniTemplates($plugin_list, $pageId)
     {
-        if ( empty($plugin_list['MelisCms']['MelisMiniTemplate']))
+        if (empty($plugin_list['MelisCms']['MelisMiniTemplate']))
             return $plugin_list;
 
         $mini_template_sites = $plugin_list['MelisCms']['MelisMiniTemplate'];
