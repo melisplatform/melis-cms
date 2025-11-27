@@ -27,6 +27,7 @@
 	    'autoresize_on_init' => false,
 		'menubar' => 'file edit view insert format tools table help',
 	    'toolbar' => 'undo redo | accordion accordionremove | blocks fontfamily fontsize | bold italic strikethrough underline | alignleft aligncenter alignright alignjustify | bullist numlist | link unlink image | table media | lineheight outdent indent | forecolor backcolor removeformat | charmap | emoticons | minitemplate code fullscreen preview | save print | pagebreak anchor codesample | ltr rtl',
+		'font_size_formats' => '0.6665rem 0.8331rem 1.0rem 1.1664rem 1.4996rem 2.0rem 2.5rem 3.0rem',
 		'toolbar_mode' => 'sliding',
 		'deprecation_warnings' => false,
 		'promotion' => false,
