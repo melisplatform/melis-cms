@@ -712,9 +712,9 @@ var melisCms = (function() {
 		let $melisIframe = $("#" + id + "_id_meliscms_page").find(".melis-iframe");
 			waitForIframeReady($melisIframe, () => {
 				let setTimeoutIframe = setTimeout(() => {
-					let	iframeBody = $melisIframe[0].contentDocument.body;
+					let	iframeBody = $melisIframe[0].contentDocument?.body;
 						if (iframeBody) {
-							let height 	= $melisIframe[0].contentDocument.body.scrollHeight;
+							let height 	= iframeBody.scrollHeight;
 								if (height > 0) {
 									$melisIframe.css("height", height);
 								}
