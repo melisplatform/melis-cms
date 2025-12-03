@@ -21,22 +21,22 @@ class MelisCmsPageExportService extends MelisGeneralService
      * @var array
      */
     protected $defaultTableList = [  //table name service              table page id field name
-                                    'MelisEngineTablePageLang'      => 'plang_page_id',
-                                    'MelisEngineTablePagePublished' => 'page_id',
-                                    'MelisEngineTablePageSaved'     => 'page_id',
-                                    'MelisEngineTablePageSeo'       => 'pseo_id',
-                                    'MelisEngineTablePageStyle'     => 'pstyle_page_id'
-                                ];
+        'MelisEngineTablePageLang'      => 'plang_page_id',
+        'MelisEngineTablePagePublished' => 'page_id',
+        'MelisEngineTablePageSaved'     => 'page_id',
+        'MelisEngineTablePageSeo'       => 'pseo_id',
+        'MelisEngineTablePageStyle'     => 'pstyle_page_id'
+    ];
 
     /**
      *Default external tables needed to export page
-    * @var array
-    */
+     * @var array
+     */
     protected $defaultExternalTables = [
-                                            'MelisEngineTableStyle',
-                                            'MelisEngineTableTemplate',
-                                            'MelisEngineTableCmsLang'
-                                    ];
+        'MelisEngineTableStyle',
+        'MelisEngineTableTemplate',
+        'MelisEngineTableCmsLang'
+    ];
 
     protected $defaultExternalTablesList = [
         'melis_cms_template' => 'templates',
@@ -103,7 +103,7 @@ class MelisCmsPageExportService extends MelisGeneralService
              * check if we are going to extract the sub pages
              * of the page
              */
-            if($arrayParameters['includeSubPages']){
+            if ($arrayParameters['includeSubPages']) {
                 $subPagesXml = new \DOMDocument();
                 $subPagesXml->loadXML($this->processSubPagesExport($pageId));
                 $pageNode['domNode']->appendChild($pageNode['domInstance']->importNode($subPagesXml->documentElement, true));
@@ -128,7 +128,7 @@ class MelisCmsPageExportService extends MelisGeneralService
             /**
              * check if we need to export the page resources
              */
-            if($arrayParameters['exportPageResources']){
+            if ($arrayParameters['exportPageResources']) {
                 $result['resources'] = $this->exportPageResources($pageId, $arrayParameters['includeSubPages']);
             }
             $result['success'] = true;
@@ -157,7 +157,7 @@ class MelisCmsPageExportService extends MelisGeneralService
         // Sending service start event
         $arrayParameters = $this->sendEvent('melis_cms_page_export_start', $arrayParameters);
 
-        try{
+        try {
             //prepare the xml
             $tblXml = new \SimpleXMLElement('<tables/>');
 
@@ -165,10 +165,10 @@ class MelisCmsPageExportService extends MelisGeneralService
              * process the extracting of table data
              * and put in xml
              */
-            foreach($this->getTableServiceList() as $tblServiceName => $pageIdFieldName){
+            foreach ($this->getTableServiceList() as $tblServiceName => $pageIdFieldName) {
                 $tblGtWay = $this->getServiceManager()->get($tblServiceName);
                 $tblData = $tblGtWay->getEntryByField($pageIdFieldName, $pageId)->current();
-                if(!empty($tblData)){
+                if (!empty($tblData)) {
                     $this->arrayToXml($tblData, $tblXml, $tblGtWay->getTableGateway()->getTable());
                 }
             }
@@ -181,7 +181,7 @@ class MelisCmsPageExportService extends MelisGeneralService
 
             //return results
             $arrayParameters['results'] = $tblXmlDoc->saveXML();
-        }catch(\Exception $ex){
+        } catch (\Exception $ex) {
             exit($ex->getMessage());
         }
 
@@ -201,7 +201,7 @@ class MelisCmsPageExportService extends MelisGeneralService
         $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
         // Sending service start event
         $arrayParameters = $this->sendEvent('melis_cms_page_export_external_table_start', $arrayParameters);
-        try{
+        try {
             $adapter = $this->getServiceManager()->get('Laminas\Db\Adapter\Adapter');
             /**
              * prepare the table tag
@@ -211,7 +211,7 @@ class MelisCmsPageExportService extends MelisGeneralService
              * process the extracting of external tables
              * and put in xml
              */
-            foreach($this->defaultExternalTablesList as $tableName => $arrayKey) {
+            foreach ($this->defaultExternalTablesList as $tableName => $arrayKey) {
                 if (! empty($externalIds[$arrayKey])) {
                     $tblGtWay = new TableGateway($tableName, $adapter);
                     $primaryCol = $this->getTablePrimaryColumn($tableName);
@@ -233,7 +233,7 @@ class MelisCmsPageExportService extends MelisGeneralService
 
             //return results
             $arrayParameters['results'] = $tblXmlDoc->saveXML();
-        }catch(\Exception $ex){
+        } catch (\Exception $ex) {
             exit($ex->getMessage());
         }
 
@@ -249,16 +249,17 @@ class MelisCmsPageExportService extends MelisGeneralService
      * @param $children
      * @return mixed
      */
-    private function processSubPagesExport($pageId, $children = array()){
+    private function processSubPagesExport($pageId, $children = array())
+    {
 
         $childrenNode = $this->createXmlNode('children');
 
         $pageTreeService = $this->getServiceManager()->get('MelisEngineTree');
-        if(empty($children)) {
+        if (empty($children)) {
             $children = $pageTreeService->getPageChildren($pageId);
         }
 
-        foreach($children as $idx => $child) {
+        foreach ($children as $idx => $child) {
             /**
              * process the parent page
              */
@@ -273,7 +274,7 @@ class MelisCmsPageExportService extends MelisGeneralService
              * process the sub pages of the page
              */
             $subChildren = $pageTreeService->getPageChildren($child['tree_page_id']);
-            if(!empty($subChildren)){
+            if (!empty($subChildren)) {
                 $childrenData = $this->processSubPagesExport($child['tree_page_id'], $subChildren);
                 $pageData = $childrenData;
                 $pageSource = new \DOMDocument();
@@ -314,7 +315,7 @@ class MelisCmsPageExportService extends MelisGeneralService
             $pagePubContent = (!empty($pagePubContent->page_content)) ? $pagePubContent->page_content : '';
             $pageSavedContent = (!empty($pageSavedContent->page_content)) ? $pageSavedContent->page_content : '';
             //combine the content to extract the resources
-            $content = $pagePubContent.$pageSavedContent;
+            $content = $pagePubContent . $pageSavedContent;
             //get resources
             $this->getResources($content, $pageRessources);
             /**
@@ -324,9 +325,7 @@ class MelisCmsPageExportService extends MelisGeneralService
                 $pageRessources = array_merge($pageRessources, $this->extractPageChildResources($arrayParameters['pageId']));
             }
             $arrayParameters['results'] = array_unique($pageRessources);
-
-        }catch (\Exception $ex){
-
+        } catch (\Exception $ex) {
         }
 
         $arrayParameters = $this->sendEvent('melis_cms_page_export_ressources_end', $arrayParameters);
@@ -344,10 +343,10 @@ class MelisCmsPageExportService extends MelisGeneralService
         $resources = [];
         $pageTreeService = $this->getServiceManager()->get('MelisEngineTree');
         $children = $pageTreeService->getPageChildren($pageId);
-        foreach($children as $data){
+        foreach ($children as $data) {
             $pageContent = $data['page_content'];
             //check if page content is also available on page saved
-            if(!empty($data['s_page_content'])){
+            if (!empty($data['s_page_content'])) {
                 $pageContent .= $data['s_page_content'];
             }
             $this->getResources($pageContent, $resources);
@@ -382,8 +381,8 @@ class MelisCmsPageExportService extends MelisGeneralService
 
         $matches = array_merge($imageMatches, $videoMatches, $audioMatches);
 
-        foreach($matches as $list){
-            foreach($list as $val) {
+        foreach ($matches as $list) {
+            foreach ($list as $val) {
                 if (
                     strpos($val, 'img') === false ||
                     strpos($val, 'source') === false ||
@@ -416,7 +415,7 @@ class MelisCmsPageExportService extends MelisGeneralService
         $zip = new \ZipArchive();
         $zip->open($zipFileName, $zip::CREATE | $zip::OVERWRITE);
 
-        $this->addFolderToZip($folderPath.'/', $zip, '');
+        $this->addFolderToZip($folderPath . '/', $zip, '');
         // Zip archive will be created only after closing object
         return $zip->close();
     }
@@ -427,13 +426,14 @@ class MelisCmsPageExportService extends MelisGeneralService
      * @param $dir
      * @return bool
      */
-    public function deleteDirectory($path) {
+    public function deleteDirectory($path)
+    {
         $dir = opendir($path);
 
-        while(false !== ( $file = readdir($dir)) ) {
-            if (( $file != '.' ) && ( $file != '..' )) {
+        while (false !== ($file = readdir($dir))) {
+            if (($file != '.') && ($file != '..')) {
                 $full = $path . '/' . $file;
-                if ( is_dir($full) ) {
+                if (is_dir($full)) {
                     $this->deleteDirectory($full);
                 } else {
                     unlink($full);
@@ -459,32 +459,32 @@ class MelisCmsPageExportService extends MelisGeneralService
          * make sure the temporary folder
          * is already created
          */
-        if(!file_exists($folderPath)) {
+        if (!file_exists($folderPath)) {
             mkdir($folderPath, 0777);
         }
 
         /**
          * check if folder is writable
          */
-        if(is_writable($folderPath)){
-            foreach($resources as $path){
+        if (is_writable($folderPath)) {
+            foreach ($resources as $path) {
                 $info = pathinfo($path);
 
-                if(!empty($info['dirname'])){
-                    $fileNewPath = $folderPath.$info['dirname'];
+                if (!empty($info['dirname'])) {
+                    $fileNewPath = $folderPath . $info['dirname'];
 
                     /**
                      * create the folder path if not exist
                      */
-                    if(!file_exists($fileNewPath)){
+                    if (!file_exists($fileNewPath)) {
                         mkdir($fileNewPath, 0777, true);
                     }
                     /**
                      * copy the file to the temporary folder
                      */
-                    if(is_writable($fileNewPath)){
-                        if (file_exists($docRoot.$path))
-                            copy($docRoot.$path, $fileNewPath.'/'.$info['basename']);
+                    if (is_writable($fileNewPath)) {
+                        if (file_exists($docRoot . $path))
+                            copy($docRoot . $path, $fileNewPath . '/' . $info['basename']);
                     }
                 }
             }
@@ -529,18 +529,19 @@ class MelisCmsPageExportService extends MelisGeneralService
      * @param $xml
      * @param $table
      */
-    private function arrayToXml( $data, &$xml, $table = null) {
-        if(!empty($table)) {
+    private function arrayToXml($data, &$xml, $table = null)
+    {
+        if (!empty($table)) {
             $tblXml = $xml->addChild($table);
-        }else{
+        } else {
             $tblXml = $xml;
         }
 
-        foreach( $data as $key => $value ) {
-            if( is_numeric($key) ){
-                $key = 'row_'.$key; //dealing with <0/>..<n/> issues
+        foreach ($data as $key => $value) {
+            if (is_numeric($key)) {
+                $key = 'row_' . $key; //dealing with <0/>..<n/> issues
             }
-            if( is_array($value) ) {
+            if (is_array($value)) {
                 $subnode = $tblXml->addChild($key);
                 $this->arrayToXml($value, $subnode);
             } else {
@@ -563,8 +564,12 @@ class MelisCmsPageExportService extends MelisGeneralService
         return ['domInstance' => $domInstance, 'domNode' => $domNode];
     }
 
-    private function removeXmlDeclaration($xml){
-        $xml = preg_replace( "/<\?xml.+?\?>/", "", $xml);
+    private function removeXmlDeclaration($xml)
+    {
+        $xml = preg_replace("/<\?xml.+?\?>/", "", $xml);
+
+        // Regex: Find '&' that is NOT immediately followed by a valid entity code
+        $xml = preg_replace('/&(?!#?[a-z0-9]+;)/', '&amp;', $xml);
         return $xml;
     }
 
@@ -593,7 +598,8 @@ class MelisCmsPageExportService extends MelisGeneralService
         }
     }
 
-    private function getAllPageIds($pageId, &$pages, &$templates, &$styles, &$langs, &$pageCount, $includeSubPages) {
+    private function getAllPageIds($pageId, &$pages, &$templates, &$styles, &$langs, &$pageCount, $includeSubPages)
+    {
         $pageTreeTable = $this->getServiceManager()->get('MelisEngineTablePageTree');
         $pageSavedTable = $this->getServiceManager()->get('MelisEngineTablePageSaved');
         $type = '';
