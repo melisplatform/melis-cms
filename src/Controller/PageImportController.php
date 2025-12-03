@@ -45,6 +45,9 @@ class PageImportController extends MelisAbstractActionController
             $max_size = $max_post;
         }
 
+        if (!$max_size)
+            $max_size = '2M'; // set 2M default as value  if not set
+
         $userTable = $this->getServiceManager()->get('MelisCoreTableUser');
         $userData = $userTable->getEntryByField('usr_id', $this->getUser()->usr_id)->current();
 
@@ -99,7 +102,7 @@ class PageImportController extends MelisAbstractActionController
 
         $zip = new ZipArchive();
         $res = $zip->open($formData['page_tree_import']['tmp_name']);
-    
+
         if ($res === true) {
             $xml = $zip->getFromName('PageExport.xml');
             $zip->close();
@@ -187,7 +190,8 @@ class PageImportController extends MelisAbstractActionController
      * @param $input
      * @param $form
      */
-    private function prepareFile($input, $form) {
+    private function prepareFile($input, $form)
+    {
         $target = $_SERVER['DOCUMENT_ROOT'] . '/xml';
 
         if (! is_dir($target))
@@ -335,10 +339,11 @@ class PageImportController extends MelisAbstractActionController
     }
 
     // get bytes
-    private function asBytes($size) {
+    private function asBytes($size)
+    {
         $size = trim($size);
-        $s = [ 'g'=> 1<<30, 'm' => 1<<20, 'k' => 1<<10 ];
-        return intval($size) * ($s[strtolower(substr($size,-1))] ?: 1);
+        $s = ['g' => 1 << 30, 'm' => 1 << 20, 'k' => 1 << 10];
+        return intval($size) * ($s[strtolower(substr($size, -1))] ?: 1);
     }
 
     private function getPageName($pageId)
