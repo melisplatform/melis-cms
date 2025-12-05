@@ -17,8 +17,6 @@ $(function () {
 			function () {
 				$(this).find(".dnd-layout-indicator").css("opacity", 0);
 				$(this).find(".dnd-layout-indicator").css("pointer-events", "none");
-
-				//mouseLeaveDndLayoutButtons( $(this).find(".dnd-layout-buttons") );
 			}
 		);
 
@@ -27,15 +25,14 @@ $(function () {
 		".melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator",
 		function () {
 			// clearTimeout(indicatorHoverTimeout);
-			let $thisEnter = $(this),
-				$dndLayoutWrapperEnter = $thisEnter.closest(".dnd-layout-wrapper"),
-				$zoneEnter = $dndLayoutWrapperEnter.find(".melis-dragdropzone"),
-				$uiOutlinedFirstEnter = $zoneEnter.find(".melis-ui-outlined").first(),
-				$toolBoxEnter = $uiOutlinedFirstEnter.find(".melis-plugin-tools-box");
+			let $thisEnter 				= $(this),
+				$dndLayoutWrapperEnter 	= $thisEnter.closest(".dnd-layout-wrapper"),
+				$zoneEnter 				= $dndLayoutWrapperEnter.find(".melis-dragdropzone"),
+				$uiOutlinedFirstEnter 	= $zoneEnter.find(".melis-ui-outlined").first(),
+				$toolBoxEnter 			= $uiOutlinedFirstEnter.find(".melis-plugin-tools-box"),
+				$buttons 				= $thisEnter.next(".dnd-layout-buttons");
 
-			mouseEnterDndLayoutButtons($thisEnter.next(".dnd-layout-buttons"));
-
-			// $thisEnter.addClass("hovering");
+				mouseEnterDndLayoutButtons($buttons);
 		}
 	);
 
@@ -163,11 +160,11 @@ $(function () {
 					// save change to session
 					melisPluginEdition.sendDragnDropList(dndId, pageId);
 
-					// re-position .dnd-layout-buttons after remove dnd
-					topPositionLayoutButtons();
-
 					// handle display remove arrow buttons with .fa .fa-ban icon
 					handleDisplayRemoveArrowButtons();
+
+					// re-position .dnd-layout-buttons after remove dnd
+					topPositionLayoutButtons();
 
 					// reinitialize tinymce
 					waitForTagHtmlInit();
@@ -261,11 +258,11 @@ $(function () {
 					// dndContainer.find("#loader").remove();
 				}
 
-				// re-position .dnd-layout-buttons after remove dnd
-				topPositionLayoutButtons();
-
 				// check display of arrow buttons after plus
 				handleDisplayRemoveArrowButtons();
+
+				// re-position .dnd-layout-buttons after remove dnd
+				topPositionLayoutButtons();
 			})
 			.always(() => {
 				// dndContainer.find("#loader").remove();
@@ -310,11 +307,11 @@ $(function () {
 							// added to update iframe height
 							melisPluginEdition.calcFrameHeight();
 
-							// re-position .dnd-layout-buttons after remove dnd
-							topPositionLayoutButtons();
-
 							// check display of arrow buttons after remove
 							handleDisplayRemoveArrowButtons();
+
+							// re-position .dnd-layout-buttons after remove dnd
+							topPositionLayoutButtons();
 						}
 					);
 				})
@@ -404,22 +401,28 @@ $(function () {
 	}
 
 	function mouseEnterDndLayoutButtons($element) {
-		const $el = $element;
-		// console.log("mouseenter: cancel fade");
+		// try to calculate layout before measuring
+		let $tempCheck = $(".dnd-layout-buttons").first();
+			if($tempCheck.length) {
+				// trigger layout calculations
+				$tempCheck[0].offsetHeight;
 
-		const timeoutId = $el.data("fadeTimeout");
+				const $el = $element;
+				// console.log("mouseenter: cancel fade");
 
-		if (timeoutId) {
-			clearTimeout(timeoutId);
-			$el.removeData("fadeTimeout");
-		}
+				const timeoutId = $el.data("fadeTimeout");
 
-		$el.css("opacity", 1);
-		$el.css("pointer-events", "auto");
-		// $el.show();
+				if (timeoutId) {
+					clearTimeout(timeoutId);
+					$el.removeData("fadeTimeout");
+				}
 
-		// connected to dynamic-dragndrop.css .melis-dragdropzone-container > .dnd-layout-wrapper
-		$el.closest(".dnd-layout-wrapper").css("z-index", "unset"); // so that .dnd-layout-buttons are clickable
+				$el.css("opacity", 1);
+				$el.css("pointer-events", "auto");
+				// $el.show();
+
+				$el.closest(".dnd-layout-wrapper").css("z-index", "unset"); // so that .dnd-layout-buttons are clickable
+			}
 	}
 
 	function mouseLeaveDndLayoutButtons($element) {
@@ -515,9 +518,6 @@ $(function () {
 		return max;
 	}
 
-	// for easy top position based on .dnd-layout-buttons height
-	topPositionLayoutButtons();
-
 	function updateDndOrder(pageId, callback) {
 		let dndIds = [];
 		$("body .dnd-plugins-content").each((i, v) => {
@@ -579,72 +579,93 @@ $(function () {
 
 	// function call
 	handleDisplayRemoveArrowButtons();
+
+	// for easy top position based on .dnd-layout-buttons height
+	topPositionLayoutButtons();
 });
 
 // .dnd-layout-buttons offset top on .dnd-layout-wrapper and other elements manipulation
 window.topPositionLayoutButtons = function () {
-	let $layoutButtons = $(".dnd-layout-buttons"),
-		$zones = $(".melis-dragdropzone.ui-sortable");
+	requestAnimationFrame(() => {
+		requestAnimationFrame(() => {
+			// force browser to calculate layout before measuring
+			let $tempCheck 	= $(".dnd-layout-buttons").first(),
+				delay 		= 500;
 
-	$layoutButtons.each(function () {
-		let $layoutButton = $(this),
-			layoutButtonHeight = $layoutButton.outerHeight(),
-			$pluginTitleSubTools = $layoutButton.find(
-				".dnd-plugin-title-and-sub-tools"
-			),
-			$subToolsWrapped = $layoutButton.find(".dnd-plugin-sub-tools"),
-			subToolsWrappedWidth = $subToolsWrapped.outerWidth(),
-			$subTools = $layoutButton.find(
-				".dnd-plugin-sub-tools.layout-buttons-wrapped"
-			),
-			subToolsWidth = $subTools.outerWidth(),
-			$pluginTitleBox = $pluginTitleSubTools.find(".melis-plugin-title-box"),
-			pluginTitleBoxWidth = $pluginTitleBox.outerWidth(),
-			$removeButton = $subTools.find(".dnd-remove-button");
+				if($tempCheck.length) {
+					// trigger layout calculcations
+					$tempCheck[0].offsetHeight;
+				}
 
-		$layoutButton.css("top", -layoutButtonHeight); // - 4 to make sure it overlaps the .dnd-layout-buttons hoverable space
+				// small delay for layout to stabilize after DOM changes
+				setTimeout(() => {
+					requestAnimationFrame(() => {
+						let $layoutButtons 	= $("body .dnd-layout-buttons"),
+							$zones 			= $(".melis-dragdropzone.ui-sortable");
+							//console.log({$layoutButtons});
+							$layoutButtons.each(function () {
+								let $layoutButton 			= $(this),
+									layoutButtonHeight 		= $layoutButton.outerHeight(),
+									$pluginTitleSubTools 	= $layoutButton.find(
+										".dnd-plugin-title-and-sub-tools"
+									),
+									$subToolsWrapped 		= $layoutButton.find(".dnd-plugin-sub-tools"),
+									subToolsWrappedWidth 	= $subToolsWrapped.outerWidth(),
+									$subTools 				= $layoutButton.find(
+										".dnd-plugin-sub-tools.layout-buttons-wrapped"
+									),
+									subToolsWidth 			= $subTools.outerWidth(),
+									$pluginTitleBox 		= $pluginTitleSubTools.find(".melis-plugin-title-box"),
+									pluginTitleBoxWidth 	= $pluginTitleBox.outerWidth(),
+									$removeButton 			= $subTools.find(".dnd-remove-button");
 
-		// check .dnd-plugin-sub-tools width if .dnd-remove-button is present
-		if ($removeButton.length) {
-			$pluginTitleSubTools.addClass("has-remove-button");
-		} else {
-			$pluginTitleSubTools.removeClass("has-remove-button");
-		}
+									$layoutButton.css("top", `-${layoutButtonHeight}px`); // - 4 to make sure it overlaps the .dnd-layout-buttons hoverable space
 
-		// add min-width on .dnd-plugin-sub-tools
-		if (subToolsWidth < subToolsWrappedWidth) {
-			$pluginTitleSubTools.css(
-				"min-width",
-				subToolsWidth + pluginTitleBoxWidth + 23
-			);
-		} else {
-			$pluginTitleSubTools.css(
-				"min-width",
-				subToolsWrappedWidth + pluginTitleBoxWidth + 23
-			);
-		}
-	});
+									// check .dnd-plugin-sub-tools width if .dnd-remove-button is present
+									if ($removeButton.length) {
+										$pluginTitleSubTools.addClass("has-remove-button");
+									} else {
+										$pluginTitleSubTools.removeClass("has-remove-button");
+									}
 
-	// check dragdropzone with empty row, related on updated dragdropzone icon
-	$zones.each(function () {
-		let $zone = $(this),
-			$col = $zone.find(".row .col-12");
+									// add min-width on .dnd-plugin-sub-tools
+									if (subToolsWidth < subToolsWrappedWidth) {
+										$pluginTitleSubTools.css(
+											"min-width",
+											subToolsWidth + pluginTitleBoxWidth + 23
+										);
+									} else {
+										$pluginTitleSubTools.css(
+											"min-width",
+											subToolsWrappedWidth + pluginTitleBoxWidth + 23
+										);
+									}
+							});
 
-		if ($col.is(":empty")) {
-			$col.closest(".row").remove();
-		}
+							// check dragdropzone with empty row, related on updated dragdropzone icon
+							$zones.each(function () {
+								let $zone = $(this),
+									$col = $zone.find(".row .col-12");
 
-		if ($zone.parents(".no-content").length) {
-			$zone
-				.parents(".no-content")
-				.removeClass("no-content")
-				.addClass("content-added");
-		} else {
-			$zone
-				.parents(".content-added")
-				.removeClass("content-added")
-				.addClass("no-content");
-		}
+								if ($col.is(":empty")) {
+									$col.closest(".row").remove();
+								}
+
+								if ($zone.parents(".no-content").length) {
+									$zone
+										.parents(".no-content")
+										.removeClass("no-content")
+										.addClass("content-added");
+								} else {
+									$zone
+										.parents(".content-added")
+										.removeClass("content-added")
+										.addClass("no-content");
+								}
+							});
+					});
+				}, delay);
+		});
 	});
 };
 

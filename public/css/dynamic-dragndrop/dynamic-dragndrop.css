@@ -482,6 +482,7 @@ button.column-icon .icon-col-bg {
 .dnd-plugin-title-and-sub-tools .melis-plugin-title-box {
     vertical-align: top;
     margin-right: 1rem;
+    width: 56px;
 }
 .dnd-layout-buttons .dnd-column-layout,
 .dnd-layout-buttons .column-icons {
@@ -507,7 +508,8 @@ button.column-icon .icon-col-bg {
 .dnd-plugin-sub-tools {
     display: inline-block;
     vertical-align: middle;
-    width: auto;
+    /* width: auto; */
+    width: 82px;
 }
 .dnd-layout-wrapper .dnd-layout-buttons {
     opacity: 0;
