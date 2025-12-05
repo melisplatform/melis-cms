@@ -605,7 +605,7 @@ window.topPositionLayoutButtons = function () {
 							//console.log({$layoutButtons});
 							$layoutButtons.each(function () {
 								let $layoutButton 			= $(this),
-									layoutButtonHeight 		= $layoutButton.outerHeight(),
+									layoutButtonHeight 		= $layoutButton.outerHeight(true),
 									$pluginTitleSubTools 	= $layoutButton.find(
 										".dnd-plugin-title-and-sub-tools"
 									),
