@@ -748,7 +748,7 @@ button.column-icon .icon-col-bg {
     flex-direction: row;
     justify-content: space-between;
 }
-.dnd-plugin-sub-tools > div {
+.dnd-plugin-sub-tools > div:first-child {
     display: inline-block;
 }
 .dnd-plugin-sub-tools.layout-buttons-wrapped > .dnd-arrow-buttons {
