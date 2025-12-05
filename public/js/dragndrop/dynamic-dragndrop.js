@@ -563,9 +563,10 @@ $(function () {
 						$row.find(".dnd-arrow-down").toggle(i !== 0);
 
 						$row.find(".dnd-remove-button").prop("disabled", true);
-						$row
-							.find(".dnd-remove-button")
-							.prepend(`<i class="fa fa-ban"></i>`);
+						
+						if($row.find(".dnd-remove-button .fa-ban").length === 0) {
+							$row.find(".dnd-remove-button").prepend(`<i class="fa fa-ban"></i>`);
+						}
 					} else {
 						$row.find(".dnd-arrow-down").toggle(i !== $dndRow.length - 1);
 
