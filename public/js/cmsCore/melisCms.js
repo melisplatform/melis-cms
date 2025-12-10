@@ -811,17 +811,8 @@ var melisCms = (function() {
 	 * @param pageId
 	 */
 	function pageTabOpenCallback(pageId) {
-		/* var $iframe = $("#"+pageId+"_id_meliscms_page .melis-iframe"),
-			height 	= $iframe.contents()[0].body.scrollHeight; */
-
 		//store the opened pages id
 		$openedPageIds.push(pageId);
-
-			/* 
-				if ( height !== 0 ) {
-					$iframe.css("height", height);
-				}
-			*/
 	}
 
 	/**
@@ -844,23 +835,29 @@ var melisCms = (function() {
 	 * Update iframe height on clicking the main menu
 	 */
 	function updateIframeHeight() {
-		let $melisCmsPage 	= $(`[data-meliskey="meliscms_page"]`),
-			$iFrames 		= $melisCmsPage.find(".iframe-container .tab-content .melis-iframe");
-
-			let setIntervalIframes = setInterval(() => {
-				if ($iFrames.length) {
-					$iFrames.each((i, v) => {
-						let $iFrame = $(v),
-							height 	= $iFrame.contents()[0].body.scrollHeight;
-							
-							if(height > 0) {
-								$iFrame.css("height", height);
-							}
-					});
-
-					clearInterval(setIntervalIframes);
+		const $activePage  = $('[data-meliskey="meliscms_page"].active');
+		const intervalId = setInterval(() => {
+			const $iframe = $activePage .find(".iframe-container .tab-content .melis-iframe");
+				if ($iframe.length === 0) {
+					return; // wait for iframes to appear
 				}
-			}, 1000);
+		
+				try {
+					const iframeDoc = $iframe.contents()[0]; // access the iframe document
+						if (iframeDoc && iframeDoc.body) {
+							const height = iframeDoc.body.scrollHeight;
+								if (height > 0) {
+									$iframe.css("height", height);
+								}
+						}
+		
+					// success → stop interval
+					clearInterval(intervalId);
+		
+				} catch (err) {
+					// cross-origin iframe OR not yet fully accessible, retry on next interval
+				}
+		}, 1000);
 	}
 
 	// WINDOW SCROLL FUNCTIONALITIES ========================================================================================================
@@ -987,7 +984,7 @@ var melisCms = (function() {
 		showHistoryVersioningTableResponsive
 	);
 
-	// click on page tab menu
+	// click on page tab menu, prevent iframe cut off on full height
 	$body.on(
 		"click",
 		"#melis-id-nav-bar-tabs [data-tool-meliskey='meliscms_page'] .tab-element",
