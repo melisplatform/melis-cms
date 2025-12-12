@@ -816,3 +816,19 @@ button:disabled.dnd-remove-button .fa-trash {
 .dnd-plugins-content.dynamic .dnd-layout-wrapper .row .col-12:not(:first-child) .melis-dragdropzone .melis-ui-outlined .melis-plugin-tools-box {
     left: 0;
 }
+/* center content vertically */
+.dnd-plugins-row > div[class*="dnd-plugins-col-"] {
+    /* min-height: 300px; */
+    display: flex;
+    flex-direction: column;
+}
+.dnd-plugins-row > div[class*="dnd-plugins-col-"] .dnd-plugins-row {
+    height: 100%;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+}
+.dnd-plugins-row > div[class*="dnd-plugins-col-"] [data-melis-plugin-tag-id] {
+    width: 100%;
+}
