@@ -50,7 +50,7 @@ return array(
                                 'meliscms_site_tools' => array(
                                     'conf' => array(
                                         'id' => 'id_meliscms_menu_sitetree',
-                                        'name' => 'Site Tools',
+                                        'name' => 'tr_meliscms_sites_tools',
                                         'rights_checkbox_disable' => true,
                                         'melisKey' => 'meliscms_site_tools',
                                     ),
