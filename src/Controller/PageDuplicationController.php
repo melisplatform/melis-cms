@@ -50,7 +50,6 @@ class PageDuplicationController extends MelisAbstractActionController
         $data = $tool->getOriginOfPage()->toArray();
 
         return $data;
-
     }
 
     /**
@@ -68,18 +67,18 @@ class PageDuplicationController extends MelisAbstractActionController
         $data    = array();
         $request = $this->getRequest();
 
-        if($request->isPost()) {
+        if ($request->isPost()) {
             $pageId = (int) $request->getPost('id');
             $cachePageId = $pageId;
             $pageService = $this->getServiceManager()->get('MelisEnginePage');
             $pageData    = $pageService->getDatasPage($pageId);
-            if(empty($pageData->getMelisTemplate())) {
+            if (empty($pageData->getMelisTemplate())) {
                 $pageData    = $pageService->getDatasPage($pageId, 'saved');
             }
 
             //added for the melis cms page script editor module usage
             $this->getEventManager()->trigger('meliscms_page_duplicate_start', $this, array('pageId' => $pageId));
-            
+
             $templateData = $pageData->getMelisTemplate();
             $pageTreeData = $pageData->getMelisPageTree();
 
@@ -110,7 +109,7 @@ class PageDuplicationController extends MelisAbstractActionController
                 'page_type' => $pageTreeData->page_type,
                 'plang_lang_id' => $langId,
                 'page_menu' => $pageTreeData->page_menu,
-                'page_tpl_id' => $pageTreeData->page_tpl_id,
+                'page_tpl_id' => (string)$pageTreeData->page_tpl_id,
                 'page_taxonomy' => $pageTreeData->page_taxonomy,
                 'fatherPageId'  => $pageId,
                 'page_search_type' => $pageTreeData->page_search_type,
@@ -118,25 +117,25 @@ class PageDuplicationController extends MelisAbstractActionController
 
 
             $results = $this->forward()->dispatch('MelisCms\Controller\PageProperties', array_merge(['action' => 'savePageTree'], $duplicatePageData))->getVariables();
-            if(isset($results['datas']['idPage']) && ( (int) $results['datas']['idPage'])) {
+            if (isset($results['datas']['idPage']) && ((int) $results['datas']['idPage'])) {
                 $pageId = (int) $results['datas']['idPage'];
                 $duplicatePageData['page_id'] = $pageId;
                 $duplicatePageData['idPage'] = $pageId;
                 $results = $this->forward()->dispatch('MelisCms\Controller\PageProperties', array_merge(['action' => 'saveProperties'], $duplicatePageData))->getVariables();
             }
 
-            if($pageId) {
+            if ($pageId) {
                 // page content
                 $melisPageSavedTable = $this->getServiceManager()->get('MelisEngineTablePageSaved');
                 $melisPageSavedTable->save([
                     'page_content' => $pageTreeData->page_content,
                     'page_creation_date' => date('Y-m-d H:i:s'),
                 ], $pageId);
-                
+
                 // page SEO
                 $pageSeoTable = $this->getServiceManager()->get('MelisEngineTablePageSeo');
                 $pageSeoData  = $pageSeoTable->getEntryById($cachePageId)->current();
-                if($pageSeoData) {
+                if ($pageSeoData) {
                     $pageSeoTable->save([
                         'pseo_id' =>  $pageId,
                         'pseo_url' => '',
@@ -157,7 +156,6 @@ class PageDuplicationController extends MelisAbstractActionController
                 $success = 1;
                 $message = $this->getTool()->getTranslation('tr_melis_cms_duplicate_success', [$pageTreeData->page_name]);
             }
-
         }
 
         $response = array(
@@ -179,6 +177,4 @@ class PageDuplicationController extends MelisAbstractActionController
         $tool = $this->getServiceManager()->get('MelisCoreTool');
         return $tool;
     }
-
-
 }

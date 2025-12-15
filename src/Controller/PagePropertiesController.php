@@ -181,7 +181,7 @@ class PagePropertiesController extends MelisAbstractActionController
                     $pageLangId = $formData['plang_lang_id'];
                     if (empty($pageLangId))
                         $pageLangId = $this->getServiceManager()->get('MelisEngineTablePageLang')
-                            ->getEntryByField("plang_page_id",$idPage)->current()->plang_lang_id;
+                            ->getEntryByField("plang_page_id", $idPage)->current()->plang_lang_id;
 
                     if (!in_array($pageLangId, $siteLangs)) {
                         return new JsonModel([
@@ -265,7 +265,7 @@ class PagePropertiesController extends MelisAbstractActionController
                         $melisEngineTablePageLang->save(array(
                             'plang_page_id' => $datasPlatformIds->pids_page_id_current,
                             'plang_lang_id' => $langId,
-                            'plang_page_id_initial' => $datasPlatformIds->pids_page_id_current,//$initial,
+                            'plang_page_id_initial' => $datasPlatformIds->pids_page_id_current, //$initial,
                         ));
 
                         // Update current page id in platform
@@ -442,7 +442,7 @@ class PagePropertiesController extends MelisAbstractActionController
                         $pageLangId = $datas['plang_lang_id'];
                         if (empty($pageLangId))
                             $pageLangId = $this->getServiceManager()->get('MelisEngineTablePageLang')
-                                ->getEntryByField("plang_page_id",$idPage)->current()->plang_lang_id;
+                                ->getEntryByField("plang_page_id", $idPage)->current()->plang_lang_id;
 
                         if (!in_array($pageLangId, $siteLangs)) {
                             $errors = [
@@ -539,7 +539,6 @@ class PagePropertiesController extends MelisAbstractActionController
                         'success' => $success,
                         'errors' => array($errors),
                     );
-
                 } else {
                     // Get validation errors
                     $result = array(
@@ -571,5 +570,4 @@ class PagePropertiesController extends MelisAbstractActionController
 
         return new JsonModel($result);
     }
-
 }
