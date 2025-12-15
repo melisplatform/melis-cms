@@ -29,16 +29,10 @@ return array(
                 'rightsDisplay' => 'none',
             ),
             'ressources' => array(
-                'js' => array(
-                    '/MelisCms/js/tools/sites/site-translation.js',
-                ),
-                'css' => array(
-
-                ),
+                'js' => array(),
+                'css' => array(),
             ),
-            'datas' => array(
-
-            ),
+            'datas' => array(),
             'interface' => array(
                 'meliscms_tool_sites_site_translations' => array(
                     'conf' => array(
