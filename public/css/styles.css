@@ -913,10 +913,14 @@ ul#select2-id_mcgdprbanner_site_id-results {
  * Fix: 0003682: BO- Page edition - tabs beyond the screen limit
  * https://mantis2.uat.melistechnology.fr/view.php?id=3682
  */
-.page-content-container .widget.widget-tabs-double-2>.widget-head ul li,
+.page-content-container .widget.widget-tabs-double-2>.widget-head ul li {
+	height: 70px;
+	margin-bottom: -3px;
+}
 .page-content-container .widget.widget-tabs-double-2 > .widget-head ul li a {
-	height: 100%;
-	max-height: 68px;
+	/* height: 100%;
+	max-height: 68px; */
+	max-height: 69px;
 }
 .page-content-container .widget.widget-tabs-double-2>.widget-head,
 .page-content-container .widget.widget-tabs-double-2>.widget-head ul {
