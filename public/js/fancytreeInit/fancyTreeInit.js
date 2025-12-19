@@ -6,8 +6,8 @@
 		if (melisCore.screenSize <= 767) {
 			melisExtensions = ["contextMenu", "filter", "glyph"];
 		} else {
-			// melisExtensions = ["contextMenu", "dnd", "filter", "glyph", "persist"];
-			melisExtensions = ["contextMenu", "dnd", "filter", "glyph"];
+			melisExtensions = ["contextMenu", "dnd", "filter", "glyph", "persist"]; // fix: https://mantis2.uat.melistechnology.fr/view.php?id=9465
+			// melisExtensions = ["contextMenu", "dnd", "filter", "glyph"];
 		}
 
 		$("#id-mod-menu-dynatree").fancytree({
@@ -18,12 +18,13 @@
 					//loading: "glyphicon-refresh fancytree-helper-spin"
 				},
 			},
-			/* persist: {
+			// fix: https://mantis2.uat.melistechnology.fr/view.php?id=9465, uncomment as persist is enabled
+			persist: {
 				cookiePrefix: "fancytree-1-",
 				expandLazy: true,
 				overrideSource: true, // true: cookie takes precedence over `source` data attributes.
 				store: "auto", // 'cookie', 'local': use localStore, 'session': sessionStore
-			}, */
+			},
 			activeVisible: false,
 			debugLevel: 0,
 			autoScroll: true,

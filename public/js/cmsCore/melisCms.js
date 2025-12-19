@@ -520,36 +520,72 @@ var melisCms = (function() {
 				newData = newData.toString();
 				newData = newData.replace(/,/g, "");
 				
-
 				// deprecated 2.38.3
 				//var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
 				var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
-				
-				tree
-					.reload({
-						url: "/melis/MelisCms/TreeSites/get-tree-pages-by-page-id"
-					})
-					.done(function() {
-						/* tree.loadKeyPath(newData, function(node, status){
-							if (status == "ok"){
-								node.setActive(true).done(function(){
-									node.setExpanded(true);
-								});
-							}
-						}).done(function(){
-							
-						}); */
-						//tree.clearFilter();
+					tree.reload({
+							url: "/melis/MelisCms/TreeSites/get-tree-pages-by-page-id"
+						})
+						.done(function() {
+							// re-get fresh tree instance
+							var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
+							/* setTimeout(() => {
+								requestAnimationFrame(() => { */
+									waitForFancyTreeReady(tree, function() {
+										// safe to call
+										tree.loadKeyPath(newData, function(node, status){
+											if (status === "ok" && node) {
+												node.setActive(true).done(function(){
+													node.setExpanded(true);
+												});
+											}
+										}).done(function(){
+											tree.clearFilter();
 
-						// remove duplicated branch of the tree while rapidly refreshing the tree [ plugin bug fix ]
-						if ( $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").hasClass("fancytree-lastsib") === false ) {
-							$("#id-mod-menu-dynatree .ui-fancytree > li:last-child").remove();
-						}
-					});
+											// remove duplicated branch of the tree while rapidly refreshing the tree [ plugin bug fix ]
+											if ( $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").hasClass("fancytree-lastsib") === false ) {
+												$("#id-mod-menu-dynatree .ui-fancytree > li:last-child").remove();
+											}
+										});
+									});
+								/* })
+							}, 100); */
+						});
 		})
 		.fail(function(xhr, textStatus, errorThrown) {
 			alert(translations.tr_meliscore_error_message);
 		});
+	}
+
+	function waitForFancyTreeReady(tree, cb, maxAttempts) {
+		maxAttempts = maxAttempts || 50; // try up to 50 * 50ms = 2.5s
+		var attempts = 0;
+
+		(function poll() {
+			attempts++;
+			var root = tree.getRootNode();
+			var stillLoading = false;
+
+			// If no children yet, treat as loading
+			if (!root || !root.children || root.children.length === 0) {
+				stillLoading = true;
+			} else {
+				// Visit nodes and detect any loading nodes (lazy loads, status nodes)
+				root.visit(function(n) {
+					// check status or isLoading where available
+					if (n.statusNodeType === "loading" || n.isLoading && n.isLoading()) {
+					stillLoading = true;
+					return false; // stop visiting
+					}
+				});
+			}
+
+			if (!stillLoading || attempts >= maxAttempts) {
+				return cb();
+			}
+			
+			setTimeout(poll, 50);
+		})();
 	}
 
 	// DISPLAY SETTING FOR PAGES
