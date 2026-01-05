@@ -523,33 +523,35 @@ var melisCms = (function() {
 				// deprecated 2.38.3
 				//var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
 				var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
+
+					// clear persist data for expanded state before reload to avoid assertion error
+					if (tree.ext && tree.ext.persist) {
+						tree.clearPersistData("expanded");
+					}
+
 					tree.reload({
 							url: "/melis/MelisCms/TreeSites/get-tree-pages-by-page-id"
 						})
 						.done(function() {
 							// re-get fresh tree instance
 							var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
-							/* setTimeout(() => {
-								requestAnimationFrame(() => { */
-									waitForFancyTreeReady(tree, function() {
-										// safe to call
-										tree.loadKeyPath(newData, function(node, status){
-											if (status === "ok" && node) {
-												node.setActive(true).done(function(){
-													node.setExpanded(true);
-												});
-											}
-										}).done(function(){
-											tree.clearFilter();
+								waitForFancyTreeReady(tree, function() {
+									// safe to call
+									tree.loadKeyPath(newData, function(node, status){
+										if (status === "ok" && node) {
+											node.setActive(true).done(function(){
+												node.setExpanded(true);
+											});
+										}
+									}).done(function(){
+										tree.clearFilter();
 
-											// remove duplicated branch of the tree while rapidly refreshing the tree [ plugin bug fix ]
-											if ( $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").hasClass("fancytree-lastsib") === false ) {
-												$("#id-mod-menu-dynatree .ui-fancytree > li:last-child").remove();
-											}
-										});
+										// remove duplicated branch of the tree while rapidly refreshing the tree [ plugin bug fix ]
+										if ( $("#id-mod-menu-dynatree .ui-fancytree > li:last-child").hasClass("fancytree-lastsib") === false ) {
+											$("#id-mod-menu-dynatree .ui-fancytree > li:last-child").remove();
+										}
 									});
-								/* })
-							}, 100); */
+								});
 						});
 		})
 		.fail(function(xhr, textStatus, errorThrown) {
