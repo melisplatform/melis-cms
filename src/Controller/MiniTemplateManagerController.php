@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Melis Technology (http://www.melistechnology.com)
  *
@@ -12,7 +13,8 @@ use MelisCore\Controller\MelisAbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
 
-class MiniTemplateManagerController extends MelisAbstractActionController {
+class MiniTemplateManagerController extends MelisAbstractActionController
+{
     public $module = 'meliscms';
     public $tool_key = 'meliscms_mini_template_manager_tool';
     public $form_key = 'mini_template_manager_tool_add_form';
@@ -32,7 +34,8 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
      * Returns the list of sites for the table
      * @return ViewModel
      */
-    public function renderMiniTemplateManagerToolTableSitesAction() {
+    public function renderMiniTemplateManagerToolTableSitesAction()
+    {
         $view = new ViewModel();
         $view->site_modules = $this->getSiteModules();
         return $view;
@@ -42,7 +45,8 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
      * Mini template manager tool - Add new mini-template container
      * @return ViewModel
      */
-    public function renderMiniTemplateManagerToolAddAction() {
+    public function renderMiniTemplateManagerToolAddAction()
+    {
         $view = new ViewModel();
         $view->templateName = $this->params()->fromQuery('templateName', '');
         return $view;
@@ -51,7 +55,8 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
     /**
      * @return ViewModel
      */
-    public function renderMiniTemplateManagerToolAddHeaderAction() {
+    public function renderMiniTemplateManagerToolAddHeaderAction()
+    {
         $params = $this->params()->fromQuery();
         $view = new ViewModel();
         $view->formType = ($params['templateName'] == 'new_template') ? 'create' : 'update';
@@ -63,7 +68,8 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
      * Mini template manager tool- add new mini-template form container
      * @return ViewModel
      */
-    public function renderMiniTemplateManagerToolAddBodyFormAction() {
+    public function renderMiniTemplateManagerToolAddBodyFormAction()
+    {
         $params = $this->params()->fromQuery();
         $form = $this->getForm($this->module, $this->tool_key, $this->form_key);
         $form->get('miniTemplateSiteModule')->setValueOptions($this->getSiteModules());
@@ -77,7 +83,7 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
             $data = [
                 'miniTemplateSiteModule' => $params['module'],
                 'miniTemplateName' => $params['templateName'],
-                'miniTemplateHtml' => file_get_contents($path . '/'. $params['templateName'] . '.phtml')
+                'miniTemplateHtml' => file_get_contents($path . '/' . $params['templateName'] . '.phtml')
             ];
 
             $form->setAttribute('id', 'id_mini_template_manager_tool_update');
@@ -148,8 +154,8 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
             $site_service = $this->getServiceManager()->get('MelisCmsSiteService');
             $modulePath = $site_service->getModulePath($post['site_name']) . '/public/miniTemplatesTinyMce'; //default folder inside the site module
             $rootPublicPath = $mtpl_service->getRootMiniTemplatePath($post['site_name']); //the minitemplate folder inside the public root
-                    
-            if (file_exists($modulePath) || file_exists($rootPublicPath)) {               
+
+            if (file_exists($modulePath) || file_exists($rootPublicPath)) {
                 $mini_templates_temp = $mtpl_service->getMiniTemplates($post['site_name']);
                 $mini_templates = [];
 
@@ -210,7 +216,8 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
      * Create mini template
      * @return JsonModel
      */
-    public function createMiniTemplateAction() {
+    public function createMiniTemplateAction()
+    {
         $data = array_merge((array) $this->getRequest()->getPost(), $this->params()->fromFiles());
 
         $this->getEventManager()->trigger('meliscms_mini_template_manager_create_start', $this, $data);
@@ -276,7 +283,8 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
      * update mini template
      * @return JsonModel
      */
-    public function updateMiniTemplateAction() {
+    public function updateMiniTemplateAction()
+    {
         $data = array_merge((array) $this->getRequest()->getPost(), $this->params()->fromFiles());
         $this->getEventManager()->trigger('meliscms_mini_template_manager_update_start', $this, $data);
 
@@ -338,7 +346,8 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
      * @param $data
      * @return array|mixed
      */
-    private function checkUpdateErrors($form, $current_data, $new_data) {
+    private function checkUpdateErrors($form, $current_data, $new_data)
+    {
         $site_service = $this->getServiceManager()->get('MelisCmsSiteService');
         //$current_site_path = $site_service->getModulePath($current_data['miniTemplateSiteModule']) . '/public/miniTemplatesTinyMce';
         $mtpl_service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
@@ -368,8 +377,10 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
             //     }
             // }
 
-            if ($current_data['miniTemplateSiteModule'] != $new_data['miniTemplateSiteModule'] 
-                || $current_data['miniTemplateName'] !== $new_data['miniTemplateName']) {
+            if (
+                $current_data['miniTemplateSiteModule'] != $new_data['miniTemplateSiteModule']
+                || $current_data['miniTemplateName'] !== $new_data['miniTemplateName']
+            ) {
 
                 $flaggedTable = $this->getServiceManager()->get('MelisEngineTableFlaggedTemplate');
                 $flaggedData = $flaggedTable->getFlaggedTemplate($new_data['miniTemplateSiteModule'], $new_data['miniTemplateName'])->current();
@@ -388,8 +399,7 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
                         'label' => $form->get('miniTemplateName')->getLabel()
                     ];
                 }
-            }           
-         
+            }
         } else {
             $errors = $this->getFormErrors($form->getMessages(), $form);
         }
@@ -401,10 +411,11 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
      * Delete mini template
      * @return JsonModel
      */
-    public function deleteMiniTemplateAction() {
+    public function deleteMiniTemplateAction()
+    {
         $data = (array) $this->getRequest()->getPost();
         $this->getEventManager()->trigger('meliscms_mini_template_manager_delete_start', $this, $data);
-        $mtpl_service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');      
+        $mtpl_service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
         //$path = $site_service->getModulePath($data['module']) . '/public/miniTemplatesTinyMce';
 
         //get the path of the template if from root public or module       
@@ -450,10 +461,11 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
      * @param $size
      * @return float|int
      */
-    private function asBytes($size) {
+    private function asBytes($size)
+    {
         $size = trim($size);
-        $s = [ 'g'=> 1<<30, 'm' => 1<<20, 'k' => 1<<10 ];
-        return intval($size) * ($s[strtolower(substr($size,-1))] ?: 1);
+        $s = ['g' => 1 << 30, 'm' => 1 << 20, 'k' => 1 << 10];
+        return intval($size) * ($s[strtolower(substr($size, -1))] ?: 1);
     }
 
 
@@ -500,30 +512,38 @@ class MiniTemplateManagerController extends MelisAbstractActionController {
      * Returns the max upload size
      * @return float|int|string
      */
-    private function getMaxUploadOrPostSize() {
-        $max_post = ini_get('post_max_size');
-        $max_upload = ini_get('upload_max_filesize');
-        $max_size = 0;
-
-        if ($max_post != $max_upload) {
-            if ($max_post > $max_upload) {
-                if ($max_upload != 0) {
-                    $max_size = $max_upload;
-                } else {
-                    $max_size = $max_post;
-                }
+    private function getMaxUploadOrPostSize()
+    {
+        $parse_size = function ($size) {
+            $unit = preg_replace('/[^bkmgtpe]/i', '', $size); // Extract unit
+            $num = preg_replace('/[^0-9\.]/', '', $size); // Extract number
+            if ($unit) {
+                // Use pow(1024, position) to get the multiplier
+                return round($num * pow(1024, stripos('bkmgtpe', $unit[0])));
             }
-        } else {
-            $max_size = $max_post;
-        }
+            return round($num);
+        };
 
-        if ($max_size != 0)
-            $max_size = $this->asBytes($max_size);
+        $post_max = ini_get('post_max_size');
+        $upload_max = ini_get('upload_max_filesize');
+
+        // Convert both to integers (bytes) for safe comparison
+        $post_bytes = $parse_size($post_max);
+        $upload_bytes = $parse_size($upload_max);
+
+        // Logic: Usually, you want the SHORTEST ceiling (the real bottleneck)
+        // but if you specifically want the larger of the two:
+        $max_size = ($post_bytes > $upload_bytes) ? $post_bytes : $upload_bytes;
+
+        // If the result is 0 (unlimited or empty), default to 10MB
+        if ($max_size <= 0)
+            $max_size = 10 * 1024 * 1024; // 10MB in bytes
 
         return $max_size;
     }
 
-    private function getSiteModules() {
+    private function getSiteModules()
+    {
         $site_service = $this->getServiceManager()->get('MelisCmsSiteService');
         $sites = $site_service->getAllSites();
         $site_modules = [];
