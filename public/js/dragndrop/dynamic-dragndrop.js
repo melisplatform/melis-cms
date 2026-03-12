@@ -369,7 +369,8 @@ $(function () {
 		}
 	});
 
-	window.parent.$body.on("click", ".tab-element", function () {
+	// .tab-element is outside of the iframe, so we need to use window.parent.document.body
+	$(window.parent.document.body).on("click", ".tab-element", function () {
 		let $tabElement = $(this),
 			melisKey = $tabElement.closest(".nav-item").data("tool-meliskey");
 

@@ -822,7 +822,7 @@ var melisDragnDrop = (function ($, window) {
 })(jQuery, window);
 
 $(function () {
-	var $pluginToolsBox = $(".melis-plugin-tools-box"),
+	var $pluginToolsBox = $(".melis-plugin-tools-box").not(".dnd-layout-buttons"),
 		$optionsHandle = $pluginToolsBox.find(
 			".m-plugin-sub-tools .m-options-handle"
 		),
