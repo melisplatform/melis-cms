@@ -7,7 +7,7 @@
        //'templates' => 'miniTemplates',
        'mini_templates_url' => '/melis/MelisCore/MelisTinyMce/getTinyTemplates',
        'mini_template_preview_mode' => 'auto',
-       'mini_template_preview_shell_url' => '/melis/MelisCore/MelisTinyMce/getMiniTemplatePreviewShell?siteId={siteId}',
+       'mini_template_preview_shell_url' => '/melis/MelisCore/MelisTinyMce/getMiniTemplatePreviewShell',
        'mini_template_site_module' => '',
        'mini_template_dropzone_selector' => '.melis-dragdropzone:first',
        'menubar' => false,
