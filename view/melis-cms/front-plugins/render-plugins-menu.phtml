@@ -86,13 +86,18 @@ $sectionHasNewPlugins = $this->sectionNewPlugins ?? [];
     </div>
 </div>
 
-
+<?php
+    $schemeTime = '';
+    if(!empty($this->schemeTime))
+        $schemeTime = '?v='.$this->schemeTime;
+?>
 <!--  ======================= tinymce temp CSS ============================= -->
 <link rel="stylesheet" href="/MelisCms/css/jquery-ui.css">
 <link rel="stylesheet" href="/MelisCms/css/plugin-mini-menu.css">
 <link rel="stylesheet" href="/MelisCms/css/dragndrop.css">
 <link rel="stylesheet" href="/MelisCms/css/dynamic-dragndrop/dynamic-dragndrop.css?v=<?= time(); ?>">
-<link href="/assets/css/schemes.css" media="screen" rel="stylesheet" type="text/css">
+<link id="default-theme" href="/assets/css/schemes.css<?= $schemeTime; ?>" media="screen" rel="stylesheet" type="text/css">
+<link id="dark-theme" href="/assets/css/dark.css<?= $schemeTime; ?>" media="screen" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="/MelisCms/js/dragndrop/jquery-ui.js"></script>
 <script type="text/javascript" src="/MelisCms/js/dragndrop/jquery.ui.touch-punch.min.js"></script>
 <script type="text/javascript" src="/MelisCms/js/plugins/plugin.sortable.js"></script>
