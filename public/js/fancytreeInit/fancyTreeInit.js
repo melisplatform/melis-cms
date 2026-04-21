@@ -283,8 +283,10 @@
 											data.melisData.item_zoneid
 										);
 
-										// dynamic dnd, issue: https://mantis2.uat.melistechnology.fr/view.php?id=8466
-										//reloadMelisIframe();
+										if (window.themeSwitcher && typeof window.themeSwitcher.syncPageEditionIframes === "function") {
+											// page edition tabs are created dynamically, so force a theme sync after tab open.
+											window.themeSwitcher.syncPageEditionIframes();
+										}
 									}
 								);
 						}
@@ -314,8 +316,10 @@
 						// show page loader
 						loader.addActivePageEditionLoading(data.melisData.item_zoneid);
 						
-						// dynamic dnd, issue: https://mantis2.uat.melistechnology.fr/view.php?id=8466
-						//reloadMelisIframe();
+						if (window.themeSwitcher && typeof window.themeSwitcher.syncPageEditionIframes === "function") {
+							// page edition tabs are created dynamically, so force a theme sync after tab open.
+							window.themeSwitcher.syncPageEditionIframes();
+						}
 					});
 
 					$(".hasNiceScroll").getNiceScroll().resize();
