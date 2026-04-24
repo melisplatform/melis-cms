@@ -780,6 +780,7 @@ return array(
 	'tr_meliscms_mini_template_manager_tool_form_thumbnail' => 'Thumbnail',
 	'tr_meliscms_mini_template_manager_tool_form_thumbnail_tool_tip' => 'The thumbnail for the mini-template displayed in the plugin menu',
 	'tr_meliscms_mini_template_manager_tool_form_thumbnail_btn_text' => 'Select Image',
+	'tr_meliscms_mini_template_manager_tool_form_thumbnail_invalid_type' => 'File type not supported. Please upload a .gif, .jpg, .jpeg, or .png image.',
 	'tr_meliscms_mini_template_manager_tool_form_remove_thumbnail' => 'Remove thumbnail',
 	'tr_meliscms_mini_template_manager_tool_form_create' => 'Create',
 	'tr_meliscms_mini_template_manager_tool_form_update' => 'Edit',

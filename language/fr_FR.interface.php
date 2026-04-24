@@ -782,6 +782,7 @@ return array(
     'tr_meliscms_mini_template_manager_tool_form_thumbnail' => 'Vignette',
     'tr_meliscms_mini_template_manager_tool_form_thumbnail_tool_tip' => 'La vignette du mini-template affichée dans le menu des plugins',
     'tr_meliscms_mini_template_manager_tool_form_thumbnail_btn_text' => 'Selectionnez l\'image',
+    'tr_meliscms_mini_template_manager_tool_form_thumbnail_invalid_type' => 'Type de fichier non supporté. Veuillez télécharger une image .gif, .jpg, .jpeg ou .png.',
     'tr_meliscms_mini_template_manager_tool_form_remove_thumbnail' => 'Supprimer la vignette',
     'tr_meliscms_mini_template_manager_tool_form_create' => 'Créer',
     'tr_meliscms_mini_template_manager_tool_form_update' => 'Editer',

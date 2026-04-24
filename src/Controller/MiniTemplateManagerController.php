@@ -233,6 +233,8 @@ class MiniTemplateManagerController extends MelisAbstractActionController
         $success = 0;
         $errors = [];
         $message = 'tr_meliscms_mini_template_create_fail';
+        $translator = $this->getServiceManager()->get('translator');
+
 
         if (!$form->isValid())
             $errors = $this->getFormErrors($form->getMessages(), $form);
@@ -243,9 +245,18 @@ class MiniTemplateManagerController extends MelisAbstractActionController
 
             if (! empty($data['miniTemplateThumbnail']['tmp_name'])) {
                 $uploaded_img = $data['miniTemplateThumbnail']['tmp_name'];
-                $uploaded_img_extension = explode('/', $data['miniTemplateThumbnail']['type'])[1];
+                $mimeToExt = ['image/png' => 'png', 'image/jpeg' => 'jpg', 'image/gif' => 'gif'];
+                $mime = (new \finfo(FILEINFO_MIME_TYPE))->file($uploaded_img);
+                if (! isset($mimeToExt[$mime])) {
+                    $errors[] = [
+                        'error' => $translator->translate('tr_meliscms_mini_template_manager_tool_form_thumbnail_invalid_type'),
+                        'label' => $translator->translate('tr_meliscms_mini_template_manager_tool_form_thumbnail')
+                    ];
+                }
             }
+        }
 
+        if (empty($errors)) {
             $res = $service->createMiniTemplate(
                 $data['miniTemplateSiteModule'],
                 $data['miniTemplateName'],
