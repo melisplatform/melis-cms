@@ -26,7 +26,12 @@ var melisDragnDrop = (function ($, window) {
 		start: function (event, ui) {
 			$(ui.helper).find(".melis-plugin-tooltip").hide();
 			$(".melis-dragdropzone").addClass("highlight").removeClass("no-content");
-			$(".ui-sortable-placeholder").css("background", "#fff");
+			$(".ui-sortable-placeholder").css({
+				background: "#e61c23",
+				border: "none",
+				"min-height": "4px",
+				height: "4px",
+			});
 		},
 		stop: function (event, ui) {
 			$(".melis-dragdropzone").removeClass("highlight");
@@ -636,7 +641,12 @@ var melisDragnDrop = (function ($, window) {
 								$(".melis-dragdropzone")
 									.addClass("highlight")
 									.removeClass("no-content");
-								$(".ui-sortable-placeholder").css("background", "#fff");
+								$(".ui-sortable-placeholder").css({
+									background: "#e61c23",
+									border: "none",
+									"min-height": "4px",
+									height: "4px",
+								});
 							},
 							stop: function (event, ui) {
 								$(".melis-dragdropzone").removeClass("highlight");

@@ -406,12 +406,10 @@ body {
 }
 
 .melis-ui-outlined:hover {
-    /*outline: 1px solid #e61c23; */
-    box-shadow: 0 0 0 1px #e61c23;
-    -webkit-box-shadow: 0 0 0 1px #e61c23;
-    -moz-box-shadow: 0 0 0 1px #e61c23;
-    -ms-box-shadow: 0 0 0 1px #e61c23;
-    /* z-index: 9999996 !important; */
+    box-shadow: 0 0 0 1px rgba(230, 28, 35, 0.55);
+    -webkit-box-shadow: 0 0 0 1px rgba(230, 28, 35, 0.55);
+    -moz-box-shadow: 0 0 0 1px rgba(230, 28, 35, 0.55);
+    -ms-box-shadow: 0 0 0 1px rgba(230, 28, 35, 0.55);
     z-index: 999;
 }
 
@@ -573,7 +571,10 @@ body {
 
 .ui-sortable-helper {
     background: #fff;
-    border: 4px solid #e61c23;
+    border: 1px solid rgba(230, 28, 35, 0.4);
+    border-radius: 4px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+    opacity: 0.92;
 }
 
 .melis-dragdropzone > div[data-module-name="MelisMiniTemplate"].melis-cms-plugin-snippets {
@@ -602,11 +603,15 @@ body {
 }
 .ui-sortable-placeholder.ui-state-highlight {
     padding: 0;
-    margin: 0 0 20px;
-    background: #e61c23;
-    transition: all 0.4s ease-in-out;
-    height: 40px;
-    /*background: rgba(255, 255, 255, 0.4);*/
+    margin: 8px 0;
+    background: #e61c23 !important;
+    border: none !important;
+    border-radius: 2px;
+    transition: height 0.15s ease, margin 0.15s ease;
+    min-height: 4px !important;
+    height: 4px !important;
+    visibility: visible !important;
+    box-shadow: 0 0 10px rgba(230, 28, 35, 0.35);
 }
 
 .melis-float-plugins .ui-state-highlight {
@@ -695,8 +700,8 @@ body {
 .melis-float-plugins {
     margin: 0 -15px;
     padding: 15px 0;
-    border: 1px dashed #90312e;
-    box-shadow: 0 0 0 0 rgb(147, 46, 42);
+    border: none;
+    box-shadow: none;
 }
 
 .melis-float-plugins:after {
