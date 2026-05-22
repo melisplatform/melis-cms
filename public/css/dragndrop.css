@@ -582,7 +582,6 @@ body {
 }
 
 .ui-sortable-helper:after {
-    /*content: "\f1e6";*/
     font-family: FontAwesome;
     font-style: normal;
     font-weight: normal;

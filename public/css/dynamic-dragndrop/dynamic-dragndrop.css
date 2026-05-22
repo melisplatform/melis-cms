@@ -1,30 +1,16 @@
 /*drag n drop zone buttons*/
 .column-icons {
-    /* display: flex; */
     position: relative;
-
-    /* width: fit-content; */
-    /* height: 48px; */
-    /* height: 32px; */
     height: auto;
-
     padding: 4px;
 }
-/* .column-icon:first-child {
-    margin-left: 0;
-} */
 .column-icon {
-    /* #e61c23 */
     background-color: transparent;
     border: 1px solid transparent;
 
     display: inline-block;
     vertical-align: middle;
 
-    /* margin-left: 1px; */
-
-    /* width: 32px;
-	height: 32px; */
     width: 30px;
     height: 30px;
 
@@ -100,18 +86,15 @@
 .left-2-col-w-right-1-col .icon-col-6 .icon-row,
 .half-1-col-left-w-right-2-col .icon-row,
 .top-1-col-w-bottom-1-3-center .icon-row {
-    /* height: 18px; */
     height: 14px;
 }
 .four-col-equal-top-bottom .icon-row {
-    /* height: 9px; */
     height: 7px;
 }
 .three-col-equal-top-bottom .icon-row,
 .left-3-col-w-half-1-col-right .icon-col-6 .icon-row,
 .half-1-col-left-w-right-3-col .icon-col-6 .icon-row,
 .top-1-col-w-center-1-3-center-w-bottom-1-col .icon-row {
-    /* height: 12px; */
     height: 9.4px;
 }
 .cols4-6-2-2-2 .icon-row,
@@ -137,7 +120,6 @@
 .half-1-col-left-w-right-3-col .icon-row,
 .left-2-col-w-right-1-col .icon-row,
 .whole-1-col .icon-row {
-    /* height: 36px; */
     height: 28px;
 }
 .cols4-2-2-2-6 .icon-col-6:first-child,
@@ -245,13 +227,11 @@
 .four-col-equal .icon-col-6,
 .left-2-col-w-right-1-col .icon-col-6,
 .half-1-col-left-w-right-2-col .icon-col-6 {
-    /* width: 47%; */
     width: 46%;
 }
 
 /* .icon-col-4 specifics */
 .three-col-equal .icon-col-4 {
-    /* width: 29.33333333%; */
     width: 28.33333333%;
 }
 /* .icon-col specifics */
@@ -281,14 +261,6 @@
 .dnd-3-cols-1-col-left-w-2-cols-right > .row:first-child {
     margin-bottom: 34px;
 }
-/* .no-content .dnd-4-cols-3-cols-left-w-1-col-right .row,
-.no-content .dnd-4-cols-1-col-left-w-3-cols-right .row {
-    height: 33.33%;
-}
-.no-content .dnd-3-cols-2-cols-left-w-1-col-right .row,
-.no-content .dnd-3-cols-1-col-left-w-2-cols-right .row {
-    height: 50%;
-} */
 .dnd-4-cols-1-col-left-w-3-cols-right .row,
 .dnd-4-cols-3-cols-left-w-1-col-right .row {
     margin-bottom: 6px;
@@ -391,7 +363,6 @@ button.column-icon .icon-col-bg {
 }
 .dnd-layout-buttons {
     top: 0;
-    /* left: 7px; */
     left: 0;
 
     padding: 4px 0 4px 8px;
@@ -433,16 +404,10 @@ button.column-icon .icon-col-bg {
     position: relative;
     z-index: 1;
     outline: none;
-    /* outline: 1px solid rgba(0, 0, 0, 0.06);
-    transition: outline-color 0.2s ease, box-shadow 0.2s ease; */
 }
 .dnd-plugins-content .row:last-child > .melis-dragdropzone-container > .dnd-layout-wrapper {
     margin-bottom: 15px;
 }
-/* .melis-dragdropzone-container > .dnd-layout-wrapper:hover {
-    outline-color: rgba(230, 28, 35, 0.35);
-    box-shadow: inset 0 0 0 1px rgba(230, 28, 35, 0.08);
-} */
 .dnd-layout-wrapper .dnd-layout-wrapper {
     outline: none;
 }
@@ -454,7 +419,6 @@ button.column-icon .icon-col-bg {
     z-index: 999;
 }
 .melis-dragdropzone-container > .dnd-layout-wrapper > .dnd-layout-indicator {
-    /* background-color: transparent; */
     opacity: 0;
     z-index: 9999;
     top: 0 !important;
@@ -503,9 +467,6 @@ button.column-icon .icon-col-bg {
     display: inline-block;
     height: 30px;
 }
-/* .dnd-layout-wrapper > .dnd-layout-buttons {
-    background-color: transparent;
-} */
 .dnd-plugin-sub-tools {
     display: inline-block;
     vertical-align: middle;
@@ -538,13 +499,13 @@ button.column-icon .icon-col-bg {
     margin-left: 0;
 }
 .melis-dragdropzone.no-content {
-    background: rgba(248, 250, 252, 0.95);
+    background: rgba(255, 245, 245, 0.8);
     bottom: 0;
     margin-bottom: 0;
-    border-color: rgba(0, 0, 0, 0.1);
+    border-color: rgba(222, 125, 121, 1);
 }
 .melis-dragdropzone.no-content.highlight {
-    background: rgba(230, 28, 35, 0.06);
+    background: rgba(255, 245, 245, 0.8);
     border-color: rgba(230, 28, 35, 0.35);
 }
 .melis-dragdropzone.no-content:after,
@@ -581,28 +542,28 @@ button.column-icon .icon-col-bg {
     margin-bottom: 0;
 }
 .melis-dragdropzone.no-content.highlight:after,
-.melis-dragdropzone.no-content.highlight:before {
+.melis-dragdropzone.no-content.highlight:before,
+.dnd-layout-wrapper > .no-content.highlight[data-after]:after,
+.dnd-layout-wrapper > .no-content.highlight[data-after]:before {
     background-color: transparent;
 }
 .melis-dragdropzone.no-content.highlight:before,
 .melis-dragdropzone.no-content:before,
-.melis-dragdropzone.no-content:after {
-    color: #64748b;
+.melis-dragdropzone.no-content:after,
+.dnd-layout-wrapper > .no-content[data-after]:before,
+.dnd-layout-wrapper > .no-content[data-after]:after {
     text-shadow: none;
-}
-.melis-dragdropzone.no-content:before {
-    width: auto;
-    max-width: 90%;
+    visibility: visible;
+    opacity: 1;
 }
 .melis-dragdropzone.no-content:after {
-    content: "\f067" !important;
-    font-family: FontAwesome !important;
-    background: none !important;
-    font-size: 24px !important;
-    color: rgba(230, 28, 35, 0.45) !important;
-    top: 38% !important;
-    width: auto !important;
-    height: auto !important;
+    content: "" !important;
+    background: url(/MelisFront/images/icons/square-plus-plugin-icon.png) no-repeat center;
+    background-size: contain;
+    top: 40%;
+}
+.melis-dragdropzone.no-content.highlight:before {
+    content: "" !important;
 }
 .melis-dragdropzone:hover {
     /* #e61c23 */
@@ -748,11 +709,6 @@ button.column-icon .icon-col-bg {
 .dnd-plugin-sub-tools.layout-buttons-wrapped > .dnd-arrow-buttons {
     display: block;
 }
-/* button:disabled.dnd-remove-button {
-    background: url(../images/dnd-remove-button-disabled-icon.png) 0 0 no-repeat;
-    width: 30px;
-    height: 30px;
-} */
 button:disabled.dnd-remove-button {
     position: relative;
     height: 30px;
@@ -776,8 +732,6 @@ button:disabled.dnd-remove-button .fa-ban {
 
     position: absolute;
     z-index: 1;
-    /* left: 27%;
-    top: 22%; */
 
     left: 5px;
     top: 6px;
@@ -791,8 +745,6 @@ button:disabled.dnd-remove-button .fa-trash {
 
     position: absolute;
     z-index: 0;
-    /* top: 18%;
-    left: 30%; */
 
     top: 5px;
     left: 6px;
@@ -814,7 +766,6 @@ button:disabled.dnd-remove-button .fa-trash {
 }
 /* center content vertically */
 .dnd-plugins-row > div[class*="dnd-plugins-col-"] {
-    /* min-height: 300px; */
     display: flex;
     flex-direction: column;
 }

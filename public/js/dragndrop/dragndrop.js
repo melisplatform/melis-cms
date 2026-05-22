@@ -27,7 +27,7 @@ var melisDragnDrop = (function ($, window) {
 			$(ui.helper).find(".melis-plugin-tooltip").hide();
 			$(".melis-dragdropzone").addClass("highlight").removeClass("no-content");
 			$(".ui-sortable-placeholder").css({
-				background: "#e61c23",
+				background: "#7c3aed",
 				border: "none",
 				"min-height": "4px",
 				height: "4px",
@@ -642,7 +642,7 @@ var melisDragnDrop = (function ($, window) {
 									.addClass("highlight")
 									.removeClass("no-content");
 								$(".ui-sortable-placeholder").css({
-									background: "#e61c23",
+									background: "#7c3aed",
 									border: "none",
 									"min-height": "4px",
 									height: "4px",
