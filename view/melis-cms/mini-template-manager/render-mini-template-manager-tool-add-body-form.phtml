@@ -115,7 +115,11 @@
         }
     );
     var tinyMceOption = {
-        height: 500
+        height: 500,
+        mini_template_site_module: <?= json_encode((string) ($this->current_module ?? ''), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>,
+        melis_minitemplate: {
+            site_id: <?= json_encode((string) ($this->siteId ?? ''), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>
+        }
     };
     melisTinyMCE.createTinyMCE("tool", "textarea[data-tinymce-id='<?= $tinymceId ?>']", tinyMceOption);
 </script>
