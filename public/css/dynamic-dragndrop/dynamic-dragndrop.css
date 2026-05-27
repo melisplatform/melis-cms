@@ -499,15 +499,15 @@ button.column-icon .icon-col-bg {
     margin-left: 0;
 }
 .melis-dragdropzone.no-content {
-    /* background: rgba(255, 245, 245, 0.8); */
-    background-color: #fff;
+    background: rgba(255, 245, 245, 0.8);
+    /* background-color: #fff; */
     bottom: 0;
     margin-bottom: 0;
     border-color: rgba(222, 125, 121, 1);
 }
 .melis-dragdropzone.no-content.highlight {
-    /* background: rgba(255, 245, 245, 0.8); */
-    background-color: #fff;
+    background: rgba(255, 245, 245, 0.8);
+    /* background-color: #fff; */
     border-color: rgba(230, 28, 35, 0.35);
 }
 .melis-dragdropzone.no-content:after,
