@@ -15,13 +15,16 @@ body {
     border-bottom: 4px solid #e61c23;
     border-left: 4px solid #e61c23;
     background: #373737;
+
     transform: translate3d(200px, 0, 0);
     -webkit-transform: translate3d(200px, 0, 0);
     -moz-transform: translate3d(200px, 0, 0);
     -ms-transform: translate3d(200px, 0, 0);
+
     transition: transform 0.4s, height 0.4s;
     -webkit-transition: transform 0.4s, height 0.4s;
     -moz-transition: transform 0.4s, height 0.4s;
+
     z-index: 9999999;
 }
 .melis-cms-dnd-box.show {
@@ -241,9 +244,9 @@ body {
 }
 
 
-.ui-tooltip-content {
+/* .ui-tooltip-content {
 
-}
+} */
 
 .melis-plugin-tooltip:after {
     left: 100%;
@@ -385,21 +388,23 @@ body {
     -moz-transform:  scale(0.5) translate3d(-50%, -50%, 0);
     -ms-transform:  scale(0.5) translate3d(-50%, -50%, 0);
     transform:  scale(0.5) translate3d(-50%, -50%, 0); */
+
     -webkit-transform:  scale(0.2) translate3d(-200%, -200%, 0);
     -moz-transform:  scale(0.2) translate3d(-200%, -200%, 0);
     -ms-transform:  scale(0.2) translate3d(-200%, -200%, 0);
     transform:  scale(0.2) translate3d(-200%, -200%, 0);
+
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     -webkit-font-smoothing: subpixel-antialiased;
     -moz-font-smoothing: subpixel-antialiased;
     -ms-font-smoothing: subpixel-antialiased;
-    font-smoothing: subpixel-antialiased;
     -webkit-filter: blur(0);
+    filter: blur(0);
 }
-.melis-ui-outlined.zMax {
-    /*z-index: 999999;*/
-}
+/* .melis-ui-outlined.zMax {
+    z-index: 999999;
+} */
 .melis-ui-outlined .melis-plugin-tools-box {
     opacity: 0;
     visibility: hidden;
@@ -567,6 +572,7 @@ body {
     -webkit-transition-delay: 0.1s;
     -moz-transition-delay: 0.1s;
     -o-transition-delay: 0.1s;
+    transition-delay: 0.1s;
 }
 
 .ui-sortable-helper {
@@ -600,17 +606,101 @@ body {
     -moz-transform: translateY(-50%);
     -ms-transform: translateY(-50%);
 }
+/* ============================================================
+   EDIT: Drop placeholder (.ui-sortable-placeholder.ui-state-highlight)
+   Debug in console: melisDndDebugPlaceholder(true)
+   Turn off:          melisDndDebugPlaceholder(false)
+   ============================================================ */
 .ui-sortable-placeholder.ui-state-highlight {
+    margin: 0;
     padding: 0;
-    margin: 8px 0;
+    width: 100%;
     background: #e61c23 !important;
     border: none !important;
     border-radius: 2px;
-    transition: height 0.15s ease, margin 0.15s ease;
+
+    -webkit-transform: scaleX(0);
+    transform: scaleX(0);
+    -webkit-transform-origin: center;
+    transform-origin: center;
+    opacity: 0;
+
+    transition: height 0.15s ease;
+    -webkit-animation: sortable-placeholder-grow 0.36s ease forwards 0.08s;
+    animation: sortable-placeholder-grow 0.36s ease forwards 0.08s;
+
     min-height: 4px !important;
     height: 4px !important;
     visibility: visible !important;
     box-shadow: 0 0 10px rgba(230, 28, 35, 0.35);
+}
+
+/* Frozen sample placeholder — stays in DOM for DevTools inspection */
+body.melis-dnd-debug-placeholder .melis-dnd-debug-placeholder-sample {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-animation: none !important;
+    animation: none !important;
+    -webkit-transform: scaleX(1) !important;
+    transform: scaleX(1) !important;
+    opacity: 1 !important;
+    outline: 2px dashed #00ff88;
+    outline-offset: 2px;
+    pointer-events: auto;
+    position: relative;
+    z-index: 99999999;
+}
+
+body.melis-dnd-debug-placeholder .ui-sortable-placeholder.ui-state-highlight:not(.melis-dnd-debug-placeholder-sample) {
+    outline: 2px dashed #00bfff;
+    outline-offset: 2px;
+}
+
+@-webkit-keyframes sortable-placeholder-grow {
+    0% {
+        -webkit-transform: scaleX(0);
+        transform: scaleX(0);
+        opacity: 0;
+    }
+    30% {
+        -webkit-transform: scaleX(0);
+        transform: scaleX(0);
+        opacity: 0;
+    }
+    55% {
+        -webkit-transform: scaleX(0);
+        transform: scaleX(0);
+        opacity: 1;
+    }
+    100% {
+        -webkit-transform: scaleX(1);
+        transform: scaleX(1);
+        opacity: 1;
+    }
+}
+
+@keyframes sortable-placeholder-grow {
+    0% {
+        -webkit-transform: scaleX(0);
+        transform: scaleX(0);
+        opacity: 0;
+    }
+    30% {
+        -webkit-transform: scaleX(0);
+        transform: scaleX(0);
+        opacity: 0;
+    }
+    55% {
+        -webkit-transform: scaleX(0);
+        transform: scaleX(0);
+        opacity: 1;
+    }
+    100% {
+        -webkit-transform: scaleX(1);
+        transform: scaleX(1);
+        opacity: 1;
+    }
 }
 
 .melis-float-plugins .ui-state-highlight {
@@ -649,9 +739,11 @@ body {
     width: 100%;
     background: #e61c23;
 }
-#content .overlay-loader{
-    /* top: -47px; */
-}
+
+/* #content .overlay-loader{
+    top: -47px;
+} */
+
 .overlay-loader .loader-icon {
     position: absolute;
     top: 50%;

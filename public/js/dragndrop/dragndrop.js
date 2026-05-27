@@ -823,13 +823,77 @@ var melisDragnDrop = (function ($, window) {
 		pluginScrollPos();
 	}
 
+	/**
+	 * Pin a sample .ui-sortable-placeholder in the page so you can select
+	 * and edit it in DevTools. Toggle off when done.
+	 * @param {boolean} enable
+	 */
+	function debugPlaceholder(enable) {
+		var debugClass = "melis-dnd-debug-placeholder";
+		var sampleClass = "melis-dnd-debug-placeholder-sample";
+
+		if (!enable) {
+			$body.removeClass(debugClass);
+			$("." + sampleClass).remove();
+			return;
+		}
+
+		$body.addClass(debugClass);
+		$("." + sampleClass).remove();
+
+		var $zone = $(".melis-dragdropzone").first();
+		if (!$zone.length) {
+			console.warn(
+				"[melisDragnDrop] No .melis-dragdropzone found — open a page with drag-drop content first."
+			);
+			return;
+		}
+
+		$zone.prepend(
+			'<div class="ui-sortable-placeholder ui-state-highlight ' +
+				sampleClass +
+				'"></div>'
+		);
+
+		console.info(
+			"[melisDragnDrop] Debug placeholder pinned. Inspect .ui-sortable-placeholder.ui-state-highlight in Elements, edit rules in dragndrop.css, then melisDragnDrop.debugPlaceholder(false)."
+		);
+	}
+
 	return {
 		requestPlugin: requestPlugin,
 		showPluginMenu: showPluginMenu,
 		pluginScrollPos: pluginScrollPos,
 		setDragDropZone: setDragDropZone,
+		debugPlaceholder: debugPlaceholder,
 	};
 })(jQuery, window);
+
+// Global helper (works from CMS iframe console and parent Melis back-office console)
+(function () {
+	var fn = function (enable) {
+		if (
+			typeof melisDragnDrop === "undefined" ||
+			typeof melisDragnDrop.debugPlaceholder !== "function"
+		) {
+			console.warn(
+				"[melisDndDebugPlaceholder] dragndrop.js is stale or not loaded. Hard refresh (Ctrl+F5), then retry."
+			);
+			return;
+		}
+		return melisDragnDrop.debugPlaceholder(enable);
+	};
+
+	window.melisDndDebugPlaceholder = fn;
+
+	try {
+		if (window.parent && window.parent !== window) {
+			window.parent.melisDndDebugPlaceholder = fn;
+		}
+	} catch (e) {
+		// cross-origin parent
+	}
+})();
 
 $(function () {
 	var $pluginToolsBox = $(".melis-plugin-tools-box").not(".dnd-layout-buttons"),
