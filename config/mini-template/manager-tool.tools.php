@@ -192,7 +192,7 @@ return [
                                         [
                                             'name' => 'regex', false,
                                             'options' => array(
-                                                'pattern' => '/^[a-zA-Z0-9_-]*$/',
+                                                'pattern' => '/^[a-zA-Z_][a-zA-Z0-9_]*$/',
                                                 'messages' => array(\Laminas\Validator\Regex::NOT_MATCH => 'tr_meliscms_mini_template_form_invalid_name'),
                                                 'encoding' => 'UTF-8',
                                             ),
