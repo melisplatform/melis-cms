@@ -982,6 +982,13 @@ var melisPluginEdition = (function ($, window) {
 				$this.addClass("no-content");
 			}
 		});
+
+		if (
+			typeof melisDragnDrop !== "undefined" &&
+			typeof melisDragnDrop.refreshStackedZoneClasses === "function"
+		) {
+			melisDragnDrop.refreshStackedZoneClasses();
+		}
 	}
 
 	function pluginContainerChecker() {
@@ -1126,6 +1133,14 @@ var melisPluginEdition = (function ($, window) {
 						$(ui.originalElement)
 							.find(".ui-resize-indicator")
 							.text(percentTotalWidth + " %");
+
+						if (
+							typeof melisDragnDrop !== "undefined" &&
+							typeof melisDragnDrop.refreshStackedZoneClasses ===
+								"function"
+						) {
+							melisDragnDrop.refreshStackedZoneClasses();
+						}
 					},
 					stop: function (event, ui) {
 						// get all data attributes
@@ -1146,7 +1161,26 @@ var melisPluginEdition = (function ($, window) {
 					},
 				});
 			});
+
+			if (
+				typeof melisDragnDrop !== "undefined" &&
+				typeof melisDragnDrop.refreshStackedZoneClasses === "function"
+			) {
+				melisDragnDrop.refreshStackedZoneClasses();
+			}
 		}
+	}
+
+	function applyPluginWidthClass($outlined, prefix, percent) {
+		var newClass = prefix + String(percent).replace(".", "-");
+
+		$outlined.removeClass(function (index, css) {
+			return (
+				css.match(new RegExp("\\b" + prefix.replace(/-/g, "\\-") + "[\\w-]+", "g")) ||
+				[]
+			).join(" ");
+		});
+		$outlined.addClass(newClass);
 	}
 
 	function getPluginData(el, percentTotalWidth) {
@@ -1154,11 +1188,8 @@ var melisPluginEdition = (function ($, window) {
 			mobileWidth,
 			tabletWidth,
 			desktopWidth,
-			currentClass,
-			newClass,
 			iframe = window.parent.$("#" + parent.activeTabId).find("iframe"),
 			parentOutlined = $(toolBox).closest(".melis-ui-outlined"),
-			classes = parentOutlined.attr("class").split(" "),
 			editable = parentOutlined.find(".melis-editable");
 
 		if (toolBox) {
@@ -1210,47 +1241,32 @@ var melisPluginEdition = (function ($, window) {
 			// check if resize in mobile
 			if (iframe.width() <= 480) {
 				mobileWidth = percentTotalWidth;
-				// update DOM data attribute
 				$(toolBox).attr("data-plugin-width-mobile", mobileWidth);
-				currentClass = "plugin-width-xs-";
-
-				var strPercentTotalWidth = percentTotalWidth;
-				// newClass = "plugin-width-xs-"+Math.floor(percentTotalWidth); // removed when css is ready
-				newClass = "plugin-width-xs-" + strPercentTotalWidth.replace(".", "-"); // removed when css is ready
-				$.each(classes, function (key, value) {
-					if (value.indexOf(currentClass) != -1) {
-						parentOutlined.removeClass(value).addClass(newClass);
-					}
-				});
+				applyPluginWidthClass(
+					parentOutlined,
+					"plugin-width-xs-",
+					percentTotalWidth
+				);
 			}
 			// check if resize in tablet
 			if (iframe.width() > 490 && iframe.width() <= 980) {
 				tabletWidth = percentTotalWidth;
 				$(toolBox).attr("data-plugin-width-tablet", tabletWidth);
-				currentClass = "plugin-width-md-";
-				var strPercentTotalWidth = percentTotalWidth;
-				// newClass = "plugin-width-md-"+Math.floor(percentTotalWidth); // removed when css is ready
-				newClass = "plugin-width-lg-" + strPercentTotalWidth.replace(".", "-"); // removed when css is ready
-				$.each(classes, function (key, value) {
-					if (value.indexOf(currentClass) != -1) {
-						parentOutlined.removeClass(value).addClass(newClass);
-					}
-				});
+				applyPluginWidthClass(
+					parentOutlined,
+					"plugin-width-md-",
+					percentTotalWidth
+				);
 			}
 			// check if resize in desktop
 			if (iframe.width() >= 981) {
 				desktopWidth = percentTotalWidth;
 				$(toolBox).attr("data-plugin-width-desktop", desktopWidth);
-				currentClass = "plugin-width-lg-";
-				var strPercentTotalWidth = percentTotalWidth;
-				// newClass = "plugin-width-lg-"+Math.floor(percentTotalWidth); // removed when css is ready
-				newClass = "plugin-width-lg-" + strPercentTotalWidth.replace(".", "-"); // removed when css is ready
-
-				$.each(classes, function (key, value) {
-					if (value.indexOf(currentClass) != -1) {
-						parentOutlined.removeClass(value).addClass(newClass);
-					}
-				});
+				applyPluginWidthClass(
+					parentOutlined,
+					"plugin-width-lg-",
+					percentTotalWidth
+				);
 			}
 
 			// set data attribute for width
@@ -1261,6 +1277,15 @@ var melisPluginEdition = (function ($, window) {
 
 			// pass is to savePageSession
 			savePluginUpdate(pluginList, toolBox.data("site-module"));
+
+			parentOutlined.css("width", "");
+
+			if (
+				typeof melisDragnDrop !== "undefined" &&
+				typeof melisDragnDrop.refreshStackedZoneClasses === "function"
+			) {
+				melisDragnDrop.refreshStackedZoneClasses();
+			}
 
 			// get plugin ID and re init
 			// check if owl re init

@@ -3,37 +3,31 @@ var melisPluginSortable = (function($, window) {
 	var $body = $("body");
 
     /* ==================================
-            Initialized
+            Initialized — skip if dragndrop.js owns sortable
     ====================================*/
-    $(".melis-dragdropzone").sortable({
-    	// when changing plugins order
-    	stop: function(event, ui) {
-            $(".melis-dragdropzone").removeClass("highlight");
-            if ( ui.item[0] ) { 
-            	// reset items index
-	            $(ui.item[0]).css({"z-index": "1"});
+    if (typeof melisDragnDrop === "undefined") {
+        $(".melis-dragdropzone").sortable({
+            stop: function(event, ui) {
+                $(".melis-dragdropzone").removeClass("highlight");
+                if ( ui.item[0] ) {
+                    $(ui.item[0]).css({"z-index": "1"});
 
-            	var plugin 			= $(ui.item[0]).find(".melis-plugin-tools-box"),
-                	moduleName 		= plugin.data("module"),
-                	pluginName 		= plugin.data("plugin"),
-                	pluginId 		= plugin.data("plugin-id"),
-                	melisTag 		= plugin.data("melis-tag"),
-                	pluginContainer = plugin.closest(".melis-float-plugins"),
-                	pageId 			= window.parent.$("#"+parent.activeTabId).find(".melis-iframe").data("iframe-id"),
-                	dropzone 		= plugin.closest(".melis-dragdropzone"),
-                	dropzoneData 	= dropzone.data("plugin-id");
+                    var plugin          = $(ui.item[0]).find(".melis-plugin-tools-box"),
+                        pluginContainer = plugin.closest(".melis-float-plugins"),
+                        pageId          = window.parent.$("#"+parent.activeTabId).find(".melis-iframe").data("iframe-id"),
+                        dropzone        = plugin.closest(".melis-dragdropzone"),
+                        dropzoneData    = dropzone.data("plugin-id");
 
-                // check plugin if wrap
-				if( $(pluginContainer).length <= 0 ) {
-                    $(plugin).data("plugin-container", "");
-				}
-				
-                // melisPluginEdition.pluginContainerChecker(); // disable for now
-				melisPluginEdition.sendDragnDropList(dropzoneData, pageId);
-                melisPluginEdition.pluginDetector();
-            }
-    	},
-    });
+                    if( $(pluginContainer).length <= 0 ) {
+                        $(plugin).data("plugin-container", "");
+                    }
+
+                    melisPluginEdition.sendDragnDropList(dropzoneData, pageId);
+                    melisPluginEdition.pluginDetector();
+                }
+            },
+        });
+    }
 
 	$body.on("click", ".m-options-handle", function() {
 		var $this = $("this");

@@ -18,29 +18,390 @@ var melisDragnDrop = (function ($, window) {
 	/* ==================================
 		Drag & Drop
 		====================================*/
-	$(".melis-cms-plugin-snippets").draggable({
-		connectWith: ".melis-draggable",
-		connectToSortable: ".melis-dragdropzone",
-		revert: true,
-		helper: "clone",
-		start: function (event, ui) {
-			$(ui.helper).find(".melis-plugin-tooltip").hide();
-			$(".melis-dragdropzone").addClass("highlight").removeClass("no-content");
-			$(".ui-sortable-placeholder").css({
-				background: "#7c3aed",
-				border: "none",
-				"min-height": "4px",
-				height: "4px",
+	var DND_DRAGGING_CLASS = "melis-dnd-dragging";
+	var railMoveTimer = null;
+
+	function pluginWidthClassSuffix(percent) {
+		return parseFloat(percent).toFixed(2).replace(".", "-");
+	}
+
+	/**
+	 * Width classes for the active preview breakpoint; other breakpoints stay full width.
+	 */
+	function pluginWidthClassesForFrame(percent, frameWidth) {
+		var suffix = pluginWidthClassSuffix(percent);
+
+		if (frameWidth <= 480) {
+			return (
+				"plugin-width-xs-" +
+				suffix +
+				" plugin-width-md-100-00 plugin-width-lg-100-00"
+			);
+		}
+		if (frameWidth > 490 && frameWidth <= 980) {
+			return (
+				"plugin-width-xs-100-00 plugin-width-md-" +
+				suffix +
+				" plugin-width-lg-100-00"
+			);
+		}
+		return (
+			"plugin-width-xs-100-00 plugin-width-md-100-00 plugin-width-lg-" +
+			suffix
+		);
+	}
+
+	function savedWidthsForFrame(percent, frameWidth) {
+		var width = parseFloat(percent);
+
+		if (frameWidth <= 480) {
+			return { mobile: width, tablet: 100, desktop: 100 };
+		}
+		if (frameWidth > 490 && frameWidth <= 980) {
+			return { mobile: 100, tablet: width, desktop: 100 };
+		}
+		return { mobile: 100, tablet: 100, desktop: width };
+	}
+
+	function isDragItemFullWidth(ui) {
+		var $item = $(ui.item[0]);
+		var $toolBox = $item.find(".melis-plugin-tools-box").first();
+		var moduleName =
+			$item.attr("data-module-name") || $toolBox.data("module");
+		var pluginName = $toolBox.data("plugin") || $item.data("pluginName");
+
+		return (
+			moduleName === "MelisMiniTemplate" ||
+			pluginName === "MelisFrontBlockSectionPlugin"
+		);
+	}
+
+	function refreshStackedZoneClasses() {
+		$(".melis-dragdropzone").each(function () {
+			$(this).toggleClass(
+				"is-stacked",
+				zoneHasOnlyFullWidthBlocks($(this))
+			);
+		});
+	}
+
+	function applyStackedPlaceholder(ui, $zone) {
+		if (!ui.placeholder || !ui.placeholder[0]) {
+			return false;
+		}
+
+		if (!zoneHasOnlyFullWidthBlocks($zone) && !isDragItemFullWidth(ui)) {
+			return false;
+		}
+
+		$(ui.placeholder[0]).css({
+			width: "100%",
+			"min-height": "8px",
+			height: "8px",
+			margin: 0,
+			padding: 0,
+		});
+
+		return true;
+	}
+
+	function removeInsertRails($zones) {
+		$zones.find(".melis-dnd-insert-rail").remove();
+	}
+
+	function syncInsertRails($zone) {
+		removeInsertRails($zone);
+
+		if (
+			!$body.hasClass(DND_DRAGGING_CLASS) ||
+			!zoneHasOnlyFullWidthBlocks($zone)
+		) {
+			return;
+		}
+
+		var $items = getZoneSortableItems($zone).not(".ui-sortable-helper");
+
+		$items.each(function (i) {
+			$(
+				'<div class="melis-dnd-insert-rail" data-insert-index="' +
+					i +
+					'" aria-hidden="true"></div>'
+			).insertBefore(this);
+		});
+
+		$(
+			'<div class="melis-dnd-insert-rail melis-dnd-insert-rail--end" data-insert-index="' +
+				$items.length +
+				'" aria-hidden="true"></div>'
+		).appendTo($zone);
+	}
+
+	function movePlaceholderToIndex($zone, index) {
+		var $placeholder = $zone.children(".ui-sortable-placeholder");
+
+		if (!$placeholder.length) {
+			return;
+		}
+
+		var $items = getZoneSortableItems($zone).not(".ui-sortable-helper");
+
+		if (!$items.length) {
+			return;
+		}
+
+		if (index <= 0) {
+			$placeholder.insertBefore($items.first());
+		} else if (index >= $items.length) {
+			$placeholder.insertAfter($items.last());
+		} else {
+			$placeholder.insertBefore($items.eq(index));
+		}
+
+		if ($zone.data("ui-sortable")) {
+			$zone.sortable("refreshPositions");
+		}
+
+		applyStackedPlaceholder(
+			{ placeholder: $placeholder, item: $zone.find(".ui-sortable-helper") },
+			$zone
+		);
+	}
+
+	function beginSortableDrag($zone, ui) {
+		$body.addClass(DND_DRAGGING_CLASS);
+		$(".melis-dragdropzone").addClass("highlight");
+		refreshStackedZoneClasses();
+		applySortableAxisForZone($zone);
+		syncInsertRails($zone);
+
+		if (!applyStackedPlaceholder(ui, $zone)) {
+			var placeholderWidthPct =
+				(100 * parseFloat($(ui.helper[0]).css("width"))) /
+					parseFloat($(ui.helper[0]).parent().css("width")) +
+				"%";
+			$(ui.placeholder[0]).css("width", placeholderWidthPct);
+		}
+
+		var moduleName = $(ui.helper[0]).attr("data-module-name");
+
+		if (moduleName === "MelisMiniTemplate") {
+			$(ui.helper[0]).css({
+				height: "auto",
+				"padding-left": "10px",
+				"padding-right": "10px",
 			});
-		},
-		stop: function (event, ui) {
-			$(".melis-dragdropzone").removeClass("highlight");
+		}
+	}
+
+	function endSortableDrag() {
+		$body.removeClass(DND_DRAGGING_CLASS);
+		$(".melis-dragdropzone").removeClass("highlight");
+		removeInsertRails($(".melis-dragdropzone"));
+		resetSortableAxisOnAllZones();
+		refreshStackedZoneClasses();
+		$(window).off("mousemove");
+	}
+
+	function beginSnippetDrag(ui) {
+		$(ui.helper).find(".melis-plugin-tooltip").hide();
+		$body.addClass(DND_DRAGGING_CLASS);
+		$(".melis-dragdropzone").addClass("highlight").removeClass("no-content");
+		refreshStackedZoneClasses();
+		$(".melis-dragdropzone").each(function () {
+			syncInsertRails($(this));
+		});
+		$(".ui-sortable-placeholder").css({
+			background: "#7c3aed",
+			border: "none",
+			"min-height": "8px",
+			height: "8px",
+			width: "100%",
+		});
+	}
+
+	function endSnippetDrag() {
+		endSortableDrag();
+		if (typeof melisPluginEdition !== "undefined") {
 			melisPluginEdition.pluginDetector();
-		},
+		}
+	}
+
+	function initDraggableSnippets() {
+		$(".melis-cms-plugin-snippets").each(function () {
+			var $snippet = $(this);
+			if ($snippet.data("ui-draggable")) {
+				$snippet.draggable("destroy");
+			}
+		});
+
+		$(".melis-cms-plugin-snippets").draggable({
+			connectWith: ".melis-draggable",
+			connectToSortable: ".melis-dragdropzone",
+			revert: true,
+			helper: "clone",
+			start: function (event, ui) {
+				beginSnippetDrag(ui);
+			},
+			stop: function () {
+				endSnippetDrag();
+			},
+		});
+	}
+
+	initDraggableSnippets();
+
+	$body.on("mouseenter", ".melis-dnd-insert-rail", function () {
+		if (!$body.hasClass(DND_DRAGGING_CLASS)) {
+			return;
+		}
+
+		var $rail = $(this);
+		var $zone = $rail.closest(".melis-dragdropzone");
+		var index = parseInt($rail.data("insert-index"), 10);
+
+		if (isNaN(index) || !$zone.length) {
+			return;
+		}
+
+		$zone.find(".melis-dnd-insert-rail").removeClass(
+			"melis-dnd-insert-rail--active"
+		);
+		$rail.addClass("melis-dnd-insert-rail--active");
+
+		clearTimeout(railMoveTimer);
+		railMoveTimer = setTimeout(function () {
+			movePlaceholderToIndex($zone, index);
+		}, 16);
 	});
+
+	/**
+	 * Sortable items in a dropzone (direct children or inside .melis-float-plugins).
+	 */
+	function getZoneSortableItems($zone) {
+		return $zone
+			.children(".melis-ui-outlined")
+			.add($zone.children(".melis-float-plugins").children(".melis-ui-outlined"));
+	}
+
+	function getActivePluginWidthPrefix(frameWidth) {
+		if (frameWidth <= 480) {
+			return "plugin-width-xs-";
+		}
+		if (frameWidth > 490 && frameWidth <= 980) {
+			return "plugin-width-md-";
+		}
+		return "plugin-width-lg-";
+	}
+
+	function getPreviewFrameWidth() {
+		if (currentFrame && currentFrame.length) {
+			return currentFrame.width();
+		}
+		return $(window).width();
+	}
+
+	/**
+	 * True when a plugin block spans ~full width of its dropzone (stacked layout).
+	 */
+	function isMelisUiOutlinedFullWidth($outlined, $zone) {
+		var $toolBox = $outlined.find(".melis-plugin-tools-box").first();
+		var pluginName =
+			$toolBox.data("plugin") || $outlined.data("pluginName");
+		var moduleName =
+			$toolBox.data("module") || $outlined.attr("data-module-name");
+
+		if (
+			pluginName === "MelisFrontBlockSectionPlugin" ||
+			moduleName === "MelisMiniTemplate"
+		) {
+			return true;
+		}
+
+		var zoneWidth = $zone.width();
+
+		if (zoneWidth > 0) {
+			var widthPercent = (100 * $outlined.outerWidth()) / zoneWidth;
+
+			// Trust rendered width: sub-90% blocks are side-by-side even if stale width classes remain.
+			if (widthPercent < 90) {
+				return false;
+			}
+			if (widthPercent >= 90) {
+				return true;
+			}
+		}
+
+		var frameWidth = getPreviewFrameWidth();
+		var activePrefix = getActivePluginWidthPrefix(frameWidth);
+		var classes = $outlined.attr("class") || "";
+		var activeClassMatch = classes.match(
+			new RegExp(activePrefix.replace(/-/g, "\\-") + "[\\d-]+")
+		);
+
+		if (activeClassMatch) {
+			return activeClassMatch[0] === activePrefix + "100-00";
+		}
+
+		var widthAttr =
+			frameWidth <= 480
+				? "data-plugin-width-mobile"
+				: frameWidth > 490 && frameWidth <= 980
+					? "data-plugin-width-tablet"
+					: "data-plugin-width-desktop";
+		var savedWidth = parseFloat($toolBox.attr(widthAttr));
+
+		if (!isNaN(savedWidth)) {
+			return savedWidth >= 90;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Vertical-only drag when every item in the zone is full-width (e.g. mini templates).
+	 */
+	function zoneHasOnlyFullWidthBlocks($zone) {
+		var $items = getZoneSortableItems($zone);
+
+		if (!$items.length) {
+			return false;
+		}
+
+		var allFullWidth = true;
+		$items.each(function () {
+			if (!isMelisUiOutlinedFullWidth($(this), $zone)) {
+				allFullWidth = false;
+				return false;
+			}
+		});
+
+		return allFullWidth;
+	}
+
+	function applySortableAxisForZone($zone) {
+		$zone.sortable(
+			"option",
+			"axis",
+			zoneHasOnlyFullWidthBlocks($zone) ? "y" : false
+		);
+	}
+
+	function resetSortableAxisOnAllZones() {
+		$(".melis-dragdropzone").each(function () {
+			$(this).sortable("option", "axis", false);
+		});
+	}
 
 	function setDragDropZone() {
 		var isCrossDropzoneMove = false;
+
+		$(".melis-dragdropzone").each(function () {
+			var $zone = $(this);
+			if ($zone.data("ui-sortable")) {
+				$zone.sortable("destroy");
+			}
+		});
+
 		$(".melis-dragdropzone").sortable({
 			connectWith: ".melis-float-plugins, .melis-dragdropzone",
 			connectToSortable: ".melis-float-plugins",
@@ -49,36 +410,21 @@ var melisDragnDrop = (function ($, window) {
 			cursorAt: { top: 0, left: 0 },
 			zIndex: 999999,
 			placeholder: "ui-state-highlight",
-			tolerance: "pointer",
+			tolerance: "intersect", // "pointer", or "fit", 
+			forcePlaceholderSize: true, // or remove
+			scroll: false, // or remove
+			distance: 5, // or remove
 			items: ".melis-ui-outlined",
 			start: function (event, ui) {
+				var $zone = $(this);
 
 				$(".melis-dragdropzone").sortable("refresh");
 
 				// hide tinyMCE panel
 				$(".mce-tinymce.mce-panel.mce-floatpanel").hide();
 
-				// highlight dragdropzone
-				$(".melis-dragdropzone").addClass("highlight");
 				$(".ui-sortable-helper").css("z-index", "9999999");
-
-				// get item percentage width
-				var placeholderWidth =
-					(100 * parseFloat($(ui.helper[0]).css("width"))) /
-						parseFloat($(ui.helper[0]).parent().css("width")) +
-					"%";
-				$(ui.placeholder[0]).css("width", placeholderWidth);
-
-				// change its css to fit for theme design specific for the melis minitemplate
-				var ddn = $(ui.helper[0]).attr("data-module-name");
-
-				if (ddn == "MelisMiniTemplate") {
-					$(ui.helper[0]).css({
-						height: "auto",
-						"padding-left": "10px",
-						"padding-right": "10px",
-					});
-				}
+				beginSortableDrag($zone, ui);
 
 				// detect if browser is in desktop
 				if ($(window).width() >= 768) {
@@ -223,12 +569,11 @@ var melisDragnDrop = (function ($, window) {
 						}
 				}
 
-				$(".melis-dragdropzone").removeClass("highlight");
-
 				// related on updated dragdropzone icon
 				$(".melis-dragdropzone").parents(".no-content").removeClass("no-content").addClass("content-added");
 
 				melisPluginEdition.pluginDetector();
+				refreshStackedZoneClasses();
 
 				// remove empty row inside .melis-dragdropzone
 				removeEmptyRow();
@@ -237,25 +582,28 @@ var melisDragnDrop = (function ($, window) {
 				$(".ui-sortable-helper").remove();
 			},
 			over: function (event, ui) {
-				$("body .melis-dragdropzone").removeClass("highlight");
-      			$(this).addClass("highlight");
+				var $zone = $(this);
 
-				setPluginWidth(ui);
+				$("body .melis-dragdropzone").not(this).removeClass("highlight");
+				$zone.addClass("highlight");
 
-				if (typeof melisPluginEdition !== "undefined") {
-					melisPluginEdition.pluginDetector();
+				applySortableAxisForZone($zone);
+				$(".melis-dragdropzone").not($zone).each(function () {
+					removeInsertRails($(this));
+				});
+				syncInsertRails($zone);
+
+				if (zoneHasOnlyFullWidthBlocks($zone)) {
+					applyStackedPlaceholder(ui, $zone);
+				} else {
+					setPluginWidth(ui, $zone);
 				}
 			},
-			out: function(event, ui) {
-				let $this = $(this);
-
-					$this.removeClass("highlight");
-
-					// related on updated dragdropzone icon
-					$this.parents(".content-added").removeClass("content-added").addClass("no-content");
+			out: function (event, ui) {
+				$(this).removeClass("highlight");
 			},
 			stop: function(event, ui) {
-				$("body .melis-dragdropzone").removeClass("highlight");
+				endSortableDrag();
 
 				/* only save if:
 				1. NOT a new plugin being dragged dropped  
@@ -271,11 +619,21 @@ var melisDragnDrop = (function ($, window) {
 					}
 				}
 
+				if (typeof melisPluginEdition !== "undefined") {
+					melisPluginEdition.pluginDetector();
+				}
+
 				// reset the flag
     			isCrossDropzoneMove = false;
 			},
 			change: function (event, ui) {
-				setPluginWidth(ui);
+				var $zone = $(this);
+
+				if (zoneHasOnlyFullWidthBlocks($zone)) {
+					applyStackedPlaceholder(ui, $zone);
+				} else {
+					setPluginWidth(ui, $zone);
+				}
 			},
 		});
 	}
@@ -289,9 +647,24 @@ var melisDragnDrop = (function ($, window) {
 	}
 
 	setDragDropZone();
+	refreshStackedZoneClasses();
 
 	// set plugin container width by placeholder
-	function setPluginWidth(ui) {
+	function setPluginWidth(ui, $zone) {
+		$zone = $zone || $(ui.placeholder[0]).closest(".melis-dragdropzone");
+
+		if ($zone.length && zoneHasOnlyFullWidthBlocks($zone)) {
+			applyStackedPlaceholder(ui, $zone);
+			placeholderWidth = $(ui.placeholder[0]);
+			return;
+		}
+
+		if (isDragItemFullWidth(ui)) {
+			$(ui.placeholder[0]).css("width", "100%");
+			placeholderWidth = $(ui.placeholder[0]);
+			return;
+		}
+
 		var data = $(ui.item[0]).data();
 		if (data.pluginName == "MelisFrontBlockSectionPlugin") {
 			$(ui.placeholder[0]).css("width", "100%");
@@ -510,34 +883,27 @@ var melisDragnDrop = (function ($, window) {
 					var datastring = [],
 						uiPlaceHolderWidth = placeholderWidth.css("width");
 
-					// re set the plugin width
+					// re set the plugin width from drop placeholder
 					setTimeout(function () {
 						var pluginId = "#" + $(plugin.html).attr("id");
+						var frameWidth = currentFrame.width();
+						var placeholderPercent = 100;
+
+						if (
+							placeholderWidth &&
+							placeholderWidth.length &&
+							typeof uiPlaceHolderWidth === "string" &&
+							uiPlaceHolderWidth.indexOf("%") !== -1
+						) {
+							placeholderPercent = parseFloat(uiPlaceHolderWidth);
+						}
+
 						$(pluginId).removeClass(function (index, css) {
-							return (css.match(/\bplugin-width\S+/g) || []).join(" "); // removes anything that starts with "plugin-width-"
+							return (css.match(/\bplugin-width\S+/g) || []).join(" ");
 						});
-						var pluginClass = "." + $(pluginId).attr("class");
-						uiPlaceHolderWidth = uiPlaceHolderWidth.slice(0, -1);
-						var strPlaceholderWidth = parseFloat(uiPlaceHolderWidth).toFixed(2);
-						// check if dragndrop mobile, tablet, desktop
-						// check if resize in mobile
-						if (currentFrame.width() <= 480) {
-							$(pluginId).addClass(
-								" plugin-width-md-100-00 plugin-width-lg-100-00 plugin-width-xs-100-00"
-							); //uiPlaceHolderWidth
-						}
-						// check if resize in tablet
-						if (currentFrame.width() > 490 && currentFrame.width() <= 980) {
-							$(pluginId).addClass(
-								" plugin-width-xs-100-00 plugin-width-lg-100-00 plugin-width-md-100-00"
-							); //uiPlaceHolderWidth
-						}
-						// check if resize in desktop
-						if (currentFrame.width() >= 981) {
-							$(pluginId).addClass(
-								" plugin-width-xs-100-00 plugin-width-md-100-00 plugin-width-lg-100-00"
-							); //uiPlaceHolderWidth
-						}
+						$(pluginId).addClass(
+							pluginWidthClassesForFrame(placeholderPercent, frameWidth)
+						);
 					}, 100);
 
 					if (
@@ -557,9 +923,33 @@ var melisDragnDrop = (function ($, window) {
 						});
 						datastring.push({ name: "melisPluginId", value: melisPluginID });
 						datastring.push({ name: "melisPluginTag", value: melisPluginTag });
-						datastring.push({ name: "melisPluginMobileWidth", value: 100 });
-						datastring.push({ name: "melisPluginTabletWidth", value: 100 });
-						datastring.push({ name: "melisPluginDesktopWidth", value: 100 });
+						(function () {
+							var placeholderPercent = 100;
+							if (
+								placeholderWidth &&
+								placeholderWidth.length &&
+								typeof uiPlaceHolderWidth === "string" &&
+								uiPlaceHolderWidth.indexOf("%") !== -1
+							) {
+								placeholderPercent = parseFloat(uiPlaceHolderWidth);
+							}
+							var savedWidths = savedWidthsForFrame(
+								placeholderPercent,
+								currentFrame.width()
+							);
+							datastring.push({
+								name: "melisPluginMobileWidth",
+								value: savedWidths.mobile,
+							});
+							datastring.push({
+								name: "melisPluginTabletWidth",
+								value: savedWidths.tablet,
+							});
+							datastring.push({
+								name: "melisPluginDesktopWidth",
+								value: savedWidths.desktop,
+							});
+						})();
 
 						// pass it in savePluginUpdate
 						melisPluginEdition.savePluginUpdate(datastring, siteModule);
@@ -631,32 +1021,7 @@ var melisDragnDrop = (function ($, window) {
 				}).done(function (data) {
 					$("#cmsPluginsMenuContent").html(data.view);
 					setTimeout(function () {
-						$(".melis-cms-plugin-snippets").draggable({
-							connectWith: ".melis-draggable",
-							connectToSortable: ".melis-dragdropzone",
-							revert: true,
-							helper: "clone",
-							start: function (event, ui) {
-								$(ui.helper).find(".melis-plugin-tooltip").hide();
-								$(".melis-dragdropzone")
-									.addClass("highlight")
-									.removeClass("no-content");
-								$(".ui-sortable-placeholder").css({
-									background: "#7c3aed",
-									border: "none",
-									"min-height": "4px",
-									height: "4px",
-								});
-							},
-							stop: function (event, ui) {
-								$(".melis-dragdropzone").removeClass("highlight");
-
-								if (typeof melisPluginEdition !== "undefined") {
-									melisPluginEdition.pluginDetector();
-								}
-							},
-						});
-
+						initDraggableSnippets();
 						setDragDropZone();
 
 						_this.closest(".melis-cms-dnd-box").addClass("hasCached");
@@ -865,6 +1230,7 @@ var melisDragnDrop = (function ($, window) {
 		showPluginMenu: showPluginMenu,
 		pluginScrollPos: pluginScrollPos,
 		setDragDropZone: setDragDropZone,
+		refreshStackedZoneClasses: refreshStackedZoneClasses,
 		debugPlaceholder: debugPlaceholder,
 	};
 })(jQuery, window);

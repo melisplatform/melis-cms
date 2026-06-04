@@ -635,6 +635,68 @@ body {
     box-shadow: 0 0 10px rgba(230, 28, 35, 0.35);
 }
 
+/* Stable placeholder while dragging (no animation restart flicker) */
+body.melis-dnd-dragging .ui-sortable-placeholder.ui-state-highlight {
+    -webkit-animation: none !important;
+    animation: none !important;
+    -webkit-transform: scaleX(1) !important;
+    transform: scaleX(1) !important;
+    opacity: 1 !important;
+    transition: none !important;
+}
+
+body.melis-dnd-dragging .melis-dragdropzone.is-stacked .ui-sortable-placeholder.ui-state-highlight {
+    min-height: 8px !important;
+    height: 8px !important;
+    width: 100% !important;
+}
+
+/* Stacked full-width blocks (mini templates, sections) */
+.melis-dragdropzone.is-stacked > .melis-ui-outlined,
+.melis-dragdropzone.is-stacked > .melis-float-plugins > .melis-ui-outlined {
+    float: none;
+    width: 100%;
+    clear: both;
+}
+
+.melis-dragdropzone.is-stacked > .melis-float-plugins {
+    margin: 0;
+    padding: 0;
+}
+
+.melis-dragdropzone.is-stacked > .melis-float-plugins:after {
+    display: none;
+}
+
+/* Divi-style insertion rails between stacked items */
+.melis-dnd-insert-rail {
+    display: block;
+    width: 100%;
+    min-height: 16px;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background: transparent;
+    pointer-events: auto;
+    position: relative;
+    z-index: 2;
+}
+
+body.melis-dnd-dragging .melis-dnd-insert-rail:hover,
+body.melis-dnd-dragging .melis-dnd-insert-rail.melis-dnd-insert-rail--active {
+    background: rgba(230, 28, 35, 0.25);
+    min-height: 8px;
+}
+
+body.melis-dnd-dragging .melis-dragdropzone.is-stacked {
+    background-color: #fff;
+}
+
+body.melis-dnd-dragging .melis-dragdropzone,
+body.melis-dnd-dragging .melis-dragdropzone.highlight {
+    transition: none !important;
+}
+
 /* Frozen sample placeholder — stays in DOM for DevTools inspection */
 body.melis-dnd-debug-placeholder .melis-dnd-debug-placeholder-sample {
     display: block !important;
