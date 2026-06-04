@@ -766,8 +766,16 @@ button:disabled.dnd-remove-button .fa-trash {
 .dnd-plugins-content.dynamic .dnd-layout-wrapper .row .col-12:not(:first-child) .melis-dragdropzone .melis-ui-outlined .melis-plugin-tools-box {
     left: 0;
 }
-/* center content vertically */
+/* center content vertically (column only — keep Bootstrap row gutters intact) */
 .dnd-plugins-row > div[class*="dnd-plugins-col-"] {
+    display: grid;
+    align-content: center;
+    align-self: stretch;
+}
+.dnd-plugins-row > div[class*="dnd-plugins-col-"] [data-melis-plugin-tag-id] {
+    width: 100%;
+}
+/* .dnd-plugins-row > div[class*="dnd-plugins-col-"] {
     display: flex;
     flex-direction: column;
 }
@@ -780,4 +788,4 @@ button:disabled.dnd-remove-button .fa-trash {
 }
 .dnd-plugins-row > div[class*="dnd-plugins-col-"] [data-melis-plugin-tag-id] {
     width: 100%;
-}
+} */
