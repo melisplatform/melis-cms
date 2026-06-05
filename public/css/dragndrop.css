@@ -636,6 +636,23 @@ body {
 }
 
 /* Stable placeholder while dragging (no animation restart flicker) */
+body.melis-dnd-dragging .melis-dragdropzone {
+    position: relative;
+}
+
+body.melis-dnd-dragging .melis-dragdropzone .melis-ui-outlined:not(.ui-sortable-helper) {
+    transition: none !important;
+}
+
+body.melis-dnd-dragging .melis-dnd-origin-spacer {
+    display: block;
+    visibility: hidden;
+    pointer-events: none;
+    border: none;
+    padding: 0;
+    background: transparent;
+}
+
 body.melis-dnd-dragging .ui-sortable-placeholder.ui-state-highlight {
     -webkit-animation: none !important;
     animation: none !important;
@@ -643,6 +660,9 @@ body.melis-dnd-dragging .ui-sortable-placeholder.ui-state-highlight {
     transform: scaleX(1) !important;
     opacity: 1 !important;
     transition: none !important;
+    position: absolute !important;
+    float: none !important;
+    clear: none !important;
 }
 
 body.melis-dnd-dragging .melis-dragdropzone.is-stacked .ui-sortable-placeholder.ui-state-highlight {
@@ -668,18 +688,28 @@ body.melis-dnd-dragging .melis-dragdropzone.is-stacked .ui-sortable-placeholder.
     display: none;
 }
 
-/* Divi-style insertion rails between stacked items */
+/* Divi-style insertion rails between stacked items (out of flow) */
+.melis-dnd-insert-rails {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 4;
+}
+
 .melis-dnd-insert-rail {
-    display: block;
+    position: absolute;
+    left: 0;
     width: 100%;
     min-height: 16px;
+    height: 16px;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     background: transparent;
     pointer-events: auto;
-    position: relative;
-    z-index: 2;
 }
 
 body.melis-dnd-dragging .melis-dnd-insert-rail:hover,

@@ -19,6 +19,7 @@ var melisDragnDrop = (function ($, window) {
 		Drag & Drop
 		====================================*/
 	var DND_DRAGGING_CLASS = "melis-dnd-dragging";
+	var DND_ORIGIN_SPACER_CLASS = "melis-dnd-origin-spacer";
 	var railMoveTimer = null;
 
 	function pluginWidthClassSuffix(percent) {
@@ -106,7 +107,7 @@ var melisDragnDrop = (function ($, window) {
 	}
 
 	function removeInsertRails($zones) {
-		$zones.find(".melis-dnd-insert-rail").remove();
+		$zones.find(".melis-dnd-insert-rails, .melis-dnd-insert-rail").remove();
 	}
 
 	function syncInsertRails($zone) {
@@ -121,19 +122,141 @@ var melisDragnDrop = (function ($, window) {
 
 		var $items = getZoneSortableItems($zone).not(".ui-sortable-helper");
 
+		if (!$items.length) {
+			return;
+		}
+
+		var $rails = $('<div class="melis-dnd-insert-rails" aria-hidden="true"></div>');
+
 		$items.each(function (i) {
+			var $item = $(this);
+			var railTop = Math.max(0, $item.position().top - 8);
+
 			$(
 				'<div class="melis-dnd-insert-rail" data-insert-index="' +
 					i +
-					'" aria-hidden="true"></div>'
-			).insertBefore(this);
+					'"></div>'
+			)
+				.css({ top: railTop })
+				.appendTo($rails);
 		});
 
+		var $last = $items.last();
 		$(
 			'<div class="melis-dnd-insert-rail melis-dnd-insert-rail--end" data-insert-index="' +
 				$items.length +
-				'" aria-hidden="true"></div>'
-		).appendTo($zone);
+				'"></div>'
+		)
+			.css({ top: $last.position().top + $last.outerHeight(true) - 8 })
+			.appendTo($rails);
+
+		$zone.append($rails);
+	}
+
+	function removeOriginSpacer($zone) {
+		var $spacer = $zone.data("melisDndOriginSpacer");
+
+		if ($spacer && $spacer.length) {
+			$spacer.remove();
+		}
+
+		$zone.removeData("melisDndOriginSpacer");
+		$zone.find("." + DND_ORIGIN_SPACER_CLASS).remove();
+	}
+
+	function createOriginSpacer($zone, ui) {
+		removeOriginSpacer($zone);
+
+		if (!ui.placeholder || !ui.placeholder[0]) {
+			return;
+		}
+
+		var $helper = $(ui.helper[0]);
+		var spacerCss = {
+			width: $helper.outerWidth(),
+			height: $helper.outerHeight(),
+			margin: $helper.css("margin"),
+			visibility: "hidden",
+			pointerEvents: "none",
+			border: "none",
+			padding: 0,
+			boxSizing: "border-box",
+		};
+
+		if (zoneHasOnlyFullWidthBlocks($zone) || isDragItemFullWidth(ui)) {
+			spacerCss.width = "100%";
+			spacerCss.clear = "both";
+			spacerCss.float = "none";
+		} else if ($helper.css("float") !== "none") {
+			spacerCss.float = $helper.css("float");
+		}
+
+		var $spacer = $("<div></div>")
+			.addClass(DND_ORIGIN_SPACER_CLASS)
+			.attr("aria-hidden", "true")
+			.css(spacerCss);
+
+		$(ui.placeholder[0]).before($spacer);
+		$zone.data("melisDndOriginSpacer", $spacer);
+	}
+
+	/**
+	 * Drop indicator out of document flow so siblings do not reflow (Divi-style).
+	 */
+	function positionOverlayPlaceholder($zone, ui) {
+		var $ph =
+			ui && ui.placeholder
+				? $(ui.placeholder[0])
+				: $zone.children(".ui-sortable-placeholder").first();
+
+		if (!$ph.length) {
+			return;
+		}
+
+		var $prev = $ph.prevAll(".melis-ui-outlined").first();
+		var $next = $ph.nextAll(".melis-ui-outlined").first();
+		var stacked =
+			$zone.hasClass("is-stacked") || zoneHasOnlyFullWidthBlocks($zone);
+		var top = 0;
+		var left = 0;
+		var width = $zone.innerWidth();
+		var height = stacked ? 8 : 4;
+
+		if ($next.length) {
+			top = $next.position().top;
+			left = stacked ? 0 : $next.position().left;
+			if (!stacked) {
+				width = $ph.width() || $next.outerWidth();
+			}
+		} else if ($prev.length) {
+			top = $prev.position().top + $prev.outerHeight(true);
+			left = stacked ? 0 : $prev.position().left;
+			if (!stacked) {
+				width = $ph.width() || $prev.outerWidth();
+			}
+		}
+
+		if (!stacked && $prev.length && $next.length) {
+			top = $next.position().top;
+			left = $next.position().left;
+			width = $ph.width() || $next.outerWidth();
+		}
+
+		$ph.css({
+			position: "absolute",
+			top: top,
+			left: left,
+			width: width,
+			height: height,
+			margin: 0,
+			float: "none",
+			clear: "none",
+			zIndex: 5,
+		});
+
+		if ($zone.data("ui-sortable")) {
+			$zone.sortable("refreshPositions");
+		}
 	}
 
 	function movePlaceholderToIndex($zone, index) {
@@ -165,6 +288,10 @@ var melisDragnDrop = (function ($, window) {
 			{ placeholder: $placeholder, item: $zone.find(".ui-sortable-helper") },
 			$zone
 		);
+		positionOverlayPlaceholder($zone, {
+			placeholder: $placeholder,
+			item: $zone.find(".ui-sortable-helper"),
+		});
 	}
 
 	function beginSortableDrag($zone, ui) {
@@ -172,6 +299,7 @@ var melisDragnDrop = (function ($, window) {
 		$(".melis-dragdropzone").addClass("highlight");
 		refreshStackedZoneClasses();
 		applySortableAxisForZone($zone);
+		createOriginSpacer($zone, ui);
 		syncInsertRails($zone);
 
 		if (!applyStackedPlaceholder(ui, $zone)) {
@@ -191,15 +319,29 @@ var melisDragnDrop = (function ($, window) {
 				"padding-right": "10px",
 			});
 		}
+
+		positionOverlayPlaceholder($zone, ui);
 	}
 
 	function endSortableDrag() {
 		$body.removeClass(DND_DRAGGING_CLASS);
 		$(".melis-dragdropzone").removeClass("highlight");
 		removeInsertRails($(".melis-dragdropzone"));
+		$(".melis-dragdropzone").each(function () {
+			removeOriginSpacer($(this));
+		});
 		resetSortableAxisOnAllZones();
 		refreshStackedZoneClasses();
 		$(window).off("mousemove");
+	}
+
+	function syncDragOverlay($zone, ui) {
+		if (zoneHasOnlyFullWidthBlocks($zone)) {
+			applyStackedPlaceholder(ui, $zone);
+		} else {
+			setPluginWidth(ui, $zone);
+		}
+		positionOverlayPlaceholder($zone, ui);
 	}
 
 	function beginSnippetDrag(ui) {
@@ -514,7 +656,6 @@ var melisDragnDrop = (function ($, window) {
 				var tabId;
 				// check if ui is from pluginMenu, new plugin from pluginMenu
 				if (ui.helper && $(ui.helper).hasClass("melis-cms-plugin-snippets")) {
-					// console.log(`dragndrop.js setDragDropZone() receive: function new plugin dropped...`);
 					var moduleName = $(ui.helper[0]).data("module-name");
 					var pluginName = $(ui.helper[0]).data("plugin-name");
 					var siteModule = $(ui.helper[0]).data("plugin-site-module");
@@ -553,9 +694,7 @@ var melisDragnDrop = (function ($, window) {
 						// send dragndrop list, save source dropzone
 						melisPluginEdition.sendDragnDropList(dragZoneSenderPluginId, tabId);
 
-						// console.log(`receive: function, existing plugin dropped, melisPluginEdition.sendDragnDropList() called`);
 						if (typeof dragZoneSenderPluginId != "undefined") {
-							// console.log(`typeof dragZoneSenderPluginId: `, typeof dragZoneSenderPluginId);
 							let parentOuterDnd = $(dragZoneSender).parents(".melis-dragdropzone-container:last");
 								parentOuterDndPluginId = parentOuterDnd.data("pluginId");
 
@@ -564,7 +703,6 @@ var melisDragnDrop = (function ($, window) {
 
 								// saving data to session when plugin drag to another dnd, save target dropzone
 								if (parentOuterDndPluginId != currentPluginDndId)
-									// console.log(`parentOuterDndPluginId != currentPluginDndId true, melisPluginEdition.sendDragnDropList() called`);
 									melisPluginEdition.sendDragnDropList(currentPluginDndId, tabId);
 						}
 				}
@@ -581,6 +719,9 @@ var melisDragnDrop = (function ($, window) {
 			update: function (event, ui) {
 				$(".ui-sortable-helper").remove();
 			},
+			sort: function (event, ui) {
+				syncDragOverlay($(this), ui);
+			},
 			over: function (event, ui) {
 				var $zone = $(this);
 
@@ -592,12 +733,7 @@ var melisDragnDrop = (function ($, window) {
 					removeInsertRails($(this));
 				});
 				syncInsertRails($zone);
-
-				if (zoneHasOnlyFullWidthBlocks($zone)) {
-					applyStackedPlaceholder(ui, $zone);
-				} else {
-					setPluginWidth(ui, $zone);
-				}
+				syncDragOverlay($zone, ui);
 			},
 			out: function (event, ui) {
 				$(this).removeClass("highlight");
@@ -609,7 +745,6 @@ var melisDragnDrop = (function ($, window) {
 				1. NOT a new plugin being dragged dropped  
 				2. item was NOT moved from another sortable (already handled in receive) */
 				if (!$(ui.item).hasClass("melis-cms-plugin-snippets") && !isCrossDropzoneMove) {
-					// console.log(`dragndrop.js setDragDropZone() stop: function rearranging existing plugins - saving order...`);
 					var $dropzone = $(this);
 					var dropzoneId = $dropzone.data("dragdropzone-id");
 					var tabId = window.parent.$("#" + parent.activeTabId).find(".melis-iframe").data("iframe-id");
@@ -627,13 +762,7 @@ var melisDragnDrop = (function ($, window) {
     			isCrossDropzoneMove = false;
 			},
 			change: function (event, ui) {
-				var $zone = $(this);
-
-				if (zoneHasOnlyFullWidthBlocks($zone)) {
-					applyStackedPlaceholder(ui, $zone);
-				} else {
-					setPluginWidth(ui, $zone);
-				}
+				syncDragOverlay($(this), ui);
 			},
 		});
 	}

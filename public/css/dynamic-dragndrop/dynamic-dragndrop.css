@@ -776,6 +776,7 @@ button:disabled.dnd-remove-button .fa-trash {
     width: 100%;
 } */
 
+/* center content vertically - causes issue when plugin side by side */
 /* .dnd-plugins-row > div[class*="dnd-plugins-col-"] {
     display: flex;
     flex-direction: column;
