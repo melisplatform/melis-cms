@@ -666,8 +666,8 @@ body.melis-dnd-dragging .ui-sortable-placeholder.ui-state-highlight {
 }
 
 body.melis-dnd-dragging .melis-dragdropzone.is-stacked .ui-sortable-placeholder.ui-state-highlight {
-    min-height: 8px !important;
-    height: 8px !important;
+    min-height: 4px !important;
+    height: 4px !important;
     width: 100% !important;
 }
 
@@ -745,7 +745,7 @@ body.melis-dnd-debug-placeholder .melis-dnd-debug-placeholder-sample {
 }
 
 body.melis-dnd-debug-placeholder .ui-sortable-placeholder.ui-state-highlight:not(.melis-dnd-debug-placeholder-sample) {
-    outline: 2px dashed #00bfff;
+    outline: 2px dashed#00bfff;
     outline-offset: 2px;
 }
 
