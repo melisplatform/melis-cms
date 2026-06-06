@@ -242,7 +242,7 @@ class GdprBannerController extends MelisAbstractActionController
      * @param Form|null $form
      * @return array
      */
-    private function formatErrorMsg(Form $form = null)
+    private function formatErrorMsg(?Form $form = null)
     {
         $formattedErrors = [];
         $formErrors = $form->getMessages();
