@@ -765,6 +765,10 @@ var melisCms = (function() {
 			// Activating page edition button action
 			enableCmsButtons(id);
 
+			if (window.themeSwitcher && typeof window.themeSwitcher.syncPageEditionIframes === 'function') {
+				window.themeSwitcher.syncPageEditionIframes();
+			}
+
 			// remove page loader
 			window.parent.loader.removeActivePageEditionLoading(
 				id + "_id_meliscms_page"
