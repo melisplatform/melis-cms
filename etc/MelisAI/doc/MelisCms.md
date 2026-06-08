@@ -33,6 +33,43 @@ screenshots_dir: ./images
 > **Status**: reviewed 2026-06-08 against the current source (no semantic version in `composer.json`).
 
 ---
+
+## 0. The MelisCms / MelisFront / MelisEngine trio — read this first
+
+> ⚠️ **These three modules are one system and are tightly coupled. If you are working on (or
+> answering a question about) any one of them, check the other two docs as well** — they share
+> the same database model, render pipeline and plugin framework, so a change or a question about
+> one routinely involves the others.
+
+- **MelisEngine** — the **shared technical foundation**. It **owns the entire CMS database
+  model** (pages *published*/*saved*, the page tree, sites, templates, languages, domains, SEO,
+  styles…) and exposes it through **table gateways + services + caching**; it also defines the
+  **`MelisTemplatingPlugin`** base class that every content block extends.
+  → [MelisEngine doc](../../../melis-engine/etc/MelisAI/doc/MelisEngine.md)
+- **MelisFront** — the **front-office rendering system**: it turns a URL into a finished page
+  using engine's data, runs the content plugins, and also powers the **live, editable preview**
+  used inside the back-office.
+  → [MelisFront doc](../../../melis-front/etc/MelisAI/doc/MelisFront.md)
+- **MelisCms** *(this module)* — the **back-office** to build and administer the sites & pages.
+  It **owns no database tables** — it reads/writes everything through MelisEngine and edits pages
+  live through MelisFront.
+
+**Load order:** `melis-core` → **melis-front** → **melis-engine** → **melis-cms** (engine
+requires front; cms requires both). **Neither MelisCms nor MelisFront owns database tables —
+MelisEngine is the single source of truth for the page/site model.**
+
+```
+            ┌──────────────┐  edits via services/tables  ┌──────────────┐
+            │   MelisCms    │ ───────────────────────────▶│              │
+            │ (back-office) │                              │  MelisEngine │  owns the DB model
+            └──────────────┘                              │  (data +     │  (pages, sites,
+            ┌──────────────┐  renders via services/tables │   services + │   templates, SEO…)
+            │  MelisFront   │ ───────────────────────────▶│   cache)     │  + plugin base class
+            │ (front render)│                              └──────────────┘
+            └──────────────┘
+```
+
+---
 ---
 
 # PART A — Functional Guide
