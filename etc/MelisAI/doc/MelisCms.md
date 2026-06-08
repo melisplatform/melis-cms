@@ -23,8 +23,8 @@ screenshots_dir: ./images
 >   the platform's chat assistant that helps them). Plain language: *what each tool is for,
 >   where to find it, how to do things step by step, and what each option means.*
 > - **[Part B — Technical Reference](#part-b--technical-reference)** — for **developers and AI
->   building inside the platform**: controllers, services, table gateways, events, cross-module
->   wiring and file paths.
+>   building inside the platform**: how it works, with **code examples** for the important
+>   services, events and extension points.
 >
 > **Audience**: consumed by the **MelisAI** module (an MCP that answers user questions and may
 > be used by an AI to build things). It fetches this `.md` and the screenshots in `./images/`
@@ -73,7 +73,9 @@ The back-office has a **left menu**. MelisCms adds:
 *The MelisCms entry in the back-office left menu — your starting point.*
 
 You spend most of your time in two places: the **site tree** (to find/organise pages) and the
-**page editor** (to put content on a page).
+**page editor** (to put content on a page). The **side tools** (§A6–A12) are used less often but
+control important global settings — they're explained in detail because they're the least
+obvious.
 
 ## A3. Key words explained (in plain language)
 
@@ -240,150 +242,220 @@ own content and SEO, but they share the same place in the tree.
 
 ---
 
+## The side tools (left menu) — explained
+
+*These tools each have their own left-menu entry. They're used less often than the page editor,
+so they're the most confusing to users — here's what each one really does and when you need it.*
+
 ## A6. Sites tool — create and manage websites
 
-**What it's for:** create a brand-new site and manage everything about an existing one.
+**What it's for.** A "site" is one whole website: its identity (name), the **web addresses**
+(domains) it answers on, the **languages** it offers, which **features (modules)** are turned on
+for it, and global **settings/translations**. The Sites tool is where all of that lives. You
+come here to **create a new website**, or to change anything that applies to a **whole site**
+(rather than to a single page).
 
-**Where:** left menu → tools → **Sites**.
+**Where:** left menu → **Sites** tool.
 
 ![Sites — list](./images/meliscms-tool-sites-list.png)
-*The Sites tool — the list of your sites.*
+*The Sites tool — the list of your sites. Each row is a complete website.*
 
 ### How do I create a new site?
 
-Click **add** and follow the **5-step wizard** — it walks you through naming the site,
-choosing its starting template/theme, setting its domain, picking its languages, and
-confirming:
+Click **add** and follow the **5-step wizard**. It walks you, screen by screen, through the
+choices needed to spin up a working website: naming it, picking the **template/theme** it starts
+from, attaching its **domain(s)**, choosing its **language(s)**, and a final confirmation that
+creates the site, its home page and base configuration:
 
 ![New site — step 1](./images/meliscms-tool-sites-newsite-modal-step1.png)
 ![New site — step 2](./images/meliscms-tool-sites-newsite-modal-step2.png)
 ![New site — step 3](./images/meliscms-tool-sites-newsite-modal-step3.png)
 ![New site — step 4](./images/meliscms-tool-sites-newsite-modal-step4.png)
 ![New site — step 5](./images/meliscms-tool-sites-newsite-modal-step5.png)
-*The new-site wizard, step by step.*
+*The new-site wizard, step by step. After it finishes, the new site appears in the site tree
+ready to receive pages.*
 
-### Managing an existing site (the edit tabs)
+### Managing an existing site — the edit tabs (what each one is for)
 
-Open a site to manage it through tabs:
+Open a site to manage it through tabs. Each tab governs one aspect of the whole site:
 
-- **Properties** — the site name/label, its **home page**, its **404** (page-not-found) page.
+- **Properties** — the site's **name/label**, its **home page** (the page shown at the root
+  `/`), and its **404 page** (what visitors see when a URL doesn't exist). Set these once per
+  site; the home page is what `www.example.com` resolves to.
 
   ![Site edit — Properties](./images/meliscms-tool-sites-edit-tab-properties.png)
 
-- **Domains** — the web addresses the site answers on (one or several, per environment).
+- **Domains** — the **web addresses** the site answers on. A single site can have several
+  domains, and **different domains per environment** (e.g. `dev.example.com` on the dev server,
+  `www.example.com` in production). This is how Melis knows which site to show for an incoming
+  request. If your site "isn't found" on a URL, this tab is usually why.
 
   ![Site edit — Domains](./images/meliscms-tool-sites-edit-tab-domains.png)
 
-- **Languages** — which languages this site offers.
+- **Languages** — which **languages this site offers**. Only languages enabled here can be used
+  for the site's pages. (Languages themselves are created in the Languages tool, §A9.) Add a
+  language here before you can create page versions in it.
 
   ![Site edit — Languages](./images/meliscms-tool-sites-edit-tab-languages.png)
 
-- **Module loading** — switch features (modules) **on/off for this site** (e.g. enable News,
-  the script editor, etc.). A feature only works on a site if it's loaded here.
+- **Module loading** — the **on/off switches for features on this site**. A module (News, the
+  Script Editor, a custom template module, etc.) only works on a site if it is **loaded here**.
+  This is the single most common "why doesn't my feature appear?" answer: the module exists on
+  the platform but hasn't been loaded onto this particular site. Toggle it on, save, and the
+  feature (its plugins, its tools) becomes available for the site.
 
   ![Site edit — Module loading](./images/meliscms-tool-sites-edit-tab-moduleloading.png)
 
-- **Site config** — site-wide **settings** (key/value), e.g. analytics ids, contact emails…
+- **Site config** — site-wide **settings as key/value pairs**. Templates and modules read these
+  to avoid hard-coding things: a Google Analytics id, a contact email, an API key, feature
+  flags… Anything that should be configurable per site without touching code goes here, and a
+  template reads it with the `SiteConfig` helper.
 
   ![Site edit — Site config](./images/meliscms-tool-sites-edit-tab-siteconfig.png)
 
-- **Translations** — site-wide **text strings** used by templates, editable per language.
+- **Translations** — the site's **text strings**, editable per language. These are the labels
+  that templates print via the `siteTranslate` helper (button captions, form labels, generic
+  wording) — separate from page content, so the same template can be reused across languages.
+  Add a key, give it a value in each language, and the template shows the right wording
+  automatically.
 
   ![Site edit — Translations](./images/meliscms-tool-sites-edit-tab-translations.png)
   ![Site edit — edit a translation](./images/meliscms-tool-sites-edit-tab-translations-edit.png)
-  *Manage and edit the site's translation strings.*
+  *Manage the site's translation strings and edit a string's value per language.*
+
+> **In short:** Properties/Domains/Languages define *what the site is and where it lives*;
+> Module loading turns *features* on; Site config and Translations hold the *settings and
+> wording* that templates and modules rely on.
 
 ---
 
-## A7. Templates tool — page layouts
+## A7. Templates tool — the page layouts
 
-**What it's for:** define the **templates** (layouts) that pages can use. A template decides
-the overall structure of a page and where content zones sit.
+**What it's for.** A **template** is the **skeleton of a page** — the header, the footer, the
+columns, and the **zones** where editors are allowed to drop content. When you create a page you
+**choose a template**, and that decides the page's overall structure. The Templates tool is
+where those skeletons are defined and maintained.
 
-**Where:** left menu → tools → **Templates**.
+**Why it can feel obscure:** most editors never create templates — they just pick one. Templates
+are usually set up once (often by a developer or integrator) and reused across many pages. You
+come here only to add a new layout or adjust an existing one.
+
+**Where:** left menu → **Templates** tool.
 
 ![Templates — list](./images/meliscms-tool-templatemanager-list.png)
-*The list of templates.*
+*The list of templates available to your sites.*
 
 ![Templates — edit](./images/meliscms-tool-templatemanager-edit.png)
-*Editing a template — its name, type and the code (layout/controller) it maps to.*
+*Editing a template — its name, its type, and the code it maps to. A template ties a friendly
+name to an actual layout/controller (the `.phtml` that produces the HTML) so editors can pick it
+by name when building a page.*
 
-**Tip:** you usually create templates once (often by a developer) and then editors just **pick
-a template** when creating pages.
+**Tip:** if a page "doesn't have the right zones" to drop a block into, it's the template that
+defines those zones — change the template (or its zones) rather than the page.
 
 ---
 
-## A8. Styles tool — CSS for pages
+## A8. Styles tool — CSS applied to pages
 
-**What it's for:** manage **styles** (CSS) that can be attached to pages to control appearance.
+**What it's for.** **Styles** are **CSS stylesheets** you can attach to pages to change their
+appearance (fonts, colours, spacing…). Instead of editing code, you register a style here and
+then **assign it to a page** in the page's Properties. The Styles tool manages that library of
+styles.
 
-**Where:** left menu → tools → **Styles**.
+**Where:** left menu → **Styles** tool.
 
 ![Styles — list](./images/meliscms-tool-stylemanager-list.png)
 ![Styles — new](./images/meliscms-tool-stylemanager-new.png)
-*The styles list and the create-style screen.*
+*The styles library and the create-style screen. Create a style (give it a name and its CSS
+path/source), then attach it to pages from the page Properties tab (§A5.1).*
 
 ---
 
-## A9. Languages tool — the languages of the platform
+## A9. Languages tool — the languages the platform knows
 
-**What it's for:** manage the **languages** available to sites (e.g. English, French). You
-enable a language here, then turn it on per-site (§A6) and create page versions for it (§A5.4).
+**What it's for.** This is the **master list of languages** the platform supports (English,
+French, …). It is the first step of going multilingual:
 
-**Where:** left menu → tools → **Languages**.
+1. **Create/enable a language here** (Languages tool).
+2. **Turn it on for a site** (Sites tool → Languages, §A6).
+3. **Create the page version** in that language (page editor → Languages tab, §A5.4).
+
+So if a language is missing when editing a site or page, it's because it hasn't been added here
+yet.
+
+**Where:** left menu → **Languages** tool.
 
 ![Languages — list](./images/meliscms-tool-languages-frontoffice-list.png)
 ![Languages — edit](./images/meliscms-tool-languages-frontoffice-edit.png)
-*The languages list and editing a language.*
+*The languages list and editing a language (its locale, name and status).*
 
 ---
 
-## A10. Platform IDs tool — page-id ranges (advanced)
+## A10. Platform IDs tool — page-id ranges across environments (advanced)
 
-**What it's for:** an advanced setting that reserves **ranges of page IDs** per environment so
-content created on different servers (dev / staging / production) never collides when you move
-it around. Most editors never need this; administrators set it once.
+**What it's for.** This is an **administrator setting** that most users never touch. When the
+same project runs on several servers — your **dev**, a **staging**, and the **production** site —
+content created on each server gets database IDs. Without coordination, two servers could both
+create "page 42", and then you could not safely move content between them. The Platform IDs tool
+**reserves a distinct range of page IDs per environment**, so IDs never collide and you can
+export/import pages between dev → staging → production reliably.
 
-**Where:** left menu → tools → **Platform IDs**.
+**Why it's obscure:** it's pure plumbing for multi-environment workflows; on a single-server
+setup you can largely ignore it. It's set up once by an administrator.
+
+**Where:** left menu → **Platform IDs** tool.
 
 ![Platform IDs — list](./images/meliscms-tool-platformids-list.png)
 ![Platform IDs — edit](./images/meliscms-tool-platformids-edit.png)
-*The platform-id ranges and editing one.*
+*The platform-id ranges and editing one. Each environment gets its own band of IDs.*
 
 ---
 
 ## A11. Site redirects tool — keep old links working
 
-**What it's for:** create **redirects** (301/302) so an old or changed URL automatically sends
-visitors (and search engines) to the right page — essential when you rename pages.
+**What it's for.** When you **rename or remove a page**, its old web address stops working — and
+any external link or bookmark to it breaks, hurting visitors and SEO. A **redirect** fixes that:
+it tells the site "when someone asks for the **old URL**, send them to the **new URL**" (a 301 =
+permanent, or 302 = temporary). The Site redirects tool is where you manage these rules per site.
 
-**Where:** left menu → tools → **Site redirects**.
+**When you need it:** any time a public URL changes. Pair it with the page's SEO tab — change the
+URL there, then add a redirect from the old one here.
+
+**Where:** left menu → **Site redirects** tool.
 
 ![Site redirects — list](./images/meliscms-tool-siteredirect-list.png)
 ![Site redirects — new](./images/meliscms-tool-siteredirect-new.png)
-*The redirects list and creating a new redirect (old URL → new URL).*
+*The redirects list and creating a new redirect (old URL → new URL, with the redirect type).*
 
 ---
 
-## A12. Mini Templates & Plugins — reusable content
+## A12. Mini Templates & Plugins — reusable, ready-made content
 
-**What it's for:** build and organise **mini-templates** — ready-made content blocks editors
-can drop onto pages (see §A5.2). The **menu manager** groups them into categories so they're
-easy to find in the editor.
+**What it's for.** A **mini-template** is a **pre-built content block** an editor can drop onto a
+page in one click — a styled call-to-action, a standard contact block, a formatted info box… The
+idea is to let non-technical editors **reuse approved building blocks** instead of recreating
+them every time (and keep the site consistent). This tool is where those blocks are created and
+maintained, and where they're **organised into menu categories** so they're easy to find in the
+page editor's mini-template manager (§A5.2, step 6).
 
-**Where:** left menu → tools → **Mini Templates & Plugins**.
+**Where:** left menu → **Mini Templates & Plugins** tool.
 
 ![Mini-templates — list](./images/meliscms-tool-minitemplate-list.png)
+*The library of mini-templates (reusable blocks).*
+
 ![Mini-templates — edit](./images/meliscms-tool-minitemplate-edit.png)
+*Editing a mini-template — its content and settings.*
+
 ![Mini-templates — menu manager](./images/meliscms-tool-minitemplate-menu-manager.png)
-*Managing mini-templates and organising them into menu categories.*
+*The menu manager — group mini-templates into categories so editors find the right block fast in
+the page editor.*
 
 ---
 
 ## A13. Dashboard widget — Pages indicators
 
 On the back-office **Dashboard**, MelisCms can show a **Pages Indicators** widget: how many
-sites and pages exist, and how many are published vs not.
+sites and pages exist, and how many are published vs not. A quick at-a-glance health check.
 
 ![Pages indicators widget](./images/meliscms-dashboardplugins-indicators.png)
 *A quick health view of your sites and pages on the dashboard.*
@@ -400,15 +472,18 @@ sites and pages exist, and how many are published vs not.
 - **Add a navigation menu** → drag the **Menu** block into the header zone; it builds from your
   page tree (pages flagged "show in menu" in their Properties).
 - **Add an image** → drag the **Media** block, then pick the image from the media browser.
-- **Change a page's web address** → page editor → **SEO** tab → edit the URL (and add a
-  **redirect** in Tools → Site redirects if the old URL is already public).
+- **A feature/module isn't showing on my site** → Tools → Sites → open the site → **Module
+  loading** and switch it on (§A6).
+- **Change a page's web address** → page editor → **SEO** tab → edit the URL, then add a
+  **redirect** in Tools → Site redirects from the old URL (§A11).
 - **Publish a page** → in the page editor, **Save** then **Publish** (§A5.5).
 - **Make a page available in another language** → enable the language (§A9), turn it on for the
   site (§A6 → Languages), then use the page **Languages** tab (§A5.4).
+- **Store a setting for the whole site (analytics id, contact email…)** → Tools → Sites → **Site
+  config** (§A6).
+- **Change a label/wording used across the site** → Tools → Sites → **Translations** (§A6).
 - **Reuse an existing page structure** → in the tree, **Duplicate** the page/branch (§A4).
 - **Move content between sites/servers** → **Export** a page/tree then **Import** it (§A4).
-- **Turn a feature on for a site** (News, etc.) → Tools → Sites → open the site → **Module
-  loading** (§A6).
 - **Enable the cookie/GDPR banner** → drag the **GDPR banner** block onto the layout.
 
 ---
@@ -416,8 +491,8 @@ sites and pages exist, and how many are published vs not.
 
 # PART B — Technical Reference
 
-*For developers and AI building inside the platform. Names below are real identifiers from the
-source.*
+*For developers and AI building inside the platform. Below: how MelisCms actually works, the key
+services to call (with examples), and the extension points (events, tabs, plugins).*
 
 ## B1. Module metadata & dependencies
 
@@ -435,72 +510,121 @@ Dependencies (`composer.json`): `melisplatform/melis-core` (auth, rights, events
 dispatch), `melisplatform/melis-engine` (the CMS data model — gateways/services it reads &
 writes), `melisplatform/melis-front` (the render pipeline reused for live page editing/preview).
 
-## B2. The trio architecture & load order
+## B2. Architecture — where MelisCms sits
 
-MelisCms is one of three core modules that must be understood together (full detail in the
-[MelisEngine](../../../melis-engine/etc/MelisAI/doc/MelisEngine.md) and
-[MelisFront](../../../melis-front/etc/MelisAI/doc/MelisFront.md) docs):
+MelisCms is the **back-office orchestration layer**; it **owns no database tables**. It is one of
+three core modules:
 
-- **MelisEngine** — owns the CMS database model (pages, sites, templates, languages, SEO,
-  styles…), exposes it via `MelisEngineTable*` gateways + `MelisEngine*` services + caching,
-  and defines the `MelisTemplatingPlugin` base class.
-- **MelisFront** — the front render pipeline; its **`melis` render mode** makes a live page
-  editable in the BO.
-- **MelisCms** — the **tableless back-office** orchestration layer over both.
+- **MelisEngine** owns the CMS data model (pages, sites, templates, languages, SEO, styles) and
+  exposes it via `MelisEngineTable*` gateways + `MelisEngine*` services + the cache + the
+  `MelisTemplatingPlugin` base class. → [MelisEngine doc](../../../melis-engine/etc/MelisAI/doc/MelisEngine.md)
+- **MelisFront** renders pages, and its **`melis` render mode** makes a live page editable inside
+  the BO. → [MelisFront doc](../../../melis-front/etc/MelisAI/doc/MelisFront.md)
+- **MelisCms** drives the UI and the page lifecycle.
 
 **Load order:** `melis-core` → `melis-front` → `melis-engine` → **`melis-cms`**.
 
-## B3. Data access — no own tables
+Practical consequence for building: **never query the CMS tables directly** — go through engine
+gateways/services. **Never write page-mutation logic inline** — fire/handle the `meliscms_page_*`
+events so the whole ecosystem (history, caches, custom fields) stays in sync.
 
-MelisCms persists nothing directly; all reads/writes go through MelisEngine gateways, notably:
-`MelisEngineTablePageTree`, `MelisEngineTablePageSaved`, `MelisEngineTablePagePublished`,
-`MelisEngineTablePageSeo`, `MelisEngineTablePageLang`, `MelisEngineTablePageStyle`,
-`MelisEngineTableTemplate`, `MelisEngineTableStyle`, `MelisEngineTableSite`,
-`MelisEngineTableSiteDomain`, `MelisEngineTableCmsLang`, `MelisEngineTableCmsSiteHome`,
-`MelisEngineTableSite404`, `MelisEngineTableCmsSiteLangs`, `MelisEngineTablePlatformIds`,
-`MelisEngineTableFlaggedTemplate` — plus engine services (`MelisEnginePage`, `MelisEngineTree`,
-`MelisEngineCacheSystem`, …). Publishing copies `melis_cms_page_saved` → `melis_cms_page_published`.
+## B3. Reading pages & the tree (engine services, with examples)
 
-## B4. Controllers (27, by feature)
+The data lives in MelisEngine; you read it through its services. The two you'll use most:
 
-- **Page**: `PageController` (lifecycle: save/publish/unpublish/delete/move/duplicate),
-  `PagePropertiesController`, `PageEditionController` (content tab, plugin drag-drop, session),
-  `PageSeoController`, `PageLanguagesController`, `PageDuplicationController`,
-  `PageExportController`, `PageImportController`.
-- **Sites**: `SitesController` + `Sites{Properties,Domains,Languages,Translation,Config,ModuleLoader}Controller`.
-- **Templates / Styles**: `ToolTemplateController`, `ToolStyleController`.
-- **Other tools**: `TreeSitesController` (site tree), `LanguageController`,
-  `PlatformController`, `SiteRedirectController`, `MiniTemplateManagerController`,
-  `MiniTemplateMenuManagerController`, `GdprBannerController`.
-- **Plugin editing**: `FrontPluginsController`, `FrontPluginsModalController` (the plugins menu
-  & drag-drop modals in the page editor).
-- `MelisSetupController`, `IndexController`.
+```php
+// In a controller (extends MelisCore\Controller\MelisAbstractActionController):
+$sm = $this->getServiceManager();
 
-## B5. Services (11)
+// --- A page (full data: tree + template + SEO + lang + style) ---
+/** @var \MelisEngine\Service\MelisPageService $pageSvc */
+$pageSvc = $sm->get('MelisEnginePage');
+$published = $pageSvc->getDatasPage($idPage);             // default: 'published' (live)
+$draft     = $pageSvc->getDatasPage($idPage, 'saved');   // the working draft
+// $published->getMelisPage() / ->getMelisPageTree() / ->getMelisPageSeo() … hydrated objects
 
-`MelisCmsPageService` (save page tree/saved/published/SEO/style/lang), `MelisCmsSiteService`,
-`MelisCmsRights` (CMS access rights), `MelisCmsSiteModuleLoadService` (per-site module
-loading), `MelisCmsSitesDomainsService`, `MelisCmsSitesPropertiesService`,
-`MelisCmsPageGetterService` (rendered HTML from engine cache),
-`MelisCmsPageExportService` / `MelisCmsPageImportService`,
-`MelisCmsMiniTemplateService` / `MelisCmsMiniTemplateGetterService`. All operate on engine
-gateways/services.
+// --- The page tree (navigation, links, breadcrumb) ---
+/** @var \MelisEngine\Service\MelisTreeService $tree */
+$tree        = $sm->get('MelisEngineTree');
+$children    = $tree->getPageChildren($idPage, 1);        // 1 = published only
+$father      = $tree->getPageFather($idPage, 'published');
+$breadcrumb  = $tree->getPageBreadcrumb($idPage);
+$url         = $tree->getPageLink($idPage, true);         // true = absolute URL
+$urlInLocale = $tree->getPageLinkByLocale($idPage, 'fr_FR', true);
+```
 
-## B6. Listeners (19)
+Other handy engine services: `MelisEngineTemplateService::getTemplate($tplId)`,
+`MelisEngineSiteService::getSiteById($siteId)` / `getSiteDataByDomain($domain)`,
+`MelisEngineLang` (languages), `MelisEngineSEOService::getSEOById($pageId)`,
+`MelisEngineStyle` (page CSS). All are cached.
 
-Wired in `Module.php` `onBootstrap` (back-office route only), bound to the `MelisCms` event
-identifier. Page lifecycle: `MelisCmsSavePageListener` (orchestrates tree+properties+edition+
-SEO+style saves), `MelisCmsPublishPageListener`, `MelisCmsUnpublishPageListener`,
-`MelisCmsDeletePageListener`, `MelisCmsPageGetterListener` (cache). Plus
-`MelisCmsFlashMessengerListener`, `MelisCmsGetRightsTreeViewListener` (rights-filter the tree),
-plugin-session listeners (`MelisCmsPageEditionSavePluginSessionListener`,
-`MelisCmsPluginSaveEditionSessionListener`, `MelisCmsAddPluginContainerListener`),
-domain/platform/user listeners, `MelisCmsDeletePluginMenuCachedListener`.
+## B4. Saving pages (the service + why you usually use events instead)
 
-## B7. Page lifecycle events (the ecosystem extension point)
+`MelisCmsPageService` (alias `MelisCmsPageService`) writes the page model through engine
+gateways. Its main methods:
 
-MelisCms fires these (others hook them — news, slider, category2, page-historic,
-page-script-editor, and MelisFront's cache invalidation):
+```php
+/** @var \MelisCms\Service\MelisCmsPageService $cmsPage */
+$cmsPage = $sm->get('MelisCmsPageService');
+
+// One call that orchestrates tree + published + saved + SEO + lang + style:
+$pageId = $cmsPage->savePage($pageTree, $pagePublished, $pageSaved, $pageSeo, $pageLang, $pageStyle, $pageId);
+
+// Or the granular pieces:
+$cmsPage->savePageTree($pageId, $parentId, $data, $pageIdInitial, $pageRelation, $langInitialId);
+$cmsPage->saveProperties($pageId, $data, $isNew);   // name/type/template/lang/menu/style
+$cmsPage->savePageSaved($page, $pageId);            // draft content
+$cmsPage->savePagePublished($page, $pageId);        // live content (publish)
+$cmsPage->savePageSeo($pageSeo, $pageSeoId);
+$cmsPage->savePageLang($pageLang, $pageId);
+$cmsPage->savePageStyle($pageStyle, $pageId);
+```
+
+> **Important:** in normal operation the BO does **not** call these directly from your code — the
+> page editor fires `meliscms_page_save_start`/`publish`/… and the module's listeners (§B6) do the
+> orchestration. If you're adding behaviour to the page lifecycle, **hook the events** (§B7)
+> rather than calling `savePage` yourself, so history/cache/other modules stay consistent.
+
+## B5. Rights
+
+`MelisCmsRights` (alias `MelisCmsRights`) checks back-office permissions against the user's XML
+rights tree:
+
+```php
+/** @var \MelisCms\Service\MelisCmsRightsService $rights */
+$rights = $sm->get('MelisCmsRights');
+if (!$rights->isAccessible($xmlRights, $sectionId, $itemId)) {
+    // user not allowed on this tool/section
+}
+$rights->isActionButtonActive('meliscms_page_action_publish'); // is an action available?
+```
+
+The tree view itself is rights-filtered by `MelisCmsGetRightsTreeViewListener` so users only see
+the pages/sites they may access.
+
+## B6. Listeners (19) — what actually happens on save/publish/delete
+
+Wired in `Module.php::onBootstrap` (back-office route only), bound to the `MelisCms` event
+identifier. The page lifecycle is implemented here:
+
+- `MelisCmsSavePageListener` — on `meliscms_page_save_start`/`publish_start`, orchestrates the
+  full save: page tree → properties → edition (the dragged plugins, from session) → SEO → style.
+- `MelisCmsPublishPageListener` / `MelisCmsUnpublishPageListener` — rights check, then move the
+  page between **saved** and **published**.
+- `MelisCmsDeletePageListener` — rights check, reassign default language, delete the tree node and
+  its SEO.
+- `MelisCmsPageGetterListener` — flags the engine page cache for regeneration after publish.
+- `MelisCmsFlashMessengerListener` — success/error toasts on each action.
+- `MelisCmsGetRightsTreeViewListener` — filters the tree to the user's rights.
+- Plugin-session listeners (`MelisCmsPageEditionSavePluginSessionListener`,
+  `MelisCmsPluginSaveEditionSessionListener`, `MelisCmsAddPluginContainerListener`) — track the
+  plugins added/removed while editing (stored in session under `content-pages[$idPage]`).
+- Domain / platform-id / user listeners and `MelisCmsDeletePluginMenuCachedListener`.
+
+## B7. The page lifecycle events (the platform's main extension point)
+
+These events are the seam the whole ecosystem hooks (news, slider, category2, page-historic,
+page-script-editor, and MelisFront's cache invalidation). Fire-and-handle pattern:
 
 | Action | Events |
 |---|---|
@@ -512,28 +636,83 @@ page-script-editor, and MelisFront's cache invalidation):
 | Duplicate | `meliscms_page_duplicate_start` / `_end` |
 | Plugin session | `meliscms_page_savesession_plugin_*`, `meliscms_page_removesession_plugin_*` |
 
-Other useful hooks: `melis_cms_page_tabs_alter` (add/remove page-editor tabs),
-`modify_page_properties_form_config` (alter the Properties form).
+**Example — react to a page being published** (this is exactly how page-historic, the script
+editor, etc. plug in):
 
-## B8. Forms, factories & dashboard plugin
+```php
+// In your module's Module.php onBootstrap (or a listener's attach()):
+$sharedEvents = $eventManager->getSharedManager();
+$sharedEvents->attach(
+    'MelisCms',                       // the identifier MelisCms fires under
+    'meliscms_page_publish_end',      // the event
+    function (\Laminas\EventManager\EventInterface $e) {
+        $params = $e->getParams();    // contains the page id, page data…
+        $idPage = $params['idPage'] ?? null;
+        // your custom code: log it, sync content, clear a cache, notify…
+    },
+    50                                 // priority
+);
+```
 
-Form-element factories populate the BO selects from engine data: `MelisCmsTemplateSelect`,
+Two more useful hooks: **`melis_cms_page_tabs_alter`** — add or remove tabs in the page editor
+(this is how the *Historic* and *Scripts* tabs are injected); **`modify_page_properties_form_config`**
+— alter the Properties form (add fields). Both are how sibling modules extend the editor without
+modifying MelisCms.
+
+## B8. Live page editing & preview (reusing MelisFront)
+
+The editor doesn't re-implement rendering — it asks **MelisFront** to render the page in **`melis`
+mode** and wraps it with the editing overlay:
+
+- Edit/preview URL: `/<site>/id/<idPage>/renderMode/melis` (the saved draft, editable);
+  `…/preview` renders the saved version read-only.
+- `FrontPluginsController` / `FrontPluginsModalController` provide the plugins menu and the
+  drag-drop modals; `MelisFront\MelisPluginRendererController` re-renders a single plugin after a
+  change.
+- Every editable block extends engine's `MelisTemplatingPlugin` (`front()` renders on the live
+  site, `back()` renders the edit container). To **add a new content block**, create a plugin that
+  extends `MelisTemplatingPlugin`, implement `front()`, and register it (this is what the News /
+  Slider / Category2 modules do — see their docs for full examples).
+- After save/publish, `MelisFrontDeletePluginCacheListener` clears the affected Menu/Breadcrumb
+  caches so the public site reflects the change.
+
+## B9. Cache
+
+Pages are cached by **MelisEngine** (`MelisEngineCacheSystem`, filesystem cache namespace
+`meliscms_page`). After a publish, MelisCms invalidates the relevant entries so the front
+regenerates. If you mutate page data outside the normal flow, clear it yourself:
+
+```php
+$cache = $sm->get('MelisEngineCacheSystem');
+$cache->deleteCacheByPrefix('page_' . $idPage, 'meliscms_page'); // prefix + cache config name
+```
+
+## B10. Controllers (27) & form factories — orientation
+
+- **Page editing**: `PageController` (the lifecycle entry points), `PagePropertiesController`,
+  `PageEditionController` (content tab + plugin session), `PageSeoController`,
+  `PageLanguagesController`, `PageDuplicationController`, `PageExportController` / `PageImportController`.
+- **Sites**: `SitesController` + `Sites{Properties,Domains,Languages,Translation,Config,ModuleLoader}Controller`.
+- **Tools**: `TreeSitesController`, `ToolTemplateController`, `ToolStyleController`,
+  `LanguageController`, `PlatformController`, `SiteRedirectController`,
+  `MiniTemplateManagerController`, `MiniTemplateMenuManagerController`, `GdprBannerController`.
+- **Plugin editing**: `FrontPluginsController`, `FrontPluginsModalController`.
+
+Form-element factories populate BO selects from live engine data: `MelisCmsTemplateSelect`,
 `MelisCmsStyleSelect`, `MelisCmsLanguageSelect`, `MelisCmsPageLanguagesSelect`,
-`MelisCmsPlatformSelect` / `MelisCmsPlatformIDsSelect`, `MelisCmsPluginSiteSelect`,
-`MelisCmsPluginSiteModuleSelect`. Dashboard: `MelisCmsPagesIndicatorsPlugin`
-(`DashboardPlugins/`, template `melis-cms/dashboard/page-indicators`).
+`MelisCmsPlatformSelect`/`MelisCmsPlatformIDsSelect`, `MelisCmsPluginSiteSelect`,
+`MelisCmsPluginSiteModuleSelect`. Dashboard: `MelisCmsPagesIndicatorsPlugin`.
 
-## B9. Cross-module wiring
+## B11. Services (11) — quick reference
 
-- **→ MelisEngine**: all data via gateways/services (§B3); publish invalidates the engine page cache.
-- **→ MelisFront**: the editor renders the page live in `melis` mode
-  (`/id/:idpage/renderMode/melis`, `/preview` for the saved version); plugin drag-drop &
-  re-render via `MelisPluginRendererController`; editable blocks all extend engine's
-  `MelisTemplatingPlugin`. After save/publish, `MelisFrontDeletePluginCacheListener` clears
-  affected plugin caches.
-- **← Modules**: the `meliscms_page_*` events are consumed across the tool ecosystem.
+`MelisCmsPageService` (save page model, §B4) · `MelisCmsSiteService` (sites, pages-per-site,
+404/home, domains/languages) · `MelisCmsRights` (§B5) · `MelisCmsSiteModuleLoadService` (the
+Module-loading tab — load/unload modules per site) · `MelisCmsSitesDomainsService` /
+`MelisCmsSitesPropertiesService` · `MelisCmsPageGetterService` (rendered HTML from engine cache) ·
+`MelisCmsPageExportService` / `MelisCmsPageImportService` (page tree JSON) ·
+`MelisCmsMiniTemplateService` / `MelisCmsMiniTemplateGetterService`.
 
-## B10. Quick code map
+## B12. Quick code map
 
 ```
 melis-cms/
@@ -544,14 +723,13 @@ melis-cms/
 │   ├── app.tools.php             → DataTable/tool configs
 │   └── app.forms.php             → page/site/template/style forms
 ├── src/
-│   ├── Module.php                → bootstrap; wires the 19 listeners
-│   ├── Controller/               → 27 controllers (Page*, Sites*, ToolTemplate, ToolStyle, Tree, Language, Platform, SiteRedirect, MiniTemplate*, FrontPlugins*…)
+│   ├── Module.php                → bootstrap; wires the 19 listeners (the page lifecycle)
+│   ├── Controller/               → 27 controllers (Page*, Sites*, ToolTemplate, ToolStyle, Tree…)
 │   ├── Controller/DashboardPlugins/ → MelisCmsPagesIndicatorsPlugin
 │   ├── Service/                  → 11 services
 │   ├── Listener/                 → 19 listeners
 │   └── Form/Factory/             → BO selects
-├── view/                         → .phtml templates (tree, page editor tabs, tools, modals, dashboard)
-├── public/ · language/           → BO assets · translations
+├── view/ · public/ · language/   → BO templates · assets · translations
 └── etc/                          → MarketPlace + MelisAI/doc (this doc)
 ```
 *(No `install/` SQL — MelisCms owns no tables; the schema is MelisEngine's.)*
@@ -614,4 +792,4 @@ Filename → content lookup for the MelisAI MCP. All under `./images/`.
 ---
 
 *Document for AI consumption (MelisAI MCP) — `melisplatform/melis-cms`. Part A = functional
-guide for users; Part B = technical reference for developers/AI. Last reviewed 2026-06-08.*
+guide for users; Part B = technical reference with examples for developers/AI. Last reviewed 2026-06-08.*
