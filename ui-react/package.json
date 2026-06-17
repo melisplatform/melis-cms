@@ -1,0 +1,11 @@
+{
+  "name": "melis-cms-brick",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "vite": "^8.0.12"
+  }
+}

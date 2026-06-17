@@ -1,0 +1,8 @@
+{
+  "id": "cms",
+  "route": "/cms",
+  "label": "CMS",
+  "forwardKey": null,
+  "melisKey": null,
+  "entry": "brick.js"
+}
