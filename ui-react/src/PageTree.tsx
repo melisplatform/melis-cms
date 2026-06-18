@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { deletePage, fetchTreeNodes, nodeCache, type MelisTreeNode } from './cms-tree-api'
+import { deletePage, fetchTreeNodes, movePage, nodeCache, searchTreePages, type MelisTreeNode } from './cms-tree-api'
 
 /* ── Tiny inline icons (the brick can't use host Tailwind/lucide; SVG uses currentColor) ── */
 const sIcon = { width: 15, height: 15, flexShrink: 0 } as const
@@ -32,6 +32,20 @@ function NewspaperIcon() {
     </svg>
   )
 }
+function LockIcon() {
+  return (
+    <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="11" width="16" height="9" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </svg>
+  )
+}
+function UnlockIcon() {
+  return (
+    <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="11" width="16" height="9" rx="2" /><path d="M8 11V7a4 4 0 0 1 7.9-1" />
+    </svg>
+  )
+}
 function Caret({ open }: { open: boolean }) {
   return (
     <svg style={{ width: 12, height: 12, flexShrink: 0, transform: open ? 'rotate(90deg)' : 'none', transition: 'transform .12s' }}
@@ -39,6 +53,30 @@ function Caret({ open }: { open: boolean }) {
       <path d="m9 6 6 6-6 6" />
     </svg>
   )
+}
+
+/** Wrap every (case-insensitive) occurrence of `q` in `text` with a highlight mark. */
+function highlight(text: string, q: string): React.ReactNode {
+  const query = q.trim()
+  if (!query) return text
+  const lower = text.toLowerCase()
+  const ql = query.toLowerCase()
+  const parts: React.ReactNode[] = []
+  let i = 0
+  let k = 0
+  let idx = lower.indexOf(ql, i)
+  while (idx !== -1) {
+    if (idx > i) parts.push(text.slice(i, idx))
+    parts.push(
+      <mark key={k++} style={{ background: 'var(--color-primary)', color: 'var(--color-primary-foreground, #fff)', borderRadius: 3, padding: '0 2px' }}>
+        {text.slice(idx, idx + query.length)}
+      </mark>,
+    )
+    i = idx + query.length
+    idx = lower.indexOf(ql, i)
+  }
+  if (i < text.length) parts.push(text.slice(i))
+  return parts
 }
 
 function nodeIcon(type?: string) {
@@ -75,8 +113,10 @@ export interface PageTreeProps {
 
 /**
  * Native React page tree — reproduces the legacy "Site tree view".
- * Lazy-loads each node's children from the legacy endpoint; client-side search
- * filters the already-loaded nodes.
+ * Lazy-loads each node's children from the legacy endpoint; search runs a REAL
+ * backend call (POST searchTreePages) so it finds pages not yet loaded, loads +
+ * expands the path to every match, filters to the matching branches and highlights
+ * the matched word in the page name — like the legacy tree.
  */
 export default function PageTree({ selectedId, onSelect, onAction }: PageTreeProps) {
   const [childrenByParent, setChildrenByParent] = useState<Record<number, MelisTreeNode[]>>({})
@@ -84,8 +124,19 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
   const [loading, setLoading] = useState<Set<number>>(new Set())
   const [rootLoading, setRootLoading] = useState(true)
   const [query, setQuery] = useState('')
+  // Server-driven search state: whether a search is active and whether it found nothing.
+  // The matched paths are revealed by loading + EXPANDING their ancestors (the whole tree
+  // stays visible — we don't filter it), and matched words are highlighted on render.
+  const [search, setSearch] = useState<{ active: boolean; notFound: boolean }>({ active: false, notFound: false })
+  // Mirror of childrenByParent for the search effect (avoids re-running it on every load).
+  const childrenRef = useRef(childrenByParent)
+  childrenRef.current = childrenByParent
   // Right-click context menu (legacy "Site tree view" actions).
   const [menu, setMenu] = useState<{ x: number; y: number; node: MelisTreeNode } | null>(null)
+  // Drag-to-reorder is LOCKED by default (an unlock icon enables it), like the legacy tree —
+  // so pages aren't moved by accident. `drag` holds the in-flight drag (source + hovered drop).
+  const [unlocked, setUnlocked] = useState(false)
+  const [drag, setDrag] = useState<{ id: number; over: number; mode: 'before' | 'after' | 'over' } | null>(null)
   const treeRef = useRef<HTMLDivElement>(null)
 
   const loadChildren = useCallback(async (parentId: number) => {
@@ -104,6 +155,41 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
   }, [loadChildren])
 
   useEffect(() => { reload() }, [reload])
+
+  // Search: debounced REAL backend call. Empty query → restore the normal tree.
+  useEffect(() => {
+    const q = query.trim()
+    if (!q) {
+      setSearch((s) => (s.active ? { active: false, notFound: false } : s))
+      return
+    }
+    let cancelled = false
+    const t = window.setTimeout(async () => {
+      const chains = await searchTreePages(q)
+      if (cancelled) return
+      if (!chains.length) {
+        setSearch({ active: true, notFound: true })
+        return
+      }
+      // Ancestors of every match: load their children (so the branch exists) and expand them,
+      // opening the FULL tree down to each matched page. The rest of the tree stays as-is.
+      const toLoad = new Set<number>()
+      chains.forEach((chain) => chain.forEach((id, i) => { if (i < chain.length - 1) toLoad.add(id) }))
+      const missing = [...toLoad].filter((id) => childrenRef.current[id] === undefined)
+      if (missing.length) {
+        const loaded = await Promise.all(missing.map(async (id) => [id, await fetchTreeNodes(id)] as const))
+        if (cancelled) return
+        setChildrenByParent((m) => {
+          const n = { ...m }
+          loaded.forEach(([id, nodes]) => { n[id] = nodes })
+          return n
+        })
+      }
+      setExpanded((prev) => { const n = new Set(prev); toLoad.forEach((id) => n.add(id)); return n })
+      setSearch({ active: true, notFound: false })
+    }, 350)
+    return () => { cancelled = true; window.clearTimeout(t) }
+  }, [query])
 
   // After a page is created (CmsPage dispatches melis:cms-page-created), refresh the tree and
   // expand the father so the new page is visible.
@@ -205,40 +291,117 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
     else onAction(action, node)
   }, [onSelect, onAction, handleDelete])
 
-  // Does this node (or any loaded descendant) match the search query?
-  const matchesDeep = useCallback((node: MelisTreeNode): boolean => {
-    const q = query.trim().toLowerCase()
-    if (!q) return true
-    if (node.title.toLowerCase().includes(q)) return true
-    return (childrenByParent[node.key] || []).some(matchesDeep)
-  }, [query, childrenByParent])
+  /* ── Drag-and-drop reorder (legacy /Page/movePage) ─────────────────────────── */
 
-  const searching = query.trim().length > 0
+  // child id → parent id (-1 for roots), derived from the loaded tree.
+  const parentOf = useMemo(() => {
+    const m = new Map<number, number>()
+    for (const [pid, kids] of Object.entries(childrenByParent)) {
+      const p = Number(pid)
+      kids.forEach((k) => m.set(k.key, p))
+    }
+    return m
+  }, [childrenByParent])
+
+  // Is `nodeId` inside the subtree of `ancestorId`? (can't drop a page into its own descendant)
+  const isDescendantOf = useCallback((nodeId: number, ancestorId: number): boolean => {
+    let cur = parentOf.get(nodeId)
+    while (cur !== undefined && cur !== -1) {
+      if (cur === ancestorId) return true
+      cur = parentOf.get(cur)
+    }
+    return false
+  }, [parentOf])
+
+  // Re-fetch the children of the given parents (-1 = root level) after a move, keeping expansion.
+  const refreshParents = useCallback(async (parents: number[]) => {
+    const uniq = [...new Set(parents)]
+    const loaded = await Promise.all(uniq.map(async (id) => [id, await fetchTreeNodes(id)] as const))
+    setChildrenByParent((m) => { const n = { ...m }; loaded.forEach(([id, nodes]) => { n[id] = nodes }); return n })
+  }, [])
+
+  const performMove = useCallback(async (sourceId: number, targetId: number, mode: 'before' | 'after' | 'over') => {
+    if (sourceId === targetId || isDescendantOf(targetId, sourceId)) return
+    const oldFather = parentOf.get(sourceId) ?? -1
+    let newFather: number
+    let newPosition: number
+    if (mode === 'over') {
+      newFather = targetId
+      let kids = childrenByParent[targetId]
+      if (kids === undefined) kids = await fetchTreeNodes(targetId)
+      newPosition = kids.filter((n) => n.key !== sourceId).length + 1 // append at end
+    } else {
+      newFather = parentOf.get(targetId) ?? -1
+      const siblings = (childrenByParent[newFather] || []).filter((n) => n.key !== sourceId)
+      const idx = siblings.findIndex((n) => n.key === targetId)
+      if (idx === -1) return
+      newPosition = (mode === 'before' ? idx : idx + 1) + 1 // 1-based insert position
+    }
+    const res = await movePage({ idPage: sourceId, oldFatherIdPage: oldFather, newFatherIdPage: newFather, newPositionIdPage: newPosition })
+    if (!res.success) { window.alert(res.message || 'Le déplacement a échoué.'); return }
+    await refreshParents([oldFather, newFather])
+    if (newFather !== -1) setExpanded((s) => new Set(s).add(newFather))
+  }, [childrenByParent, parentOf, isDescendantOf, refreshParents])
+
+  const searching = search.active
 
   const renderLevel = (parentId: number, depth: number) => {
     const items = childrenByParent[parentId] || []
-    return items.filter(matchesDeep).map((node) => {
-      const open = expanded.has(node.key) || (searching && !!childrenByParent[node.key])
+    // The whole tree stays visible during a search; paths to matches were auto-expanded
+    // (their ancestors added to `expanded`), so the same open rule covers both modes.
+    return items.map((node) => {
+      const open = expanded.has(node.key)
       const offline = node.melisData?.page_is_online === 0
       const hasDraft = node.melisData?.page_has_saved_version === 1
       const selected = node.key === selectedId
+      const draggable = unlocked && !!node.dragdrop
+      const dropHere = drag && drag.over === node.key && drag.id !== node.key && !isDescendantOf(node.key, drag.id)
+      const dropMode = dropHere ? drag!.mode : null
+      const dropShadow =
+        dropMode === 'before' ? 'inset 0 2px 0 0 var(--color-primary)' :
+        dropMode === 'after' ? 'inset 0 -2px 0 0 var(--color-primary)' : 'none'
       return (
         <div key={node.key}>
           <div
             data-page-id={node.key}
+            draggable={draggable}
             onClick={() => onSelect(node)}
             onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY, node }) }}
+            onDragStart={draggable ? (e) => {
+              e.stopPropagation()
+              setDrag({ id: node.key, over: node.key, mode: 'over' })
+              e.dataTransfer.effectAllowed = 'move'
+              try { e.dataTransfer.setData('text/plain', String(node.key)) } catch { /* IE guard */ }
+            } : undefined}
+            onDragOver={drag ? (e) => {
+              if (node.key === drag.id || isDescendantOf(node.key, drag.id)) { e.dataTransfer.dropEffect = 'none'; return }
+              e.preventDefault()
+              e.dataTransfer.dropEffect = 'move'
+              const r = (e.currentTarget as HTMLElement).getBoundingClientRect()
+              const y = e.clientY - r.top
+              const mode: 'before' | 'after' | 'over' = y < r.height * 0.3 ? 'before' : y > r.height * 0.7 ? 'after' : 'over'
+              if (drag.over !== node.key || drag.mode !== mode) setDrag({ id: drag.id, over: node.key, mode })
+            } : undefined}
+            onDrop={drag ? (e) => {
+              e.preventDefault(); e.stopPropagation()
+              const d = drag
+              setDrag(null)
+              if (d && node.key !== d.id && !isDescendantOf(node.key, d.id)) void performMove(d.id, node.key, d.mode)
+            } : undefined}
+            onDragEnd={() => setDrag(null)}
             title={node.title}
             style={{
               display: 'flex', alignItems: 'center', gap: 6,
               padding: '4px 8px', paddingLeft: 8 + depth * 16,
-              cursor: 'pointer', borderRadius: 6, userSelect: 'none',
+              cursor: draggable ? 'grab' : 'pointer', borderRadius: 6, userSelect: 'none',
               color: offline ? 'var(--color-muted-foreground)' : 'var(--color-foreground)',
-              background: selected ? 'color-mix(in srgb, var(--color-primary) 16%, transparent)' : 'transparent',
+              background: dropMode === 'over' ? 'color-mix(in srgb, var(--color-primary) 24%, transparent)'
+                : selected ? 'color-mix(in srgb, var(--color-primary) 16%, transparent)' : 'transparent',
+              boxShadow: dropShadow,
               fontSize: 13, lineHeight: '20px', whiteSpace: 'nowrap',
             }}
-            onMouseEnter={(e) => { if (!selected) (e.currentTarget as HTMLElement).style.background = 'var(--color-accent, rgba(127,127,127,.12))' }}
-            onMouseLeave={(e) => { if (!selected) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+            onMouseEnter={(e) => { if (!selected && !drag) (e.currentTarget as HTMLElement).style.background = 'var(--color-accent, rgba(127,127,127,.12))' }}
+            onMouseLeave={(e) => { if (!selected && !drag) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
           >
             <span
               onClick={(e) => { e.stopPropagation(); if (node.lazy) toggle(node) }}
@@ -258,7 +421,9 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
             {hasDraft && (
               <span title="Brouillon non publié" style={{ width: 6, height: 6, borderRadius: 999, background: '#f59e0b', flexShrink: 0 }} />
             )}
-            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{node.title}</span>
+            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {searching ? highlight(node.title, query) : node.title}
+            </span>
             {/* No actions button — right-click opens the context menu. */}
           </div>
           {open && childrenByParent[node.key] && renderLevel(node.key, depth + 1)}
@@ -296,10 +461,28 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
         >
           ↻
         </button>
+        <button
+          onClick={() => setUnlocked((u) => !u)}
+          title={unlocked ? 'Verrouiller le glisser-déposer (réorganisation)' : 'Déverrouiller le glisser-déposer (réorganisation)'}
+          aria-pressed={unlocked}
+          style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            padding: '0 10px', borderRadius: 6, border: '1px solid var(--color-border)',
+            background: unlocked ? 'color-mix(in srgb, var(--color-primary) 16%, transparent)' : 'transparent',
+            color: unlocked ? 'var(--color-primary)' : 'var(--color-foreground)', cursor: 'pointer',
+          }}
+        >
+          {unlocked ? <UnlockIcon /> : <LockIcon />}
+        </button>
       </div>
 
       {/* Tree */}
       <div ref={treeRef} style={{ flex: 1, minHeight: 0, overflow: 'auto', padding: 6 }}>
+        {searching && search.notFound && (
+          <div style={{ padding: '6px 8px', marginBottom: 4, fontSize: 12, color: 'var(--color-muted-foreground)' }}>
+            Aucune page ne correspond à « {query.trim()} ».
+          </div>
+        )}
         {rootLoading ? (
           <div style={{ padding: 12, fontSize: 13, color: 'var(--color-muted-foreground)' }}>Chargement de l'arbre…</div>
         ) : roots.length === 0 ? (
