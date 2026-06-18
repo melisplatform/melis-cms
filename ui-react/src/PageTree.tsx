@@ -105,6 +105,40 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
 
   useEffect(() => { reload() }, [reload])
 
+  // After a page is created (CmsPage dispatches melis:cms-page-created), refresh the tree and
+  // expand the father so the new page is visible.
+  useEffect(() => {
+    const onCreated = (e: Event) => {
+      const father = Number((e as CustomEvent<{ father?: string }>).detail?.father)
+      void (async () => {
+        await reload()
+        if (father) {
+          await loadChildren(father)
+          setExpanded((s) => new Set(s).add(father))
+        }
+      })()
+    }
+    window.addEventListener('melis:cms-page-created', onCreated)
+    return () => window.removeEventListener('melis:cms-page-created', onCreated)
+  }, [reload, loadChildren])
+
+  // Reload the tree after a page mutation done in a tool iframe (publish / unpublish / delete /
+  // duplicate). buildToolPage forwards every tool response as {__melisToolResult, url, data}.
+  useEffect(() => {
+    const onResult = (e: MessageEvent) => {
+      const d = e.data as { __melisToolResult?: boolean; url?: string; data?: { success?: number | boolean } } | null
+      if (!d || !d.__melisToolResult) return
+      const ok = d.data?.success === 1 || d.data?.success === true
+      if (!ok) return
+      const url = d.url || ''
+      if (/\/Page\/(publishPage|unpublishPage|deletePage)\b/.test(url) || /duplicate-page|duplicateTreePage/i.test(url)) {
+        reload()
+      }
+    }
+    window.addEventListener('message', onResult)
+    return () => window.removeEventListener('message', onResult)
+  }, [reload])
+
   const toggle = useCallback(async (node: MelisTreeNode) => {
     const id = node.key
     const isOpen = expanded.has(id)
