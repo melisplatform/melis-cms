@@ -41,7 +41,7 @@ export default function CmsSidebar() {
   const handleAction = (action: CmsTreeAction, node: MelisTreeNode) => {
     if (action === 'new') {
       // Create a child page under this node (idFatherPage = node.key).
-      openTab(`/cms/new~${node.key}`, 'Nouvelle page')
+      openTab(`/melis-cms/page/new~${node.key}`, 'Nouvelle page')
       return
     }
     const m = MODALS[action]
@@ -65,7 +65,7 @@ export default function CmsSidebar() {
         <PageTree
           selectedId={selectedId}
           onSelect={(n) => {
-            const path = `/cms/${n.key}`
+            const path = `/melis-cms/page/${n.key}`
             const label = n.melisData?.page_title || n.title
             openTab(path, label)
           }}

@@ -1,6 +1,6 @@
 {
   "id": "cms",
-  "route": "/cms",
+  "route": "/melis-cms/page",
   "label": "CMS",
   "forwardKey": null,
   "melisKey": null,

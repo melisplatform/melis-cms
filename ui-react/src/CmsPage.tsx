@@ -37,7 +37,7 @@ export default function CmsPage() {
   useEffect(() => {
     const onClosed = (e: Event) => {
       const path = (e as CustomEvent<{ path?: string }>).detail?.path ?? ''
-      const m = path.match(/^\/cms\/(.+)$/)
+      const m = path.match(/^\/melis-cms\/page\/(.+)$/)
       if (m) {
         const cid = decodeURIComponent(m[1])
         setOpened((o) => o.filter((x) => x !== cid))

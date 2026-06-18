@@ -208,7 +208,13 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
           >
             <span
               onClick={(e) => { e.stopPropagation(); if (node.lazy) toggle(node) }}
-              style={{ width: 14, display: 'inline-flex', justifyContent: 'center', color: 'var(--color-muted-foreground)' }}
+              style={{
+                width: 24, height: 24, marginLeft: -4, flexShrink: 0, borderRadius: 4,
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                color: 'var(--color-muted-foreground)', cursor: node.lazy ? 'pointer' : 'default',
+              }}
+              onMouseEnter={node.lazy ? (e) => { (e.currentTarget as HTMLElement).style.background = 'var(--color-accent, rgba(127,127,127,.18))' } : undefined}
+              onMouseLeave={node.lazy ? (e) => { (e.currentTarget as HTMLElement).style.background = 'transparent' } : undefined}
             >
               {node.lazy ? <Caret open={open} /> : null}
             </span>
@@ -219,22 +225,7 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
               <span title="Brouillon non publié" style={{ width: 6, height: 6, borderRadius: 999, background: '#f59e0b', flexShrink: 0 }} />
             )}
             <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{node.title}</span>
-            {/* Visible actions trigger (opens the same context menu) — works regardless of right-click. */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                const r = (e.currentTarget as HTMLElement).getBoundingClientRect()
-                setMenu({ x: r.right, y: r.bottom, node })
-              }}
-              title="Actions"
-              style={{
-                border: 'none', background: 'transparent', color: 'var(--color-muted-foreground)',
-                cursor: 'pointer', padding: '0 4px', margin: 0, lineHeight: 1, fontSize: 16,
-                flexShrink: 0, borderRadius: 4,
-              }}
-            >
-              ⋯
-            </button>
+            {/* No actions button — right-click opens the context menu. */}
           </div>
           {open && childrenByParent[node.key] && renderLevel(node.key, depth + 1)}
           {open && loading.has(node.key) && (
