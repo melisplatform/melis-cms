@@ -12,6 +12,10 @@ export interface MelisTreeNode {
   key: number
   /** Display label, already formatted "<id> - <name>". */
   title: string
+  /** True when the page is locked by another user. The legacy tree injects a lock
+   *  <i> as raw HTML at the start of the title; we detect it, set this flag, and strip
+   *  the markup so the component can render a real <LockIcon/> (React escapes HTML). */
+  locked?: boolean
   /** True when the node has children (show an expand caret + lazy-load). */
   lazy: boolean
   /** True when the user is allowed to drag-reorder this node (server-side rights). */
@@ -129,7 +133,16 @@ export async function fetchTreeNodes(nodeId: number): Promise<MelisTreeNode[]> {
     if (Array.isArray(data)) nodes = data as MelisTreeNode[]
     else if (Array.isArray(data?.data)) nodes = data.data as MelisTreeNode[]
     else if (Array.isArray(data?.tree)) nodes = data.tree as MelisTreeNode[]
-    nodes.forEach((n) => nodeCache.set(n.key, n))
+    nodes.forEach((n) => {
+      // The legacy lock feature (MelisSBPageLockTreeListener) prepends a lock icon as
+      // raw HTML to the title. React escapes HTML, so it would show as text — instead,
+      // flag the node and strip the markup; PageTree renders a <LockIcon/> from the flag.
+      if (typeof n.title === 'string' && /<i\b[^>]*\bfa-lock\b/i.test(n.title)) {
+        n.locked = true
+        n.title = n.title.replace(/^\s*<i\b[^>]*\bfa-lock\b[^>]*><\/i>\s*/i, '').trim()
+      }
+      nodeCache.set(n.key, n)
+    })
     return nodes
   } catch {
     return []

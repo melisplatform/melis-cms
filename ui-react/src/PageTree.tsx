@@ -209,7 +209,9 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
   }, [reload, loadChildren])
 
   // Reload the tree after a page mutation done in a tool iframe (publish / unpublish / delete /
-  // duplicate). buildToolPage forwards every tool response as {__melisToolResult, url, data}.
+  // duplicate / page-lock unlock). buildToolPage forwards every tool response as
+  // {__melisToolResult, url, data}. Unlocking a page removes its lock row → the tree must
+  // refresh so the lock icon (see cms-tree-api `locked`) disappears.
   useEffect(() => {
     const onResult = (e: MessageEvent) => {
       const d = e.data as { __melisToolResult?: boolean; url?: string; data?: { success?: number | boolean } } | null
@@ -217,7 +219,7 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
       const ok = d.data?.success === 1 || d.data?.success === true
       if (!ok) return
       const url = d.url || ''
-      if (/\/Page\/(publishPage|unpublishPage|deletePage)\b/.test(url) || /duplicate-page|duplicateTreePage/i.test(url)) {
+      if (/\/Page\/(publishPage|unpublishPage|deletePage)\b/.test(url) || /duplicate-page|duplicateTreePage/i.test(url) || /\/PageLock\/unlockPage\b/.test(url)) {
         reload()
       }
     }
@@ -421,6 +423,12 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
             {hasDraft && (
               <span title="Brouillon non publié" style={{ width: 6, height: 6, borderRadius: 999, background: '#f59e0b', flexShrink: 0 }} />
             )}
+            {node.locked && (
+              <span title="Page verrouillée (en cours d'édition par un autre utilisateur)"
+                style={{ display: 'inline-flex', flexShrink: 0, color: 'var(--color-muted-foreground)' }}>
+                <LockIcon />
+              </span>
+            )}
             <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {searching ? highlight(node.title, query) : node.title}
             </span>
@@ -512,8 +520,10 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
             { key: 'new',    label: 'Nouvelle page', icon: ICONS.new },
             { key: 'edit',   label: 'Éditer',        icon: ICONS.edit },
             { key: 'dupe',   label: 'Dupliquer',     icon: ICONS.dupe },
-            { key: 'export', label: 'Exporter',      icon: ICONS.export },
-            { key: 'import', label: 'Importer',      icon: ICONS.import },
+            // Masqués temporairement (peu utilisés en réel) — code conservé pour réactivation future.
+            // L'action runAction('export'/'import') et ICONS.export/import restent en place.
+            // { key: 'export', label: 'Exporter',      icon: ICONS.export },
+            // { key: 'import', label: 'Importer',      icon: ICONS.import },
             { key: 'sep' },
             { key: 'delete', label: 'Supprimer',     icon: ICONS.delete, danger: true },
           ] as Array<{ key: string; label?: string; icon?: React.ReactNode; danger?: boolean }>).map((it) =>
