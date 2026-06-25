@@ -21,6 +21,27 @@
       "label": "Templates",
       "forwardKey": "MelisCms/ToolTemplate",
       "melisKey": "meliscms_tool_templates"
+    },
+    {
+      "id": "cms-languages",
+      "route": "/melis-cms/languages",
+      "label": "Languages",
+      "forwardKey": "MelisCms/Language",
+      "melisKey": "meliscms_tool_language"
+    },
+    {
+      "id": "cms-platform-ids",
+      "route": "/melis-cms/platform-ids",
+      "label": "Platforms IDs",
+      "forwardKey": "MelisCms/Platform",
+      "melisKey": "meliscms_tool_platform_ids"
+    },
+    {
+      "id": "cms-styles",
+      "route": "/melis-cms/styles",
+      "label": "Styles",
+      "forwardKey": "MelisCms/ToolStyle",
+      "melisKey": "meliscms_tool_styles"
     }
   ]
 }

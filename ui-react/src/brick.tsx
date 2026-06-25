@@ -2,6 +2,9 @@ import CmsPage from './CmsPage'
 import CmsSidebar from './CmsSidebar'
 import SiteRedirectPage from './SiteRedirectPage'
 import TemplatePage from './TemplatePage'
+import CmsLanguagePage from './CmsLanguagePage'
+import CmsPlatformIdPage from './CmsPlatformIdPage'
+import CmsStylePage from './CmsStylePage'
 
 /**
  * Brick entry point. MelisCms ships SEVERAL React tools from this single bundle; each
@@ -20,3 +23,6 @@ declare global {
 window.__melisRegisterBrick?.({ id: 'cms', Component: CmsPage, Sidebar: CmsSidebar })
 window.__melisRegisterBrick?.({ id: 'cms-site-301', Component: SiteRedirectPage })
 window.__melisRegisterBrick?.({ id: 'cms-templates', Component: TemplatePage })
+window.__melisRegisterBrick?.({ id: 'cms-languages', Component: CmsLanguagePage })
+window.__melisRegisterBrick?.({ id: 'cms-platform-ids', Component: CmsPlatformIdPage })
+window.__melisRegisterBrick?.({ id: 'cms-styles', Component: CmsStylePage })

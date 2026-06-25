@@ -1,48 +1,59 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
-  deleteTemplate, fetchTemplates, fetchTemplateSites, fetchTemplateStats,
-  type TemplateItem, type TemplateStats, type SiteOption,
-} from './template-api'
-import { ExportModal, DownloadIcon } from './ExportModal'
+  deleteLanguage, fetchLanguageById, fetchLanguages, fetchLanguageStats,
+  saveLanguage, type LangItem, type LangStats,
+} from './cms-language-api'
 import { ViewToggle } from './ViewToggle'
 
+// Outil Langues (CMS) legacy (vue « Old » en iframe). Voir brick.manifest.json (cms-languages).
+const MELIS_KEY = 'meliscms_tool_language'
+
 /* ──────────────────────────────────────────────────────────────────────────
- * Brique « Templates » (MelisCms). La LISTE est full React (montée à /melis-cms/templates) ;
- * la CRÉATION/ÉDITION (/melis-cms/templates/new|:id) rend l'outil LEGACY en iframe — son
- * formulaire est couplé au système de fichiers (scan contrôleurs/actions/layouts) et à un
- * compteur de plateforme pour `tpl_id` : on ne le réimplémente pas. Styles inline + variables
- * CSS du thème, i18n FR/EN via <html lang> (la brique ne partage pas les modules de l'hôte).
+ * Brique « Langues » (MelisCms) — full React, montée à /melis-cms/languages
+ * (et /melis-cms/languages/:id pour le formulaire). La brique ne peut PAS importer les
+ * modules de l'hôte (Tailwind/shadcn/i18n) : tout est en styles inline + variables CSS
+ * du thème, avec un mini-dictionnaire FR/EN lu depuis <html lang> (posé par l'hôte).
  * ────────────────────────────────────────────────────────────────────────── */
 
-const MELIS_KEY = 'meliscms_tool_templates'
-const FRAME_ID = 'melis-brick-frame-cms-templates'
-
-// ── i18n minimal ──
+// ── i18n minimal (la brique ne partage pas le dictionnaire de l'hôte) ──
 type Lang = 'fr' | 'en'
-function currentLang(): Lang { return (document.documentElement.lang || 'en').toLowerCase().startsWith('fr') ? 'fr' : 'en' }
+function currentLang(): Lang {
+  const l = (document.documentElement.lang || 'en').toLowerCase()
+  return l.startsWith('fr') ? 'fr' : 'en'
+}
 const DICT: Record<Lang, Record<string, string>> = {
   fr: {
-    title: 'Templates', subtitle: 'Templates des sites', new: 'Nouveau template', search: 'Rechercher un template…',
-    empty: 'Aucun template trouvé', count: '{n} templates — fin de la liste',
-    kpi_total: 'Total', kpi_sites: 'Sites', kpi_types: 'Types',
-    all_sites: 'Tous les sites', all_types: 'Tous les types',
-    col_id: 'ID', col_name: 'Nom', col_type: 'Type', col_ctrl: 'Contrôleur / Action', col_layout: 'Layout', col_site: 'Site', col_date: 'Création',
+    title: 'Langues', subtitle: 'Langues du CMS',
+    new: 'Nouvelle langue', search: 'Rechercher une langue…',
+    empty: 'Aucune langue trouvée', count: '{n} langues — fin de la liste',
+    kpi_total: 'Total',
+    col_id: 'ID', col_locale: 'Locale', col_name: 'Nom',
     columns: 'Colonnes', export: 'Exporter', cols_visible: 'Visibles', cols_hidden: 'Masquées', drag_here: 'Glisser ici', reset: 'Réinitialiser',
-    edit: 'Modifier', del: 'Supprimer', cancel: 'Annuler', back: 'retour', refresh: 'Rafraîchir', loading: 'Chargement…',
-    del_title: 'Supprimer le template', del_confirm: 'Supprimer « {n} » ? Cette action est irréversible.',
-    legacy_note: 'Création / édition via l’outil classique (formulaire lié au code du site).',
+    edit: 'Modifier', del: 'Supprimer', cancel: 'Annuler', save: 'Enregistrer', back: 'retour',
+    refresh: 'Rafraîchir', loading: 'Chargement…', saved: 'Enregistré ✓',
+    del_title: 'Supprimer la langue', del_confirm: 'Supprimer « {u} » ? Cette action est irréversible.',
+    new_title: 'Nouvelle langue', edit_title: 'Modifier la langue',
+    f_locale: 'Locale', f_locale_ph: 'en_EN', f_name: 'Nom', f_name_ph: 'English',
+    f_locale_hint: 'Code de la langue au format xx_XX (ex. fr_FR).',
+    f_name_hint: 'Le libellé de la langue.', err_save: 'Erreur lors de la sauvegarde',
+    err_name: 'Le nom est requis.', err_locale: 'La locale doit être au format xx_XX (ex. fr_FR).',
   },
   en: {
-    title: 'Templates', subtitle: 'Site templates', new: 'New template', search: 'Search a template…',
-    empty: 'No template found', count: '{n} templates — end of list',
-    kpi_total: 'Total', kpi_sites: 'Sites', kpi_types: 'Types',
-    all_sites: 'All sites', all_types: 'All types',
-    col_id: 'ID', col_name: 'Name', col_type: 'Type', col_ctrl: 'Controller / Action', col_layout: 'Layout', col_site: 'Site', col_date: 'Created',
+    title: 'Languages', subtitle: 'CMS languages',
+    new: 'New language', search: 'Search a language…',
+    empty: 'No language found', count: '{n} languages — end of list',
+    kpi_total: 'Total',
+    col_id: 'ID', col_locale: 'Locale', col_name: 'Name',
     columns: 'Columns', export: 'Export', cols_visible: 'Visible', cols_hidden: 'Hidden', drag_here: 'Drag here', reset: 'Reset',
-    edit: 'Edit', del: 'Delete', cancel: 'Cancel', back: 'back', refresh: 'Refresh', loading: 'Loading…',
-    del_title: 'Delete template', del_confirm: 'Delete “{n}”? This action is irreversible.',
-    legacy_note: 'Create / edit via the classic tool (form bound to the site code).',
+    edit: 'Edit', del: 'Delete', cancel: 'Cancel', save: 'Save', back: 'back',
+    refresh: 'Refresh', loading: 'Loading…', saved: 'Saved ✓',
+    del_title: 'Delete language', del_confirm: 'Delete “{u}”? This action is irreversible.',
+    new_title: 'New language', edit_title: 'Edit language',
+    f_locale: 'Locale', f_locale_ph: 'en_EN', f_name: 'Name', f_name_ph: 'English',
+    f_locale_hint: 'Language code in xx_XX format (e.g. en_EN).',
+    f_name_hint: 'The language label.', err_save: 'Error while saving',
+    err_name: 'Name is required.', err_locale: 'Locale must be in xx_XX format (e.g. en_EN).',
   },
 }
 function useT() {
@@ -54,29 +65,28 @@ function useT() {
   }
 }
 
-// ── Styles (variables CSS du thème) ──
+// ── Styles (variables CSS du thème de l'hôte) ──
 const card: CSSProperties = { border: '1px solid var(--color-border)', background: 'var(--color-card)', borderRadius: 12, boxShadow: '0 1px 2px rgba(0,0,0,.04)' }
-const inputCss: CSSProperties = { height: 36, boxSizing: 'border-box', borderRadius: 8, border: '1px solid var(--color-input,var(--color-border))', background: 'var(--color-card)', color: 'var(--color-foreground)', padding: '0 12px', fontSize: 14, outline: 'none' }
+const inputCss: CSSProperties = { height: 40, width: '100%', boxSizing: 'border-box', borderRadius: 8, border: '1px solid var(--color-input,var(--color-border))', background: 'var(--color-card)', color: 'var(--color-foreground)', padding: '0 12px', fontSize: 14, outline: 'none' }
 const btnPrimary: CSSProperties = { display: 'inline-flex', alignItems: 'center', gap: 6, height: 36, padding: '0 14px', borderRadius: 8, border: 0, background: 'var(--color-primary)', color: 'var(--color-primary-foreground,#fff)', fontSize: 14, fontWeight: 500, cursor: 'pointer' }
 const btnGhost: CSSProperties = { display: 'inline-flex', alignItems: 'center', gap: 6, height: 36, padding: '0 12px', borderRadius: 8, border: '1px solid var(--color-border)', background: 'var(--color-card)', color: 'var(--color-foreground)', fontSize: 14, cursor: 'pointer' }
 const iconBtn: CSSProperties = { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 6, border: 0, background: 'transparent', color: 'var(--color-muted-foreground)', cursor: 'pointer' }
 const th: CSSProperties = { textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.04em', color: 'var(--color-muted-foreground)', whiteSpace: 'nowrap' }
 const td: CSSProperties = { padding: '10px 16px', fontSize: 14, color: 'var(--color-foreground)', borderTop: '1px solid var(--color-border)' }
-const panelCss: CSSProperties = { display: 'flex', flexDirection: 'column', gap: 2, minHeight: 130, borderRadius: 8, border: '1px dashed var(--color-border)', padding: 6 }
-const panelTitle: CSSProperties = { padding: '0 6px 4px', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--color-muted-foreground)' }
+const label: CSSProperties = { display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 4, color: 'var(--color-foreground)' }
+const hint: CSSProperties = { marginTop: 4, fontSize: 12, color: 'var(--color-muted-foreground)' }
 
 const sIcon = { width: 15, height: 15, flexShrink: 0 } as const
 const PencilIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
 const TrashIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /></svg>
 const PlusIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
-const GripIcon = () => <svg style={{ width: 13, height: 13, flexShrink: 0, color: 'var(--color-muted-foreground)' }} viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" /><circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" /><circle cx="9" cy="18" r="1.5" /><circle cx="15" cy="18" r="1.5" /></svg>
 
-// ── Colonnes (masquer + réordonner, persisté) ──
+// ── Colonnes (masquer + réordonner par glisser-déposer, persisté) ──
 type ColDef = { id: string; visible: boolean }
-const COL_ORDER = ['id', 'name', 'type', 'ctrl', 'layout', 'site', 'date'] as const
-const COL_LABEL: Record<string, string> = { id: 'col_id', name: 'col_name', type: 'col_type', ctrl: 'col_ctrl', layout: 'col_layout', site: 'col_site', date: 'col_date' }
+const COL_ORDER = ['id', 'locale', 'name'] as const
+const COL_LABEL: Record<string, string> = { id: 'col_id', locale: 'col_locale', name: 'col_name' }
 const DEFAULT_COLS: ColDef[] = COL_ORDER.map((id) => ({ id, visible: id !== 'id' }))
-const COL_KEY = 'melis-template-cols-v1'
+const COL_KEY = 'melis-cmslanguage-cols-v1'
 function loadCols(): ColDef[] {
   try {
     const raw = localStorage.getItem(COL_KEY)
@@ -89,6 +99,11 @@ function loadCols(): ColDef[] {
 }
 function saveCols(c: ColDef[]) { try { localStorage.setItem(COL_KEY, JSON.stringify(c)) } catch { /* */ } }
 const visibleCols = (c: ColDef[]) => c.filter((x) => x.visible)
+
+const GripIcon = () => <svg style={{ width: 13, height: 13, flexShrink: 0, color: 'var(--color-muted-foreground)' }} viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" /><circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" /><circle cx="9" cy="18" r="1.5" /><circle cx="15" cy="18" r="1.5" /></svg>
+
+const panelCss: CSSProperties = { display: 'flex', flexDirection: 'column', gap: 2, minHeight: 130, borderRadius: 8, border: '1px dashed var(--color-border)', padding: 6 }
+const panelTitle: CSSProperties = { padding: '0 6px 4px', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--color-muted-foreground)' }
 
 function ColManager({ cols, labelFor, onChange, onClose }: {
   cols: ColDef[]; labelFor: (id: string) => string; onChange: (c: ColDef[]) => void; onClose: () => void
@@ -113,19 +128,26 @@ function ColManager({ cols, labelFor, onChange, onClose }: {
     } else { const next = [...vList, ...hList, upd]; onChange(next); saveCols(next) }
     setDragId(null); setOver(null)
   }
+
   function item(col: ColDef, panel: 'visible' | 'hidden') {
     const isOver = over?.id === col.id && over?.panel === panel
     return (
       <div key={col.id} draggable
-        onDragStart={() => setDragId(col.id)} onDragEnd={() => { setDragId(null); setOver(null) }}
+        onDragStart={() => setDragId(col.id)}
+        onDragEnd={() => { setDragId(null); setOver(null) }}
         onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); if (over?.id !== col.id || over?.panel !== panel) setOver({ id: col.id, panel }) }}
         onDrop={(e) => { e.preventDefault(); drop(panel) }}
-        style={{ display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 8px', fontSize: 14, cursor: 'grab', userSelect: 'none', opacity: dragId === col.id ? 0.4 : 1, background: isOver ? 'color-mix(in srgb, var(--color-primary) 12%, transparent)' : 'transparent', boxShadow: isOver ? '0 0 0 1px color-mix(in srgb, var(--color-primary) 35%, transparent)' : 'none' }}>
+        style={{
+          display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 8px', fontSize: 14, cursor: 'grab', userSelect: 'none',
+          opacity: dragId === col.id ? 0.4 : 1,
+          background: isOver ? 'color-mix(in srgb, var(--color-primary) 12%, transparent)' : 'transparent',
+          boxShadow: isOver ? '0 0 0 1px color-mix(in srgb, var(--color-primary) 35%, transparent)' : 'none',
+        }}>
         <GripIcon /><span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{labelFor(col.id)}</span>
       </div>
     )
   }
-  const ph = (txt: string) => <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--color-muted-foreground)', opacity: 0.5, padding: '16px 0' }}>{txt}</div>
+
   return (
     <div style={{ ...card, position: 'absolute', right: 0, top: '100%', marginTop: 6, zIndex: 50, width: 380, maxWidth: 'calc(100vw - 1rem)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderBottom: '1px solid var(--color-border)' }}>
@@ -133,76 +155,75 @@ function ColManager({ cols, labelFor, onChange, onClose }: {
         <button style={{ ...iconBtn, width: 22, height: 22 }} onClick={onClose}>✕</button>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, padding: 12 }}>
-        <div style={panelCss} onDragOver={(e) => { e.preventDefault(); if (over?.id !== '__panel__' || over?.panel !== 'hidden') setOver({ id: '__panel__', panel: 'hidden' }) }} onDrop={(e) => { e.preventDefault(); drop('hidden') }}>
+        <div style={panelCss}
+          onDragOver={(e) => { e.preventDefault(); if (over?.id !== '__panel__' || over?.panel !== 'hidden') setOver({ id: '__panel__', panel: 'hidden' }) }}
+          onDrop={(e) => { e.preventDefault(); drop('hidden') }}>
           <p style={panelTitle}>{t('cols_hidden')}</p>
-          {hidden.length === 0 ? ph(t('drag_here')) : hidden.map((c) => item(c, 'hidden'))}
+          {hidden.length === 0 ? <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--color-muted-foreground)', opacity: 0.5, padding: '16px 0' }}>{t('drag_here')}</div> : hidden.map((c) => item(c, 'hidden'))}
         </div>
-        <div style={panelCss} onDragOver={(e) => { e.preventDefault(); if (over?.id !== '__panel__' || over?.panel !== 'visible') setOver({ id: '__panel__', panel: 'visible' }) }} onDrop={(e) => { e.preventDefault(); drop('visible') }}>
+        <div style={panelCss}
+          onDragOver={(e) => { e.preventDefault(); if (over?.id !== '__panel__' || over?.panel !== 'visible') setOver({ id: '__panel__', panel: 'visible' }) }}
+          onDrop={(e) => { e.preventDefault(); drop('visible') }}>
           <p style={panelTitle}>{t('cols_visible')}</p>
-          {shown.length === 0 ? ph(t('drag_here')) : shown.map((c) => item(c, 'visible'))}
+          {shown.length === 0 ? <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--color-muted-foreground)', opacity: 0.5, padding: '16px 0' }}>{t('drag_here')}</div> : shown.map((c) => item(c, 'visible'))}
         </div>
       </div>
       <div style={{ borderTop: '1px solid var(--color-border)', padding: 6 }}>
-        <button style={{ ...btnGhost, width: '100%', height: 30, border: 0, justifyContent: 'center', color: 'var(--color-muted-foreground)' }} onClick={() => { onChange(DEFAULT_COLS); saveCols(DEFAULT_COLS) }}>{t('reset')}</button>
+        <button style={{ ...btnGhost, width: '100%', height: 30, border: 0, justifyContent: 'center', color: 'var(--color-muted-foreground)' }}
+          onClick={() => { onChange(DEFAULT_COLS); saveCols(DEFAULT_COLS) }}>{t('reset')}</button>
       </div>
     </div>
   )
 }
 
+// ── KPI ──
 function Kpi({ label: lbl, value }: { label: string; value: number | null }) {
   return (
-    <div style={{ ...card, display: 'flex', flexDirection: 'column', gap: 2, padding: 16, flex: 1, minWidth: 130 }}>
+    <div style={{ ...card, display: 'flex', flexDirection: 'column', gap: 2, padding: 16, flex: 1, minWidth: 140 }}>
       <span style={{ fontSize: 12, color: 'var(--color-muted-foreground)' }}>{lbl}</span>
       <span style={{ fontSize: 22, fontWeight: 700 }}>{value == null ? '…' : value}</span>
     </div>
   )
 }
 
-function fmtDate(s: string): string {
-  if (!s) return '—'
-  const d = new Date(s.replace(' ', 'T'))
-  return isNaN(d.getTime()) ? s : d.toLocaleString(currentLang() === 'fr' ? 'fr-FR' : 'en-GB', { year: 'numeric', month: 'short', day: '2-digit' })
-}
-
 // ════════════════════════════════════════════════════════════════════════════
-export default function TemplatePage() {
+export default function CmsLanguagePage() {
   const { id } = useParams()
   const location = useLocation()
+  // base = route de la liste (pathname sans le segment /:id éventuel)
   const base = id ? location.pathname.slice(0, location.pathname.length - id.length - 1) : location.pathname
-  if (id) return <TemplateLegacyForm base={base} />
-  return <TemplateList base={base} />
+
+  if (id) return <CmsLanguageForm id={id} base={base} />
+  return <CmsLanguageList base={base} />
 }
 
-// ── Liste (native) ──────────────────────────────────────────────────────────
-function TemplateList({ base }: { base: string }) {
+// ── Liste ───────────────────────────────────────────────────────────────────
+function CmsLanguageList({ base }: { base: string }) {
   const t = useT()
   const navigate = useNavigate()
-  const [items, setItems] = useState<TemplateItem[]>([])
-  const [stats, setStats] = useState<TemplateStats | null>(null)
-  const [sites, setSites] = useState<SiteOption[]>([])
+  const [items, setItems] = useState<LangItem[]>([])
+  const [stats, setStats] = useState<LangStats | null>(null)
   const [loading, setLoading] = useState(false)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
-  const [site, setSite] = useState<number | null>(null)
   const [sortCol, setSortCol] = useState<string | null>(null)
   const [sortAsc, setSortAsc] = useState(true)
-  const [toDelete, setToDelete] = useState<TemplateItem | null>(null)
+  const [toDelete, setToDelete] = useState<LangItem | null>(null)
   const [tick, setTick] = useState(0)
   const [cols, setCols] = useState<ColDef[]>(loadCols)
   const [showCols, setShowCols] = useState(false)
-  const [showExport, setShowExport] = useState(false)
   const [mode, setMode] = useState<'react' | 'iframe'>('react')
   const [frameLoaded, setFrameLoaded] = useState(false)
 
-  useEffect(() => { fetchTemplateStats().then(setStats).catch(() => null) }, [tick])
-  useEffect(() => { fetchTemplateSites().then(setSites).catch(() => null) }, [])
+  useEffect(() => { fetchLanguageStats().then(setStats).catch(() => null) }, [tick])
   useEffect(() => {
     setLoading(true)
-    fetchTemplates({ search, site }).then((r) => setItems(r.items)).catch(() => null).finally(() => setLoading(false))
-  }, [search, site, tick])
+    fetchLanguages({ search })
+      .then((r) => setItems(r.items)).catch(() => null).finally(() => setLoading(false))
+  }, [search, tick])
 
-  const cell = (r: TemplateItem, c: string): string | number => (
-    c === 'id' ? r.id : c === 'name' ? r.name : c === 'type' ? r.typeLabel : c === 'ctrl' ? r.controllerAction : c === 'layout' ? r.layout : c === 'site' ? r.siteName : c === 'date' ? r.creationDate : ''
+  const cell = (r: LangItem, c: string): string | number => (
+    c === 'id' ? r.id : c === 'locale' ? r.locale : c === 'name' ? r.name : ''
   )
   const sorted = useMemo(() => {
     if (!sortCol) return items
@@ -215,20 +236,16 @@ function TemplateList({ base }: { base: string }) {
   }, [items, sortCol, sortAsc])
 
   function toggleSort(id: string) { if (sortCol === id) setSortAsc((v) => !v); else { setSortCol(id); setSortAsc(true) } }
+
   async function confirmDelete() {
     if (!toDelete) return
-    try { await deleteTemplate(toDelete.id); setToDelete(null); setTick((x) => x + 1) } catch { setToDelete(null) }
-  }
-  const renderCellNode = (r: TemplateItem, c: string) => {
-    if (c === 'type') return <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 6, fontSize: 12, background: 'color-mix(in srgb, var(--color-primary) 10%, transparent)', color: 'var(--color-primary)' }}>{r.typeLabel}</span>
-    if (c === 'ctrl' || c === 'layout') return <span style={{ fontFamily: 'monospace', fontSize: 13 }}>{String(cell(r, c)) || '—'}</span>
-    if (c === 'name') return <span style={{ fontWeight: 500 }}>{r.name}</span>
-    if (c === 'date') return fmtDate(r.creationDate)
-    return String(cell(r, c)) || '—'
+    try { await deleteLanguage(toDelete.id); setToDelete(null); setTick((x) => x + 1) }
+    catch { setToDelete(null) }
   }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
+      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <div>
           <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{t('title')}</h1>
@@ -241,43 +258,41 @@ function TemplateList({ base }: { base: string }) {
         </div>
       </div>
 
-      {/* Vue « Old » : outil Templates legacy en iframe (montée à la 1ʳᵉ activation, gardée en display:none) */}
+      {/* Vue « Old » : outil Langues legacy en iframe (montée à la 1ʳᵉ activation, gardée en display:none) */}
       {frameLoaded && (
         <div style={{ ...card, display: mode === 'iframe' ? 'flex' : 'none', flex: 1, minHeight: 480, overflow: 'hidden' }}>
           <iframe src={`/melis/react-tool-page?key=${encodeURIComponent(MELIS_KEY)}`}
-            style={{ flex: 1, width: '100%', border: 0 }} title="Templates — Vue Melis"
+            style={{ flex: 1, width: '100%', border: 0 }} title="Langues — Vue Melis"
             sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals" />
         </div>
       )}
 
       {/* Vue « New » : liste React native */}
       <div style={{ display: mode === 'react' ? 'flex' : 'none', flexDirection: 'column', gap: 20 }}>
+      {/* KPI */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         <Kpi label={t('kpi_total')} value={stats?.total ?? null} />
-        <Kpi label={t('kpi_sites')} value={stats?.sites ?? null} />
-        <Kpi label={t('kpi_types')} value={stats?.types ?? null} />
       </div>
 
+      {/* Filtres */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <input style={{ ...inputCss, flex: 1, minWidth: 220 }} value={searchInput} onChange={(e) => setSearchInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && setSearch(searchInput.trim())} placeholder={t('search')} />
-        <select style={{ ...inputCss, width: 'auto' }} value={site ?? ''} onChange={(e) => setSite(e.target.value ? Number(e.target.value) : null)}>
-          <option value="">{t('all_sites')}</option>
-          {sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-        </select>
+        <input style={{ ...inputCss, height: 36, flex: 1, minWidth: 220 }} value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && setSearch(searchInput.trim())}
+          placeholder={t('search')} />
         <div style={{ position: 'relative' }}>
-          <button style={btnGhost} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
+          <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
           {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
         </div>
-        <button style={btnGhost} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>
       </div>
 
+      {/* Table */}
       <div style={{ ...card, overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 720 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 480 }}>
           <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
             <tr>
               {visibleCols(cols).map(({ id }) => (
-                <th key={id} style={{ ...th, cursor: 'pointer', ...(id === 'id' ? { width: 60 } : {}) }} onClick={() => toggleSort(id)}>
+                <th key={id} style={{ ...th, cursor: 'pointer', ...(id === 'id' ? { width: 70 } : {}) }} onClick={() => toggleSort(id)}>
                   {t(COL_LABEL[id])}{sortCol === id ? (sortAsc ? ' ↑' : ' ↓') : ''}
                 </th>
               ))}
@@ -290,7 +305,11 @@ function TemplateList({ base }: { base: string }) {
             ) : sorted.map((r) => (
               <tr key={r.id}>
                 {visibleCols(cols).map(({ id }) => (
-                  <td key={id} style={{ ...td, ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}) }}>{renderCellNode(r, id)}</td>
+                  <td key={id} style={{ ...td, ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}), ...(id === 'locale' ? { fontFamily: 'monospace', fontSize: 13 } : {}), ...(id === 'name' ? { fontWeight: 500 } : {}) }}>
+                    {id === 'id' && r.id}
+                    {id === 'locale' && r.locale}
+                    {id === 'name' && r.name}
+                  </td>
                 ))}
                 <td style={td}>
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
@@ -308,11 +327,12 @@ function TemplateList({ base }: { base: string }) {
       </div>
       </div>
 
+      {/* Suppression */}
       {toDelete && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,.5)' }}>
-          <div style={{ ...card, padding: 24, width: '100%', maxWidth: 380 }}>
+          <div style={{ ...card, padding: 24, width: '100%', maxWidth: 360 }}>
             <h3 style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>{t('del_title')}</h3>
-            <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', marginTop: 8 }}>{t('del_confirm', { n: toDelete.name })}</p>
+            <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', marginTop: 8 }}>{t('del_confirm', { u: toDelete.name })}</p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 20 }}>
               <button style={btnGhost} onClick={() => setToDelete(null)}>{t('cancel')}</button>
               <button style={{ ...btnGhost, borderColor: '#fca5a5', color: '#dc2626' }} onClick={confirmDelete}>{t('del')}</button>
@@ -320,61 +340,79 @@ function TemplateList({ base }: { base: string }) {
           </div>
         </div>
       )}
-
-      {showExport && (
-        <ExportModal<TemplateItem>
-          cols={cols}
-          labelFor={(id) => t(COL_LABEL[id])}
-          fetchAll={async () => (await fetchTemplates({ search, site })).items}
-          getCell={(r, id) => cell(r, id)}
-          filename="templates"
-          sheetName={t('title')}
-          total={items.length}
-          onClose={() => setShowExport(false)}
-        />
-      )}
     </div>
   )
 }
 
-// ── Création / édition : outil legacy en iframe persistante ───────────────────
-function getFrame(): HTMLIFrameElement {
-  let f = document.getElementById(FRAME_ID) as HTMLIFrameElement | null
-  if (!f) {
-    f = document.createElement('iframe')
-    f.id = FRAME_ID
-    f.src = `/melis/react-tool-page?key=${encodeURIComponent(MELIS_KEY)}`
-    f.title = 'Templates'
-    f.style.cssText = 'position:fixed;border:0;display:none;z-index:1;'
-    document.body.appendChild(f)
-  }
-  return f
-}
-
-function TemplateLegacyForm({ base }: { base: string }) {
+// ── Formulaire ────────────────────────────────────────────────────────────────
+function CmsLanguageForm({ id, base }: { id: string; base: string }) {
   const t = useT()
   const navigate = useNavigate()
-  const anchorRef = useRef<HTMLDivElement>(null)
+  const isEdit = id !== 'new'
+  const langId = isEdit ? parseInt(id) : null
+
+  const [locale, setLocale] = useState('')
+  const [name, setName] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [saved, setSaved] = useState(false)
+
   useEffect(() => {
-    const f = getFrame()
-    const anchor = anchorRef.current!
-    const sync = () => {
-      const r = anchor.getBoundingClientRect()
-      f.style.left = `${r.left}px`; f.style.top = `${r.top}px`
-      f.style.width = `${r.width}px`; f.style.height = `${r.height}px`; f.style.display = 'block'
-    }
-    sync()
-    const ro = new ResizeObserver(sync); ro.observe(anchor)
-    window.addEventListener('resize', sync); window.addEventListener('scroll', sync, true)
-    return () => { f.style.display = 'none'; ro.disconnect(); window.removeEventListener('resize', sync); window.removeEventListener('scroll', sync, true) }
-  }, [])
+    if (!langId) return
+    setLoading(true)
+    fetchLanguageById(langId)
+      .then((r) => { setLocale(r.locale); setName(r.name) })
+      .catch(() => navigate(base))
+      .finally(() => setLoading(false))
+  }, [langId])
+
+  async function submit() {
+    setError(null)
+    if (!name.trim()) { setError(t('err_name')); return }
+    if (!/^[a-z]{2}_[A-Z]{2}$/.test(locale.trim())) { setError(t('err_locale')); return }
+    setSaving(true)
+    try {
+      await saveLanguage({ id: langId, locale: locale.trim(), name: name.trim() })
+      setSaved(true)
+      setTimeout(() => navigate(base), 500)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t('err_save'))
+    } finally { setSaving(false) }
+  }
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: '1px solid var(--color-border)' }}>
-        <button style={{ ...btnGhost, height: 32, padding: '0 10px' }} onClick={() => navigate(base)}>← {t('back')}</button>
-        <span style={{ fontSize: 13, color: 'var(--color-muted-foreground)' }}>{t('legacy_note')}</span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button style={{ ...btnGhost, height: 32, padding: '0 10px' }} onClick={() => navigate(base)}>← {t('back')}</button>
+          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{isEdit ? t('edit_title') : t('new_title')}</h1>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {saved && <span style={{ fontSize: 14, color: '#059669' }}>{t('saved')}</span>}
+          <button style={btnPrimary} onClick={submit} disabled={saving || loading}>{saving ? '…' : t('save')}</button>
+        </div>
       </div>
-      <div ref={anchorRef} style={{ flex: 1, width: '100%', minHeight: 0 }} />
+
+      {error && <div style={{ ...card, borderColor: '#fca5a5', background: '#fef2f2', color: '#b91c1c', padding: '8px 14px', fontSize: 14 }}>{error}</div>}
+
+      {loading ? (
+        <div style={{ padding: 48, textAlign: 'center', color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>
+      ) : (
+        <div style={{ ...card, padding: 20, maxWidth: 640 }}>
+          <div style={{ marginBottom: 16 }}>
+            <label style={label}>{t('f_locale')}</label>
+            <input style={{ ...inputCss, fontFamily: 'monospace' }} value={locale} onChange={(e) => setLocale(e.target.value)} placeholder={t('f_locale_ph')} maxLength={5} autoComplete="off" />
+            <p style={hint}>{t('f_locale_hint')}</p>
+          </div>
+          <div>
+            <label style={label}>{t('f_name')}</label>
+            <input style={inputCss} value={name} onChange={(e) => setName(e.target.value)} placeholder={t('f_name_ph')} maxLength={255} autoComplete="off" />
+            <p style={hint}>{t('f_name_hint')}</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

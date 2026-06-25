@@ -1,18 +1,18 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
-  deleteRedirect, fetchRedirectById, fetchRedirects, fetchRedirectStats, fetchSites,
-  saveRedirect, type RedirectItem, type RedirectStats, type SiteOption,
-} from './redirect-api'
+  deletePlatformId, fetchPlatformIdById, fetchPlatformIds, fetchPlatformIdStats,
+  savePlatformId, type PlatformIdItem, type PlatformIdStats,
+} from './cms-platform-id-api'
 import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle } from './ViewToggle'
 
-// Outil Redirections 301 legacy (vue « Old » en iframe). Voir brick.manifest.json (cms-site-301).
-const MELIS_KEY = 'meliscms_tool_site_301'
+// Outil Platforms IDs legacy (vue « Old » en iframe). Voir brick.manifest.json.
+const MELIS_KEY = 'meliscms_tool_platform_ids'
 
 /* ──────────────────────────────────────────────────────────────────────────
- * Brique « Redirections 301 » (MelisCms) — full React, montée à /melis-cms/site-301
- * (et /melis-cms/site-301/:id pour le formulaire). La brique ne peut PAS importer les
+ * Brique « Platforms IDs » (MelisCms) — full React, montée à /melis-cms/platform-ids
+ * (et /melis-cms/platform-ids/:id pour le formulaire). La brique ne peut PAS importer les
  * modules de l'hôte (Tailwind/shadcn/i18n) : tout est en styles inline + variables CSS
  * du thème, avec un mini-dictionnaire FR/EN lu depuis <html lang> (posé par l'hôte).
  * ────────────────────────────────────────────────────────────────────────── */
@@ -25,34 +25,42 @@ function currentLang(): Lang {
 }
 const DICT: Record<Lang, Record<string, string>> = {
   fr: {
-    title: 'Redirections 301', subtitle: 'Redirections d’URL par site',
-    new: 'Nouvelle redirection', search: 'Rechercher une redirection…',
-    empty: 'Aucune redirection trouvée', count: '{n} redirections — fin de la liste',
-    kpi_total: 'Total', kpi_sites: 'Sites concernés',
-    all_sites: 'Tous les sites', col_id: 'ID', col_site: 'Site', col_old: 'Ancienne URL', col_new: 'Nouvelle URL',
+    title: 'Platforms IDs', subtitle: 'Plages d’ID de pages et templates par plateforme',
+    new: 'Nouvelle plage', search: 'Rechercher une plage…',
+    empty: 'Aucune plage trouvée', count: '{n} plages — fin de la liste',
+    kpi_total: 'Total',
+    col_id: 'ID', col_page_start: 'Début page', col_page_current: 'Page courante', col_page_end: 'Fin page',
+    col_tpl_start: 'Début template', col_tpl_current: 'Template courant', col_tpl_end: 'Fin template',
     columns: 'Colonnes', export: 'Exporter', cols_visible: 'Visibles', cols_hidden: 'Masquées', drag_here: 'Glisser ici', reset: 'Réinitialiser',
     edit: 'Modifier', del: 'Supprimer', cancel: 'Annuler', save: 'Enregistrer', back: 'retour',
     refresh: 'Rafraîchir', loading: 'Chargement…', saved: 'Enregistré ✓',
-    del_title: 'Supprimer la redirection', del_confirm: 'Supprimer « {u} » ? Cette action est irréversible.',
-    new_title: 'Nouvelle redirection', edit_title: 'Modifier la redirection',
-    f_site: 'Site', f_site_ph: '— Choisir un site —', f_old: 'Ancienne URL', f_old_ph: '/ancienne-url',
-    f_new: 'Nouvelle URL', f_new_ph: '/nouvelle-url', f_old_hint: 'L’URL à rediriger (unique pour ce site).',
-    f_new_hint: 'La destination de la redirection.', err_save: 'Erreur lors de la sauvegarde',
+    del_title: 'Supprimer la plage', del_confirm: 'Supprimer la plage #{u} ? Cette action est irréversible.',
+    new_title: 'Nouvelle plage', edit_title: 'Modifier la plage',
+    sec_page: 'IDs de pages', sec_tpl: 'IDs de templates',
+    f_start: 'Début', f_current: 'Courant', f_end: 'Fin',
+    err_save: 'Erreur lors de la sauvegarde',
+    err_int: 'Les valeurs doivent être des entiers ≥ 0.',
+    err_order_page: 'Pour les pages : début ≤ courant ≤ fin.',
+    err_order_tpl: 'Pour les templates : début ≤ courant ≤ fin.',
   },
   en: {
-    title: '301 Redirects', subtitle: 'Per-site URL redirects',
-    new: 'New redirect', search: 'Search a redirect…',
-    empty: 'No redirect found', count: '{n} redirects — end of list',
-    kpi_total: 'Total', kpi_sites: 'Sites covered',
-    all_sites: 'All sites', col_id: 'ID', col_site: 'Site', col_old: 'Old URL', col_new: 'New URL',
+    title: 'Platforms IDs', subtitle: 'Page & template ID ranges per platform',
+    new: 'New range', search: 'Search a range…',
+    empty: 'No range found', count: '{n} ranges — end of list',
+    kpi_total: 'Total',
+    col_id: 'ID', col_page_start: 'Page start', col_page_current: 'Page current', col_page_end: 'Page end',
+    col_tpl_start: 'Template start', col_tpl_current: 'Template current', col_tpl_end: 'Template end',
     columns: 'Columns', export: 'Export', cols_visible: 'Visible', cols_hidden: 'Hidden', drag_here: 'Drag here', reset: 'Reset',
     edit: 'Edit', del: 'Delete', cancel: 'Cancel', save: 'Save', back: 'back',
     refresh: 'Refresh', loading: 'Loading…', saved: 'Saved ✓',
-    del_title: 'Delete redirect', del_confirm: 'Delete “{u}”? This action is irreversible.',
-    new_title: 'New redirect', edit_title: 'Edit redirect',
-    f_site: 'Site', f_site_ph: '— Choose a site —', f_old: 'Old URL', f_old_ph: '/old-url',
-    f_new: 'New URL', f_new_ph: '/new-url', f_old_hint: 'The URL to redirect (unique for this site).',
-    f_new_hint: 'The redirect destination.', err_save: 'Error while saving',
+    del_title: 'Delete range', del_confirm: 'Delete range #{u}? This action is irreversible.',
+    new_title: 'New range', edit_title: 'Edit range',
+    sec_page: 'Page IDs', sec_tpl: 'Template IDs',
+    f_start: 'Start', f_current: 'Current', f_end: 'End',
+    err_save: 'Error while saving',
+    err_int: 'Values must be integers ≥ 0.',
+    err_order_page: 'For pages: start ≤ current ≤ end.',
+    err_order_tpl: 'For templates: start ≤ current ≤ end.',
   },
 }
 function useT() {
@@ -73,20 +81,23 @@ const iconBtn: CSSProperties = { display: 'inline-flex', alignItems: 'center', j
 const th: CSSProperties = { textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.04em', color: 'var(--color-muted-foreground)', whiteSpace: 'nowrap' }
 const td: CSSProperties = { padding: '10px 16px', fontSize: 14, color: 'var(--color-foreground)', borderTop: '1px solid var(--color-border)' }
 const label: CSSProperties = { display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 4, color: 'var(--color-foreground)' }
-const hint: CSSProperties = { marginTop: 4, fontSize: 12, color: 'var(--color-muted-foreground)' }
+const secTitle: CSSProperties = { fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--color-muted-foreground)', margin: '0 0 10px' }
+const numCell: CSSProperties = { fontVariantNumeric: 'tabular-nums' }
 
 const sIcon = { width: 15, height: 15, flexShrink: 0 } as const
 const PencilIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
 const TrashIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /></svg>
 const PlusIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
-const ArrowRight = () => <svg style={{ width: 13, height: 13, color: 'var(--color-muted-foreground)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7" /></svg>
 
 // ── Colonnes (masquer + réordonner par glisser-déposer, persisté) ──
 type ColDef = { id: string; visible: boolean }
-const COL_ORDER = ['id', 'site', 'old', 'new'] as const
-const COL_LABEL: Record<string, string> = { id: 'col_id', site: 'col_site', old: 'col_old', new: 'col_new' }
+const COL_ORDER = ['id', 'pageStart', 'pageCurrent', 'pageEnd', 'tplStart', 'tplCurrent', 'tplEnd'] as const
+const COL_LABEL: Record<string, string> = {
+  id: 'col_id', pageStart: 'col_page_start', pageCurrent: 'col_page_current', pageEnd: 'col_page_end',
+  tplStart: 'col_tpl_start', tplCurrent: 'col_tpl_current', tplEnd: 'col_tpl_end',
+}
 const DEFAULT_COLS: ColDef[] = COL_ORDER.map((id) => ({ id, visible: id !== 'id' }))
-const COL_KEY = 'melis-site301-cols-v1'
+const COL_KEY = 'melis-cms-platform-ids-cols-v1'
 function loadCols(): ColDef[] {
   try {
     const raw = localStorage.getItem(COL_KEY)
@@ -186,30 +197,43 @@ function Kpi({ label: lbl, value }: { label: string; value: number | null }) {
   )
 }
 
+// Valeur numérique d'une cellule (table + export).
+function cellValue(r: PlatformIdItem, id: string): number {
+  switch (id) {
+    case 'id': return r.id
+    case 'pageStart': return r.pageStart
+    case 'pageCurrent': return r.pageCurrent
+    case 'pageEnd': return r.pageEnd
+    case 'tplStart': return r.tplStart
+    case 'tplCurrent': return r.tplCurrent
+    case 'tplEnd': return r.tplEnd
+    default: return 0
+  }
+}
+
 // ════════════════════════════════════════════════════════════════════════════
-export default function SiteRedirectPage() {
+export default function CmsPlatformIdPage() {
   const { id } = useParams()
   const location = useLocation()
   // base = route de la liste (pathname sans le segment /:id éventuel)
   const base = id ? location.pathname.slice(0, location.pathname.length - id.length - 1) : location.pathname
 
-  if (id) return <RedirectForm id={id} base={base} />
-  return <RedirectList base={base} />
+  if (id) return <CmsPlatformIdForm id={id} base={base} />
+  return <CmsPlatformIdList base={base} />
 }
 
 // ── Liste ───────────────────────────────────────────────────────────────────
-function RedirectList({ base }: { base: string }) {
+function CmsPlatformIdList({ base }: { base: string }) {
   const t = useT()
   const navigate = useNavigate()
-  const [items, setItems] = useState<RedirectItem[]>([])
-  const [stats, setStats] = useState<RedirectStats | null>(null)
-  const [sites, setSites] = useState<SiteOption[]>([])
+  const [items, setItems] = useState<PlatformIdItem[]>([])
+  const [stats, setStats] = useState<PlatformIdStats | null>(null)
   const [loading, setLoading] = useState(false)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
-  const [site, setSite] = useState<number | null>(null)
+  const [sortCol, setSortCol] = useState<string>('id')
   const [sortAsc, setSortAsc] = useState(false)
-  const [toDelete, setToDelete] = useState<RedirectItem | null>(null)
+  const [toDelete, setToDelete] = useState<PlatformIdItem | null>(null)
   const [tick, setTick] = useState(0)
   const [cols, setCols] = useState<ColDef[]>(loadCols)
   const [showCols, setShowCols] = useState(false)
@@ -217,19 +241,23 @@ function RedirectList({ base }: { base: string }) {
   const [mode, setMode] = useState<'react' | 'iframe'>('react')
   const [frameLoaded, setFrameLoaded] = useState(false)
 
-  useEffect(() => { fetchRedirectStats().then(setStats).catch(() => null) }, [tick])
-  useEffect(() => { fetchSites().then(setSites).catch(() => null) }, [])
+  useEffect(() => { fetchPlatformIdStats().then(setStats).catch(() => null) }, [tick])
   useEffect(() => {
     setLoading(true)
-    fetchRedirects({ search, site })
+    fetchPlatformIds({ search })
       .then((r) => setItems(r.items)).catch(() => null).finally(() => setLoading(false))
-  }, [search, site, tick])
+  }, [search, tick])
 
-  const sorted = useMemo(() => [...items].sort((a, b) => sortAsc ? a.id - b.id : b.id - a.id), [items, sortAsc])
+  const sorted = useMemo(() => [...items].sort((a, b) => {
+    const cmp = cellValue(a, sortCol) - cellValue(b, sortCol)
+    return sortAsc ? cmp : -cmp
+  }), [items, sortCol, sortAsc])
+
+  function toggleSort(id: string) { if (sortCol === id) setSortAsc((v) => !v); else { setSortCol(id); setSortAsc(true) } }
 
   async function confirmDelete() {
     if (!toDelete) return
-    try { await deleteRedirect(toDelete.id); setToDelete(null); setTick((x) => x + 1) }
+    try { await deletePlatformId(toDelete.id); setToDelete(null); setTick((x) => x + 1) }
     catch { setToDelete(null) }
   }
 
@@ -248,11 +276,11 @@ function RedirectList({ base }: { base: string }) {
         </div>
       </div>
 
-      {/* Vue « Old » : outil Redirections 301 legacy en iframe (montée à la 1ʳᵉ activation, gardée en display:none) */}
+      {/* Vue « Old » : outil Platforms IDs legacy en iframe (montée à la 1ʳᵉ activation, gardée en display:none) */}
       {frameLoaded && (
         <div style={{ ...card, display: mode === 'iframe' ? 'flex' : 'none', flex: 1, minHeight: 480, overflow: 'hidden' }}>
           <iframe src={`/melis/react-tool-page?key=${encodeURIComponent(MELIS_KEY)}`}
-            style={{ flex: 1, width: '100%', border: 0 }} title="Redirections 301 — Vue Melis"
+            style={{ flex: 1, width: '100%', border: 0 }} title="Platforms IDs — Vue Melis"
             sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals" />
         </div>
       )}
@@ -262,7 +290,6 @@ function RedirectList({ base }: { base: string }) {
       {/* KPI */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         <Kpi label={t('kpi_total')} value={stats?.total ?? null} />
-        <Kpi label={t('kpi_sites')} value={stats?.sites ?? null} />
       </div>
 
       {/* Filtres */}
@@ -271,10 +298,6 @@ function RedirectList({ base }: { base: string }) {
           onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && setSearch(searchInput.trim())}
           placeholder={t('search')} />
-        <select style={{ ...inputCss, height: 36, width: 'auto' }} value={site ?? ''} onChange={(e) => setSite(e.target.value ? Number(e.target.value) : null)}>
-          <option value="">{t('all_sites')}</option>
-          {sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-        </select>
         <div style={{ position: 'relative' }}>
           <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
           {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
@@ -284,13 +307,13 @@ function RedirectList({ base }: { base: string }) {
 
       {/* Table */}
       <div style={{ ...card, overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 640 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 720 }}>
           <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
             <tr>
               {visibleCols(cols).map(({ id }) => (
-                <th key={id} style={{ ...th, ...(id === 'id' ? { cursor: 'pointer', width: 70 } : {}) }}
-                  onClick={id === 'id' ? () => setSortAsc((v) => !v) : undefined}>
-                  {t(COL_LABEL[id])}{id === 'id' ? ` ${sortAsc ? '↑' : '↓'}` : ''}
+                <th key={id} style={{ ...th, cursor: 'pointer', ...(id === 'id' ? { width: 70 } : {}) }}
+                  onClick={() => toggleSort(id)}>
+                  {t(COL_LABEL[id])}{sortCol === id ? (sortAsc ? ' ↑' : ' ↓') : ''}
                 </th>
               ))}
               <th style={{ ...th, width: 80 }} />
@@ -302,15 +325,8 @@ function RedirectList({ base }: { base: string }) {
             ) : sorted.map((r) => (
               <tr key={r.id}>
                 {visibleCols(cols).map(({ id }) => (
-                  <td key={id} style={{ ...td, ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}), ...(id === 'old' ? { fontFamily: 'monospace', fontSize: 13 } : {}) }}>
-                    {id === 'id' && r.id}
-                    {id === 'site' && r.siteName}
-                    {id === 'old' && r.oldUrl}
-                    {id === 'new' && (
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                        <ArrowRight /><span style={{ fontFamily: 'monospace', fontSize: 13 }}>{r.newUrl}</span>
-                      </span>
-                    )}
+                  <td key={id} style={{ ...td, ...numCell, ...(id === 'id' ? { color: 'var(--color-muted-foreground)' } : {}) }}>
+                    {cellValue(r, id)}
                   </td>
                 ))}
                 <td style={td}>
@@ -334,7 +350,7 @@ function RedirectList({ base }: { base: string }) {
         <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,.5)' }}>
           <div style={{ ...card, padding: 24, width: '100%', maxWidth: 360 }}>
             <h3 style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>{t('del_title')}</h3>
-            <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', marginTop: 8 }}>{t('del_confirm', { u: toDelete.oldUrl })}</p>
+            <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', marginTop: 8 }}>{t('del_confirm', { u: toDelete.id })}</p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 20 }}>
               <button style={btnGhost} onClick={() => setToDelete(null)}>{t('cancel')}</button>
               <button style={{ ...btnGhost, borderColor: '#fca5a5', color: '#dc2626' }} onClick={confirmDelete}>{t('del')}</button>
@@ -344,12 +360,12 @@ function RedirectList({ base }: { base: string }) {
       )}
 
       {showExport && (
-        <ExportModal<RedirectItem>
+        <ExportModal<PlatformIdItem>
           cols={cols}
           labelFor={(id) => t(COL_LABEL[id])}
-          fetchAll={async () => (await fetchRedirects({ search, site })).items}
-          getCell={(r, id) => id === 'id' ? r.id : id === 'site' ? r.siteName : id === 'old' ? r.oldUrl : id === 'new' ? r.newUrl : ''}
-          filename={currentLang() === 'fr' ? 'redirections-301' : 'redirects-301'}
+          fetchAll={async () => (await fetchPlatformIds({ search })).items}
+          getCell={(r, id) => cellValue(r, id)}
+          filename="platform-ids"
           sheetName={t('title')}
           total={items.length}
           onClose={() => setShowExport(false)}
@@ -360,38 +376,67 @@ function RedirectList({ base }: { base: string }) {
 }
 
 // ── Formulaire ────────────────────────────────────────────────────────────────
-function RedirectForm({ id, base }: { id: string; base: string }) {
+function NumField({ lbl, value, onChange }: { lbl: string; value: string; onChange: (v: string) => void }) {
+  return (
+    <div>
+      <label style={label}>{lbl}</label>
+      <input style={{ ...inputCss, fontVariantNumeric: 'tabular-nums' }} type="number" min={0} step={1}
+        value={value} onChange={(e) => onChange(e.target.value)} autoComplete="off" />
+    </div>
+  )
+}
+
+function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
   const t = useT()
   const navigate = useNavigate()
   const isEdit = id !== 'new'
-  const redirectId = isEdit ? parseInt(id) : null
+  const platformId = isEdit ? parseInt(id) : null
 
-  const [sites, setSites] = useState<SiteOption[]>([])
-  const [siteId, setSiteId] = useState<number | ''>('')
-  const [oldUrl, setOldUrl] = useState('')
-  const [newUrl, setNewUrl] = useState('')
+  const [pageStart, setPageStart] = useState('')
+  const [pageCurrent, setPageCurrent] = useState('')
+  const [pageEnd, setPageEnd] = useState('')
+  const [tplStart, setTplStart] = useState('')
+  const [tplCurrent, setTplCurrent] = useState('')
+  const [tplEnd, setTplEnd] = useState('')
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
 
-  useEffect(() => { fetchSites().then(setSites).catch(() => null) }, [])
   useEffect(() => {
-    if (!redirectId) return
+    if (!platformId) return
     setLoading(true)
-    fetchRedirectById(redirectId)
-      .then((r) => { setSiteId(r.siteId); setOldUrl(r.oldUrl); setNewUrl(r.newUrl) })
+    fetchPlatformIdById(platformId)
+      .then((r) => {
+        setPageStart(String(r.pageStart)); setPageCurrent(String(r.pageCurrent)); setPageEnd(String(r.pageEnd))
+        setTplStart(String(r.tplStart)); setTplCurrent(String(r.tplCurrent)); setTplEnd(String(r.tplEnd))
+      })
       .catch(() => navigate(base))
       .finally(() => setLoading(false))
-  }, [redirectId])
+  }, [platformId])
+
+  // Entier ≥ 0 ; rejette les non-numériques / décimaux.
+  function parseInt0(v: string): number | null {
+    const s = v.trim()
+    if (!/^\d+$/.test(s)) return null
+    const n = parseInt(s, 10)
+    return Number.isInteger(n) && n >= 0 ? n : null
+  }
 
   async function submit() {
     setError(null)
-    if (!siteId) { setError(DICT[currentLang()].f_site + ' *'); return }
-    if (!oldUrl.trim() || !newUrl.trim()) { setError(t('err_save')); return }
+    const ps = parseInt0(pageStart), pc = parseInt0(pageCurrent), pe = parseInt0(pageEnd)
+    const ts = parseInt0(tplStart), tc = parseInt0(tplCurrent), te = parseInt0(tplEnd)
+    if ([ps, pc, pe, ts, tc, te].some((n) => n === null)) { setError(t('err_int')); return }
+    if (!(ps! <= pc! && pc! <= pe!)) { setError(t('err_order_page')); return }
+    if (!(ts! <= tc! && tc! <= te!)) { setError(t('err_order_tpl')); return }
     setSaving(true)
     try {
-      await saveRedirect({ id: redirectId, siteId: Number(siteId), oldUrl: oldUrl.trim(), newUrl: newUrl.trim() })
+      await savePlatformId({
+        id: platformId,
+        pageStart: ps!, pageCurrent: pc!, pageEnd: pe!,
+        tplStart: ts!, tplCurrent: tc!, tplEnd: te!,
+      })
       setSaved(true)
       setTimeout(() => navigate(base), 500)
     } catch (e) {
@@ -418,23 +463,24 @@ function RedirectForm({ id, base }: { id: string; base: string }) {
       {loading ? (
         <div style={{ padding: 48, textAlign: 'center', color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>
       ) : (
-        <div style={{ ...card, padding: 20, maxWidth: 640 }}>
-          <div style={{ marginBottom: 16 }}>
-            <label style={label}>{t('f_site')}</label>
-            <select style={inputCss} value={siteId} onChange={(e) => setSiteId(e.target.value ? Number(e.target.value) : '')} disabled={isEdit}>
-              <option value="">{t('f_site_ph')}</option>
-              {sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
-          </div>
-          <div style={{ marginBottom: 16 }}>
-            <label style={label}>{t('f_old')}</label>
-            <input style={{ ...inputCss, fontFamily: 'monospace' }} value={oldUrl} onChange={(e) => setOldUrl(e.target.value)} placeholder={t('f_old_ph')} maxLength={255} autoComplete="off" />
-            <p style={hint}>{t('f_old_hint')}</p>
-          </div>
+        <div style={{ ...card, padding: 20, maxWidth: 640, display: 'flex', flexDirection: 'column', gap: 24 }}>
+          {/* Page IDs */}
           <div>
-            <label style={label}>{t('f_new')}</label>
-            <input style={{ ...inputCss, fontFamily: 'monospace' }} value={newUrl} onChange={(e) => setNewUrl(e.target.value)} placeholder={t('f_new_ph')} maxLength={255} autoComplete="off" />
-            <p style={hint}>{t('f_new_hint')}</p>
+            <p style={secTitle}>{t('sec_page')}</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+              <NumField lbl={t('f_start')} value={pageStart} onChange={setPageStart} />
+              <NumField lbl={t('f_current')} value={pageCurrent} onChange={setPageCurrent} />
+              <NumField lbl={t('f_end')} value={pageEnd} onChange={setPageEnd} />
+            </div>
+          </div>
+          {/* Template IDs */}
+          <div>
+            <p style={secTitle}>{t('sec_tpl')}</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+              <NumField lbl={t('f_start')} value={tplStart} onChange={setTplStart} />
+              <NumField lbl={t('f_current')} value={tplCurrent} onChange={setTplCurrent} />
+              <NumField lbl={t('f_end')} value={tplEnd} onChange={setTplEnd} />
+            </div>
           </div>
         </div>
       )}

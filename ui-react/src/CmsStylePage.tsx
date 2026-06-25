@@ -1,20 +1,21 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
-  deleteRedirect, fetchRedirectById, fetchRedirects, fetchRedirectStats, fetchSites,
-  saveRedirect, type RedirectItem, type RedirectStats, type SiteOption,
-} from './redirect-api'
+  deleteStyle, fetchStyleById, fetchStyles, fetchStyleSites, fetchStyleStats,
+  saveStyle, type StyleItem, type StyleStats, type SiteOption,
+} from './cms-style-api'
 import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle } from './ViewToggle'
 
-// Outil Redirections 301 legacy (vue « Old » en iframe). Voir brick.manifest.json (cms-site-301).
-const MELIS_KEY = 'meliscms_tool_site_301'
+// Outil Styles (CSS) legacy (vue « Old » en iframe). Voir brick.manifest.json (meliscms_tool_styles).
+const MELIS_KEY = 'meliscms_tool_styles'
 
 /* ──────────────────────────────────────────────────────────────────────────
- * Brique « Redirections 301 » (MelisCms) — full React, montée à /melis-cms/site-301
- * (et /melis-cms/site-301/:id pour le formulaire). La brique ne peut PAS importer les
- * modules de l'hôte (Tailwind/shadcn/i18n) : tout est en styles inline + variables CSS
- * du thème, avec un mini-dictionnaire FR/EN lu depuis <html lang> (posé par l'hôte).
+ * Brique « Styles » (MelisCms) — full React, montée à /melis-cms/styles
+ * (et /melis-cms/styles/:id pour le formulaire). C'est l'outil le plus riche du
+ * CMS : chaque style a un STATUT (on/off) et une association SITE. La brique ne peut
+ * PAS importer les modules de l'hôte (Tailwind/shadcn/i18n) : tout est en styles inline
+ * + variables CSS du thème, avec un mini-dictionnaire FR/EN lu depuis <html lang>.
  * ────────────────────────────────────────────────────────────────────────── */
 
 // ── i18n minimal (la brique ne partage pas le dictionnaire de l'hôte) ──
@@ -25,34 +26,42 @@ function currentLang(): Lang {
 }
 const DICT: Record<Lang, Record<string, string>> = {
   fr: {
-    title: 'Redirections 301', subtitle: 'Redirections d’URL par site',
-    new: 'Nouvelle redirection', search: 'Rechercher une redirection…',
-    empty: 'Aucune redirection trouvée', count: '{n} redirections — fin de la liste',
-    kpi_total: 'Total', kpi_sites: 'Sites concernés',
-    all_sites: 'Tous les sites', col_id: 'ID', col_site: 'Site', col_old: 'Ancienne URL', col_new: 'Nouvelle URL',
+    title: 'Styles', subtitle: 'Styles CSS des sites',
+    new: 'Nouveau style', search: 'Rechercher un style…',
+    empty: 'Aucun style trouvé', count: '{n} styles — fin de la liste',
+    kpi_total: 'Total', kpi_active: 'Actifs', kpi_inactive: 'Inactifs',
+    all_sites: 'Tous les sites', filter_all: 'Tous',
+    status_active: 'Actif', status_inactive: 'Inactif',
+    col_id: 'ID', col_status: 'Statut', col_name: 'Nom', col_path: 'Chemin', col_site: 'Site',
     columns: 'Colonnes', export: 'Exporter', cols_visible: 'Visibles', cols_hidden: 'Masquées', drag_here: 'Glisser ici', reset: 'Réinitialiser',
     edit: 'Modifier', del: 'Supprimer', cancel: 'Annuler', save: 'Enregistrer', back: 'retour',
     refresh: 'Rafraîchir', loading: 'Chargement…', saved: 'Enregistré ✓',
-    del_title: 'Supprimer la redirection', del_confirm: 'Supprimer « {u} » ? Cette action est irréversible.',
-    new_title: 'Nouvelle redirection', edit_title: 'Modifier la redirection',
-    f_site: 'Site', f_site_ph: '— Choisir un site —', f_old: 'Ancienne URL', f_old_ph: '/ancienne-url',
-    f_new: 'Nouvelle URL', f_new_ph: '/nouvelle-url', f_old_hint: 'L’URL à rediriger (unique pour ce site).',
-    f_new_hint: 'La destination de la redirection.', err_save: 'Erreur lors de la sauvegarde',
+    del_title: 'Supprimer le style', del_confirm: 'Supprimer « {n} » ? Cette action est irréversible.',
+    new_title: 'Nouveau style', edit_title: 'Modifier le style',
+    f_site: 'Site', f_site_ph: '— Choisir un site —', f_name: 'Nom', f_name_ph: 'Nom du style',
+    f_path: 'Chemin', f_path_ph: '/chemin/vers/style.css', f_status: 'Actif',
+    f_name_hint: 'Le nom affiché du style.', f_path_hint: 'Le chemin du fichier CSS.',
+    f_status_hint: 'Activer ou désactiver ce style.', err_save: 'Erreur lors de la sauvegarde',
+    export_filename: 'styles',
   },
   en: {
-    title: '301 Redirects', subtitle: 'Per-site URL redirects',
-    new: 'New redirect', search: 'Search a redirect…',
-    empty: 'No redirect found', count: '{n} redirects — end of list',
-    kpi_total: 'Total', kpi_sites: 'Sites covered',
-    all_sites: 'All sites', col_id: 'ID', col_site: 'Site', col_old: 'Old URL', col_new: 'New URL',
+    title: 'Styles', subtitle: 'Site CSS styles',
+    new: 'New style', search: 'Search a style…',
+    empty: 'No style found', count: '{n} styles — end of list',
+    kpi_total: 'Total', kpi_active: 'Active', kpi_inactive: 'Inactive',
+    all_sites: 'All sites', filter_all: 'All',
+    status_active: 'Active', status_inactive: 'Inactive',
+    col_id: 'ID', col_status: 'Status', col_name: 'Name', col_path: 'Path', col_site: 'Site',
     columns: 'Columns', export: 'Export', cols_visible: 'Visible', cols_hidden: 'Hidden', drag_here: 'Drag here', reset: 'Reset',
     edit: 'Edit', del: 'Delete', cancel: 'Cancel', save: 'Save', back: 'back',
     refresh: 'Refresh', loading: 'Loading…', saved: 'Saved ✓',
-    del_title: 'Delete redirect', del_confirm: 'Delete “{u}”? This action is irreversible.',
-    new_title: 'New redirect', edit_title: 'Edit redirect',
-    f_site: 'Site', f_site_ph: '— Choose a site —', f_old: 'Old URL', f_old_ph: '/old-url',
-    f_new: 'New URL', f_new_ph: '/new-url', f_old_hint: 'The URL to redirect (unique for this site).',
-    f_new_hint: 'The redirect destination.', err_save: 'Error while saving',
+    del_title: 'Delete style', del_confirm: 'Delete “{n}”? This action is irreversible.',
+    new_title: 'New style', edit_title: 'Edit style',
+    f_site: 'Site', f_site_ph: '— Choose a site —', f_name: 'Name', f_name_ph: 'Style name',
+    f_path: 'Path', f_path_ph: '/path/to/style.css', f_status: 'Active',
+    f_name_hint: 'The displayed name of the style.', f_path_hint: 'The CSS file path.',
+    f_status_hint: 'Enable or disable this style.', err_save: 'Error while saving',
+    export_filename: 'styles',
   },
 }
 function useT() {
@@ -79,14 +88,13 @@ const sIcon = { width: 15, height: 15, flexShrink: 0 } as const
 const PencilIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
 const TrashIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /></svg>
 const PlusIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
-const ArrowRight = () => <svg style={{ width: 13, height: 13, color: 'var(--color-muted-foreground)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7" /></svg>
 
 // ── Colonnes (masquer + réordonner par glisser-déposer, persisté) ──
 type ColDef = { id: string; visible: boolean }
-const COL_ORDER = ['id', 'site', 'old', 'new'] as const
-const COL_LABEL: Record<string, string> = { id: 'col_id', site: 'col_site', old: 'col_old', new: 'col_new' }
+const COL_ORDER = ['id', 'status', 'name', 'path', 'site'] as const
+const COL_LABEL: Record<string, string> = { id: 'col_id', status: 'col_status', name: 'col_name', path: 'col_path', site: 'col_site' }
 const DEFAULT_COLS: ColDef[] = COL_ORDER.map((id) => ({ id, visible: id !== 'id' }))
-const COL_KEY = 'melis-site301-cols-v1'
+const COL_KEY = 'melis-cms-style-cols-v1'
 function loadCols(): ColDef[] {
   try {
     const raw = localStorage.getItem(COL_KEY)
@@ -186,30 +194,45 @@ function Kpi({ label: lbl, value }: { label: string; value: number | null }) {
   )
 }
 
+// ── Badge de statut ──
+function StatusBadge({ active, label }: { active: boolean; label: string }) {
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 6, padding: '2px 8px', borderRadius: 6, fontSize: 12, fontWeight: 500,
+      background: active ? 'color-mix(in srgb, #10b981 14%, transparent)' : 'var(--color-muted,rgba(0,0,0,.06))',
+      color: active ? '#059669' : 'var(--color-muted-foreground)',
+    }}>
+      <span style={{ width: 6, height: 6, borderRadius: '50%', background: active ? '#10b981' : 'var(--color-muted-foreground)' }} />
+      {label}
+    </span>
+  )
+}
+
 // ════════════════════════════════════════════════════════════════════════════
-export default function SiteRedirectPage() {
+export default function CmsStylePage() {
   const { id } = useParams()
   const location = useLocation()
   // base = route de la liste (pathname sans le segment /:id éventuel)
   const base = id ? location.pathname.slice(0, location.pathname.length - id.length - 1) : location.pathname
 
-  if (id) return <RedirectForm id={id} base={base} />
-  return <RedirectList base={base} />
+  if (id) return <StyleForm id={id} base={base} />
+  return <StyleList base={base} />
 }
 
 // ── Liste ───────────────────────────────────────────────────────────────────
-function RedirectList({ base }: { base: string }) {
+function StyleList({ base }: { base: string }) {
   const t = useT()
   const navigate = useNavigate()
-  const [items, setItems] = useState<RedirectItem[]>([])
-  const [stats, setStats] = useState<RedirectStats | null>(null)
+  const [items, setItems] = useState<StyleItem[]>([])
+  const [stats, setStats] = useState<StyleStats | null>(null)
   const [sites, setSites] = useState<SiteOption[]>([])
   const [loading, setLoading] = useState(false)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [site, setSite] = useState<number | null>(null)
+  const [status, setStatus] = useState<'' | '0' | '1'>('')
   const [sortAsc, setSortAsc] = useState(false)
-  const [toDelete, setToDelete] = useState<RedirectItem | null>(null)
+  const [toDelete, setToDelete] = useState<StyleItem | null>(null)
   const [tick, setTick] = useState(0)
   const [cols, setCols] = useState<ColDef[]>(loadCols)
   const [showCols, setShowCols] = useState(false)
@@ -217,21 +240,31 @@ function RedirectList({ base }: { base: string }) {
   const [mode, setMode] = useState<'react' | 'iframe'>('react')
   const [frameLoaded, setFrameLoaded] = useState(false)
 
-  useEffect(() => { fetchRedirectStats().then(setStats).catch(() => null) }, [tick])
-  useEffect(() => { fetchSites().then(setSites).catch(() => null) }, [])
+  useEffect(() => { fetchStyleStats().then(setStats).catch(() => null) }, [tick])
+  useEffect(() => { fetchStyleSites().then(setSites).catch(() => null) }, [])
   useEffect(() => {
     setLoading(true)
-    fetchRedirects({ search, site })
+    fetchStyles({ search, site, status })
       .then((r) => setItems(r.items)).catch(() => null).finally(() => setLoading(false))
-  }, [search, site, tick])
+  }, [search, site, status, tick])
 
   const sorted = useMemo(() => [...items].sort((a, b) => sortAsc ? a.id - b.id : b.id - a.id), [items, sortAsc])
 
   async function confirmDelete() {
     if (!toDelete) return
-    try { await deleteRedirect(toDelete.id); setToDelete(null); setTick((x) => x + 1) }
+    try { await deleteStyle(toDelete.id); setToDelete(null); setTick((x) => x + 1) }
     catch { setToDelete(null) }
   }
+
+  // ── Filtre statut segmenté (boutons All / Active ● vert / Inactive ● rouge) ──
+  const statusTab = (active: boolean): CSSProperties => ({
+    display: 'inline-flex', alignItems: 'center', gap: 6, height: 28, padding: '0 12px', borderRadius: 6, border: 0,
+    fontSize: 12, fontWeight: 500, cursor: 'pointer',
+    background: active ? 'var(--color-card)' : 'transparent',
+    color: active ? 'var(--color-foreground)' : 'var(--color-muted-foreground)',
+    boxShadow: active ? '0 1px 2px rgba(0,0,0,.06)' : 'none',
+  })
+  const dot = (color: string): CSSProperties => ({ width: 6, height: 6, borderRadius: '50%', background: color })
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
@@ -248,11 +281,11 @@ function RedirectList({ base }: { base: string }) {
         </div>
       </div>
 
-      {/* Vue « Old » : outil Redirections 301 legacy en iframe (montée à la 1ʳᵉ activation, gardée en display:none) */}
+      {/* Vue « Old » : outil Styles legacy en iframe (montée à la 1ʳᵉ activation, gardée en display:none) */}
       {frameLoaded && (
         <div style={{ ...card, display: mode === 'iframe' ? 'flex' : 'none', flex: 1, minHeight: 480, overflow: 'hidden' }}>
           <iframe src={`/melis/react-tool-page?key=${encodeURIComponent(MELIS_KEY)}`}
-            style={{ flex: 1, width: '100%', border: 0 }} title="Redirections 301 — Vue Melis"
+            style={{ flex: 1, width: '100%', border: 0 }} title="Styles — Vue Melis"
             sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals" />
         </div>
       )}
@@ -262,15 +295,22 @@ function RedirectList({ base }: { base: string }) {
       {/* KPI */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         <Kpi label={t('kpi_total')} value={stats?.total ?? null} />
-        <Kpi label={t('kpi_sites')} value={stats?.sites ?? null} />
+        <Kpi label={t('kpi_active')} value={stats?.active ?? null} />
+        <Kpi label={t('kpi_inactive')} value={stats?.inactive ?? null} />
       </div>
 
       {/* Filtres */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
         <input style={{ ...inputCss, height: 36, flex: 1, minWidth: 220 }} value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && setSearch(searchInput.trim())}
           placeholder={t('search')} />
+        {/* Filtre statut segmenté */}
+        <div style={{ display: 'inline-flex', gap: 4, padding: 4, borderRadius: 8, border: '1px solid var(--color-border)', background: 'color-mix(in srgb, var(--color-muted,#888) 12%, transparent)' }}>
+          <button style={statusTab(status === '')} onClick={() => setStatus('')}>{t('filter_all')}</button>
+          <button style={statusTab(status === '1')} onClick={() => setStatus('1')}><span style={dot('#10b981')} />{t('status_active')}</button>
+          <button style={statusTab(status === '0')} onClick={() => setStatus('0')}><span style={dot('#ef4444')} />{t('status_inactive')}</button>
+        </div>
         <select style={{ ...inputCss, height: 36, width: 'auto' }} value={site ?? ''} onChange={(e) => setSite(e.target.value ? Number(e.target.value) : null)}>
           <option value="">{t('all_sites')}</option>
           {sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
@@ -288,7 +328,7 @@ function RedirectList({ base }: { base: string }) {
           <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
             <tr>
               {visibleCols(cols).map(({ id }) => (
-                <th key={id} style={{ ...th, ...(id === 'id' ? { cursor: 'pointer', width: 70 } : {}) }}
+                <th key={id} style={{ ...th, ...(id === 'id' ? { cursor: 'pointer', width: 70 } : {}), ...(id === 'status' ? { width: 110 } : {}) }}
                   onClick={id === 'id' ? () => setSortAsc((v) => !v) : undefined}>
                   {t(COL_LABEL[id])}{id === 'id' ? ` ${sortAsc ? '↑' : '↓'}` : ''}
                 </th>
@@ -302,15 +342,12 @@ function RedirectList({ base }: { base: string }) {
             ) : sorted.map((r) => (
               <tr key={r.id}>
                 {visibleCols(cols).map(({ id }) => (
-                  <td key={id} style={{ ...td, ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}), ...(id === 'old' ? { fontFamily: 'monospace', fontSize: 13 } : {}) }}>
+                  <td key={id} style={{ ...td, ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}), ...(id === 'path' ? { fontFamily: 'monospace', fontSize: 13 } : {}) }}>
                     {id === 'id' && r.id}
+                    {id === 'status' && <StatusBadge active={!!r.status} label={r.status ? t('status_active') : t('status_inactive')} />}
+                    {id === 'name' && <span style={{ fontWeight: 500 }}>{r.name}</span>}
+                    {id === 'path' && r.path}
                     {id === 'site' && r.siteName}
-                    {id === 'old' && r.oldUrl}
-                    {id === 'new' && (
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                        <ArrowRight /><span style={{ fontFamily: 'monospace', fontSize: 13 }}>{r.newUrl}</span>
-                      </span>
-                    )}
                   </td>
                 ))}
                 <td style={td}>
@@ -334,7 +371,7 @@ function RedirectList({ base }: { base: string }) {
         <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,.5)' }}>
           <div style={{ ...card, padding: 24, width: '100%', maxWidth: 360 }}>
             <h3 style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>{t('del_title')}</h3>
-            <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', marginTop: 8 }}>{t('del_confirm', { u: toDelete.oldUrl })}</p>
+            <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', marginTop: 8 }}>{t('del_confirm', { n: toDelete.name })}</p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 20 }}>
               <button style={btnGhost} onClick={() => setToDelete(null)}>{t('cancel')}</button>
               <button style={{ ...btnGhost, borderColor: '#fca5a5', color: '#dc2626' }} onClick={confirmDelete}>{t('del')}</button>
@@ -344,12 +381,12 @@ function RedirectList({ base }: { base: string }) {
       )}
 
       {showExport && (
-        <ExportModal<RedirectItem>
+        <ExportModal<StyleItem>
           cols={cols}
           labelFor={(id) => t(COL_LABEL[id])}
-          fetchAll={async () => (await fetchRedirects({ search, site })).items}
-          getCell={(r, id) => id === 'id' ? r.id : id === 'site' ? r.siteName : id === 'old' ? r.oldUrl : id === 'new' ? r.newUrl : ''}
-          filename={currentLang() === 'fr' ? 'redirections-301' : 'redirects-301'}
+          fetchAll={async () => (await fetchStyles({ search, site, status })).items}
+          getCell={(r, id) => id === 'id' ? r.id : id === 'status' ? (r.status ? t('status_active') : t('status_inactive')) : id === 'name' ? r.name : id === 'path' ? r.path : id === 'site' ? r.siteName : ''}
+          filename={t('export_filename')}
           sheetName={t('title')}
           total={items.length}
           onClose={() => setShowExport(false)}
@@ -360,38 +397,39 @@ function RedirectList({ base }: { base: string }) {
 }
 
 // ── Formulaire ────────────────────────────────────────────────────────────────
-function RedirectForm({ id, base }: { id: string; base: string }) {
+function StyleForm({ id, base }: { id: string; base: string }) {
   const t = useT()
   const navigate = useNavigate()
   const isEdit = id !== 'new'
-  const redirectId = isEdit ? parseInt(id) : null
+  const styleId = isEdit ? parseInt(id) : null
 
   const [sites, setSites] = useState<SiteOption[]>([])
   const [siteId, setSiteId] = useState<number | ''>('')
-  const [oldUrl, setOldUrl] = useState('')
-  const [newUrl, setNewUrl] = useState('')
+  const [name, setName] = useState('')
+  const [path, setPath] = useState('')
+  const [status, setStatus] = useState(true)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
 
-  useEffect(() => { fetchSites().then(setSites).catch(() => null) }, [])
+  useEffect(() => { fetchStyleSites().then(setSites).catch(() => null) }, [])
   useEffect(() => {
-    if (!redirectId) return
+    if (!styleId) return
     setLoading(true)
-    fetchRedirectById(redirectId)
-      .then((r) => { setSiteId(r.siteId); setOldUrl(r.oldUrl); setNewUrl(r.newUrl) })
+    fetchStyleById(styleId)
+      .then((r) => { setSiteId(r.siteId); setName(r.name); setPath(r.path); setStatus(!!r.status) })
       .catch(() => navigate(base))
       .finally(() => setLoading(false))
-  }, [redirectId])
+  }, [styleId])
 
   async function submit() {
     setError(null)
     if (!siteId) { setError(DICT[currentLang()].f_site + ' *'); return }
-    if (!oldUrl.trim() || !newUrl.trim()) { setError(t('err_save')); return }
+    if (!name.trim() || !path.trim()) { setError(t('err_save')); return }
     setSaving(true)
     try {
-      await saveRedirect({ id: redirectId, siteId: Number(siteId), oldUrl: oldUrl.trim(), newUrl: newUrl.trim() })
+      await saveStyle({ id: styleId, siteId: Number(siteId), name: name.trim(), status: status ? 1 : 0, path: path.trim() })
       setSaved(true)
       setTimeout(() => navigate(base), 500)
     } catch (e) {
@@ -421,20 +459,27 @@ function RedirectForm({ id, base }: { id: string; base: string }) {
         <div style={{ ...card, padding: 20, maxWidth: 640 }}>
           <div style={{ marginBottom: 16 }}>
             <label style={label}>{t('f_site')}</label>
-            <select style={inputCss} value={siteId} onChange={(e) => setSiteId(e.target.value ? Number(e.target.value) : '')} disabled={isEdit}>
+            <select style={inputCss} value={siteId} onChange={(e) => setSiteId(e.target.value ? Number(e.target.value) : '')}>
               <option value="">{t('f_site_ph')}</option>
               {sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
           <div style={{ marginBottom: 16 }}>
-            <label style={label}>{t('f_old')}</label>
-            <input style={{ ...inputCss, fontFamily: 'monospace' }} value={oldUrl} onChange={(e) => setOldUrl(e.target.value)} placeholder={t('f_old_ph')} maxLength={255} autoComplete="off" />
-            <p style={hint}>{t('f_old_hint')}</p>
+            <label style={label}>{t('f_name')}</label>
+            <input style={inputCss} value={name} onChange={(e) => setName(e.target.value)} placeholder={t('f_name_ph')} maxLength={255} autoComplete="off" />
+            <p style={hint}>{t('f_name_hint')}</p>
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <label style={label}>{t('f_path')}</label>
+            <input style={{ ...inputCss, fontFamily: 'monospace' }} value={path} onChange={(e) => setPath(e.target.value)} placeholder={t('f_path_ph')} maxLength={255} autoComplete="off" />
+            <p style={hint}>{t('f_path_hint')}</p>
           </div>
           <div>
-            <label style={label}>{t('f_new')}</label>
-            <input style={{ ...inputCss, fontFamily: 'monospace' }} value={newUrl} onChange={(e) => setNewUrl(e.target.value)} placeholder={t('f_new_ph')} maxLength={255} autoComplete="off" />
-            <p style={hint}>{t('f_new_hint')}</p>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+              <input type="checkbox" checked={status} onChange={(e) => setStatus(e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
+              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-foreground)' }}>{t('f_status')}</span>
+            </label>
+            <p style={hint}>{t('f_status_hint')}</p>
           </div>
         </div>
       )}
