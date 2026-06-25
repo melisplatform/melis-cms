@@ -1,8 +1,26 @@
 {
-  "id": "cms",
-  "route": "/melis-cms/page",
-  "label": "CMS",
-  "forwardKey": null,
-  "melisKey": null,
-  "entry": "brick.js"
+  "entry": "brick.js",
+  "bricks": [
+    {
+      "id": "cms",
+      "route": "/melis-cms/page",
+      "label": "CMS",
+      "forwardKey": null,
+      "melisKey": null
+    },
+    {
+      "id": "cms-site-301",
+      "route": "/melis-cms/site-301",
+      "label": "Redirections 301",
+      "forwardKey": "MelisCms/SiteRedirect",
+      "melisKey": "meliscms_tool_site_301"
+    },
+    {
+      "id": "cms-templates",
+      "route": "/melis-cms/templates",
+      "label": "Templates",
+      "forwardKey": "MelisCms/ToolTemplate",
+      "melisKey": "meliscms_tool_templates"
+    }
+  ]
 }
