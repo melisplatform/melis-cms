@@ -10,6 +10,12 @@ import { ViewToggle } from './ViewToggle'
 // Outil Styles (CSS) legacy (vue « Old » en iframe). Voir brick.manifest.json (meliscms_tool_styles).
 const MELIS_KEY = 'meliscms_tool_styles'
 
+// Capacités (droits avancés) : la brique ne peut PAS importer le hook hôte → lit le global window.MelisCan.
+// Default-allow (true) tant que non chargé / pour un admin ; l'API reste gardée côté serveur (403).
+function can(cap: string): boolean {
+  return (window as unknown as { MelisCan?: (k: string, c: string) => boolean }).MelisCan?.(MELIS_KEY, cap) ?? true
+}
+
 /* ──────────────────────────────────────────────────────────────────────────
  * Brique « Styles » (MelisCms) — full React, montée à /melis-cms/styles
  * (et /melis-cms/styles/:id pour le formulaire). C'est l'outil le plus riche du
@@ -43,6 +49,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_name_hint: 'Le nom affiché du style.', f_path_hint: 'Le chemin du fichier CSS.',
     f_status_hint: 'Activer ou désactiver ce style.', err_save: 'Erreur lors de la sauvegarde',
     export_filename: 'styles',
+    no_access: 'Vous n’avez pas les droits pour consulter cette liste.',
   },
   en: {
     title: 'Styles', subtitle: 'Site CSS styles',
@@ -62,6 +69,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_name_hint: 'The displayed name of the style.', f_path_hint: 'The CSS file path.',
     f_status_hint: 'Enable or disable this style.', err_save: 'Error while saving',
     export_filename: 'styles',
+    no_access: 'You do not have permission to view this list.',
   },
 }
 function useT() {
@@ -277,7 +285,7 @@ function StyleList({ base }: { base: string }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
           <button style={btnGhost} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
-          <button style={btnPrimary} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>
+          {can('create') && <button style={btnPrimary} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>}
         </div>
       </div>
 
@@ -292,6 +300,9 @@ function StyleList({ base }: { base: string }) {
 
       {/* Vue « New » : liste React native */}
       <div style={{ display: mode === 'react' ? 'flex' : 'none', flexDirection: 'column', gap: 20 }}>
+      {!can('list') ? (
+        <div style={{ ...card, padding: '40px 16px', textAlign: 'center', fontSize: 14, color: 'var(--color-muted-foreground)' }}>{t('no_access')}</div>
+      ) : (<>
       {/* KPI */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         <Kpi label={t('kpi_total')} value={stats?.total ?? null} />
@@ -319,7 +330,7 @@ function StyleList({ base }: { base: string }) {
           <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
           {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
         </div>
-        <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>
+        {can('export') && <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>}
       </div>
 
       {/* Table */}
@@ -352,8 +363,8 @@ function StyleList({ base }: { base: string }) {
                 ))}
                 <td style={td}>
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-                    <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>
-                    <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>
+                    {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>}
+                    {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
                   </div>
                 </td>
               </tr>
@@ -364,6 +375,7 @@ function StyleList({ base }: { base: string }) {
           {loading ? t('loading') : t('count', { n: items.length })}
         </div>
       </div>
+      </>)}
       </div>
 
       {/* Suppression */}
@@ -413,6 +425,7 @@ function StyleForm({ id, base }: { id: string; base: string }) {
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
 
+  useEffect(() => { if (!can(isEdit ? 'edit' : 'create')) navigate(base) }, [isEdit, base, navigate])
   useEffect(() => { fetchStyleSites().then(setSites).catch(() => null) }, [])
   useEffect(() => {
     if (!styleId) return

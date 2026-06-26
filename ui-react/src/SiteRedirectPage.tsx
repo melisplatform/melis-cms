@@ -10,6 +10,12 @@ import { ViewToggle } from './ViewToggle'
 // Outil Redirections 301 legacy (vue « Old » en iframe). Voir brick.manifest.json (cms-site-301).
 const MELIS_KEY = 'meliscms_tool_site_301'
 
+// Capacités (droits avancés) : la brique ne peut PAS importer le hook hôte → lit le global window.MelisCan.
+// Default-allow (true) tant que non chargé / pour un admin ; l'API reste gardée côté serveur (403).
+function can(cap: string): boolean {
+  return (window as unknown as { MelisCan?: (k: string, c: string) => boolean }).MelisCan?.(MELIS_KEY, cap) ?? true
+}
+
 /* ──────────────────────────────────────────────────────────────────────────
  * Brique « Redirections 301 » (MelisCms) — full React, montée à /melis-cms/site-301
  * (et /melis-cms/site-301/:id pour le formulaire). La brique ne peut PAS importer les
@@ -38,6 +44,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_site: 'Site', f_site_ph: '— Choisir un site —', f_old: 'Ancienne URL', f_old_ph: '/ancienne-url',
     f_new: 'Nouvelle URL', f_new_ph: '/nouvelle-url', f_old_hint: 'L’URL à rediriger (unique pour ce site).',
     f_new_hint: 'La destination de la redirection.', err_save: 'Erreur lors de la sauvegarde',
+    no_access: 'Vous n’avez pas les droits pour consulter cette liste.',
   },
   en: {
     title: '301 Redirects', subtitle: 'Per-site URL redirects',
@@ -53,6 +60,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_site: 'Site', f_site_ph: '— Choose a site —', f_old: 'Old URL', f_old_ph: '/old-url',
     f_new: 'New URL', f_new_ph: '/new-url', f_old_hint: 'The URL to redirect (unique for this site).',
     f_new_hint: 'The redirect destination.', err_save: 'Error while saving',
+    no_access: 'You do not have permission to view this list.',
   },
 }
 function useT() {
@@ -244,7 +252,7 @@ function RedirectList({ base }: { base: string }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
           <button style={btnGhost} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
-          <button style={btnPrimary} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>
+          {can('create') && <button style={btnPrimary} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>}
         </div>
       </div>
 
@@ -259,6 +267,9 @@ function RedirectList({ base }: { base: string }) {
 
       {/* Vue « New » : liste React native */}
       <div style={{ display: mode === 'react' ? 'flex' : 'none', flexDirection: 'column', gap: 20 }}>
+      {!can('list') ? (
+        <div style={{ ...card, padding: '40px 16px', textAlign: 'center', fontSize: 14, color: 'var(--color-muted-foreground)' }}>{t('no_access')}</div>
+      ) : (<>
       {/* KPI */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         <Kpi label={t('kpi_total')} value={stats?.total ?? null} />
@@ -279,7 +290,7 @@ function RedirectList({ base }: { base: string }) {
           <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
           {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
         </div>
-        <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>
+        {can('export') && <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>}
       </div>
 
       {/* Table */}
@@ -315,8 +326,8 @@ function RedirectList({ base }: { base: string }) {
                 ))}
                 <td style={td}>
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-                    <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>
-                    <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>
+                    {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>}
+                    {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
                   </div>
                 </td>
               </tr>
@@ -327,6 +338,7 @@ function RedirectList({ base }: { base: string }) {
           {loading ? t('loading') : t('count', { n: items.length })}
         </div>
       </div>
+      </>)}
       </div>
 
       {/* Suppression */}
@@ -375,6 +387,7 @@ function RedirectForm({ id, base }: { id: string; base: string }) {
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
 
+  useEffect(() => { if (!can(isEdit ? 'edit' : 'create')) navigate(base) }, [isEdit, base, navigate])
   useEffect(() => { fetchSites().then(setSites).catch(() => null) }, [])
   useEffect(() => {
     if (!redirectId) return

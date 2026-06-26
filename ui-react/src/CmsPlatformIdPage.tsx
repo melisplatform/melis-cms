@@ -10,6 +10,12 @@ import { ViewToggle } from './ViewToggle'
 // Outil Platforms IDs legacy (vue « Old » en iframe). Voir brick.manifest.json.
 const MELIS_KEY = 'meliscms_tool_platform_ids'
 
+// Capacités (droits avancés) : la brique ne peut PAS importer le hook hôte → lit le global window.MelisCan.
+// Default-allow (true) tant que non chargé / pour un admin ; l'API reste gardée côté serveur (403).
+function can(cap: string): boolean {
+  return (window as unknown as { MelisCan?: (k: string, c: string) => boolean }).MelisCan?.(MELIS_KEY, cap) ?? true
+}
+
 /* ──────────────────────────────────────────────────────────────────────────
  * Brique « Platforms IDs » (MelisCms) — full React, montée à /melis-cms/platform-ids
  * (et /melis-cms/platform-ids/:id pour le formulaire). La brique ne peut PAS importer les
@@ -42,6 +48,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     err_int: 'Les valeurs doivent être des entiers ≥ 0.',
     err_order_page: 'Pour les pages : début ≤ courant ≤ fin.',
     err_order_tpl: 'Pour les templates : début ≤ courant ≤ fin.',
+    no_access: 'Vous n’avez pas les droits pour consulter cette liste.',
   },
   en: {
     title: 'Platforms IDs', subtitle: 'Page & template ID ranges per platform',
@@ -61,6 +68,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     err_int: 'Values must be integers ≥ 0.',
     err_order_page: 'For pages: start ≤ current ≤ end.',
     err_order_tpl: 'For templates: start ≤ current ≤ end.',
+    no_access: 'You do not have permission to view this list.',
   },
 }
 function useT() {
@@ -272,7 +280,7 @@ function CmsPlatformIdList({ base }: { base: string }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
           <button style={btnGhost} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
-          <button style={btnPrimary} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>
+          {can('create') && <button style={btnPrimary} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>}
         </div>
       </div>
 
@@ -287,6 +295,9 @@ function CmsPlatformIdList({ base }: { base: string }) {
 
       {/* Vue « New » : liste React native */}
       <div style={{ display: mode === 'react' ? 'flex' : 'none', flexDirection: 'column', gap: 20 }}>
+      {!can('list') ? (
+        <div style={{ ...card, padding: '40px 16px', textAlign: 'center', fontSize: 14, color: 'var(--color-muted-foreground)' }}>{t('no_access')}</div>
+      ) : (<>
       {/* KPI */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         <Kpi label={t('kpi_total')} value={stats?.total ?? null} />
@@ -302,7 +313,7 @@ function CmsPlatformIdList({ base }: { base: string }) {
           <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
           {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
         </div>
-        <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>
+        {can('export') && <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>}
       </div>
 
       {/* Table */}
@@ -331,8 +342,8 @@ function CmsPlatformIdList({ base }: { base: string }) {
                 ))}
                 <td style={td}>
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-                    <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>
-                    <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>
+                    {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>}
+                    {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
                   </div>
                 </td>
               </tr>
@@ -343,6 +354,7 @@ function CmsPlatformIdList({ base }: { base: string }) {
           {loading ? t('loading') : t('count', { n: items.length })}
         </div>
       </div>
+      </>)}
       </div>
 
       {/* Suppression */}
@@ -403,6 +415,7 @@ function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
 
+  useEffect(() => { if (!can(isEdit ? 'edit' : 'create')) navigate(base) }, [isEdit, base, navigate])
   useEffect(() => {
     if (!platformId) return
     setLoading(true)

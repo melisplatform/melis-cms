@@ -9,6 +9,12 @@ import { ViewToggle } from './ViewToggle'
 // Outil Langues (CMS) legacy (vue « Old » en iframe). Voir brick.manifest.json (cms-languages).
 const MELIS_KEY = 'meliscms_tool_language'
 
+// Capacités (droits avancés) : la brique ne peut PAS importer le hook hôte → lit le global window.MelisCan.
+// Default-allow (true) tant que non chargé / pour un admin ; l'API reste gardée côté serveur (403).
+function can(cap: string): boolean {
+  return (window as unknown as { MelisCan?: (k: string, c: string) => boolean }).MelisCan?.(MELIS_KEY, cap) ?? true
+}
+
 /* ──────────────────────────────────────────────────────────────────────────
  * Brique « Langues » (MelisCms) — full React, montée à /melis-cms/languages
  * (et /melis-cms/languages/:id pour le formulaire). La brique ne peut PAS importer les
@@ -38,6 +44,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_locale_hint: 'Code de la langue au format xx_XX (ex. fr_FR).',
     f_name_hint: 'Le libellé de la langue.', err_save: 'Erreur lors de la sauvegarde',
     err_name: 'Le nom est requis.', err_locale: 'La locale doit être au format xx_XX (ex. fr_FR).',
+    no_access: 'Vous n’avez pas les droits pour consulter cette liste.',
   },
   en: {
     title: 'Languages', subtitle: 'CMS languages',
@@ -54,6 +61,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_locale_hint: 'Language code in xx_XX format (e.g. en_EN).',
     f_name_hint: 'The language label.', err_save: 'Error while saving',
     err_name: 'Name is required.', err_locale: 'Locale must be in xx_XX format (e.g. en_EN).',
+    no_access: 'You do not have permission to view this list.',
   },
 }
 function useT() {
@@ -254,7 +262,7 @@ function CmsLanguageList({ base }: { base: string }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
           <button style={btnGhost} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
-          <button style={btnPrimary} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>
+          {can('create') && <button style={btnPrimary} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>}
         </div>
       </div>
 
@@ -269,6 +277,9 @@ function CmsLanguageList({ base }: { base: string }) {
 
       {/* Vue « New » : liste React native */}
       <div style={{ display: mode === 'react' ? 'flex' : 'none', flexDirection: 'column', gap: 20 }}>
+      {!can('list') ? (
+        <div style={{ ...card, padding: '40px 16px', textAlign: 'center', fontSize: 14, color: 'var(--color-muted-foreground)' }}>{t('no_access')}</div>
+      ) : (<>
       {/* KPI */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         <Kpi label={t('kpi_total')} value={stats?.total ?? null} />
@@ -313,8 +324,8 @@ function CmsLanguageList({ base }: { base: string }) {
                 ))}
                 <td style={td}>
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-                    <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>
-                    <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>
+                    {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>}
+                    {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
                   </div>
                 </td>
               </tr>
@@ -325,6 +336,7 @@ function CmsLanguageList({ base }: { base: string }) {
           {loading ? t('loading') : t('count', { n: items.length })}
         </div>
       </div>
+      </>)}
       </div>
 
       {/* Suppression */}
@@ -358,6 +370,7 @@ function CmsLanguageForm({ id, base }: { id: string; base: string }) {
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
 
+  useEffect(() => { if (!can(isEdit ? 'edit' : 'create')) navigate(base) }, [isEdit, base, navigate])
   useEffect(() => {
     if (!langId) return
     setLoading(true)

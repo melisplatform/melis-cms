@@ -18,6 +18,12 @@ import { ViewToggle } from './ViewToggle'
 const MELIS_KEY = 'meliscms_tool_templates'
 const FRAME_ID = 'melis-brick-frame-cms-templates'
 
+// Capacités (droits avancés) : la brique ne peut PAS importer le hook hôte → lit le global window.MelisCan.
+// Default-allow (true) tant que non chargé / pour un admin ; l'API reste gardée côté serveur (403).
+function can(cap: string): boolean {
+  return (window as unknown as { MelisCan?: (k: string, c: string) => boolean }).MelisCan?.(MELIS_KEY, cap) ?? true
+}
+
 // ── i18n minimal ──
 type Lang = 'fr' | 'en'
 function currentLang(): Lang { return (document.documentElement.lang || 'en').toLowerCase().startsWith('fr') ? 'fr' : 'en' }
@@ -32,6 +38,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     edit: 'Modifier', del: 'Supprimer', cancel: 'Annuler', back: 'retour', refresh: 'Rafraîchir', loading: 'Chargement…',
     del_title: 'Supprimer le template', del_confirm: 'Supprimer « {n} » ? Cette action est irréversible.',
     legacy_note: 'Création / édition via l’outil classique (formulaire lié au code du site).',
+    no_access: 'Vous n’avez pas les droits pour consulter cette liste.',
   },
   en: {
     title: 'Templates', subtitle: 'Site templates', new: 'New template', search: 'Search a template…',
@@ -43,6 +50,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     edit: 'Edit', del: 'Delete', cancel: 'Cancel', back: 'back', refresh: 'Refresh', loading: 'Loading…',
     del_title: 'Delete template', del_confirm: 'Delete “{n}”? This action is irreversible.',
     legacy_note: 'Create / edit via the classic tool (form bound to the site code).',
+    no_access: 'You do not have permission to view this list.',
   },
 }
 function useT() {
@@ -169,7 +177,7 @@ export default function TemplatePage() {
   const { id } = useParams()
   const location = useLocation()
   const base = id ? location.pathname.slice(0, location.pathname.length - id.length - 1) : location.pathname
-  if (id) return <TemplateLegacyForm base={base} />
+  if (id) return <TemplateLegacyForm id={id} base={base} />
   return <TemplateList base={base} />
 }
 
@@ -237,7 +245,7 @@ function TemplateList({ base }: { base: string }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
           <button style={btnGhost} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
-          <button style={btnPrimary} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>
+          {can('create') && <button style={btnPrimary} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>}
         </div>
       </div>
 
@@ -252,6 +260,9 @@ function TemplateList({ base }: { base: string }) {
 
       {/* Vue « New » : liste React native */}
       <div style={{ display: mode === 'react' ? 'flex' : 'none', flexDirection: 'column', gap: 20 }}>
+      {!can('list') ? (
+        <div style={{ ...card, padding: '40px 16px', textAlign: 'center', fontSize: 14, color: 'var(--color-muted-foreground)' }}>{t('no_access')}</div>
+      ) : (<>
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         <Kpi label={t('kpi_total')} value={stats?.total ?? null} />
         <Kpi label={t('kpi_sites')} value={stats?.sites ?? null} />
@@ -269,7 +280,7 @@ function TemplateList({ base }: { base: string }) {
           <button style={btnGhost} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
           {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
         </div>
-        <button style={btnGhost} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>
+        {can('export') && <button style={btnGhost} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>}
       </div>
 
       <div style={{ ...card, overflow: 'hidden' }}>
@@ -294,8 +305,8 @@ function TemplateList({ base }: { base: string }) {
                 ))}
                 <td style={td}>
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-                    <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>
-                    <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>
+                    {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>}
+                    {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
                   </div>
                 </td>
               </tr>
@@ -306,6 +317,7 @@ function TemplateList({ base }: { base: string }) {
           {loading ? t('loading') : t('count', { n: items.length })}
         </div>
       </div>
+      </>)}
       </div>
 
       {toDelete && (
@@ -351,10 +363,12 @@ function getFrame(): HTMLIFrameElement {
   return f
 }
 
-function TemplateLegacyForm({ base }: { base: string }) {
+function TemplateLegacyForm({ id, base }: { id: string; base: string }) {
   const t = useT()
   const navigate = useNavigate()
+  const isEdit = id !== 'new'
   const anchorRef = useRef<HTMLDivElement>(null)
+  useEffect(() => { if (!can(isEdit ? 'edit' : 'create')) navigate(base) }, [isEdit, base, navigate])
   useEffect(() => {
     const f = getFrame()
     const anchor = anchorRef.current!
