@@ -13,5 +13,6 @@ return [
         'meliscms_tool_styles'        => ['list', 'create', 'edit', 'delete', 'export'],
         'meliscms_tool_language'      => ['list', 'create', 'edit', 'delete'], // pas d'export
         'meliscms_tool_platform_ids'  => ['list', 'create', 'edit', 'delete', 'export'],
+        'meliscms_tool_sites'         => ['list', 'create', 'edit', 'delete'], // pas d'export
     ],
 ];

@@ -42,6 +42,13 @@
       "label": "Styles",
       "forwardKey": "MelisCms/ToolStyle",
       "melisKey": "meliscms_tool_styles"
+    },
+    {
+      "id": "cms-sites",
+      "route": "/melis-cms/sites",
+      "label": "Sites",
+      "forwardKey": "MelisCms/Sites",
+      "melisKey": "meliscms_tool_sites"
     }
   ]
 }

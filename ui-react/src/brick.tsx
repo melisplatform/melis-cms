@@ -5,6 +5,7 @@ import TemplatePage from './TemplatePage'
 import CmsLanguagePage from './CmsLanguagePage'
 import CmsPlatformIdPage from './CmsPlatformIdPage'
 import CmsStylePage from './CmsStylePage'
+import SitesPage from './SitesPage'
 
 /**
  * Brick entry point. MelisCms ships SEVERAL React tools from this single bundle; each
@@ -26,3 +27,4 @@ window.__melisRegisterBrick?.({ id: 'cms-templates', Component: TemplatePage })
 window.__melisRegisterBrick?.({ id: 'cms-languages', Component: CmsLanguagePage })
 window.__melisRegisterBrick?.({ id: 'cms-platform-ids', Component: CmsPlatformIdPage })
 window.__melisRegisterBrick?.({ id: 'cms-styles', Component: CmsStylePage })
+window.__melisRegisterBrick?.({ id: 'cms-sites', Component: SitesPage })
