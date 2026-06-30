@@ -49,6 +49,13 @@
       "label": "Sites",
       "forwardKey": "MelisCms/Sites",
       "melisKey": "meliscms_tool_sites"
+    },
+    {
+      "id": "cms-mini-templates",
+      "route": "/melis-cms/mini-templates",
+      "label": "Mini-Templates",
+      "forwardKey": "MelisCms/MiniTemplateManager",
+      "melisKey": "meliscms_mini_template_manager_tool"
     }
   ]
 }
