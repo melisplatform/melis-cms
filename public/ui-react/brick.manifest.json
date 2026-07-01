@@ -20,7 +20,8 @@
       "route": "/melis-cms/templates",
       "label": "Templates",
       "forwardKey": "MelisCms/ToolTemplate",
-      "melisKey": "meliscms_tool_templates"
+      "melisKey": "meliscms_tool_templates",
+      "subTabs": true
     },
     {
       "id": "cms-languages",
@@ -34,7 +35,8 @@
       "route": "/melis-cms/platform-ids",
       "label": "Platforms IDs",
       "forwardKey": "MelisCms/Platform",
-      "melisKey": "meliscms_tool_platform_ids"
+      "melisKey": "meliscms_tool_platform_ids",
+      "subTabs": true
     },
     {
       "id": "cms-styles",

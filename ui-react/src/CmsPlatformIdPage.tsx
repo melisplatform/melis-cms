@@ -10,6 +10,12 @@ import { ViewToggle } from './ViewToggle'
 // Outil Platforms IDs legacy (vue « Old » en iframe). Voir brick.manifest.json.
 const MELIS_KEY = 'meliscms_tool_platform_ids'
 
+// API sub-tabs de l'hôte (la brique ne peut pas importer le contexte React de l'hôte)
+type SubTabW = {
+  __melisOpenSubTab?: (section: string, tab: { id: string; label: string; path: string }) => void
+  __melisUpdateSubTabLabel?: (section: string, id: string, label: string) => void
+}
+
 // Capacités (droits avancés) : la brique ne peut PAS importer le hook hôte → lit le global window.MelisCan.
 // Default-allow (true) tant que non chargé / pour un admin ; l'API reste gardée côté serveur (403).
 function can(cap: string): boolean {
@@ -78,6 +84,9 @@ function useT() {
     if (vars) for (const [k, v] of Object.entries(vars)) s = s.replaceAll(`{${k}}`, String(v))
     return s
   }
+}
+function notify(kind: 'ok' | 'ko', title: string, message: string) {
+  window.postMessage({ __melisNotif: true, kind, title, message }, '*')
 }
 
 // ── Styles (variables CSS du thème de l'hôte) ──
@@ -415,6 +424,16 @@ function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
 
+  const subTabId = `${base}/${id}`
+  useEffect(() => {
+    const label = isEdit ? t('loading') : t('new_title')
+    ;(window as unknown as SubTabW).__melisOpenSubTab?.(base, { id: subTabId, label, path: subTabId })
+  }, [])
+  useEffect(() => {
+    if (isEdit && !loading && platformId !== null)
+      ;(window as unknown as SubTabW).__melisUpdateSubTabLabel?.(base, subTabId, `#${platformId}`)
+  }, [loading, isEdit])
+
   useEffect(() => { if (!can(isEdit ? 'edit' : 'create')) navigate(base) }, [isEdit, base, navigate])
   useEffect(() => {
     if (!platformId) return
@@ -451,6 +470,7 @@ function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
         tplStart: ts!, tplCurrent: tc!, tplEnd: te!,
       })
       setSaved(true)
+      notify('ok', t('title'), t('saved'))
       setTimeout(() => navigate(base), 500)
     } catch (e) {
       setError(e instanceof Error ? e.message : t('err_save'))

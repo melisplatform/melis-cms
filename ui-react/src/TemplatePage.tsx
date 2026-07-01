@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties, type FormEvent } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
-  deleteTemplate, fetchTemplates, fetchTemplateSites, fetchTemplateStats,
+  deleteTemplate, fetchTemplate, fetchTemplates, fetchTemplateSites, fetchTemplateStats, saveTemplate,
   type TemplateItem, type TemplateStats, type SiteOption,
 } from './template-api'
 import { ExportModal, DownloadIcon } from './ExportModal'
@@ -16,7 +16,6 @@ import { ViewToggle } from './ViewToggle'
  * ────────────────────────────────────────────────────────────────────────── */
 
 const MELIS_KEY = 'meliscms_tool_templates'
-const FRAME_ID = 'melis-brick-frame-cms-templates'
 
 // Capacités (droits avancés) : la brique ne peut PAS importer le hook hôte → lit le global window.MelisCan.
 // Default-allow (true) tant que non chargé / pour un admin ; l'API reste gardée côté serveur (403).
@@ -29,28 +28,36 @@ type Lang = 'fr' | 'en'
 function currentLang(): Lang { return (document.documentElement.lang || 'en').toLowerCase().startsWith('fr') ? 'fr' : 'en' }
 const DICT: Record<Lang, Record<string, string>> = {
   fr: {
-    title: 'Templates', subtitle: 'Templates des sites', new: 'Nouveau template', search: 'Rechercher un template…',
-    empty: 'Aucun template trouvé', count: '{n} templates — fin de la liste',
-    kpi_total: 'Total', kpi_sites: 'Sites', kpi_types: 'Types',
-    all_sites: 'Tous les sites', all_types: 'Tous les types',
-    col_id: 'ID', col_name: 'Nom', col_type: 'Type', col_ctrl: 'Contrôleur / Action', col_layout: 'Layout', col_site: 'Site', col_date: 'Création',
-    columns: 'Colonnes', export: 'Exporter', cols_visible: 'Visibles', cols_hidden: 'Masquées', drag_here: 'Glisser ici', reset: 'Réinitialiser',
-    edit: 'Modifier', del: 'Supprimer', cancel: 'Annuler', back: 'retour', refresh: 'Rafraîchir', loading: 'Chargement…',
-    del_title: 'Supprimer le template', del_confirm: 'Supprimer « {n} » ? Cette action est irréversible.',
-    legacy_note: 'Création / édition via l’outil classique (formulaire lié au code du site).',
-    no_access: 'Vous n’avez pas les droits pour consulter cette liste.',
+    title: "Templates", subtitle: "Templates des sites", new: "Nouveau template", search: "Rechercher un template…",
+    empty: "Aucun template trouvé", count: "{n} templates — fin de la liste",
+    kpi_total: "Total", kpi_sites: "Sites", kpi_types: "Types",
+    all_sites: "Tous les sites", all_types: "Tous les types",
+    col_id: "ID", col_name: "Nom", col_type: "Type", col_ctrl: "Contrôleur / Action", col_layout: "Layout", col_site: "Site", col_date: "Création",
+    columns: "Colonnes", export: "Exporter", cols_visible: "Visibles", cols_hidden: "Masquées", drag_here: "Glisser ici", reset: "Réinitialiser",
+    edit: "Modifier", del: "Supprimer", cancel: "Annuler", back: "retour", refresh: "Rafraîchir", loading: "Chargement…",
+    del_title: "Supprimer le template", del_confirm: "Supprimer « {n} » ? Cette action est irréversible.",
+    no_access: "Vous n'avez pas les droits pour consulter cette liste.",
+    form_edit: "Modifier le template", form_new: "Nouveau template",
+    field_name: "Nom", field_type: "Type", field_site: "Site", field_folder: "Dossier site (website_folder)",
+    field_layout: "Layout", field_ctrl: "Contrôleur", field_action: "Action", field_php_path: "Chemin PHP",
+    save: "Enregistrer", saving: "Enregistrement…", saved: "Enregistré ✓", save_err: "Erreur lors de l'enregistrement.",
+    no_edit_access: "Vous n'avez pas les droits pour modifier ce template.",
   },
   en: {
-    title: 'Templates', subtitle: 'Site templates', new: 'New template', search: 'Search a template…',
-    empty: 'No template found', count: '{n} templates — end of list',
-    kpi_total: 'Total', kpi_sites: 'Sites', kpi_types: 'Types',
-    all_sites: 'All sites', all_types: 'All types',
-    col_id: 'ID', col_name: 'Name', col_type: 'Type', col_ctrl: 'Controller / Action', col_layout: 'Layout', col_site: 'Site', col_date: 'Created',
-    columns: 'Columns', export: 'Export', cols_visible: 'Visible', cols_hidden: 'Hidden', drag_here: 'Drag here', reset: 'Reset',
-    edit: 'Edit', del: 'Delete', cancel: 'Cancel', back: 'back', refresh: 'Refresh', loading: 'Loading…',
-    del_title: 'Delete template', del_confirm: 'Delete “{n}”? This action is irreversible.',
-    legacy_note: 'Create / edit via the classic tool (form bound to the site code).',
-    no_access: 'You do not have permission to view this list.',
+    title: "Templates", subtitle: "Site templates", new: "New template", search: "Search a template…",
+    empty: "No template found", count: "{n} templates — end of list",
+    kpi_total: "Total", kpi_sites: "Sites", kpi_types: "Types",
+    all_sites: "All sites", all_types: "All types",
+    col_id: "ID", col_name: "Name", col_type: "Type", col_ctrl: "Controller / Action", col_layout: "Layout", col_site: "Site", col_date: "Created",
+    columns: "Columns", export: "Export", cols_visible: "Visible", cols_hidden: "Hidden", drag_here: "Drag here", reset: "Reset",
+    edit: "Edit", del: "Delete", cancel: "Cancel", back: "back", refresh: "Refresh", loading: "Loading…",
+    del_title: "Delete template", del_confirm: "Delete \"{n}\"? This action is irreversible.",
+    no_access: "You do not have permission to view this list.",
+    form_edit: "Edit template", form_new: "New template",
+    field_name: "Name", field_type: "Type", field_site: "Site", field_folder: "Website folder",
+    field_layout: "Layout", field_ctrl: "Controller", field_action: "Action", field_php_path: "PHP path",
+    save: "Save", saving: "Saving…", saved: "Saved ✓", save_err: "Error while saving.",
+    no_edit_access: "You do not have permission to edit this template.",
   },
 }
 function useT() {
@@ -177,7 +184,7 @@ export default function TemplatePage() {
   const { id } = useParams()
   const location = useLocation()
   const base = id ? location.pathname.slice(0, location.pathname.length - id.length - 1) : location.pathname
-  if (id) return <TemplateLegacyForm id={id} base={base} />
+  if (id) return <TemplateForm id={id} base={base} />
   return <TemplateList base={base} />
 }
 
@@ -349,46 +356,152 @@ function TemplateList({ base }: { base: string }) {
   )
 }
 
-// ── Création / édition : outil legacy en iframe persistante ───────────────────
-function getFrame(): HTMLIFrameElement {
-  let f = document.getElementById(FRAME_ID) as HTMLIFrameElement | null
-  if (!f) {
-    f = document.createElement('iframe')
-    f.id = FRAME_ID
-    f.src = `/melis/react-tool-page?key=${encodeURIComponent(MELIS_KEY)}`
-    f.title = 'Templates'
-    f.style.cssText = 'position:fixed;border:0;display:none;z-index:1;'
-    document.body.appendChild(f)
-  }
-  return f
+// ── Formulaire d'édition React ────────────────────────────────────────────────
+function notify(kind: 'ok' | 'ko', title: string, message: string) {
+  window.postMessage({ __melisNotif: true, kind, title, message }, '*')
 }
 
-function TemplateLegacyForm({ id, base }: { id: string; base: string }) {
+const labelCss: CSSProperties = { fontSize: 13, fontWeight: 500, color: 'var(--color-foreground)', marginBottom: 4, display: 'block' }
+const sectionTitle: CSSProperties = { fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--color-muted-foreground)', margin: '4px 0 10px' }
+
+function TemplateForm({ id, base }: { id: string; base: string }) {
   const t = useT()
   const navigate = useNavigate()
-  const isEdit = id !== 'new'
-  const anchorRef = useRef<HTMLDivElement>(null)
-  useEffect(() => { if (!can(isEdit ? 'edit' : 'create')) navigate(base) }, [isEdit, base, navigate])
+  const numId = parseInt(id, 10)
+  const [item, setItem] = useState<TemplateItem | null>(null)
+  const [sites, setSites] = useState<SiteOption[]>([])
+  const [loadErr, setLoadErr] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [saveErr, setSaveErr] = useState('')
+
+  // Form fields
+  const [name, setName] = useState('')
+  const [type, setType] = useState('ZF2')
+  const [siteId, setSiteId] = useState<number | null>(null)
+  const [websiteFolder, setWebsiteFolder] = useState('')
+  const [layout, setLayout] = useState('')
+  const [controller, setController] = useState('')
+  const [action, setAction] = useState('')
+  const [phpPath, setPhpPath] = useState('')
+
+  useEffect(() => { if (!can('edit')) navigate(base) }, [base, navigate])
+  useEffect(() => { fetchTemplateSites().then(setSites).catch(() => null) }, [])
   useEffect(() => {
-    const f = getFrame()
-    const anchor = anchorRef.current!
-    const sync = () => {
-      const r = anchor.getBoundingClientRect()
-      f.style.left = `${r.left}px`; f.style.top = `${r.top}px`
-      f.style.width = `${r.width}px`; f.style.height = `${r.height}px`; f.style.display = 'block'
+    if (isNaN(numId) || numId <= 0) { setLoadErr('Invalid ID'); return }
+    fetchTemplate(numId).then((tpl) => {
+      setItem(tpl)
+      setName(tpl.name)
+      setType(tpl.type)
+      setSiteId(tpl.siteId || null)
+      setWebsiteFolder(tpl.websiteFolder)
+      setLayout(tpl.layout)
+      setController(tpl.controller)
+      setAction(tpl.action)
+      setPhpPath(tpl.phpPath)
+    }).catch((e) => setLoadErr(String(e)))
+  }, [numId])
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    if (!item) return
+    setSaving(true); setSaveErr(''); setSaved(false)
+    try {
+      await saveTemplate({ id: item.id, name, type, siteId, websiteFolder, layout, controller, action, phpPath })
+      setSaved(true)
+      notify('ok', t('title'), t('saved'))
+    } catch (e) {
+      setSaveErr(String(e))
+      notify('ko', t('title'), t('save_err'))
+    } finally {
+      setSaving(false)
     }
-    sync()
-    const ro = new ResizeObserver(sync); ro.observe(anchor)
-    window.addEventListener('resize', sync); window.addEventListener('scroll', sync, true)
-    return () => { f.style.display = 'none'; ro.disconnect(); window.removeEventListener('resize', sync); window.removeEventListener('scroll', sync, true) }
-  }, [])
+  }
+
+  if (loadErr) return (
+    <div style={{ padding: 24, color: 'var(--color-destructive,#ef4444)', fontSize: 14 }}>{loadErr}</div>
+  )
+  if (!item) return (
+    <div style={{ padding: 24, fontSize: 14, color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>
+  )
+
+  const isZf2 = type === 'ZF2'
+  const isPhp = type === 'PHP'
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: '1px solid var(--color-border)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, overflow: 'auto' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 24px', borderBottom: '1px solid var(--color-border)', flexShrink: 0 }}>
         <button style={{ ...btnGhost, height: 32, padding: '0 10px' }} onClick={() => navigate(base)}>← {t('back')}</button>
-        <span style={{ fontSize: 13, color: 'var(--color-muted-foreground)' }}>{t('legacy_note')}</span>
+        <h1 style={{ fontSize: 16, fontWeight: 600, margin: 0, flex: 1 }}>{t('form_edit')} — {item.name}</h1>
+        <span style={{ fontSize: 12, color: 'var(--color-muted-foreground)' }}>ID {item.id}</span>
+        {saveErr && <span style={{ fontSize: 13, color: 'var(--color-destructive,#ef4444)' }}>{saveErr}</span>}
+        <button type="submit" form="template-edit-form" style={{ ...btnPrimary, minWidth: 120 }} disabled={saving}>
+          {saving ? t('saving') : saved ? t('saved') : t('save')}
+        </button>
       </div>
-      <div ref={anchorRef} style={{ flex: 1, width: '100%', minHeight: 0 }} />
+
+      {/* Form */}
+      <form id="template-edit-form" onSubmit={handleSubmit} style={{ flex: 1, padding: 24, display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 720 }}>
+        {/* Informations de base */}
+        <div style={{ ...card, padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <p style={sectionTitle}>{t('field_name')} / {t('field_type')} / {t('field_site')}</p>
+          <div>
+            <label style={labelCss}>{t('field_name')}</label>
+            <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box' }} value={name} onChange={(e) => setName(e.target.value)} required />
+          </div>
+          <div style={{ display: 'flex', gap: 12 }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelCss}>{t('field_type')}</label>
+              <select style={{ ...inputCss, width: '100%', boxSizing: 'border-box' }} value={type} onChange={(e) => setType(e.target.value)}>
+                <option value="ZF2">Laminas (ZF2)</option>
+                <option value="PHP">PHP</option>
+                <option value="TWG">Twig</option>
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelCss}>{t('field_site')}</label>
+              <select style={{ ...inputCss, width: '100%', boxSizing: 'border-box' }} value={siteId ?? ''} onChange={(e) => setSiteId(e.target.value ? Number(e.target.value) : null)}>
+                <option value="">—</option>
+                {sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </div>
+          </div>
+          <div>
+            <label style={labelCss}>{t('field_folder')}</label>
+            <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: 13 }} value={websiteFolder} onChange={(e) => setWebsiteFolder(e.target.value)} />
+          </div>
+        </div>
+
+        {/* Champs spécifiques au type */}
+        <div style={{ ...card, padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <p style={sectionTitle}>{isPhp ? t('field_php_path') : `${t('field_layout')} / ${t('field_ctrl')} / ${t('field_action')}`}</p>
+          {isPhp ? (
+            <div>
+              <label style={labelCss}>{t('field_php_path')}</label>
+              <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: 13 }} value={phpPath} onChange={(e) => setPhpPath(e.target.value)} />
+            </div>
+          ) : (<>
+            <div>
+              <label style={labelCss}>{t('field_layout')}</label>
+              <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: 13 }} value={layout} onChange={(e) => setLayout(e.target.value)} />
+            </div>
+            {isZf2 && (<>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <label style={labelCss}>{t('field_ctrl')}</label>
+                  <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: 13 }} value={controller} onChange={(e) => setController(e.target.value)} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={labelCss}>{t('field_action')}</label>
+                  <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: 13 }} value={action} onChange={(e) => setAction(e.target.value)} />
+                </div>
+              </div>
+            </>)}
+          </>)}
+        </div>
+
+      </form>
     </div>
   )
 }

@@ -155,6 +155,7 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
       if (res.success === true || (res.success as unknown) === 1) {
         onLabel(label.trim() || `Site #${siteId}`)
         setSavedAt(Date.now())
+        window.postMessage({ __melisNotif: true, kind: 'ok', title: tr('Sites', 'Sites'), message: tr('Enregistré ✓', 'Saved ✓') }, '*')
         onSaved()
       } else {
         setError(res.textMessage || tr('Échec de l’enregistrement.', 'Save failed.'))

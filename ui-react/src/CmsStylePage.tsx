@@ -80,6 +80,9 @@ function useT() {
     return s
   }
 }
+function notify(kind: 'ok' | 'ko', title: string, message: string) {
+  window.postMessage({ __melisNotif: true, kind, title, message }, '*')
+}
 
 // ── Styles (variables CSS du thème de l'hôte) ──
 const card: CSSProperties = { border: '1px solid var(--color-border)', background: 'var(--color-card)', borderRadius: 12, boxShadow: '0 1px 2px rgba(0,0,0,.04)' }
@@ -444,6 +447,7 @@ function StyleForm({ id, base }: { id: string; base: string }) {
     try {
       await saveStyle({ id: styleId, siteId: Number(siteId), name: name.trim(), status: status ? 1 : 0, path: path.trim() })
       setSaved(true)
+      notify('ok', t('title'), t('saved'))
       setTimeout(() => navigate(base), 500)
     } catch (e) {
       setError(e instanceof Error ? e.message : t('err_save'))

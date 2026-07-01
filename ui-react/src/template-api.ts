@@ -1,7 +1,6 @@
 /**
- * Client de l'API Templates pour la brique MelisCms (liste + suppression).
+ * Client de l'API Templates pour la brique MelisCms (liste + formulaire d'édition React).
  * Appelle la couche REST partagée : /melis/react-api/templates[/...]
- * La création/édition reste l'outil legacy (formulaire couplé au FS + plateforme).
  */
 
 const XHR_HEADER = { 'X-Requested-With': 'XMLHttpRequest' } as const
@@ -57,6 +56,31 @@ export async function fetchTemplateStats(): Promise<TemplateStats> {
 export async function fetchTemplateSites(): Promise<SiteOption[]> {
   const d = await apiFetch<{ sites: SiteOption[] }>('/melis/react-api/templates/sites')
   return d.sites
+}
+
+export async function fetchTemplate(id: number): Promise<TemplateItem> {
+  return apiFetch<TemplateItem>(`/melis/react-api/templates/${id}`)
+}
+
+export interface TemplateSaveInput {
+  id: number
+  name: string
+  type: string
+  siteId: number | null
+  websiteFolder: string
+  layout: string
+  controller: string
+  action: string
+  phpPath: string
+}
+
+export async function saveTemplate(data: TemplateSaveInput): Promise<number> {
+  const res = await apiFetch<{ id: number }>('/melis/react-api/templates/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  return res.id
 }
 
 export async function deleteTemplate(id: number): Promise<void> {
