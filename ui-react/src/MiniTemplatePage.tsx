@@ -547,6 +547,13 @@ function MiniTemplateForm({ item, onBack }: { item: MiniTemplateItem | null; onB
   const [siteError, setSiteError] = useState(false)
   const [nameRequired, setNameRequired] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+  // Re-render when the community-extensions brick registers after initial mount.
+  const [, forceUpdate] = useState(0)
+  useEffect(() => {
+    const handler = () => forceUpdate((n) => n + 1)
+    window.addEventListener('melis-ai-community-extensions-loaded', handler)
+    return () => window.removeEventListener('melis-ai-community-extensions-loaded', handler)
+  }, [])
 
   useEffect(() => { if (!can(isEdit ? 'edit' : 'create')) onBack() }, [isEdit, onBack])
   useEffect(() => { fetchMiniTemplateSites().then(setSites).catch(() => null) }, [])
@@ -690,5 +697,6 @@ function MiniTemplateForm({ item, onBack }: { item: MiniTemplateItem | null; onB
     </div>
   )
 }
+
 
 
