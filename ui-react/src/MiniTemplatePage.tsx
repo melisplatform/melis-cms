@@ -549,7 +549,12 @@ function MiniTemplateForm({ item, onBack }: { item: MiniTemplateItem | null; onB
   const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { if (!can(isEdit ? 'edit' : 'create')) onBack() }, [isEdit, onBack])
-  useEffect(() => { fetchMiniTemplateSites().then(setSites).catch(() => null) }, [])
+  useEffect(() => {
+    fetchMiniTemplateSites().then((s) => {
+      setSites(s)
+      if (!isEdit && !site && s.length > 0) setSite(s[0].module)
+    }).catch(() => null)
+  }, [])
 
   // Load existing template HTML on edit
   useEffect(() => {
