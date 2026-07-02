@@ -20,7 +20,7 @@ function Switch({ checked, disabled, onChange }: { checked: boolean; disabled?: 
   return (
     <button type="button" role="switch" aria-checked={checked} disabled={disabled} onClick={() => onChange(!checked)}
       style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', height: 20, width: 36, flexShrink: 0, borderRadius: 999, border: 0,
-        background: checked ? 'var(--color-primary,#cb4040)' : 'color-mix(in srgb, var(--color-muted-foreground,#888) 30%, transparent)',
+        background: checked ? '#10b981' : '#ef4444',
         cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, transition: 'background .15s', padding: 0 }}>
       <span style={{ display: 'inline-block', width: 16, height: 16, borderRadius: 999, background: '#fff', boxShadow: '0 1px 2px rgba(0,0,0,.2)', transform: checked ? 'translateX(18px)' : 'translateX(2px)', transition: 'transform .15s' }} />
     </button>
