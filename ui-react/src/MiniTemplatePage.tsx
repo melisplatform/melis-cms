@@ -7,18 +7,18 @@ import {
 import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle } from './ViewToggle'
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
- * Mini-Template Manager (MelisCms) â€” brique full React
- * MontÃ© Ã  /melis-cms/mini-templates. Liste + formulaire ajout/Ã©dition.
- * Identificateur composite (site_module + template_name) â€” pas de PK numÃ©rique.
- * â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ──────────────────────────────────────────────────────────────────────────
+ * Mini-Template Manager (MelisCms) — brique full React
+ * Monté à /melis-cms/mini-templates. Liste + formulaire ajout/édition.
+ * Identificateur composite (site_module + template_name) — pas de PK numérique.
+ * ────────────────────────────────────────────────────────────────────────── */
 
 const MELIS_KEY = 'meliscms_mini_template_manager_tool'
 function can(cap: string): boolean {
   return (window as unknown as { MelisCan?: (k: string, c: string) => boolean }).MelisCan?.(MELIS_KEY, cap) ?? true
 }
 
-// â”€â”€ i18n minimal â”€â”€
+// ── i18n minimal ──
 type Lang = 'fr' | 'en'
 function currentLang(): Lang {
   const l = (document.documentElement.lang || 'en').toLowerCase()
@@ -26,42 +26,42 @@ function currentLang(): Lang {
 }
 const DICT: Record<Lang, Record<string, string>> = {
   fr: {
-    title: 'Mini-Templates', subtitle: 'Blocs HTML rÃ©utilisables (TinyMCE)',
-    new: 'Nouveau template', search: 'Rechercherâ€¦',
-    empty_site: 'SÃ©lectionnez un site pour voir ses templates.',
-    empty: 'Aucun template trouvÃ©.', count: '{n} templates â€” fin de la liste',
+    title: 'Mini-Templates', subtitle: 'Blocs HTML réutilisables (TinyMCE)',
+    new: 'Nouveau template', search: 'Rechercher…',
+    empty_site: 'Sélectionnez un site pour voir ses templates.',
+    empty: 'Aucun template trouvé.', count: '{n} templates — fin de la liste',
     kpi_total: 'Total', kpi_sites: 'Sites',
-    all_sites: 'Tous les sites', select_site: 'â€” Choisir un site â€”',
+    all_sites: 'Tous les sites', select_site: '— Choisir un site —',
     col_thumbnail: 'Image', col_path: 'Chemin',
     columns: 'Colonnes', export: 'Exporter',
-    cols_visible: 'Visibles', cols_hidden: 'MasquÃ©es', drag_here: 'Glisser ici', reset: 'RÃ©initialiser',
+    cols_visible: 'Visibles', cols_hidden: 'Masquées', drag_here: 'Glisser ici', reset: 'Réinitialiser',
     edit: 'Modifier', del: 'Supprimer', cancel: 'Annuler', save: 'Enregistrer', back: 'retour',
-    refresh: 'RafraÃ®chir', loading: 'Chargementâ€¦', saved: 'EnregistrÃ© âœ“',
+    refresh: 'Rafraîchir', loading: 'Chargement…', saved: 'Enregistré ✓',
     del_title: 'Supprimer le template',
-    del_confirm: 'Supprimer Â« {n} Â» ? Cette action est irrÃ©versible.',
+    del_confirm: 'Supprimer « {n} » ? Cette action est irréversible.',
     new_title: 'Nouveau mini-template', edit_title: 'Modifier le mini-template',
     f_site: 'Site / Module', f_name: 'Nom du template',
     f_name_ph: 'mon_template', f_name_hint: 'Lettres, chiffres et _ uniquement. Doit commencer par une lettre ou _.',
     f_name_invalid: 'Nom invalide (lettres, chiffres, underscore ; commence par lettre ou _).',
     f_html: 'Contenu HTML', f_html_ph: '<!-- HTML du bloc -->',
-    f_thumbnail: 'Miniature (png, jpg, gif)', f_thumbnail_hint: 'Optionnel. Formats acceptÃ©s : PNG, JPG, JPEG, GIF.',
+    f_thumbnail: 'Miniature (png, jpg, gif)', f_thumbnail_hint: 'Optionnel. Formats acceptés : PNG, JPG, JPEG, GIF.',
     f_thumbnail_change: 'Changer la miniature',
     err_site: 'Le site est obligatoire.', err_name: 'Le nom est obligatoire.', err_save: 'Erreur lors de la sauvegarde.',
     export_filename: 'mini-templates',
-    no_access: "Vous nâ€™avez pas les droits pour consulter cette liste.",
+    no_access: "Vous n’avez pas les droits pour consulter cette liste.",
   },
   en: {
     title: 'Mini-Templates', subtitle: 'Reusable HTML blocks (TinyMCE)',
-    new: 'New template', search: 'Searchâ€¦',
+    new: 'New template', search: 'Search…',
     empty_site: 'Select a site to view its templates.',
-    empty: 'No template found.', count: '{n} templates â€” end of list',
+    empty: 'No template found.', count: '{n} templates — end of list',
     kpi_total: 'Total', kpi_sites: 'Sites',
-    all_sites: 'All sites', select_site: 'â€” Choose a site â€”',
+    all_sites: 'All sites', select_site: '— Choose a site —',
     col_thumbnail: 'Image', col_path: 'Path',
     columns: 'Columns', export: 'Export',
     cols_visible: 'Visible', cols_hidden: 'Hidden', drag_here: 'Drag here', reset: 'Reset',
     edit: 'Edit', del: 'Delete', cancel: 'Cancel', save: 'Save', back: 'back',
-    refresh: 'Refresh', loading: 'Loadingâ€¦', saved: 'Saved âœ“',
+    refresh: 'Refresh', loading: 'Loading…', saved: 'Saved ✓',
     del_title: 'Delete template',
     del_confirm: 'Delete "{n}"? This action is irreversible.',
     new_title: 'New mini-template', edit_title: 'Edit mini-template',
@@ -85,7 +85,7 @@ function useT() {
   }
 }
 
-// â”€â”€ Styles â”€â”€
+// ── Styles ──
 const card: CSSProperties = { border: '1px solid var(--color-border)', background: 'var(--color-card)', borderRadius: 12, boxShadow: '0 1px 2px rgba(0,0,0,.04)' }
 const inputCss: CSSProperties = { height: 40, width: '100%', boxSizing: 'border-box', borderRadius: 8, border: '1px solid var(--color-input,var(--color-border))', background: 'var(--color-card)', color: 'var(--color-foreground)', padding: '0 12px', fontSize: 14, outline: 'none' }
 const btnPrimary: CSSProperties = { display: 'inline-flex', alignItems: 'center', gap: 6, height: 36, padding: '0 14px', borderRadius: 8, border: 0, background: 'var(--color-primary)', color: 'var(--color-primary-foreground,#fff)', fontSize: 14, fontWeight: 500, cursor: 'pointer' }
@@ -101,7 +101,7 @@ const PencilIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stro
 const TrashIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /></svg>
 const PlusIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
 
-// â”€â”€ Column manager â”€â”€
+// ── Column manager ──
 type ColDef = { id: string; visible: boolean }
 const DEFAULT_COLS: ColDef[] = [
   { id: 'thumbnail', visible: true },
@@ -167,7 +167,7 @@ function ColManager({ cols, labelFor, onChange, onClose }: {
     <div style={{ ...card, position: 'absolute', right: 0, top: '100%', marginTop: 6, zIndex: 50, width: 380, maxWidth: 'calc(100vw - 1rem)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderBottom: '1px solid var(--color-border)' }}>
         <span style={{ fontSize: 14, fontWeight: 600 }}>{t('columns')}</span>
-        <button style={{ ...iconBtn, width: 22, height: 22 }} onClick={onClose}>âœ•</button>
+        <button style={{ ...iconBtn, width: 22, height: 22 }} onClick={onClose}>✕</button>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, padding: 12 }}>
         <div style={panelCss} onDragOver={(e) => { e.preventDefault(); if (over?.id !== '__panel__' || over?.panel !== 'hidden') setOver({ id: '__panel__', panel: 'hidden' }) }} onDrop={(e) => { e.preventDefault(); drop('hidden') }}>
@@ -187,17 +187,17 @@ function ColManager({ cols, labelFor, onChange, onClose }: {
   )
 }
 
-// â”€â”€ KPI card â”€â”€
+// ── KPI card ──
 function Kpi({ label: l, value }: { label: string; value: number | null }) {
   return (
     <div style={{ ...card, display: 'flex', flexDirection: 'column', gap: 2, padding: 16, flex: 1, minWidth: 140 }}>
       <span style={{ fontSize: 12, color: 'var(--color-muted-foreground)' }}>{l}</span>
-      <span style={{ fontSize: 22, fontWeight: 700 }}>{value == null ? 'â€¦' : value}</span>
+      <span style={{ fontSize: 22, fontWeight: 700 }}>{value == null ? '…' : value}</span>
     </div>
   )
 }
 
-// â”€â”€ Page root â”€â”€
+// ── Page root ──
 export default function MiniTemplatePage() {
   const [view, setView] = useState<'list' | 'form'>('list')
   const [editItem, setEditItem] = useState<MiniTemplateItem | null>(null)
@@ -212,7 +212,7 @@ export default function MiniTemplatePage() {
   return <MiniTemplateList onNew={openNew} onEdit={openEdit} />
 }
 
-// â”€â”€ Persistent list cache â”€â”€
+// ── Persistent list cache ──
 type ListCache = {
   items: MiniTemplateItem[]
   total: number
@@ -226,7 +226,7 @@ type ListCache = {
 }
 let _cache: ListCache | null = null
 
-// â”€â”€ List â”€â”€
+// ── List ──
 function MiniTemplateList({ onNew, onEdit }: { onNew: () => void; onEdit: (item: MiniTemplateItem) => void }) {
   const t = useT()
 
@@ -298,7 +298,7 @@ function MiniTemplateList({ onNew, onEdit }: { onNew: () => void; onEdit: (item:
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
-          <button style={btnGhost} onClick={() => { _cache = null; setTick((x) => x + 1) }} title={t('refresh')}>â†»</button>
+          <button style={btnGhost} onClick={() => { _cache = null; setTick((x) => x + 1) }} title={t('refresh')}>↻</button>
           {can('create') && <button style={btnPrimary} onClick={onNew}><PlusIcon />{t('new')}</button>}
         </div>
       </div>
@@ -307,7 +307,7 @@ function MiniTemplateList({ onNew, onEdit }: { onNew: () => void; onEdit: (item:
       {frameLoaded && (
         <div style={{ ...card, display: mode === 'iframe' ? 'flex' : 'none', flex: 1, minHeight: 480, overflow: 'hidden' }}>
           <iframe src={`/melis/react-tool-page?key=${encodeURIComponent(MELIS_KEY)}`}
-            style={{ flex: 1, width: '100%', border: 0 }} title="Mini-Templates â€” Vue Melis"
+            style={{ flex: 1, width: '100%', border: 0 }} title="Mini-Templates — Vue Melis"
             sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals" />
         </div>
       )}
@@ -354,7 +354,7 @@ function MiniTemplateList({ onNew, onEdit }: { onNew: () => void; onEdit: (item:
                   {visibleCols(cols).map(({ id }) => (
                     <th key={id} style={{ ...th, ...(id === 'path' ? { cursor: 'pointer' } : {}), ...(id === 'thumbnail' ? { width: 80 } : {}) }}
                       onClick={id === 'path' ? () => setSortAsc((v) => !v) : undefined}>
-                      {t(COL_LABEL[id])}{id === 'path' ? ` ${sortAsc ? 'â†‘' : 'â†“'}` : ''}
+                      {t(COL_LABEL[id])}{id === 'path' ? ` ${sortAsc ? '↑' : '↓'}` : ''}
                     </th>
                   ))}
                   <th style={{ ...th, width: 80 }} />
@@ -370,7 +370,7 @@ function MiniTemplateList({ onNew, onEdit }: { onNew: () => void; onEdit: (item:
                         {id === 'thumbnail' && (
                           r.thumbnailUrl
                             ? <img src={r.thumbnailUrl} alt={r.name} style={{ width: 52, height: 40, objectFit: 'cover', borderRadius: 4, display: 'block' }} />
-                            : <div style={{ width: 52, height: 40, borderRadius: 4, background: 'var(--color-muted,rgba(0,0,0,.06))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: 'var(--color-muted-foreground)' }}>â€”</div>
+                            : <div style={{ width: 52, height: 40, borderRadius: 4, background: 'var(--color-muted,rgba(0,0,0,.06))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: 'var(--color-muted-foreground)' }}>—</div>
                         )}
                         {id === 'path' && <span style={{ fontFamily: 'monospace', fontSize: 13 }}>{r.path}</span>}
                       </td>
@@ -428,14 +428,14 @@ function MiniTemplateList({ onNew, onEdit }: { onNew: () => void; onEdit: (item:
   )
 }
 
-// â”€â”€ TinyMCE â€” brick-local loader (mirrors MelisToolEditor from melis-core) â”€â”€
+// ── TinyMCE — brick-local loader (mirrors MelisToolEditor from melis-core) ──
 declare global {
   interface Window {
     tinymce?: any
     tinyMceCleaner?: (ed: any) => void
     __melisMiniTemplateExtensions?: {
       renderHtmlActions?: (
-        onContent: (html: string) => void,
+        onContent: (html: string, thumbnail?: File) => void,
         context: { site?: string; name?: string }
       ) => import('react').ReactNode
     }
@@ -527,7 +527,7 @@ function TinyMceField({ value, onChange }: { value: string; onChange: (v: string
   )
 }
 
-// â”€â”€ Form (add / edit) â”€â”€
+// ── Form (add / edit) ──
 function MiniTemplateForm({ item, onBack }: { item: MiniTemplateItem | null; onBack: () => void }) {
   const t    = useT()
   const isEdit = item !== null
@@ -547,13 +547,6 @@ function MiniTemplateForm({ item, onBack }: { item: MiniTemplateItem | null; onB
   const [siteError, setSiteError] = useState(false)
   const [nameRequired, setNameRequired] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
-  // Re-render when the community-extensions brick registers after initial mount.
-  const [, forceUpdate] = useState(0)
-  useEffect(() => {
-    const handler = () => forceUpdate((n) => n + 1)
-    window.addEventListener('melis-ai-community-extensions-loaded', handler)
-    return () => window.removeEventListener('melis-ai-community-extensions-loaded', handler)
-  }, [])
 
   useEffect(() => { if (!can(isEdit ? 'edit' : 'create')) onBack() }, [isEdit, onBack])
   useEffect(() => { fetchMiniTemplateSites().then(setSites).catch(() => null) }, [])
@@ -619,12 +612,12 @@ function MiniTemplateForm({ item, onBack }: { item: MiniTemplateItem | null; onB
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button style={{ ...btnGhost, height: 32, padding: '0 10px' }} onClick={onBack}>â† {t('back')}</button>
+          <button style={{ ...btnGhost, height: 32, padding: '0 10px' }} onClick={onBack}>← {t('back')}</button>
           <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{isEdit ? t('edit_title') : t('new_title')}</h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {saved && <span style={{ fontSize: 14, color: '#059669' }}>{t('saved')}</span>}
-          <button style={btnPrimary} onClick={submit} disabled={saving || loading}>{saving ? 'â€¦' : t('save')}</button>
+          <button style={btnPrimary} onClick={submit} disabled={saving || loading}>{saving ? '…' : t('save')}</button>
         </div>
       </div>
 
@@ -665,9 +658,15 @@ function MiniTemplateForm({ item, onBack }: { item: MiniTemplateItem | null; onB
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
                 <label style={{ ...lbl, marginBottom: 0 }}>{t('f_html')}</label>
                 {window.__melisMiniTemplateExtensions?.renderHtmlActions?.(
-                  (htmlContent) => {
+                  (htmlContent, thumbnail) => {
                     setHtml(htmlContent)
                     try { window.tinymce?.get(EDITOR_ID)?.setContent(htmlContent) } catch { /* */ }
+                    // AI-generated thumbnail (html2canvas capture of the preview) — pre-fill
+                    // the form's thumbnail field so the form's submit saves it (mirrors legacy).
+                    if (thumbnail) {
+                      setThumbFile(thumbnail)
+                      setThumbPreview(URL.createObjectURL(thumbnail))
+                    }
                   },
                   { site, name }
                 )}
@@ -697,6 +696,5 @@ function MiniTemplateForm({ item, onBack }: { item: MiniTemplateItem | null; onB
     </div>
   )
 }
-
 
 
