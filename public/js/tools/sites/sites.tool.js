@@ -111,8 +111,14 @@ $(function () {
 					/* $("#id-mod-menu-dynatree").fancytree("destroy");
                     mainTree(); */
 
+					// L'arbre du menu legacy (#id-mod-menu-dynatree) n'existe que dans le BO classique
+					// (/melis). En "old view" (outil rendu dans l'iframe du BO React) il est absent →
+					// getTree() renvoie null et tree.reload() plantait. On garde donc le null-check :
+					// BO classique = arbre présent → reload (comportement inchangé) ; old view = skip.
 					var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
-					tree.reload();
+					if (tree && typeof tree.reload === "function") {
+						tree.reload();
+					}
 				} else {
 					var container = currentTabId + "_id_meliscms_tool_sites_edit_site";
 					var errors = prepareErrs(data.errors, container);
@@ -719,8 +725,13 @@ $(function () {
 					/* $("#id-mod-menu-dynatree").fancytree("destroy");
                     mainTree(); */
 
+					// Idem création : l'arbre du menu legacy (#id-mod-menu-dynatree) est absent en
+					// "old view" (iframe du BO React) → getTree() renvoie null. Null-check pour ne
+					// pas planter, tout en gardant le reload du BO classique (/melis) intact.
 					var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
-					tree.reload();
+					if (tree && typeof tree.reload === "function") {
+						tree.reload();
+					}
 				} else {
 					melisHelper.melisKoNotification(
 						data.textTitle,

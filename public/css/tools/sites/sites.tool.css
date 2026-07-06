@@ -77,15 +77,40 @@ ul.meliscms-site-domains-list > li:hover {
 }
 
 /** SITE V2 PROPERTIES **/
-/** SITE V2 DOMAIN TAB **/
+/** SITE V2 HOMEPAGE / CONFIG LANGUAGE TABS (classe partagée meliscms-site-language-homepage-list) **/
 ul.meliscms-site-language-homepage-list > li,
 ul.meliscms-site-language-homepage-list > li:hover {
     border: 0 solid #e61c23 !important;
 }
-.page-content-container .nav-tabs.meliscms-site-language-homepage-list li.active > a,
-.page-content-container .nav-tabs.meliscms-site-language-homepage-list > li.active:focus > a,
-.page-content-container .nav-tabs.meliscms-site-language-homepage-list > li.active:active > a {
-    border: 0 solid #e61c23 !important;
+/* L'onglet réellement sélectionné est piloté par `.active` sur le <a.nav-link> : c'est ce que
+   Bootstrap déplace au clic (il ne touche PAS au <li>). Le script de la page-outil iframe pose
+   .active sur le 1er <li> ET son <a> au chargement → au clic suivant, ce 1er <li> garde un
+   .active périmé. On neutralise donc tout <a> d'un <li.active> (aspect inactif = boîte grise),
+   puis on colore UNIQUEMENT le vrai <a.nav-link.active>. Résultat correct au load ET au clic,
+   un seul onglet surligné. */
+ul.meliscms-site-language-homepage-list li.active > a {
+    background: #ecebeb !important;
+    color: #7d7b7b !important;
+    border: 1px solid transparent !important;
+    border-radius: 4px !important;
+    font-weight: normal !important;
+}
+ul.meliscms-site-language-homepage-list li.active > a span,
+ul.meliscms-site-language-homepage-list li.active > a i {
+    color: #7d7b7b !important;
+}
+/* Onglet ACTIF : fond rouge plein + texte blanc = look natif de l'outil, rendu robuste ici car
+   melis-core/styles.css (qui le fournit d'ordinaire) n'est pas chargé dans l'iframe old-view. */
+ul.meliscms-site-language-homepage-list .nav-link.active {
+    background: #e61c23 !important;
+    border: 1px solid #e61c23 !important;
+    border-radius: 4px !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+ul.meliscms-site-language-homepage-list .nav-link.active span,
+ul.meliscms-site-language-homepage-list .nav-link.active i {
+    color: #fff !important;
 }
 
 .no-box-shadow {

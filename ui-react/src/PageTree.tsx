@@ -154,6 +154,14 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
     setRootLoading(false)
   }, [loadChildren])
 
+  // Refresh button: clear the search box (query + active-search state), then reload the tree.
+  // Clearing the query also lets the search effect restore the normal (unfiltered) view.
+  const clearAndReload = useCallback(async () => {
+    setQuery('')
+    setSearch((s) => (s.active ? { active: false, notFound: false } : s))
+    await reload()
+  }, [reload])
+
   useEffect(() => { reload() }, [reload])
 
   // Search: debounced REAL backend call. Empty query → restore the normal tree.
@@ -460,7 +468,7 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
           }}
         />
         <button
-          onClick={reload}
+          onClick={clearAndReload}
           title="Rafraîchir"
           style={{
             padding: '0 10px', borderRadius: 6, border: '1px solid var(--color-border)',

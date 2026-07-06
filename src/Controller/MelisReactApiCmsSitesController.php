@@ -370,7 +370,9 @@ class MelisReactApiCmsSitesController extends MelisAbstractActionController
             $svc       = $this->getServiceManager()->get('MelisCmsSiteService');
             $siteName  = $svc->generateModuleNameCase($name);
             $siteLabel = $label !== '' ? $label : $siteName;
-            $siteData  = ['site_name' => $siteName, 'site_label' => $siteLabel, 'site_dnd_render_mode' => 'bootstrap'];
+            // NB : ne PAS ajouter de colonne absente du schéma (ex. `site_dnd_render_mode`) —
+            // l'INSERT échouerait ("Unknown column") et saveSite renverrait l'erreur générique.
+            $siteData  = ['site_name' => $siteName, 'site_label' => $siteLabel];
 
             // Unicité du nom de module (comme le contrôleur legacy).
             if ($isNewSite) {
@@ -399,7 +401,13 @@ class MelisReactApiCmsSitesController extends MelisAbstractActionController
 
             $result = $svc->saveSite($siteData, $domainData, $siteLanguages, [], $siteName, $createModule, $isNewSite);
             if (empty($result['success'])) {
-                return $this->jsonResponse(['success' => false, 'error' => $result['message'] ?? 'Site creation failed'], 500);
+                // saveSite renvoie une CLÉ de traduction (ex. tr_melis_cms_sites_tool_add_create_site_unknown_error)
+                // → on la traduit ici pour que React affiche un message lisible plutôt que la clé brute.
+                $msgKey = $result['message'] ?? 'tr_melis_cms_sites_tool_add_create_site_unknown_error';
+                $translator = $this->getServiceManager()->get('translator');
+                $error = $translator->translate($msgKey);
+                if ($error === $msgKey) { $error = $translator->translate('tr_melis_cms_sites_tool_add_create_site_unknown_error'); }
+                return $this->jsonResponse(['success' => false, 'error' => $error], 500);
             }
 
             // Invalide le cache des chemins de modules (regenerateModulesPath legacy).
