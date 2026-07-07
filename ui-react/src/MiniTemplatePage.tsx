@@ -1,4 +1,5 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ChangeEvent } from 'react'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   consumeMiniTemplateListStale, deleteMiniTemplate, fetchMiniTemplateItem, fetchMiniTemplateSites,
   fetchMiniTemplateStats, fetchMiniTemplates, markMiniTemplateListStale, saveMiniTemplate,
@@ -16,6 +17,20 @@ import { ViewToggle } from './ViewToggle'
 const MELIS_KEY = 'meliscms_mini_template_manager_tool'
 function can(cap: string): boolean {
   return (window as unknown as { MelisCan?: (k: string, c: string) => boolean }).MelisCan?.(MELIS_KEY, cap) ?? true
+}
+
+// API sub-tabs de l'hôte (la brique ne peut pas importer le contexte React de l'hôte)
+type SubTabW = {
+  __melisOpenSubTab?: (section: string, tab: { id: string; label: string; path: string }) => void
+  __melisUpdateSubTabLabel?: (section: string, id: string, label: string) => void
+}
+
+// Identifiant composite (site + name) encodé dans le segment /:id de la route.
+// site (module) et name (validé [a-zA-Z0-9_]) ne contiennent pas de « ~ » → séparateur sûr.
+const idFor = (site: string, name: string) => `${site}~${name}`
+function decodeId(id: string): { site: string; name: string } {
+  const i = id.indexOf('~')
+  return i === -1 ? { site: '', name: '' } : { site: id.slice(0, i), name: id.slice(i + 1) }
 }
 
 // ── i18n minimal ──
@@ -198,18 +213,19 @@ function Kpi({ label: l, value }: { label: string; value: number | null }) {
 }
 
 // ── Page root ──
+// Route-based (comme Templates / Platforms IDs) : /melis-cms/mini-templates (liste),
+// /melis-cms/mini-templates/new (création) et /melis-cms/mini-templates/:id (édition).
+// Le routage par URL est la condition des sous-onglets (subTabs) : chaque édition ouvre
+// son propre onglet côté hôte → plusieurs entrées éditables en parallèle.
 export default function MiniTemplatePage() {
-  const [view, setView] = useState<'list' | 'form'>('list')
-  const [editItem, setEditItem] = useState<MiniTemplateItem | null>(null)
-
-  function openNew() { setEditItem(null); setView('form') }
-  function openEdit(item: MiniTemplateItem) { setEditItem(item); setView('form') }
-  function backToList() { setView('list') }
-
-  if (view === 'form') {
-    return <MiniTemplateForm item={editItem} onBack={backToList} />
-  }
-  return <MiniTemplateList onNew={openNew} onEdit={openEdit} />
+  const { id } = useParams()
+  const location = useLocation()
+  const base = id ? location.pathname.slice(0, location.pathname.length - id.length - 1) : location.pathname
+  // key={id} : forcer un remount frais à chaque changement de sous-onglet (l'identité site+name
+  // vient de l'URL et initialise l'état — sans remount, passer d'une édition à l'autre garderait
+  // le site/nom précédent).
+  if (id) return <MiniTemplateForm key={id} id={id} base={base} />
+  return <MiniTemplateList base={base} />
 }
 
 // ── Persistent list cache ──
@@ -227,8 +243,9 @@ type ListCache = {
 let _cache: ListCache | null = null
 
 // ── List ──
-function MiniTemplateList({ onNew, onEdit }: { onNew: () => void; onEdit: (item: MiniTemplateItem) => void }) {
+function MiniTemplateList({ base }: { base: string }) {
   const t = useT()
+  const navigate = useNavigate()
 
   const [items, setItems]             = useState<MiniTemplateItem[]>(_cache?.items ?? [])
   const [total, setTotal]             = useState(_cache?.total ?? 0)
@@ -299,7 +316,7 @@ function MiniTemplateList({ onNew, onEdit }: { onNew: () => void; onEdit: (item:
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
           <button style={btnGhost} onClick={() => { _cache = null; setTick((x) => x + 1) }} title={t('refresh')}>↻</button>
-          {can('create') && <button style={btnPrimary} onClick={onNew}><PlusIcon />{t('new')}</button>}
+          {can('create') && <button style={btnPrimary} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>}
         </div>
       </div>
 
@@ -377,7 +394,7 @@ function MiniTemplateList({ onNew, onEdit }: { onNew: () => void; onEdit: (item:
                     ))}
                     <td style={td}>
                       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-                        {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => onEdit(r)}><PencilIcon /></button>}
+                        {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${idFor(r.site, r.name)}`)}><PencilIcon /></button>}
                         {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
                       </div>
                     </td>
@@ -528,17 +545,19 @@ function TinyMceField({ value, onChange }: { value: string; onChange: (v: string
 }
 
 // ── Form (add / edit) ──
-function MiniTemplateForm({ item, onBack }: { item: MiniTemplateItem | null; onBack: () => void }) {
+function MiniTemplateForm({ id, base }: { id: string; base: string }) {
   const t    = useT()
-  const isEdit = item !== null
+  const navigate = useNavigate()
+  const isEdit = id !== 'new'
+  const { site: editSite, name: editName } = isEdit ? decodeId(id) : { site: '', name: '' }
 
   const [sites, setSites]       = useState<MiniTemplateSiteOption[]>([])
-  const [site, setSite]         = useState(item?.site ?? '')
-  const [name, setName]         = useState(item?.name ?? '')
+  const [site, setSite]         = useState(editSite)
+  const [name, setName]         = useState(editName)
   const [html, setHtml]         = useState('')
-  const [thumbUrl, setThumbUrl] = useState<string | null>(item?.thumbnailUrl ?? null)
+  const [thumbUrl, setThumbUrl] = useState<string | null>(null)
   const [thumbFile, setThumbFile] = useState<File | null>(null)
-  const [thumbPreview, setThumbPreview] = useState<string | null>(item?.thumbnailUrl ?? null)
+  const [thumbPreview, setThumbPreview] = useState<string | null>(null)
   const [loading, setLoading]   = useState(false)
   const [saving, setSaving]     = useState(false)
   const [error, setError]       = useState<string | null>(null)
@@ -548,7 +567,14 @@ function MiniTemplateForm({ item, onBack }: { item: MiniTemplateItem | null; onB
   const [nameRequired, setNameRequired] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => { if (!can(isEdit ? 'edit' : 'create')) onBack() }, [isEdit, onBack])
+  // Sous-onglet hôte : ouvre un onglet dédié à cette édition (édition multiple en parallèle).
+  const subTabId = `${base}/${id}`
+  useEffect(() => {
+    const label = isEdit ? (editName || t('loading')) : t('new_title')
+    ;(window as unknown as SubTabW).__melisOpenSubTab?.(base, { id: subTabId, label, path: subTabId })
+  }, [])
+
+  useEffect(() => { if (!can(isEdit ? 'edit' : 'create')) navigate(base) }, [isEdit, base, navigate])
   useEffect(() => {
     fetchMiniTemplateSites().then((s) => {
       setSites(s)
@@ -558,17 +584,17 @@ function MiniTemplateForm({ item, onBack }: { item: MiniTemplateItem | null; onB
 
   // Load existing template HTML on edit
   useEffect(() => {
-    if (!item) return
+    if (!isEdit) return
     setLoading(true)
-    fetchMiniTemplateItem(item.site, item.name)
+    fetchMiniTemplateItem(editSite, editName)
       .then((d) => {
         setHtml(d.html)
         setThumbUrl(d.thumbnailUrl)
         setThumbPreview(d.thumbnailUrl)
       })
-      .catch(() => onBack())
+      .catch(() => navigate(base))
       .finally(() => setLoading(false))
-  }, [item])
+  }, [id])
 
   function onNameChange(v: string) {
     setName(v)
@@ -600,13 +626,13 @@ function MiniTemplateForm({ item, onBack }: { item: MiniTemplateItem | null; onB
         site,
         name: name.trim(),
         html: window.tinymce?.get(EDITOR_ID)?.getContent() ?? html,
-        oldSite: isEdit ? item!.site : undefined,
-        oldName: isEdit ? item!.name : undefined,
+        oldSite: isEdit ? editSite : undefined,
+        oldName: isEdit ? editName : undefined,
         thumbnail: thumbFile,
       })
       markMiniTemplateListStale()
       setSaved(true)
-      setTimeout(onBack, 600)
+      setTimeout(() => navigate(base), 600)
     } catch (e) {
       setError(e instanceof Error ? e.message : t('err_save'))
     } finally { setSaving(false) }
@@ -617,7 +643,7 @@ function MiniTemplateForm({ item, onBack }: { item: MiniTemplateItem | null; onB
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button style={{ ...btnGhost, height: 32, padding: '0 10px' }} onClick={onBack}>← {t('back')}</button>
+          {/* Pas de bouton « retour » ici : la barre de sous-onglets de l'hôte fournit déjà « ← Back ». */}
           <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{isEdit ? t('edit_title') : t('new_title')}</h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

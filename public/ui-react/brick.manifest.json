@@ -57,7 +57,16 @@
       "route": "/melis-cms/mini-templates",
       "label": "Mini-Templates",
       "forwardKey": "MelisCms/MiniTemplateManager",
-      "melisKey": "meliscms_mini_template_manager_tool"
+      "melisKey": "meliscms_mini_template_manager_tool",
+      "subTabs": true
+    },
+    {
+      "id": "cms-menu-manager",
+      "route": "/melis-cms/menu-manager",
+      "label": "Menu manager",
+      "forwardKey": "MelisCms/MiniTemplateMenuManager",
+      "melisKey": "meliscms_mini_template_menu_manager_tool",
+      "subTabs": true
     }
   ]
 }
