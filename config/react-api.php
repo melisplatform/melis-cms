@@ -394,6 +394,59 @@ return [
                                     'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiCmsMiniTemplate', 'action' => 'delete'],
                                 ],
                             ],
+                            // ── CMS Menu Manager (MelisCms tool, UI via brique) ──
+                            // Réutilise MelisCmsMiniTemplateService (getTree/saveTree/saveCategory/deleteCategory).
+                            'menu-manager-sites' => [
+                                'type'    => 'Segment',
+                                'options' => [
+                                    'route'    => '/menu-manager/sites[/]',
+                                    'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiCmsMenuManager', 'action' => 'sites'],
+                                ],
+                            ],
+                            'menu-manager-languages' => [
+                                'type'    => 'Segment',
+                                'options' => [
+                                    'route'    => '/menu-manager/languages[/]',
+                                    'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiCmsMenuManager', 'action' => 'languages'],
+                                ],
+                            ],
+                            'menu-manager-tree-save' => [
+                                'type'    => 'Segment',
+                                'options' => [
+                                    'route'    => '/menu-manager/tree/save[/]',
+                                    'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiCmsMenuManager', 'action' => 'saveTree'],
+                                ],
+                            ],
+                            'menu-manager-tree' => [
+                                'type'    => 'Segment',
+                                'options' => [
+                                    'route'    => '/menu-manager/tree[/]',
+                                    'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiCmsMenuManager', 'action' => 'tree'],
+                                ],
+                            ],
+                            'menu-manager-category-save' => [
+                                'type'    => 'Segment',
+                                'options' => [
+                                    'route'    => '/menu-manager/category/save[/]',
+                                    'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiCmsMenuManager', 'action' => 'saveCategory'],
+                                ],
+                            ],
+                            'menu-manager-category-delete' => [
+                                'type'    => 'Segment',
+                                'options' => [
+                                    'route'       => '/menu-manager/category/delete/:id',
+                                    'constraints' => ['id' => '[0-9]+'],
+                                    'defaults'    => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiCmsMenuManager', 'action' => 'deleteCategory'],
+                                ],
+                            ],
+                            'menu-manager-category-item' => [
+                                'type'    => 'Segment',
+                                'options' => [
+                                    'route'       => '/menu-manager/category/:id',
+                                    'constraints' => ['id' => '[0-9]+'],
+                                    'defaults'    => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiCmsMenuManager', 'action' => 'category'],
+                                ],
+                            ],
                         ],
                     ],
                 ],
@@ -410,6 +463,7 @@ return [
             'MelisCms\Controller\MelisReactApiCmsPlatformId' => \MelisCms\Controller\MelisReactApiCmsPlatformIdController::class,
             'MelisCms\Controller\MelisReactApiCmsStyle' => \MelisCms\Controller\MelisReactApiCmsStyleController::class,
             'MelisCms\Controller\MelisReactApiCmsMiniTemplate' => \MelisCms\Controller\MelisReactApiCmsMiniTemplateController::class,
+            'MelisCms\Controller\MelisReactApiCmsMenuManager' => \MelisCms\Controller\MelisReactApiCmsMenuManagerController::class,
         ],
     ],
 ];

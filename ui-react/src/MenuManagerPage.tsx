@@ -106,6 +106,29 @@ const PlugIcon = () => <svg style={{ width: 14, height: 14, flexShrink: 0 }} vie
 const GripIcon = () => <svg style={{ width: 13, height: 13, flexShrink: 0, color: 'var(--color-muted-foreground)' }} viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" /><circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" /><circle cx="9" cy="18" r="1.5" /><circle cx="15" cy="18" r="1.5" /></svg>
 const InfoIcon = () => <svg style={{ width: 15, height: 15, flexShrink: 0, color: 'var(--color-muted-foreground)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></svg>
 
+// ── Interrupteur actif/inactif (vert = actif, rouge = inactif) ──
+function StatusToggle({ checked, onChange, labelOn, labelOff }: {
+  checked: boolean; onChange: (v: boolean) => void; labelOn: string; labelOff: string
+}) {
+  return (
+    <button type="button" role="switch" aria-checked={checked} onClick={() => onChange(!checked)}
+      style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: 0, background: 'transparent', cursor: 'pointer', padding: 0 }}>
+      <span style={{
+        position: 'relative', width: 40, height: 22, borderRadius: 999, flexShrink: 0,
+        background: checked ? '#22c55e' : '#ef4444', transition: 'background .15s',
+      }}>
+        <span style={{
+          position: 'absolute', top: 2, left: checked ? 20 : 2, width: 18, height: 18, borderRadius: 999,
+          background: '#fff', boxShadow: '0 1px 2px rgba(0,0,0,.3)', transition: 'left .15s',
+        }} />
+      </span>
+      <span style={{ fontSize: 14, fontWeight: 500, color: checked ? '#059669' : '#dc2626' }}>
+        {checked ? labelOn : labelOff}
+      </span>
+    </button>
+  )
+}
+
 function catId(node: TreeNode): number {
   return parseInt(node.id.split('-')[0], 10) || 0
 }
@@ -477,15 +500,7 @@ function CategoryForm({ id, base }: { id: string; base: string }) {
         <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{isEdit ? t('edit_title') : t('new_title')}</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {saved && <span style={{ fontSize: 14, color: '#059669' }}>{t('saved')}</span>}
-          <button
-            onClick={() => setStatus((s) => (s ? 0 : 1))}
-            style={{
-              ...btnGhost, height: 32, padding: '0 12px',
-              color: status ? '#059669' : '#dc2626',
-              borderColor: status ? '#86efac' : '#fca5a5',
-            }}>
-            {status ? t('active') : t('inactive')}
-          </button>
+          <StatusToggle checked={!!status} onChange={(v) => setStatus(v ? 1 : 0)} labelOn={t('active')} labelOff={t('inactive')} />
           <button style={btnPrimary} onClick={submit} disabled={saving || loading}>{saving ? '…' : t('save')}</button>
         </div>
       </div>
