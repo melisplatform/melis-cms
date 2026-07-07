@@ -16,6 +16,13 @@ function can(cap: string): boolean {
   return (window as unknown as { MelisCan?: (k: string, c: string) => boolean }).MelisCan?.(MELIS_KEY, cap) ?? true
 }
 
+// API sous-onglets de l'hôte (la brique ne peut pas importer son contexte React) — cf. manifest subTabs:true.
+// Sans ça, éditer/créer ouvrait un onglet top-level « <id> » au lieu d'un sous-onglet nommé (look Users).
+type SubTabW = {
+  __melisOpenSubTab?: (section: string, tab: { id: string; label: string; path: string }) => void
+  __melisUpdateSubTabLabel?: (section: string, id: string, label: string) => void
+}
+
 /* ──────────────────────────────────────────────────────────────────────────
  * Brique « Styles » (MelisCms) — full React, montée à /melis-cms/styles
  * (et /melis-cms/styles/:id pour le formulaire). C'est l'outil le plus riche du
@@ -216,6 +223,21 @@ function StatusBadge({ active, label }: { active: boolean; label: string }) {
       <span style={{ width: 6, height: 6, borderRadius: '50%', background: active ? '#10b981' : 'var(--color-muted-foreground)' }} />
       {label}
     </span>
+  )
+}
+
+// ── Interrupteur Actif / Inactif (vert = actif, rouge = inactif) — comme l'outil core Modules ──
+function StatusToggle({ checked, onChange, labelOn, labelOff }: {
+  checked: boolean; onChange: (v: boolean) => void; labelOn: string; labelOff: string
+}) {
+  return (
+    <button type="button" role="switch" aria-checked={checked} onClick={() => onChange(!checked)}
+      style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: 0, background: 'transparent', cursor: 'pointer', padding: 0 }}>
+      <span style={{ position: 'relative', width: 40, height: 22, borderRadius: 999, flexShrink: 0, background: checked ? '#22c55e' : '#ef4444', transition: 'background .15s' }}>
+        <span style={{ position: 'absolute', top: 2, left: checked ? 20 : 2, width: 18, height: 18, borderRadius: 999, background: '#fff', boxShadow: '0 1px 2px rgba(0,0,0,.3)', transition: 'left .15s' }} />
+      </span>
+      <span style={{ fontSize: 14, fontWeight: 500, color: checked ? '#059669' : '#dc2626' }}>{checked ? labelOn : labelOff}</span>
+    </button>
   )
 }
 
@@ -428,6 +450,15 @@ function StyleForm({ id, base }: { id: string; base: string }) {
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
 
+  // Sous-onglet nommé (look Users) : ouvert au montage, renommé avec le nom du style au chargement.
+  const subTabId = `${base}/${id}`
+  useEffect(() => {
+    ;(window as unknown as SubTabW).__melisOpenSubTab?.(base, { id: subTabId, label: isEdit ? t('loading') : t('new_title'), path: subTabId })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (isEdit && name) (window as unknown as SubTabW).__melisUpdateSubTabLabel?.(base, subTabId, name)
+  }, [name]) // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => { if (!can(isEdit ? 'edit' : 'create')) navigate(base) }, [isEdit, base, navigate])
   useEffect(() => { fetchStyleSites().then(setSites).catch(() => null) }, [])
   useEffect(() => {
@@ -459,7 +490,6 @@ function StyleForm({ id, base }: { id: string; base: string }) {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button style={{ ...btnGhost, height: 32, padding: '0 10px' }} onClick={() => navigate(base)}>← {t('back')}</button>
           <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{isEdit ? t('edit_title') : t('new_title')}</h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -492,10 +522,8 @@ function StyleForm({ id, base }: { id: string; base: string }) {
             <p style={hint}>{t('f_path_hint')}</p>
           </div>
           <div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-              <input type="checkbox" checked={status} onChange={(e) => setStatus(e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
-              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-foreground)' }}>{t('f_status')}</span>
-            </label>
+            <label style={label}>{t('f_status')}</label>
+            <StatusToggle checked={status} onChange={setStatus} labelOn={t('status_active')} labelOff={t('status_inactive')} />
             <p style={hint}>{t('f_status_hint')}</p>
           </div>
         </div>

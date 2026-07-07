@@ -15,6 +15,13 @@ function can(cap: string): boolean {
   return (window as unknown as { MelisCan?: (k: string, c: string) => boolean }).MelisCan?.(MELIS_KEY, cap) ?? true
 }
 
+// API sous-onglets de l'hôte (la brique ne peut pas importer son contexte React) — cf. manifest subTabs:true.
+// Sans ça, éditer/créer ouvrait un onglet top-level « <id> » au lieu d'un sous-onglet nommé (look Users).
+type SubTabW = {
+  __melisOpenSubTab?: (section: string, tab: { id: string; label: string; path: string }) => void
+  __melisUpdateSubTabLabel?: (section: string, id: string, label: string) => void
+}
+
 /* ──────────────────────────────────────────────────────────────────────────
  * Brique « Langues » (MelisCms) — full React, montée à /melis-cms/languages
  * (et /melis-cms/languages/:id pour le formulaire). La brique ne peut PAS importer les
@@ -373,6 +380,15 @@ function CmsLanguageForm({ id, base }: { id: string; base: string }) {
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
 
+  // Sous-onglet nommé (look Users) : ouvert au montage, renommé avec le nom de la langue au chargement.
+  const subTabId = `${base}/${id}`
+  useEffect(() => {
+    ;(window as unknown as SubTabW).__melisOpenSubTab?.(base, { id: subTabId, label: isEdit ? t('loading') : t('new_title'), path: subTabId })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (isEdit && name) (window as unknown as SubTabW).__melisUpdateSubTabLabel?.(base, subTabId, name)
+  }, [name]) // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => { if (!can(isEdit ? 'edit' : 'create')) navigate(base) }, [isEdit, base, navigate])
   useEffect(() => {
     if (!langId) return
@@ -403,7 +419,6 @@ function CmsLanguageForm({ id, base }: { id: string; base: string }) {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button style={{ ...btnGhost, height: 32, padding: '0 10px' }} onClick={() => navigate(base)}>← {t('back')}</button>
           <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{isEdit ? t('edit_title') : t('new_title')}</h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

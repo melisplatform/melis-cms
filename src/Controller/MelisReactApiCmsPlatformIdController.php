@@ -30,6 +30,9 @@ class MelisReactApiCmsPlatformIdController extends MelisAbstractActionController
 
     private const COLS = 'pids_id, pids_page_id_start, pids_page_id_current, pids_page_id_end, '
                        . 'pids_tpl_id_start, pids_tpl_id_current, pids_tpl_id_end';
+    // Le nom de la plateforme n'est PAS dans melis_cms_platform_ids : il vient de melis_core_platform
+    // via la relation 1:1 pids_id = plf_id (cf. MelisPlatformIdsTable::getPlatformIdsByPlatformName).
+    private const JOIN = ' FROM melis_cms_platform_ids p LEFT JOIN melis_core_platform cp ON cp.plf_id = p.pids_id ';
 
     public function listAction(): HttpResponse
     {
@@ -48,17 +51,17 @@ class MelisReactApiCmsPlatformIdController extends MelisAbstractActionController
             $params = [];
             if ($search !== '') {
                 $like  = '%' . $search . '%';
-                $where = 'WHERE (CONCAT_WS(\'|\', pids_id, pids_page_id_start, pids_page_id_current, pids_page_id_end, pids_tpl_id_start, pids_tpl_id_current, pids_tpl_id_end) LIKE ?)';
+                $where = 'WHERE (CONCAT_WS(\'|\', p.pids_id, COALESCE(cp.plf_name, \'\'), p.pids_page_id_start, p.pids_page_id_current, p.pids_page_id_end, p.pids_tpl_id_start, p.pids_tpl_id_current, p.pids_tpl_id_end) LIKE ?)';
                 $params = [$like];
             }
 
             $total = (int) (iterator_to_array($db->query(
-                "SELECT COUNT(*) AS total FROM melis_cms_platform_ids $where", $params
+                "SELECT COUNT(*) AS total" . self::JOIN . "$where", $params
             ))[0]['total'] ?? 0);
 
             $rows = $db->query(
-                "SELECT " . self::COLS . " FROM melis_cms_platform_ids $where
-                 ORDER BY pids_id DESC LIMIT ? OFFSET ?",
+                "SELECT " . self::COLS . ", cp.plf_name" . self::JOIN . "$where
+                 ORDER BY p.pids_id DESC LIMIT ? OFFSET ?",
                 array_merge($params, [$limit, $offset])
             );
 
@@ -82,7 +85,18 @@ class MelisReactApiCmsPlatformIdController extends MelisAbstractActionController
         try {
             $db    = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
             $total = (int) (iterator_to_array($db->query('SELECT COUNT(*) AS total FROM melis_cms_platform_ids', []))[0]['total'] ?? 0);
-            return $this->jsonResponse(['success' => true, 'data' => ['total' => $total]]);
+            // Plateformes SANS plage définie (comme getAvailablePlatforms : plf sans ligne pids).
+            // On ne peut créer une plage QUE pour une de ces plateformes (pids_id = plf_id).
+            $avail = [];
+            foreach ($db->query(
+                'SELECT cp.plf_id AS id, cp.plf_name AS name FROM melis_core_platform cp
+                 LEFT JOIN melis_cms_platform_ids p ON p.pids_id = cp.plf_id
+                 WHERE p.pids_id IS NULL ORDER BY cp.plf_name', []
+            ) as $r) {
+                $r = (array) $r;
+                $avail[] = ['id' => (int) $r['id'], 'name' => (string) $r['name']];
+            }
+            return $this->jsonResponse(['success' => true, 'data' => ['total' => $total, 'availablePlatforms' => $avail]]);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);
         }
@@ -98,7 +112,7 @@ class MelisReactApiCmsPlatformIdController extends MelisAbstractActionController
 
         try {
             $db   = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
-            $rows = iterator_to_array($db->query('SELECT ' . self::COLS . ' FROM melis_cms_platform_ids WHERE pids_id = ?', [$id]));
+            $rows = iterator_to_array($db->query('SELECT ' . self::COLS . ', cp.plf_name' . self::JOIN . 'WHERE p.pids_id = ?', [$id]));
             if (!$rows) { return $this->jsonResponse(['success' => false, 'error' => 'Not found'], 404); }
             return $this->jsonResponse(['success' => true, 'data' => $this->formatPid((array) $rows[0])]);
         } catch (\Throwable $e) {
@@ -147,13 +161,24 @@ class MelisReactApiCmsPlatformIdController extends MelisAbstractActionController
                 return $this->jsonResponse(['success' => true, 'data' => ['id' => $id]]);
             }
 
+            // CRÉATION : une plage est rattachée à une plateforme EXISTANTE encore sans plage
+            // (relation 1:1 pids_id = plf_id). On ne peut donc créer que pour une plateforme « absente ».
+            $platformId = (int) ($body['platformId'] ?? 0);
+            if ($platformId <= 0) {
+                return $this->jsonResponse(['success' => false, 'error' => 'Platform is required'], 400);
+            }
+            if (!iterator_to_array($db->query('SELECT plf_id FROM melis_core_platform WHERE plf_id = ?', [$platformId]))) {
+                return $this->jsonResponse(['success' => false, 'error' => 'Unknown platform'], 400);
+            }
+            if (iterator_to_array($db->query('SELECT pids_id FROM melis_cms_platform_ids WHERE pids_id = ?', [$platformId]))) {
+                return $this->jsonResponse(['success' => false, 'error' => 'This platform already has a range'], 409);
+            }
             $db->query(
-                'INSERT INTO melis_cms_platform_ids (pids_page_id_start, pids_page_id_current, pids_page_id_end,
-                 pids_tpl_id_start, pids_tpl_id_current, pids_tpl_id_end) VALUES (?, ?, ?, ?, ?, ?)',
-                $vals
+                'INSERT INTO melis_cms_platform_ids (pids_id, pids_page_id_start, pids_page_id_current, pids_page_id_end,
+                 pids_tpl_id_start, pids_tpl_id_current, pids_tpl_id_end) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                array_merge([$platformId], $vals)
             );
-            $newId = (int) iterator_to_array($db->query('SELECT LAST_INSERT_ID() AS id', []))[0]['id'];
-            return $this->jsonResponse(['success' => true, 'data' => ['id' => $newId]], 201);
+            return $this->jsonResponse(['success' => true, 'data' => ['id' => $platformId]], 201);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);
         }
@@ -185,6 +210,7 @@ class MelisReactApiCmsPlatformIdController extends MelisAbstractActionController
     {
         return [
             'id'          => (int) $r['pids_id'],
+            'name'        => (string) ($r['plf_name'] ?? ''),
             'pageStart'   => (int) $r['pids_page_id_start'],
             'pageCurrent' => (int) $r['pids_page_id_current'],
             'pageEnd'     => (int) $r['pids_page_id_end'],

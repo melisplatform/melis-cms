@@ -11,6 +11,7 @@ const XHR_HEADER = { 'X-Requested-With': 'XMLHttpRequest' } as const
 
 export interface PlatformIdItem {
   id: number
+  name: string           // nom de la plateforme (pids_platform) — affiché mais non éditable
   pageStart: number
   pageCurrent: number
   pageEnd: number
@@ -18,10 +19,13 @@ export interface PlatformIdItem {
   tplCurrent: number
   tplEnd: number
 }
-export interface PlatformIdStats { total: number }
+export interface AvailablePlatform { id: number; name: string }
+// availablePlatforms = plateformes SANS plage : on ne peut créer une plage que pour l'une d'elles.
+export interface PlatformIdStats { total: number; availablePlatforms: AvailablePlatform[] }
 export interface PlatformIdListResult { items: PlatformIdItem[]; total: number; page: number; limit: number }
 export interface PlatformIdSavePayload {
   id?: number | null
+  platformId?: number | null   // création : plateforme (plf_id) à rattacher (pids_id = plf_id)
   pageStart: number
   pageCurrent: number
   pageEnd: number

@@ -58,6 +58,9 @@ function SiteSubTabBar({ tabs, activeId, onBack, onSelect, onClose }: {
   )
 }
 
+// Sentinelle d'id pour le sous-onglet « Nouveau site » (les ids de site réels sont > 0).
+const NEW_TAB = 0
+
 export default function SitesPage() {
   const [view, setView] = useState<View>({ kind: 'list' })
   const [open, setOpen] = useState<OpenTab[]>([])
@@ -66,10 +69,20 @@ export default function SitesPage() {
     setOpen((prev) => (prev.some((o) => o.id === id) ? prev : [...prev, { id, label }]))
     setView({ kind: 'edit', id })
   }
-  function closeEditor(id: number) {
+  // « Nouveau » ouvre AUSSI un sous-onglet (comme l'édition) — plus d'onglet hors système.
+  function openNew() {
+    setOpen((prev) => (prev.some((o) => o.id === NEW_TAB) ? prev : [...prev, { id: NEW_TAB, label: tr('Nouveau site', 'New site') }]))
+    setView({ kind: 'new' })
+  }
+  function closeTab(id: number) {
     setOpen((prev) => {
       const rest = prev.filter((o) => o.id !== id)
-      setView((v) => (v.kind === 'edit' && v.id === id ? (rest.length ? { kind: 'edit', id: rest[rest.length - 1].id } : { kind: 'list' }) : v))
+      setView((v) => {
+        const isActive = (v.kind === 'edit' && v.id === id) || (v.kind === 'new' && id === NEW_TAB)
+        if (!isActive) return v
+        const last = rest[rest.length - 1]
+        return last ? (last.id === NEW_TAB ? { kind: 'new' } : { kind: 'edit', id: last.id }) : { kind: 'list' }
+      })
       return rest
     })
   }
@@ -77,25 +90,31 @@ export default function SitesPage() {
     setOpen((prev) => prev.map((o) => (o.id === id ? { ...o, label } : o)))
   }
 
-  const activeId = view.kind === 'edit' ? view.id : null
+  const activeId = view.kind === 'edit' ? view.id : view.kind === 'new' ? NEW_TAB : null
+  const hasNew = open.some((o) => o.id === NEW_TAB)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {open.length > 0 && (
         <SiteSubTabBar tabs={open} activeId={activeId}
-          onBack={() => setView({ kind: 'list' })} onSelect={(id) => setView({ kind: 'edit', id })} onClose={closeEditor} />
+          onBack={() => setView({ kind: 'list' })}
+          onSelect={(id) => setView(id === NEW_TAB ? { kind: 'new' } : { kind: 'edit', id })}
+          onClose={closeTab} />
       )}
 
       <div style={{ flex: 1, minHeight: 0 }}>
         <div style={{ height: '100%', display: view.kind === 'list' ? 'block' : 'none' }}>
-          <SitesList active={view.kind === 'list'} onEdit={openEditor} onNew={() => setView({ kind: 'new' })} />
+          <SitesList active={view.kind === 'list'} onEdit={openEditor} onNew={openNew} />
         </div>
 
-        {view.kind === 'new' && (
-          <SiteWizard onCancel={() => setView({ kind: 'list' })} onCreated={() => { markSitesListStale(); setView({ kind: 'list' }) }} />
+        {/* Assistant de création — monté tant que le sous-onglet « Nouveau site » est ouvert (état préservé). */}
+        {hasNew && (
+          <div style={{ height: '100%', display: view.kind === 'new' ? 'block' : 'none' }}>
+            <SiteWizard onCancel={() => closeTab(NEW_TAB)} onCreated={() => { markSitesListStale(); closeTab(NEW_TAB) }} />
+          </div>
         )}
 
-        {open.map((o) => (
+        {open.filter((o) => o.id !== NEW_TAB).map((o) => (
           <div key={o.id} style={{ height: '100%', display: activeId === o.id ? 'block' : 'none' }}>
             <SiteEditor siteId={o.id} onSaved={() => markSitesListStale()} onLabel={(l) => setLabel(o.id, l)} />
           </div>

@@ -75,6 +75,13 @@ function notify(kind: 'ok' | 'ko', title: string, message: string) {
   window.postMessage({ __melisNotif: true, kind, title, message }, '*')
 }
 
+// API sous-onglets de l'hôte (la brique ne peut pas importer son contexte React) — cf. manifest subTabs:true.
+// Sans ça, éditer une redirection ouvrait un onglet top-level « <id> » au lieu d'un sous-onglet nommé (look Users).
+type SubTabW = {
+  __melisOpenSubTab?: (section: string, tab: { id: string; label: string; path: string }) => void
+  __melisUpdateSubTabLabel?: (section: string, id: string, label: string) => void
+}
+
 // ── Styles (variables CSS du thème de l'hôte) ──
 const card: CSSProperties = { border: '1px solid var(--color-border)', background: 'var(--color-card)', borderRadius: 12, boxShadow: '0 1px 2px rgba(0,0,0,.04)' }
 const inputCss: CSSProperties = { height: 40, width: '100%', boxSizing: 'border-box', borderRadius: 8, border: '1px solid var(--color-input,var(--color-border))', background: 'var(--color-card)', color: 'var(--color-foreground)', padding: '0 12px', fontSize: 14, outline: 'none' }
@@ -390,6 +397,15 @@ function RedirectForm({ id, base }: { id: string; base: string }) {
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
 
+  // Sous-onglet nommé (look Users) : ouvert au montage, renommé avec l'ancienne URL au chargement.
+  const subTabId = `${base}/${id}`
+  useEffect(() => {
+    ;(window as unknown as SubTabW).__melisOpenSubTab?.(base, { id: subTabId, label: isEdit ? t('loading') : t('new_title'), path: subTabId })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (isEdit && !loading && oldUrl) (window as unknown as SubTabW).__melisUpdateSubTabLabel?.(base, subTabId, oldUrl)
+  }, [loading, oldUrl, isEdit]) // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => { if (!can(isEdit ? 'edit' : 'create')) navigate(base) }, [isEdit, base, navigate])
   useEffect(() => { fetchSites().then(setSites).catch(() => null) }, [])
   useEffect(() => {
@@ -421,7 +437,6 @@ function RedirectForm({ id, base }: { id: string; base: string }) {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button style={{ ...btnGhost, height: 32, padding: '0 10px' }} onClick={() => navigate(base)}>← {t('back')}</button>
           <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{isEdit ? t('edit_title') : t('new_title')}</h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

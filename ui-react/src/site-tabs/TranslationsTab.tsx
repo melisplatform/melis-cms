@@ -30,10 +30,15 @@ export function TranslationsTab({ siteId, langs }: { siteId: number; langs: Lang
   const load = () => { setLoading(true); fetchTranslations(siteId).then(setRows).catch(() => setRows([])).finally(() => setLoading(false)) }
   useEffect(load, [siteId])
 
-  const filtered = useMemo(
-    () => rows.filter((r) => r.key.toLowerCase().includes(search.toLowerCase())),
-    [rows, search],
-  )
+  // Recherche sur la clé ET sur les textes de toutes les langues.
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return rows
+    return rows.filter((r) =>
+      r.key.toLowerCase().includes(q) ||
+      Object.values(r.texts).some((t) => (t?.text ?? '').toLowerCase().includes(q)),
+    )
+  }, [rows, search])
 
   function openNew() {
     const texts: Draft['texts'] = {}
@@ -71,7 +76,7 @@ export function TranslationsTab({ siteId, langs }: { siteId: number; langs: Lang
   return (
     <div style={{ maxWidth: 900, display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div style={{ display: 'flex', gap: 8 }}>
-        <input style={{ ...input, flex: 1 }} placeholder={tr('Rechercher une clé…', 'Search a key…')} value={search} onChange={(e) => setSearch(e.target.value)} />
+        <input style={{ ...input, flex: 1 }} placeholder={tr('Rechercher une clé ou un texte…', 'Search a key or text…')} value={search} onChange={(e) => setSearch(e.target.value)} />
         <button style={btnPrimary} onClick={openNew}>+ {tr('Nouvelle clé', 'New key')}</button>
       </div>
 
@@ -89,7 +94,7 @@ export function TranslationsTab({ siteId, langs }: { siteId: number; langs: Lang
               <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '32px' }} colSpan={langs.length + 2}>{tr('Aucune traduction.', 'No translation.')}</td></tr>
             ) : filtered.map((r) => (
               <tr key={r.key}>
-                <td style={{ ...td, fontWeight: 600, fontFamily: 'monospace' }}>{r.key}{r.module && <span style={{ marginLeft: 6, fontSize: 11, color: 'var(--color-muted-foreground)' }}>({r.module})</span>}</td>
+                <td style={{ ...td, fontWeight: 600, fontFamily: 'monospace' }}>{r.key}</td>
                 {langs.map((l) => <td key={l.id} style={{ ...td, color: 'var(--color-muted-foreground)' }}>{(r.texts[l.id]?.text || '—').slice(0, 60)}</td>)}
                 <td style={{ ...td, whiteSpace: 'nowrap', textAlign: 'right' }}>
                   <button style={{ ...btn, height: 28 }} onClick={() => openEdit(r)} title={tr('Éditer', 'Edit')}>✎</button>

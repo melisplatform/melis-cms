@@ -23,6 +23,17 @@ const input: React.CSSProperties = { height: 36, width: '100%', borderRadius: 8,
 const lbl: React.CSSProperties = { display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }
 const hint: React.CSSProperties = { fontSize: 12, color: 'var(--color-muted-foreground)', margin: '6px 0 0' }
 
+/** Drapeau de langue (image servie par MelisCore, comme dans les autres outils). */
+function Flag({ locale }: { locale: string }) {
+  const short = (locale || '').slice(0, 2).toLowerCase()
+  if (!short) return null
+  return (
+    <img src={`/MelisCore/assets/images/lang/${short}.png`} alt="" width={18} height={12}
+      style={{ borderRadius: 2, objectFit: 'cover', boxShadow: '0 0 0 1px rgba(0,0,0,.1)', flexShrink: 0 }}
+      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+  )
+}
+
 // Ordre identique à l'édition legacy : Propriétés, Module Loading, Domaines, Langues, Config, Traductions.
 const TABS = [
   { id: 'props', fr: 'Propriétés', en: 'Properties' },
@@ -240,17 +251,39 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
               <PagePicker value={s404.id} title={s404.title} onChange={(id, t) => setS404({ id, title: t })} />
             </div>
           </div>
+          {/* Drag & Drop mode : choisi UNIQUEMENT à la création (comme le legacy) → lecture seule ici. */}
           <div>
-            <label style={lbl}>{tr('Mode de rendu (DnD)', 'Render mode (DnD)')}</label>
-            <div style={{ display: 'flex', gap: 16 }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }}>
-                <input type="radio" name="dnd" checked={dndMode === ''} onChange={() => setDndMode('')} />
+            <label style={lbl}>{tr('Mode Drag & Drop', 'Drag & Drop mode')}</label>
+            <div style={{ display: 'flex', gap: 16, opacity: 0.65 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'not-allowed' }}>
+                <input type="radio" name="dnd" checked={dndMode === ''} disabled readOnly />
                 {tr('Standard', 'Standard')}
               </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }}>
-                <input type="radio" name="dnd" checked={dndMode === 'bootstrap'} onChange={() => setDndMode('bootstrap')} />
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'not-allowed' }}>
+                <input type="radio" name="dnd" checked={dndMode === 'bootstrap'} disabled readOnly />
                 Bootstrap
               </label>
+            </div>
+            <p style={hint}>{tr('Défini à la création, non modifiable ensuite.', 'Set at creation, cannot be changed afterwards.')}</p>
+          </div>
+
+          {/* Pages d'accueil par langue (comme le legacy — pour chaque langue ACTIVE, cf. onglet Langues). */}
+          <div>
+            <label style={lbl}>{tr('Pages d’accueil par langue', 'Home pages per language')}</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {activeLangIds.length === 0 ? (
+                <p style={hint}>{tr('Aucune langue active — activez-en dans l’onglet Langues.', 'No active language — enable one in the Languages tab.')}</p>
+              ) : data.languages.filter((l) => activeLangIds.includes(l.id)).map((l) => (
+                <div key={l.id} style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 12, alignItems: 'center' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14 }}>
+                    <Flag locale={l.locale} />
+                    {l.name} <span style={{ color: 'var(--color-muted-foreground)', fontSize: 12 }}>({l.locale})</span>
+                  </span>
+                  <PagePicker value={homes[l.id]?.pageId ?? 0} title={homes[l.id]?.title}
+                    placeholder={tr('— page d’accueil —', '— home page —')}
+                    onChange={(id, t) => setHome(l.id, id, t)} />
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -288,22 +321,16 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
       {mode === 'react' && tab === 'langs' && (
         <div style={{ ...card, padding: 20, maxWidth: 760, display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
-            <label style={lbl}>{tr('Langues actives & pages d’accueil', 'Active languages & home pages')}</label>
+            <label style={lbl}>{tr('Langues actives', 'Active languages')}</label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {data.languages.map((l) => {
                 const active = activeLangIds.includes(l.id)
                 return (
-                  <div key={l.id} style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 12, alignItems: 'center' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }}>
-                      <input type="checkbox" checked={active} onChange={() => toggleLang(l.id)} />
-                      {l.name} <span style={{ color: 'var(--color-muted-foreground)', fontSize: 12 }}>({l.locale})</span>
-                    </label>
-                    {active ? (
-                      <PagePicker value={homes[l.id]?.pageId ?? 0} title={homes[l.id]?.title}
-                        placeholder={tr('— page d’accueil —', '— home page —')}
-                        onChange={(id, t) => setHome(l.id, id, t)} />
-                    ) : <span />}
-                  </div>
+                  <label key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }}>
+                    <input type="checkbox" checked={active} onChange={() => toggleLang(l.id)} />
+                    <Flag locale={l.locale} />
+                    {l.name} <span style={{ color: 'var(--color-muted-foreground)', fontSize: 12 }}>({l.locale})</span>
+                  </label>
                 )
               })}
             </div>
@@ -314,15 +341,15 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
             )}
           </div>
           <div>
-            <label style={lbl}>{tr('Gestion des URLs multilingues', 'Multilingual URL handling')}</label>
+            <label style={lbl}>{tr('Comment souhaitez-vous refléter la langue dans les URLs du site ?', "How do you want to reflect the language in the site's URLs?")}</label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }}>
                 <input type="radio" name="optlang" checked={optLangUrl === 1} onChange={() => setOptLangUrl(1)} />
-                {tr('Même domaine pour toutes les langues', 'Same domain for all languages')}
+                {tr('Je veux que la locale apparaisse après mon domaine (ex : www.monsite.com/fr/mapage)', 'I want the locale shown after my domain (ex: www.mysite.com/en/myurl)')}
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }}>
                 <input type="radio" name="optlang" checked={optLangUrl === 2} onChange={() => setOptLangUrl(2)} />
-                {tr('Un domaine par langue', 'One domain per language')}
+                {tr('Je ne veux rien, l’URL de ma page sera construite uniquement sur le nom de la page', "I want nothing, my page url will be solely built on the page's name")}
               </label>
             </div>
           </div>

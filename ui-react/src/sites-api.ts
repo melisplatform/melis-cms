@@ -43,6 +43,13 @@ export async function fetchSiteLangs(): Promise<SiteLang[]> {
   return data.languages
 }
 
+export interface SiteMeta { languages: SiteLang[]; modules: string[]; defaultDomain: string; platform: string }
+/** Meta pour le wizard de création : langues, modules existants, domaine par défaut, plateforme. */
+export async function fetchSiteMeta(): Promise<SiteMeta> {
+  const data = await apiFetch<{ languages: SiteLang[]; modules?: string[]; defaultDomain?: string; platform?: string }>('/melis/react-api/cms-sites/meta')
+  return { languages: data.languages ?? [], modules: data.modules ?? [], defaultDomain: data.defaultDomain ?? '', platform: data.platform ?? '' }
+}
+
 /** Suppression via l'endpoint legacy. Retourne le message serveur. */
 export async function deleteSite(siteId: number): Promise<{ success: boolean; textTitle?: string; textMessage?: string }> {
   const res = await fetch('/melis/MelisCms/Sites/deleteSite', {
@@ -55,13 +62,15 @@ export async function deleteSite(siteId: number): Promise<{ success: boolean; te
 }
 
 export interface CreateSitePayload {
-  name: string
-  label: string
+  name: string                      // nom du module (nouveau module) — généré en PascalCase côté serveur
+  label: string                     // libellé du site (site_label)
   languages: { id: number; locale: string }[]
   domains: Record<string, string>   // locale → domaine (ou clé 'single')
-  urlSetting: number                // 1 = domaine unique, 2 = multi-domaine
-  createModule: boolean
-  isNewSite: boolean
+  urlSetting: number                // 1 = locale après domaine, 2 = un domaine par langue, 3 = rien (nom de page)
+  isNewSite: boolean                // true = créer un NOUVEAU module ; false = rattacher à un module EXISTANT
+  existingModuleName?: string       // nom du module existant si isNewSite=false
+  createFile: boolean               // créer les dossiers/fichiers du module
+  dndRenderMode: boolean            // mode Drag & Drop (bootstrap)
 }
 
 /** Création via la couche react-api propre (qui réutilise MelisCmsSiteService::saveSite). */

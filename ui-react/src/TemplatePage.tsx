@@ -8,11 +8,11 @@ import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle } from './ViewToggle'
 
 /* ──────────────────────────────────────────────────────────────────────────
- * Brique « Templates » (MelisCms). La LISTE est full React (montée à /melis-cms/templates) ;
- * la CRÉATION/ÉDITION (/melis-cms/templates/new|:id) rend l'outil LEGACY en iframe — son
- * formulaire est couplé au système de fichiers (scan contrôleurs/actions/layouts) et à un
- * compteur de plateforme pour `tpl_id` : on ne le réimplémente pas. Styles inline + variables
- * CSS du thème, i18n FR/EN via <html lang> (la brique ne partage pas les modules de l'hôte).
+ * Brique « Templates » (MelisCms). LISTE + CRÉATION + ÉDITION sont full React (montées à
+ * /melis-cms/templates, /new, /:id). La création réutilise le compteur `tpl_id` par plateforme
+ * côté serveur (react-api Template save). La vue « Old » (toggle) affiche le tool legacy en iframe.
+ * Styles inline + variables CSS du thème, i18n FR/EN via <html lang> (la brique ne partage pas
+ * les modules de l'hôte).
  * ────────────────────────────────────────────────────────────────────────── */
 
 const MELIS_KEY = 'meliscms_tool_templates'
@@ -21,6 +21,13 @@ const MELIS_KEY = 'meliscms_tool_templates'
 // Default-allow (true) tant que non chargé / pour un admin ; l'API reste gardée côté serveur (403).
 function can(cap: string): boolean {
   return (window as unknown as { MelisCan?: (k: string, c: string) => boolean }).MelisCan?.(MELIS_KEY, cap) ?? true
+}
+
+// API sous-onglets de l'hôte (la brique ne peut pas importer son contexte React) — cf. manifest subTabs:true.
+// Sans ça, éditer/créer ouvrait un onglet top-level « <id> » au lieu d'un sous-onglet nommé (look Users).
+type SubTabW = {
+  __melisOpenSubTab?: (section: string, tab: { id: string; label: string; path: string }) => void
+  __melisUpdateSubTabLabel?: (section: string, id: string, label: string) => void
 }
 
 // ── i18n minimal ──
@@ -367,6 +374,7 @@ const sectionTitle: CSSProperties = { fontSize: 11, fontWeight: 600, textTransfo
 function TemplateForm({ id, base }: { id: string; base: string }) {
   const t = useT()
   const navigate = useNavigate()
+  const isNew = id === 'new'
   const numId = parseInt(id, 10)
   const [item, setItem] = useState<TemplateItem | null>(null)
   const [sites, setSites] = useState<SiteOption[]>([])
@@ -385,9 +393,19 @@ function TemplateForm({ id, base }: { id: string; base: string }) {
   const [action, setAction] = useState('')
   const [phpPath, setPhpPath] = useState('')
 
-  useEffect(() => { if (!can('edit')) navigate(base) }, [base, navigate])
+  // Sous-onglet nommé (look Users) : ouvert au montage, renommé avec le nom du template au chargement.
+  const subTabId = `${base}/${id}`
+  useEffect(() => {
+    ;(window as unknown as SubTabW).__melisOpenSubTab?.(base, { id: subTabId, label: isNew ? t('form_new') : t('loading'), path: subTabId })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!isNew && item?.name) (window as unknown as SubTabW).__melisUpdateSubTabLabel?.(base, subTabId, item.name)
+  }, [item?.name]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => { if (!can(isNew ? 'create' : 'edit')) navigate(base) }, [base, navigate, isNew])
   useEffect(() => { fetchTemplateSites().then(setSites).catch(() => null) }, [])
   useEffect(() => {
+    if (isNew) return // création : formulaire natif avec des champs vides, pas de fetch.
     if (isNaN(numId) || numId <= 0) { setLoadErr('Invalid ID'); return }
     fetchTemplate(numId).then((tpl) => {
       setItem(tpl)
@@ -404,12 +422,13 @@ function TemplateForm({ id, base }: { id: string; base: string }) {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (!item) return
+    if (!isNew && !item) return
     setSaving(true); setSaveErr(''); setSaved(false)
     try {
-      await saveTemplate({ id: item.id, name, type, siteId, websiteFolder, layout, controller, action, phpPath })
-      setSaved(true)
+      const savedId = await saveTemplate({ id: isNew ? 0 : item!.id, name, type, siteId, websiteFolder, layout, controller, action, phpPath })
       notify('ok', t('title'), t('saved'))
+      if (isNew) navigate(`${base}/${savedId}`) // création → bascule sur l'édition du template créé
+      else setSaved(true)
     } catch (e) {
       setSaveErr(String(e))
       notify('ko', t('title'), t('save_err'))
@@ -421,20 +440,16 @@ function TemplateForm({ id, base }: { id: string; base: string }) {
   if (loadErr) return (
     <div style={{ padding: 24, color: 'var(--color-destructive,#ef4444)', fontSize: 14 }}>{loadErr}</div>
   )
-  if (!item) return (
+  if (!isNew && !item) return (
     <div style={{ padding: 24, fontSize: 14, color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>
   )
-
-  const isZf2 = type === 'ZF2'
-  const isPhp = type === 'PHP'
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, overflow: 'auto' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 24px', borderBottom: '1px solid var(--color-border)', flexShrink: 0 }}>
-        <button style={{ ...btnGhost, height: 32, padding: '0 10px' }} onClick={() => navigate(base)}>← {t('back')}</button>
-        <h1 style={{ fontSize: 16, fontWeight: 600, margin: 0, flex: 1 }}>{t('form_edit')} — {item.name}</h1>
-        <span style={{ fontSize: 12, color: 'var(--color-muted-foreground)' }}>ID {item.id}</span>
+        <h1 style={{ fontSize: 16, fontWeight: 600, margin: 0, flex: 1 }}>{isNew ? t('form_new') : `${t('form_edit')} — ${item!.name}`}</h1>
+        {!isNew && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground)' }}>ID {item!.id}</span>}
         {saveErr && <span style={{ fontSize: 13, color: 'var(--color-destructive,#ef4444)' }}>{saveErr}</span>}
         <button type="submit" form="template-edit-form" style={{ ...btnPrimary, minWidth: 120 }} disabled={saving}>
           {saving ? t('saving') : saved ? t('saved') : t('save')}
@@ -453,10 +468,9 @@ function TemplateForm({ id, base }: { id: string; base: string }) {
           <div style={{ display: 'flex', gap: 12 }}>
             <div style={{ flex: 1 }}>
               <label style={labelCss}>{t('field_type')}</label>
+              {/* Legacy : le type ne propose que « Laminas » (ZF2). Pas d'autres options. */}
               <select style={{ ...inputCss, width: '100%', boxSizing: 'border-box' }} value={type} onChange={(e) => setType(e.target.value)}>
-                <option value="ZF2">Laminas (ZF2)</option>
-                <option value="PHP">PHP</option>
-                <option value="TWG">Twig</option>
+                <option value="ZF2">Laminas</option>
               </select>
             </div>
             <div style={{ flex: 1 }}>
@@ -467,38 +481,25 @@ function TemplateForm({ id, base }: { id: string; base: string }) {
               </select>
             </div>
           </div>
-          <div>
-            <label style={labelCss}>{t('field_folder')}</label>
-            <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: 13 }} value={websiteFolder} onChange={(e) => setWebsiteFolder(e.target.value)} />
-          </div>
         </div>
 
-        {/* Champs spécifiques au type */}
+        {/* Layout / Contrôleur / Action (type Laminas) */}
         <div style={{ ...card, padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <p style={sectionTitle}>{isPhp ? t('field_php_path') : `${t('field_layout')} / ${t('field_ctrl')} / ${t('field_action')}`}</p>
-          {isPhp ? (
-            <div>
-              <label style={labelCss}>{t('field_php_path')}</label>
-              <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: 13 }} value={phpPath} onChange={(e) => setPhpPath(e.target.value)} />
+          <p style={sectionTitle}>{t('field_layout')} / {t('field_ctrl')} / {t('field_action')}</p>
+          <div>
+            <label style={labelCss}>{t('field_layout')}</label>
+            <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: 13 }} value={layout} onChange={(e) => setLayout(e.target.value)} />
+          </div>
+          <div style={{ display: 'flex', gap: 12 }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelCss}>{t('field_ctrl')}</label>
+              <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: 13 }} value={controller} onChange={(e) => setController(e.target.value)} />
             </div>
-          ) : (<>
-            <div>
-              <label style={labelCss}>{t('field_layout')}</label>
-              <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: 13 }} value={layout} onChange={(e) => setLayout(e.target.value)} />
+            <div style={{ flex: 1 }}>
+              <label style={labelCss}>{t('field_action')}</label>
+              <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: 13 }} value={action} onChange={(e) => setAction(e.target.value)} />
             </div>
-            {isZf2 && (<>
-              <div style={{ display: 'flex', gap: 12 }}>
-                <div style={{ flex: 1 }}>
-                  <label style={labelCss}>{t('field_ctrl')}</label>
-                  <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: 13 }} value={controller} onChange={(e) => setController(e.target.value)} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label style={labelCss}>{t('field_action')}</label>
-                  <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: 13 }} value={action} onChange={(e) => setAction(e.target.value)} />
-                </div>
-              </div>
-            </>)}
-          </>)}
+          </div>
         </div>
 
       </form>

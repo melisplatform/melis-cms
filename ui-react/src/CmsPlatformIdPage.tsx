@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   deletePlatformId, fetchPlatformIdById, fetchPlatformIds, fetchPlatformIdStats,
-  savePlatformId, type PlatformIdItem, type PlatformIdStats,
+  savePlatformId, type PlatformIdItem, type PlatformIdStats, type AvailablePlatform,
 } from './cms-platform-id-api'
 import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle } from './ViewToggle'
@@ -41,8 +41,11 @@ const DICT: Record<Lang, Record<string, string>> = {
     new: 'Nouvelle plage', search: 'Rechercher une plage…',
     empty: 'Aucune plage trouvée', count: '{n} plages — fin de la liste',
     kpi_total: 'Total',
-    col_id: 'ID', col_page_start: 'Début page', col_page_current: 'Page courante', col_page_end: 'Fin page',
+    col_id: 'ID', col_name: 'Plateforme', col_page_start: 'Début page', col_page_current: 'Page courante', col_page_end: 'Fin page',
     col_tpl_start: 'Début template', col_tpl_current: 'Template courant', col_tpl_end: 'Fin template',
+    f_platform: 'Plateforme', f_platform_ph: '— Choisir une plateforme —',
+    no_available: 'Toutes les plateformes ont déjà une plage définie.',
+    err_platform: 'Veuillez choisir une plateforme.',
     columns: 'Colonnes', export: 'Exporter', cols_visible: 'Visibles', cols_hidden: 'Masquées', drag_here: 'Glisser ici', reset: 'Réinitialiser',
     edit: 'Modifier', del: 'Supprimer', cancel: 'Annuler', save: 'Enregistrer', back: 'retour',
     refresh: 'Rafraîchir', loading: 'Chargement…', saved: 'Enregistré ✓',
@@ -61,8 +64,11 @@ const DICT: Record<Lang, Record<string, string>> = {
     new: 'New range', search: 'Search a range…',
     empty: 'No range found', count: '{n} ranges — end of list',
     kpi_total: 'Total',
-    col_id: 'ID', col_page_start: 'Page start', col_page_current: 'Page current', col_page_end: 'Page end',
+    col_id: 'ID', col_name: 'Platform', col_page_start: 'Page start', col_page_current: 'Page current', col_page_end: 'Page end',
     col_tpl_start: 'Template start', col_tpl_current: 'Template current', col_tpl_end: 'Template end',
+    f_platform: 'Platform', f_platform_ph: '— Choose a platform —',
+    no_available: 'All platforms already have a range defined.',
+    err_platform: 'Please choose a platform.',
     columns: 'Columns', export: 'Export', cols_visible: 'Visible', cols_hidden: 'Hidden', drag_here: 'Drag here', reset: 'Reset',
     edit: 'Edit', del: 'Delete', cancel: 'Cancel', save: 'Save', back: 'back',
     refresh: 'Refresh', loading: 'Loading…', saved: 'Saved ✓',
@@ -108,13 +114,13 @@ const PlusIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke
 
 // ── Colonnes (masquer + réordonner par glisser-déposer, persisté) ──
 type ColDef = { id: string; visible: boolean }
-const COL_ORDER = ['id', 'pageStart', 'pageCurrent', 'pageEnd', 'tplStart', 'tplCurrent', 'tplEnd'] as const
+const COL_ORDER = ['name', 'id', 'pageStart', 'pageCurrent', 'pageEnd', 'tplStart', 'tplCurrent', 'tplEnd'] as const
 const COL_LABEL: Record<string, string> = {
-  id: 'col_id', pageStart: 'col_page_start', pageCurrent: 'col_page_current', pageEnd: 'col_page_end',
+  name: 'col_name', id: 'col_id', pageStart: 'col_page_start', pageCurrent: 'col_page_current', pageEnd: 'col_page_end',
   tplStart: 'col_tpl_start', tplCurrent: 'col_tpl_current', tplEnd: 'col_tpl_end',
 }
 const DEFAULT_COLS: ColDef[] = COL_ORDER.map((id) => ({ id, visible: id !== 'id' }))
-const COL_KEY = 'melis-cms-platform-ids-cols-v1'
+const COL_KEY = 'melis-cms-platform-ids-cols-v2'
 function loadCols(): ColDef[] {
   try {
     const raw = localStorage.getItem(COL_KEY)
@@ -266,7 +272,9 @@ function CmsPlatformIdList({ base }: { base: string }) {
   }, [search, tick])
 
   const sorted = useMemo(() => [...items].sort((a, b) => {
-    const cmp = cellValue(a, sortCol) - cellValue(b, sortCol)
+    const cmp = sortCol === 'name'
+      ? a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+      : cellValue(a, sortCol) - cellValue(b, sortCol)
     return sortAsc ? cmp : -cmp
   }), [items, sortCol, sortAsc])
 
@@ -289,7 +297,17 @@ function CmsPlatformIdList({ base }: { base: string }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
           <button style={btnGhost} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
-          {can('create') && <button style={btnPrimary} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>}
+          {can('create') && (() => {
+            // On ne peut créer une plage que s'il reste une plateforme SANS plage.
+            const hasAvail = !stats || (stats.availablePlatforms?.length ?? 0) > 0
+            return (
+              <button style={{ ...btnPrimary, opacity: hasAvail ? 1 : 0.5, cursor: hasAvail ? 'pointer' : 'not-allowed' }}
+                disabled={!hasAvail} title={hasAvail ? '' : t('no_available')}
+                onClick={() => { if (hasAvail) navigate(`${base}/new`) }}>
+                <PlusIcon />{t('new')}
+              </button>
+            )
+          })()}
         </div>
       </div>
 
@@ -345,8 +363,8 @@ function CmsPlatformIdList({ base }: { base: string }) {
             ) : sorted.map((r) => (
               <tr key={r.id}>
                 {visibleCols(cols).map(({ id }) => (
-                  <td key={id} style={{ ...td, ...numCell, ...(id === 'id' ? { color: 'var(--color-muted-foreground)' } : {}) }}>
-                    {cellValue(r, id)}
+                  <td key={id} style={{ ...td, ...(id === 'name' ? { fontWeight: 500 } : numCell), ...(id === 'id' ? { color: 'var(--color-muted-foreground)' } : {}) }}>
+                    {id === 'name' ? (r.name || '—') : cellValue(r, id)}
                   </td>
                 ))}
                 <td style={td}>
@@ -385,7 +403,7 @@ function CmsPlatformIdList({ base }: { base: string }) {
           cols={cols}
           labelFor={(id) => t(COL_LABEL[id])}
           fetchAll={async () => (await fetchPlatformIds({ search })).items}
-          getCell={(r, id) => cellValue(r, id)}
+          getCell={(r, id) => id === 'name' ? r.name : cellValue(r, id)}
           filename="platform-ids"
           sheetName={t('title')}
           total={items.length}
@@ -413,6 +431,10 @@ function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
   const isEdit = id !== 'new'
   const platformId = isEdit ? parseInt(id) : null
 
+  const [name, setName] = useState('')
+  // Création : plateformes sans plage + sélection (pids_id = plf_id choisi).
+  const [avail, setAvail] = useState<AvailablePlatform[]>([])
+  const [newPlatform, setNewPlatform] = useState<number | ''>('')
   const [pageStart, setPageStart] = useState('')
   const [pageCurrent, setPageCurrent] = useState('')
   const [pageEnd, setPageEnd] = useState('')
@@ -430,16 +452,29 @@ function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
     ;(window as unknown as SubTabW).__melisOpenSubTab?.(base, { id: subTabId, label, path: subTabId })
   }, [])
   useEffect(() => {
-    if (isEdit && !loading && platformId !== null)
-      ;(window as unknown as SubTabW).__melisUpdateSubTabLabel?.(base, subTabId, `#${platformId}`)
-  }, [loading, isEdit])
+    // Libellé du sous-onglet : nom de la plateforme en édition (au lieu de « #id »), « Nouvelle plage »
+    // en création. updateLabel (et pas seulement openSubTab, idempotent) garantit que le libellé est posé.
+    const label = isEdit ? (name || '') : t('new_title')
+    if (label) (window as unknown as SubTabW).__melisUpdateSubTabLabel?.(base, subTabId, label)
+  }, [loading, isEdit, name]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { if (!can(isEdit ? 'edit' : 'create')) navigate(base) }, [isEdit, base, navigate])
+  // Création : charge les plateformes SANS plage (pour le sélecteur). Aucune → retour liste (garde-fou).
+  useEffect(() => {
+    if (isEdit) return
+    fetchPlatformIdStats().then((s) => {
+      const list = s.availablePlatforms || []
+      setAvail(list)
+      if (list.length === 0) navigate(base)
+      else if (list.length === 1) setNewPlatform(list[0].id)
+    }).catch(() => null)
+  }, [isEdit]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!platformId) return
     setLoading(true)
     fetchPlatformIdById(platformId)
       .then((r) => {
+        setName(r.name)
         setPageStart(String(r.pageStart)); setPageCurrent(String(r.pageCurrent)); setPageEnd(String(r.pageEnd))
         setTplStart(String(r.tplStart)); setTplCurrent(String(r.tplCurrent)); setTplEnd(String(r.tplEnd))
       })
@@ -457,6 +492,7 @@ function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
 
   async function submit() {
     setError(null)
+    if (!isEdit && !newPlatform) { setError(t('err_platform')); return }
     const ps = parseInt0(pageStart), pc = parseInt0(pageCurrent), pe = parseInt0(pageEnd)
     const ts = parseInt0(tplStart), tc = parseInt0(tplCurrent), te = parseInt0(tplEnd)
     if ([ps, pc, pe, ts, tc, te].some((n) => n === null)) { setError(t('err_int')); return }
@@ -466,6 +502,7 @@ function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
     try {
       await savePlatformId({
         id: platformId,
+        platformId: isEdit ? null : Number(newPlatform),
         pageStart: ps!, pageCurrent: pc!, pageEnd: pe!,
         tplStart: ts!, tplCurrent: tc!, tplEnd: te!,
       })
@@ -482,8 +519,7 @@ function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button style={{ ...btnGhost, height: 32, padding: '0 10px' }} onClick={() => navigate(base)}>← {t('back')}</button>
-          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{isEdit ? t('edit_title') : t('new_title')}</h1>
+          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{isEdit ? t('edit_title') : t('new_title')}{isEdit && name ? ` — ${name}` : ''}</h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {saved && <span style={{ fontSize: 14, color: '#059669' }}>{t('saved')}</span>}
@@ -497,6 +533,21 @@ function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
         <div style={{ padding: 48, textAlign: 'center', color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>
       ) : (
         <div style={{ ...card, padding: 20, maxWidth: 640, display: 'flex', flexDirection: 'column', gap: 24 }}>
+          {/* Plateforme : affichée non éditable en édition ; en création on choisit une plateforme SANS plage. */}
+          {isEdit ? (
+            <div>
+              <label style={label}>{t('f_platform')}</label>
+              <input style={{ ...inputCss, opacity: 0.7 }} value={name} disabled readOnly />
+            </div>
+          ) : (
+            <div>
+              <label style={label}>{t('f_platform')}</label>
+              <select style={inputCss} value={newPlatform} onChange={(e) => setNewPlatform(e.target.value ? Number(e.target.value) : '')}>
+                <option value="">{t('f_platform_ph')}</option>
+                {avail.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+              </select>
+            </div>
+          )}
           {/* Page IDs */}
           <div>
             <p style={secTitle}>{t('sec_page')}</p>

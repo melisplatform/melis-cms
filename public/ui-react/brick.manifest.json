@@ -13,7 +13,8 @@
       "route": "/melis-cms/site-301",
       "label": "Redirections 301",
       "forwardKey": "MelisCms/SiteRedirect",
-      "melisKey": "meliscms_tool_site_301"
+      "melisKey": "meliscms_tool_site_301",
+      "subTabs": true
     },
     {
       "id": "cms-templates",
@@ -28,7 +29,8 @@
       "route": "/melis-cms/languages",
       "label": "Languages",
       "forwardKey": "MelisCms/Language",
-      "melisKey": "meliscms_tool_language"
+      "melisKey": "meliscms_tool_language",
+      "subTabs": true
     },
     {
       "id": "cms-platform-ids",
@@ -43,7 +45,8 @@
       "route": "/melis-cms/styles",
       "label": "Styles",
       "forwardKey": "MelisCms/ToolStyle",
-      "melisKey": "meliscms_tool_styles"
+      "melisKey": "meliscms_tool_styles",
+      "subTabs": true
     },
     {
       "id": "cms-sites",

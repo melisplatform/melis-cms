@@ -13,6 +13,24 @@ const lbl: React.CSSProperties = { display: 'block', fontSize: 13, fontWeight: 6
 const input: React.CSSProperties = { height: 34, width: '100%', borderRadius: 8, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-background,#fff)', padding: '0 10px', fontSize: 14, boxSizing: 'border-box' }
 const hint: React.CSSProperties = { fontSize: 12, color: 'var(--color-muted-foreground)' }
 
+/** Pilule de sélection (Général + une par langue) — même design que platform theme / login. */
+const pill = (active: boolean): React.CSSProperties => ({
+  display: 'inline-flex', alignItems: 'center', gap: 8, height: 36, padding: '0 14px', borderRadius: 8,
+  border: active ? '1.5px solid var(--color-primary,#cb4040)' : '1px solid var(--color-border,#e5e7eb)',
+  background: active ? 'color-mix(in srgb, var(--color-primary,#cb4040) 12%, transparent)' : 'transparent',
+  color: active ? 'var(--color-primary,#cb4040)' : 'var(--color-foreground)', fontSize: 14, fontWeight: 600, cursor: 'pointer',
+})
+/** Drapeau de langue (image servie par MelisCore, comme dans les autres outils). */
+function Flag({ locale }: { locale: string }) {
+  const short = (locale || '').slice(0, 2).toLowerCase()
+  if (!short) return null
+  return (
+    <img src={`/MelisCore/assets/images/lang/${short}.png`} alt="" width={18} height={12}
+      style={{ borderRadius: 2, objectFit: 'cover', boxShadow: '0 0 0 1px rgba(0,0,0,.1)', flexShrink: 0 }}
+      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+  )
+}
+
 const sectionKey = (s: ConfigSection) => (s.langId == null ? 'gen' : String(s.langId))
 
 /** Nom de champ POST legacy pour une valeur de config. */
@@ -67,23 +85,23 @@ function SectionForm({ sect, fields, setField }: { sect: ConfigSection; fields: 
 
 export function ConfigTab({ data, fields, setField }: { data: SiteConfigData; fields: Record<string, string>; setField: (n: string, v: string) => void }) {
   const [sub, setSub] = useState<string>('gen')
-  const sections: { key: string; label: string; sect: ConfigSection }[] = [
-    { key: 'gen', label: tr('Général', 'General'), sect: data.general },
-    ...data.perLang.map((s) => ({ key: String(s.langId), label: s.name || s.locale || String(s.langId), sect: s })),
+  const sections: { key: string; label: string; locale: string | null; sect: ConfigSection }[] = [
+    { key: 'gen', label: tr('Général', 'General'), locale: null, sect: data.general },
+    ...data.perLang.map((s) => ({ key: String(s.langId), label: s.name || s.locale || String(s.langId), locale: s.locale ?? null, sect: s })),
   ]
   const current = sections.find((s) => s.key === sub) ?? sections[0]
   return (
-    <div style={{ display: 'flex', gap: 20 }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 150 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* Sélecteur : « Général » + une pilule par langue (drapeau + nom), design cohérent avec platform theme. */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         {sections.map((s) => (
-          <button key={s.key} onClick={() => setSub(s.key)}
-            style={{ textAlign: 'left', padding: '8px 12px', borderRadius: 8, border: 0, cursor: 'pointer', fontSize: 13, fontWeight: 600,
-              background: sub === s.key ? 'var(--color-primary,#cb4040)' : 'transparent', color: sub === s.key ? '#fff' : 'var(--color-foreground)' }}>
+          <button key={s.key} onClick={() => setSub(s.key)} style={pill(sub === s.key)}>
+            {s.locale && <Flag locale={s.locale} />}
             {s.label}
           </button>
         ))}
       </div>
-      <div style={{ flex: 1 }}>
+      <div>
         <SectionForm sect={current.sect} fields={fields} setField={setField} />
       </div>
     </div>

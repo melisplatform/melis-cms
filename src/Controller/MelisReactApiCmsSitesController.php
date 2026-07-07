@@ -73,7 +73,25 @@ class MelisReactApiCmsSitesController extends MelisAbstractActionController
                 }
             } catch (\Throwable) {}
 
-            return $this->jsonResponse(['success' => true, 'data' => ['languages' => $languages]]);
+            // Modules existants (site_name) — pour l'étape « utiliser un module existant » du wizard.
+            $modules = [];
+            try {
+                $rows = $this->getServiceManager()->get('MelisEngineTableSite')->fetchAll();
+                foreach ($rows as $r) {
+                    $r = (array) $r;
+                    $n = (string) ($r['site_name'] ?? '');
+                    if ($n !== '') { $modules[$n] = $n; }
+                }
+            } catch (\Throwable) {}
+            $modules = array_values($modules);
+            sort($modules);
+
+            return $this->jsonResponse(['success' => true, 'data' => [
+                'languages'     => $languages,
+                'modules'       => $modules,
+                'defaultDomain' => (string) ($_SERVER['HTTP_HOST'] ?? ''),
+                'platform'      => (string) (getenv('MELIS_PLATFORM') ?: ''),
+            ]]);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);
         }
@@ -361,18 +379,24 @@ class MelisReactApiCmsSitesController extends MelisAbstractActionController
             $languages = is_array($body['languages'] ?? null) ? $body['languages'] : [];
             $domains   = is_array($body['domains'] ?? null) ? $body['domains'] : [];
             $urlSetting   = (int) ($body['urlSetting'] ?? 1) ?: 1;
-            $createModule = array_key_exists('createModule', $body) ? (bool) $body['createModule'] : true;
+            // isNewSite = créer un NOUVEAU module ; sinon on rattache le site à un module EXISTANT.
             $isNewSite    = array_key_exists('isNewSite', $body) ? (bool) $body['isNewSite'] : true;
+            // createFile = 6e arg de saveSite (créer dossiers/fichiers du module). Rétro-compat `createModule`.
+            $createFile   = array_key_exists('createFile', $body) ? (bool) $body['createFile'] : (bool) ($body['createModule'] ?? false);
+            $dndRenderMode  = (bool) ($body['dndRenderMode'] ?? false);
+            $existingModule = trim((string) ($body['existingModuleName'] ?? ''));
 
-            if ($name === '')        { return $this->jsonResponse(['success' => false, 'error' => 'Site name required'], 422); }
-            if (empty($languages))   { return $this->jsonResponse(['success' => false, 'error' => 'At least one language required'], 422); }
+            // Nom du module : module existant choisi (rattachement) sinon nom saisi (nouveau module).
+            $moduleSource = (!$isNewSite && $existingModule !== '') ? $existingModule : $name;
+            if ($moduleSource === '') { return $this->jsonResponse(['success' => false, 'error' => 'Site name required'], 422); }
+            if (empty($languages))    { return $this->jsonResponse(['success' => false, 'error' => 'At least one language required'], 422); }
 
             $svc       = $this->getServiceManager()->get('MelisCmsSiteService');
-            $siteName  = $svc->generateModuleNameCase($name);
+            $siteName  = $svc->generateModuleNameCase($moduleSource);
             $siteLabel = $label !== '' ? $label : $siteName;
-            // NB : ne PAS ajouter de colonne absente du schéma (ex. `site_dnd_render_mode`) —
-            // l'INSERT échouerait ("Unknown column") et saveSite renverrait l'erreur générique.
             $siteData  = ['site_name' => $siteName, 'site_label' => $siteLabel];
+            // DnD (Drag & Drop) render mode : 'bootstrap' si activé, comme le contrôleur legacy.
+            if ($dndRenderMode) { $siteData['site_dnd_render_mode'] = 'bootstrap'; }
 
             // Unicité du nom de module (comme le contrôleur legacy).
             if ($isNewSite) {
@@ -399,7 +423,7 @@ class MelisReactApiCmsSitesController extends MelisAbstractActionController
             }
             $siteLanguages['sites_url_setting'] = $urlSetting;
 
-            $result = $svc->saveSite($siteData, $domainData, $siteLanguages, [], $siteName, $createModule, $isNewSite);
+            $result = $svc->saveSite($siteData, $domainData, $siteLanguages, [], $siteName, $createFile, $isNewSite);
             if (empty($result['success'])) {
                 // saveSite renvoie une CLÉ de traduction (ex. tr_melis_cms_sites_tool_add_create_site_unknown_error)
                 // → on la traduit ici pour que React affiche un message lisible plutôt que la clé brute.
