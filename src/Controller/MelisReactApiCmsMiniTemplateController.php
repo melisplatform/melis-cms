@@ -223,7 +223,12 @@ class MelisReactApiCmsMiniTemplateController extends MelisAbstractActionControll
                     ? $thumbnail['tmp_name'] : null;
                 $imgExt = $imgTmpPath ? pathinfo((string) ($thumbnail['name'] ?? ''), PATHINFO_EXTENSION) : null;
 
-                $result = $svc->createMiniTemplate($site, $name, $html, $imgTmpPath, $imgExt);
+                // Bouton « + » du Menu manager : lie le template à une catégorie dès la création.
+                // Le service attend le site_id NUMÉRIQUE (mtplct_site_id) — résolu depuis le module.
+                $catId  = isset($_POST['category']) && $_POST['category'] !== '' ? (int) $_POST['category'] : null;
+                $siteId = $catId ? $this->siteIdFromModule($site) : null;
+
+                $result = $svc->createMiniTemplate($site, $name, $html, $imgTmpPath, $imgExt, $catId, $siteId);
             }
 
             if (empty($result['success'])) {
@@ -286,6 +291,17 @@ class MelisReactApiCmsMiniTemplateController extends MelisAbstractActionControll
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────
+
+    /**
+     * Résout le site_id numérique (melis_cms_site.site_id) depuis son module (site_name).
+     * Utilisé pour lier un mini-template à une catégorie à la création (mtplct_site_id).
+     */
+    private function siteIdFromModule(string $module): ?int
+    {
+        $db   = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
+        $rows = iterator_to_array($db->query('SELECT site_id FROM melis_cms_site WHERE site_name = ?', [$module]));
+        return !empty($rows) ? (int) $rows[0]['site_id'] : null;
+    }
 
     /**
      * Find the filesystem directory containing {name}.phtml for a given site.

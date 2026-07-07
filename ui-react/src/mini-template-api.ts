@@ -103,6 +103,8 @@ export async function saveMiniTemplate(payload: {
   oldSite?: string
   oldName?: string
   thumbnail?: File | null
+  /** Menu-manager « + » : lie le template fraîchement créé à cette catégorie (mtplc_id). Création uniquement. */
+  category?: number | null
 }): Promise<MiniTemplateSaveResult> {
   const fd = new FormData()
   fd.append('site', payload.site)
@@ -111,6 +113,7 @@ export async function saveMiniTemplate(payload: {
   if (payload.oldSite) fd.append('oldSite', payload.oldSite)
   if (payload.oldName) fd.append('oldName', payload.oldName)
   if (payload.thumbnail) fd.append('thumbnail', payload.thumbnail)
+  if (payload.category) fd.append('category', String(payload.category))
 
   // Ne PAS passer Content-Type — le navigateur l'ajoute avec le boundary multipart.
   const res = await fetch('/melis/react-api/cms-mini-templates/save', {

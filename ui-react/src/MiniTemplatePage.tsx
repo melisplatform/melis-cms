@@ -1,5 +1,5 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ChangeEvent } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import {
   consumeMiniTemplateListStale, deleteMiniTemplate, fetchMiniTemplateItem, fetchMiniTemplateSites,
   fetchMiniTemplateStats, fetchMiniTemplates, markMiniTemplateListStale, saveMiniTemplate,
@@ -22,6 +22,7 @@ function can(cap: string): boolean {
 // API sub-tabs de l'hôte (la brique ne peut pas importer le contexte React de l'hôte)
 type SubTabW = {
   __melisOpenSubTab?: (section: string, tab: { id: string; label: string; path: string }) => void
+  __melisCloseSubTab?: (section: string, id: string) => void
   __melisUpdateSubTabLabel?: (section: string, id: string, label: string) => void
 }
 
@@ -55,6 +56,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     del_title: 'Supprimer le template',
     del_confirm: 'Supprimer « {n} » ? Cette action est irréversible.',
     new_title: 'Nouveau mini-template', edit_title: 'Modifier le mini-template',
+    add_to_category: 'Ce template sera ajouté à la catégorie « {n} ».',
     f_site: 'Site / Module', f_name: 'Nom du template',
     f_name_ph: 'mon_template', f_name_hint: 'Lettres, chiffres et _ uniquement. Doit commencer par une lettre ou _.',
     f_name_invalid: 'Nom invalide (lettres, chiffres, underscore ; commence par lettre ou _).',
@@ -80,6 +82,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     del_title: 'Delete template',
     del_confirm: 'Delete "{n}"? This action is irreversible.',
     new_title: 'New mini-template', edit_title: 'Edit mini-template',
+    add_to_category: 'This template will be added to the "{n}" category.',
     f_site: 'Site / Module', f_name: 'Template name',
     f_name_ph: 'my_template', f_name_hint: 'Letters, digits and _ only. Must start with a letter or _.',
     f_name_invalid: 'Invalid name (letters, digits, underscore; starts with letter or _).',
@@ -218,9 +221,14 @@ function Kpi({ label: l, value }: { label: string; value: number | null }) {
 // Le routage par URL est la condition des sous-onglets (subTabs) : chaque édition ouvre
 // son propre onglet côté hôte → plusieurs entrées éditables en parallèle.
 export default function MiniTemplatePage() {
-  const { id } = useParams()
   const location = useLocation()
-  const base = id ? location.pathname.slice(0, location.pathname.length - id.length - 1) : location.pathname
+  // ⚠️ Les briques sont montées par Shell HORS de la route `:id` de l'hôte (rendu direct, pas via
+  // l'Outlet) : `useParams()` ne voit jamais le segment `:id` ici → il faut dériver l'id du pathname.
+  // La brique est montée sur 2 segments (/melis-cms/mini-templates) ; un 3e segment (`new` ou l'id
+  // composite site~name) déclenche le formulaire en sous-onglet.
+  const segs = location.pathname.replace(/^\/+|\/+$/g, '').split('/')
+  const base = '/' + segs.slice(0, 2).join('/')
+  const id = segs.length > 2 ? segs.slice(2).join('/') : undefined
   // key={id} : forcer un remount frais à chaque changement de sous-onglet (l'identité site+name
   // vient de l'URL et initialise l'état — sans remount, passer d'une édition à l'autre garderait
   // le site/nom précédent).
@@ -548,8 +556,16 @@ function TinyMceField({ value, onChange }: { value: string; onChange: (v: string
 function MiniTemplateForm({ id, base }: { id: string; base: string }) {
   const t    = useT()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const isEdit = id !== 'new'
   const { site: editSite, name: editName } = isEdit ? decodeId(id) : { site: '', name: '' }
+  // Cross-tool navigation (ex. bouton « Add mini-template » du Menu manager) : présélectionne
+  // le site via son id (?site=<siteId>) — résolu en module une fois la liste des sites chargée.
+  const siteIdParam = !isEdit ? searchParams.get('site') : null
+  // Menu manager « + » sur une catégorie : lie le nouveau template à cette catégorie (mtplc_id).
+  // catName = libellé affiché dans le bandeau d'info (purement cosmétique).
+  const categoryParam = !isEdit ? searchParams.get('category') : null
+  const catNameParam = !isEdit ? searchParams.get('catName') : null
 
   const [sites, setSites]       = useState<MiniTemplateSiteOption[]>([])
   const [site, setSite]         = useState(editSite)
@@ -578,7 +594,11 @@ function MiniTemplateForm({ id, base }: { id: string; base: string }) {
   useEffect(() => {
     fetchMiniTemplateSites().then((s) => {
       setSites(s)
-      if (!isEdit && !site && s.length > 0) setSite(s[0].module)
+      if (!isEdit && !site) {
+        const preselected = siteIdParam ? s.find((o) => String(o.id) === siteIdParam) : undefined
+        if (preselected) setSite(preselected.module)
+        else if (s.length > 0) setSite(s[0].module)
+      }
     }).catch(() => null)
   }, [])
 
@@ -629,9 +649,13 @@ function MiniTemplateForm({ id, base }: { id: string; base: string }) {
         oldSite: isEdit ? editSite : undefined,
         oldName: isEdit ? editName : undefined,
         thumbnail: thumbFile,
+        category: categoryParam ? Number(categoryParam) : undefined,
       })
       markMiniTemplateListStale()
       setSaved(true)
+      // Fermer le sous-onglet de création : après save on revient à la liste,
+      // l'onglet « Nouveau » vide ne doit pas subsister (cf. commerce ContactPage).
+      if (!isEdit) (window as unknown as SubTabW).__melisCloseSubTab?.(base, subTabId)
       setTimeout(() => navigate(base), 600)
     } catch (e) {
       setError(e instanceof Error ? e.message : t('err_save'))
@@ -654,6 +678,12 @@ function MiniTemplateForm({ id, base }: { id: string; base: string }) {
 
       {error && (
         <div style={{ ...card, borderColor: '#fca5a5', background: '#fef2f2', color: '#b91c1c', padding: '8px 14px', fontSize: 14 }}>{error}</div>
+      )}
+
+      {categoryParam && (
+        <div style={{ ...card, borderColor: '#bfdbfe', background: '#eff6ff', color: '#1d4ed8', padding: '8px 14px', fontSize: 14 }}>
+          {t('add_to_category', { n: catNameParam ?? '' })}
+        </div>
       )}
 
       {loading ? (

@@ -131,7 +131,7 @@ class MelisReactApiCmsMenuManagerController extends MelisAbstractActionControlle
             $texts = $service->getCategoryTexts($catId);
             $translations = [];
             foreach ($texts as $text) {
-                $translations[(int) $text['mtplc_lang_id']] = (string) $text['mtplct_name'];
+                $translations[(int) $text['mtplct_lang_id']] = (string) $text['mtplct_name'];
             }
 
             $categoryTable = $this->getServiceManager()->get('MelisCmsMiniTplCategoryTable');
