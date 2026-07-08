@@ -5,6 +5,8 @@ import { ViewToggle, type ViewMode } from './ViewToggle'
 import { ConfigTab, buildConfigFields } from './site-tabs/ConfigTab'
 import { ModuleLoaderTab } from './site-tabs/ModuleLoaderTab'
 import { TranslationsTab } from './site-tabs/TranslationsTab'
+import { ScriptsTab } from './site-tabs/ScriptsTab'
+import { fetchSiteScript, saveSiteScript } from './site-scripts-api'
 
 const MELIS_KEY = 'meliscms_tool_sites'
 function can(cap: string): boolean {
@@ -34,13 +36,15 @@ function Flag({ locale }: { locale: string }) {
   )
 }
 
-// Ordre identique à l'édition legacy : Propriétés, Module Loading, Domaines, Langues, Config, Traductions.
+// Ordre identique à l'édition legacy : Propriétés, Module Loading, Domaines, Langues, Config,
+// Scripts (conditionnel — module MelisCmsPageScriptEditor), Traductions.
 const TABS = [
   { id: 'props', fr: 'Propriétés', en: 'Properties' },
   { id: 'modules', fr: 'Chargement de modules', en: 'Module Loading' },
   { id: 'domains', fr: 'Domaines', en: 'Domains' },
   { id: 'langs', fr: 'Langues', en: 'Languages' },
   { id: 'config', fr: 'Config du site', en: 'Site Config' },
+  { id: 'scripts', fr: 'Scripts', en: 'Scripts' },
   { id: 'translations', fr: 'Traductions', en: 'Translations' },
 ] as const
 type TabId = (typeof TABS)[number]['id']
@@ -58,6 +62,16 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
   const [data, setData] = useState<SiteEditData | null>(null)
   const [loadErr, setLoadErr] = useState<string | null>(null)
   const [tab, setTab] = useState<TabId>('props')
+  // L'onglet Scripts n'apparaît que si le module MelisCmsPageScriptEditor est actif : on sonde son
+  // API (route inexistante si le module est désactivé → 404/erreur → onglet masqué), même logique
+  // que le legacy où l'onglet n'est injecté que si la config du module est chargée.
+  const [scriptsActive, setScriptsActive] = useState(false)
+  // État des scripts du site — levé ici (et non dans ScriptsTab) pour être persisté par le Save
+  // GLOBAL de l'éditeur, comme le legacy (le save du site déclenche le listener de save des scripts).
+  const [scriptId, setScriptId] = useState<number | null>(null)
+  const [scriptHeadTop, setScriptHeadTop] = useState('')
+  const [scriptHeadBottom, setScriptHeadBottom] = useState('')
+  const [scriptBodyBottom, setScriptBodyBottom] = useState('')
   const [mode, setMode] = useState<ViewMode>('react')
   const [frameLoaded, setFrameLoaded] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -81,6 +95,13 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
   const [moduleList, setModuleList] = useState<SiteModule[]>([]) // ordonné (ordre de chargement)
 
   useEffect(() => {
+    fetchSiteScript(siteId).then((r) => {
+      setScriptsActive(true)
+      setScriptId(r.script?.id ?? null)
+      setScriptHeadTop(r.script?.headTop ?? '')
+      setScriptHeadBottom(r.script?.headBottom ?? '')
+      setScriptBodyBottom(r.script?.bodyBottom ?? '')
+    }).catch(() => setScriptsActive(false))
     fetchSiteConfig(siteId).then((c) => { setConfigData(c); setConfigFields(buildConfigFields(c)) }).catch(() => null)
     fetchSiteModules(siteId).then((m) => { setModulesData(m); setModuleList(m.modules) }).catch(() => null)
     fetchSite(siteId).then((d) => {
@@ -164,6 +185,13 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
         modules: modulesData ? { isAdmin: modulesData.isAdmin, activeNames: moduleList.filter((m) => m.active).map((m) => m.name) } : undefined,
       })
       if (res.success === true || (res.success as unknown) === 1) {
+        // Persiste aussi les scripts du site (onglet Scripts) dans le même Save global, comme le legacy.
+        if (scriptsActive) {
+          await saveSiteScript({ siteId, id: scriptId, headTop: scriptHeadTop, headBottom: scriptHeadBottom, bodyBottom: scriptBodyBottom })
+          // récupère l'id créé à la 1ʳᵉ sauvegarde (évite un doublon au save suivant)
+          const sc = await fetchSiteScript(siteId).catch(() => null)
+          if (sc) setScriptId(sc.script?.id ?? null)
+        }
         onLabel(label.trim() || `Site #${siteId}`)
         setSavedAt(Date.now())
         window.postMessage({ __melisNotif: true, kind: 'ok', title: tr('Sites', 'Sites'), message: tr('Enregistré ✓', 'Saved ✓') }, '*')
@@ -215,7 +243,7 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
 
       {/* Tabs */}
       <div style={{ display: mode === 'react' ? 'flex' : 'none', gap: 4, borderBottom: '1px solid var(--color-border,#e5e7eb)' }}>
-        {TABS.map((t) => (
+        {TABS.filter((t) => t.id !== 'scripts' || scriptsActive).map((t) => (
           <button key={t.id} onClick={() => setTab(t.id)}
             style={{ height: 38, padding: '0 16px', border: 0, background: 'transparent', cursor: 'pointer', fontSize: 14, fontWeight: 600,
               color: tab === t.id ? 'var(--color-primary,#cb4040)' : 'var(--color-muted-foreground)',
@@ -362,6 +390,17 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
           {!configData ? <span style={{ fontSize: 14, color: 'var(--color-muted-foreground)' }}>{tr('Chargement…', 'Loading…')}</span>
             : <ConfigTab data={configData} fields={configFields} setField={setConfigField} />}
         </div>
+      )}
+
+      {/* SCRIPTS (onglet natif — module MelisCmsPageScriptEditor). Champs contrôlés + persistés par
+          le Save global ; les exceptions restent autonomes (ajout/suppression immédiats). */}
+      {mode === 'react' && tab === 'scripts' && scriptsActive && (
+        <ScriptsTab
+          siteId={siteId}
+          headTop={scriptHeadTop} onHeadTop={setScriptHeadTop}
+          headBottom={scriptHeadBottom} onHeadBottom={setScriptHeadBottom}
+          bodyBottom={scriptBodyBottom} onBodyBottom={setScriptBodyBottom}
+        />
       )}
 
       {/* TRADUCTIONS (CRUD autonome) */}

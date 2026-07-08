@@ -6,8 +6,7 @@
       "route": "/melis-cms/page",
       "label": "CMS",
       "forwardKey": null,
-      "melisKey": null,
-      "persistent": true
+      "melisKey": null
     },
     {
       "id": "cms-site-301",
@@ -15,8 +14,7 @@
       "label": "Redirections 301",
       "forwardKey": "MelisCms/SiteRedirect",
       "melisKey": "meliscms_tool_site_301",
-      "subTabs": true,
-      "persistent": true
+      "subTabs": true
     },
     {
       "id": "cms-templates",
@@ -24,8 +22,7 @@
       "label": "Templates",
       "forwardKey": "MelisCms/ToolTemplate",
       "melisKey": "meliscms_tool_templates",
-      "subTabs": true,
-      "persistent": true
+      "subTabs": true
     },
     {
       "id": "cms-languages",
@@ -33,8 +30,7 @@
       "label": "Languages",
       "forwardKey": "MelisCms/Language",
       "melisKey": "meliscms_tool_language",
-      "subTabs": true,
-      "persistent": true
+      "subTabs": true
     },
     {
       "id": "cms-platform-ids",
@@ -42,8 +38,7 @@
       "label": "Platforms IDs",
       "forwardKey": "MelisCms/Platform",
       "melisKey": "meliscms_tool_platform_ids",
-      "subTabs": true,
-      "persistent": true
+      "subTabs": true
     },
     {
       "id": "cms-styles",
@@ -51,16 +46,14 @@
       "label": "Styles",
       "forwardKey": "MelisCms/ToolStyle",
       "melisKey": "meliscms_tool_styles",
-      "subTabs": true,
-      "persistent": true
+      "subTabs": true
     },
     {
       "id": "cms-sites",
       "route": "/melis-cms/sites",
       "label": "Sites",
       "forwardKey": "MelisCms/Sites",
-      "melisKey": "meliscms_tool_sites",
-      "persistent": true
+      "melisKey": "meliscms_tool_sites"
     },
     {
       "id": "cms-mini-templates",
@@ -68,8 +61,7 @@
       "label": "Mini-Templates",
       "forwardKey": "MelisCms/MiniTemplateManager",
       "melisKey": "meliscms_mini_template_manager_tool",
-      "subTabs": true,
-      "persistent": true
+      "subTabs": true
     },
     {
       "id": "cms-menu-manager",
@@ -77,8 +69,7 @@
       "label": "Menu manager",
       "forwardKey": "MelisCms/MiniTemplateMenuManager",
       "melisKey": "meliscms_mini_template_menu_manager_tool",
-      "subTabs": true,
-      "persistent": true
+      "subTabs": true
     }
   ]
 }
