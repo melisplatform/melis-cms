@@ -242,13 +242,24 @@ function StatusToggle({ checked, onChange, labelOn, labelOff }: {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-export default function CmsStylePage() {
+export default function CmsStylePage({ active = true }: { active?: boolean }) {
   const { id } = useParams()
   const location = useLocation()
+  // La brique reste MONTÉE au changement d'onglet principal (manifest persistent:true) pour que l'état
+  // de la liste survive au lieu de se recharger. INACTIVE, elle doit IGNORER le route global (un :id
+  // appartenant à un AUTRE outil) : sinon elle basculerait en formulaire, fetcherait un id étranger et
+  // navigate() (détournant la navigation de l'outil actif). On GÈLE donc le route (id + pathname) tant
+  // qu'elle est inactive ; on ne lit le route vif que lorsqu'elle est active.
+  const [frozen, setFrozen] = useState({ id, pathname: location.pathname })
+  useEffect(() => {
+    if (active) setFrozen({ id, pathname: location.pathname })
+  }, [active, id, location.pathname])
+  const effId = active ? id : frozen.id
+  const effPath = active ? location.pathname : frozen.pathname
   // base = route de la liste (pathname sans le segment /:id éventuel)
-  const base = id ? location.pathname.slice(0, location.pathname.length - id.length - 1) : location.pathname
+  const base = effId ? effPath.slice(0, effPath.length - effId.length - 1) : effPath
 
-  if (id) return <StyleForm id={id} base={base} />
+  if (effId) return <StyleForm id={effId} base={base} />
   return <StyleList base={base} />
 }
 

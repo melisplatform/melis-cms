@@ -205,13 +205,19 @@ function Kpi({ label: lbl, value }: { label: string; value: number | null }) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-export default function SiteRedirectPage() {
+export default function SiteRedirectPage({ active = true }: { active?: boolean }) {
   const { id } = useParams()
   const location = useLocation()
+  // Persistante (manifest) : reste montée au changement d'onglet → on GÈLE le route quand inactive
+  // (sinon lecture d'un :id étranger → bascule formulaire + fetch + navigate = détournement). Cf. skill.
+  const [frozen, setFrozen] = useState({ id, pathname: location.pathname })
+  useEffect(() => { if (active) setFrozen({ id, pathname: location.pathname }) }, [active, id, location.pathname])
+  const effId = active ? id : frozen.id
+  const effPath = active ? location.pathname : frozen.pathname
   // base = route de la liste (pathname sans le segment /:id éventuel)
-  const base = id ? location.pathname.slice(0, location.pathname.length - id.length - 1) : location.pathname
+  const base = effId ? effPath.slice(0, effPath.length - effId.length - 1) : effPath
 
-  if (id) return <RedirectForm id={id} base={base} />
+  if (effId) return <RedirectForm id={effId} base={base} />
   return <RedirectList base={base} />
 }
 

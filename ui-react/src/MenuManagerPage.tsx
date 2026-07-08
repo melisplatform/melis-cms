@@ -214,7 +214,7 @@ function moveNode(nodes: TreeNode[], draggedId: string, action: DropAction): Tre
 // ════════════════════════════════════════════════════════════════════════════
 // Page root — route-based (comme Mini-Templates) : /melis-cms/menu-manager (arbre),
 // /melis-cms/menu-manager/new (création) et /melis-cms/menu-manager/:id (édition).
-export default function MenuManagerPage() {
+export default function MenuManagerPage({ active = true }: { active?: boolean }) {
   const location = useLocation()
   // ⚠️ Les briques sont montées par Shell HORS de la route `:id` de l'hôte (rendu direct dans
   // <main>, PAS via l'Outlet) : `useParams()` ne voit donc jamais le segment `:id` → `id` serait
@@ -222,7 +222,11 @@ export default function MenuManagerPage() {
   // mais l'arbre reste affiché). On dérive l'id + la base du pathname : la brique est montée sur
   // 2 segments (/melis-cms/menu-manager) ; un 3e segment (`new` ou l'id numérique d'une catégorie)
   // déclenche le formulaire en sous-onglet.
-  const segs = location.pathname.replace(/^\/+|\/+$/g, '').split('/')
+  // Persistante (manifest) : on GÈLE le pathname quand inactive, sinon un pathname étranger dériverait
+  // un id étranger → bascule formulaire + fetch d'un autre outil = détournement. Cf. skill.
+  const [frozenPath, setFrozenPath] = useState(location.pathname)
+  useEffect(() => { if (active) setFrozenPath(location.pathname) }, [active, location.pathname])
+  const segs = (active ? location.pathname : frozenPath).replace(/^\/+|\/+$/g, '').split('/')
   const base = '/' + segs.slice(0, 2).join('/')
   const id = segs.length > 2 ? segs[2] : undefined
   if (id) return <CategoryForm key={id} id={id} base={base} />

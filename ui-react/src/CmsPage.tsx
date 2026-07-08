@@ -24,10 +24,14 @@ function toolSrc(id: string): string {
   return `/melis/react-tool-page?key=meliscms_page&idPage=${encodeURIComponent(id)}`
 }
 
-export default function CmsPage() {
+export default function CmsPage({ active = true }: { active?: boolean }) {
   const { id } = useParams()
   const navigate = useNavigate()
-  const current = id ?? null
+  // Persistante (manifest) : geler l'id quand inactive, sinon un :id étranger entrerait dans le pool
+  // d'iframes `opened` et tenterait d'afficher l'éditeur d'un autre outil. Cf. skill.
+  const [frozenId, setFrozenId] = useState<string | undefined>(id)
+  useEffect(() => { if (active) setFrozenId(id) }, [active, id])
+  const current = (active ? id : frozenId) ?? null
 
   // Ids whose editor iframe is kept mounted.
   const [opened, setOpened] = useState<string[]>(() => (current ? [current] : []))

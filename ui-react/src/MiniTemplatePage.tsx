@@ -220,13 +220,17 @@ function Kpi({ label: l, value }: { label: string; value: number | null }) {
 // /melis-cms/mini-templates/new (création) et /melis-cms/mini-templates/:id (édition).
 // Le routage par URL est la condition des sous-onglets (subTabs) : chaque édition ouvre
 // son propre onglet côté hôte → plusieurs entrées éditables en parallèle.
-export default function MiniTemplatePage() {
+export default function MiniTemplatePage({ active = true }: { active?: boolean }) {
   const location = useLocation()
   // ⚠️ Les briques sont montées par Shell HORS de la route `:id` de l'hôte (rendu direct, pas via
   // l'Outlet) : `useParams()` ne voit jamais le segment `:id` ici → il faut dériver l'id du pathname.
   // La brique est montée sur 2 segments (/melis-cms/mini-templates) ; un 3e segment (`new` ou l'id
   // composite site~name) déclenche le formulaire en sous-onglet.
-  const segs = location.pathname.replace(/^\/+|\/+$/g, '').split('/')
+  // Persistante (manifest) : on GÈLE le pathname quand inactive, sinon un pathname étranger dériverait
+  // un id étranger → bascule formulaire + fetch d'un autre outil = détournement. Cf. skill.
+  const [frozenPath, setFrozenPath] = useState(location.pathname)
+  useEffect(() => { if (active) setFrozenPath(location.pathname) }, [active, location.pathname])
+  const segs = (active ? location.pathname : frozenPath).replace(/^\/+|\/+$/g, '').split('/')
   const base = '/' + segs.slice(0, 2).join('/')
   const id = segs.length > 2 ? segs.slice(2).join('/') : undefined
   // key={id} : forcer un remount frais à chaque changement de sous-onglet (l'identité site+name
