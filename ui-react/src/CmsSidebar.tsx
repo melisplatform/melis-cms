@@ -2,15 +2,16 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate, useParams } from 'react-router-dom'
 import PageTree, { type CmsTreeAction } from './PageTree'
+import DuplicatePageModal from './DuplicatePageModal'
 import type { MelisTreeNode } from './cms-tree-api'
 
 /**
- * Legacy modal actions (dupe/export/import) → rendered standalone via react-tool-page
+ * Legacy modal actions (export/import) → rendered standalone via react-tool-page
  * (full platform env) inside a React overlay. Each is a real melisKey zone in
  * melis-cms/config/app.interface.php; the query param is what its forward reads.
+ * `dupe` is now a NATIVE React modal (DuplicatePageModal) — no iframe.
  */
-const MODALS: Record<Exclude<CmsTreeAction, 'new'>, { key: string; param: string; title: string }> = {
-  dupe:   { key: 'meliscms_tools_tree_modal_form_handler', param: 'sourcePageId', title: 'Dupliquer la page' },
+const MODALS: Record<'export' | 'import', { key: string; param: string; title: string }> = {
   export: { key: 'meliscms_page_export_modal',             param: 'pageId',       title: 'Exporter la page' },
   import: { key: 'meliscms_page_import_modal',             param: 'pageId',       title: 'Importer une page' },
 }
@@ -32,6 +33,8 @@ export default function CmsSidebar() {
   // id may be "<number>" (edit) or "new~<father>" (create) — only a numeric id is "selected".
   const selectedId = id && /^\d+$/.test(id) ? Number(id) : null
   const [modal, setModal] = useState<{ src: string; title: string } | null>(null)
+  // Native "Duplicate tree" modal (replaces the legacy iframe tool) — holds the source page.
+  const [dupNode, setDupNode] = useState<MelisTreeNode | null>(null)
 
   const openTab = (path: string, label: string) => {
     ;(window as unknown as { __melisOpenTab?: OpenTab }).__melisOpenTab?.({ id: path, label, path })
@@ -42,6 +45,11 @@ export default function CmsSidebar() {
     if (action === 'new') {
       // Create a child page under this node (idFatherPage = node.key).
       openTab(`/melis-cms/page/new~${node.key}`, 'Nouvelle page')
+      return
+    }
+    if (action === 'dupe') {
+      // Native React modal (no iframe): duplicate the whole page tree from this node.
+      setDupNode(node)
       return
     }
     const m = MODALS[action]
@@ -105,6 +113,16 @@ export default function CmsSidebar() {
           </div>
         </div>,
         document.body,
+      )}
+
+      {/* Native "Duplicate tree" modal (replaces the legacy iframe tool). */}
+      {dupNode && (
+        <DuplicatePageModal
+          sourcePageId={dupNode.key}
+          sourceTitle={dupNode.title}
+          onClose={() => setDupNode(null)}
+          onDone={() => setDupNode(null)}
+        />
       )}
     </div>
   )

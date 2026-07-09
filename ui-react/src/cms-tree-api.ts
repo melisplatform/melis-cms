@@ -120,6 +120,56 @@ export async function movePage(params: {
   }
 }
 
+/**
+ * Duplicates a whole page tree (legacy endpoint, no backend change):
+ *   POST /melis/MelisCms/TreeSites/duplicateTreePage
+ *   body (form-encoded): sourcePageId, lang_id, pageRelation, destinationPageId, use_root
+ * Mirrors the legacy "Duplicate tree" tool (meliscms_tools_tree_modal_form_handler):
+ *  - `useRoot` places the copy at the site root; the backend forces destinationPageId = -1
+ *    (so we may leave it empty — matching the legacy disabled field).
+ *  - `pageRelation` links each copy to its source as a language version of the same page.
+ * Returns the server success flag + notification texts + validation errors.
+ */
+export interface DuplicateTreeParams {
+  sourcePageId: number
+  langId: number
+  pageRelation: boolean
+  destinationPageId: number | null
+  useRoot: boolean
+}
+
+export async function duplicateTreePage(
+  p: DuplicateTreeParams,
+): Promise<{ success: boolean; title?: string; message?: string; errors?: unknown }> {
+  try {
+    const body = new URLSearchParams({
+      sourcePageId: String(p.sourcePageId),
+      lang_id: String(p.langId),
+      pageRelation: p.pageRelation ? '1' : '0',
+      use_root: p.useRoot ? '1' : '0',
+      destinationPageId: p.useRoot ? '' : String(p.destinationPageId ?? ''),
+    })
+    const res = await fetch('/melis/MelisCms/TreeSites/duplicateTreePage', {
+      method: 'POST',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      },
+      credentials: 'include',
+      body: body.toString(),
+    })
+    const data = await res.json()
+    return {
+      success: data?.success === 1 || data?.success === true,
+      title: data?.textTitle,
+      message: data?.textMessage,
+      errors: data?.errors,
+    }
+  } catch {
+    return { success: false }
+  }
+}
+
 export async function fetchTreeNodes(nodeId: number): Promise<MelisTreeNode[]> {
   try {
     const res = await fetch(
