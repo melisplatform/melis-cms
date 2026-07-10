@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { fetchSite, saveSiteEdit, fetchSiteConfig, fetchSiteModules, type SiteEditData, type SiteConfigData, type SiteModulesData, type SiteModule } from './sites-api'
 import { PagePicker } from './PagePicker'
-import { ViewToggle, type ViewMode } from './ViewToggle'
+import { type ViewMode } from './ViewToggle'
 import { ConfigTab, buildConfigFields } from './site-tabs/ConfigTab'
 import { ModuleLoaderTab } from './site-tabs/ModuleLoaderTab'
 import { TranslationsTab } from './site-tabs/TranslationsTab'
@@ -72,8 +72,7 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
   const openExtraTab = (id: string) => { setTab(id); setActivatedTabs((s) => s.has(id) ? s : new Set(s).add(id)) }
   const tabLabelOf = (l: string | { fr: string; en: string }) => (typeof l === 'string' ? l : (LANG === 'en' ? l.en : l.fr))
 
-  const [mode, setMode] = useState<ViewMode>('react')
-  const [frameLoaded, setFrameLoaded] = useState(false)
+  const [mode] = useState<ViewMode>('react') // édition toujours en React (pas de vue Old ici)
   const [saving, setSaving] = useState(false)
   const [savedAt, setSavedAt] = useState(0)
   const [error, setError] = useState<string | null>(null)
@@ -213,7 +212,7 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
           <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0', fontFamily: 'monospace' }}>{data.site.name} · #{data.site.id}</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
+          {/* Pas de toggle New/Old en ÉDITION (uniquement sur la liste). */}
           {savedAt > 0 && mode === 'react' && <span style={{ fontSize: 12, color: '#15803d' }}>✓ {tr('Enregistré', 'Saved')}</span>}
           {can('edit') && mode === 'react' && (
             <button style={{ ...btnPrimary, opacity: saving ? 0.6 : 1 }} disabled={saving} onClick={submit}>
@@ -222,15 +221,6 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
           )}
         </div>
       </div>
-
-      {/* Vue « Old » : ÉDITION legacy du site (zone meliscms_tool_sites_edit_site + siteId) */}
-      {frameLoaded && (
-        <div style={{ ...card, display: mode === 'iframe' ? 'flex' : 'none', flex: 1, minHeight: 480, overflow: 'hidden' }}>
-          <iframe src={`/melis/react-tool-page?key=meliscms_tool_sites_edit_site&siteId=${siteId}`}
-            style={{ flex: 1, width: '100%', border: 0 }} title="Site edit — Vue Melis"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals" />
-        </div>
-      )}
 
       {/* Tabs */}
       <div style={{ display: mode === 'react' ? 'flex' : 'none', gap: 4, borderBottom: '1px solid var(--color-border,#e5e7eb)' }}>
