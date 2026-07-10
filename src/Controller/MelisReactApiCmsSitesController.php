@@ -35,13 +35,39 @@ class MelisReactApiCmsSitesController extends MelisAbstractActionController
             $search    = (string) $this->params()->fromQuery('search', '');
             $rows      = $siteTable->getSitesData($search, ['site_name', 'site_label'], 'site_name', 'asc', null, null)->toArray();
 
+            // Carte des langues CMS disponibles (lang_cms_id → {id, locale, name}). Le slang_lang_id
+            // d'un site référence ce lang_cms_id (cf. getAction).
+            $langMap = [];
+            try {
+                foreach ((array) $this->getServiceManager()->get('MelisEngineLang')->getAvailableLanguages() as $l) {
+                    $l  = (array) $l;
+                    $id = (int) ($l['lang_cms_id'] ?? $l['lang_id'] ?? 0);
+                    $langMap[$id] = [
+                        'id'     => $id,
+                        'locale' => (string) ($l['lang_cms_locale'] ?? $l['lang_locale'] ?? ''),
+                        'name'   => (string) ($l['lang_cms_name'] ?? $l['lang_name'] ?? ''),
+                    ];
+                }
+            } catch (\Throwable) {}
+
+            $siteLangsTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteLangs');
+
             $items = [];
             foreach ($rows as $r) {
+                $siteId = (int) ($r['site_id'] ?? 0);
+                // Langues ACTIVES du site (drapeaux en front).
+                $languages = [];
+                try {
+                    foreach ($siteLangsTable->getSiteLangs(null, $siteId, null, true)->toArray() as $sl) {
+                        $lid = (int) $sl['slang_lang_id'];
+                        if (isset($langMap[$lid])) { $languages[] = $langMap[$lid]; }
+                    }
+                } catch (\Throwable) {}
                 $items[] = [
-                    'id'        => (int) ($r['site_id'] ?? 0),
+                    'id'        => $siteId,
                     'name'      => (string) ($r['site_name'] ?? ''),
                     'label'     => (string) ($r['site_label'] ?? ''),
-                    'languages' => (string) ($r['site_language'] ?? ($r['lang_name'] ?? '')),
+                    'languages' => $languages, // tableau [{id, locale, name}]
                 ];
             }
 

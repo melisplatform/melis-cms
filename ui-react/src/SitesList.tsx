@@ -18,8 +18,8 @@ const DICT: Record<string, { fr: string; en: string }> = {
   new: { fr: 'Nouveau site', en: 'New site' },
   search: { fr: 'Rechercher un site…', en: 'Search a site…' },
   col_id: { fr: 'ID', en: 'ID' },
-  col_name: { fr: 'Nom (module)', en: 'Name (module)' },
-  col_label: { fr: 'Libellé', en: 'Label' },
+  col_label: { fr: 'Nom du site', en: 'Site name' },
+  col_name: { fr: 'Module', en: 'Module' },
   col_lang: { fr: 'Langues', en: 'Languages' },
   edit: { fr: 'Éditer', en: 'Edit' },
   del: { fr: 'Supprimer', en: 'Delete' },
@@ -42,6 +42,18 @@ const btnPrimary: React.CSSProperties = { ...btnGhost, border: 0, background: 'v
 const inputCss: React.CSSProperties = { borderRadius: 8, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-background,#fff)', padding: '0 10px', fontSize: 14, boxSizing: 'border-box' }
 const th: React.CSSProperties = { textAlign: 'left', fontSize: 12, fontWeight: 600, color: 'var(--color-muted-foreground,#6b7280)', padding: '10px 14px' }
 const td: React.CSSProperties = { fontSize: 14, padding: '10px 14px', borderTop: '1px solid var(--color-border,#f0f0f0)' }
+
+/** Drapeau de langue (image MelisCore /assets/images/lang/<short>.png). en_EN → en, fr_FR → fr. */
+function LangFlag({ locale, name }: { locale: string; name: string }) {
+  const short = (locale || '').slice(0, 2).toLowerCase()
+  if (!short) return null
+  return (
+    <img src={`/MelisCore/assets/images/lang/${short}.png`} alt={name} title={name}
+      width={18} height={12}
+      style={{ display: 'inline-block', borderRadius: 2, objectFit: 'cover', boxShadow: '0 0 1px rgba(0,0,0,.3)' }}
+      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+  )
+}
 
 export default function SitesList({ active, onEdit, onNew }: {
   active: boolean
@@ -114,8 +126,8 @@ export default function SitesList({ active, onEdit, onNew }: {
               <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
                 <tr>
                   <th style={{ ...th, width: 60 }}>{t('col_id')}</th>
-                  <th style={th}>{t('col_name')}</th>
                   <th style={th}>{t('col_label')}</th>
+                  <th style={th}>{t('col_name')}</th>
                   <th style={th}>{t('col_lang')}</th>
                   <th style={{ ...th, width: 90 }} />
                 </tr>
@@ -126,9 +138,15 @@ export default function SitesList({ active, onEdit, onNew }: {
                 ) : sorted.map((s) => (
                   <tr key={s.id}>
                     <td style={{ ...td, color: 'var(--color-muted-foreground)' }}>{s.id}</td>
-                    <td style={{ ...td, fontWeight: 600 }}>{s.name}</td>
-                    <td style={td}>{s.label}</td>
-                    <td style={{ ...td, color: 'var(--color-muted-foreground)' }}>{s.languages || '—'}</td>
+                    <td style={{ ...td, fontWeight: 600 }}>{s.label}</td>
+                    <td style={{ ...td, color: 'var(--color-muted-foreground)' }}>{s.name}</td>
+                    <td style={td}>
+                      {s.languages && s.languages.length > 0 ? (
+                        <span style={{ display: 'inline-flex', gap: 5, flexWrap: 'wrap', alignItems: 'center' }}>
+                          {s.languages.map((l) => <LangFlag key={l.id} locale={l.locale} name={l.name} />)}
+                        </span>
+                      ) : <span style={{ color: 'var(--color-muted-foreground)' }}>—</span>}
+                    </td>
                     <td style={{ ...td, whiteSpace: 'nowrap', textAlign: 'right' }}>
                       <button style={{ ...btnGhost, height: 28 }} title={t('edit')}
                         onClick={() => onEdit(s.id, s.label || s.name)}>✎</button>

@@ -11,8 +11,8 @@
 
 const XHR_HEADER = { 'X-Requested-With': 'XMLHttpRequest' } as const
 
-export interface SiteItem { id: number; name: string; label: string; languages: string }
 export interface SiteLang { id: number; locale: string; name: string }
+export interface SiteItem { id: number; name: string; label: string; languages: SiteLang[] }
 
 // Flag "liste périmée" : posé après une création/édition/suppression, consommé par la liste
 // quand elle redevient active (elle reste montée — onglets parallèles — donc ne se recharge pas seule).
