@@ -259,12 +259,13 @@ function RedirectList({ base }: { base: string }) {
   }
 
   function testRedirect(r: RedirectItem) {
-    if (!r.oldUrl) return
-    const path = r.oldUrl.startsWith('/') ? r.oldUrl : '/' + r.oldUrl
-    // Par défaut : URL RELATIVE → hérite du schéma (http/https) ET du domaine courants, exactement
-    // comme le legacy (window.open(oldUrl)). C'est le comportement robuste : le schéma du BO fait foi,
-    // pas celui — parfois périmé (http au lieu de https) — de melis_cms_site_domain, qui ouvrait le
-    // site en http → bootstrap front raté → 404 « brut » au lieu de la vraie page 404 du site.
+    // On ouvre la NOUVELLE url (la destination), pas l'ancienne — parité avec le legacy, dont le
+    // handler lit `td:nth-child(4)` = colonne s301_new_url (la variable y est trompeusement nommée
+    // `oldUrl`). « Tester » = vérifier que la cible de la redirection répond bien.
+    if (!r.newUrl) return
+    const path = r.newUrl.startsWith('/') ? r.newUrl : '/' + r.newUrl
+    // URL RELATIVE par défaut → hérite du schéma (http/https) ET du domaine courants, comme le legacy.
+    // Le schéma du BO fait foi, pas celui — parfois périmé (http vs https) — de melis_cms_site_domain.
     // On ne bascule sur le domaine absolu (baseUrl) QUE si la redirection vise un AUTRE domaine que
     // celui courant (cas multi-site) : là, le relatif toucherait le mauvais site.
     let url = path
