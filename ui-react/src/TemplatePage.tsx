@@ -40,7 +40,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     kpi_total: "Total", kpi_sites: "Sites", kpi_types: "Types",
     all_sites: "Tous les sites", all_types: "Tous les types",
     col_id: "ID", col_name: "Nom", col_type: "Type", col_ctrl: "Contrôleur / Action", col_layout: "Layout", col_site: "Site", col_date: "Création",
-    columns: "Colonnes", export: "Exporter", cols_visible: "Visibles", cols_hidden: "Masquées", drag_here: "Glisser ici", reset: "Réinitialiser",
+    columns: "Colonnes", export: "Exporter", cols_visible: "Visibles", cols_hidden: "Masquées", drag_here: "Glisser ici", reset: "Réinitialiser", reset_filters: "Réinitialiser les filtres",
     edit: "Modifier", del: "Supprimer", cancel: "Annuler", back: "retour", refresh: "Rafraîchir", loading: "Chargement…",
     del_title: "Supprimer le template", del_confirm: "Supprimer « {n} » ? Cette action est irréversible.",
     no_access: "Vous n'avez pas les droits pour consulter cette liste.",
@@ -56,7 +56,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     kpi_total: "Total", kpi_sites: "Sites", kpi_types: "Types",
     all_sites: "All sites", all_types: "All types",
     col_id: "ID", col_name: "Name", col_type: "Type", col_ctrl: "Controller / Action", col_layout: "Layout", col_site: "Site", col_date: "Created",
-    columns: "Columns", export: "Export", cols_visible: "Visible", cols_hidden: "Hidden", drag_here: "Drag here", reset: "Reset",
+    columns: "Columns", export: "Export", cols_visible: "Visible", cols_hidden: "Hidden", drag_here: "Drag here", reset: "Reset", reset_filters: "Reset filters",
     edit: "Edit", del: "Delete", cancel: "Cancel", back: "back", refresh: "Refresh", loading: "Loading…",
     del_title: "Delete template", del_confirm: "Delete \"{n}\"? This action is irreversible.",
     no_access: "You do not have permission to view this list.",
@@ -91,6 +91,7 @@ const sIcon = { width: 15, height: 15, flexShrink: 0 } as const
 const PencilIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
 const TrashIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /></svg>
 const PlusIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
+const ResetIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v6h6" /><path d="M3 13a9 9 0 1 0 3-7.7L3 8" /></svg>
 const GripIcon = () => <svg style={{ width: 13, height: 13, flexShrink: 0, color: 'var(--color-muted-foreground)' }} viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" /><circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" /><circle cx="9" cy="18" r="1.5" /><circle cx="15" cy="18" r="1.5" /></svg>
 
 // ── Colonnes (masquer + réordonner, persisté) ──
@@ -243,6 +244,15 @@ function TemplateList({ base }: { base: string }) {
   }, [items, sortCol, sortAsc])
 
   function toggleSort(id: string) { if (sortCol === id) setSortAsc((v) => !v); else { setSortCol(id); setSortAsc(true) } }
+  // Réinitialiser les filtres : recherche + site + tri par défaut (aucun → ordre de l'API), puis refetch.
+  // On vide `items` : sinon les lignes restent affichées pendant le rechargement et le clic paraît sans effet.
+  function resetFilters() {
+    setSearchInput(''); setSearch('')
+    setSite(null)
+    setSortCol(null); setSortAsc(true)
+    setItems([])
+    setTick((x) => x + 1)
+  }
   async function confirmDelete() {
     if (!toDelete) return
     try { await deleteTemplate(toDelete.id); setToDelete(null); setTick((x) => x + 1) } catch { setToDelete(null) }
@@ -296,6 +306,7 @@ function TemplateList({ base }: { base: string }) {
           <option value="">{t('all_sites')}</option>
           {sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
         </select>
+        <button style={btnGhost} onClick={resetFilters}><ResetIcon />{t('reset_filters')}</button>
         <div style={{ position: 'relative' }}>
           <button style={btnGhost} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
           {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}

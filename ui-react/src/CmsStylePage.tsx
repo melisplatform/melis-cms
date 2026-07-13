@@ -46,7 +46,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     all_sites: 'Tous les sites', filter_all: 'Tous',
     status_active: 'Actif', status_inactive: 'Inactif',
     col_id: 'ID', col_status: 'Statut', col_name: 'Nom', col_path: 'Chemin', col_site: 'Site',
-    columns: 'Colonnes', export: 'Exporter', cols_visible: 'Visibles', cols_hidden: 'Masquées', drag_here: 'Glisser ici', reset: 'Réinitialiser',
+    columns: 'Colonnes', export: 'Exporter', cols_visible: 'Visibles', cols_hidden: 'Masquées', drag_here: 'Glisser ici', reset: 'Réinitialiser', reset_filters: 'Réinitialiser les filtres',
     edit: 'Modifier', del: 'Supprimer', cancel: 'Annuler', save: 'Enregistrer', back: 'retour',
     refresh: 'Rafraîchir', loading: 'Chargement…', saved: 'Enregistré ✓',
     del_title: 'Supprimer le style', del_confirm: 'Supprimer « {n} » ? Cette action est irréversible.',
@@ -66,7 +66,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     all_sites: 'All sites', filter_all: 'All',
     status_active: 'Active', status_inactive: 'Inactive',
     col_id: 'ID', col_status: 'Status', col_name: 'Name', col_path: 'Path', col_site: 'Site',
-    columns: 'Columns', export: 'Export', cols_visible: 'Visible', cols_hidden: 'Hidden', drag_here: 'Drag here', reset: 'Reset',
+    columns: 'Columns', export: 'Export', cols_visible: 'Visible', cols_hidden: 'Hidden', drag_here: 'Drag here', reset: 'Reset', reset_filters: 'Reset filters',
     edit: 'Edit', del: 'Delete', cancel: 'Cancel', save: 'Save', back: 'back',
     refresh: 'Refresh', loading: 'Loading…', saved: 'Saved ✓',
     del_title: 'Delete style', del_confirm: 'Delete “{n}”? This action is irreversible.',
@@ -106,6 +106,7 @@ const sIcon = { width: 15, height: 15, flexShrink: 0 } as const
 const PencilIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
 const TrashIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /></svg>
 const PlusIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
+const ResetIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v6h6" /><path d="M3 13a9 9 0 1 0 3-7.7L3 8" /></svg>
 
 // ── Colonnes (masquer + réordonner par glisser-déposer, persisté) ──
 type ColDef = { id: string; visible: boolean }
@@ -294,6 +295,17 @@ function StyleList({ base }: { base: string }) {
 
   const sorted = useMemo(() => [...items].sort((a, b) => sortAsc ? a.id - b.id : b.id - a.id), [items, sortAsc])
 
+  // Réinitialiser les filtres : recherche + statut + site + tri par défaut (id desc), puis refetch.
+  // On vide `items` : sinon les lignes restent affichées pendant le rechargement et le clic paraît sans effet.
+  function resetFilters() {
+    setSearchInput(''); setSearch('')
+    setStatus('')
+    setSite(null)
+    setSortAsc(false)
+    setItems([])
+    setTick((x) => x + 1)
+  }
+
   async function confirmDelete() {
     if (!toDelete) return
     try { await deleteStyle(toDelete.id); setToDelete(null); setTick((x) => x + 1) }
@@ -362,6 +374,7 @@ function StyleList({ base }: { base: string }) {
           <option value="">{t('all_sites')}</option>
           {sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
         </select>
+        <button style={{ ...btnGhost, height: 36 }} onClick={resetFilters}><ResetIcon />{t('reset_filters')}</button>
         <div style={{ position: 'relative' }}>
           <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
           {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}

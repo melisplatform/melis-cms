@@ -42,7 +42,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     empty: 'Aucune langue trouvée', count: '{n} langues — fin de la liste',
     kpi_total: 'Total',
     col_id: 'ID', col_locale: 'Locale', col_name: 'Nom',
-    columns: 'Colonnes', export: 'Exporter', cols_visible: 'Visibles', cols_hidden: 'Masquées', drag_here: 'Glisser ici', reset: 'Réinitialiser',
+    columns: 'Colonnes', export: 'Exporter', cols_visible: 'Visibles', cols_hidden: 'Masquées', drag_here: 'Glisser ici', reset: 'Réinitialiser', reset_filters: 'Réinitialiser les filtres',
     edit: 'Modifier', del: 'Supprimer', cancel: 'Annuler', save: 'Enregistrer', back: 'retour',
     refresh: 'Rafraîchir', loading: 'Chargement…', saved: 'Enregistré ✓',
     del_title: 'Supprimer la langue', del_confirm: 'Supprimer « {u} » ? Cette action est irréversible.',
@@ -59,7 +59,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     empty: 'No language found', count: '{n} languages — end of list',
     kpi_total: 'Total',
     col_id: 'ID', col_locale: 'Locale', col_name: 'Name',
-    columns: 'Columns', export: 'Export', cols_visible: 'Visible', cols_hidden: 'Hidden', drag_here: 'Drag here', reset: 'Reset',
+    columns: 'Columns', export: 'Export', cols_visible: 'Visible', cols_hidden: 'Hidden', drag_here: 'Drag here', reset: 'Reset', reset_filters: 'Reset filters',
     edit: 'Edit', del: 'Delete', cancel: 'Cancel', save: 'Save', back: 'back',
     refresh: 'Refresh', loading: 'Loading…', saved: 'Saved ✓',
     del_title: 'Delete language', del_confirm: 'Delete “{u}”? This action is irreversible.',
@@ -98,6 +98,7 @@ const sIcon = { width: 15, height: 15, flexShrink: 0 } as const
 const PencilIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
 const TrashIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /></svg>
 const PlusIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
+const ResetIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v6h6" /><path d="M3 13a9 9 0 1 0 3-7.7L3 8" /></svg>
 
 // ── Colonnes (masquer + réordonner par glisser-déposer, persisté) ──
 type ColDef = { id: string; visible: boolean }
@@ -261,6 +262,15 @@ function CmsLanguageList({ base }: { base: string }) {
 
   function toggleSort(id: string) { if (sortCol === id) setSortAsc((v) => !v); else { setSortCol(id); setSortAsc(true) } }
 
+  // Réinitialiser les filtres : recherche (seul filtre) + tri par défaut (aucun → ordre de l'API), puis refetch.
+  // On vide `items` : sinon les lignes restent affichées pendant le rechargement et le clic paraît sans effet.
+  function resetFilters() {
+    setSearchInput(''); setSearch('')
+    setSortCol(null); setSortAsc(true)
+    setItems([])
+    setTick((x) => x + 1)
+  }
+
   async function confirmDelete() {
     if (!toDelete) return
     try { await deleteLanguage(toDelete.id); setToDelete(null); setTick((x) => x + 1) }
@@ -307,6 +317,7 @@ function CmsLanguageList({ base }: { base: string }) {
           onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && setSearch(searchInput.trim())}
           placeholder={t('search')} />
+        <button style={{ ...btnGhost, height: 36 }} onClick={resetFilters}><ResetIcon />{t('reset_filters')}</button>
         <div style={{ position: 'relative' }}>
           <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
           {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}

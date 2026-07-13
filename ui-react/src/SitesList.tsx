@@ -17,6 +17,7 @@ const DICT: Record<string, { fr: string; en: string }> = {
   refresh: { fr: 'Rafraîchir', en: 'Refresh' },
   new: { fr: 'Nouveau site', en: 'New site' },
   search: { fr: 'Rechercher un site…', en: 'Search a site…' },
+  reset_filters: { fr: 'Réinitialiser les filtres', en: 'Reset filters' },
   col_id: { fr: 'ID', en: 'ID' },
   col_label: { fr: 'Nom du site', en: 'Site name' },
   col_name: { fr: 'Module', en: 'Module' },
@@ -42,6 +43,9 @@ const btnPrimary: React.CSSProperties = { ...btnGhost, border: 0, background: 'v
 const inputCss: React.CSSProperties = { borderRadius: 8, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-background,#fff)', padding: '0 10px', fontSize: 14, boxSizing: 'border-box' }
 const th: React.CSSProperties = { textAlign: 'left', fontSize: 12, fontWeight: 600, color: 'var(--color-muted-foreground,#6b7280)', padding: '10px 14px' }
 const td: React.CSSProperties = { fontSize: 14, padding: '10px 14px', borderTop: '1px solid var(--color-border,#f0f0f0)' }
+
+/** Flèche de rotation anti-horaire — bouton « Réinitialiser les filtres ». */
+const ResetIcon = () => <svg style={{ width: 14, height: 14, flexShrink: 0 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v6h6" /><path d="M3 13a9 9 0 1 0 3-7.7L3 8" /></svg>
 
 /** Drapeau de langue (image MelisCore /assets/images/lang/<short>.png). en_EN → en, fr_FR → fr. */
 function LangFlag({ locale, name }: { locale: string; name: string }) {
@@ -78,6 +82,15 @@ export default function SitesList({ active, onEdit, onNew }: {
   useEffect(() => { if (active && consumeSitesListStale()) setTick((x) => x + 1) }, [active])
 
   const sorted = useMemo(() => [...items].sort((a, b) => a.id - b.id), [items])
+
+  // Réinitialiser les filtres : recherche (seul filtre de cette liste ; le tri est fixe, par id),
+  // puis refetch. On vide `items` : sinon les lignes restent affichées pendant le rechargement et
+  // le clic paraît sans effet quand aucune recherche n'était saisie.
+  function resetFilters() {
+    setSearchInput(''); setSearch('')
+    setItems([])
+    setTick((x) => x + 1)
+  }
 
   async function confirmDelete() {
     if (!toDelete) return
@@ -119,6 +132,7 @@ export default function SitesList({ active, onEdit, onNew }: {
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && setSearch(searchInput.trim())}
               placeholder={t('search')} />
+            <button style={{ ...btnGhost, height: 36 }} onClick={resetFilters}><ResetIcon />{t('reset_filters')}</button>
           </div>
 
           <div style={{ ...card, overflow: 'hidden' }}>
