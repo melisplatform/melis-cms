@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 
 import SitesList from './SitesList'
 import SiteWizard from './SiteWizard'
@@ -65,7 +65,7 @@ const NEW_TAB = 0
  * Reflète le sous-onglet actif dans l'URL : /[section]/[tool]/:id (ou /new), comme l'outil
  * Utilisateurs. COSMÉTIQUE (history.replaceState) — PAS de navigation React Router, sinon le host
  * créerait un onglet de shell par id (le pattern « sous-onglets in-tool » garde l'état en local).
- * Le host (ToolTabBar) ne réécrit PAS l'URL de cet outil (il est dans SELF_MANAGED_SUBTABS).
+ * Le host (ToolTabBar) ne réécrit PAS l'URL de cet outil (il est dans SELF_MANAGED_URL).
  */
 function reflectSubTabUrl(seg: string | number | null) {
   const base = window.location.pathname.replace(/\/(?:new|\d+)$/, '')
@@ -102,42 +102,12 @@ export default function SitesPage() {
     setOpen((prev) => prev.map((o) => (o.id === id ? { ...o, label } : o)))
   }
 
-  // ── Vue « Old » (iframe legacy) : router l'édition vers l'ÉDITEUR REACT ─────────
-  // La liste legacy en iframe (SitesList mode Old) ouvre l'édition d'un site dans SA propre pile
-  // d'onglets (qu'elle POSTe à l'hôte via __melisToolTabs). Plutôt que de laisser l'hôte afficher
-  // une 2ᵉ barre (ToolTabBar) qui s'empile sur SiteSubTabBar, on intercepte le message ici : on
-  // ouvre le SiteEditor React (même sous-onglet unique) et on referme l'onglet dans l'iframe pour
-  // qu'elle revienne à sa liste (pas de rebond ni d'édition « fantôme »).
-  const seenEditTabs = useRef<Set<string>>(new Set())
-  useEffect(() => {
-    function onMsg(e: MessageEvent) {
-      const d = e.data as { __melisToolTabs?: boolean; melisKey?: string; tabs?: { id: string; label: string; active: boolean; primary?: boolean }[] } | null
-      if (!d || !d.__melisToolTabs || d.melisKey !== 'meliscms_tool_sites') return
-      const tabs = Array.isArray(d.tabs) ? d.tabs : []
-      const primary = tabs.find((t) => t.primary)
-      const present = new Set<string>()
-      for (const t of tabs) {
-        if (t.primary) continue
-        present.add(t.id)
-        if (seenEditTabs.current.has(t.id)) continue
-        seenEditTabs.current.add(t.id)
-        // id des onglets d'édition : "<siteId>_id_meliscms_tool_sites_edit_site".
-        const m = t.id.match(/^(\d+)_id_meliscms_tool_sites_edit_site$/)
-        if (!m) continue
-        const siteId = Number(m[1])
-        openEditor(siteId, t.label || `#${siteId}`)
-        // Referme l'onglet dans l'iframe legacy → elle repasse sur sa liste (le SiteEditor React prend le relais).
-        const frame = document.querySelector('iframe[title="Sites — Vue Melis"]') as HTMLIFrameElement | null
-        try { frame?.contentWindow?.postMessage({ __melisToolTabCmd: true, melisKey: 'meliscms_tool_sites', cmd: 'close', id: t.id, next: primary?.id ?? null }, '*') } catch { /* ignore */ }
-      }
-      // Purge les ids d'onglets fermés (pour re-router une prochaine édition du même site).
-      for (const id of Array.from(seenEditTabs.current)) if (!present.has(id)) seenEditTabs.current.delete(id)
-    }
-    window.addEventListener('message', onMsg)
-    return () => window.removeEventListener('message', onMsg)
-    // openEditor n'utilise que des setters stables → capture initiale suffisante.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // ── Vue « Old » (iframe legacy) ──────────────────────────────────────────────────
+  // Elle reste 100% LEGACY : ouvrir un site depuis la liste legacy ouvre le formulaire legacy DANS
+  // l'iframe (tabOpen), et la barre d'onglets de l'hôte (ToolTabBar, alimentée par le pont
+  // __melisToolTabs) permet de revenir à la liste — comme pour tout autre outil de la plateforme.
+  // On ne détourne PLUS ces onglets vers le SiteEditor React : c'était le but du toggle de pouvoir
+  // comparer les deux interfaces, et le détournement rendait la vue Old inutilisable.
 
   const activeId = view.kind === 'edit' ? view.id : view.kind === 'new' ? NEW_TAB : null
   const hasNew = open.some((o) => o.id === NEW_TAB)
