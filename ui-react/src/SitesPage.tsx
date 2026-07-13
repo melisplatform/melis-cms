@@ -61,6 +61,18 @@ function SiteSubTabBar({ tabs, activeId, onBack, onSelect, onClose }: {
 // Sentinelle d'id pour le sous-onglet « Nouveau site » (les ids de site réels sont > 0).
 const NEW_TAB = 0
 
+/**
+ * Reflète le sous-onglet actif dans l'URL : /[section]/[tool]/:id (ou /new), comme l'outil
+ * Utilisateurs. COSMÉTIQUE (history.replaceState) — PAS de navigation React Router, sinon le host
+ * créerait un onglet de shell par id (le pattern « sous-onglets in-tool » garde l'état en local).
+ * Le host (ToolTabBar) ne réécrit PAS l'URL de cet outil (il est dans SELF_MANAGED_SUBTABS).
+ */
+function reflectSubTabUrl(seg: string | number | null) {
+  const base = window.location.pathname.replace(/\/(?:new|\d+)$/, '')
+  const next = seg != null && seg !== '' ? `${base}/${seg}` : base
+  if (window.location.pathname !== next) window.history.replaceState(window.history.state, '', next)
+}
+
 export default function SitesPage() {
   const [view, setView] = useState<View>({ kind: 'list' })
   const [open, setOpen] = useState<OpenTab[]>([])
@@ -129,6 +141,11 @@ export default function SitesPage() {
 
   const activeId = view.kind === 'edit' ? view.id : view.kind === 'new' ? NEW_TAB : null
   const hasNew = open.some((o) => o.id === NEW_TAB)
+
+  // URL = /[section]/[tool]/:id (ou /new), reflétée à chaque changement de sous-onglet actif.
+  useEffect(() => {
+    reflectSubTabUrl(view.kind === 'edit' ? view.id : view.kind === 'new' ? 'new' : null)
+  }, [view])
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>

@@ -53,7 +53,8 @@
       "route": "/melis-cms/sites",
       "label": "Sites",
       "forwardKey": "MelisCms/Sites",
-      "melisKey": "meliscms_tool_sites"
+      "melisKey": "meliscms_tool_sites",
+      "persistent": true
     },
     {
       "id": "cms-mini-templates",
