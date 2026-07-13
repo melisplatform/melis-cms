@@ -15,6 +15,7 @@ export interface RedirectItem {
   siteName: string
   oldUrl: string
   newUrl: string
+  baseUrl: string | null
 }
 export interface RedirectStats { total: number; sites: number }
 export interface SiteOption { id: number; name: string }

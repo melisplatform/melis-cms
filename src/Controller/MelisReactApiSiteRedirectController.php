@@ -73,13 +73,14 @@ class MelisReactApiSiteRedirectController extends MelisAbstractActionController
 
             $rows = $db->query(
                 "SELECT r.s301_id, r.s301_site_id, r.s301_old_url, r.s301_new_url,
-                        s.site_name, s.site_label
+                        s.site_name, s.site_label, d.sdom_scheme, d.sdom_domain
                  FROM melis_cms_site_301 r
                  LEFT JOIN melis_cms_site s ON s.site_id = r.s301_site_id
+                 LEFT JOIN melis_cms_site_domain d ON d.sdom_site_id = s.site_id AND d.sdom_env = ?
                  $whereClause
                  ORDER BY r.s301_id DESC
                  LIMIT ? OFFSET ?",
-                array_merge($params, [$limit, $offset])
+                array_merge([(string) getenv('MELIS_PLATFORM')], $params, [$limit, $offset])
             );
 
             $items = [];
@@ -163,11 +164,12 @@ class MelisReactApiSiteRedirectController extends MelisAbstractActionController
             $db   = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
             $rows = iterator_to_array($db->query(
                 "SELECT r.s301_id, r.s301_site_id, r.s301_old_url, r.s301_new_url,
-                        s.site_name, s.site_label
+                        s.site_name, s.site_label, d.sdom_scheme, d.sdom_domain
                  FROM melis_cms_site_301 r
                  LEFT JOIN melis_cms_site s ON s.site_id = r.s301_site_id
+                 LEFT JOIN melis_cms_site_domain d ON d.sdom_site_id = s.site_id AND d.sdom_env = ?
                  WHERE r.s301_id = ?",
-                [$id]
+                [(string) getenv('MELIS_PLATFORM'), $id]
             ));
             if (!$rows) {
                 return $this->jsonResponse(['success' => false, 'error' => 'Not found'], 404);
@@ -275,12 +277,14 @@ class MelisReactApiSiteRedirectController extends MelisAbstractActionController
     {
         $siteName = trim((string) ($r['site_label'] ?? ''));
         if ($siteName === '') { $siteName = (string) ($r['site_name'] ?? ''); }
+        $domain = trim((string) ($r['sdom_domain'] ?? ''));
         return [
             'id'       => (int)    $r['s301_id'],
             'siteId'   => (int)    $r['s301_site_id'],
             'siteName' => $siteName !== '' ? $siteName : ('#' . (int) $r['s301_site_id']),
             'oldUrl'   => (string) $r['s301_old_url'],
             'newUrl'   => (string) $r['s301_new_url'],
+            'baseUrl'  => $domain !== '' ? (((string) ($r['sdom_scheme'] ?? '') ?: 'http') . '://' . $domain) : null,
         ];
     }
 

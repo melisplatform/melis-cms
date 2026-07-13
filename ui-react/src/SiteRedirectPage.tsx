@@ -37,7 +37,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     kpi_total: 'Total', kpi_sites: 'Sites concernés',
     all_sites: 'Tous les sites', col_id: 'ID', col_site: 'Site', col_old: 'Ancienne URL', col_new: 'Nouvelle URL',
     columns: 'Colonnes', export: 'Exporter', cols_visible: 'Visibles', cols_hidden: 'Masquées', drag_here: 'Glisser ici', reset: 'Réinitialiser',
-    edit: 'Modifier', del: 'Supprimer', cancel: 'Annuler', save: 'Enregistrer', back: 'retour',
+    edit: 'Modifier', del: 'Supprimer', cancel: 'Annuler', save: 'Enregistrer', back: 'retour', test: 'Tester la redirection',
     refresh: 'Rafraîchir', loading: 'Chargement…', saved: 'Enregistré ✓',
     del_title: 'Supprimer la redirection', del_confirm: 'Supprimer « {u} » ? Cette action est irréversible.',
     new_title: 'Nouvelle redirection', edit_title: 'Modifier la redirection',
@@ -53,7 +53,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     kpi_total: 'Total', kpi_sites: 'Sites covered',
     all_sites: 'All sites', col_id: 'ID', col_site: 'Site', col_old: 'Old URL', col_new: 'New URL',
     columns: 'Columns', export: 'Export', cols_visible: 'Visible', cols_hidden: 'Hidden', drag_here: 'Drag here', reset: 'Reset',
-    edit: 'Edit', del: 'Delete', cancel: 'Cancel', save: 'Save', back: 'back',
+    edit: 'Edit', del: 'Delete', cancel: 'Cancel', save: 'Save', back: 'back', test: 'Test the redirect',
     refresh: 'Refresh', loading: 'Loading…', saved: 'Saved ✓',
     del_title: 'Delete redirect', del_confirm: 'Delete “{u}”? This action is irreversible.',
     new_title: 'New redirect', edit_title: 'Edit redirect',
@@ -98,6 +98,7 @@ const PencilIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stro
 const TrashIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /></svg>
 const PlusIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
 const ArrowRight = () => <svg style={{ width: 13, height: 13, color: 'var(--color-muted-foreground)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7" /></svg>
+const TestIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><path d="M15 3h6v6" /><path d="M10 14 21 3" /></svg>
 
 // ── Colonnes (masquer + réordonner par glisser-déposer, persisté) ──
 type ColDef = { id: string; visible: boolean }
@@ -257,6 +258,14 @@ function RedirectList({ base }: { base: string }) {
     catch { setToDelete(null) }
   }
 
+  function testRedirect(r: RedirectItem) {
+    if (!r.oldUrl) return
+    // baseUrl = domaine réel du site (résolu côté serveur) : nécessaire pour que le navigateur
+    // suive le 301 (sinon oldUrl relative s'ouvre sur l'origine du back-office, pas du front).
+    const url = r.baseUrl ? r.baseUrl.replace(/\/$/, '') + (r.oldUrl.startsWith('/') ? '' : '/') + r.oldUrl : r.oldUrl
+    window.open(url, '_blank')
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
       {/* Header */}
@@ -342,6 +351,7 @@ function RedirectList({ base }: { base: string }) {
                 ))}
                 <td style={td}>
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
+                    {can('test') && <button style={iconBtn} title={t('test')} onClick={() => testRedirect(r)}><TestIcon /></button>}
                     {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>}
                     {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
                   </div>

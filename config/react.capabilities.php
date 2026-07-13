@@ -8,7 +8,7 @@
 
 return [
     'melisReactToolCapabilities' => [
-        'meliscms_tool_site_301'      => ['list', 'create', 'edit', 'delete', 'export'],
+        'meliscms_tool_site_301'      => ['list', 'create', 'edit', 'delete', 'export', 'test'],
         'meliscms_tool_templates'     => ['list', 'create', 'edit', 'delete', 'export'],
         'meliscms_tool_styles'        => ['list', 'create', 'edit', 'delete', 'export'],
         'meliscms_tool_language'      => ['list', 'create', 'edit', 'delete'], // pas d'export
