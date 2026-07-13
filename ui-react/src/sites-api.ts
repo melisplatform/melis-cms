@@ -12,7 +12,7 @@
 const XHR_HEADER = { 'X-Requested-With': 'XMLHttpRequest' } as const
 
 export interface SiteLang { id: number; locale: string; name: string }
-export interface SiteItem { id: number; name: string; label: string; languages: SiteLang[] }
+export interface SiteItem { id: number; name: string; label: string; languages: SiteLang[]; moduleFound: boolean }
 
 // Flag "liste périmée" : posé après une création/édition/suppression, consommé par la liste
 // quand elle redevient active (elle reste montée — onglets parallèles — donc ne se recharge pas seule).
@@ -53,6 +53,22 @@ export async function fetchSiteMeta(): Promise<SiteMeta> {
 /** Suppression via l'endpoint legacy. Retourne le message serveur. */
 export async function deleteSite(siteId: number): Promise<{ success: boolean; textTitle?: string; textMessage?: string }> {
   const res = await fetch('/melis/MelisCms/Sites/deleteSite', {
+    method: 'POST',
+    headers: { ...XHR_HEADER, 'Content-Type': 'application/x-www-form-urlencoded' },
+    credentials: 'include',
+    body: new URLSearchParams({ siteId: String(siteId) }).toString(),
+  })
+  return res.json()
+}
+
+/**
+ * Minification des assets (JS/CSS) du site — endpoint LEGACY partagé avec le bouton du même nom
+ * de la liste Sites classique (MelisFront\Controller\MinifyAssetsController, route racine
+ * `/minify-assets`, PAS sous `/melis`). Toute la logique (bundling MatthiasMullie\Minify,
+ * écriture de public/bundle.js|css, horodatage) reste côté Melis.
+ */
+export async function minifyAssets(siteId: number): Promise<{ title: string; message: string; success: boolean }> {
+  const res = await fetch('/minify-assets', {
     method: 'POST',
     headers: { ...XHR_HEADER, 'Content-Type': 'application/x-www-form-urlencoded' },
     credentials: 'include',

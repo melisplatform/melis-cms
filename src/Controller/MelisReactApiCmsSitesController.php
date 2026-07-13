@@ -10,7 +10,7 @@ use MelisCore\Controller\MelisAbstractActionController;
 /**
  * API REST pour l'outil "Sites" de MelisCms (liste + métadonnées du tunnel de création).
  *
- *   GET /melis/react-api/cms-sites        → { items: [{id,name,label,languages}], total }
+ *   GET /melis/react-api/cms-sites        → { items: [{id,name,label,languages,moduleFound}], total }
  *   GET /melis/react-api/cms-sites/meta   → { languages: [{id,locale,name}] } (pour le tunnel React)
  *
  * La SUPPRESSION et la CRÉATION réutilisent les endpoints legacy éprouvés
@@ -51,6 +51,7 @@ class MelisReactApiCmsSitesController extends MelisAbstractActionController
             } catch (\Throwable) {}
 
             $siteLangsTable = $this->getServiceManager()->get('MelisEngineTableCmsSiteLangs');
+            $cmsSiteSrv     = $this->getServiceManager()->get('MelisCmsSiteService');
 
             $items = [];
             foreach ($rows as $r) {
@@ -63,11 +64,18 @@ class MelisReactApiCmsSitesController extends MelisAbstractActionController
                         if (isset($langMap[$lid])) { $languages[] = $langMap[$lid]; }
                     }
                 } catch (\Throwable) {}
+                // Module trouvé sur disque ? (désactive le bouton "Minifier les assets" — même
+                // check que SitesController::renderToolSitesContentAction() / DT_RowAttr[data-mod-found]).
+                $moduleFound = false;
+                try {
+                    $moduleFound = file_exists($cmsSiteSrv->getModulePath((string) ($r['site_name'] ?? '')));
+                } catch (\Throwable) {}
                 $items[] = [
-                    'id'        => $siteId,
-                    'name'      => (string) ($r['site_name'] ?? ''),
-                    'label'     => (string) ($r['site_label'] ?? ''),
-                    'languages' => $languages, // tableau [{id, locale, name}]
+                    'id'          => $siteId,
+                    'name'        => (string) ($r['site_name'] ?? ''),
+                    'label'       => (string) ($r['site_label'] ?? ''),
+                    'languages'   => $languages, // tableau [{id, locale, name}]
+                    'moduleFound' => $moduleFound,
                 ];
             }
 
