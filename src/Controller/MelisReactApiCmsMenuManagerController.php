@@ -174,10 +174,34 @@ class MelisReactApiCmsMenuManagerController extends MelisAbstractActionControlle
                 $params[((int) $langId) . '_name'] = trim((string) $name);
             }
 
+            // Les modules greffent des listeners sur ces événements (MelisCmsFlashMessengerListener
+            // journalise les *_end). L'API React DOIT donc déclencher les mêmes événements que
+            // MiniTemplateMenuManagerController, avec la même forme de params.
+            $event    = $catId ? 'meliscms_mini_template_menu_manager_update_category' : 'meliscms_mini_template_menu_manager_create_category';
+            $typeCode = $catId ? 'CMS_MTPL_CATEGORY_UPDATE' : 'CMS_MTPL_CATEGORY_ADD';
+
+            $this->getEventManager()->trigger($event . '_start', $this, $params);
+
             $service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
             $res = $service->saveCategory($params, $catId);
 
-            if (!$res['success']) {
+            $success = !empty($res['success']);
+            $message = $catId
+                ? ($success ? 'tr_meliscms_mini_template_menu_manager_category_updated_successfully' : 'tr_meliscms_mini_template_menu_manager_category_update_fail')
+                : ($success ? 'tr_meliscms_mini_template_menu_manager_category_created_successfully' : 'tr_meliscms_mini_template_menu_manager_category_create_fail');
+
+            $this->getEventManager()->trigger($event . '_end', $this, [
+                'success'      => $success ? 1 : 0,
+                'textTitle'    => 'tr_meliscms_mini_template_menu_manager_category',
+                'textMessage'  => $message,
+                'errors'       => $res['errors'] ?? [],
+                'id'           => $res['id'] ?? 0,
+                'categoryName' => $success ? $this->categoryNameForLog($translations, $currentLocale) : '',
+                'typeCode'     => $typeCode,
+                'itemId'       => $res['id'] ?? 0,
+            ]);
+
+            if (!$success) {
                 return $this->jsonResponse(['success' => false, 'error' => $this->flattenErrors($res['errors'] ?? [])], 400);
             }
             return $this->jsonResponse(['success' => true, 'data' => ['id' => (int) $res['id']]], $catId ? 200 : 201);
@@ -197,9 +221,26 @@ class MelisReactApiCmsMenuManagerController extends MelisAbstractActionControlle
         }
 
         try {
+            // Legacy : $params = POST, dont ['id' => '<catId>-…'] (id du nœud jsTree). Ici l'id est déjà
+            // numérique et vient de la route — on le passe sous la même clé pour les listeners.
+            $this->getEventManager()->trigger('meliscms_mini_template_menu_manager_delete_category_start', $this, ['id' => $catId]);
+
             $service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
             $res = $service->deleteCategory($catId);
-            if (!$res['success']) {
+
+            $success = !empty($res['success']);
+
+            $this->getEventManager()->trigger('meliscms_mini_template_menu_manager_delete_category_end', $this, [
+                'success'     => $success ? 1 : 0,
+                'textTitle'   => 'tr_meliscms_mini_template_menu_manager_category',
+                'textMessage' => $success ? 'tr_meliscms_mini_template_menu_manager_category_deleted_successfully' : 'tr_meliscms_mini_template_menu_manager_category_delete_fail',
+                'errors'      => $res['errors'] ?? [],
+                'id'          => $catId,
+                'typeCode'    => 'CMS_MTPL_CATEGORY_DELETE',
+                'itemId'      => $catId,
+            ]);
+
+            if (!$success) {
                 return $this->jsonResponse(['success' => false, 'error' => $this->flattenErrors($res['errors'] ?? [])], 400);
             }
             return $this->jsonResponse(['success' => true, 'data' => null]);
@@ -209,6 +250,38 @@ class MelisReactApiCmsMenuManagerController extends MelisAbstractActionControlle
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+    /**
+     * Nom de catégorie transmis aux listeners *_end (journalisation), même règle que le legacy :
+     * la traduction de la locale courante si elle existe, sinon la 1re non vide suffixée de sa langue.
+     */
+    private function categoryNameForLog(array $translations, string $currentLocale): string
+    {
+        try {
+            $langService = $this->getServiceManager()->get('MelisEngineLangService');
+            $currentLang = $langService->getLangByLocale($currentLocale);
+            $currentLangId = (int) ($currentLang['lang_cms_id'] ?? 0);
+
+            $fallback = '';
+            foreach ($translations as $langId => $name) {
+                $name = trim((string) $name);
+                if ($name === '') {
+                    continue;
+                }
+                if ((int) $langId === $currentLangId) {
+                    return $name;
+                }
+                if ($fallback === '') {
+                    $lang = $langService->getLangDataById((int) $langId);
+                    $lang = !empty($lang) ? $lang[0] : [];
+                    $fallback = $name . ' (' . ($lang['lang_cms_name'] ?? '') . ')';
+                }
+            }
+            return $fallback;
+        } catch (\Throwable) {
+            return '';
+        }
+    }
 
     private function flattenErrors(array $errors): string
     {
