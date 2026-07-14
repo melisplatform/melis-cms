@@ -206,8 +206,34 @@ class MelisReactApiCmsMiniTemplateController extends MelisAbstractActionControll
 
             $thumbnail = $_FILES['thumbnail'] ?? ['name' => '', 'tmp_name' => '', 'error' => UPLOAD_ERR_NO_FILE];
 
+            $currentSite = $oldSite !== '' ? $oldSite : $site;
+            $catId       = isset($_POST['category']) && $_POST['category'] !== '' ? (int) $_POST['category'] : null;
+            $siteId      = $catId ? $this->siteIdFromModule($site) : null;
+
+            // Les modules greffent des listeners sur ces événements (ex. MelisAICommunityExtensions,
+            // qui déplace les CSS/JS/images générés par l'IA de temp/ vers leur emplacement définitif
+            // sur create_end, et nettoie ces assets sur delete_end). L'API React DOIT donc déclencher
+            // les mêmes événements que MiniTemplateManagerController, avec la même forme de params.
+            $startData = [
+                'miniTemplateSiteModule' => $site,
+                'miniTemplateName'       => $name,
+                'miniTemplateHtml'       => $html,
+                'miniTemplateThumbnail'  => $thumbnail,
+                'categoryId'             => $catId,
+                'siteId'                 => $siteId,
+            ];
             if ($isEdit) {
-                $currentSite = $oldSite !== '' ? $oldSite : $site;
+                $startData['current_module']   = $currentSite;
+                $startData['current_template'] = $oldName;
+            }
+
+            $this->getEventManager()->trigger(
+                $isEdit ? 'meliscms_mini_template_manager_update_start' : 'meliscms_mini_template_manager_create_start',
+                $this,
+                $startData
+            );
+
+            if ($isEdit) {
                 $result = $svc->updateMiniTemplate(
                     ['miniTemplateSiteModule' => $currentSite, 'miniTemplateName' => $oldName],
                     [
@@ -225,13 +251,32 @@ class MelisReactApiCmsMiniTemplateController extends MelisAbstractActionControll
 
                 // Bouton « + » du Menu manager : lie le template à une catégorie dès la création.
                 // Le service attend le site_id NUMÉRIQUE (mtplct_site_id) — résolu depuis le module.
-                $catId  = isset($_POST['category']) && $_POST['category'] !== '' ? (int) $_POST['category'] : null;
-                $siteId = $catId ? $this->siteIdFromModule($site) : null;
-
                 $result = $svc->createMiniTemplate($site, $name, $html, $imgTmpPath, $imgExt, $catId, $siteId);
             }
 
-            if (empty($result['success'])) {
+            $success = !empty($result['success']);
+
+            // *_end : mêmes clés que le legacy (success / textTitle / textMessage / errors / data
+            // + typeCode), attendues par les listeners (MelisCmsFlashMessengerListener journalise,
+            // MelisAICommunityExtensionsCreateMiniTemplateListener lit data.module/data.template_name).
+            $endData = [
+                'success'     => $success ? 1 : 0,
+                'textTitle'   => 'Mini-template',
+                'textMessage' => $isEdit
+                    ? ($success ? 'tr_meliscms_mini_template_updated_successfully' : 'tr_meliscms_mini_template_update_fail')
+                    : ($success ? 'tr_meliscms_mini_template_created_successfully' : 'tr_meliscms_mini_template_create_fail'),
+                'errors'      => $result['errors'] ?? [],
+                'data'        => $result['data'] ?? [],
+                'typeCode'    => $isEdit ? 'CMS_MTPL_UPDATE' : 'CMS_MTPL_ADD',
+            ];
+
+            $this->getEventManager()->trigger(
+                $isEdit ? 'meliscms_mini_template_manager_update_end' : 'meliscms_mini_template_manager_create_end',
+                $this,
+                $endData
+            );
+
+            if (!$success) {
                 $errors = $result['errors'] ?? [];
                 $msg    = is_array($errors) && !empty($errors) ? implode(' ', array_column($errors, 'error')) : 'Erreur lors de la sauvegarde.';
                 return $this->jsonResponse(['success' => false, 'error' => $msg], 400);
@@ -276,9 +321,27 @@ class MelisReactApiCmsMiniTemplateController extends MelisAbstractActionControll
             $phtmlPath = $path . '/' . $name . '.phtml';
             [, $thumbAbsPath] = $this->buildThumbnailInfo($svc, $site, $path, $name);
 
+            // Legacy: $data = POST ['module' => …, 'template' => …]. Ici le corps est du JSON, donc on
+            // passe aussi module/template dans le payload de l'événement (les listeners les lisent
+            // d'abord depuis les params, avec repli sur le POST pour le tool legacy).
+            $eventData = ['module' => $site, 'template' => $name];
+
+            $this->getEventManager()->trigger('meliscms_mini_template_manager_delete_start', $this, $eventData);
+
             $result = $svc->deleteMiniTemplate($phtmlPath, (string) $thumbAbsPath, $name);
 
-            if (empty($result['success'])) {
+            $success = !empty($result['success']);
+
+            $this->getEventManager()->trigger('meliscms_mini_template_manager_delete_end', $this, [
+                'success'     => $success ? 1 : 0,
+                'textTitle'   => 'Mini-template',
+                'textMessage' => $success ? 'tr_meliscms_mini_template_deleted_successfully' : 'tr_meliscms_mini_template_delete_fail',
+                'errors'      => $result['errors'] ?? [],
+                'data'        => $eventData,
+                'typeCode'    => 'CMS_MTPL_DELETE',
+            ]);
+
+            if (!$success) {
                 $errors = $result['errors'] ?? [];
                 $msg    = is_array($errors) && !empty($errors) ? (is_array($errors[0]) ? ($errors[0]['error'] ?? 'Erreur.') : (string) $errors[0]) : 'Erreur lors de la suppression.';
                 return $this->jsonResponse(['success' => false, 'error' => $msg], 400);

@@ -6,7 +6,7 @@ import {
   type MiniTemplateItem, type MiniTemplateSiteOption, type MiniTemplateStats,
 } from './mini-template-api'
 import { ExportModal, DownloadIcon } from './ExportModal'
-import { ViewToggle } from './ViewToggle'
+import { ViewToggle, type ViewMode } from './ViewToggle'
 
 /* ──────────────────────────────────────────────────────────────────────────
  * Mini-Template Manager (MelisCms) — brique full React
@@ -24,6 +24,7 @@ type SubTabW = {
   __melisOpenSubTab?: (section: string, tab: { id: string; label: string; path: string }) => void
   __melisCloseSubTab?: (section: string, id: string) => void
   __melisUpdateSubTabLabel?: (section: string, id: string, label: string) => void
+  __melisSetToolView?: (melisKey: string, view: ViewMode) => void
 }
 
 // Identifiant composite (site + name) encodé dans le segment /:id de la route.
@@ -234,11 +235,23 @@ export default function MiniTemplatePage({ active = true }: { active?: boolean }
   const segs = (active ? location.pathname : frozenPath).replace(/^\/+|\/+$/g, '').split('/')
   const base = '/' + segs.slice(0, 2).join('/')
   const id = segs.length > 2 ? segs.slice(2).join('/') : undefined
+
+  // Vue courante du toggle New/Old. Portée par la RACINE (et non par la liste) : la liste est
+  // démontée dès qu'un formulaire s'ouvre, et l'hôte doit continuer à connaître la vue active.
+  const [mode, setMode] = useState<ViewMode>('react')
+  // Publier la vue à l'hôte (cf. melis-core lib/tool-view-mode) : tant qu'on est en vue React,
+  // l'iframe « Old » — ou son pont d'onglets, dont l'état survit à son démontage — ne doit pas
+  // afficher SES onglets legacy à côté des sous-onglets React (deux onglets « Nouveau » pour le
+  // même écran). En vue Old, symétriquement, l'hôte masque les sous-onglets React.
+  // Un formulaire ouvert (id) est par nature la vue React.
+  const view: ViewMode = id ? 'react' : mode
+  useEffect(() => { (window as unknown as SubTabW).__melisSetToolView?.(MELIS_KEY, view) }, [view])
+
   // key={id} : forcer un remount frais à chaque changement de sous-onglet (l'identité site+name
   // vient de l'URL et initialise l'état — sans remount, passer d'une édition à l'autre garderait
   // le site/nom précédent).
   if (id) return <MiniTemplateForm key={id} id={id} base={base} />
-  return <MiniTemplateList base={base} />
+  return <MiniTemplateList base={base} mode={mode} setMode={setMode} />
 }
 
 // ── Persistent list cache ──
@@ -256,7 +269,9 @@ type ListCache = {
 let _cache: ListCache | null = null
 
 // ── List ──
-function MiniTemplateList({ base }: { base: string }) {
+// `mode` vient de la racine (MiniTemplatePage) : la vue du toggle doit survivre au démontage de la
+// liste quand un formulaire s'ouvre, et rester publiée à l'hôte.
+function MiniTemplateList({ base, mode, setMode }: { base: string; mode: ViewMode; setMode: (m: ViewMode) => void }) {
   const t = useT()
   const navigate = useNavigate()
 
@@ -274,8 +289,7 @@ function MiniTemplateList({ base }: { base: string }) {
   const [showExport, setShowExport]   = useState(false)
   const [toDelete, setToDelete]       = useState<MiniTemplateItem | null>(null)
   const [tick, setTick]               = useState(0)
-  const [mode, setMode]               = useState<'react' | 'iframe'>('react')
-  const [frameLoaded, setFrameLoaded] = useState(false)
+  const [frameLoaded, setFrameLoaded] = useState(mode === 'iframe')
 
   // Save cache on unmount
   useEffect(() => () => {
