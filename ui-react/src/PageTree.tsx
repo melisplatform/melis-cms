@@ -216,6 +216,14 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
     return () => window.removeEventListener('melis:cms-page-created', onCreated)
   }, [reload, loadChildren])
 
+  // Une action NATIVE de la coquille React (ex. déverrouillage) émet melis:cms-tree-refresh pour
+  // que l'arbre se recharge (le cadenas d'une page débloquée doit disparaître) — pas de message iframe.
+  useEffect(() => {
+    const onRefresh = () => { reload() }
+    window.addEventListener('melis:cms-tree-refresh', onRefresh)
+    return () => window.removeEventListener('melis:cms-tree-refresh', onRefresh)
+  }, [reload])
+
   // Reload the tree after a page mutation done in a tool iframe (publish / unpublish / delete /
   // duplicate / page-lock unlock). buildToolPage forwards every tool response as
   // {__melisToolResult, url, data}. Unlocking a page removes its lock row → the tree must

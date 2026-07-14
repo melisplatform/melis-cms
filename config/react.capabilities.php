@@ -16,5 +16,23 @@ return [
         'meliscms_tool_sites'         => ['list', 'create', 'edit', 'delete', 'export'],
         'meliscms_mini_template_manager_tool'      => ['list', 'create', 'edit', 'delete', 'export'],
         'meliscms_mini_template_menu_manager_tool' => ['list', 'create', 'edit', 'delete'], // pas d'export (arbre, pas de liste tabulaire)
+
+        // ── Éditeur de page CMS (meliscms_page) — coquille React full-React ──
+        // Arbre : `actions` = boutons de la barre d'actions ; `tabs` = onglets. Le gating React
+        // (CmsPage.tsx) filtre les onglets et masque les boutons refusés via ces clés à plat
+        // (flatten → 'create','save',… pour les actions ; 'edition','properties',… pour les onglets).
+        // MODULARITÉ : chaque module contributeur ajoute SES onglets/boutons sous CETTE MÊME clé
+        // dans SON propre react.capabilities.php (merge Laminas) — small-business déclare workflow +
+        // versioning + commentaires ; page-historic/analytics/script-editor peuvent déclarer les leurs.
+        // Ici : seuls les onglets/boutons NATIFS de MelisCms.
+        'meliscms_page' => [
+            'actions' => ['create', 'save', 'publish', 'delete', 'duplicate'],
+            'tabs'    => [
+                ['key' => 'edition',    'label' => 'tr_meliscms_page_tab_edition_Edition'],
+                ['key' => 'properties', 'label' => 'tr_meliscms_page_tab_properties_Properties'],
+                ['key' => 'seo',        'label' => 'tr_meliscms_page_tab_seo_Seo'],
+                ['key' => 'languages',  'label' => 'tr_meliscms_page_languages'],
+            ],
+        ],
     ],
 ];

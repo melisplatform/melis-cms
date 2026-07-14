@@ -447,6 +447,43 @@ return [
                                     'defaults'    => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiCmsMenuManager', 'action' => 'category'],
                                 ],
                             ],
+
+                            // ── Éditeur de page CMS (meliscms_page) — coquille React full-React ──
+                            // Structure MODULAIRE (onglets + boutons assemblés par fusion de config,
+                            // incl. contributions d'autres modules) + en-tête page. Contenu des onglets
+                            // chargé par melisKey via react-tool-page (Édition = drag'n'drop legacy).
+                            'cms-page-structure' => [
+                                'type'    => 'Segment',
+                                'options' => [
+                                    'route'    => '/cms-page/structure[/]',
+                                    'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPage', 'action' => 'structure'],
+                                ],
+                            ],
+                            // Onglets natifs (Propriétés / SEO / Langages) : read + write + refs
+                            'cms-page-refs' => [
+                                'type' => 'Segment',
+                                'options' => ['route' => '/cms-page/refs[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPage', 'action' => 'refs']],
+                            ],
+                            'cms-page-properties-save' => [
+                                'type' => 'Segment',
+                                'options' => ['route' => '/cms-page/properties/save[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPage', 'action' => 'save-properties']],
+                            ],
+                            'cms-page-properties' => [
+                                'type' => 'Segment',
+                                'options' => ['route' => '/cms-page/properties[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPage', 'action' => 'properties']],
+                            ],
+                            'cms-page-seo-save' => [
+                                'type' => 'Segment',
+                                'options' => ['route' => '/cms-page/seo/save[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPage', 'action' => 'save-seo']],
+                            ],
+                            'cms-page-seo' => [
+                                'type' => 'Segment',
+                                'options' => ['route' => '/cms-page/seo[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPage', 'action' => 'seo']],
+                            ],
+                            'cms-page-languages' => [
+                                'type' => 'Segment',
+                                'options' => ['route' => '/cms-page/languages[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPage', 'action' => 'languages']],
+                            ],
                         ],
                     ],
                 ],
@@ -464,6 +501,7 @@ return [
             'MelisCms\Controller\MelisReactApiCmsStyle' => \MelisCms\Controller\MelisReactApiCmsStyleController::class,
             'MelisCms\Controller\MelisReactApiCmsMiniTemplate' => \MelisCms\Controller\MelisReactApiCmsMiniTemplateController::class,
             'MelisCms\Controller\MelisReactApiCmsMenuManager' => \MelisCms\Controller\MelisReactApiCmsMenuManagerController::class,
+            'MelisCms\Controller\MelisReactApiPage' => \MelisCms\Controller\MelisReactApiPageController::class,
         ],
     ],
 ];
