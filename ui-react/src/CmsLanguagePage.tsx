@@ -5,6 +5,7 @@ import {
   saveLanguage, type LangItem, type LangStats,
 } from './cms-language-api'
 import { ViewToggle } from './ViewToggle'
+import { Flag } from './PageTabs'
 
 // Outil Langues (CMS) legacy (vue « Old » en iframe). Voir brick.manifest.json (cms-languages).
 const MELIS_KEY = 'meliscms_tool_language'
@@ -346,7 +347,7 @@ function CmsLanguageList({ base }: { base: string }) {
                   <td key={id} style={{ ...td, ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}), ...(id === 'locale' ? { fontFamily: 'monospace', fontSize: 13 } : {}), ...(id === 'name' ? { fontWeight: 500 } : {}) }}>
                     {id === 'id' && r.id}
                     {id === 'locale' && r.locale}
-                    {id === 'name' && r.name}
+                    {id === 'name' && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}><Flag locale={r.locale} />{r.name}</span>}
                   </td>
                 ))}
                 <td style={td}>

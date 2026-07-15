@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { fetchTranslations, saveTranslation, deleteTranslation, type TransKey } from '../sites-api'
+import { Flag } from '../PageTabs'
 
 /**
  * Onglet "Traductions de site" : CRUD autonome (endpoints legacy dédiés saveTranslation /
@@ -85,7 +86,7 @@ export function TranslationsTab({ siteId, langs }: { siteId: number; langs: Lang
           <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
             <tr>
               <th style={th}>{tr('Clé', 'Key')}</th>
-              {langs.map((l) => <th key={l.id} style={th}>{l.name}</th>)}
+              {langs.map((l) => <th key={l.id} style={th}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><Flag locale={l.locale} size={16} />{l.name}</span></th>)}
               <th style={{ ...th, width: 80 }} />
             </tr>
           </thead>
@@ -116,7 +117,7 @@ export function TranslationsTab({ siteId, langs }: { siteId: number; langs: Lang
               onChange={(e) => setDraft({ ...draft, key: e.target.value })} placeholder="my_translation_key" />
             {langs.map((l) => (
               <div key={l.id} style={{ marginBottom: 12 }}>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{l.name} <span style={{ color: 'var(--color-muted-foreground)', fontSize: 12 }}>({l.locale})</span></label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, marginBottom: 4 }}><Flag locale={l.locale} size={16} />{l.name} <span style={{ color: 'var(--color-muted-foreground)', fontSize: 12 }}>({l.locale})</span></label>
                 <textarea style={{ ...input, height: 70, padding: 10, resize: 'vertical' }} value={draft.texts[l.id]?.text ?? ''}
                   onChange={(e) => setDraft({ ...draft, texts: { ...draft.texts, [l.id]: { ...draft.texts[l.id], text: e.target.value } } })} />
               </div>

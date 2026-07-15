@@ -6,6 +6,7 @@ import {
   type LanguageOption, type SiteOption, type TreeNode,
 } from './menu-manager-api'
 import { ViewToggle } from './ViewToggle'
+import { Flag, FlagSelect } from './PageTabs'
 
 /* ──────────────────────────────────────────────────────────────────────────
  * Menu Manager (MelisCms) — brique full React, montée à /melis-cms/menu-manager.
@@ -105,15 +106,6 @@ function useT() {
     if (vars) for (const [k, v] of Object.entries(vars)) s = s.replaceAll(`{${k}}`, String(v))
     return s
   }
-}
-
-// Flags par langue (cosmétique — la locale legacy n'est pas un vrai code pays, ex. "en_EN"/"fr_FR").
-const FLAG_MAP: Record<string, string> = {
-  en: '🇺🇸', fr: '🇫🇷', de: '🇩🇪', es: '🇪🇸', it: '🇮🇹', nl: '🇳🇱', pt: '🇵🇹',
-  ar: '🇸🇦', zh: '🇨🇳', ja: '🇯🇵', ru: '🇷🇺', pl: '🇵🇱', tr: '🇹🇷',
-}
-function langFlag(locale: string): string {
-  return FLAG_MAP[locale.slice(0, 2).toLowerCase()] ?? '🏳️'
 }
 
 // ── Styles (variables CSS du thème de l'hôte) ──
@@ -506,9 +498,13 @@ function MenuManagerTree({ base }: { base: string }) {
           <option value="">{t('select_site')}</option>
           {sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
         </select>
-        <select style={{ ...inputCss, height: 36, width: 'auto', minWidth: 140 }} value={locale} onChange={(e) => setLocale(e.target.value)}>
-          {languages.map((l) => <option key={l.id} value={l.locale}>{l.name}</option>)}
-        </select>
+        <div style={{ width: 190 }}>
+          <FlagSelect
+            value={languages.find((l) => l.locale === locale)?.id ?? 0}
+            onChange={(id) => { const l = languages.find((x) => x.id === id); if (l) setLocale(l.locale) }}
+            options={languages}
+          />
+        </div>
       </div>
 
       {error && <div style={{ ...card, borderColor: '#fca5a5', background: '#fef2f2', color: '#b91c1c', padding: '8px 14px', fontSize: 14 }}>{error}</div>}
@@ -695,7 +691,7 @@ function CategoryForm({ id, base }: { id: string; base: string }) {
                     color: isActive ? 'var(--color-primary-foreground,#fff)' : 'var(--color-foreground)',
                   }}>
                   <span style={{ flex: 1 }}>{l.name}</span>
-                  <span style={{ fontSize: 18, lineHeight: 1 }}>{langFlag(l.locale)}</span>
+                  <Flag locale={l.locale} size={22} />
                 </button>
               )
             })}

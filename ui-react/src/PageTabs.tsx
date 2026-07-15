@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 /**
  * Contenus NATIFS des onglets de l'éditeur de page CMS.
@@ -19,11 +19,25 @@ export async function apiPost<T>(path: string, body: unknown): Promise<T> {
   const j = await r.json(); if (!j?.success) throw new Error(j?.error || 'Erreur'); return j.data as T
 }
 
-/** Drapeau emoji depuis une locale Melis (ex 'fr_FR' → 🇫🇷). EN→GB (langue sans pays propre). */
+/** Drapeau emoji depuis une locale Melis (ex 'fr_FR' → 🇫🇷). EN→GB (langue sans pays propre).
+ *  ⚠️ NE PAS utiliser pour l'affichage : Windows ne rend pas les emojis drapeaux (affiche « GB »).
+ *  → préférer le composant <Flag> (vraie image). Conservé pour compat. */
 export function localeFlag(locale?: string): string {
   const cc = (locale || '').slice(-2).toUpperCase().replace(/^EN$/, 'GB')
   if (!/^[A-Z]{2}$/.test(cc)) return '🏳️'
   return String.fromCodePoint(...[...cc].map((c) => 127397 + c.charCodeAt(0)))
+}
+
+/** Drapeau = VRAIE image (`/MelisCore/assets/images/lang/<xx>.png`) — l'emoji ne s'affiche pas sous
+ *  Windows. `<xx>` = 2 premières lettres du locale (en_EN→en, fr_FR→fr). Masqué si l'image manque. */
+export function Flag({ locale, size = 20 }: { locale?: string; size?: number }) {
+  const short = (locale || '').slice(0, 2).toLowerCase()
+  if (!/^[a-z]{2}$/.test(short)) return null
+  return (
+    <img src={`/MelisCore/assets/images/lang/${short}.png`} alt="" width={size} height={Math.round(size * 0.7)}
+      style={{ borderRadius: 3, objectFit: 'cover', boxShadow: '0 0 0 1px rgba(0,0,0,.08)', flexShrink: 0, verticalAlign: 'middle', display: 'inline-block' }}
+      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+  )
 }
 
 // ── styles partagés (full width) ──
@@ -31,6 +45,41 @@ const wrap: React.CSSProperties = { padding: 20, width: '100%', boxSizing: 'bord
 const label: React.CSSProperties = { display: 'block', fontSize: 12, fontWeight: 600, margin: '14px 0 5px', color: 'var(--color-foreground,#111827)' }
 const field: React.CSSProperties = { width: '100%', height: 36, padding: '0 10px', borderRadius: 6, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', fontSize: 13, boxSizing: 'border-box' }
 const area: React.CSSProperties = { ...field, height: 'auto', minHeight: 70, padding: 10, resize: 'vertical' as const }
+
+/** Sélecteur de langue custom avec DRAPEAUX IMAGES (un <option> natif ne peut pas contenir d'image). */
+export type FlagOpt = { id: number; locale?: string; name: string }
+export function FlagSelect({ value, onChange, options, placeholder = 'Choisissez', disabled }: {
+  value: number; onChange: (id: number) => void; options: FlagOpt[]; placeholder?: string; disabled?: boolean
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => { const onDoc = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }; document.addEventListener('mousedown', onDoc); return () => document.removeEventListener('mousedown', onDoc) }, [])
+  const current = options.find((o) => o.id === value)
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <button type="button" disabled={disabled} onClick={() => !disabled && setOpen((o) => !o)}
+        style={{ ...field, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.7 : 1, textAlign: 'left' }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
+          {current ? <><Flag locale={current.locale} /><span>{current.name}</span></> : <span style={{ color: 'var(--color-muted-foreground,#6b7280)' }}>{placeholder}</span>}
+        </span>
+        {!disabled && <span style={{ color: 'var(--color-muted-foreground,#6b7280)', fontSize: 10 }}>▾</span>}
+      </button>
+      {open && !disabled && (
+        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 60, background: 'var(--color-card,#fff)', border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,.14)', padding: 4, maxHeight: 260, overflow: 'auto' }}>
+          {options.length === 0 && <div style={{ padding: 10, fontSize: 12.5, color: 'var(--color-muted-foreground,#6b7280)' }}>…</div>}
+          {options.map((o) => { const sel = o.id === value; return (
+            <button key={o.id} type="button" onClick={() => { onChange(o.id); setOpen(false) }}
+              style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', padding: '8px 9px', border: 0, borderRadius: 6, cursor: 'pointer', fontSize: 13, background: sel ? 'color-mix(in srgb, var(--color-primary,#dc2626) 12%, transparent)' : 'transparent', color: 'inherit' }}
+              onMouseEnter={(e) => { if (!sel) (e.currentTarget as HTMLElement).style.background = 'var(--color-accent, rgba(127,127,127,.1))' }}
+              onMouseLeave={(e) => { if (!sel) (e.currentTarget as HTMLElement).style.background = 'transparent' }}>
+              <Flag locale={o.locale} /><span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.name}</span>
+            </button>
+          )})}
+        </div>
+      )}
+    </div>
+  )
+}
 
 function Feedback({ msg }: { msg: { ok: boolean; text: string } | null }) {
   if (!msg) return null
@@ -54,7 +103,8 @@ export function PropertiesTab({ value, onChange, refs }: { value: PropsData; onC
       <label style={label}>Template *</label>
       <select style={field} value={value.templateId} onChange={(e) => set('templateId', Number(e.target.value))}><option value={0}>—</option>{refs.templates.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.id})</option>)}</select>
       <label style={label}>Langue (non modifiable après création)</label>
-      <select style={{ ...field, opacity: 0.7 }} value={value.langId} disabled>{refs.languages.map((l) => <option key={l.id} value={l.id}>{localeFlag(l.locale)} {l.name}</option>)}</select>
+      <FlagSelect value={value.langId} onChange={() => {}} options={refs.languages} disabled />
+      <div style={{ height: 4 }} />
       <label style={label}>Affichage menu *</label>
       <select style={field} value={value.menu} onChange={(e) => set('menu', e.target.value)}>{refs.menus.map((m) => <option key={m} value={m}>{m}</option>)}</select>
       <label style={label}>Style</label>
@@ -209,14 +259,14 @@ export function LanguagesTab({ idPage }: { idPage: number }) {
         <thead><tr><th style={th}>Langue</th><th style={th}>Locale</th><th style={th}>Nom de page</th><th style={th}>ID</th></tr></thead>
         <tbody>{d.versions.map((v) => (
           <tr key={v.pageId}>
-            <td style={td}><span style={{ marginRight: 6, fontSize: 15 }}>{localeFlag(v.locale)}</span>{v.langName || v.langId}</td>
+            <td style={td}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}><Flag locale={v.locale} />{v.langName || v.langId}</span></td>
             <td style={td}>{v.locale}</td><td style={td}>{v.pageName || '—'}</td><td style={td}>{v.pageId}</td>
           </tr>
         ))}</tbody>
       </table>
       {d.creatable.length > 0 && (
         <div style={{ marginTop: 16, fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>
-          Langues créables : {d.creatable.map((c) => <span key={c.id} style={{ marginRight: 10 }}>{localeFlag(c.locale)} {c.name}</span>)} — la création se fait via la vue <em>Old</em> pour l'instant.
+          Langues créables : {d.creatable.map((c) => <span key={c.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginRight: 10 }}><Flag locale={c.locale} size={16} />{c.name}</span>)} — la création se fait via la vue <em>Old</em> pour l'instant.
         </div>
       )}
       <Feedback msg={msg} />

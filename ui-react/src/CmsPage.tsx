@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ViewToggle, type ViewMode } from './ViewToggle'
+import NewPageView from './NewPageView'
+import DuplicatePageModal from './DuplicatePageModal'
 import {
   PropertiesTab, SeoTab, LanguagesTab, HistoricTab, AnalyticsTab, ScriptsTab, VersioningTab, CommentsTab,
   apiGet, apiPost, type PropsData, type SeoData, type Refs,
@@ -128,10 +130,17 @@ function iconFor(b: StructBtn): string {
 }
 /** Section d'appartenance d'un bouton (barre organisée par groupes séparés, plutôt qu'une longue ligne). */
 function groupOf(key: string): number {
-  if (/action_(save|clear|publish)/.test(key)) return 0   // Édition / publication
-  if (/action_(new|duplicate|delete)/.test(key)) return 1 // Page
-  if (/action_(view|display)/.test(key)) return 2         // Aperçu / affichage
-  return 3                                                // Modulaires (newsletter, workflow, unlock…)
+  if (/action_(save|publish)/.test(key)) return 0            // Sauvegarder · Publier
+  if (/action_(new|duplicate|clear|delete)/.test(key)) return 1 // Nouvelle page · Dupliquer · Effacer brouillon · Supprimer
+  if (/action_(view|display)/.test(key)) return 2            // Voir · Affichage
+  return 3                                                   // Modulaires (newsletter, workflow, unlock…)
+}
+/** Rang d'affichage EXPLICITE d'un bouton dans sa section (l'ordre config ne suffit pas). Les
+ * boutons modulaires (non listés) gardent l'ordre config (rang par défaut élevé, tri stable). */
+const BTN_ORDER = ['action_save', 'action_publish', 'action_new', 'action_duplicate', 'action_clear', 'action_delete', 'action_view', 'action_display']
+function orderOf(key: string): number {
+  const i = BTN_ORDER.findIndex((k) => key.endsWith(k))
+  return i === -1 ? 99 : i
 }
 
 export default function CmsPage({ active = true }: { active?: boolean }) {
@@ -165,6 +174,9 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   const [readyPages, setReadyPages] = useState<Set<string>>(new Set())
   const [toast, setToast] = useState<{ ok: boolean; text: string } | null>(null)
   const [unlockOpen, setUnlockOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false) // modal React de confirmation de suppression
+  const [dupOpen, setDupOpen] = useState(false) // modal React de duplication (même que le clic droit de l'arbre)
+  const [wfOpen, setWfOpen] = useState(false) // modal Workflow (mutualisée, fournie par melis-small-business)
   const [unlocking, setUnlocking] = useState(false)
   const [, bumpTabs] = useState(0)
   useEffect(() => { const on = () => bumpTabs((n) => n + 1); window.addEventListener('melis:page-tabs-changed', on); return () => window.removeEventListener('melis:page-tabs-changed', on) }, [])
@@ -260,7 +272,9 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     .filter((b) => !b.key.includes('unlock') || lockedByOther) // « Débloquer » SEULEMENT si verrouillé par un AUTRE user
     .filter((b) => !lockedByOther || !LOCK_HIDDEN_BTN.some((k) => b.key.endsWith(k))) // actions d'édition cachées si verrou d'un autre
   // Boutons regroupés en sections (Édition/publication · Page · Aperçu · Modulaires), séparées par un trait.
-  const btnGroups = [0, 1, 2, 3].map((gi) => visibleButtons.filter((b) => groupOf(b.key) === gi)).filter((g) => g.length)
+  const btnGroups = [0, 1, 2, 3]
+    .map((gi) => visibleButtons.filter((b) => groupOf(b.key) === gi).sort((a, b) => orderOf(a.key) - orderOf(b.key)))
+    .filter((g) => g.length)
   useEffect(() => {
     if (!capsLoaded || !visibleTabs.length) return
     if (!visibleTabs.some((t) => t.key === activeTab)) driveTab(visibleTabs[0].key)
@@ -275,7 +289,15 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
       if (!doc) return
       let style = doc.__melisChromeStyle
       if (!style) { style = doc.createElement('style'); doc.__melisChromeStyle = style; doc.head?.appendChild(style) }
-      style.textContent = showChrome ? `[data-melisKey='meliscms_pagehead']{display:none !important;} ul.tabs-label.nav-tabs{display:none !important;}` : ''
+      // On masque le chrome LEGACY redondant avec la coquille React : l'en-tête de page, la barre
+      // d'onglets (ul.tabs-label) ET son conteneur `.widget-head` (sinon il laisse une bande blanche
+      // ~69px en haut de l'édition), + le padding-top du pane d'édition.
+      style.textContent = showChrome
+        ? `[data-melisKey='meliscms_pagehead']{display:none !important;}`
+          + `ul.tabs-label.nav-tabs{display:none !important;}`
+          + `[data-melisKey='meliscms_tabs'] > .widget-tabs > .widget-head{display:none !important;}`
+          + `[data-melisKey='meliscms_page_edition']{padding-top:0 !important;}`
+        : ''
     } catch { /* */ }
   }, [showChrome])
 
@@ -437,15 +459,16 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   }, [current, refreshStructure, reloadEdition])
 
   // Supprimer la page (« Supprimer page ») → deletePage legacy, puis fermeture de l'onglet + refresh arbre.
+  // Suppression EFFECTIVE (appelée par la modal React de confirmation). Ferme l'onglet + refresh arbre.
   const doDelete = useCallback(async () => {
     if (!current) return
-    if (!window.confirm('Supprimer définitivement cette page (et ses versions) ?')) return
     setSaving(true)
     try {
       const res = await fetch(`/melis/MelisCms/Page/deletePage?idPage=${encodeURIComponent(current)}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
       const data = await res.json().catch(() => ({})) as LegacyResp
       if (data.success === 1) {
         notify('ok', (data.textTitle || 'Suppression').trim(), 'La page a été supprimée.')
+        setDeleteOpen(false)
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh'))
         ;(window as unknown as { __melisCloseTab?: (id: string) => void }).__melisCloseTab?.(`/melis-cms/page/${current}`)
         setOpened((o) => o.filter((x) => x !== current))
@@ -480,10 +503,12 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     if (b.key.endsWith('action_save')) { await saveAll(); return }          // Sauvegarder → save global (legacy)
     if (b.key.endsWith('action_publish')) { await doPublish(); return }     // Publier → save puis PUBLIE (legacy)
     if (b.key.endsWith('action_clear')) { await doClear(); return }         // Effacer brouillon → clearSavedPage (legacy)
-    if (b.key.endsWith('action_delete')) { await doDelete(); return }       // Supprimer page → deletePage (legacy)
+    if (b.key.endsWith('action_delete')) { setDeleteOpen(true); return }     // Supprimer page → modal React de confirmation
     if (b.key.endsWith('action_new')) { openNewPage(); return }             // Nouvelle page → route React de création
-    driveButton(b.key)                                                       // Voir/Affichage/Dupliquer → pilotage iframe legacy
-  }, [saveAll, doPublish, doClear, doDelete, openNewPage, driveButton])
+    if (b.key.endsWith('action_duplicate')) { setDupOpen(true); return }    // Dupliquer → MÊME modal React que le clic droit de l'arbre
+    if (b.key.includes('workflow')) { setWfOpen(true); return }             // Flux de travail → modal Workflow mutualisée (small-business)
+    driveButton(b.key)                                                       // Voir/Affichage → pilotage iframe legacy
+  }, [saveAll, doPublish, doClear, openNewPage, driveButton])
 
   useEffect(() => { if (!current) return; const f = frameRef.current[current]; if (f) applyIframeChrome(f) }, [current, applyIframeChrome])
 
@@ -493,6 +518,17 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     window.addEventListener('melis:tab-closed', onClosed); return () => window.removeEventListener('melis:tab-closed', onClosed)
   }, [])
   const openedRef = useRef(opened); openedRef.current = opened
+  // Ouvre la page fraîchement CRÉÉE en édition : ferme l'onglet de création, ouvre l'onglet d'édition,
+  // rafraîchit l'arbre. Utilisé par les DEUX flux de création (form React natif + iframe legacy « Old »).
+  const openCreatedPage = useCallback((newId: number | string, name: string) => {
+    const newTabId = openedRef.current.find((x) => x === 'new' || x.startsWith('new~')) ?? 'new'
+    const editPath = `/melis-cms/page/${newId}`
+    const wg = window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void; __melisCloseTab?: (id: string) => void }
+    wg.__melisOpenTab?.({ id: editPath, label: (name || `Page ${newId}`).trim(), path: editPath })
+    navigate(editPath); wg.__melisCloseTab?.(`/melis-cms/page/${newTabId}`)
+    setOpened((o) => o.filter((x) => x !== newTabId))
+    window.dispatchEvent(new CustomEvent('melis:cms-page-created', { detail: { idPage: newId, father: newTabId.startsWith('new~') ? newTabId.slice('new~'.length) : '' } }))
+  }, [navigate])
   useEffect(() => {
     const onResult = (e: MessageEvent) => {
       const d = e.data as { __melisToolResult?: boolean; url?: string; data?: { success?: number; datas?: { idPage?: number | string; item_zoneid?: string; item_name?: string } } } | null
@@ -501,16 +537,10 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
       if ((d.url || '').indexOf('/Page/savePage') === -1 || !data || data.success !== 1) return
       if (data.datas?.item_zoneid !== '0_id_meliscms_page') return
       const newId = data.datas?.idPage; if (!newId) return
-      const newTabId = openedRef.current.find((x) => x === 'new' || x.startsWith('new~')) ?? 'new'
-      const editPath = `/melis-cms/page/${newId}`
-      const wg = window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void; __melisCloseTab?: (id: string) => void }
-      wg.__melisOpenTab?.({ id: editPath, label: (data.datas?.item_name || `Page ${newId}`).trim(), path: editPath })
-      navigate(editPath); wg.__melisCloseTab?.(`/melis-cms/page/${newTabId}`)
-      setOpened((o) => o.filter((x) => x !== newTabId))
-      window.dispatchEvent(new CustomEvent('melis:cms-page-created', { detail: { idPage: newId, father: newTabId.startsWith('new~') ? newTabId.slice('new~'.length) : '' } }))
+      openCreatedPage(newId, (data.datas?.item_name || '').trim()) // création via iframe legacy (Old)
     }
     window.addEventListener('message', onResult); return () => window.removeEventListener('message', onResult)
-  }, [navigate])
+  }, [openCreatedPage])
   function hookNewPage(iframe: HTMLIFrameElement) {
     try {
       const doc = iframe.contentDocument as (Document & { __melisNewPageHooked?: boolean }) | null
@@ -637,10 +667,17 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
       )}
 
       <div style={{ position: 'relative', flex: '1 1 auto', minHeight: 0 }}>
-        {opened.map((cid) => (
-          <iframe key={cid} src={toolSrc(cid)} title={`Page ${cid}`} onLoad={(e) => onFrameLoad(cid, e.currentTarget)}
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0, display: cid === current && !nativeTabActive ? 'block' : 'none' }} />
-        ))}
+        {opened.map((cid) => {
+          // Cid de CRÉATION → écran « Nouvelle page » React natif (form + toggle New/Old), pas l'iframe.
+          if (cid === 'new' || cid.startsWith('new~')) {
+            const fatherOf = cid.startsWith('new~') ? cid.slice('new~'.length) : ''
+            return <NewPageView key={cid} father={fatherOf} visible={cid === current} onCreated={openCreatedPage} />
+          }
+          return (
+            <iframe key={cid} src={toolSrc(cid)} title={`Page ${cid}`} onLoad={(e) => onFrameLoad(cid, e.currentTarget)}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0, display: cid === current && !nativeTabActive ? 'block' : 'none' }} />
+          )
+        })}
         {/* Onglets natifs — TOUS montés (dès leur 1ʳᵉ ouverture), visibilité togglée → aucun refetch au switch */}
         {showChrome && current && [...mountedTabs].map((key) => {
           const visible = key === activeTab
@@ -675,6 +712,52 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
           </div>
         </div>
       )}
+
+      {/* Modal React de confirmation de SUPPRESSION (remplace le window.confirm natif) */}
+      {deleteOpen && (
+        <div onClick={() => !saving && setDeleteOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: 480, maxWidth: '100%', background: 'var(--color-card,#fff)', borderRadius: 10, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,.35)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', background: '#dc2626', color: '#fff' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 15, fontWeight: 600 }}><Icon name="trash" />Supprimer la page</span>
+              <button onClick={() => !saving && setDeleteOpen(false)} style={{ appearance: 'none', border: 0, background: 'transparent', color: '#fff', fontSize: 20, lineHeight: 1, cursor: 'pointer' }}>×</button>
+            </div>
+            <div style={{ padding: 18, fontSize: 13, color: 'var(--color-foreground,#111827)', lineHeight: 1.5 }}>
+              Supprimer définitivement la page <strong>{header?.pageName || `Page ${current}`}</strong> (brouillon <strong>et</strong> version publiée) ?<br />
+              Les pages dans d'<strong>autres langues</strong> ne sont <strong>pas</strong> supprimées — ce sont des pages distinctes, simplement liées.<br />
+              Cette action est <strong>irréversible</strong>.
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '0 18px 18px' }}>
+              <button className="melis-pgbtn" onClick={() => setDeleteOpen(false)} disabled={saving} style={{ ...btnBase, height: 34, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)' }}>Annuler</button>
+              <button className="melis-pgbtn" onClick={doDelete} disabled={saving} style={{ ...btnBase, height: 34, border: 0, background: '#dc2626', color: '#fff' }}>{saving ? 'Suppression…' : 'Supprimer définitivement'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal React de DUPLICATION — identique au clic droit « Dupliquer » de l'arbre */}
+      {dupOpen && current && !isCreation && (
+        <DuplicatePageModal
+          sourcePageId={Number(current)}
+          sourceTitle={header?.pageName || `Page ${current}`}
+          onClose={() => setDupOpen(false)}
+          onDone={() => window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh'))}
+        />
+      )}
+
+      {/* Modal WORKFLOW — MUTUALISÉE : composant fourni par melis-small-business via window.__melisWorkflowModal
+          (même que le bouton « Flux de travail » de l'outil News). Rendu ici avec un contexte type PAGE. */}
+      {wfOpen && current && !isCreation && (() => {
+        const WF = (window as unknown as { __melisWorkflowModal?: React.ComponentType<{ ctx: { wfType: string; wfId: number | string; wfDetails: string; wfOpeningJs: string }; appLang: string; onClose: () => void }> }).__melisWorkflowModal
+        if (!WF) return null
+        const name = (header?.pageName || `Page ${current}`).replace(/'/g, '')
+        return (
+          <WF
+            ctx={{ wfType: 'PAGE', wfId: Number(current), wfDetails: `${name} (${current})`, wfOpeningJs: `melisHelper.tabOpen('${name}', 'fa fa-file-o fa-2x', '${current}_id_meliscms_page', 'meliscms_page', { idPage: ${current} });` }}
+            appLang={(document.documentElement.lang || 'fr').slice(0, 2)}
+            onClose={() => setWfOpen(false)}
+          />
+        )
+      })()}
     </div>
   )
 }

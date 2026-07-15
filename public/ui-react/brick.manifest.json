@@ -6,7 +6,8 @@
       "route": "/melis-cms/page",
       "label": "CMS",
       "forwardKey": null,
-      "melisKey": null
+      "melisKey": null,
+      "persistent": true
     },
     {
       "id": "cms-site-301",
