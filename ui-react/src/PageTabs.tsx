@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 /**
  * Contenus NATIFS des onglets de l'éditeur de page CMS.
@@ -87,7 +87,8 @@ function Feedback({ msg }: { msg: { ok: boolean; text: string } | null }) {
 }
 
 export type Ref = { id: number; name: string; locale?: string }
-export type Refs = { templates: Ref[]; languages: Ref[]; styles: Ref[]; types: string[]; menus: string[] }
+export type PageType = { value: string; label: string }
+export type Refs = { templates: Ref[]; languages: Ref[]; styles: Ref[]; types: PageType[]; menus: string[] }
 export type PropsData = { idPage: number; name: string; type: string; menu: string; templateId: number; langId: number; styleId: number; taxonomy: string; creationDate: string | null }
 export type SeoData = { idPage: number; url: string; urlRedirect: string; url301: string; metaTitle: string; metaDesc: string; canonical: string }
 
@@ -99,7 +100,7 @@ export function PropertiesTab({ value, onChange, refs }: { value: PropsData; onC
       <label style={label}>Nom *</label>
       <input style={field} value={value.name} onChange={(e) => set('name', e.target.value)} />
       <label style={label}>Type *</label>
-      <select style={field} value={value.type} onChange={(e) => set('type', e.target.value)}>{refs.types.map((t) => <option key={t} value={t}>{t}</option>)}</select>
+      <select style={field} value={value.type} onChange={(e) => set('type', e.target.value)}>{refs.types.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}</select>
       <label style={label}>Template *</label>
       <select style={field} value={value.templateId} onChange={(e) => set('templateId', Number(e.target.value))}><option value={0}>—</option>{refs.templates.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.id})</option>)}</select>
       <label style={label}>Langue (non modifiable après création)</label>
@@ -157,38 +158,128 @@ export function AnalyticsTab({ idPage }: { idPage: number }) {
   )
 }
 
-// ═══ SCRIPTS (modulaire) ═══
+// ═══ SCRIPTS (modulaire) — ÉDITABLE ═══
+type Scripts = { headTop: string; headBottom: string; bodyBottom: string }
 export function ScriptsTab({ idPage }: { idPage: number }) {
-  const [d, setD] = useState<{ headTop: string; headBottom: string; bodyBottom: string } | null>(null)
+  const [d, setD] = useState<Scripts | null>(null)
+  const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
-  useEffect(() => { let x = false; apiGet<{ headTop: string; headBottom: string; bodyBottom: string }>(`scripts?idPage=${idPage}`).then((v) => !x && setD(v)).catch((e) => !x && setMsg({ ok: false, text: e.message })); return () => { x = true } }, [idPage])
+  useEffect(() => { let x = false; apiGet<Scripts>(`scripts?idPage=${idPage}`).then((v) => !x && setD(v)).catch((e) => !x && setMsg({ ok: false, text: e.message })); return () => { x = true } }, [idPage])
   if (!d) return <div style={wrap}>Chargement…</div>
   const codeBox: React.CSSProperties = { width: '100%', minHeight: 90, padding: 10, borderRadius: 6, border: '1px solid var(--color-border,#e5e7eb)', background: '#0f172a', color: '#e2e8f0', fontFamily: 'monospace', fontSize: 12, boxSizing: 'border-box', resize: 'vertical' as const }
-  const blocks: [string, string][] = [['Head (haut)', d.headTop], ['Head (bas)', d.headBottom], ['Body (bas)', d.bodyBottom]]
+  const set = (k: keyof Scripts, v: string) => setD((s) => (s ? { ...s, [k]: v } : s))
+  const blocks: [string, keyof Scripts, string][] = [
+    ['Head — haut', 'headTop', 'Injecté en haut du <head> (méta, préconnexions…)'],
+    ['Head — bas', 'headBottom', 'Injecté en bas du <head> (scripts d\'analytics…)'],
+    ['Body — bas', 'bodyBottom', 'Injecté avant </body> (scripts de fin de page…)'],
+  ]
+  const save = async () => {
+    setSaving(true); setMsg(null)
+    try {
+      await apiPost('scripts/save', { idPage, headTop: d.headTop, headBottom: d.headBottom, bodyBottom: d.bodyBottom })
+      setMsg({ ok: true, text: 'Scripts enregistrés.' })
+    } catch (e) { setMsg({ ok: false, text: (e as Error).message }) } finally { setSaving(false) }
+    setTimeout(() => setMsg(null), 3500)
+  }
   return (
     <div style={wrap}>
-      {blocks.map(([title, val]) => (<div key={title}><label style={label}>{title}</label><textarea style={codeBox} value={val} readOnly placeholder="(vide)" /></div>))}
-      <div style={{ marginTop: 10, fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>Lecture seule (édition via la vue Old pour l'instant).</div>
+      {blocks.map(([title, key, hint]) => (
+        <div key={key}>
+          <label style={label}>{title}</label>
+          <textarea style={codeBox} value={d[key]} onChange={(e) => set(key, e.target.value)} placeholder="(vide)" spellCheck={false} />
+          <div style={{ fontSize: 11, color: 'var(--color-muted-foreground,#6b7280)', margin: '3px 0 4px' }}>{hint}</div>
+        </div>
+      ))}
+      <div style={{ marginTop: 12 }}>
+        <button onClick={save} disabled={saving} style={{ appearance: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, height: 34, padding: '0 16px', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', border: 0, background: 'var(--color-primary,#dc2626)', color: '#fff', opacity: saving ? 0.6 : 1 }}>{saving ? 'Enregistrement…' : 'Enregistrer les scripts'}</button>
+      </div>
       <Feedback msg={msg} />
     </div>
   )
 }
 
-// ═══ VERSIONING (modulaire) ═══
+// POST urlencodé vers un endpoint LEGACY (versioning : voir/restaurer/renommer). Réponse JSON.
+async function legacyPost(url: string, params: Record<string, string | number>): Promise<{ success?: number; datas?: Record<string, unknown>; textMessage?: string }> {
+  const body = new URLSearchParams()
+  Object.entries(params).forEach(([k, v]) => body.set(k, String(v)))
+  const res = await fetch(url, { method: 'POST', headers: { ...XHR, 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }, credentials: 'same-origin', body: body.toString() })
+  return await res.json().catch(() => ({}))
+}
+const smallBtn: React.CSSProperties = { appearance: 'none', display: 'inline-flex', alignItems: 'center', gap: 4, height: 26, padding: '0 8px', borderRadius: 5, fontSize: 12, fontWeight: 500, cursor: 'pointer', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', whiteSpace: 'nowrap' }
+
+// ═══ VERSIONING (modulaire) — Voir / Restaurer / Renommer ═══
+type WfVersion = { id: number; number: number; name: string | null; editDate: string; user: string }
 export function VersioningTab({ idPage }: { idPage: number }) {
-  const [rows, setRows] = useState<{ id: number; number: number; name: string | null; editDate: string; user: string }[] | null>(null)
+  const [rows, setRows] = useState<WfVersion[] | null>(null)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
-  useEffect(() => { let x = false; apiGet<{ items: { id: number; number: number; name: string | null; editDate: string; user: string }[] }>(`versioning?idPage=${idPage}`).then((v) => !x && setRows(v.items)).catch((e) => !x && setMsg({ ok: false, text: e.message })); return () => { x = true } }, [idPage])
+  const [busy, setBusy] = useState<number | null>(null)
+  const [editing, setEditing] = useState<{ id: number; name: string } | null>(null)
+  const reload = useCallback(() => { apiGet<{ items: WfVersion[] }>(`versioning?idPage=${idPage}`).then((v) => setRows(v.items)).catch((e) => setMsg({ ok: false, text: e.message })) }, [idPage])
+  useEffect(() => { let x = false; apiGet<{ items: WfVersion[] }>(`versioning?idPage=${idPage}`).then((v) => !x && setRows(v.items)).catch((e) => !x && setMsg({ ok: false, text: e.message })); return () => { x = true } }, [idPage])
+  const flash = (ok: boolean, text: string) => { setMsg({ ok, text }); setTimeout(() => setMsg(null), 3500) }
+
+  // Ouvrir la prévisualisation de la version (nouvelle fenêtre) — endpoint legacy getLinkSeeVersion.
+  const doView = async (id: number) => {
+    setBusy(id)
+    try {
+      const r = await legacyPost('/melis/MelisSmallBusiness/PageVersioning/getLinkSeeVersion', { idPage, idVersion: id })
+      const link = (r.datas?.linkToPageVersion as string) || ''
+      if (link) window.open(link, '_blank', 'noopener'); else flash(false, 'Aperçu indisponible.')
+    } catch (e) { flash(false, (e as Error).message) } finally { setBusy(null) }
+  }
+  // Restaurer la version dans l'édition (rollback → melis_cms_page_saved) + recharger l'édition/l'en-tête.
+  const doRestore = async (id: number) => {
+    if (!window.confirm('Restaurer cette version dans l\'édition en cours ? (le brouillon actuel sera remplacé)')) return
+    setBusy(id)
+    try {
+      const r = await legacyPost('/melis/MelisSmallBusiness/PageVersioning/rollBackVersion', { idPage, idVersion: id })
+      if (r.success === 1) {
+        flash(true, 'Version restaurée dans l\'édition.')
+        window.dispatchEvent(new CustomEvent('melis:cms-reload-edition')) // recharge l'iframe d'édition + en-tête
+        reload()
+      } else flash(false, r.textMessage && !r.textMessage.startsWith('tr_') ? r.textMessage : 'La restauration a échoué.')
+    } catch (e) { flash(false, (e as Error).message) } finally { setBusy(null) }
+  }
+  // Renommer la version — endpoint legacy saveVersion.
+  const doRename = async () => {
+    if (!editing) return
+    setBusy(editing.id)
+    try {
+      const r = await legacyPost('/melis/MelisSmallBusiness/PageVersioning/saveVersion', { pageVersionId: editing.id, page_v_version_name: editing.name })
+      if (r.success === 1) { flash(true, 'Version renommée.'); setEditing(null); reload() }
+      else flash(false, 'Le renommage a échoué.')
+    } catch (e) { flash(false, (e as Error).message) } finally { setBusy(null) }
+  }
+
   if (!rows) return <div style={wrap}>Chargement…</div>
   const th: React.CSSProperties = { textAlign: 'left', fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)', padding: '8px 10px', borderBottom: '1px solid var(--color-border,#e5e7eb)' }
-  const td: React.CSSProperties = { fontSize: 13, padding: '8px 10px', borderBottom: '1px solid var(--color-border,#f3f4f6)' }
+  const td: React.CSSProperties = { fontSize: 13, padding: '8px 10px', borderBottom: '1px solid var(--color-border,#f3f4f6)', verticalAlign: 'middle' }
   return (
     <div style={wrap}>
       <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Versions de la page</div>
-      {rows.length === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>Aucune version.</div> : (
+      {rows.length === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>Aucune version enregistrée.</div> : (
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead><tr><th style={th}>N°</th><th style={th}>Nom</th><th style={th}>Modifiée le</th><th style={th}>Par</th></tr></thead>
-          <tbody>{rows.map((r) => <tr key={r.id}><td style={td}>{r.number}</td><td style={td}>{r.name || '—'}</td><td style={td}>{r.editDate}</td><td style={td}>{r.user}</td></tr>)}</tbody>
+          <thead><tr><th style={th}>N°</th><th style={th}>Nom</th><th style={th}>Modifiée le</th><th style={th}>Par</th><th style={{ ...th, textAlign: 'right' }}>Actions</th></tr></thead>
+          <tbody>{rows.map((r) => (
+            <tr key={r.id}>
+              <td style={td}>{r.number}</td>
+              <td style={td}>{editing?.id === r.id
+                ? <input autoFocus value={editing.name} onChange={(e) => setEditing({ id: r.id, name: e.target.value })} onKeyDown={(e) => { if (e.key === 'Enter') doRename(); if (e.key === 'Escape') setEditing(null) }} style={{ ...field, height: 28, width: 200 }} placeholder="Nom de la version" />
+                : (r.name || <span style={{ color: 'var(--color-muted-foreground,#6b7280)' }}>—</span>)}</td>
+              <td style={td}>{r.editDate}</td>
+              <td style={td}>{r.user}</td>
+              <td style={{ ...td, textAlign: 'right', whiteSpace: 'nowrap' }}>
+                {editing?.id === r.id ? (<>
+                  <button style={{ ...smallBtn, border: 0, background: 'var(--color-primary,#dc2626)', color: '#fff' }} disabled={busy === r.id} onClick={doRename}>Enregistrer</button>
+                  <button style={{ ...smallBtn, marginLeft: 6 }} onClick={() => setEditing(null)}>Annuler</button>
+                </>) : (<>
+                  <button style={smallBtn} disabled={busy === r.id} onClick={() => doView(r.id)} title="Aperçu de cette version">👁 Voir</button>
+                  <button style={{ ...smallBtn, marginLeft: 6 }} disabled={busy === r.id} onClick={() => doRestore(r.id)} title="Restaurer cette version dans l'édition">↩ Restaurer</button>
+                  <button style={{ ...smallBtn, marginLeft: 6 }} disabled={busy === r.id} onClick={() => setEditing({ id: r.id, name: r.name || '' })} title="Nommer / renommer">✎ Renommer</button>
+                </>)}
+              </td>
+            </tr>
+          ))}</tbody>
         </table>
       )}
       <Feedback msg={msg} />
@@ -196,24 +287,65 @@ export function VersioningTab({ idPage }: { idPage: number }) {
   )
 }
 
-// ═══ COMMENTAIRES (modulaire) ═══
+// ═══ COMMENTAIRES → FRISE D'ÉVÉNEMENTS (modulaire) ═══
+type TLItem = { kind: 'comment' | 'workflow'; date: string; user: string; text: string; title?: string; action?: string | null; toUser?: string | null; toRole?: string | null }
+const WF_META: Record<string, { label: string; color: string; bg: string }> = {
+  VALIDATION: { label: 'Demande de validation', color: '#d97706', bg: 'rgba(245,158,11,.15)' },
+  VALIDATED: { label: 'Validé', color: '#059669', bg: 'rgba(16,185,129,.15)' },
+  REFUSED: { label: 'Refusé', color: '#dc2626', bg: 'rgba(239,68,68,.15)' },
+}
 export function CommentsTab({ idPage }: { idPage: number }) {
-  const [rows, setRows] = useState<{ id: number; date: string; title: string; text: string; user: string }[] | null>(null)
+  const [items, setItems] = useState<TLItem[] | null>(null)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
-  useEffect(() => { let x = false; apiGet<{ items: { id: number; date: string; title: string; text: string; user: string }[] }>(`comments?idPage=${idPage}`).then((v) => !x && setRows(v.items)).catch((e) => !x && setMsg({ ok: false, text: e.message })); return () => { x = true } }, [idPage])
-  if (!rows) return <div style={wrap}>Chargement…</div>
+  const [text, setText] = useState('')
+  const [sending, setSending] = useState(false)
+  const reload = useCallback(() => { apiGet<{ items: TLItem[] }>(`timeline?idPage=${idPage}`).then((v) => setItems(v.items)).catch((e) => setMsg({ ok: false, text: e.message })) }, [idPage])
+  useEffect(() => { let x = false; apiGet<{ items: TLItem[] }>(`timeline?idPage=${idPage}`).then((v) => !x && setItems(v.items)).catch((e) => !x && setMsg({ ok: false, text: e.message })); return () => { x = true } }, [idPage])
+  const add = async () => {
+    if (!text.trim()) return
+    setSending(true); setMsg(null)
+    try { await apiPost('comments/save', { idPage, text: text.trim() }); setText(''); reload() }
+    catch (e) { setMsg({ ok: false, text: (e as Error).message }); setTimeout(() => setMsg(null), 3500) } finally { setSending(false) }
+  }
+  if (!items) return <div style={wrap}>Chargement…</div>
   return (
     <div style={wrap}>
-      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Commentaires</div>
-      {rows.length === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>Aucun commentaire.</div> : rows.map((r) => (
-        <div key={r.id} style={{ padding: '10px 0', borderBottom: '1px solid var(--color-border,#f3f4f6)' }}>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'baseline' }}>
-            <span style={{ fontSize: 13, fontWeight: 600 }} dangerouslySetInnerHTML={{ __html: r.title || '(sans titre)' }} />
-            <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>— {r.user} · {r.date}</span>
-          </div>
-          <div style={{ fontSize: 13, marginTop: 4 }} dangerouslySetInnerHTML={{ __html: r.text || '' }} />
-        </div>
-      ))}
+      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>Activité de la page</div>
+
+      {/* Ajouter un commentaire */}
+      <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', marginBottom: 18 }}>
+        <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Ajouter un commentaire…" rows={2}
+          style={{ flex: 1, resize: 'vertical', minHeight: 40, borderRadius: 6, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', padding: 10, fontSize: 13, boxSizing: 'border-box' }} />
+        <button onClick={add} disabled={sending || !text.trim()} style={{ appearance: 'none', height: 36, padding: '0 16px', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: (sending || !text.trim()) ? 'not-allowed' : 'pointer', border: 0, background: 'var(--color-primary,#dc2626)', color: '#fff', opacity: (sending || !text.trim()) ? 0.6 : 1, whiteSpace: 'nowrap' }}>{sending ? 'Envoi…' : 'Commenter'}</button>
+      </div>
+
+      {items.length === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>Aucune activité pour le moment.</div> : (
+        <div>{items.map((it, i) => {
+          const wf = it.kind === 'workflow' ? (WF_META[it.action || ''] || { label: it.action || 'Workflow', color: '#6b7280', bg: 'rgba(127,127,127,.12)' }) : null
+          const dot = wf ? wf.color : 'var(--color-primary,#dc2626)'
+          const last = i === items.length - 1
+          return (
+            <div key={i} style={{ display: 'flex', gap: 12 }}>
+              {/* Rail : pastille + trait vertical */}
+              <div style={{ position: 'relative', width: 12, flexShrink: 0 }}>
+                <div style={{ position: 'absolute', top: 6, left: 'calc(50% - 5px)', width: 10, height: 10, borderRadius: '50%', background: dot, zIndex: 1, boxShadow: '0 0 0 3px var(--color-background,#fff)' }} />
+                {!last && <div style={{ position: 'absolute', top: 6, bottom: -6, left: 'calc(50% - 1px)', width: 2, background: 'var(--color-border,#e5e7eb)' }} />}
+              </div>
+              {/* Contenu */}
+              <div style={{ flex: 1, paddingBottom: 18, minWidth: 0 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+                  {wf
+                    ? <span style={{ fontSize: 11, fontWeight: 600, borderRadius: 999, padding: '2px 8px', background: wf.bg, color: wf.color }}>{wf.label}</span>
+                    : <span style={{ fontSize: 11, fontWeight: 600, borderRadius: 999, padding: '2px 8px', background: 'color-mix(in srgb, var(--color-primary,#dc2626) 12%, transparent)', color: 'var(--color-primary,#dc2626)' }}>💬 Commentaire</span>}
+                  <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{it.user}{wf && (it.toUser || it.toRole) ? ` → ${[it.toUser, it.toRole].filter(Boolean).join(' / ')}` : ''} · {it.date}</span>
+                </div>
+                {it.title && <div style={{ fontSize: 13, fontWeight: 600, marginTop: 4 }} dangerouslySetInnerHTML={{ __html: it.title }} />}
+                {it.text && <div style={{ fontSize: 13, marginTop: 4, color: 'var(--color-foreground,#111827)', whiteSpace: 'pre-wrap' }} dangerouslySetInnerHTML={{ __html: it.text }} />}
+              </div>
+            </div>
+          )
+        })}</div>
+      )}
       <Feedback msg={msg} />
     </div>
   )

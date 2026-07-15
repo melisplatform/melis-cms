@@ -101,7 +101,7 @@ export default function NewPageView({ father, visible, onCreated }: { father: st
             <input style={field} value={form.name} onChange={(e) => set('name', e.target.value)} autoFocus placeholder="Nom de la page" />
 
             <label style={label}>Type *</label>
-            <select style={field} value={form.type} onChange={(e) => set('type', e.target.value)}>{refs.types.map((t) => <option key={t} value={t}>{t}</option>)}</select>
+            <select style={field} value={form.type} onChange={(e) => set('type', e.target.value)}>{refs.types.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}</select>
 
             <label style={label}>Template *</label>
             <select style={field} value={form.templateId} onChange={(e) => set('templateId', Number(e.target.value))}><option value={0}>Choisissez</option>{refs.templates.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.id})</option>)}</select>

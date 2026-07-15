@@ -324,9 +324,37 @@ class MelisReactApiPageController extends MelisAbstractActionController
             $styles = $siteId ? iterator_to_array($db->query('SELECT style_id AS id, style_name AS name FROM melis_cms_style WHERE style_site_id = ? AND style_status = 1 ORDER BY style_name', [$siteId])) : [];
             return $this->jsonResponse(['success' => true, 'data' => [
                 'templates' => $templates, 'languages' => $languages, 'styles' => $styles,
-                'types' => ['SITE', 'FOLDER', 'PAGE'], 'menus' => ['LINK', 'NOLINK', 'NONE'],
+                'types' => $this->pageTypes(), 'menus' => ['LINK', 'NOLINK', 'NONE'],
             ]]);
         } catch (\Throwable $e) { return $this->errorResponse($e); }
+    }
+
+    /**
+     * Types de page — MODULAIRES, parité legacy : base SITE/FOLDER/PAGE (app.forms.php) + NEWSLETTER
+     * (melis-newsletter) + NEWS_DETAIL (melis-cms-news) AJOUTÉS par les modules ACTIFS via l'événement
+     * `modify_page_properties_form_config` (mêmes listeners que le form legacy, cf. PagePropertiesController).
+     * → un type n'apparaît que si son module est actif (son listener est attaché). Retour: [{value,label}].
+     */
+    private function pageTypes(): array
+    {
+        try {
+            $config = $this->getServiceManager()->get('MelisCoreConfig');
+            $appConfigForm = $config->getFormMergedAndOrdered('/meliscms/forms/meliscms_page_properties', 'meliscms_page_properties', '');
+            $modified = $this->getEventManager()->trigger('modify_page_properties_form_config', $this, ['appConfigForm' => $appConfigForm]);
+            $last = $modified->last();
+            if (!empty($last)) { $appConfigForm = $last; }
+            $translator = $this->getServiceManager()->get('translator');
+            foreach ($appConfigForm['elements'] ?? [] as $el) {
+                if (($el['spec']['name'] ?? '') === 'page_type') {
+                    $out = [];
+                    foreach (($el['spec']['options']['value_options'] ?? []) as $val => $label) {
+                        $out[] = ['value' => (string) $val, 'label' => $translator->translate((string) $label)];
+                    }
+                    if ($out) { return $out; }
+                }
+            }
+        } catch (\Throwable) { /* fallback ci-dessous */ }
+        return [['value' => 'SITE', 'label' => 'Site'], ['value' => 'FOLDER', 'label' => 'Dossier'], ['value' => 'PAGE', 'label' => 'Page']];
     }
 
     // ─── helpers ─────────────────────────────────────────────────────────────────

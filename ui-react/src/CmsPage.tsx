@@ -271,6 +271,8 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     .filter((b) => !capsLoaded || can(b.cap))
     .filter((b) => !b.key.includes('unlock') || lockedByOther) // « Débloquer » SEULEMENT si verrouillé par un AUTRE user
     .filter((b) => !lockedByOther || !LOCK_HIDDEN_BTN.some((k) => b.key.endsWith(k))) // actions d'édition cachées si verrou d'un autre
+    // « Envoyer la newsletter » UNIQUEMENT si la page est de type NEWSLETTER (parité legacy MelisNewsletterSendTool).
+    .filter((b) => !b.key.includes('newsletter') || edit?.props.type === 'NEWSLETTER')
   // Boutons regroupés en sections (Édition/publication · Page · Aperçu · Modulaires), séparées par un trait.
   const btnGroups = [0, 1, 2, 3]
     .map((gi) => visibleButtons.filter((b) => groupOf(b.key) === gi).sort((a, b) => orderOf(a.key) - orderOf(b.key)))
@@ -496,6 +498,14 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
       window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // rafraîchit l'arbre + déploie jusqu'à la page → le cadenas disparaît
     } catch (e) { setToast({ ok: false, text: (e as Error).message }) } finally { setUnlocking(false) }
   }, [current])
+
+  // Recharge l'édition + l'en-tête sur demande d'un onglet natif (ex. Versioning après une restauration).
+  useEffect(() => {
+    if (!current) return
+    const onReload = () => { reloadEdition(); refreshStructure(current) }
+    window.addEventListener('melis:cms-reload-edition', onReload)
+    return () => window.removeEventListener('melis:cms-reload-edition', onReload)
+  }, [current, reloadEdition, refreshStructure])
 
   const onButton = useCallback(async (b: StructBtn) => {
     setOpenMenu(null)
