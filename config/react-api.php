@@ -484,6 +484,11 @@ return [
                                 'type' => 'Segment',
                                 'options' => ['route' => '/cms-page/languages[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPage', 'action' => 'languages']],
                             ],
+                            // Chaîne d'ancêtres (racine → parent) d'une page → déployer l'arbre jusqu'à la page en cours.
+                            'cms-page-ancestors' => [
+                                'type' => 'Segment',
+                                'options' => ['route' => '/cms-page/ancestors[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPage', 'action' => 'ancestors']],
+                            ],
                         ],
                     ],
                 ],

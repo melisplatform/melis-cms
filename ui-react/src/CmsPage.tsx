@@ -60,7 +60,7 @@ function isNativeTab(key: string): boolean {
 type StructTab = { key: string; label: string; icon: string | null; cap: string }
 type StructBtn = { key: string; label: string; cap: string; children?: { key: string; label: string }[] }
 type Structure = { idPage: number; header: PageHeader; tabs: StructTab[]; buttons: StructBtn[] }
-type PageHeader = { pageName: string | null; status: string | null; hasDraft: boolean; editDate: string | null; editor: string | null }
+type PageHeader = { pageName: string | null; status: string | null; hasDraft: boolean; online: boolean; editDate: string | null; editor: string | null }
 type Edit = { props: PropsData; seo: SeoData; refs: Refs }
 
 interface CapsApi { can: (cap: string) => boolean; loaded: boolean }
@@ -157,11 +157,64 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   const [mountedTabs, setMountedTabs] = useState<Set<string>>(new Set())
   const [openMenu, setOpenMenu] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  // Pages dont l'édition est RÉELLEMENT chargée : le canvas imbriqué (.melis-iframe, la page rendue
+  // en mode édition DANS l'iframe tool-page) a fini de charger (readyState 'complete' + contenu) et
+  // les zones/plugins sont activés. Le `onLoad` du tool-page arrive TROP TÔT (canvas encore en cours
+  // → session PHP potentiellement repeuplée/partielle). Tant qu'une page n'est pas ici, Sauvegarder/
+  // Publier sont bloqués (cf. editionReady) — sinon on enverrait un XML partiel.
+  const [readyPages, setReadyPages] = useState<Set<string>>(new Set())
   const [toast, setToast] = useState<{ ok: boolean; text: string } | null>(null)
   const [unlockOpen, setUnlockOpen] = useState(false)
   const [unlocking, setUnlocking] = useState(false)
   const [, bumpTabs] = useState(0)
   useEffect(() => { const on = () => bumpTabs((n) => n + 1); window.addEventListener('melis:page-tabs-changed', on); return () => window.removeEventListener('melis:page-tabs-changed', on) }, [])
+
+  // Édition prête à être sauvegardée : le canvas d'édition de la page courante a FINI de charger
+  // (cf. readyPages, alimenté par le poller) ET les Propriétés/SEO sont chargés. Sinon → boutons off.
+  const editionReady = !!current && !isCreation && readyPages.has(current) && !!edit
+
+  // Détecte la fin RÉELLE du chargement de l'édition d'une page : on traverse l'iframe tool-page
+  // (même origine) → le canvas imbriqué `.melis-iframe` (page rendue en mode édition) doit avoir du
+  // contenu (body.children > 0, exclut l'état vide initial) ET readyState === 'complete' (window.load
+  // → zones/plugins activés). NB : le contenu arrive par paliers avec de longs plateaux → NE PAS se
+  // fier à la stabilité du nombre d'enfants (faux positif) ; seul 'complete' fait foi.
+  const isEditionLoaded = useCallback((cid: string): boolean => {
+    const ifr = frameRef.current[cid]
+    if (!ifr) return false
+    let td: Document | null = null
+    try { td = ifr.contentDocument } catch { return false }
+    if (!td) return false
+    const canvas = td.querySelector('.meliscms-page-tab-edition iframe.melis-iframe, iframe.melis-iframe') as HTMLIFrameElement | null
+    if (!canvas) return false
+    let cd: Document | null = null
+    try { cd = canvas.contentDocument } catch { return false }
+    if (!cd || !cd.body || cd.body.children.length === 0) return false
+    return cd.readyState === 'complete'
+  }, [])
+
+  // Poller : arme editionReady quand le canvas de la page courante est complètement chargé. Confirme
+  // 2 lectures 'complete' d'affilée (anti-flicker) + filet de sécurité 30s (page qui ne "complete"
+  // jamais : on débloque si le canvas a du contenu et n'est plus en 'loading').
+  useEffect(() => {
+    if (!current || isCreation || readyPages.has(current)) return
+    const cid = current
+    const startedAt = Date.now()
+    let stable = 0
+    const iv = window.setInterval(() => {
+      if (isEditionLoaded(cid)) stable++; else stable = 0
+      let fallback = false
+      if (Date.now() - startedAt > 30000) {
+        const ifr = frameRef.current[cid]
+        try {
+          const canvas = ifr?.contentDocument?.querySelector('.meliscms-page-tab-edition iframe.melis-iframe, iframe.melis-iframe') as HTMLIFrameElement | null
+          const cd = canvas?.contentDocument
+          fallback = !!cd && !!cd.body && cd.body.children.length > 0 && cd.readyState !== 'loading'
+        } catch { /* */ }
+      }
+      if (stable >= 2 || fallback) { window.clearInterval(iv); setReadyPages((s) => (s.has(cid) ? s : new Set(s).add(cid))) }
+    }, 400)
+    return () => window.clearInterval(iv)
+  }, [current, isCreation, readyPages, isEditionLoaded])
 
   // structure (onglets/boutons/en-tête)
   const refreshStructure = useCallback(async (idPage: string) => {
@@ -193,10 +246,19 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   // marque l'onglet actif comme monté (il le reste → pas de refetch)
   useEffect(() => { if (activeTab && isNativeTab(activeTab)) setMountedTabs((s) => (s.has(activeTab) ? s : new Set(s).add(activeTab))) }, [activeTab])
 
-  const visibleTabs = (struct?.tabs ?? []).filter((t) => !capsLoaded || can(t.cap))
+  // VERROU (mécanisme PageLock, small-business) — comme le legacy (MelisSBPageLockPageActionButtonsAndTabsListener) :
+  //  • verrou d'un AUTRE utilisateur → cacher Sauvegarder/Effacer/Publier/Supprimer + montrer « Débloquer » (reprise) + bandeau.
+  //  • verrou par MOI (propriétaire) → RIEN (édition normale, pas de bandeau, pas de « Débloquer »). Le verrou me protège
+  //    des autres, il ne me bloque jamais moi-même.
+  const lockedByOther = !!lock?.locked && !lock.byMe
+  const LOCK_HIDDEN_BTN = ['action_save', 'action_clear', 'action_publish', 'action_delete']
+  const visibleTabs = (struct?.tabs ?? [])
+    .filter((t) => !capsLoaded || can(t.cap))
+    .filter((t) => !lockedByOther || !t.key.includes('versioning')) // versioning caché si verrouillé par un autre (legacy)
   const visibleButtons = (struct?.buttons ?? [])
     .filter((b) => !capsLoaded || can(b.cap))
-    .filter((b) => !b.key.includes('unlock') || !!lock?.locked) // Débloquer visible SEULEMENT si la page est verrouillée
+    .filter((b) => !b.key.includes('unlock') || lockedByOther) // « Débloquer » SEULEMENT si verrouillé par un AUTRE user
+    .filter((b) => !lockedByOther || !LOCK_HIDDEN_BTN.some((k) => b.key.endsWith(k))) // actions d'édition cachées si verrou d'un autre
   // Boutons regroupés en sections (Édition/publication · Page · Aperçu · Modulaires), séparées par un trait.
   const btnGroups = [0, 1, 2, 3].map((gi) => visibleButtons.filter((b) => groupOf(b.key) === gi)).filter((g) => g.length)
   useEffect(() => {
@@ -239,53 +301,164 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     } catch { /* */ }
   }, [current])
 
-  // Persiste le brouillon (Propriétés + SEO ensemble) sans UI. Le contenu drag'n'drop est auto-sauvé.
-  const persistDraft = useCallback(async () => {
-    if (!edit) return
-    await Promise.all([apiPost('properties/save', edit.props), apiPost('seo/save', edit.seo)])
-  }, [edit])
+  // ── Sauvegarde / publication : REBRANCHÉES sur les endpoints LEGACY (aucun PHP historique modifié).
+  // Un seul bouton « Sauvegarder » envoie TOUTES les infos des onglets d'un coup, exactement comme le
+  // legacy (melisCms.js:savePage) : le POST porte Propriétés + SEO (noms de champs EXACTS des forms
+  // `pageproperties`/`pageseo`), et la chaîne serveur (meliscms_page_save_start) sauvegarde AUSSI le
+  // XML de l'édition — lu depuis la SESSION PHP peuplée par le drag'n'drop de l'iframe — dans
+  // melis_cms_page_saved.page_content. saveEdition ne réécrit le contenu QUE si la session est peuplée
+  // (sinon l'existant est préservé → pas de perte de contenu).
+  type LegacyResp = { success?: number; textTitle?: string; textMessage?: string; errors?: Record<string, { errorMessage?: string; label?: string }>; datas?: { idPage?: number | string } }
 
-  // Sauvegarde globale (bouton « Sauvegarder ») : persiste + toast local.
-  const saveAll = useCallback(async () => {
-    if (!edit) return
-    setSaving(true); setToast(null)
-    try {
-      await persistDraft()
-      setToast({ ok: true, text: 'Page enregistrée.' })
-      if (current) refreshStructure(current) // rafraîchit le statut/en-tête
-    } catch (e) { setToast({ ok: false, text: (e as Error).message }) } finally { setSaving(false) }
-    setTimeout(() => setToast(null), 3500)
-  }, [edit, persistDraft, current, refreshStructure])
+  // Corps urlencodé attendu par savePage/publishPage, reconstruit depuis l'état React agrégé (`edit`).
+  const buildLegacyBody = useCallback((): string => {
+    const p = edit!.props, s = edit!.seo
+    const b = new URLSearchParams()
+    b.set('page_id', String(p.idPage || current || ''))
+    b.set('page_name', p.name ?? '')
+    b.set('page_type', p.type ?? 'PAGE')
+    b.set('plang_lang_id', String(p.langId ?? ''))
+    b.set('page_menu', p.menu ?? 'LINK')
+    b.set('page_tpl_id', String(p.templateId ?? ''))
+    b.set('style_id', p.styleId ? String(p.styleId) : '')
+    b.set('page_taxonomy', p.taxonomy ?? '')
+    b.set('page_search_type', 'tr_meliscms_page_tab_properties_search_type_option1')
+    b.set('pseo_meta_title', s.metaTitle ?? '')
+    b.set('pseo_meta_description', s.metaDesc ?? '')
+    b.set('pseo_url', s.url ?? '')
+    b.set('pseo_url_redirect', s.urlRedirect ?? '')
+    b.set('pseo_url_301', s.url301 ?? '')
+    b.set('pseo_canonical', s.canonical ?? '')
+    return b.toString()
+  }, [edit, current])
 
-  // Publier (bouton « Publier ») : sauve le brouillon PUIS PUBLIE réellement via l'endpoint legacy
-  // (`publishPage` → événement meliscms_page_publish_start → déplace saved→published, page_status=1).
-  // Notification native comme les outils + reload de l'arbre (le statut online y change).
-  const doPublish = useCallback(async () => {
+  const postLegacyPage = useCallback(async (url: string): Promise<LegacyResp> => {
+    const res = await fetch(url, {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+      body: buildLegacyBody(),
+    })
+    return await res.json().catch(() => ({})) as LegacyResp
+  }, [buildLegacyBody])
+
+  const errorFields = (data: LegacyResp): NotifField[] =>
+    Object.values(data.errors || {}).filter((e) => e && e.label).map((e) => ({ label: String(e.label), messages: [String(e.errorMessage || '')] }))
+
+  // Recharge l'iframe d'édition de la page courante (refléter l'état serveur après clear/publish).
+  // On la retire de readyPages → Sauvegarder/Publier re-bloqués jusqu'au rechargement complet du canvas.
+  const reloadEdition = useCallback(() => {
     if (!current) return
+    setReadyPages((s) => { if (!s.has(current)) return s; const n = new Set(s); n.delete(current); return n })
+    const f = frameRef.current[current]
+    try { if (f) f.src = toolSrc(current) } catch { /* */ }
+  }, [current])
+
+  // Libère le VERROU de la page (supprime la ligne melis_sb_page_locked) — comme le legacy à la
+  // publication (meliscms_page_publish_end → PageLock::unlockPage). On le fait après un save/publish
+  // réussi : le verrou est un état d'édition en cours, pas de raison de le garder une fois figé. Effet
+  // concret : le cadenas du treeview DISPARAÎT (suppression en base, pas juste masquage). Le verrou se
+  // recrée tout seul à la prochaine édition d'un plugin. Endpoint modulaire (small-business) : si absent
+  // → no-op silencieux.
+  const releaseLock = useCallback(async (idPage: string) => {
+    try { await apiPost('unlock', { idPage: Number(idPage) }) } catch { /* module PageLock absent → rien */ }
+    setLock({ locked: false, byUser: null, byMe: false, since: null })
+  }, [])
+
+  // Sauvegarde globale (« Sauvegarder ») → savePage legacy (Propriétés + SEO + XML d'édition).
+  const saveAll = useCallback(async () => {
+    if (!edit || !current || !editionReady) return
+    setSaving(true)
+    try {
+      const data = await postLegacyPage(`/melis/MelisCms/Page/savePage?idPage=${encodeURIComponent(current)}&fatherPageId=`)
+      if (data.success === 1) {
+        notify('ok', (data.textTitle || 'Enregistrement').trim(), 'La page a été enregistrée.') // notif du shell (comme Publier)
+        await releaseLock(current) // libère le verrou → le cadenas du tree disparaît
+        window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // nom/statut + cadenas → maj + déploie jusqu'à la page
+        refreshStructure(current) // rafraîchit le statut/en-tête
+      } else {
+        notify('ko', (data.textTitle || 'Enregistrement').trim(), data.textMessage || 'L’enregistrement a échoué.', errorFields(data))
+      }
+    } catch (e) { notify('ko', 'Enregistrement', (e as Error).message) } finally { setSaving(false) }
+  }, [edit, current, editionReady, postLegacyPage, refreshStructure, releaseLock])
+
+  // Publier (« Publier ») → publishPage legacy : la chaîne sauvegarde (comme save) PUIS publie
+  // (saved→published, page_status=1). Même corps que save (cf. melisCms.js:publishPage).
+  const doPublish = useCallback(async () => {
+    if (!edit || !current || !editionReady) return
     setSaving(true); setToast(null)
     try {
-      await persistDraft() // le brouillon doit être à jour avant de le publier
-      const res = await fetch(`/melis/MelisCms/Page/publishPage?idPage=${current}`, {
-        method: 'POST', credentials: 'same-origin',
-        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: '',
-      })
-      const data = await res.json().catch(() => ({} as Record<string, unknown>)) as {
-        success?: number; textTitle?: string; textMessage?: string; errors?: Record<string, { errorMessage?: string; label?: string }>
-      }
-      const ok = data && data.success === 1
-      if (ok) {
+      const data = await postLegacyPage(`/melis/MelisCms/Page/publishPage?idPage=${encodeURIComponent(current)}`)
+      if (data.success === 1) {
         notify('ok', (data.textTitle || 'Publication').trim(), 'La page a été publiée.')
-        window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh')) // statut online → maj de l'arbre
+        await releaseLock(current) // libère le verrou (comme le legacy à la publication)
+        window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // statut online + cadenas → maj + déploie jusqu'à la page
         refreshStructure(current) // en-tête : plus de brouillon, statut publié
       } else {
-        const fields = Object.values(data.errors || {})
-          .filter((e) => e && e.label)
-          .map((e) => ({ label: String(e.label), messages: [String(e.errorMessage || '')] }))
-        notify('ko', (data.textTitle || 'Publication').trim(), 'La publication a échoué.', fields)
+        notify('ko', (data.textTitle || 'Publication').trim(), data.textMessage || 'La publication a échoué.', errorFields(data))
       }
     } catch (e) { notify('ko', 'Publication', (e as Error).message) } finally { setSaving(false) }
-  }, [current, persistDraft, refreshStructure])
+  }, [edit, current, editionReady, postLegacyPage, refreshStructure, releaseLock])
+
+  // Dépublier (switch Publié/Dépublié → OFF) → unpublishPage legacy (GET) : passe page_status=0 dans
+  // la version publiée (la page sort du site, sans rien supprimer). Comme melisCms.js:unpublishPage.
+  const doUnpublish = useCallback(async () => {
+    if (!current) return
+    setSaving(true)
+    try {
+      const res = await fetch(`/melis/MelisCms/Page/unpublishPage?idPage=${encodeURIComponent(current)}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+      const data = await res.json().catch(() => ({})) as LegacyResp
+      if (data.success === 1) {
+        notify('ok', (data.textTitle || 'Dépublication').trim(), 'La page a été dépubliée.')
+        window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // statut offline → maj + déploie jusqu'à la page
+        refreshStructure(current) // en-tête : switch → Hors ligne
+      } else {
+        notify('ko', (data.textTitle || 'Dépublication').trim(), data.textMessage || 'La dépublication a échoué.', errorFields(data))
+      }
+    } catch (e) { notify('ko', 'Dépublication', (e as Error).message) } finally { setSaving(false) }
+  }, [current, refreshStructure])
+
+  // Switch Publié/Dépublié (comme le legacy .page-publishunpublish) : ON = publier, OFF = dépublier.
+  const togglePublish = useCallback((toOnline: boolean) => { if (toOnline) doPublish(); else doUnpublish() }, [doPublish, doUnpublish])
+
+  // Effacer le brouillon (« Effacer brouillon ») → clearSavedPage legacy (revient à la version publiée).
+  const doClear = useCallback(async () => {
+    if (!current) return
+    if (!window.confirm('Effacer le brouillon et revenir à la dernière version publiée ?')) return
+    setSaving(true); setToast(null)
+    try {
+      const res = await fetch(`/melis/MelisCms/Page/clearSavedPage?idPage=${encodeURIComponent(current)}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+      const data = await res.json().catch(() => ({})) as LegacyResp
+      if (data.success === 1) {
+        notify('ok', (data.textTitle || 'Brouillon').trim(), 'Le brouillon a été effacé.')
+        window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } }))
+        refreshStructure(current); reloadEdition() // le contenu revient à la version publiée
+      } else notify('ko', (data.textTitle || 'Brouillon').trim(), data.textMessage || 'L’opération a échoué.')
+    } catch (e) { notify('ko', 'Brouillon', (e as Error).message) } finally { setSaving(false) }
+  }, [current, refreshStructure, reloadEdition])
+
+  // Supprimer la page (« Supprimer page ») → deletePage legacy, puis fermeture de l'onglet + refresh arbre.
+  const doDelete = useCallback(async () => {
+    if (!current) return
+    if (!window.confirm('Supprimer définitivement cette page (et ses versions) ?')) return
+    setSaving(true)
+    try {
+      const res = await fetch(`/melis/MelisCms/Page/deletePage?idPage=${encodeURIComponent(current)}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+      const data = await res.json().catch(() => ({})) as LegacyResp
+      if (data.success === 1) {
+        notify('ok', (data.textTitle || 'Suppression').trim(), 'La page a été supprimée.')
+        window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh'))
+        ;(window as unknown as { __melisCloseTab?: (id: string) => void }).__melisCloseTab?.(`/melis-cms/page/${current}`)
+        setOpened((o) => o.filter((x) => x !== current))
+      } else notify('ko', (data.textTitle || 'Suppression').trim(), data.textMessage || 'La suppression a échoué.')
+    } catch (e) { notify('ko', 'Suppression', (e as Error).message) } finally { setSaving(false) }
+  }, [current])
+
+  // Nouvelle page (« Nouvelle page ») → route React de création, en enfant de la page courante.
+  const openNewPage = useCallback(() => {
+    const path = current ? `${NEW_PAGE_ROUTE}~${current}` : NEW_PAGE_ROUTE
+    ;(window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void }).__melisOpenTab?.({ id: path, label: 'Nouvelle page', path })
+    navigate(path)
+  }, [current, navigate])
 
   // Distinguer par la CLÉ (le cap 'save' est partagé par Sauvegarder ET Effacer brouillon pour le gating,
   // mais leurs ACTIONS diffèrent : seul le vrai bouton Save déclenche la sauvegarde globale).
@@ -297,17 +470,20 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
       await apiPost('unlock', { idPage: Number(current) })
       const l = await apiGet<{ locked: boolean; byUser: string | null; byMe: boolean; since: string | null }>(`lock?idPage=${current}`)
       setLock(l); setUnlockOpen(false); setToast({ ok: true, text: 'Page débloquée.' }); setTimeout(() => setToast(null), 3000)
-      window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh')) // rafraîchit l'arbre → le cadenas disparaît
+      window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // rafraîchit l'arbre + déploie jusqu'à la page → le cadenas disparaît
     } catch (e) { setToast({ ok: false, text: (e as Error).message }) } finally { setUnlocking(false) }
   }, [current])
 
   const onButton = useCallback(async (b: StructBtn) => {
     setOpenMenu(null)
     if (b.key.includes('unlock')) { setUnlockOpen(true); return }            // Débloquer → modal React natif
-    if (b.key.endsWith('action_save')) { await saveAll(); return }          // Sauvegarder → save global
-    if (b.key.endsWith('action_publish')) { await doPublish(); return }     // Publier → save puis PUBLIE (legacy) + notif + reload arbre
-    driveButton(b.key)                                                       // autres (clear/delete/…) → legacy
-  }, [saveAll, doPublish, driveButton])
+    if (b.key.endsWith('action_save')) { await saveAll(); return }          // Sauvegarder → save global (legacy)
+    if (b.key.endsWith('action_publish')) { await doPublish(); return }     // Publier → save puis PUBLIE (legacy)
+    if (b.key.endsWith('action_clear')) { await doClear(); return }         // Effacer brouillon → clearSavedPage (legacy)
+    if (b.key.endsWith('action_delete')) { await doDelete(); return }       // Supprimer page → deletePage (legacy)
+    if (b.key.endsWith('action_new')) { openNewPage(); return }             // Nouvelle page → route React de création
+    driveButton(b.key)                                                       // Voir/Affichage/Dupliquer → pilotage iframe legacy
+  }, [saveAll, doPublish, doClear, doDelete, openNewPage, driveButton])
 
   useEffect(() => { if (!current) return; const f = frameRef.current[current]; if (f) applyIframeChrome(f) }, [current, applyIframeChrome])
 
@@ -385,21 +561,41 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
               <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--color-foreground,#111827)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{header?.pageName ?? (struct ? `Page ${struct.idPage}` : '')}</span>
               {statusLabel && <span style={{ fontSize: 11, fontWeight: 600, color: '#fff', background: statusColor, borderRadius: 999, padding: '2px 8px' }}>{statusLabel}</span>}
               {header?.editDate && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>modifiée le {header.editDate}{header.editor ? ` par ${header.editor}` : ''}</span>}
+              {!editionReady && !saving && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>chargement de l'édition…</span>}
               {saving && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>enregistrement…</span>}
               {toast && <span style={{ fontSize: 12, fontWeight: 600, color: toast.ok ? '#16a34a' : '#dc2626' }}>{toast.text}</span>}
             </>)}
           </div>
-          <ViewToggle mode={mode} onChange={setMode} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {/* Switch Publié / Dépublié (comme le legacy .page-publishunpublish). ON=En ligne (publie), OFF=Hors ligne (dépublie). */}
+            {showChrome && header && (() => {
+              const online = !!header.online
+              const disabled = saving || (!online && !editionReady) // pour publier (OFF→ON) il faut l'édition chargée
+              return (
+                <button type="button" onClick={() => togglePublish(!online)} disabled={disabled}
+                  title={online ? 'En ligne — cliquer pour dépublier' : 'Hors ligne — cliquer pour publier'}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 8, appearance: 'none', border: 0, background: 'transparent', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.6 : 1, padding: 0 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: .3, color: 'var(--color-muted-foreground,#6b7280)' }}>STATUT</span>
+                  <span style={{ position: 'relative', width: 40, height: 21, borderRadius: 999, background: online ? '#16a34a' : '#dc2626', transition: 'background .15s', flex: '0 0 auto' }}>
+                    <span style={{ position: 'absolute', top: 2, left: 2, width: 17, height: 17, borderRadius: '50%', background: '#fff', boxShadow: '0 1px 2px rgba(0,0,0,.3)', transform: online ? 'translateX(19px)' : 'translateX(0)', transition: 'transform .15s' }} />
+                  </span>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: online ? '#16a34a' : '#dc2626', minWidth: 54, textAlign: 'left' }}>{online ? 'En ligne' : 'Hors ligne'}</span>
+                </button>
+              )
+            })()}
+            <ViewToggle mode={mode} onChange={setMode} />
+          </div>
         </div>
       )}
 
-      {/* Bandeau d'avertissement si la page est VERROUILLÉE (mécanisme PageLock modulaire) */}
-      {showChrome && lock?.locked && (
+      {/* Bandeau d'avertissement UNIQUEMENT si la page est verrouillée par un AUTRE utilisateur (mécanisme
+          PageLock modulaire). Le propriétaire du verrou ne voit RIEN : le verrou le protège, il ne le bloque pas. */}
+      {showChrome && lockedByOther && (
         <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 8, margin: '0 16px 10px', padding: '9px 12px', borderRadius: 7, background: '#fef3c7', border: '1px solid #fcd34d', color: '#92400e', fontSize: 13 }}>
           <Icon name="unlock" />
           <span>
-            <strong>Page verrouillée</strong>{lock.byMe ? ' par vous' : lock.byUser ? ` par ${lock.byUser}` : ''}{lock.since ? ` depuis le ${lock.since}` : ''}.
-            {lock.byMe ? ' Vous pouvez la débloquer.' : ' Un autre utilisateur l’édite ; débloquez-la pour reprendre la main.'}
+            <strong>Page verrouillée</strong>{lock?.byUser ? ` par ${lock.byUser}` : ''}{lock?.since ? ` depuis le ${lock.since}` : ''}.
+            {' '}Un autre utilisateur l’édite ; débloquez-la pour reprendre la main.
           </span>
         </div>
       )}
@@ -423,7 +619,9 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
                       )}
                     </div>
                   ) : (
-                    <button key={b.key} className="melis-pgbtn" style={btnStyle(b)} disabled={saving && (b.key.endsWith('action_save') || b.key.endsWith('action_publish'))} onClick={() => onButton(b)}><Icon name={iconFor(b)} />{b.label}</button>
+                    (() => { const gated = b.key.endsWith('action_save') || b.key.endsWith('action_publish'); const dis = gated && (saving || !editionReady); return (
+                    <button key={b.key} className="melis-pgbtn" style={{ ...btnStyle(b), ...(dis ? { opacity: .55, cursor: 'not-allowed' } : null) }} disabled={dis} title={gated && !editionReady ? 'Édition en cours de chargement…' : undefined} onClick={() => onButton(b)}><Icon name={iconFor(b)} />{b.label}</button>
+                    ) })()
                   )
                 ))}
               </div>

@@ -154,6 +154,25 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
     setRootLoading(false)
   }, [loadChildren])
 
+  // Ref stable de la page sélectionnée (pour les listeners d'événements sans re-souscription).
+  const selectedIdRef = useRef(selectedId)
+  selectedIdRef.current = selectedId
+
+  // Déploie l'arbre jusqu'à `pageId` : récupère la chaîne d'ancêtres (racine → parent) puis charge
+  // leurs enfants et les ouvre → la page en cours redevient visible après un reload (qui referme tout).
+  const revealPath = useCallback(async (pageId: number | null) => {
+    if (!pageId || pageId <= 0) return
+    let chain: number[] = []
+    try {
+      const res = await fetch(`/melis/react-api/cms-page/ancestors?idPage=${pageId}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'include' })
+      chain = (await res.json())?.data?.ancestors ?? []
+    } catch { return }
+    if (!chain.length) return
+    const loaded = await Promise.all(chain.map(async (id) => [id, await fetchTreeNodes(id)] as const))
+    setChildrenByParent((m) => { const n = { ...m }; loaded.forEach(([id, nodes]) => { n[id] = nodes }); return n })
+    setExpanded((prev) => { const n = new Set(prev); chain.forEach((id) => n.add(id)); return n })
+  }, [])
+
   // Refresh button: clear the search box (query + active-search state), then reload the tree.
   // Clearing the query also lets the search effect restore the normal (unfiltered) view.
   const clearAndReload = useCallback(async () => {
@@ -219,10 +238,13 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
   // Une action NATIVE de la coquille React (ex. déverrouillage) émet melis:cms-tree-refresh pour
   // que l'arbre se recharge (le cadenas d'une page débloquée doit disparaître) — pas de message iframe.
   useEffect(() => {
-    const onRefresh = () => { reload() }
+    const onRefresh = (e: Event) => {
+      const rid = (e as CustomEvent<{ revealPageId?: number }>).detail?.revealPageId ?? selectedIdRef.current
+      void (async () => { await reload(); await revealPath(rid ?? null) })() // recharge PUIS re-déploie jusqu'à la page en cours
+    }
     window.addEventListener('melis:cms-tree-refresh', onRefresh)
     return () => window.removeEventListener('melis:cms-tree-refresh', onRefresh)
-  }, [reload])
+  }, [reload, revealPath])
 
   // Reload the tree after a page mutation done in a tool iframe (publish / unpublish / delete /
   // duplicate / page-lock unlock). buildToolPage forwards every tool response as
@@ -236,12 +258,13 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
       if (!ok) return
       const url = d.url || ''
       if (/\/Page\/(publishPage|unpublishPage|deletePage)\b/.test(url) || /duplicate-page|duplicateTreePage/i.test(url) || /\/PageLock\/unlockPage\b/.test(url)) {
-        reload()
+        const isDelete = /\/Page\/deletePage\b/.test(url)
+        void (async () => { await reload(); if (!isDelete) await revealPath(selectedIdRef.current) })() // re-déploie jusqu'à la page (sauf suppression)
       }
     }
     window.addEventListener('message', onResult)
     return () => window.removeEventListener('message', onResult)
-  }, [reload])
+  }, [reload, revealPath])
 
   const toggle = useCallback(async (node: MelisTreeNode) => {
     const id = node.key

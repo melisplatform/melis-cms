@@ -279,6 +279,34 @@ class MelisReactApiPageController extends MelisAbstractActionController
         } catch (\Throwable $e) { return $this->errorResponse($e); }
     }
 
+    // ─── Arbre : chemin vers une page ─────────────────────────────────────────────
+
+    /**
+     * GET /cms-page/ancestors?idPage=X → { ancestors: [id_racine, …, id_parent] }.
+     * Remonte melis_cms_page_tree.tree_father_page_id jusqu'à la racine (father 0). Sert à la
+     * coquille React pour DÉPLOYER l'arbre du menu jusqu'à la page en cours après un reload.
+     */
+    public function ancestorsAction(): HttpResponse
+    {
+        if (!$this->isAuthenticated()) { return $this->jsonResponse(['success' => false, 'error' => 'Unauthenticated'], 401); }
+        try {
+            $idPage = (int) $this->params()->fromQuery('idPage', 0);
+            $db = $this->db();
+            $chain = [];
+            $cur = $idPage;
+            $guard = 0;
+            while ($cur > 0 && $guard++ < 100) {
+                $rows = iterator_to_array($db->query('SELECT tree_father_page_id FROM melis_cms_page_tree WHERE tree_page_id = ? LIMIT 1', [$cur]));
+                if (empty($rows)) { break; }
+                $father = (int) ($rows[0]['tree_father_page_id'] ?? 0);
+                if ($father <= 0) { break; }
+                array_unshift($chain, $father); // racine en tête
+                $cur = $father;
+            }
+            return $this->jsonResponse(['success' => true, 'data' => ['idPage' => $idPage, 'ancestors' => $chain]]);
+        } catch (\Throwable $e) { return $this->errorResponse($e); }
+    }
+
     // ─── Références (listes déroulantes) ──────────────────────────────────────────
 
     /** GET /cms-page/refs?idPage=X → templates (du site), langues, styles (du site), enums type/menu. */
@@ -386,8 +414,9 @@ class MelisReactApiPageController extends MelisAbstractActionController
         $header = [
             'idPage'   => $idPage,
             'pageName' => null,
-            'status'   => null,      // 'draft' | 'published' | null
+            'status'   => null,      // 'draft' | 'published' | 'unpublished' | null
             'hasDraft' => false,
+            'online'   => false,     // page EN LIGNE = version publiée existante avec page_status=1 (pilote le switch Publié/Dépublié)
             'editDate' => null,
             'editor'   => null,
         ];
@@ -399,10 +428,14 @@ class MelisReactApiPageController extends MelisAbstractActionController
             $tree   = $saved ? $saved->getMelisPageTree() : null;
             $header['hasDraft'] = !empty($saved) && $saved->getType() === 'saved';
 
+            // État EN LIGNE réel : lu sur la version PUBLIÉE (indépendant de l'existence d'un brouillon).
+            $pub     = $engine->getDatasPage($idPage, 'published');
+            $pubTree = $pub ? $pub->getMelisPageTree() : null;
+            $header['online'] = !empty($pubTree) && (int) ($pubTree->page_status ?? 0) === 1;
+
             if (empty($tree)) {
                 // pas de brouillon → lire la version publiée pour l'en-tête
-                $pub  = $engine->getDatasPage($idPage, 'published');
-                $tree = $pub ? $pub->getMelisPageTree() : null;
+                $tree = $pubTree;
             }
             if (!empty($tree)) {
                 $header['pageName'] = $tree->page_name ?? null;
