@@ -143,7 +143,7 @@ function saveCols(c: ColDef[]) { try { localStorage.setItem(COL_KEY, JSON.string
 const visibleCols = (c: ColDef[]) => c.filter((x) => x.visible)
 
 const GripIcon = () => <svg style={{ width: 13, height: 13, color: 'var(--color-muted-foreground)' }} viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" /><circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" /><circle cx="9" cy="18" r="1.5" /><circle cx="15" cy="18" r="1.5" /></svg>
-const panelCss: CSSProperties = { display: 'flex', flexDirection: 'column', gap: 2, minHeight: 120, borderRadius: 8, border: '1px dashed var(--color-border)', padding: 6 }
+const panelCss: CSSProperties = { display: 'flex', flexDirection: 'column', gap: 2, minHeight: 120, maxHeight: 'min(48vh, 320px)', overflowY: 'auto', minWidth: 0, borderRadius: 8, border: '1px dashed var(--color-border)', padding: 6 }
 const panelTitle: CSSProperties = { padding: '0 6px 4px', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--color-muted-foreground)' }
 
 function ColManager({ cols, labelFor, onChange, onClose }: {
