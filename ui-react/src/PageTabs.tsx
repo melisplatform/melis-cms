@@ -81,6 +81,12 @@ export function FlagSelect({ value, onChange, options, placeholder = 'Choisissez
   )
 }
 
+/** Notification du shell (même toast que les outils legacy / CmsPage) : postMessage capté par
+ *  <Notifications> de la coquille (la brique tourne dans la MÊME fenêtre que l'hôte). */
+function notify(kind: 'ok' | 'ko', title: string, message: string) {
+  window.postMessage({ __melisNotif: true, kind, title, message }, '*')
+}
+
 function Feedback({ msg }: { msg: { ok: boolean; text: string } | null }) {
   if (!msg) return null
   return <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 6, fontSize: 13, background: msg.ok ? '#dcfce7' : '#fee2e2', color: msg.ok ? '#166534' : '#991b1b' }}>{msg.text}</div>
@@ -214,8 +220,11 @@ export function VersioningTab({ idPage }: { idPage: number }) {
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const [busy, setBusy] = useState<number | null>(null)
   const [editing, setEditing] = useState<{ id: number; name: string } | null>(null)
+  const [confirmRestore, setConfirmRestore] = useState<number | null>(null) // modal React de confirmation de restauration
   const reload = useCallback(() => { apiGet<{ items: WfVersion[] }>(`versioning?idPage=${idPage}`).then((v) => setRows(v.items)).catch((e) => setMsg({ ok: false, text: e.message })) }, [idPage])
   useEffect(() => { let x = false; apiGet<{ items: WfVersion[] }>(`versioning?idPage=${idPage}`).then((v) => !x && setRows(v.items)).catch((e) => !x && setMsg({ ok: false, text: e.message })); return () => { x = true } }, [idPage])
+  // La publication (et la sauvegarde) crée une nouvelle version → recharger la liste sur demande de la coquille.
+  useEffect(() => { const on = () => reload(); window.addEventListener('melis:cms-versioning-refresh', on); return () => window.removeEventListener('melis:cms-versioning-refresh', on) }, [reload])
   const flash = (ok: boolean, text: string) => { setMsg({ ok, text }); setTimeout(() => setMsg(null), 3500) }
 
   // Ouvrir la prévisualisation de la version (nouvelle fenêtre) — endpoint legacy getLinkSeeVersion.
@@ -228,17 +237,17 @@ export function VersioningTab({ idPage }: { idPage: number }) {
     } catch (e) { flash(false, (e as Error).message) } finally { setBusy(null) }
   }
   // Restaurer la version dans l'édition (rollback → melis_cms_page_saved) + recharger l'édition/l'en-tête.
+  // Confirmation via modal React (setConfirmRestore) — plus de window.confirm natif.
   const doRestore = async (id: number) => {
-    if (!window.confirm('Restaurer cette version dans l\'édition en cours ? (le brouillon actuel sera remplacé)')) return
     setBusy(id)
     try {
       const r = await legacyPost('/melis/MelisSmallBusiness/PageVersioning/rollBackVersion', { idPage, idVersion: id })
       if (r.success === 1) {
-        flash(true, 'Version restaurée dans l\'édition.')
+        notify('ok', 'Versioning', 'Version restaurée dans l\'édition.')
         window.dispatchEvent(new CustomEvent('melis:cms-reload-edition')) // recharge l'iframe d'édition + en-tête
         reload()
-      } else flash(false, r.textMessage && !r.textMessage.startsWith('tr_') ? r.textMessage : 'La restauration a échoué.')
-    } catch (e) { flash(false, (e as Error).message) } finally { setBusy(null) }
+      } else notify('ko', 'Versioning', r.textMessage && !r.textMessage.startsWith('tr_') ? r.textMessage : 'La restauration a échoué.')
+    } catch (e) { notify('ko', 'Versioning', (e as Error).message) } finally { setBusy(null); setConfirmRestore(null) }
   }
   // Renommer la version — endpoint legacy saveVersion.
   const doRename = async () => {
@@ -246,9 +255,9 @@ export function VersioningTab({ idPage }: { idPage: number }) {
     setBusy(editing.id)
     try {
       const r = await legacyPost('/melis/MelisSmallBusiness/PageVersioning/saveVersion', { pageVersionId: editing.id, page_v_version_name: editing.name })
-      if (r.success === 1) { flash(true, 'Version renommée.'); setEditing(null); reload() }
-      else flash(false, 'Le renommage a échoué.')
-    } catch (e) { flash(false, (e as Error).message) } finally { setBusy(null) }
+      if (r.success === 1) { notify('ok', 'Versioning', 'Version renommée.'); setEditing(null); reload() }
+      else notify('ko', 'Versioning', 'Le renommage a échoué.')
+    } catch (e) { notify('ko', 'Versioning', (e as Error).message) } finally { setBusy(null) }
   }
 
   if (!rows) return <div style={wrap}>Chargement…</div>
@@ -274,7 +283,7 @@ export function VersioningTab({ idPage }: { idPage: number }) {
                   <button style={{ ...smallBtn, marginLeft: 6 }} onClick={() => setEditing(null)}>Annuler</button>
                 </>) : (<>
                   <button style={smallBtn} disabled={busy === r.id} onClick={() => doView(r.id)} title="Aperçu de cette version">👁 Voir</button>
-                  <button style={{ ...smallBtn, marginLeft: 6 }} disabled={busy === r.id} onClick={() => doRestore(r.id)} title="Restaurer cette version dans l'édition">↩ Restaurer</button>
+                  <button style={{ ...smallBtn, marginLeft: 6 }} disabled={busy === r.id} onClick={() => setConfirmRestore(r.id)} title="Restaurer cette version dans l'édition">↩ Restaurer</button>
                   <button style={{ ...smallBtn, marginLeft: 6 }} disabled={busy === r.id} onClick={() => setEditing({ id: r.id, name: r.name || '' })} title="Nommer / renommer">✎ Renommer</button>
                 </>)}
               </td>
@@ -283,6 +292,30 @@ export function VersioningTab({ idPage }: { idPage: number }) {
         </table>
       )}
       <Feedback msg={msg} />
+
+      {/* Modal React de confirmation de RESTAURATION (remplace le window.confirm natif) */}
+      {confirmRestore != null && (() => {
+        const v = rows.find((r) => r.id === confirmRestore)
+        const busyThis = busy === confirmRestore
+        return (
+          <div onClick={() => !busyThis && setConfirmRestore(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+            <div onClick={(e) => e.stopPropagation()} style={{ width: 480, maxWidth: '100%', background: 'var(--color-card,#fff)', borderRadius: 10, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,.35)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', background: '#f59e0b', color: '#fff' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 15, fontWeight: 600 }}>↩ Restaurer la version</span>
+                <button onClick={() => !busyThis && setConfirmRestore(null)} style={{ appearance: 'none', border: 0, background: 'transparent', color: '#fff', fontSize: 20, lineHeight: 1, cursor: 'pointer' }}>×</button>
+              </div>
+              <div style={{ padding: 18, fontSize: 13, color: 'var(--color-foreground,#111827)', lineHeight: 1.5 }}>
+                Restaurer la version <strong>n°{v?.number}{v?.name ? ` — ${v.name}` : ''}</strong> dans l'édition en cours ?<br />
+                Le <strong>brouillon actuel sera remplacé</strong> par le contenu de cette version.
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '0 18px 18px' }}>
+                <button onClick={() => setConfirmRestore(null)} disabled={busyThis} style={{ ...smallBtn, height: 34, padding: '0 14px' }}>Annuler</button>
+                <button onClick={() => confirmRestore != null && doRestore(confirmRestore)} disabled={busyThis} style={{ ...smallBtn, height: 34, padding: '0 14px', border: 0, background: '#f59e0b', color: '#fff' }}>{busyThis ? 'Restauration…' : 'Restaurer'}</button>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }
@@ -294,20 +327,28 @@ const WF_META: Record<string, { label: string; color: string; bg: string }> = {
   VALIDATED: { label: 'Validé', color: '#059669', bg: 'rgba(16,185,129,.15)' },
   REFUSED: { label: 'Refusé', color: '#dc2626', bg: 'rgba(239,68,68,.15)' },
 }
+const COMMENTS_PER_PAGE = 20
 export function CommentsTab({ idPage }: { idPage: number }) {
   const [items, setItems] = useState<TLItem[] | null>(null)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
+  const [pageNum, setPageNum] = useState(1) // pagination client (1-based), 20 éléments/page
   const reload = useCallback(() => { apiGet<{ items: TLItem[] }>(`timeline?idPage=${idPage}`).then((v) => setItems(v.items)).catch((e) => setMsg({ ok: false, text: e.message })) }, [idPage])
   useEffect(() => { let x = false; apiGet<{ items: TLItem[] }>(`timeline?idPage=${idPage}`).then((v) => !x && setItems(v.items)).catch((e) => !x && setMsg({ ok: false, text: e.message })); return () => { x = true } }, [idPage])
+  useEffect(() => { setPageNum(1) }, [idPage]) // nouvelle page → retour à la 1ʳᵉ page
   const add = async () => {
     if (!text.trim()) return
     setSending(true); setMsg(null)
-    try { await apiPost('comments/save', { idPage, text: text.trim() }); setText(''); reload() }
+    // timeline triée newest-first → le nouveau commentaire est en tête (page 1)
+    try { await apiPost('comments/save', { idPage, text: text.trim() }); setText(''); setPageNum(1); reload() }
     catch (e) { setMsg({ ok: false, text: (e as Error).message }); setTimeout(() => setMsg(null), 3500) } finally { setSending(false) }
   }
   if (!items) return <div style={wrap}>Chargement…</div>
+  const totalPages = Math.max(1, Math.ceil(items.length / COMMENTS_PER_PAGE))
+  const curPage = Math.min(Math.max(1, pageNum), totalPages)
+  const start = (curPage - 1) * COMMENTS_PER_PAGE
+  const paged = items.slice(start, start + COMMENTS_PER_PAGE)
   return (
     <div style={wrap}>
       <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>Activité de la page</div>
@@ -320,12 +361,12 @@ export function CommentsTab({ idPage }: { idPage: number }) {
       </div>
 
       {items.length === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>Aucune activité pour le moment.</div> : (
-        <div>{items.map((it, i) => {
+        <div>{paged.map((it, i) => {
           const wf = it.kind === 'workflow' ? (WF_META[it.action || ''] || { label: it.action || 'Workflow', color: '#6b7280', bg: 'rgba(127,127,127,.12)' }) : null
           const dot = wf ? wf.color : 'var(--color-primary,#dc2626)'
-          const last = i === items.length - 1
+          const last = i === paged.length - 1
           return (
-            <div key={i} style={{ display: 'flex', gap: 12 }}>
+            <div key={start + i} style={{ display: 'flex', gap: 12 }}>
               {/* Rail : pastille + trait vertical */}
               <div style={{ position: 'relative', width: 12, flexShrink: 0 }}>
                 <div style={{ position: 'absolute', top: 6, left: 'calc(50% - 5px)', width: 10, height: 10, borderRadius: '50%', background: dot, zIndex: 1, boxShadow: '0 0 0 3px var(--color-background,#fff)' }} />
@@ -345,6 +386,15 @@ export function CommentsTab({ idPage }: { idPage: number }) {
             </div>
           )
         })}</div>
+      )}
+
+      {/* Pagination — 20 éléments par page */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 8, paddingTop: 12, borderTop: '1px solid var(--color-border,#f3f4f6)' }}>
+          <button style={{ ...smallBtn, opacity: curPage <= 1 ? 0.5 : 1, cursor: curPage <= 1 ? 'not-allowed' : 'pointer' }} disabled={curPage <= 1} onClick={() => setPageNum(curPage - 1)}>‹ Précédent</button>
+          <span style={{ fontSize: 12.5, color: 'var(--color-muted-foreground,#6b7280)' }}>Page {curPage} / {totalPages} · {items.length} éléments</span>
+          <button style={{ ...smallBtn, opacity: curPage >= totalPages ? 0.5 : 1, cursor: curPage >= totalPages ? 'not-allowed' : 'pointer' }} disabled={curPage >= totalPages} onClick={() => setPageNum(curPage + 1)}>Suivant ›</button>
+        </div>
       )}
       <Feedback msg={msg} />
     </div>

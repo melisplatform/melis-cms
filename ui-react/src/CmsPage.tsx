@@ -416,6 +416,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         notify('ok', (data.textTitle || 'Publication').trim(), 'La page a été publiée.')
         await releaseLock(current) // libère le verrou (comme le legacy à la publication)
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // statut online + cadenas → maj + déploie jusqu'à la page
+        window.dispatchEvent(new CustomEvent('melis:cms-versioning-refresh')) // publier crée une version → recharge l'onglet Versioning
         refreshStructure(current) // en-tête : plus de brouillon, statut publié
       } else {
         notify('ko', (data.textTitle || 'Publication').trim(), data.textMessage || 'La publication a échoué.', errorFields(data))
