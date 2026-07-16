@@ -52,10 +52,10 @@ export function ModuleLoaderTab({ isAdmin, modules, setModules }: {
     while (stack.length) { const cur = stack.pop()!; for (const dep of byName[cur]?.requires ?? []) if (!out.has(dep)) { out.add(dep); stack.push(dep) } }
     return [...out]
   }
-  // Fermeture transitive des dépendants ACTIFS (cassés si M désactivé).
-  function activeDependentsClosure(name: string): string[] {
+  // Fermeture transitive de TOUS les dépendants (actifs ou non) — pour l'affichage du popup.
+  function allDependentsClosure(name: string): string[] {
     const out = new Set<string>(); const stack = [name]
-    while (stack.length) { const cur = stack.pop()!; for (const dep of byName[cur]?.dependents ?? []) if (byName[dep]?.active && !out.has(dep)) { out.add(dep); stack.push(dep) } }
+    while (stack.length) { const cur = stack.pop()!; for (const dep of byName[cur]?.dependents ?? []) if (!out.has(dep)) { out.add(dep); stack.push(dep) } }
     return [...out]
   }
   function applyActive(names: string[], value: boolean) {
@@ -68,7 +68,7 @@ export function ModuleLoaderTab({ isAdmin, modules, setModules }: {
       const deps = requiresClosure(name).filter((d) => !byName[d]?.active)
       applyActive([name, ...deps], true)
     } else {
-      const cascade = activeDependentsClosure(name)
+      const cascade = allDependentsClosure(name)
       if (cascade.length) { setConfirm({ module: name, cascade }); return }
       applyActive([name], false)
     }
@@ -145,15 +145,24 @@ export function ModuleLoaderTab({ isAdmin, modules, setModules }: {
       {confirm && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,.5)' }}>
           <div style={{ ...card, width: '100%', maxWidth: 460, padding: 24 }}>
-            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>{tr('Désactiver le module', 'Deactivate module')}</h3>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>{tr('Désactivation des modules', 'Module deactivation')}</h3>
             <p style={{ marginTop: 8, fontSize: 14, color: muted }}>
-              {tr(`Désactiver « ${confirm.module} » désactivera aussi les modules qui en dépendent :`, `Deactivating "${confirm.module}" will also deactivate modules that depend on it:`)}
+              {tr(`Les modules suivants sont dépendants de « ${confirm.module} » :`, `The following modules are dependant of "${confirm.module}":`)}
             </p>
-            <ul style={{ marginTop: 8, paddingLeft: 18, fontSize: 14 }}>{confirm.cascade.map((d) => <li key={d}>{d}</li>)}</ul>
+            <ul style={{ marginTop: 8, paddingLeft: 18, fontSize: 14 }}>{confirm.cascade.map((d) => (
+              <li key={d}>{d}{!byName[d]?.active && <span style={{ color: muted, fontSize: 12 }}> ({tr('déjà inactif', 'already inactive')})</span>}</li>
+            ))}</ul>
+            <p style={{ marginTop: 12, fontSize: 14, fontWeight: 500 }}>
+              {tr('Voulez-vous désactiver ces modules aussi ?', 'Do you want to deactivate these modules too?')}
+            </p>
             <div style={{ marginTop: 20, display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-              <button style={btn} onClick={() => setConfirm(null)}>{tr('Annuler', 'Cancel')}</button>
-              <button style={{ ...btnPrimary, background: '#d97706' }} onClick={() => { applyActive([confirm.module, ...confirm.cascade], false); setConfirm(null) }}>
-                {tr('Désactiver', 'Deactivate')}
+              {/* No : ne désactive que le module lui-même, laisse les dépendants actifs (comme le legacy). */}
+              <button style={{ ...btn, color: '#dc2626', borderColor: '#dc2626' }} onClick={() => { applyActive([confirm.module], false); setConfirm(null) }}>
+                {tr('Non', 'No')}
+              </button>
+              {/* Yes : désactive le module ET tous ses dépendants (les inactifs sont déjà off → no-op). */}
+              <button style={{ ...btnPrimary, background: '#16a34a' }} onClick={() => { applyActive([confirm.module, ...confirm.cascade.filter((d) => byName[d]?.active)], false); setConfirm(null) }}>
+                {tr('Oui', 'Yes')}
               </button>
             </div>
           </div>
