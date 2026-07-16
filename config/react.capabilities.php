@@ -26,13 +26,36 @@ return [
         // versioning + commentaires ; page-historic/analytics/script-editor peuvent déclarer les leurs.
         // Ici : seuls les onglets/boutons NATIFS de MelisCms.
         'meliscms_page' => [
-            'actions' => ['create', 'save', 'publish', 'delete', 'duplicate'],
+            // Actions labellisées {key,label} : le `label` (clé tr_ des VRAIS boutons de la barre
+            // d'actions) est traduit côté serveur → mêmes libellés que les boutons de l'éditeur.
+            'actions' => [
+                ['key' => 'create',    'label' => 'tr_meliscms_page_actions_New'],
+                ['key' => 'save',      'label' => 'tr_meliscms_page_actions_Save'],
+                ['key' => 'clear',     'label' => 'tr_meliscms_page_action_clear'],
+                ['key' => 'publish',   'label' => 'tr_meliscms_page_actions_Publish'],
+                ['key' => 'status',    'label' => 'Switch offline/online'], // switch En ligne / Hors ligne
+                ['key' => 'delete',    'label' => 'tr_meliscms_page_actions_Delete Page'],
+                ['key' => 'duplicate', 'label' => 'tr_meliscms_page_action_duplicate'],
+                ['key' => 'view',      'label' => 'tr_meliscms_page_actions_See'],
+                ['key' => 'display',   'label' => 'tr_meliscms_page_actions_display_Display'],
+            ],
             'tabs'    => [
                 ['key' => 'edition',    'label' => 'tr_meliscms_page_tab_edition_Edition'],
                 ['key' => 'properties', 'label' => 'tr_meliscms_page_tab_properties_Properties'],
                 ['key' => 'seo',        'label' => 'tr_meliscms_page_tab_seo_Seo'],
                 ['key' => 'languages',  'label' => 'tr_meliscms_page_languages'],
             ],
+        ],
+    ],
+
+    // Nœud « rights-only » de l'éditeur de page : exposé UNIQUEMENT dans Users→Droits (pas dans le
+    // menu de gauche) sous la section MelisCms. L'éditeur s'ouvre via l'arbre du site (droits par-page),
+    // donc il n'a pas de nœud de menu propre — celui-ci porte ses capacités (onglets + boutons), que
+    // les modules complètent sous la même clé `meliscms_page` (cf. melisReactToolCapabilities). Injecté
+    // par MelisReactApi\...\buildMenuResponse quand ?full=1. Cf. react.capabilities.php des autres modules.
+    'melisReactRightsTools' => [
+        'meliscms_toolstree_section' => [
+            ['melisKey' => 'meliscms_page', 'name' => 'Edition de page', 'icon' => 'fa-file-text-o'],
         ],
     ],
 ];

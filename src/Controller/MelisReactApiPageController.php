@@ -55,15 +55,24 @@ class MelisReactApiPageController extends MelisAbstractActionController
         'meliscms_page_languages'  => 'languages',
     ];
 
-    /** Map bouton melisKey → capacité (pour le gating React). */
+    /**
+     * Map bouton melisKey → capacité (pour le gating React). Les boutons non listés prennent leur
+     * propre melisKey comme cap (default-allow tant que non déclaré). Chaque capacité est déclarée par
+     * SON module dans react.capabilities.php sous la clé `meliscms_page` (natifs ici ; workflow/unlock
+     * = small-business ; newsletter = melis-newsletter).
+     */
     private const BTN_CAP = [
-        'meliscms_page_action_new'       => 'create',
-        'meliscms_page_action_save'      => 'save',
-        'meliscms_page_action_clear'     => 'save',
-        'meliscms_page_action_publish'   => 'publish',
-        'meliscms_page_action_delete'    => 'delete',
-        'meliscms_page_action_duplicate' => 'duplicate',
-        'melissb_page_action_workflow'   => 'workflow',
+        'meliscms_page_action_new'            => 'create',
+        'meliscms_page_action_save'           => 'save',
+        'meliscms_page_action_clear'          => 'clear',
+        'meliscms_page_action_publish'        => 'publish',
+        'meliscms_page_action_delete'         => 'delete',
+        'meliscms_page_action_duplicate'      => 'duplicate',
+        'meliscms_page_action_view'           => 'view',
+        'meliscms_page_action_display'        => 'display',
+        'meliscms_page_action_send_newsletter' => 'newsletter',
+        'melissb_page_action_workflow'        => 'workflow',
+        'melissb_pagelock_unlock_button'      => 'unlock',
     ];
 
     // ─── GET /cms-page/structure ─────────────────────────────────────────────────
@@ -454,7 +463,14 @@ class MelisReactApiPageController extends MelisAbstractActionController
             $engine = $this->getServiceManager()->get('MelisEnginePage');
             $saved  = $engine->getDatasPage($idPage, 'saved');
             $tree   = $saved ? $saved->getMelisPageTree() : null;
-            $header['hasDraft'] = !empty($saved) && $saved->getType() === 'saved';
+            // hasDraft = existence RÉELLE d'une ligne dans melis_cms_page_saved. On NE se fie PAS à
+            // getDatasPage('saved')->getType() : quand la page n'a pas de brouillon (ex. après publication,
+            // le brouillon est supprimé), getDatasPage retombe sur la version PUBLIÉE mais garde le type
+            // 'saved' demandé → hasDraft serait toujours vrai (badge « Brouillon » figé). On interroge donc
+            // directement la table des brouillons.
+            $db = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
+            $savedRow = iterator_to_array($db->query('SELECT page_id FROM melis_cms_page_saved WHERE page_id = ? LIMIT 1', [$idPage]));
+            $header['hasDraft'] = !empty($savedRow);
 
             // État EN LIGNE réel : lu sur la version PUBLIÉE (indépendant de l'existence d'un brouillon).
             $pub     = $engine->getDatasPage($idPage, 'published');

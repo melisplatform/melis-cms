@@ -608,8 +608,9 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
             </>)}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            {/* Switch Publié / Dépublié (comme le legacy .page-publishunpublish). ON=En ligne (publie), OFF=Hors ligne (dépublie). */}
-            {showChrome && header && (() => {
+            {/* Switch Publié / Dépublié (comme le legacy .page-publishunpublish). ON=En ligne (publie), OFF=Hors ligne (dépublie).
+                Gaté par la capacité `status` (droits avancés) → masquable dans Users→Droits comme les boutons. */}
+            {showChrome && header && (!capsLoaded || can('status')) && (() => {
               const online = !!header.online
               const disabled = saving || (!online && !editionReady) // pour publier (OFF→ON) il faut l'édition chargée
               return (
