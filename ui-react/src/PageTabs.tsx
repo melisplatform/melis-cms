@@ -144,21 +144,69 @@ export function SeoTab({ value, onChange }: { value: SeoData; onChange: (v: SeoD
 }
 
 // ═══ ANALYTICS (modulaire) ═══
+/** Locale du back-office (attribut <html lang>, ex 'fr' / 'fr_FR' / 'en_EN') normalisée pour Intl. */
+function boLocale(): string {
+  return (document.documentElement.lang || 'fr').replace('_', '-') || 'fr'
+}
+/** Formate une date SQL 'Y-m-d H:i:s' selon la langue affichée du back-office (Intl). */
+function fmtDate(s: string | null | undefined): string {
+  if (!s) return '—'
+  const dt = new Date(String(s).replace(' ', 'T'))
+  if (isNaN(dt.getTime())) return String(s)
+  try { return new Intl.DateTimeFormat(boLocale(), { dateStyle: 'medium', timeStyle: 'short' }).format(dt) }
+  catch { return String(s) }
+}
+
+const ANALYTICS_PER_PAGE = 100
+type AData = { visits: number; sessions: number; lastVisit: string | null; recent: { date: string }[]; recentTotal: number; page: number; perPage: number }
 export function AnalyticsTab({ idPage }: { idPage: number }) {
-  const [d, setD] = useState<{ visits: number; sessions: number; lastVisit: string | null; recent: { date: string }[] } | null>(null)
+  const [d, setD] = useState<AData | null>(null)
+  const [pageNum, setPageNum] = useState(1) // pagination SERVEUR (1-based) — 100 visites/page, jamais tout chargé
+  const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
-  useEffect(() => { let x = false; apiGet<{ visits: number; sessions: number; lastVisit: string | null; recent: { date: string }[] }>(`analytics?idPage=${idPage}`).then((v) => !x && setD(v)).catch((e) => !x && setMsg({ ok: false, text: e.message })); return () => { x = true } }, [idPage])
+  useEffect(() => { setPageNum(1) }, [idPage]) // changement de page CMS → retour page 1
+  useEffect(() => {
+    let x = false; setLoading(true)
+    apiGet<AData>(`analytics?idPage=${idPage}&page=${pageNum}&perPage=${ANALYTICS_PER_PAGE}`)
+      .then((v) => { if (!x) setD(v) })
+      .catch((e) => { if (!x) setMsg({ ok: false, text: e.message }) })
+      .finally(() => { if (!x) setLoading(false) })
+    return () => { x = true }
+  }, [idPage, pageNum])
   if (!d) return <div style={wrap}>Chargement…</div>
+  const total = d.recentTotal ?? d.visits
+  const totalPages = Math.max(1, Math.ceil(total / ANALYTICS_PER_PAGE))
+  const curPage = Math.min(Math.max(1, pageNum), totalPages)
+  const start = (curPage - 1) * ANALYTICS_PER_PAGE
   const card: React.CSSProperties = { flex: 1, minWidth: 140, padding: 16, borderRadius: 8, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)' }
   return (
     <div style={wrap}>
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
         <div style={card}><div style={{ fontSize: 24, fontWeight: 700 }}>{d.visits}</div><div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>Visites</div></div>
         <div style={card}><div style={{ fontSize: 24, fontWeight: 700 }}>{d.sessions}</div><div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>Sessions</div></div>
-        <div style={card}><div style={{ fontSize: 15, fontWeight: 600 }}>{d.lastVisit ?? '—'}</div><div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>Dernière visite</div></div>
+        <div style={card}><div style={{ fontSize: 15, fontWeight: 600 }}>{fmtDate(d.lastVisit)}</div><div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>Dernière visite</div></div>
       </div>
-      {d.recent.length > 0 && <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Visites récentes</div>}
-      {d.recent.map((r, i) => <div key={i} style={{ fontSize: 13, padding: '4px 0', borderBottom: '1px solid var(--color-border,#f3f4f6)' }}>{r.date}</div>)}
+      {total > 0 && <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6, opacity: loading ? 0.5 : 1 }}>Visites récentes</div>}
+      {/* Grille multi-colonnes (auto-fill) : 100 dates par page → on remplit la largeur au lieu
+          d'une seule colonne qui gaspille l'espace. Colonnes ~190px, réparties selon la largeur. */}
+      <div style={{ opacity: loading ? 0.5 : 1, transition: 'opacity .15s', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))', columnGap: 20, rowGap: 0 }}>
+        {d.recent.map((r, i) => (
+          <div key={start + i} style={{ display: 'flex', gap: 8, fontSize: 13, padding: '5px 4px', borderBottom: '1px solid var(--color-border,#f3f4f6)', whiteSpace: 'nowrap' }}>
+            <span style={{ color: 'var(--color-muted-foreground,#9ca3af)', fontVariantNumeric: 'tabular-nums', minWidth: 34, textAlign: 'right' }}>{start + i + 1}.</span>
+            <span>{fmtDate(r.date)}</span>
+          </div>
+        ))}
+      </div>
+      {total === 0 && <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>Aucune visite enregistrée.</div>}
+
+      {/* Pagination SERVEUR — 100 visites par page */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 10, paddingTop: 12, borderTop: '1px solid var(--color-border,#f3f4f6)' }}>
+          <button style={{ ...smallBtn, opacity: curPage <= 1 || loading ? 0.5 : 1, cursor: curPage <= 1 || loading ? 'not-allowed' : 'pointer' }} disabled={curPage <= 1 || loading} onClick={() => setPageNum(curPage - 1)}>‹ Précédent</button>
+          <span style={{ fontSize: 12.5, color: 'var(--color-muted-foreground,#6b7280)' }}>Page {curPage} / {totalPages} · {total} visites</span>
+          <button style={{ ...smallBtn, opacity: curPage >= totalPages || loading ? 0.5 : 1, cursor: curPage >= totalPages || loading ? 'not-allowed' : 'pointer' }} disabled={curPage >= totalPages || loading} onClick={() => setPageNum(curPage + 1)}>Suivant ›</button>
+        </div>
+      )}
       <Feedback msg={msg} />
     </div>
   )
@@ -213,16 +261,29 @@ async function legacyPost(url: string, params: Record<string, string | number>):
 }
 const smallBtn: React.CSSProperties = { appearance: 'none', display: 'inline-flex', alignItems: 'center', gap: 4, height: 26, padding: '0 8px', borderRadius: 5, fontSize: 12, fontWeight: 500, cursor: 'pointer', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', whiteSpace: 'nowrap' }
 
-// ═══ VERSIONING (modulaire) — Voir / Restaurer / Renommer ═══
+// ═══ VERSIONING (modulaire) — pagination SERVEUR 20/page, dates locale BO — Voir / Restaurer / Renommer ═══
+const VERSIONING_PER_PAGE = 20
 type WfVersion = { id: number; number: number; name: string | null; editDate: string; user: string }
+type VersData = { items: WfVersion[]; page: number; perPage: number; total: number }
 export function VersioningTab({ idPage }: { idPage: number }) {
-  const [rows, setRows] = useState<WfVersion[] | null>(null)
+  const [d, setD] = useState<VersData | null>(null)
+  const [pageNum, setPageNum] = useState(1) // pagination serveur — jamais tout chargé
+  const [reloadKey, setReloadKey] = useState(0)
+  const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const [busy, setBusy] = useState<number | null>(null)
   const [editing, setEditing] = useState<{ id: number; name: string } | null>(null)
   const [confirmRestore, setConfirmRestore] = useState<number | null>(null) // modal React de confirmation de restauration
-  const reload = useCallback(() => { apiGet<{ items: WfVersion[] }>(`versioning?idPage=${idPage}`).then((v) => setRows(v.items)).catch((e) => setMsg({ ok: false, text: e.message })) }, [idPage])
-  useEffect(() => { let x = false; apiGet<{ items: WfVersion[] }>(`versioning?idPage=${idPage}`).then((v) => !x && setRows(v.items)).catch((e) => !x && setMsg({ ok: false, text: e.message })); return () => { x = true } }, [idPage])
+  const reload = useCallback(() => setReloadKey((k) => k + 1), []) // re-fetch la PAGE courante
+  useEffect(() => { setPageNum(1) }, [idPage])
+  useEffect(() => {
+    let x = false; setLoading(true)
+    apiGet<VersData>(`versioning?idPage=${idPage}&page=${pageNum}&perPage=${VERSIONING_PER_PAGE}`)
+      .then((v) => { if (!x) setD(v) })
+      .catch((e) => { if (!x) setMsg({ ok: false, text: e.message }) })
+      .finally(() => { if (!x) setLoading(false) })
+    return () => { x = true }
+  }, [idPage, pageNum, reloadKey])
   // La publication (et la sauvegarde) crée une nouvelle version → recharger la liste sur demande de la coquille.
   useEffect(() => { const on = () => reload(); window.addEventListener('melis:cms-versioning-refresh', on); return () => window.removeEventListener('melis:cms-versioning-refresh', on) }, [reload])
   const flash = (ok: boolean, text: string) => { setMsg({ ok, text }); setTimeout(() => setMsg(null), 3500) }
@@ -260,22 +321,25 @@ export function VersioningTab({ idPage }: { idPage: number }) {
     } catch (e) { notify('ko', 'Versioning', (e as Error).message) } finally { setBusy(null) }
   }
 
-  if (!rows) return <div style={wrap}>Chargement…</div>
+  if (!d) return <div style={wrap}>Chargement…</div>
+  const total = d.total ?? d.items.length
+  const totalPages = Math.max(1, Math.ceil(total / VERSIONING_PER_PAGE))
+  const curPage = Math.min(Math.max(1, pageNum), totalPages)
   const th: React.CSSProperties = { textAlign: 'left', fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)', padding: '8px 10px', borderBottom: '1px solid var(--color-border,#e5e7eb)' }
   const td: React.CSSProperties = { fontSize: 13, padding: '8px 10px', borderBottom: '1px solid var(--color-border,#f3f4f6)', verticalAlign: 'middle' }
   return (
     <div style={wrap}>
       <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Versions de la page</div>
-      {rows.length === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>Aucune version enregistrée.</div> : (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      {total === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>Aucune version enregistrée.</div> : (
+        <table style={{ width: '100%', borderCollapse: 'collapse', opacity: loading ? 0.5 : 1, transition: 'opacity .15s' }}>
           <thead><tr><th style={th}>N°</th><th style={th}>Nom</th><th style={th}>Modifiée le</th><th style={th}>Par</th><th style={{ ...th, textAlign: 'right' }}>Actions</th></tr></thead>
-          <tbody>{rows.map((r) => (
+          <tbody>{d.items.map((r) => (
             <tr key={r.id}>
               <td style={td}>{r.number}</td>
               <td style={td}>{editing?.id === r.id
                 ? <input autoFocus value={editing.name} onChange={(e) => setEditing({ id: r.id, name: e.target.value })} onKeyDown={(e) => { if (e.key === 'Enter') doRename(); if (e.key === 'Escape') setEditing(null) }} style={{ ...field, height: 28, width: 200 }} placeholder="Nom de la version" />
                 : (r.name || <span style={{ color: 'var(--color-muted-foreground,#6b7280)' }}>—</span>)}</td>
-              <td style={td}>{r.editDate}</td>
+              <td style={td}>{fmtDate(r.editDate)}</td>
               <td style={td}>{r.user}</td>
               <td style={{ ...td, textAlign: 'right', whiteSpace: 'nowrap' }}>
                 {editing?.id === r.id ? (<>
@@ -290,6 +354,14 @@ export function VersioningTab({ idPage }: { idPage: number }) {
             </tr>
           ))}</tbody>
         </table>
+      )}
+      {/* Pagination serveur — 20 versions par page */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 10, paddingTop: 12, borderTop: '1px solid var(--color-border,#f3f4f6)' }}>
+          <button style={{ ...smallBtn, opacity: curPage <= 1 || loading ? 0.5 : 1, cursor: curPage <= 1 || loading ? 'not-allowed' : 'pointer' }} disabled={curPage <= 1 || loading} onClick={() => setPageNum(curPage - 1)}>‹ Précédent</button>
+          <span style={{ fontSize: 12.5, color: 'var(--color-muted-foreground,#6b7280)' }}>Page {curPage} / {totalPages} · {total} versions</span>
+          <button style={{ ...smallBtn, opacity: curPage >= totalPages || loading ? 0.5 : 1, cursor: curPage >= totalPages || loading ? 'not-allowed' : 'pointer' }} disabled={curPage >= totalPages || loading} onClick={() => setPageNum(curPage + 1)}>Suivant ›</button>
+        </div>
       )}
       <Feedback msg={msg} />
 
@@ -401,23 +473,75 @@ export function CommentsTab({ idPage }: { idPage: number }) {
   )
 }
 
-// ═══ HISTORIQUE (modulaire) ═══
+// ═══ HISTORIQUE (modulaire) — pagination SERVEUR 25/page, dates locale BO, badges couleur + filtre ═══
+const HISTORIC_PER_PAGE = 25
 type Hist = { id: number; date: string; action: string; user: string }
+type HistData = { items: Hist[]; page: number; perPage: number; total: number; actionTypes: string[]; action: string }
+/** Couleur d'un badge d'action (par mots-clefs). NB : « unpublish » testé AVANT « publish ». */
+function histActionStyle(a: string): { color: string; bg: string } {
+  const s = (a || '').toLowerCase()
+  if (/unpublish|dépubli|depubli|offline|hors\s*ligne/.test(s)) return { color: '#b45309', bg: 'rgba(245,158,11,.16)' }
+  if (/publish|publi|online|en\s*ligne/.test(s)) return { color: '#059669', bg: 'rgba(16,185,129,.16)' }
+  if (/duplicat|copy|copie/.test(s)) return { color: '#7c3aed', bg: 'rgba(124,58,237,.16)' }
+  if (/delet|suppr|remove/.test(s)) return { color: '#dc2626', bg: 'rgba(239,68,68,.16)' }
+  if (/save|saved|enregist|brouillon|draft/.test(s)) return { color: '#2563eb', bg: 'rgba(37,99,235,.16)' }
+  if (/creat|nouvel|new\b|add|ajout/.test(s)) return { color: '#0891b2', bg: 'rgba(6,182,212,.16)' }
+  if (/rollback|restaur|revert/.test(s)) return { color: '#d97706', bg: 'rgba(217,119,6,.16)' }
+  return { color: 'var(--color-muted-foreground,#6b7280)', bg: 'rgba(127,127,127,.14)' }
+}
+function ActionBadge({ action }: { action: string }) {
+  const c = histActionStyle(action)
+  return <span style={{ fontSize: 12, fontWeight: 600, borderRadius: 999, padding: '2px 10px', background: c.bg, color: c.color, whiteSpace: 'nowrap', display: 'inline-block' }}>{action}</span>
+}
 export function HistoricTab({ idPage }: { idPage: number }) {
-  const [rows, setRows] = useState<Hist[] | null>(null)
+  const [d, setD] = useState<HistData | null>(null)
+  const [pageNum, setPageNum] = useState(1) // pagination serveur — jamais tout chargé
+  const [filter, setFilter] = useState('')  // filtre SERVEUR par type d'action ('' = toutes)
+  const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
-  useEffect(() => { let x = false; apiGet<{ items: Hist[] }>(`historic?idPage=${idPage}`).then((d) => !x && setRows(d.items)).catch((e) => !x && setMsg({ ok: false, text: e.message })); return () => { x = true } }, [idPage])
-  if (!rows) return <div style={wrap}>Chargement…</div>
+  useEffect(() => { setPageNum(1); setFilter('') }, [idPage])
+  useEffect(() => {
+    let x = false; setLoading(true)
+    apiGet<HistData>(`historic?idPage=${idPage}&page=${pageNum}&perPage=${HISTORIC_PER_PAGE}${filter ? `&action=${encodeURIComponent(filter)}` : ''}`)
+      .then((v) => { if (!x) setD(v) })
+      .catch((e) => { if (!x) setMsg({ ok: false, text: e.message }) })
+      .finally(() => { if (!x) setLoading(false) })
+    return () => { x = true }
+  }, [idPage, pageNum, filter])
+  if (!d) return <div style={wrap}>Chargement…</div>
+  const total = d.total ?? d.items.length
+  const totalPages = Math.max(1, Math.ceil(total / HISTORIC_PER_PAGE))
+  const curPage = Math.min(Math.max(1, pageNum), totalPages)
   const th: React.CSSProperties = { textAlign: 'left', fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)', padding: '8px 10px', borderBottom: '1px solid var(--color-border,#e5e7eb)' }
   const td: React.CSSProperties = { fontSize: 13, padding: '8px 10px', borderBottom: '1px solid var(--color-border,#f3f4f6)' }
   return (
     <div style={wrap}>
-      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Historique de la page</div>
-      {rows.length === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>Aucun historique.</div> : (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
+        <div style={{ fontSize: 13, fontWeight: 600 }}>Historique de la page</div>
+        {/* Filtre par type d'action (serveur → filtre tout l'historique, pas juste la page). */}
+        {(d.actionTypes?.length ?? 0) > 0 && (
+          <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: 'var(--color-muted-foreground,#6b7280)' }}>
+            Filtrer :
+            <select value={filter} onChange={(e) => { setFilter(e.target.value); setPageNum(1) }} style={{ ...field, height: 32, width: 'auto', minWidth: 170 }}>
+              <option value="">Toutes les actions</option>
+              {d.actionTypes.map((t) => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </label>
+        )}
+      </div>
+      {total === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>{filter ? 'Aucune entrée pour ce type d’action.' : 'Aucun historique.'}</div> : (
+        <table style={{ width: '100%', borderCollapse: 'collapse', opacity: loading ? 0.5 : 1, transition: 'opacity .15s' }}>
           <thead><tr><th style={th}>Date</th><th style={th}>Action</th><th style={th}>Utilisateur</th></tr></thead>
-          <tbody>{rows.map((r) => <tr key={r.id}><td style={td}>{r.date}</td><td style={td}>{r.action}</td><td style={td}>{r.user}</td></tr>)}</tbody>
+          <tbody>{d.items.map((r) => <tr key={r.id}><td style={td}>{fmtDate(r.date)}</td><td style={td}><ActionBadge action={r.action} /></td><td style={td}>{r.user}</td></tr>)}</tbody>
         </table>
+      )}
+      {/* Pagination serveur — 25 entrées par page */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 10, paddingTop: 12, borderTop: '1px solid var(--color-border,#f3f4f6)' }}>
+          <button style={{ ...smallBtn, opacity: curPage <= 1 || loading ? 0.5 : 1, cursor: curPage <= 1 || loading ? 'not-allowed' : 'pointer' }} disabled={curPage <= 1 || loading} onClick={() => setPageNum(curPage - 1)}>‹ Précédent</button>
+          <span style={{ fontSize: 12.5, color: 'var(--color-muted-foreground,#6b7280)' }}>Page {curPage} / {totalPages} · {total} entrées</span>
+          <button style={{ ...smallBtn, opacity: curPage >= totalPages || loading ? 0.5 : 1, cursor: curPage >= totalPages || loading ? 'not-allowed' : 'pointer' }} disabled={curPage >= totalPages || loading} onClick={() => setPageNum(curPage + 1)}>Suivant ›</button>
+        </div>
       )}
       <Feedback msg={msg} />
     </div>
