@@ -111,6 +111,19 @@ return [
             'MelisCmsMiniTemplateService'       => \MelisCms\Service\MelisCmsMiniTemplateService::class,
             'MelisCmsMiniTemplateGetterService' => \MelisCms\Service\MelisCmsMiniTemplateGetterService::class,
         ],
+        'invokables' => [
+            // Extension toolPageAction() (react-tool-page) : pousse le JS meliscms + historic dans le
+            // <head> pour l'éditeur de page (globals au parse time). Doit vivre dans le ServiceManager
+            // principal (pas 'controllers') — cf. PluginViewController::getServiceManager().
+            'MelisCms\Controller\React\PluginViewToolPageExtension' => \MelisCms\Controller\React\PluginViewToolPageExtension::class,
+        ],
+    ],
+    // Enregistre l'extension de l'éditeur de page CMS auprès de MelisReactOverride\PluginViewController
+    // (merge de config, indépendant de l'ordre de chargement des modules).
+    'melis_react_override' => [
+        'toolpage_extensions' => [
+            'MelisCms\Controller\React\PluginViewToolPageExtension',
+        ],
     ],
     'controllers' => [
         'invokables' => [

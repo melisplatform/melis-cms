@@ -177,6 +177,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   const [toast, setToast] = useState<{ ok: boolean; text: string } | null>(null)
   const [unlockOpen, setUnlockOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false) // modal React de confirmation de suppression
+  const [clearOpen, setClearOpen] = useState(false) // modal React de confirmation d'effacement du brouillon
   const [dupOpen, setDupOpen] = useState(false) // modal React de duplication (même que le clic droit de l'arbre)
   const [wfOpen, setWfOpen] = useState(false) // modal Workflow (mutualisée, fournie par melis-small-business)
   const [unlocking, setUnlocking] = useState(false)
@@ -287,6 +288,10 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
 
   // ── iframe legacy (pilotage) ──
   const frameRef = useRef<Record<string, HTMLIFrameElement | null>>({})
+  // Pages dont l'iframe est PRÊTE À AFFICHER : on la garde `visibility:hidden` jusqu'à ce que le chrome
+  // legacy (barre de boutons + onglets) soit masqué (applyIframeChrome au `load`) → sinon on voit la
+  // barre d'actions legacy « flasher » à l'ouverture avant d'être cachée. Révélée juste après.
+  const [revealed, setRevealed] = useState<Set<string>>(new Set())
   const applyIframeChrome = useCallback((iframe: HTMLIFrameElement) => {
     try {
       const doc = iframe.contentDocument as (Document & { __melisChromeStyle?: HTMLStyleElement }) | null
@@ -375,6 +380,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   const reloadEdition = useCallback(() => {
     if (!current) return
     setReadyPages((s) => { if (!s.has(current)) return s; const n = new Set(s); n.delete(current); return n })
+    setRevealed((s) => { if (!s.has(current)) return s; const n = new Set(s); n.delete(current); return n }) // re-masquer pendant le rechargement (évite le flash du chrome legacy)
     const f = frameRef.current[current]
     try { if (f) f.src = toolSrc(current) } catch { /* */ }
   }, [current])
@@ -451,18 +457,28 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   const togglePublish = useCallback((toOnline: boolean) => { if (toOnline) doPublish(); else doUnpublish() }, [doPublish, doUnpublish])
 
   // Effacer le brouillon (« Effacer brouillon ») → clearSavedPage legacy (revient à la version publiée).
+  // Effacement EFFECTIF (appelé par la modal React de confirmation ci-dessous, plus de confirm() natif).
   const doClear = useCallback(async () => {
     if (!current) return
-    if (!window.confirm(tr.clearDraftConfirm)) return
     setSaving(true); setToast(null)
     try {
       const res = await fetch(`/melis/MelisCms/Page/clearSavedPage?idPage=${encodeURIComponent(current)}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
       const data = await res.json().catch(() => ({})) as LegacyResp
       if (data.success === 1) {
-        notify('ok', (data.textTitle || tr.notifDraft).trim(), tr.draftCleared)
+        // clearSavedPage renvoie un textTitle/textMessage = clés `tr_...` NON traduites (traduites côté
+        // JS legacy seulement) → on utilise nos propres libellés i18n pour éviter d'afficher « tr_… ».
+        notify('ok', tr.notifDraft, tr.draftCleared)
+        setClearOpen(false)
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } }))
         refreshStructure(current); reloadEdition() // le contenu revient à la version publiée
-      } else notify('ko', (data.textTitle || tr.notifDraft).trim(), data.textMessage || tr.draftFailed)
+      } else {
+        // clearSavedPage renvoie des clés tr_ (traduites côté legacy par melisHelper). React n'a pas
+        // cette map → on traduit les cas connus, sinon on garde un message non-tr_ ou le générique.
+        const raw = data.textMessage || ''
+        const known: Record<string, string> = { 'tr_meliscms_delete_no_saved_page': tr.noDraftToClear }
+        const msg = known[raw] || (raw && !raw.startsWith('tr_') ? raw : tr.draftFailed)
+        notify('ko', tr.notifDraft, msg)
+      }
     } catch (e) { notify('ko', tr.notifDraft, (e as Error).message) } finally { setSaving(false) }
   }, [current, refreshStructure, reloadEdition])
 
@@ -518,7 +534,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     if (b.key.includes('unlock')) { setUnlockOpen(true); return }            // Débloquer → modal React natif
     if (b.key.endsWith('action_save')) { await saveAll(); return }          // Sauvegarder → save global (legacy)
     if (b.key.endsWith('action_publish')) { await doPublish(); return }     // Publier → save puis PUBLIE (legacy)
-    if (b.key.endsWith('action_clear')) { await doClear(); return }         // Effacer brouillon → clearSavedPage (legacy)
+    if (b.key.endsWith('action_clear')) { setClearOpen(true); return }       // Effacer brouillon → modal React de confirmation
     if (b.key.endsWith('action_delete')) { setDeleteOpen(true); return }     // Supprimer page → modal React de confirmation
     if (b.key.endsWith('action_new')) { openNewPage(); return }             // Nouvelle page → route React de création
     if (b.key.endsWith('action_duplicate')) { setDupOpen(true); return }    // Dupliquer → MÊME modal React que le clic droit de l'arbre
@@ -573,7 +589,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
       }, true)
     } catch { /* */ }
   }
-  function onFrameLoad(cid: string, iframe: HTMLIFrameElement) { frameRef.current[cid] = iframe; hookNewPage(iframe); applyIframeChrome(iframe); if (cid === current && activeTab && !isNativeTab(activeTab)) driveTab(activeTab) }
+  function onFrameLoad(cid: string, iframe: HTMLIFrameElement) { frameRef.current[cid] = iframe; hookNewPage(iframe); applyIframeChrome(iframe); setRevealed((s) => s.has(cid) ? s : new Set(s).add(cid)); if (cid === current && activeTab && !isNativeTab(activeTab)) driveTab(activeTab) }
 
   useEffect(() => { const onDoc = () => setOpenMenu(null); if (openMenu) { document.addEventListener('click', onDoc); return () => document.removeEventListener('click', onDoc) } }, [openMenu])
 
@@ -692,7 +708,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
           }
           return (
             <iframe key={cid} src={toolSrc(cid)} title={`Page ${cid}`} onLoad={(e) => onFrameLoad(cid, e.currentTarget)}
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0, display: cid === current && !nativeTabActive ? 'block' : 'none' }} />
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0, display: cid === current && !nativeTabActive ? 'block' : 'none', visibility: revealed.has(cid) ? 'visible' : 'hidden' }} />
           )
         })}
         {/* Onglets natifs — TOUS montés (dès leur 1ʳᵉ ouverture), visibilité togglée → aucun refetch au switch */}
@@ -746,6 +762,25 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '0 18px 18px' }}>
               <button className="melis-pgbtn" onClick={() => setDeleteOpen(false)} disabled={saving} style={{ ...btnBase, height: 34, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)' }}>{tr.cancel}</button>
               <button className="melis-pgbtn" onClick={doDelete} disabled={saving} style={{ ...btnBase, height: 34, border: 0, background: '#dc2626', color: '#fff' }}>{saving ? tr.deleting : tr.deleteConfirm}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal React de confirmation — EFFACER LE BROUILLON (remplace le confirm() natif) */}
+      {clearOpen && (
+        <div onClick={() => !saving && setClearOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: 460, maxWidth: '100%', background: 'var(--color-card,#fff)', borderRadius: 10, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,.35)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', background: '#d97706', color: '#fff' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 15, fontWeight: 600 }}><Icon name="eraser" />{tr.clearTitle}</span>
+              <button onClick={() => !saving && setClearOpen(false)} style={{ appearance: 'none', border: 0, background: 'transparent', color: '#fff', fontSize: 20, lineHeight: 1, cursor: 'pointer' }}>×</button>
+            </div>
+            <div style={{ padding: 18, fontSize: 13, color: 'var(--color-foreground,#111827)', lineHeight: 1.5 }}>
+              {tr.clearDraftConfirm}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '0 18px 18px' }}>
+              <button className="melis-pgbtn" onClick={() => setClearOpen(false)} disabled={saving} style={{ ...btnBase, height: 34, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)' }}>{tr.cancel}</button>
+              <button className="melis-pgbtn" onClick={doClear} disabled={saving} style={{ ...btnBase, height: 34, border: 0, background: '#d97706', color: '#fff' }}>{saving ? tr.clearing : tr.clearConfirmBtn}</button>
             </div>
           </div>
         </div>

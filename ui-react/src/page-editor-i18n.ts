@@ -205,6 +205,10 @@ const DICT: Record<PeLang, Record<string, string>> = {
 
     // ── CmsPage : divers ──
     clearDraftConfirm: 'Effacer le brouillon et revenir à la dernière version publiée ?',
+    clearTitle: 'Effacer le brouillon',
+    clearConfirmBtn: 'Effacer le brouillon',
+    clearing: 'Effacement…',
+    noDraftToClear: 'Cette page n’a pas d’édition en cours.',
     selectPage: "Sélectionnez une page dans l'arbre.",
     newPage: 'Nouvelle page',
     editionLoadingTip: 'Édition en cours de chargement…',
@@ -401,6 +405,10 @@ const DICT: Record<PeLang, Record<string, string>> = {
 
     // ── CmsPage: misc ──
     clearDraftConfirm: 'Clear the draft and revert to the last published version?',
+    clearTitle: 'Erase draft',
+    clearConfirmBtn: 'Erase draft',
+    clearing: 'Erasing…',
+    noDraftToClear: 'This page has no edition in progress.',
     selectPage: 'Select a page in the tree.',
     newPage: 'New page',
     editionLoadingTip: 'Edition loading…',
