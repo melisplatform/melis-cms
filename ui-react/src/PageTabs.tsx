@@ -456,6 +456,13 @@ export function CommentsTab({ idPage }: { idPage: number }) {
   const [pageNum, setPageNum] = useState(1) // pagination client (1-based), 20 éléments/page
   const reload = useCallback(() => { apiGet<{ items: TLItem[] }>(`timeline?idPage=${idPage}`).then((v) => setItems(v.items)).catch((e) => setMsg({ ok: false, text: e.message })) }, [idPage])
   useEffect(() => { let x = false; apiGet<{ items: TLItem[] }>(`timeline?idPage=${idPage}`).then((v) => !x && setItems(v.items)).catch((e) => !x && setMsg({ ok: false, text: e.message })); return () => { x = true } }, [idPage])
+  // Une action WORKFLOW (demande/validation/refus/commentaire, modale mutualisée small-business)
+  // alimente aussi la timeline de commentaires → recharger l'onglet sans rouvrir la page.
+  useEffect(() => {
+    const on = (e: Event) => { const d = (e as CustomEvent<{ wfType?: string; wfId?: number | string }>).detail; if (!d || d.wfType == null || (d.wfType === 'PAGE' && Number(d.wfId) === idPage)) reload() }
+    window.addEventListener('melis:workflow-action-done', on)
+    return () => window.removeEventListener('melis:workflow-action-done', on)
+  }, [reload, idPage])
   useEffect(() => { setPageNum(1) }, [idPage]) // nouvelle page → retour à la 1ʳᵉ page
   const add = async () => {
     if (!text.trim()) return
