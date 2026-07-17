@@ -266,13 +266,15 @@ class MelisReactApiPageController extends MelisAbstractActionController
             $db = $this->db();
             $me = iterator_to_array($db->query('SELECT plang_page_id_initial FROM melis_cms_page_lang WHERE plang_page_id = ? LIMIT 1', [$idPage]));
             $initial = (int) ($me[0]['plang_page_id_initial'] ?? $idPage);
-            // versions existantes (pages sœurs) + libellé langue
+            // versions existantes (pages sœurs) + libellé langue. Nom = version publiée, à défaut
+            // la version sauvegardée (brouillon) → sinon les pages non publiées afficheraient « — ».
             $versions = iterator_to_array($db->query(
-                'SELECT pl.plang_page_id AS pageId, pl.plang_lang_id AS langId, l.lang_cms_name AS langName, l.lang_cms_locale AS locale, t.page_name AS pageName
+                'SELECT pl.plang_page_id AS pageId, pl.plang_lang_id AS langId, l.lang_cms_name AS langName, l.lang_cms_locale AS locale,
+                        COALESCE(pub.page_name, sav.page_name) AS pageName
                  FROM melis_cms_page_lang pl
                  LEFT JOIN melis_cms_lang l ON l.lang_cms_id = pl.plang_lang_id
-                 LEFT JOIN melis_cms_page_tree tr ON tr.tree_page_id = pl.plang_page_id
-                 LEFT JOIN melis_cms_page_published t ON t.page_id = pl.plang_page_id
+                 LEFT JOIN melis_cms_page_published pub ON pub.page_id = pl.plang_page_id
+                 LEFT JOIN melis_cms_page_saved sav ON sav.page_id = pl.plang_page_id
                  WHERE pl.plang_page_id_initial = ?', [$initial]));
             $usedLangs = array_map(fn($v) => (int) $v['langId'], $versions);
             // langues du site créables (pas déjà utilisées)

@@ -126,6 +126,8 @@ const DICT: Record<PeLang, Record<string, string>> = {
     entriesWord: 'entrées',
 
     // ── LanguagesTab ──
+    currentPage: 'page courante',
+    openPageTitle: 'Ouvrir cette page',
     langVersions: 'Versions de langue de cette page',
     colLanguage: 'Langue',
     colLocale: 'Locale',
@@ -320,6 +322,8 @@ const DICT: Record<PeLang, Record<string, string>> = {
     entriesWord: 'entries',
 
     // ── LanguagesTab ──
+    currentPage: 'current page',
+    openPageTitle: 'Open this page',
     langVersions: 'Language versions of this page',
     colLanguage: 'Language',
     colLocale: 'Locale',

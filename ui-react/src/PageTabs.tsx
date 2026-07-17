@@ -546,9 +546,12 @@ export function HistoricTab({ idPage }: { idPage: number }) {
   const [d, setD] = useState<HistData | null>(null)
   const [pageNum, setPageNum] = useState(1) // pagination serveur — jamais tout chargé
   const [filter, setFilter] = useState('')  // filtre SERVEUR par type d'action ('' = toutes)
+  const [reloadKey, setReloadKey] = useState(0) // re-fetch après save/publish/offline/duplication
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
   useEffect(() => { setPageNum(1); setFilter('') }, [idPage])
+  // Une action d'édition (save/publish/dépublier/dupliquer) crée une entrée d'historique → recharger.
+  useEffect(() => { const on = () => setReloadKey((k) => k + 1); window.addEventListener('melis:cms-historic-refresh', on); return () => window.removeEventListener('melis:cms-historic-refresh', on) }, [])
   useEffect(() => {
     let x = false; setLoading(true)
     apiGet<HistData>(`historic?idPage=${idPage}&page=${pageNum}&perPage=${HISTORIC_PER_PAGE}${filter ? `&action=${encodeURIComponent(filter)}` : ''}`)
@@ -556,7 +559,7 @@ export function HistoricTab({ idPage }: { idPage: number }) {
       .catch((e) => { if (!x) setMsg({ ok: false, text: e.message }) })
       .finally(() => { if (!x) setLoading(false) })
     return () => { x = true }
-  }, [idPage, pageNum, filter])
+  }, [idPage, pageNum, filter, reloadKey])
   if (!d) return <div style={wrap}>{tr.loading}</div>
   const total = d.total ?? d.items.length
   const totalPages = Math.max(1, Math.ceil(total / HISTORIC_PER_PAGE))
@@ -629,20 +632,41 @@ export function LanguagesTab({ idPage }: { idPage: number }) {
     } catch (e) { notify('ko', tr.langVersions, (e as Error).message); setMsg({ ok: false, text: (e as Error).message }) }
     finally { setCreating(null) }
   }, [idPage, navigate, tr])
+  // Ouvre une AUTRE version de langue dans un onglet du shell (même mécanisme que l'arbre).
+  const openPage = useCallback((pageId: number, name: string) => {
+    const path = `/melis-cms/page/${pageId}`
+    ;(window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void }).__melisOpenTab?.({ id: path, label: (name || `Page ${pageId}`).toString().trim(), path })
+    navigate(path)
+  }, [navigate])
   if (!d) return <div style={wrap}>{tr.loading}</div>
   const th: React.CSSProperties = { textAlign: 'left', fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)', padding: '8px 10px', borderBottom: '1px solid var(--color-border,#e5e7eb)' }
   const td: React.CSSProperties = { fontSize: 13, padding: '8px 10px', borderBottom: '1px solid var(--color-border,#f3f4f6)' }
+  const linkStyle: React.CSSProperties = { color: 'var(--color-primary,#dc2626)', textDecoration: 'none', cursor: 'pointer', fontWeight: 500 }
   return (
     <div style={wrap}>
       <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>{tr.langVersions}</div>
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead><tr><th style={th}>{tr.colLanguage}</th><th style={th}>{tr.colLocale}</th><th style={th}>{tr.colPageName}</th><th style={th}>{tr.colId}</th></tr></thead>
-        <tbody>{d.versions.map((v) => (
-          <tr key={v.pageId}>
-            <td style={td}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}><Flag locale={v.locale} />{v.langName || v.langId}</span></td>
-            <td style={td}>{v.locale}</td><td style={td}>{v.pageName || '—'}</td><td style={td}>{v.pageId}</td>
-          </tr>
-        ))}</tbody>
+        <tbody>{d.versions.map((v) => {
+          const isCurrent = v.pageId === idPage
+          const open = () => openPage(v.pageId, v.pageName)
+          const rowStyle: React.CSSProperties = isCurrent ? { background: 'color-mix(in srgb, var(--color-primary,#dc2626) 7%, transparent)' } : { cursor: 'pointer' }
+          return (
+            <tr key={v.pageId} style={rowStyle} title={isCurrent ? undefined : tr.openPageTitle}
+              onClick={isCurrent ? undefined : open}
+              onMouseEnter={isCurrent ? undefined : (e) => { (e.currentTarget as HTMLElement).style.background = 'var(--color-accent, rgba(127,127,127,.08))' }}
+              onMouseLeave={isCurrent ? undefined : (e) => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}>
+              <td style={td}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}><Flag locale={v.locale} />{v.langName || v.langId}</span></td>
+              <td style={td}>{v.locale}</td>
+              <td style={td}>
+                {isCurrent
+                  ? <span>{v.pageName || '—'} <span style={{ fontSize: 11, color: 'var(--color-muted-foreground,#6b7280)', fontWeight: 500 }}>· {tr.currentPage}</span></span>
+                  : <a style={linkStyle} onClick={(e) => { e.stopPropagation(); open() }}>{v.pageName || `Page ${v.pageId}`}</a>}
+              </td>
+              <td style={td}>{v.pageId}</td>
+            </tr>
+          )
+        })}</tbody>
       </table>
       <div style={{ marginTop: 20 }}>
         <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{tr.creatableLangs}</div>

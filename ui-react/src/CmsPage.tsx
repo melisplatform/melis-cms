@@ -400,6 +400,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         notify('ok', (data.textTitle || tr.notifSave).trim(), tr.pageSaved) // notif du shell (comme Publier)
         await releaseLock(current) // libère le verrou → le cadenas du tree disparaît
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // nom/statut + cadenas → maj + déploie jusqu'à la page
+        window.dispatchEvent(new CustomEvent('melis:cms-historic-refresh')) // save → nouvelle entrée d'historique
         refreshStructure(current) // rafraîchit le statut/en-tête
       } else {
         notify('ko', (data.textTitle || tr.notifSave).trim(), data.textMessage || tr.saveFailed, errorFields(data))
@@ -419,6 +420,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         await releaseLock(current) // libère le verrou (comme le legacy à la publication)
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // statut online + cadenas → maj + déploie jusqu'à la page
         window.dispatchEvent(new CustomEvent('melis:cms-versioning-refresh')) // publier crée une version → recharge l'onglet Versioning
+        window.dispatchEvent(new CustomEvent('melis:cms-historic-refresh')) // publier → nouvelle entrée d'historique
         refreshStructure(current) // en-tête : plus de brouillon, statut publié
       } else {
         notify('ko', (data.textTitle || tr.notifPublish).trim(), data.textMessage || tr.publishFailed, errorFields(data))
@@ -437,6 +439,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
       if (data.success === 1) {
         notify('ok', (data.textTitle || tr.notifUnpublish).trim(), tr.pageUnpublished)
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // statut offline → maj + déploie jusqu'à la page
+        window.dispatchEvent(new CustomEvent('melis:cms-historic-refresh')) // passage offline → nouvelle entrée d'historique
         refreshStructure(current) // en-tête : switch → Hors ligne
       } else {
         notify('ko', (data.textTitle || tr.notifUnpublish).trim(), data.textMessage || tr.unpublishFailed, errorFields(data))
@@ -754,7 +757,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
           sourcePageId={Number(current)}
           sourceTitle={header?.pageName || `Page ${current}`}
           onClose={() => setDupOpen(false)}
-          onDone={() => window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh'))}
+          onDone={() => { window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh')); window.dispatchEvent(new CustomEvent('melis:cms-historic-refresh')) }}
         />
       )}
 
