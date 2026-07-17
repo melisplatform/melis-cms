@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { peT } from './page-editor-i18n'
 
 /**
  * Contenus NATIFS des onglets de l'éditeur de page CMS.
@@ -48,9 +50,10 @@ const area: React.CSSProperties = { ...field, height: 'auto', minHeight: 70, pad
 
 /** Sélecteur de langue custom avec DRAPEAUX IMAGES (un <option> natif ne peut pas contenir d'image). */
 export type FlagOpt = { id: number; locale?: string; name: string }
-export function FlagSelect({ value, onChange, options, placeholder = 'Choisissez', disabled }: {
+export function FlagSelect({ value, onChange, options, placeholder, disabled }: {
   value: number; onChange: (id: number) => void; options: FlagOpt[]; placeholder?: string; disabled?: boolean
 }) {
+  const ph = placeholder ?? peT().choose
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => { const onDoc = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }; document.addEventListener('mousedown', onDoc); return () => document.removeEventListener('mousedown', onDoc) }, [])
@@ -60,7 +63,7 @@ export function FlagSelect({ value, onChange, options, placeholder = 'Choisissez
       <button type="button" disabled={disabled} onClick={() => !disabled && setOpen((o) => !o)}
         style={{ ...field, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.7 : 1, textAlign: 'left' }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
-          {current ? <><Flag locale={current.locale} /><span>{current.name}</span></> : <span style={{ color: 'var(--color-muted-foreground,#6b7280)' }}>{placeholder}</span>}
+          {current ? <><Flag locale={current.locale} /><span>{current.name}</span></> : <span style={{ color: 'var(--color-muted-foreground,#6b7280)' }}>{ph}</span>}
         </span>
         {!disabled && <span style={{ color: 'var(--color-muted-foreground,#6b7280)', fontSize: 10 }}>▾</span>}
       </button>
@@ -100,45 +103,81 @@ export type SeoData = { idPage: number; url: string; urlRedirect: string; url301
 
 // ═══ PROPRIÉTÉS (contrôlé) ═══
 export function PropertiesTab({ value, onChange, refs }: { value: PropsData; onChange: (v: PropsData) => void; refs: Refs }) {
+  const tr = peT()
   const set = (k: keyof PropsData, v: string | number) => onChange({ ...value, [k]: v })
   return (
     <div style={wrap}>
-      <label style={label}>Nom *</label>
+      <label style={label}>{tr.name} *</label>
       <input style={field} value={value.name} onChange={(e) => set('name', e.target.value)} />
-      <label style={label}>Type *</label>
+      <label style={label}>{tr.type} *</label>
       <select style={field} value={value.type} onChange={(e) => set('type', e.target.value)}>{refs.types.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}</select>
-      <label style={label}>Template *</label>
+      <label style={label}>{tr.template} *</label>
       <select style={field} value={value.templateId} onChange={(e) => set('templateId', Number(e.target.value))}><option value={0}>—</option>{refs.templates.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.id})</option>)}</select>
-      <label style={label}>Langue (non modifiable après création)</label>
+      <label style={label}>{tr.langNonEditable}</label>
       <FlagSelect value={value.langId} onChange={() => {}} options={refs.languages} disabled />
       <div style={{ height: 4 }} />
-      <label style={label}>Affichage menu *</label>
+      <label style={label}>{tr.menuDisplay} *</label>
       <select style={field} value={value.menu} onChange={(e) => set('menu', e.target.value)}>{refs.menus.map((m) => <option key={m} value={m}>{m}</option>)}</select>
-      <label style={label}>Style</label>
-      <select style={field} value={value.styleId} onChange={(e) => set('styleId', Number(e.target.value))}><option value={0}>Choisissez</option>{refs.styles.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</select>
-      <label style={label}>Taxonomie</label>
-      <input style={field} value={value.taxonomy} onChange={(e) => set('taxonomy', e.target.value)} placeholder="Séparez les mots-clefs avec une virgule" />
+      <label style={label}>{tr.style}</label>
+      <select style={field} value={value.styleId} onChange={(e) => set('styleId', Number(e.target.value))}><option value={0}>{tr.choose}</option>{refs.styles.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</select>
+      <label style={label}>{tr.taxonomy}</label>
+      <input style={field} value={value.taxonomy} onChange={(e) => set('taxonomy', e.target.value)} placeholder={tr.taxonomyPlaceholder} />
     </div>
   )
 }
 
 // ═══ SEO (contrôlé) ═══
+/** Carte de section (titre + sous-titre + contenu) — réutilisée pour regrouper les champs. */
+function Section({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <div style={{ border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 10, background: 'var(--color-card,#fff)', padding: 18, marginBottom: 16 }}>
+      <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--color-foreground,#111827)' }}>{title}</div>
+      {hint && <div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)', marginTop: 2, marginBottom: 4 }}>{hint}</div>}
+      {children}
+    </div>
+  )
+}
+/** Champ étiqueté (label au-dessus, texte indicatif optionnel en dessous). */
+function Fieldset({ label: lbl, children, first, hint }: { label: string; children: React.ReactNode; first?: boolean; hint?: string }) {
+  return (
+    <div>
+      <label style={{ ...label, marginTop: first ? 8 : 14 }}>{lbl}</label>
+      {children}
+      {hint && <div style={{ fontSize: 11.5, lineHeight: 1.4, color: 'var(--color-muted-foreground,#6b7280)', margin: '5px 2px 0' }}>{hint}</div>}
+    </div>
+  )
+}
+/** Grille 2 colonnes fixes (les champs se réduisent via minmax(0,1fr) au lieu de déborder). */
+const grid2: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', columnGap: 20, rowGap: 0 }
 export function SeoTab({ value, onChange }: { value: SeoData; onChange: (v: SeoData) => void }) {
+  const tr = peT()
   const set = (k: keyof SeoData, v: string) => onChange({ ...value, [k]: v })
   return (
-    <div style={wrap}>
-      <label style={label}>Titre (meta title)</label>
-      <input style={field} value={value.metaTitle} onChange={(e) => set('metaTitle', e.target.value)} />
-      <label style={label}>Description (meta description)</label>
-      <textarea style={area} value={value.metaDesc} onChange={(e) => set('metaDesc', e.target.value)} />
-      <label style={label}>URL personnalisée</label>
-      <input style={field} value={value.url} onChange={(e) => set('url', e.target.value)} placeholder="ex: nos-services" />
-      <label style={label}>URL de redirection</label>
-      <input style={field} value={value.urlRedirect} onChange={(e) => set('urlRedirect', e.target.value)} />
-      <label style={label}>Redirection 301</label>
-      <input style={field} value={value.url301} onChange={(e) => set('url301', e.target.value)} />
-      <label style={label}>Canonical</label>
-      <input style={field} value={value.canonical} onChange={(e) => set('canonical', e.target.value)} />
+    <div style={{ ...wrap, maxWidth: 1000 }}>
+      <Section title={tr.seoSectionMeta} hint={tr.seoSectionMetaHint}>
+        <Fieldset label={tr.metaTitle} first>
+          <input style={field} value={value.metaTitle} onChange={(e) => set('metaTitle', e.target.value)} />
+        </Fieldset>
+        <Fieldset label={tr.metaDesc}>
+          <textarea style={{ ...area, minHeight: 90 }} value={value.metaDesc} onChange={(e) => set('metaDesc', e.target.value)} />
+        </Fieldset>
+      </Section>
+      <Section title={tr.seoSectionUrls} hint={tr.seoSectionUrlsHint}>
+        <div style={grid2}>
+          <Fieldset label={tr.customUrl} hint={tr.customUrlHint} first>
+            <input style={field} value={value.url} onChange={(e) => set('url', e.target.value)} placeholder={tr.customUrlPlaceholder} />
+          </Fieldset>
+          <Fieldset label={tr.redirectUrl} hint={tr.redirectUrlHint} first>
+            <input style={field} value={value.urlRedirect} onChange={(e) => set('urlRedirect', e.target.value)} />
+          </Fieldset>
+          <Fieldset label={tr.redirect301} hint={tr.redirect301Hint}>
+            <input style={field} value={value.url301} onChange={(e) => set('url301', e.target.value)} />
+          </Fieldset>
+          <Fieldset label={tr.canonical} hint={tr.canonicalHint}>
+            <input style={field} value={value.canonical} onChange={(e) => set('canonical', e.target.value)} />
+          </Fieldset>
+        </div>
+      </Section>
     </div>
   )
 }
@@ -160,6 +199,7 @@ function fmtDate(s: string | null | undefined): string {
 const ANALYTICS_PER_PAGE = 100
 type AData = { visits: number; sessions: number; lastVisit: string | null; recent: { date: string }[]; recentTotal: number; page: number; perPage: number }
 export function AnalyticsTab({ idPage }: { idPage: number }) {
+  const tr = peT()
   const [d, setD] = useState<AData | null>(null)
   const [pageNum, setPageNum] = useState(1) // pagination SERVEUR (1-based) — 100 visites/page, jamais tout chargé
   const [loading, setLoading] = useState(false)
@@ -173,7 +213,7 @@ export function AnalyticsTab({ idPage }: { idPage: number }) {
       .finally(() => { if (!x) setLoading(false) })
     return () => { x = true }
   }, [idPage, pageNum])
-  if (!d) return <div style={wrap}>Chargement…</div>
+  if (!d) return <div style={wrap}>{tr.loading}</div>
   const total = d.recentTotal ?? d.visits
   const totalPages = Math.max(1, Math.ceil(total / ANALYTICS_PER_PAGE))
   const curPage = Math.min(Math.max(1, pageNum), totalPages)
@@ -182,11 +222,11 @@ export function AnalyticsTab({ idPage }: { idPage: number }) {
   return (
     <div style={wrap}>
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
-        <div style={card}><div style={{ fontSize: 24, fontWeight: 700 }}>{d.visits}</div><div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>Visites</div></div>
-        <div style={card}><div style={{ fontSize: 24, fontWeight: 700 }}>{d.sessions}</div><div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>Sessions</div></div>
-        <div style={card}><div style={{ fontSize: 15, fontWeight: 600 }}>{fmtDate(d.lastVisit)}</div><div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>Dernière visite</div></div>
+        <div style={card}><div style={{ fontSize: 24, fontWeight: 700 }}>{d.visits}</div><div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.visits}</div></div>
+        <div style={card}><div style={{ fontSize: 24, fontWeight: 700 }}>{d.sessions}</div><div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.sessions}</div></div>
+        <div style={card}><div style={{ fontSize: 15, fontWeight: 600 }}>{fmtDate(d.lastVisit)}</div><div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.lastVisit}</div></div>
       </div>
-      {total > 0 && <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6, opacity: loading ? 0.5 : 1 }}>Visites récentes</div>}
+      {total > 0 && <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6, opacity: loading ? 0.5 : 1 }}>{tr.recentVisits}</div>}
       {/* Grille multi-colonnes (auto-fill) : 100 dates par page → on remplit la largeur au lieu
           d'une seule colonne qui gaspille l'espace. Colonnes ~190px, réparties selon la largeur. */}
       <div style={{ opacity: loading ? 0.5 : 1, transition: 'opacity .15s', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))', columnGap: 20, rowGap: 0 }}>
@@ -197,14 +237,14 @@ export function AnalyticsTab({ idPage }: { idPage: number }) {
           </div>
         ))}
       </div>
-      {total === 0 && <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>Aucune visite enregistrée.</div>}
+      {total === 0 && <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.noVisit}</div>}
 
       {/* Pagination SERVEUR — 100 visites par page */}
       {totalPages > 1 && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 10, paddingTop: 12, borderTop: '1px solid var(--color-border,#f3f4f6)' }}>
-          <button style={{ ...smallBtn, opacity: curPage <= 1 || loading ? 0.5 : 1, cursor: curPage <= 1 || loading ? 'not-allowed' : 'pointer' }} disabled={curPage <= 1 || loading} onClick={() => setPageNum(curPage - 1)}>‹ Précédent</button>
-          <span style={{ fontSize: 12.5, color: 'var(--color-muted-foreground,#6b7280)' }}>Page {curPage} / {totalPages} · {total} visites</span>
-          <button style={{ ...smallBtn, opacity: curPage >= totalPages || loading ? 0.5 : 1, cursor: curPage >= totalPages || loading ? 'not-allowed' : 'pointer' }} disabled={curPage >= totalPages || loading} onClick={() => setPageNum(curPage + 1)}>Suivant ›</button>
+          <button style={{ ...smallBtn, opacity: curPage <= 1 || loading ? 0.5 : 1, cursor: curPage <= 1 || loading ? 'not-allowed' : 'pointer' }} disabled={curPage <= 1 || loading} onClick={() => setPageNum(curPage - 1)}>{tr.prev}</button>
+          <span style={{ fontSize: 12.5, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.pageWord} {curPage} / {totalPages} · {total} {tr.visitsWord}</span>
+          <button style={{ ...smallBtn, opacity: curPage >= totalPages || loading ? 0.5 : 1, cursor: curPage >= totalPages || loading ? 'not-allowed' : 'pointer' }} disabled={curPage >= totalPages || loading} onClick={() => setPageNum(curPage + 1)}>{tr.next}</button>
         </div>
       )}
       <Feedback msg={msg} />
@@ -215,23 +255,24 @@ export function AnalyticsTab({ idPage }: { idPage: number }) {
 // ═══ SCRIPTS (modulaire) — ÉDITABLE ═══
 type Scripts = { headTop: string; headBottom: string; bodyBottom: string }
 export function ScriptsTab({ idPage }: { idPage: number }) {
+  const tr = peT()
   const [d, setD] = useState<Scripts | null>(null)
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
   useEffect(() => { let x = false; apiGet<Scripts>(`scripts?idPage=${idPage}`).then((v) => !x && setD(v)).catch((e) => !x && setMsg({ ok: false, text: e.message })); return () => { x = true } }, [idPage])
-  if (!d) return <div style={wrap}>Chargement…</div>
+  if (!d) return <div style={wrap}>{tr.loading}</div>
   const codeBox: React.CSSProperties = { width: '100%', minHeight: 90, padding: 10, borderRadius: 6, border: '1px solid var(--color-border,#e5e7eb)', background: '#0f172a', color: '#e2e8f0', fontFamily: 'monospace', fontSize: 12, boxSizing: 'border-box', resize: 'vertical' as const }
   const set = (k: keyof Scripts, v: string) => setD((s) => (s ? { ...s, [k]: v } : s))
   const blocks: [string, keyof Scripts, string][] = [
-    ['Head — haut', 'headTop', 'Injecté en haut du <head> (méta, préconnexions…)'],
-    ['Head — bas', 'headBottom', 'Injecté en bas du <head> (scripts d\'analytics…)'],
-    ['Body — bas', 'bodyBottom', 'Injecté avant </body> (scripts de fin de page…)'],
+    [tr.headTop, 'headTop', tr.headTopHint],
+    [tr.headBottom, 'headBottom', tr.headBottomHint],
+    [tr.bodyBottom, 'bodyBottom', tr.bodyBottomHint],
   ]
   const save = async () => {
     setSaving(true); setMsg(null)
     try {
       await apiPost('scripts/save', { idPage, headTop: d.headTop, headBottom: d.headBottom, bodyBottom: d.bodyBottom })
-      setMsg({ ok: true, text: 'Scripts enregistrés.' })
+      setMsg({ ok: true, text: tr.scriptsSaved })
     } catch (e) { setMsg({ ok: false, text: (e as Error).message }) } finally { setSaving(false) }
     setTimeout(() => setMsg(null), 3500)
   }
@@ -240,12 +281,12 @@ export function ScriptsTab({ idPage }: { idPage: number }) {
       {blocks.map(([title, key, hint]) => (
         <div key={key}>
           <label style={label}>{title}</label>
-          <textarea style={codeBox} value={d[key]} onChange={(e) => set(key, e.target.value)} placeholder="(vide)" spellCheck={false} />
+          <textarea style={codeBox} value={d[key]} onChange={(e) => set(key, e.target.value)} placeholder={tr.emptyPlaceholder} spellCheck={false} />
           <div style={{ fontSize: 11, color: 'var(--color-muted-foreground,#6b7280)', margin: '3px 0 4px' }}>{hint}</div>
         </div>
       ))}
       <div style={{ marginTop: 12 }}>
-        <button onClick={save} disabled={saving} style={{ appearance: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, height: 34, padding: '0 16px', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', border: 0, background: 'var(--color-primary,#dc2626)', color: '#fff', opacity: saving ? 0.6 : 1 }}>{saving ? 'Enregistrement…' : 'Enregistrer les scripts'}</button>
+        <button onClick={save} disabled={saving} style={{ appearance: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, height: 34, padding: '0 16px', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', border: 0, background: 'var(--color-primary,#dc2626)', color: '#fff', opacity: saving ? 0.6 : 1 }}>{saving ? tr.savingScripts : tr.saveScripts}</button>
       </div>
       <Feedback msg={msg} />
     </div>
@@ -266,6 +307,7 @@ const VERSIONING_PER_PAGE = 20
 type WfVersion = { id: number; number: number; name: string | null; editDate: string; user: string }
 type VersData = { items: WfVersion[]; page: number; perPage: number; total: number }
 export function VersioningTab({ idPage }: { idPage: number }) {
+  const tr = peT()
   const [d, setD] = useState<VersData | null>(null)
   const [pageNum, setPageNum] = useState(1) // pagination serveur — jamais tout chargé
   const [reloadKey, setReloadKey] = useState(0)
@@ -294,7 +336,7 @@ export function VersioningTab({ idPage }: { idPage: number }) {
     try {
       const r = await legacyPost('/melis/MelisSmallBusiness/PageVersioning/getLinkSeeVersion', { idPage, idVersion: id })
       const link = (r.datas?.linkToPageVersion as string) || ''
-      if (link) window.open(link, '_blank', 'noopener'); else flash(false, 'Aperçu indisponible.')
+      if (link) window.open(link, '_blank', 'noopener'); else flash(false, tr.previewUnavailable)
     } catch (e) { flash(false, (e as Error).message) } finally { setBusy(null) }
   }
   // Restaurer la version dans l'édition (rollback → melis_cms_page_saved) + recharger l'édition/l'en-tête.
@@ -304,10 +346,10 @@ export function VersioningTab({ idPage }: { idPage: number }) {
     try {
       const r = await legacyPost('/melis/MelisSmallBusiness/PageVersioning/rollBackVersion', { idPage, idVersion: id })
       if (r.success === 1) {
-        notify('ok', 'Versioning', 'Version restaurée dans l\'édition.')
+        notify('ok', 'Versioning', tr.versionRestored)
         window.dispatchEvent(new CustomEvent('melis:cms-reload-edition')) // recharge l'iframe d'édition + en-tête
         reload()
-      } else notify('ko', 'Versioning', r.textMessage && !r.textMessage.startsWith('tr_') ? r.textMessage : 'La restauration a échoué.')
+      } else notify('ko', 'Versioning', r.textMessage && !r.textMessage.startsWith('tr_') ? r.textMessage : tr.restoreFailed)
     } catch (e) { notify('ko', 'Versioning', (e as Error).message) } finally { setBusy(null); setConfirmRestore(null) }
   }
   // Renommer la version — endpoint legacy saveVersion.
@@ -316,12 +358,12 @@ export function VersioningTab({ idPage }: { idPage: number }) {
     setBusy(editing.id)
     try {
       const r = await legacyPost('/melis/MelisSmallBusiness/PageVersioning/saveVersion', { pageVersionId: editing.id, page_v_version_name: editing.name })
-      if (r.success === 1) { notify('ok', 'Versioning', 'Version renommée.'); setEditing(null); reload() }
-      else notify('ko', 'Versioning', 'Le renommage a échoué.')
+      if (r.success === 1) { notify('ok', 'Versioning', tr.versionRenamed); setEditing(null); reload() }
+      else notify('ko', 'Versioning', tr.renameFailed)
     } catch (e) { notify('ko', 'Versioning', (e as Error).message) } finally { setBusy(null) }
   }
 
-  if (!d) return <div style={wrap}>Chargement…</div>
+  if (!d) return <div style={wrap}>{tr.loading}</div>
   const total = d.total ?? d.items.length
   const totalPages = Math.max(1, Math.ceil(total / VERSIONING_PER_PAGE))
   const curPage = Math.min(Math.max(1, pageNum), totalPages)
@@ -329,26 +371,26 @@ export function VersioningTab({ idPage }: { idPage: number }) {
   const td: React.CSSProperties = { fontSize: 13, padding: '8px 10px', borderBottom: '1px solid var(--color-border,#f3f4f6)', verticalAlign: 'middle' }
   return (
     <div style={wrap}>
-      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Versions de la page</div>
-      {total === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>Aucune version enregistrée.</div> : (
+      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>{tr.pageVersions}</div>
+      {total === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.noVersion}</div> : (
         <table style={{ width: '100%', borderCollapse: 'collapse', opacity: loading ? 0.5 : 1, transition: 'opacity .15s' }}>
-          <thead><tr><th style={th}>N°</th><th style={th}>Nom</th><th style={th}>Modifiée le</th><th style={th}>Par</th><th style={{ ...th, textAlign: 'right' }}>Actions</th></tr></thead>
+          <thead><tr><th style={th}>{tr.colNumber}</th><th style={th}>{tr.colName}</th><th style={th}>{tr.colModifiedOn}</th><th style={th}>{tr.colBy}</th><th style={{ ...th, textAlign: 'right' }}>{tr.colActions}</th></tr></thead>
           <tbody>{d.items.map((r) => (
             <tr key={r.id}>
               <td style={td}>{r.number}</td>
               <td style={td}>{editing?.id === r.id
-                ? <input autoFocus value={editing.name} onChange={(e) => setEditing({ id: r.id, name: e.target.value })} onKeyDown={(e) => { if (e.key === 'Enter') doRename(); if (e.key === 'Escape') setEditing(null) }} style={{ ...field, height: 28, width: 200 }} placeholder="Nom de la version" />
+                ? <input autoFocus value={editing.name} onChange={(e) => setEditing({ id: r.id, name: e.target.value })} onKeyDown={(e) => { if (e.key === 'Enter') doRename(); if (e.key === 'Escape') setEditing(null) }} style={{ ...field, height: 28, width: 200 }} placeholder={tr.versionNamePlaceholder} />
                 : (r.name || <span style={{ color: 'var(--color-muted-foreground,#6b7280)' }}>—</span>)}</td>
               <td style={td}>{fmtDate(r.editDate)}</td>
               <td style={td}>{r.user}</td>
               <td style={{ ...td, textAlign: 'right', whiteSpace: 'nowrap' }}>
                 {editing?.id === r.id ? (<>
-                  <button style={{ ...smallBtn, border: 0, background: 'var(--color-primary,#dc2626)', color: '#fff' }} disabled={busy === r.id} onClick={doRename}>Enregistrer</button>
-                  <button style={{ ...smallBtn, marginLeft: 6 }} onClick={() => setEditing(null)}>Annuler</button>
+                  <button style={{ ...smallBtn, border: 0, background: 'var(--color-primary,#dc2626)', color: '#fff' }} disabled={busy === r.id} onClick={doRename}>{tr.save}</button>
+                  <button style={{ ...smallBtn, marginLeft: 6 }} onClick={() => setEditing(null)}>{tr.cancel}</button>
                 </>) : (<>
-                  <button style={smallBtn} disabled={busy === r.id} onClick={() => doView(r.id)} title="Aperçu de cette version">👁 Voir</button>
-                  <button style={{ ...smallBtn, marginLeft: 6 }} disabled={busy === r.id} onClick={() => setConfirmRestore(r.id)} title="Restaurer cette version dans l'édition">↩ Restaurer</button>
-                  <button style={{ ...smallBtn, marginLeft: 6 }} disabled={busy === r.id} onClick={() => setEditing({ id: r.id, name: r.name || '' })} title="Nommer / renommer">✎ Renommer</button>
+                  <button style={smallBtn} disabled={busy === r.id} onClick={() => doView(r.id)} title={tr.viewTip}>{tr.view}</button>
+                  <button style={{ ...smallBtn, marginLeft: 6 }} disabled={busy === r.id} onClick={() => setConfirmRestore(r.id)} title={tr.restoreTip}>{tr.restore}</button>
+                  <button style={{ ...smallBtn, marginLeft: 6 }} disabled={busy === r.id} onClick={() => setEditing({ id: r.id, name: r.name || '' })} title={tr.renameTip}>{tr.rename}</button>
                 </>)}
               </td>
             </tr>
@@ -358,31 +400,31 @@ export function VersioningTab({ idPage }: { idPage: number }) {
       {/* Pagination serveur — 20 versions par page */}
       {totalPages > 1 && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 10, paddingTop: 12, borderTop: '1px solid var(--color-border,#f3f4f6)' }}>
-          <button style={{ ...smallBtn, opacity: curPage <= 1 || loading ? 0.5 : 1, cursor: curPage <= 1 || loading ? 'not-allowed' : 'pointer' }} disabled={curPage <= 1 || loading} onClick={() => setPageNum(curPage - 1)}>‹ Précédent</button>
-          <span style={{ fontSize: 12.5, color: 'var(--color-muted-foreground,#6b7280)' }}>Page {curPage} / {totalPages} · {total} versions</span>
-          <button style={{ ...smallBtn, opacity: curPage >= totalPages || loading ? 0.5 : 1, cursor: curPage >= totalPages || loading ? 'not-allowed' : 'pointer' }} disabled={curPage >= totalPages || loading} onClick={() => setPageNum(curPage + 1)}>Suivant ›</button>
+          <button style={{ ...smallBtn, opacity: curPage <= 1 || loading ? 0.5 : 1, cursor: curPage <= 1 || loading ? 'not-allowed' : 'pointer' }} disabled={curPage <= 1 || loading} onClick={() => setPageNum(curPage - 1)}>{tr.prev}</button>
+          <span style={{ fontSize: 12.5, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.pageWord} {curPage} / {totalPages} · {total} {tr.versionsWord}</span>
+          <button style={{ ...smallBtn, opacity: curPage >= totalPages || loading ? 0.5 : 1, cursor: curPage >= totalPages || loading ? 'not-allowed' : 'pointer' }} disabled={curPage >= totalPages || loading} onClick={() => setPageNum(curPage + 1)}>{tr.next}</button>
         </div>
       )}
       <Feedback msg={msg} />
 
       {/* Modal React de confirmation de RESTAURATION (remplace le window.confirm natif) */}
       {confirmRestore != null && (() => {
-        const v = rows.find((r) => r.id === confirmRestore)
+        const v = d.items.find((r) => r.id === confirmRestore)
         const busyThis = busy === confirmRestore
         return (
           <div onClick={() => !busyThis && setConfirmRestore(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
             <div onClick={(e) => e.stopPropagation()} style={{ width: 480, maxWidth: '100%', background: 'var(--color-card,#fff)', borderRadius: 10, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,.35)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', background: '#f59e0b', color: '#fff' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 15, fontWeight: 600 }}>↩ Restaurer la version</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 15, fontWeight: 600 }}>{tr.restoreVersionTitle}</span>
                 <button onClick={() => !busyThis && setConfirmRestore(null)} style={{ appearance: 'none', border: 0, background: 'transparent', color: '#fff', fontSize: 20, lineHeight: 1, cursor: 'pointer' }}>×</button>
               </div>
               <div style={{ padding: 18, fontSize: 13, color: 'var(--color-foreground,#111827)', lineHeight: 1.5 }}>
-                Restaurer la version <strong>n°{v?.number}{v?.name ? ` — ${v.name}` : ''}</strong> dans l'édition en cours ?<br />
-                Le <strong>brouillon actuel sera remplacé</strong> par le contenu de cette version.
+                {tr.restoreConfirm1a} <strong>{tr.colNumber}{v?.number}{v?.name ? ` — ${v.name}` : ''}</strong> {tr.restoreConfirm1b}<br />
+                {tr.restoreConfirm2pre} <strong>{tr.restoreConfirm2a}</strong> {tr.restoreConfirm2b}
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '0 18px 18px' }}>
-                <button onClick={() => setConfirmRestore(null)} disabled={busyThis} style={{ ...smallBtn, height: 34, padding: '0 14px' }}>Annuler</button>
-                <button onClick={() => confirmRestore != null && doRestore(confirmRestore)} disabled={busyThis} style={{ ...smallBtn, height: 34, padding: '0 14px', border: 0, background: '#f59e0b', color: '#fff' }}>{busyThis ? 'Restauration…' : 'Restaurer'}</button>
+                <button onClick={() => setConfirmRestore(null)} disabled={busyThis} style={{ ...smallBtn, height: 34, padding: '0 14px' }}>{tr.cancel}</button>
+                <button onClick={() => confirmRestore != null && doRestore(confirmRestore)} disabled={busyThis} style={{ ...smallBtn, height: 34, padding: '0 14px', border: 0, background: '#f59e0b', color: '#fff' }}>{busyThis ? tr.restoring : tr.restoreBtn}</button>
               </div>
             </div>
           </div>
@@ -394,13 +436,19 @@ export function VersioningTab({ idPage }: { idPage: number }) {
 
 // ═══ COMMENTAIRES → FRISE D'ÉVÉNEMENTS (modulaire) ═══
 type TLItem = { kind: 'comment' | 'workflow'; date: string; user: string; text: string; title?: string; action?: string | null; toUser?: string | null; toRole?: string | null }
-const WF_META: Record<string, { label: string; color: string; bg: string }> = {
-  VALIDATION: { label: 'Demande de validation', color: '#d97706', bg: 'rgba(245,158,11,.15)' },
-  VALIDATED: { label: 'Validé', color: '#059669', bg: 'rgba(16,185,129,.15)' },
-  REFUSED: { label: 'Refusé', color: '#dc2626', bg: 'rgba(239,68,68,.15)' },
+/** Métadonnées de badge workflow — les libellés dépendent de la langue (peT). */
+function wfMeta(): Record<string, { label: string; color: string; bg: string }> {
+  const tr = peT()
+  return {
+    VALIDATION: { label: tr.wfValidation, color: '#d97706', bg: 'rgba(245,158,11,.15)' },
+    VALIDATED: { label: tr.wfValidated, color: '#059669', bg: 'rgba(16,185,129,.15)' },
+    REFUSED: { label: tr.wfRefused, color: '#dc2626', bg: 'rgba(239,68,68,.15)' },
+  }
 }
 const COMMENTS_PER_PAGE = 20
 export function CommentsTab({ idPage }: { idPage: number }) {
+  const tr = peT()
+  const WF_META = wfMeta()
   const [items, setItems] = useState<TLItem[] | null>(null)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const [text, setText] = useState('')
@@ -416,23 +464,23 @@ export function CommentsTab({ idPage }: { idPage: number }) {
     try { await apiPost('comments/save', { idPage, text: text.trim() }); setText(''); setPageNum(1); reload() }
     catch (e) { setMsg({ ok: false, text: (e as Error).message }); setTimeout(() => setMsg(null), 3500) } finally { setSending(false) }
   }
-  if (!items) return <div style={wrap}>Chargement…</div>
+  if (!items) return <div style={wrap}>{tr.loading}</div>
   const totalPages = Math.max(1, Math.ceil(items.length / COMMENTS_PER_PAGE))
   const curPage = Math.min(Math.max(1, pageNum), totalPages)
   const start = (curPage - 1) * COMMENTS_PER_PAGE
   const paged = items.slice(start, start + COMMENTS_PER_PAGE)
   return (
     <div style={wrap}>
-      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>Activité de la page</div>
+      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>{tr.pageActivity}</div>
 
       {/* Ajouter un commentaire */}
       <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', marginBottom: 18 }}>
-        <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Ajouter un commentaire…" rows={2}
+        <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder={tr.addCommentPlaceholder} rows={2}
           style={{ flex: 1, resize: 'vertical', minHeight: 40, borderRadius: 6, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', padding: 10, fontSize: 13, boxSizing: 'border-box' }} />
-        <button onClick={add} disabled={sending || !text.trim()} style={{ appearance: 'none', height: 36, padding: '0 16px', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: (sending || !text.trim()) ? 'not-allowed' : 'pointer', border: 0, background: 'var(--color-primary,#dc2626)', color: '#fff', opacity: (sending || !text.trim()) ? 0.6 : 1, whiteSpace: 'nowrap' }}>{sending ? 'Envoi…' : 'Commenter'}</button>
+        <button onClick={add} disabled={sending || !text.trim()} style={{ appearance: 'none', height: 36, padding: '0 16px', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: (sending || !text.trim()) ? 'not-allowed' : 'pointer', border: 0, background: 'var(--color-primary,#dc2626)', color: '#fff', opacity: (sending || !text.trim()) ? 0.6 : 1, whiteSpace: 'nowrap' }}>{sending ? tr.sending : tr.comment}</button>
       </div>
 
-      {items.length === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>Aucune activité pour le moment.</div> : (
+      {items.length === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.noActivity}</div> : (
         <div>{paged.map((it, i) => {
           const wf = it.kind === 'workflow' ? (WF_META[it.action || ''] || { label: it.action || 'Workflow', color: '#6b7280', bg: 'rgba(127,127,127,.12)' }) : null
           const dot = wf ? wf.color : 'var(--color-primary,#dc2626)'
@@ -449,7 +497,7 @@ export function CommentsTab({ idPage }: { idPage: number }) {
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
                   {wf
                     ? <span style={{ fontSize: 11, fontWeight: 600, borderRadius: 999, padding: '2px 8px', background: wf.bg, color: wf.color }}>{wf.label}</span>
-                    : <span style={{ fontSize: 11, fontWeight: 600, borderRadius: 999, padding: '2px 8px', background: 'color-mix(in srgb, var(--color-primary,#dc2626) 12%, transparent)', color: 'var(--color-primary,#dc2626)' }}>💬 Commentaire</span>}
+                    : <span style={{ fontSize: 11, fontWeight: 600, borderRadius: 999, padding: '2px 8px', background: 'color-mix(in srgb, var(--color-primary,#dc2626) 12%, transparent)', color: 'var(--color-primary,#dc2626)' }}>{tr.commentBadge}</span>}
                   <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{it.user}{wf && (it.toUser || it.toRole) ? ` → ${[it.toUser, it.toRole].filter(Boolean).join(' / ')}` : ''} · {it.date}</span>
                 </div>
                 {it.title && <div style={{ fontSize: 13, fontWeight: 600, marginTop: 4 }} dangerouslySetInnerHTML={{ __html: it.title }} />}
@@ -463,9 +511,9 @@ export function CommentsTab({ idPage }: { idPage: number }) {
       {/* Pagination — 20 éléments par page */}
       {totalPages > 1 && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 8, paddingTop: 12, borderTop: '1px solid var(--color-border,#f3f4f6)' }}>
-          <button style={{ ...smallBtn, opacity: curPage <= 1 ? 0.5 : 1, cursor: curPage <= 1 ? 'not-allowed' : 'pointer' }} disabled={curPage <= 1} onClick={() => setPageNum(curPage - 1)}>‹ Précédent</button>
-          <span style={{ fontSize: 12.5, color: 'var(--color-muted-foreground,#6b7280)' }}>Page {curPage} / {totalPages} · {items.length} éléments</span>
-          <button style={{ ...smallBtn, opacity: curPage >= totalPages ? 0.5 : 1, cursor: curPage >= totalPages ? 'not-allowed' : 'pointer' }} disabled={curPage >= totalPages} onClick={() => setPageNum(curPage + 1)}>Suivant ›</button>
+          <button style={{ ...smallBtn, opacity: curPage <= 1 ? 0.5 : 1, cursor: curPage <= 1 ? 'not-allowed' : 'pointer' }} disabled={curPage <= 1} onClick={() => setPageNum(curPage - 1)}>{tr.prev}</button>
+          <span style={{ fontSize: 12.5, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.pageWord} {curPage} / {totalPages} · {items.length} {tr.itemsWord}</span>
+          <button style={{ ...smallBtn, opacity: curPage >= totalPages ? 0.5 : 1, cursor: curPage >= totalPages ? 'not-allowed' : 'pointer' }} disabled={curPage >= totalPages} onClick={() => setPageNum(curPage + 1)}>{tr.next}</button>
         </div>
       )}
       <Feedback msg={msg} />
@@ -494,6 +542,7 @@ function ActionBadge({ action }: { action: string }) {
   return <span style={{ fontSize: 12, fontWeight: 600, borderRadius: 999, padding: '2px 10px', background: c.bg, color: c.color, whiteSpace: 'nowrap', display: 'inline-block' }}>{action}</span>
 }
 export function HistoricTab({ idPage }: { idPage: number }) {
+  const tr = peT()
   const [d, setD] = useState<HistData | null>(null)
   const [pageNum, setPageNum] = useState(1) // pagination serveur — jamais tout chargé
   const [filter, setFilter] = useState('')  // filtre SERVEUR par type d'action ('' = toutes)
@@ -508,7 +557,7 @@ export function HistoricTab({ idPage }: { idPage: number }) {
       .finally(() => { if (!x) setLoading(false) })
     return () => { x = true }
   }, [idPage, pageNum, filter])
-  if (!d) return <div style={wrap}>Chargement…</div>
+  if (!d) return <div style={wrap}>{tr.loading}</div>
   const total = d.total ?? d.items.length
   const totalPages = Math.max(1, Math.ceil(total / HISTORIC_PER_PAGE))
   const curPage = Math.min(Math.max(1, pageNum), totalPages)
@@ -517,30 +566,30 @@ export function HistoricTab({ idPage }: { idPage: number }) {
   return (
     <div style={wrap}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
-        <div style={{ fontSize: 13, fontWeight: 600 }}>Historique de la page</div>
+        <div style={{ fontSize: 13, fontWeight: 600 }}>{tr.pageHistory}</div>
         {/* Filtre par type d'action (serveur → filtre tout l'historique, pas juste la page). */}
         {(d.actionTypes?.length ?? 0) > 0 && (
           <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: 'var(--color-muted-foreground,#6b7280)' }}>
-            Filtrer :
+            {tr.filter}
             <select value={filter} onChange={(e) => { setFilter(e.target.value); setPageNum(1) }} style={{ ...field, height: 32, width: 'auto', minWidth: 170 }}>
-              <option value="">Toutes les actions</option>
+              <option value="">{tr.allActions}</option>
               {d.actionTypes.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
           </label>
         )}
       </div>
-      {total === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>{filter ? 'Aucune entrée pour ce type d’action.' : 'Aucun historique.'}</div> : (
+      {total === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>{filter ? tr.noEntryForAction : tr.noHistory}</div> : (
         <table style={{ width: '100%', borderCollapse: 'collapse', opacity: loading ? 0.5 : 1, transition: 'opacity .15s' }}>
-          <thead><tr><th style={th}>Date</th><th style={th}>Action</th><th style={th}>Utilisateur</th></tr></thead>
+          <thead><tr><th style={th}>{tr.colDate}</th><th style={th}>{tr.colAction}</th><th style={th}>{tr.colUser}</th></tr></thead>
           <tbody>{d.items.map((r) => <tr key={r.id}><td style={td}>{fmtDate(r.date)}</td><td style={td}><ActionBadge action={r.action} /></td><td style={td}>{r.user}</td></tr>)}</tbody>
         </table>
       )}
       {/* Pagination serveur — 25 entrées par page */}
       {totalPages > 1 && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 10, paddingTop: 12, borderTop: '1px solid var(--color-border,#f3f4f6)' }}>
-          <button style={{ ...smallBtn, opacity: curPage <= 1 || loading ? 0.5 : 1, cursor: curPage <= 1 || loading ? 'not-allowed' : 'pointer' }} disabled={curPage <= 1 || loading} onClick={() => setPageNum(curPage - 1)}>‹ Précédent</button>
-          <span style={{ fontSize: 12.5, color: 'var(--color-muted-foreground,#6b7280)' }}>Page {curPage} / {totalPages} · {total} entrées</span>
-          <button style={{ ...smallBtn, opacity: curPage >= totalPages || loading ? 0.5 : 1, cursor: curPage >= totalPages || loading ? 'not-allowed' : 'pointer' }} disabled={curPage >= totalPages || loading} onClick={() => setPageNum(curPage + 1)}>Suivant ›</button>
+          <button style={{ ...smallBtn, opacity: curPage <= 1 || loading ? 0.5 : 1, cursor: curPage <= 1 || loading ? 'not-allowed' : 'pointer' }} disabled={curPage <= 1 || loading} onClick={() => setPageNum(curPage - 1)}>{tr.prev}</button>
+          <span style={{ fontSize: 12.5, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.pageWord} {curPage} / {totalPages} · {total} {tr.entriesWord}</span>
+          <button style={{ ...smallBtn, opacity: curPage >= totalPages || loading ? 0.5 : 1, cursor: curPage >= totalPages || loading ? 'not-allowed' : 'pointer' }} disabled={curPage >= totalPages || loading} onClick={() => setPageNum(curPage + 1)}>{tr.next}</button>
         </div>
       )}
       <Feedback msg={msg} />
@@ -552,17 +601,42 @@ export function HistoricTab({ idPage }: { idPage: number }) {
 type Version = { pageId: number; langId: number; langName: string; locale: string; pageName: string }
 type Langs = { idPage: number; initial: number; versions: Version[]; creatable: Ref[] }
 export function LanguagesTab({ idPage }: { idPage: number }) {
+  const tr = peT()
+  const navigate = useNavigate()
   const [d, setD] = useState<Langs | null>(null)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
-  useEffect(() => { let x = false; apiGet<Langs>(`languages?idPage=${idPage}`).then((v) => !x && setD(v)).catch((e) => !x && setMsg({ ok: false, text: e.message })); return () => { x = true } }, [idPage])
-  if (!d) return <div style={wrap}>Chargement…</div>
+  const [reloadKey, setReloadKey] = useState(0)
+  const [creating, setCreating] = useState<string | null>(null) // locale en cours de création
+  useEffect(() => { let x = false; apiGet<Langs>(`languages?idPage=${idPage}`).then((v) => !x && setD(v)).catch((e) => !x && setMsg({ ok: false, text: e.message })); return () => { x = true } }, [idPage, reloadKey])
+  // Crée une version de langue via l'endpoint LEGACY (même flux que le tool jQuery pagelang.js) :
+  // POST pageLangPageId + pageLangLocale → nouvelle page (statut hors ligne). On ouvre ensuite la page
+  // créée dans un onglet du shell (comme l'arbre / la création de page React).
+  const createLang = useCallback(async (locale: string) => {
+    setCreating(locale); setMsg(null)
+    try {
+      const r = await legacyPost('/melis/MelisCms/PageLanguages/createNewPageLangVersion', { pageLangPageId: idPage, pageLangLocale: locale })
+      const info = (r as { pageInfo?: { pageid?: number | string; name?: string } }).pageInfo
+      if (r.success && info?.pageid) {
+        notify('ok', tr.langVersions, tr.langCreated)
+        setReloadKey((k) => k + 1) // rafraîchit la liste des versions
+        const path = `/melis-cms/page/${info.pageid}`
+        ;(window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void }).__melisOpenTab?.({ id: path, label: (info.name || `Page ${info.pageid}`).toString().trim(), path })
+        navigate(path)
+      } else {
+        const t = r.textMessage && !r.textMessage.startsWith('tr_') ? r.textMessage : tr.langCreateFailed
+        notify('ko', tr.langVersions, t); setMsg({ ok: false, text: t })
+      }
+    } catch (e) { notify('ko', tr.langVersions, (e as Error).message); setMsg({ ok: false, text: (e as Error).message }) }
+    finally { setCreating(null) }
+  }, [idPage, navigate, tr])
+  if (!d) return <div style={wrap}>{tr.loading}</div>
   const th: React.CSSProperties = { textAlign: 'left', fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)', padding: '8px 10px', borderBottom: '1px solid var(--color-border,#e5e7eb)' }
   const td: React.CSSProperties = { fontSize: 13, padding: '8px 10px', borderBottom: '1px solid var(--color-border,#f3f4f6)' }
   return (
     <div style={wrap}>
-      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Versions de langue de cette page</div>
+      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>{tr.langVersions}</div>
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead><tr><th style={th}>Langue</th><th style={th}>Locale</th><th style={th}>Nom de page</th><th style={th}>ID</th></tr></thead>
+        <thead><tr><th style={th}>{tr.colLanguage}</th><th style={th}>{tr.colLocale}</th><th style={th}>{tr.colPageName}</th><th style={th}>{tr.colId}</th></tr></thead>
         <tbody>{d.versions.map((v) => (
           <tr key={v.pageId}>
             <td style={td}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}><Flag locale={v.locale} />{v.langName || v.langId}</span></td>
@@ -570,11 +644,25 @@ export function LanguagesTab({ idPage }: { idPage: number }) {
           </tr>
         ))}</tbody>
       </table>
-      {d.creatable.length > 0 && (
-        <div style={{ marginTop: 16, fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>
-          Langues créables : {d.creatable.map((c) => <span key={c.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginRight: 10 }}><Flag locale={c.locale} size={16} />{c.name}</span>)} — la création se fait via la vue <em>Old</em> pour l'instant.
-        </div>
-      )}
+      <div style={{ marginTop: 20 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{tr.creatableLangs}</div>
+        {d.creatable.length > 0 ? (
+          <>
+            <div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)', marginBottom: 10 }}>{tr.createLangHint}</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {d.creatable.map((c) => (
+                <button key={c.id} type="button" style={{ ...smallBtn, height: 30, opacity: creating ? 0.6 : 1 }}
+                  disabled={!!creating} onClick={() => createLang(c.locale)}>
+                  <Flag locale={c.locale} size={16} />
+                  {creating === c.locale ? tr.langCreating : `${tr.createLangBtn} · ${c.name}`}
+                </button>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.noCreatableLangs}</div>
+        )}
+      </div>
       <Feedback msg={msg} />
     </div>
   )

@@ -7,6 +7,7 @@ import {
   PropertiesTab, SeoTab, LanguagesTab, HistoricTab, AnalyticsTab, ScriptsTab, VersioningTab, CommentsTab,
   apiGet, apiPost, type PropsData, type SeoData, type Refs,
 } from './PageTabs'
+import { peT } from './page-editor-i18n'
 
 /**
  * Éditeur de page CMS — COQUILLE REACT au-dessus de l'outil legacy (UNE iframe, pour l'Édition
@@ -144,6 +145,7 @@ function orderOf(key: string): number {
 }
 
 export default function CmsPage({ active = true }: { active?: boolean }) {
+  const tr = peT() // dictionnaire i18n (référence stable : DICT[lang] du BO) → sûr hors deps des useCallback
   const { id } = useParams()
   const navigate = useNavigate()
   const { can, loaded: capsLoaded } = useCaps(TOOL_KEY)
@@ -395,14 +397,14 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     try {
       const data = await postLegacyPage(`/melis/MelisCms/Page/savePage?idPage=${encodeURIComponent(current)}&fatherPageId=`)
       if (data.success === 1) {
-        notify('ok', (data.textTitle || 'Enregistrement').trim(), 'La page a été enregistrée.') // notif du shell (comme Publier)
+        notify('ok', (data.textTitle || tr.notifSave).trim(), tr.pageSaved) // notif du shell (comme Publier)
         await releaseLock(current) // libère le verrou → le cadenas du tree disparaît
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // nom/statut + cadenas → maj + déploie jusqu'à la page
         refreshStructure(current) // rafraîchit le statut/en-tête
       } else {
-        notify('ko', (data.textTitle || 'Enregistrement').trim(), data.textMessage || 'L’enregistrement a échoué.', errorFields(data))
+        notify('ko', (data.textTitle || tr.notifSave).trim(), data.textMessage || tr.saveFailed, errorFields(data))
       }
-    } catch (e) { notify('ko', 'Enregistrement', (e as Error).message) } finally { setSaving(false) }
+    } catch (e) { notify('ko', tr.notifSave, (e as Error).message) } finally { setSaving(false) }
   }, [edit, current, editionReady, postLegacyPage, refreshStructure, releaseLock])
 
   // Publier (« Publier ») → publishPage legacy : la chaîne sauvegarde (comme save) PUIS publie
@@ -413,15 +415,15 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     try {
       const data = await postLegacyPage(`/melis/MelisCms/Page/publishPage?idPage=${encodeURIComponent(current)}`)
       if (data.success === 1) {
-        notify('ok', (data.textTitle || 'Publication').trim(), 'La page a été publiée.')
+        notify('ok', (data.textTitle || tr.notifPublish).trim(), tr.pagePublished)
         await releaseLock(current) // libère le verrou (comme le legacy à la publication)
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // statut online + cadenas → maj + déploie jusqu'à la page
         window.dispatchEvent(new CustomEvent('melis:cms-versioning-refresh')) // publier crée une version → recharge l'onglet Versioning
         refreshStructure(current) // en-tête : plus de brouillon, statut publié
       } else {
-        notify('ko', (data.textTitle || 'Publication').trim(), data.textMessage || 'La publication a échoué.', errorFields(data))
+        notify('ko', (data.textTitle || tr.notifPublish).trim(), data.textMessage || tr.publishFailed, errorFields(data))
       }
-    } catch (e) { notify('ko', 'Publication', (e as Error).message) } finally { setSaving(false) }
+    } catch (e) { notify('ko', tr.notifPublish, (e as Error).message) } finally { setSaving(false) }
   }, [edit, current, editionReady, postLegacyPage, refreshStructure, releaseLock])
 
   // Dépublier (switch Publié/Dépublié → OFF) → unpublishPage legacy (GET) : passe page_status=0 dans
@@ -433,13 +435,13 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
       const res = await fetch(`/melis/MelisCms/Page/unpublishPage?idPage=${encodeURIComponent(current)}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
       const data = await res.json().catch(() => ({})) as LegacyResp
       if (data.success === 1) {
-        notify('ok', (data.textTitle || 'Dépublication').trim(), 'La page a été dépubliée.')
+        notify('ok', (data.textTitle || tr.notifUnpublish).trim(), tr.pageUnpublished)
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // statut offline → maj + déploie jusqu'à la page
         refreshStructure(current) // en-tête : switch → Hors ligne
       } else {
-        notify('ko', (data.textTitle || 'Dépublication').trim(), data.textMessage || 'La dépublication a échoué.', errorFields(data))
+        notify('ko', (data.textTitle || tr.notifUnpublish).trim(), data.textMessage || tr.unpublishFailed, errorFields(data))
       }
-    } catch (e) { notify('ko', 'Dépublication', (e as Error).message) } finally { setSaving(false) }
+    } catch (e) { notify('ko', tr.notifUnpublish, (e as Error).message) } finally { setSaving(false) }
   }, [current, refreshStructure])
 
   // Switch Publié/Dépublié (comme le legacy .page-publishunpublish) : ON = publier, OFF = dépublier.
@@ -448,17 +450,17 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   // Effacer le brouillon (« Effacer brouillon ») → clearSavedPage legacy (revient à la version publiée).
   const doClear = useCallback(async () => {
     if (!current) return
-    if (!window.confirm('Effacer le brouillon et revenir à la dernière version publiée ?')) return
+    if (!window.confirm(tr.clearDraftConfirm)) return
     setSaving(true); setToast(null)
     try {
       const res = await fetch(`/melis/MelisCms/Page/clearSavedPage?idPage=${encodeURIComponent(current)}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
       const data = await res.json().catch(() => ({})) as LegacyResp
       if (data.success === 1) {
-        notify('ok', (data.textTitle || 'Brouillon').trim(), 'Le brouillon a été effacé.')
+        notify('ok', (data.textTitle || tr.notifDraft).trim(), tr.draftCleared)
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } }))
         refreshStructure(current); reloadEdition() // le contenu revient à la version publiée
-      } else notify('ko', (data.textTitle || 'Brouillon').trim(), data.textMessage || 'L’opération a échoué.')
-    } catch (e) { notify('ko', 'Brouillon', (e as Error).message) } finally { setSaving(false) }
+      } else notify('ko', (data.textTitle || tr.notifDraft).trim(), data.textMessage || tr.draftFailed)
+    } catch (e) { notify('ko', tr.notifDraft, (e as Error).message) } finally { setSaving(false) }
   }, [current, refreshStructure, reloadEdition])
 
   // Supprimer la page (« Supprimer page ») → deletePage legacy, puis fermeture de l'onglet + refresh arbre.
@@ -470,19 +472,19 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
       const res = await fetch(`/melis/MelisCms/Page/deletePage?idPage=${encodeURIComponent(current)}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
       const data = await res.json().catch(() => ({})) as LegacyResp
       if (data.success === 1) {
-        notify('ok', (data.textTitle || 'Suppression').trim(), 'La page a été supprimée.')
+        notify('ok', (data.textTitle || tr.notifDelete).trim(), tr.pageDeleted)
         setDeleteOpen(false)
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh'))
         ;(window as unknown as { __melisCloseTab?: (id: string) => void }).__melisCloseTab?.(`/melis-cms/page/${current}`)
         setOpened((o) => o.filter((x) => x !== current))
-      } else notify('ko', (data.textTitle || 'Suppression').trim(), data.textMessage || 'La suppression a échoué.')
-    } catch (e) { notify('ko', 'Suppression', (e as Error).message) } finally { setSaving(false) }
+      } else notify('ko', (data.textTitle || tr.notifDelete).trim(), data.textMessage || tr.deleteFailedMsg)
+    } catch (e) { notify('ko', tr.notifDelete, (e as Error).message) } finally { setSaving(false) }
   }, [current])
 
   // Nouvelle page (« Nouvelle page ») → route React de création, en enfant de la page courante.
   const openNewPage = useCallback(() => {
     const path = current ? `${NEW_PAGE_ROUTE}~${current}` : NEW_PAGE_ROUTE
-    ;(window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void }).__melisOpenTab?.({ id: path, label: 'Nouvelle page', path })
+    ;(window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void }).__melisOpenTab?.({ id: path, label: tr.newPage, path })
     navigate(path)
   }, [current, navigate])
 
@@ -495,7 +497,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     try {
       await apiPost('unlock', { idPage: Number(current) })
       const l = await apiGet<{ locked: boolean; byUser: string | null; byMe: boolean; since: string | null }>(`lock?idPage=${current}`)
-      setLock(l); setUnlockOpen(false); setToast({ ok: true, text: 'Page débloquée.' }); setTimeout(() => setToast(null), 3000)
+      setLock(l); setUnlockOpen(false); setToast({ ok: true, text: tr.pageUnlocked }); setTimeout(() => setToast(null), 3000)
       window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // rafraîchit l'arbre + déploie jusqu'à la page → le cadenas disparaît
     } catch (e) { setToast({ ok: false, text: (e as Error).message }) } finally { setUnlocking(false) }
   }, [current])
@@ -563,7 +565,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         ev.preventDefault(); ev.stopImmediatePropagation()
         const father = btn.getAttribute('data-pagenumber') || ''
         const path = father ? `${NEW_PAGE_ROUTE}~${father}` : NEW_PAGE_ROUTE
-        ;(window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void }).__melisOpenTab?.({ id: path, label: 'Nouvelle page', path })
+        ;(window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void }).__melisOpenTab?.({ id: path, label: tr.newPage, path })
         navigate(path)
       }, true)
     } catch { /* */ }
@@ -574,7 +576,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
 
   // ── rendu ──
   const header = struct?.header
-  const statusLabel = header?.status === 'published' ? 'En ligne' : header?.status === 'draft' ? 'Brouillon' : header?.status === 'unpublished' ? 'Hors ligne' : null
+  const statusLabel = header?.status === 'published' ? tr.statusOnline : header?.status === 'draft' ? tr.statusDraft : header?.status === 'unpublished' ? tr.statusOffline : null
   const statusColor = header?.status === 'published' ? '#16a34a' : header?.status === 'draft' ? '#d97706' : '#6b7280'
   const nativeTabActive = !!(showChrome && activeTab && isNativeTab(activeTab))
 
@@ -601,9 +603,9 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
             {showChrome && (<>
               <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--color-foreground,#111827)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{header?.pageName ?? (struct ? `Page ${struct.idPage}` : '')}</span>
               {statusLabel && <span style={{ fontSize: 11, fontWeight: 600, color: '#fff', background: statusColor, borderRadius: 999, padding: '2px 8px' }}>{statusLabel}</span>}
-              {header?.editDate && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>modifiée le {header.editDate}{header.editor ? ` par ${header.editor}` : ''}</span>}
-              {!editionReady && !saving && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>chargement de l'édition…</span>}
-              {saving && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>enregistrement…</span>}
+              {header?.editDate && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.modifiedOn} {header.editDate}{header.editor ? ` ${tr.byWord} ${header.editor}` : ''}</span>}
+              {!editionReady && !saving && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.loadingEdition}</span>}
+              {saving && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.savingEdition}</span>}
               {toast && <span style={{ fontSize: 12, fontWeight: 600, color: toast.ok ? '#16a34a' : '#dc2626' }}>{toast.text}</span>}
             </>)}
           </div>
@@ -615,13 +617,13 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
               const disabled = saving || (!online && !editionReady) // pour publier (OFF→ON) il faut l'édition chargée
               return (
                 <button type="button" onClick={() => togglePublish(!online)} disabled={disabled}
-                  title={online ? 'En ligne — cliquer pour dépublier' : 'Hors ligne — cliquer pour publier'}
+                  title={online ? tr.onlineTip : tr.offlineTip}
                   style={{ display: 'inline-flex', alignItems: 'center', gap: 8, appearance: 'none', border: 0, background: 'transparent', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.6 : 1, padding: 0 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: .3, color: 'var(--color-muted-foreground,#6b7280)' }}>STATUT</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: .3, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.statusLabel}</span>
                   <span style={{ position: 'relative', width: 40, height: 21, borderRadius: 999, background: online ? '#16a34a' : '#dc2626', transition: 'background .15s', flex: '0 0 auto' }}>
                     <span style={{ position: 'absolute', top: 2, left: 2, width: 17, height: 17, borderRadius: '50%', background: '#fff', boxShadow: '0 1px 2px rgba(0,0,0,.3)', transform: online ? 'translateX(19px)' : 'translateX(0)', transition: 'transform .15s' }} />
                   </span>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: online ? '#16a34a' : '#dc2626', minWidth: 54, textAlign: 'left' }}>{online ? 'En ligne' : 'Hors ligne'}</span>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: online ? '#16a34a' : '#dc2626', minWidth: 54, textAlign: 'left' }}>{online ? tr.statusOnline : tr.statusOffline}</span>
                 </button>
               )
             })()}
@@ -636,8 +638,8 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 8, margin: '0 16px 10px', padding: '9px 12px', borderRadius: 7, background: '#fef3c7', border: '1px solid #fcd34d', color: '#92400e', fontSize: 13 }}>
           <Icon name="unlock" />
           <span>
-            <strong>Page verrouillée</strong>{lock?.byUser ? ` par ${lock.byUser}` : ''}{lock?.since ? ` depuis le ${lock.since}` : ''}.
-            {' '}Un autre utilisateur l’édite ; débloquez-la pour reprendre la main.
+            <strong>{tr.pageLocked}</strong>{lock?.byUser ? ` ${tr.lockedBy} ${lock.byUser}` : ''}{lock?.since ? ` ${tr.lockedSince} ${lock.since}` : ''}.
+            {' '}{tr.lockedMsg}
           </span>
         </div>
       )}
@@ -662,7 +664,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
                     </div>
                   ) : (
                     (() => { const gated = b.key.endsWith('action_save') || b.key.endsWith('action_publish'); const dis = gated && (saving || !editionReady); return (
-                    <button key={b.key} className="melis-pgbtn" style={{ ...btnStyle(b), ...(dis ? { opacity: .55, cursor: 'not-allowed' } : null) }} disabled={dis} title={gated && !editionReady ? 'Édition en cours de chargement…' : undefined} onClick={() => onButton(b)}><Icon name={iconFor(b)} />{b.label}</button>
+                    <button key={b.key} className="melis-pgbtn" style={{ ...btnStyle(b), ...(dis ? { opacity: .55, cursor: 'not-allowed' } : null) }} disabled={dis} title={gated && !editionReady ? tr.editionLoadingTip : undefined} onClick={() => onButton(b)}><Icon name={iconFor(b)} />{b.label}</button>
                     ) })()
                   )
                 ))}
@@ -695,7 +697,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
           const visible = key === activeTab
           const style: React.CSSProperties = { position: 'absolute', inset: 0, overflow: 'auto', background: 'var(--color-background,#fff)', display: visible ? 'block' : 'none' }
           if (CONTROLLED.has(key)) {
-            if (!edit) return <div key={key} style={style}><div style={{ padding: 20 }}>Chargement…</div></div>
+            if (!edit) return <div key={key} style={style}><div style={{ padding: 20 }}>{tr.loading}</div></div>
             return <div key={key} style={style}>{key === KEY_PROPERTIES
               ? <PropertiesTab value={edit.props} refs={edit.refs} onChange={(v) => setEdit({ ...edit, props: v })} />
               : <SeoTab value={edit.seo} onChange={(v) => setEdit({ ...edit, seo: v })} />}</div>
@@ -703,7 +705,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
           const Comp = SELF_TABS[key] ?? w.__melisPageTabRegistry?.tabs[key]
           return Comp ? <div key={key} style={style}><Comp idPage={Number(current)} /></div> : null
         })}
-        {current == null && <div style={{ padding: 24, color: 'var(--color-muted-foreground)', fontSize: 14 }}>Sélectionnez une page dans l'arbre.</div>}
+        {current == null && <div style={{ padding: 24, color: 'var(--color-muted-foreground)', fontSize: 14 }}>{tr.selectPage}</div>}
       </div>
 
       {/* Modal React natif de déverrouillage (remplace le modal legacy) */}
@@ -711,15 +713,15 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         <div onClick={() => !unlocking && setUnlockOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
           <div onClick={(e) => e.stopPropagation()} style={{ width: 480, maxWidth: '100%', background: 'var(--color-card,#fff)', borderRadius: 10, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,.35)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', background: '#f59e0b', color: '#fff' }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 15, fontWeight: 600 }}><Icon name="unlock" />Débloquer la page</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 15, fontWeight: 600 }}><Icon name="unlock" />{tr.unlockTitle}</span>
               <button onClick={() => !unlocking && setUnlockOpen(false)} style={{ appearance: 'none', border: 0, background: 'transparent', color: '#fff', fontSize: 20, lineHeight: 1, cursor: 'pointer' }}>×</button>
             </div>
             <div style={{ padding: 18, fontSize: 13, color: 'var(--color-foreground,#111827)', lineHeight: 1.5 }}>
-              Cette page a été verrouillée{lock?.byUser ? ` par ${lock.byUser}` : ''}{lock?.since ? ` le ${lock.since}` : ''}.<br />Merci de confirmer le déblocage.
+              {tr.unlockBody1}{lock?.byUser ? ` ${tr.unlockBody1by} ${lock.byUser}` : ''}{lock?.since ? ` ${tr.unlockBody1on} ${lock.since}` : ''}.<br />{tr.unlockBody2}
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '0 18px 18px' }}>
-              <button className="melis-pgbtn" onClick={() => setUnlockOpen(false)} disabled={unlocking} style={{ ...btnBase, height: 34, border: '1px solid #fecaca', background: 'var(--color-card,#fff)', color: '#dc2626' }}>Annuler</button>
-              <button className="melis-pgbtn" onClick={doUnlock} disabled={unlocking} style={{ ...btnBase, height: 34, border: 0, background: '#16a34a', color: '#fff' }}>{unlocking ? 'Déblocage…' : 'Confirmer'}</button>
+              <button className="melis-pgbtn" onClick={() => setUnlockOpen(false)} disabled={unlocking} style={{ ...btnBase, height: 34, border: '1px solid #fecaca', background: 'var(--color-card,#fff)', color: '#dc2626' }}>{tr.cancel}</button>
+              <button className="melis-pgbtn" onClick={doUnlock} disabled={unlocking} style={{ ...btnBase, height: 34, border: 0, background: '#16a34a', color: '#fff' }}>{unlocking ? tr.unlocking : tr.confirm}</button>
             </div>
           </div>
         </div>
@@ -730,17 +732,17 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         <div onClick={() => !saving && setDeleteOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
           <div onClick={(e) => e.stopPropagation()} style={{ width: 480, maxWidth: '100%', background: 'var(--color-card,#fff)', borderRadius: 10, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,.35)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', background: '#dc2626', color: '#fff' }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 15, fontWeight: 600 }}><Icon name="trash" />Supprimer la page</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 15, fontWeight: 600 }}><Icon name="trash" />{tr.deleteTitle}</span>
               <button onClick={() => !saving && setDeleteOpen(false)} style={{ appearance: 'none', border: 0, background: 'transparent', color: '#fff', fontSize: 20, lineHeight: 1, cursor: 'pointer' }}>×</button>
             </div>
             <div style={{ padding: 18, fontSize: 13, color: 'var(--color-foreground,#111827)', lineHeight: 1.5 }}>
-              Supprimer définitivement la page <strong>{header?.pageName || `Page ${current}`}</strong> (brouillon <strong>et</strong> version publiée) ?<br />
-              Les pages dans d'<strong>autres langues</strong> ne sont <strong>pas</strong> supprimées — ce sont des pages distinctes, simplement liées.<br />
-              Cette action est <strong>irréversible</strong>.
+              {tr.deleteBody1a} <strong>{header?.pageName || `Page ${current}`}</strong> {tr.deleteBody1b} <strong>{tr.deleteBody1and}</strong> {tr.deleteBody1c}<br />
+              {tr.deleteBody2a}<strong>{tr.deleteBody2b}</strong> {tr.deleteBody2c} <strong>{tr.deleteBody2d}</strong> {tr.deleteBody2e}<br />
+              {tr.deleteBody3a} <strong>{tr.deleteBody3b}</strong>.
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '0 18px 18px' }}>
-              <button className="melis-pgbtn" onClick={() => setDeleteOpen(false)} disabled={saving} style={{ ...btnBase, height: 34, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)' }}>Annuler</button>
-              <button className="melis-pgbtn" onClick={doDelete} disabled={saving} style={{ ...btnBase, height: 34, border: 0, background: '#dc2626', color: '#fff' }}>{saving ? 'Suppression…' : 'Supprimer définitivement'}</button>
+              <button className="melis-pgbtn" onClick={() => setDeleteOpen(false)} disabled={saving} style={{ ...btnBase, height: 34, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)' }}>{tr.cancel}</button>
+              <button className="melis-pgbtn" onClick={doDelete} disabled={saving} style={{ ...btnBase, height: 34, border: 0, background: '#dc2626', color: '#fff' }}>{saving ? tr.deleting : tr.deleteConfirm}</button>
             </div>
           </div>
         </div>

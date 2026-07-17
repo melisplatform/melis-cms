@@ -394,7 +394,13 @@ class MelisReactApiPageController extends MelisAbstractActionController
     private function siteIdForPage(int $idPage): int
     {
         try {
-            $site = $this->getServiceManager()->get('MelisEngineTree')->getSiteByPageId($idPage);
+            $tree = $this->getServiceManager()->get('MelisEngineTree');
+            $site = $tree->getSiteByPageId($idPage);
+            // Page jamais publiée (father -1, saved only) : l'arbre publié ne la connaît pas →
+            // fallback sur l'arbre 'saved' (parité legacy PageLanguagesController).
+            if (empty($site->site_id)) {
+                $site = $tree->getSiteByPageId($idPage, 'saved');
+            }
             return (int) ($site->site_id ?? 0);
         } catch (\Throwable) { return 0; }
     }
