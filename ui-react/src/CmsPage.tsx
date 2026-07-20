@@ -736,7 +736,12 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
             return <NewPageView key={cid} father={fatherOf} visible={cid === current} onCreated={openCreatedPage} />
           }
           return (
-            <iframe key={cid} src={toolSrc(cid)} title={`Page ${cid}`} onLoad={(e) => onFrameLoad(cid, e.currentTarget)}
+            // data-melis-view-mode : lu DEPUIS l'iframe (react-bridge.js de MelisAICommunityExtensions
+            // remonte la chaîne des frameElement). En mode « Old » l'outil doit rester 100% legacy —
+            // le bouton « Generate with AI » rouvre alors l'ancienne popup mini-template au lieu du
+            // dialogue React. Attribut plutôt qu'un global : porté par CETTE instance d'outil, et
+            // réactif (le toggle le met à jour, il est relu au moment du clic).
+            <iframe key={cid} src={toolSrc(cid)} title={`Page ${cid}`} data-melis-view-mode={mode} onLoad={(e) => onFrameLoad(cid, e.currentTarget)}
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0, display: cid === current && !nativeTabActive ? 'block' : 'none', visibility: revealed.has(cid) ? 'visible' : 'hidden' }} />
           )
         })}
