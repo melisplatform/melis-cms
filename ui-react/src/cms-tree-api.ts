@@ -48,10 +48,13 @@ export async function deletePage(
       credentials: 'include',
     })
     const data = await res.json()
+    // Garde-fou : le backend peut renvoyer une CLÉ de traduction brute (tr_…) non traduite.
+    // On ne la propage pas telle quelle → l'appelant retombe sur son message localisé.
+    const raw = typeof data?.textMessage === 'string' ? data.textMessage : ''
     return {
       success: data?.success === 1 || data?.success === true,
       title: data?.textTitle,
-      message: data?.textMessage,
+      message: raw && !raw.startsWith('tr_') ? raw : undefined,
     }
   } catch {
     return { success: false }

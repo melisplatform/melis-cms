@@ -1444,7 +1444,23 @@ class PageController extends MelisAbstractActionController
             }
             else {
                 $textTitle = $translator->translate('tr_meliscms_page_success_Page_deleted2').' Page ' . $idPage;
-                $textMessage = 'tr_meliscms_page_error_Some errors occured while processing the request. Please find details bellow.';
+                // Message d'erreur CLAIR et TRADUIT : privilégier le motif précis remonté dans $errors
+                // (ex. « page ayant des pages enfants »), sinon message générique. Le code historique
+                // posait ici la CLÉ de traduction BRUTE (tr_meliscms_page_error_…), affichée telle quelle
+                // par le BO React (qui, contrairement au legacy JS, ne traduit pas les clés tr_).
+                $textMessage = '';
+                foreach ($errors as $err) {
+                    if (is_array($err)) {
+                        foreach ($err as $ek => $ev) {
+                            if ($ek !== 'label' && is_string($ev) && $ev !== '') { $textMessage = $ev; break 2; }
+                        }
+                    } elseif (is_string($err) && $err !== '') {
+                        $textMessage = $err; break;
+                    }
+                }
+                if ($textMessage === '') {
+                    $textMessage = $translator->translate('tr_meliscms_page_error_Some errors occured while processing the request. Please find details bellow.');
+                }
             }
         }
         else

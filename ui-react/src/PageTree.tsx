@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { deletePage, fetchTreeNodes, movePage, nodeCache, searchTreePages, type MelisTreeNode } from './cms-tree-api'
+import { peT } from './page-editor-i18n'
 
 /* ── Tiny inline icons (the brick can't use host Tailwind/lucide; SVG uses currentColor) ── */
 const sIcon = { width: 15, height: 15, flexShrink: 0 } as const
@@ -119,6 +120,7 @@ export interface PageTreeProps {
  * the matched word in the page name — like the legacy tree.
  */
 export default function PageTree({ selectedId, onSelect, onAction }: PageTreeProps) {
+  const tr = peT() // dictionnaire i18n partagé (référence stable → sûr hors deps des useCallback)
   const [childrenByParent, setChildrenByParent] = useState<Record<number, MelisTreeNode[]>>({})
   const [expanded, setExpanded] = useState<Set<number>>(new Set())
   const [loading, setLoading] = useState<Set<number>>(new Set())
@@ -133,6 +135,10 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
   childrenRef.current = childrenByParent
   // Right-click context menu (legacy "Site tree view" actions).
   const [menu, setMenu] = useState<{ x: number; y: number; node: MelisTreeNode } | null>(null)
+  // Modal React de confirmation de suppression (remplace window.confirm/alert natif).
+  const [delNode, setDelNode] = useState<MelisTreeNode | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const [delError, setDelError] = useState<string | null>(null)
   // Drag-to-reorder is LOCKED by default (an unlock icon enables it), like the legacy tree —
   // so pages aren't moved by accident. `drag` holds the in-flight drag (source + hovered drop).
   const [unlocked, setUnlocked] = useState(false)
@@ -313,17 +319,23 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
     }
   }, [menu])
 
-  // Delete a page (handled here because it must refresh the tree afterwards).
-  const handleDelete = useCallback(async (node: MelisTreeNode) => {
-    const ok = window.confirm(`Supprimer la page « ${node.melisData?.page_title || node.title} » ?`)
-    if (!ok) return
-    const res = await deletePage(node.key)
+  // Delete a page → ouvre la modal React de confirmation (plus de window.confirm natif).
+  const handleDelete = useCallback((node: MelisTreeNode) => {
+    setDelError(null); setDelNode(node)
+  }, [])
+  // Confirmation EFFECTIVE (bouton « Supprimer » de la modal) : supprime puis rafraîchit l'arbre.
+  const confirmDelete = useCallback(async () => {
+    if (!delNode || deleting) return
+    setDeleting(true); setDelError(null)
+    const res = await deletePage(delNode.key)
+    setDeleting(false)
     if (res.success) {
+      setDelNode(null)
       await reload()
     } else {
-      window.alert(res.message || 'La page n\'a pas pu être supprimée (elle a peut-être des sous-pages).')
+      setDelError(res.message || tr.deleteTreeFailed)
     }
-  }, [reload])
+  }, [delNode, deleting, reload, tr])
 
   const runAction = useCallback((action: CmsTreeAction | 'edit' | 'delete', node: MelisTreeNode) => {
     setMenu(null)
@@ -331,6 +343,14 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
     else if (action === 'delete') handleDelete(node)
     else onAction(action, node)
   }, [onSelect, onAction, handleDelete])
+
+  // Échap ferme la modal de suppression (sauf pendant la suppression en cours).
+  useEffect(() => {
+    if (!delNode) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !deleting) setDelNode(null) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [delNode, deleting])
 
   /* ── Drag-and-drop reorder (legacy /Page/movePage) ─────────────────────────── */
 
@@ -585,6 +605,43 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
               </div>
             ),
           )}
+        </div>,
+        document.body,
+      )}
+
+      {/* Modal React de confirmation de SUPPRESSION (remplace window.confirm/alert natif). */}
+      {delNode && createPortal(
+        <div
+          onClick={(e) => { if (e.target === e.currentTarget && !deleting) setDelNode(null) }}
+          style={{ position: 'fixed', inset: 0, zIndex: 100001, padding: 24, background: 'rgba(15,18,25,.55)', backdropFilter: 'blur(2px)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflow: 'auto' }}
+        >
+          <div style={{ width: 'min(440px, 96vw)', marginTop: '12vh', border: '1px solid var(--color-border)', background: 'var(--color-card,var(--color-background,#fff))', color: 'var(--color-foreground)', borderRadius: 14, boxShadow: '0 24px 70px rgba(0,0,0,.4)', overflow: 'hidden' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 18px', borderBottom: '1px solid var(--color-border)' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: 9, flexShrink: 0, background: 'color-mix(in srgb, var(--color-destructive,#c0392b) 14%, transparent)', color: 'var(--color-destructive,#c0392b)' }}>
+                <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6M14 11v6" />
+                </svg>
+              </span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 600, fontSize: 15 }}>{tr.deleteTitle}</div>
+                <div style={{ fontSize: 12, color: 'var(--color-muted-foreground)', marginTop: 1 }}>{tr.deleteIrreversible}</div>
+              </div>
+              <button onClick={() => { if (!deleting) setDelNode(null) }} title={tr.cancel} disabled={deleting} style={{ border: 'none', background: 'transparent', color: 'var(--color-muted-foreground)', cursor: deleting ? 'not-allowed' : 'pointer', fontSize: 18, lineHeight: 1, padding: 4 }}>✕</button>
+            </div>
+            {/* Body */}
+            <div style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 12, fontSize: 13.5 }}>
+              <div>{tr.deleteTreeBodyPre} <strong>« {delNode.melisData?.page_title || delNode.title} »</strong> ?</div>
+              {delError && (
+                <div style={{ padding: '8px 12px', borderRadius: 9, fontSize: 12.5, background: 'color-mix(in srgb, var(--color-destructive,#c0392b) 12%, transparent)', color: 'var(--color-destructive,#c0392b)', border: '1px solid color-mix(in srgb, var(--color-destructive,#c0392b) 40%, transparent)' }}>{delError}</div>
+              )}
+            </div>
+            {/* Footer */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 9, padding: '14px 18px', borderTop: '1px solid var(--color-border)', background: 'color-mix(in srgb, var(--color-foreground) 3%, transparent)' }}>
+              <button onClick={() => { if (!deleting) setDelNode(null) }} disabled={deleting} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 36, padding: '0 14px', borderRadius: 9, border: '1px solid var(--color-border)', background: 'var(--color-card,transparent)', color: 'var(--color-foreground)', fontSize: 13.5, fontWeight: 500, cursor: deleting ? 'not-allowed' : 'pointer' }}>{tr.cancel}</button>
+              <button onClick={confirmDelete} disabled={deleting} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, height: 36, padding: '0 16px', borderRadius: 9, border: 0, background: 'var(--color-destructive,#c0392b)', color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: deleting ? 'not-allowed' : 'pointer', opacity: deleting ? 0.65 : 1 }}>{deleting ? tr.deleting : tr.deleteBtn}</button>
+            </div>
+          </div>
         </div>,
         document.body,
       )}

@@ -183,6 +183,11 @@ const DICT: Record<PeLang, Record<string, string>> = {
     deleteBody3b: 'irréversible',
     deleteConfirm: 'Supprimer définitivement',
     deleting: 'Suppression…',
+    // ── PageTree : modale de suppression (clic droit de l'arbre) ──
+    deleteIrreversible: 'Cette action est irréversible.',
+    deleteTreeBodyPre: 'Supprimer définitivement la page',
+    deleteBtn: 'Supprimer',
+    deleteTreeFailed: 'La page n’a pas pu être supprimée (elle a peut-être des sous-pages).',
 
     // ── CmsPage : notify (titres) ──
     notifSave: 'Enregistrement',
@@ -386,6 +391,11 @@ const DICT: Record<PeLang, Record<string, string>> = {
     deleteBody3b: 'irreversible',
     deleteConfirm: 'Delete permanently',
     deleting: 'Deleting…',
+    // ── PageTree: delete modal (tree right-click) ──
+    deleteIrreversible: 'This action is irreversible.',
+    deleteTreeBodyPre: 'Permanently delete the page',
+    deleteBtn: 'Delete',
+    deleteTreeFailed: 'The page could not be deleted (it may have sub-pages).',
 
     // ── CmsPage: notify (titles) ──
     notifSave: 'Save',
