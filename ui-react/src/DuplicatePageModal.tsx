@@ -39,6 +39,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     saving: 'Duplication…',
     required: 'Champ obligatoire',
     fail: "Échec de la duplication de l'arborescence",
+    affected: 'Pages concernées :',
   },
   en: {
     title: 'Duplicate tree',
@@ -61,10 +62,27 @@ const DICT: Record<Lang, Record<string, string>> = {
     saving: 'Duplicating…',
     required: 'This field is required',
     fail: 'Failed to duplicate page tree',
+    affected: 'Affected pages:',
   },
 }
 function tr(key: string): string {
   return DICT[currentLang()][key] ?? key
+}
+
+/**
+ * Pages en conflit à afficher de façon compacte. Le backend renvoie `errors` comme un
+ * TABLEAU `[{ errorMessage, label:'Page X' }]` uniquement pour le conflit de version de
+ * langue (option « Relation ») ; les autres échecs (source/destination absente, validation
+ * de formulaire) renvoient un OBJET — déjà couvert par `textMessage`, donc on l'ignore ici.
+ * On dédoublonne et on retire le préfixe « Page » (le libellé de la liste le porte déjà).
+ */
+function affectedPages(errors: unknown): string[] {
+  if (!Array.isArray(errors)) return []
+  const labels = errors
+    .map((e) => (e && typeof e === 'object' ? String((e as { label?: string }).label ?? '') : ''))
+    .filter(Boolean)
+    .map((l) => l.replace(/^Page\s+/i, ''))
+  return Array.from(new Set(labels))
 }
 
 /* ── styles ── */
@@ -227,6 +245,7 @@ export default function DuplicatePageModal({ sourcePageId, sourceTitle, onClose,
   const [useRoot, setUseRoot] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [affected, setAffected] = useState<string[]>([])
   const [touched, setTouched] = useState(false)
 
   useEffect(() => {
@@ -251,6 +270,7 @@ export default function DuplicatePageModal({ sourcePageId, sourceTitle, onClose,
     if (invalid || submitting) return
     setSubmitting(true)
     setError(null)
+    setAffected([])
     const res = await duplicateTreePage({
       sourcePageId: srcId,
       langId: Number(langId),
@@ -266,6 +286,7 @@ export default function DuplicatePageModal({ sourcePageId, sourceTitle, onClose,
       onClose()
     } else {
       setError(res.message || tr('fail'))
+      setAffected(affectedPages(res.errors))
     }
   }
 
@@ -290,8 +311,13 @@ export default function DuplicatePageModal({ sourcePageId, sourceTitle, onClose,
         {/* Body */}
         <div style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 15 }}>
           {error && (
-            <div style={{ padding: '8px 12px', borderRadius: 9, fontSize: 12.5, background: 'color-mix(in srgb, var(--color-destructive,#c0392b) 12%, transparent)', color: 'var(--color-destructive,#c0392b)', border: '1px solid color-mix(in srgb, var(--color-destructive,#c0392b) 40%, transparent)' }}>
-              {error}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '8px 12px', borderRadius: 9, fontSize: 12.5, background: 'color-mix(in srgb, var(--color-destructive,#c0392b) 12%, transparent)', color: 'var(--color-destructive,#c0392b)', border: '1px solid color-mix(in srgb, var(--color-destructive,#c0392b) 40%, transparent)' }}>
+              <span>{error}</span>
+              {affected.length > 0 && (
+                <span style={{ fontSize: 11.5, opacity: 0.85 }}>
+                  <strong style={{ fontWeight: 600 }}>{tr('affected')}</strong> {affected.join(', ')}
+                </span>
+              )}
             </div>
           )}
 

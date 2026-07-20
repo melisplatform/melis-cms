@@ -724,15 +724,18 @@ class TreeSitesController extends MelisAbstractActionController
                                 $success = 1;
                                 $textMessage = $translator->translate('tr_meliscms_menu_dupe_success');
                             } else {
-                                $textMessage = $translator->translate('tr_meliscms_menu_dupe_fail');
+                                $textMessage = $translator->translate('tr_meliscms_menu_dupe_page_relation_initial_conflict');
                             }
 
 
                         } else {
-                            //Return errors
+                            // Conflit de version de langue : avec l'option « Relation avec une page initiale »,
+                            // on ne peut pas créer une version liée pour des pages qui possèdent DÉJÀ une version
+                            // dans la langue cible. Message principal explicite + liste des pages en conflit.
+                            $textMessage = sprintf($translator->translate('tr_meliscms_menu_dupe_page_relation_conflict'), $langLocale);
                             foreach ($parentDataLang as $key => $val) {
                                 $errors[] = [
-                                    'errorMessage' => $translator->translate('tr_meliscms_menu_dupe_page_relation_fail') . ' ' . $langLocale,
+                                    'errorMessage' => $translator->translate('tr_meliscms_menu_dupe_page_relation_fail'),
                                     'label' => 'Page ' . $val['pageId']
                                 ];
                             }
@@ -748,6 +751,7 @@ class TreeSitesController extends MelisAbstractActionController
                 } else {
                     // destination page not existing
                     if (empty($pageDestId)) {
+                        $textMessage = $translator->translate('tr_meliscms_menu_dupe_destination_fail');
                         $errors = [
                             'destinationPageId' => [
                                 'errorMessage' => $translator->translate('tr_meliscms_menu_dupe_destination_fail'),
@@ -756,6 +760,7 @@ class TreeSitesController extends MelisAbstractActionController
                         ];
                         // source page not existing
                     } else {
+                        $textMessage = $translator->translate('tr_meliscms_menu_dupe_source_fail');
                         $errors = [
                             'sourcePageId' => [
                                 'errorMessage' => $translator->translate('tr_meliscms_menu_dupe_source_fail'),
