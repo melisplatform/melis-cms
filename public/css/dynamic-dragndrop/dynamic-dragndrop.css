@@ -822,7 +822,10 @@ button:disabled.dnd-remove-button .fa-trash {
    the plugin's :hover drops and its box hides before it can be reached. Keep the topmost
    plugin's box inside the plugin so the pointer never leaves it. Later rows have the
    previous row above them, no overlap, and must keep top:-40px. */
-.melis-dragdropzone > .dnd-plugins-row:first-child > .dnd-plugins-col-12:first-child > .melis-ui-outlined:first-child > .melis-plugin-tools-box {
+/* Two DOM shapes exist: with a DND layout the plugin is wrapped in a row/col pair,
+   without one it is a direct child of .melis-dragdropzone. Cover both. */
+.melis-dragdropzone > .melis-ui-outlined:first-child > .melis-plugin-tools-box,
+.melis-dragdropzone > .dnd-plugins-row:first-child > [class*="dnd-plugins-col"]:first-child > .melis-ui-outlined:first-child > .melis-plugin-tools-box {
     top: 0;
 }
 /* center content vertically */
