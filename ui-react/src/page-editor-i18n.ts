@@ -190,17 +190,20 @@ const DICT: Record<PeLang, Record<string, string>> = {
     notifUnpublish: 'Dépublication',
     notifDraft: 'Brouillon',
     notifDelete: 'Suppression',
+    notifDuplicate: 'Duplication',
     // ── CmsPage : notify (corps) ──
     pageSaved: 'La page a été enregistrée.',
     pagePublished: 'La page a été publiée.',
     pageUnpublished: 'La page a été dépubliée.',
     draftCleared: 'Le brouillon a été effacé.',
     pageDeleted: 'La page a été supprimée.',
+    pageDuplicated: 'La page a été dupliquée.',
     saveFailed: 'L’enregistrement a échoué.',
     publishFailed: 'La publication a échoué.',
     unpublishFailed: 'La dépublication a échoué.',
     draftFailed: 'L’opération a échoué.',
     deleteFailedMsg: 'La suppression a échoué.',
+    duplicateFailed: 'La duplication a échoué.',
     pageUnlocked: 'Page débloquée.',
 
     // ── CmsPage : divers ──
@@ -390,17 +393,20 @@ const DICT: Record<PeLang, Record<string, string>> = {
     notifUnpublish: 'Unpublication',
     notifDraft: 'Draft',
     notifDelete: 'Deletion',
+    notifDuplicate: 'Duplication',
     // ── CmsPage: notify (bodies) ──
     pageSaved: 'The page has been saved.',
     pagePublished: 'The page has been published.',
     pageUnpublished: 'The page has been unpublished.',
     draftCleared: 'The draft has been cleared.',
     pageDeleted: 'The page has been deleted.',
+    pageDuplicated: 'The page has been duplicated.',
     saveFailed: 'Save failed.',
     publishFailed: 'Publication failed.',
     unpublishFailed: 'Unpublication failed.',
     draftFailed: 'The operation failed.',
     deleteFailedMsg: 'Deletion failed.',
+    duplicateFailed: 'Duplication failed.',
     pageUnlocked: 'Page unlocked.',
 
     // ── CmsPage: misc ──

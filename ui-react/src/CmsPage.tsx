@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ViewToggle, type ViewMode } from './ViewToggle'
 import NewPageView from './NewPageView'
-import DuplicatePageModal from './DuplicatePageModal'
 import {
   PropertiesTab, SeoTab, LanguagesTab, HistoricTab, AnalyticsTab, ScriptsTab, VersioningTab, CommentsTab,
   apiGet, apiPost, type PropsData, type SeoData, type Refs,
@@ -178,7 +177,6 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   const [unlockOpen, setUnlockOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false) // modal React de confirmation de suppression
   const [clearOpen, setClearOpen] = useState(false) // modal React de confirmation d'effacement du brouillon
-  const [dupOpen, setDupOpen] = useState(false) // modal React de duplication (même que le clic droit de l'arbre)
   const [wfOpen, setWfOpen] = useState(false) // modal Workflow (mutualisée, fournie par melis-small-business)
   const [unlocking, setUnlocking] = useState(false)
   const [, bumpTabs] = useState(0)
@@ -507,6 +505,37 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     navigate(path)
   }, [current, navigate])
 
+  // Dupliquer (« Dupliquer ») → réplique EXACTEMENT le bouton toolbar LEGACY (page-duplicate.tool.js) :
+  // POST direct « page seule » sur PageDuplication/duplicate-page (duplique UNIQUEMENT la page courante,
+  // SANS ses sous-pages), puis ouvre la page dupliquée. NE PAS confondre avec la modal d'arborescence du
+  // clic droit du tree (TreeSites/duplicateTreePage), qui elle recopie toute la descendance.
+  const doDuplicate = useCallback(async () => {
+    if (!current) return
+    setSaving(true)
+    try {
+      const res = await fetch('/melis/MelisCms/PageDuplication/duplicate-page', {
+        method: 'POST', credentials: 'same-origin',
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+        body: new URLSearchParams({ id: String(current) }).toString(),
+      })
+      const data = await res.json().catch(() => ({})) as LegacyResp & { pageId?: number | string; response?: { pageId?: number | string; name?: string; openPageAfterDuplicate?: boolean } }
+      if (data.success === 1) {
+        const newId = data.response?.pageId ?? data.pageId
+        if (newId && data.response?.openPageAfterDuplicate !== false) {
+          const editPath = `/melis-cms/page/${newId}`
+          const label = (data.response?.name || `${tr.pageWord} ${newId}`).trim()
+          ;(window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void }).__melisOpenTab?.({ id: editPath, label, path: editPath })
+          navigate(editPath)
+        }
+        window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: newId ? Number(newId) : undefined } })) // fait apparaître la copie dans l'arbre
+        window.dispatchEvent(new CustomEvent('melis:cms-historic-refresh'))
+        notify('ok', (data.textTitle || tr.notifDuplicate).trim(), data.textMessage || tr.pageDuplicated)
+      } else {
+        notify('ko', (data.textTitle || tr.notifDuplicate).trim(), data.textMessage || tr.duplicateFailed, errorFields(data))
+      }
+    } catch (e) { notify('ko', tr.notifDuplicate, (e as Error).message) } finally { setSaving(false) }
+  }, [current, navigate])
+
   // Distinguer par la CLÉ (le cap 'save' est partagé par Sauvegarder ET Effacer brouillon pour le gating,
   // mais leurs ACTIONS diffèrent : seul le vrai bouton Save déclenche la sauvegarde globale).
   // Déverrouillage NATIF React (pas lié à l'édition) : endpoint modulaire + refresh de l'état verrou.
@@ -537,10 +566,10 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     if (b.key.endsWith('action_clear')) { setClearOpen(true); return }       // Effacer brouillon → modal React de confirmation
     if (b.key.endsWith('action_delete')) { setDeleteOpen(true); return }     // Supprimer page → modal React de confirmation
     if (b.key.endsWith('action_new')) { openNewPage(); return }             // Nouvelle page → route React de création
-    if (b.key.endsWith('action_duplicate')) { setDupOpen(true); return }    // Dupliquer → MÊME modal React que le clic droit de l'arbre
+    if (b.key.endsWith('action_duplicate')) { await doDuplicate(); return } // Dupliquer → POST « page seule » (legacy), PAS l'arborescence
     if (b.key.includes('workflow')) { setWfOpen(true); return }             // Flux de travail → modal Workflow mutualisée (small-business)
     driveButton(b.key)                                                       // Voir/Affichage → pilotage iframe legacy
-  }, [saveAll, doPublish, doClear, openNewPage, driveButton])
+  }, [saveAll, doPublish, doClear, openNewPage, doDuplicate, driveButton])
 
   useEffect(() => { if (!current) return; const f = frameRef.current[current]; if (f) applyIframeChrome(f) }, [current, applyIframeChrome])
 
@@ -784,16 +813,6 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
             </div>
           </div>
         </div>
-      )}
-
-      {/* Modal React de DUPLICATION — identique au clic droit « Dupliquer » de l'arbre */}
-      {dupOpen && current && !isCreation && (
-        <DuplicatePageModal
-          sourcePageId={Number(current)}
-          sourceTitle={header?.pageName || `Page ${current}`}
-          onClose={() => setDupOpen(false)}
-          onDone={() => { window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh')); window.dispatchEvent(new CustomEvent('melis:cms-historic-refresh')) }}
-        />
       )}
 
       {/* Modal WORKFLOW — MUTUALISÉE : composant fourni par melis-small-business via window.__melisWorkflowModal
