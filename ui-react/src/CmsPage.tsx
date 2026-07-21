@@ -492,11 +492,17 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         notify('ok', (data.textTitle || tr.notifDelete).trim(), tr.pageDeleted)
         setDeleteOpen(false)
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh'))
+        // Fermer l'onglet ne NAVIGUE pas (contrairement au bouton X de la Topbar). Sans navigation,
+        // l'URL resterait sur la page supprimée — dont l'iframe vient d'être retirée de `opened` →
+        // contenu blanc (ticket 0010702). On bascule d'abord vers une autre page encore ouverte
+        // (ou le dashboard s'il n'en reste aucune), PUIS on ferme l'onglet, comme openCreatedPage.
+        const rest = openedRef.current.filter((x) => x !== current && x !== 'new' && !x.startsWith('new~'))
+        navigate(rest.length ? `/melis-cms/page/${rest[rest.length - 1]}` : '/')
         ;(window as unknown as { __melisCloseTab?: (id: string) => void }).__melisCloseTab?.(`/melis-cms/page/${current}`)
         setOpened((o) => o.filter((x) => x !== current))
       } else notify('ko', (data.textTitle || tr.notifDelete).trim(), data.textMessage || tr.deleteFailedMsg)
     } catch (e) { notify('ko', tr.notifDelete, (e as Error).message) } finally { setSaving(false) }
-  }, [current])
+  }, [current, navigate])
 
   // Nouvelle page (« Nouvelle page ») → route React de création, en enfant de la page courante.
   const openNewPage = useCallback(() => {
