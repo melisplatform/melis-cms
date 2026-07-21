@@ -906,7 +906,11 @@ var melisCms = (function() {
 				sidebarWidth = 0;
 
 			if (!sidebarStatus) {
-				sidebarWidth = $("#id_meliscore_leftmenu").outerWidth();
+				// Ticket 0010531 — en vue « old » React (react-tool-page), le leftmenu n'existe pas :
+				// outerWidth() renvoie undefined → largeur NaN → la barre sticky rétrécit au contenu
+				// (coupée après le dernier bouton). Défaut 0 → largeur pleine. En /melis le leftmenu
+				// existe → sa largeur réelle est conservée (comportement inchangé).
+				sidebarWidth = $("#id_meliscore_leftmenu").outerWidth() || 0;
 			}
 
 			var activateFixed = $("#" + activeTabId + " div.page-title").outerHeight();
@@ -928,7 +932,11 @@ var melisCms = (function() {
 			var sidebarStatus = $("body").hasClass("sidebar-mini");
 			var sidebarWidth = 0;
 			if (!sidebarStatus) {
-				sidebarWidth = $("#id_meliscore_leftmenu").outerWidth();
+				// Ticket 0010531 — en vue « old » React (react-tool-page), le leftmenu n'existe pas :
+				// outerWidth() renvoie undefined → largeur NaN → la barre sticky rétrécit au contenu
+				// (coupée après le dernier bouton). Défaut 0 → largeur pleine. En /melis le leftmenu
+				// existe → sa largeur réelle est conservée (comportement inchangé).
+				sidebarWidth = $("#id_meliscore_leftmenu").outerWidth() || 0;
 			}
 
 			// var currentTitle = Math.abs($("#"+ activeTabId + " div.page-title").offset().top);
