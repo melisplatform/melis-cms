@@ -683,3 +683,93 @@ function adjustLayoutButtonMargins() {
 
 // run on load and resize
 $(window).on("load resize", adjustLayoutButtonMargins);
+
+/* ============================================================================
+ * Ticket 0010694 — le « right menu » (panneau drag'n'drop) doit SUIVRE le scroll en BO REACT.
+ * Contexte : dans le nouveau BO React, l'edition est rendue dans une iframe standalone
+ * (/melis/react-tool-page). La canvas iframe est en PLEINE HAUTEUR et c'est le documentElement
+ * de la tool-page (window.parent) qui scrolle → `.melis-cms-dnd-box` (position:fixed dans la
+ * canvas) reste collee au haut de la canvas pleine hauteur et « scrolle away ». On re-epingle
+ * donc le menu au haut VISIBLE (top = scrollTop du parent) au scroll/resize.
+ *
+ * - Gate STRICT sur react-tool-page → le BO legacy standalone garde le comportement d'origine
+ *   (dragndrop.js:pluginScrollPos), INCHANGE. La vue « Old » React passe aussi par react-tool-page
+ *   → couverte.
+ * - Place ici (et non dans dragndrop.js) car dynamic-dragndrop.js est charge avec `?v=<time>`
+ *   (toujours frais) alors que dragndrop.js est charge SANS version → sinon le fix reste en
+ *   cache navigateur cote client (cause du « toujours rien »).
+ * ============================================================================ */
+$(function () {
+	var inReactToolPage = false;
+	try {
+		inReactToolPage = /react-tool-page/.test(
+			(window.parent && window.parent.location && window.parent.location.href) || ""
+		);
+	} catch (e) {}
+	if (!inReactToolPage) return;
+
+	function parentScrollTop() {
+		try {
+			var pdoc = window.parent.document;
+			return (
+				window.parent.pageYOffset ||
+				(pdoc.documentElement && pdoc.documentElement.scrollTop) ||
+				(pdoc.body && pdoc.body.scrollTop) ||
+				0
+			);
+		} catch (e) { return 0; }
+	}
+
+	// Recale le menu au haut VISIBLE. `top` uniquement quand la valeur change (evite tout
+	// reflow inutile). Le legacy `pluginScrollPos` (dragndrop.js) peut aussi ecrire `top` sur
+	// le meme element ; la boucle rAF ci-dessous repasse a la frame suivante → on gagne toujours.
+	var lastTop = -1, lastH = -1;
+	function pin() {
+		var box = document.querySelector(".melis-cms-dnd-box");
+		if (!box) return;
+		var st = parentScrollTop();
+		if (st !== lastTop) { box.style.top = st + "px"; lastTop = st; }
+		var h = 0;
+		try { h = window.parent.innerHeight || box.offsetHeight; } catch (e) { h = box.offsetHeight; }
+		if (h && h !== lastH) { box.style.height = h + "px"; lastH = h; }
+	}
+
+	// Boucle rAF ACTIVE pendant le scroll : recale a CHAQUE frame (peinture) → aucun retard
+	// perceptible meme en defilement a inertie, et sur les navigateurs ou l'event `scroll`
+	// n'est pas cale sur la frame (Firefox/Safari). S'auto-arrete apres ~450ms sans scroll.
+	var running = false, lastActivity = 0;
+	function loop() {
+		pin();
+		var now = (window.performance && performance.now) ? performance.now() : +new Date();
+		if (now - lastActivity < 450) {
+			requestAnimationFrame(loop);
+		} else {
+			running = false;
+			pin(); // recalage final
+		}
+	}
+	function kick() {
+		lastActivity = (window.performance && performance.now) ? performance.now() : +new Date();
+		if (!running) { running = true; requestAnimationFrame(loop); }
+	}
+
+	// Sources d'activite : scroll/molette/tactile/resize du parent (le vrai conteneur de scroll)
+	// ET du document local, en natif passif (fiable) + jQuery en secours.
+	try {
+		var opt = { passive: true, capture: true };
+		window.parent.addEventListener("scroll", kick, opt);
+		window.parent.addEventListener("wheel", kick, opt);
+		window.parent.addEventListener("touchmove", kick, opt);
+		window.parent.addEventListener("resize", kick, opt);
+		window.parent.document.addEventListener("scroll", kick, opt);
+	} catch (e) {}
+	try { $(window.parent).on("scroll resize wheel", kick); } catch (e) {}
+	try { window.parent.$("body").on("scroll wheel touchmove", kick); } catch (e) {}
+
+	// Recalages initiaux : la canvas passe en pleine hauteur ~1-3s apres le load (melisCms.js),
+	// ce qui deplace le referentiel → on epingle plusieurs fois au demarrage.
+	pin();
+	[0, 100, 300, 600, 1000, 1600, 2600, 3600].forEach(function (ms) {
+		setTimeout(pin, ms);
+	});
+});
