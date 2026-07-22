@@ -70,10 +70,33 @@ ul.meliscms-site-domains-list > li,
 ul.meliscms-site-domains-list > li:hover {
     border: 0 solid #e61c23 !important;
 }
-.page-content-container .nav-tabs.meliscms-site-domains-list li.active > a,
-.page-content-container .nav-tabs.meliscms-site-domains-list > li.active:focus > a,
-.page-content-container .nav-tabs.meliscms-site-domains-list > li.active:active > a {
-    border: 0 solid #e61c23 !important;
+/* MÊME correctif que la liste homepage/config (cf. plus bas) : Bootstrap laisse un `.active`
+   périmé sur le 1er <li> au chargement → on neutralise tout <a> d'un <li.active> (boîte grise
+   inactive) puis on colore UNIQUEMENT le vrai <a.nav-link.active>. Sans ça, en vue OLD-VIEW
+   (iframe) où melis-core/styles.css n'est pas chargé, l'onglet cliqué n'a AUCUN style → texte
+   blanc invisible / boîte blanche (ticket : clic sur un domaine le rend invisible). Reproduit le
+   look natif → inoffensif en full legacy /melis. */
+ul.meliscms-site-domains-list li.active > a {
+    background: #ecebeb !important;
+    color: #7d7b7b !important;
+    border: 1px solid transparent !important;
+    border-radius: 4px !important;
+    font-weight: normal !important;
+}
+ul.meliscms-site-domains-list li.active > a span,
+ul.meliscms-site-domains-list li.active > a i {
+    color: #7d7b7b !important;
+}
+ul.meliscms-site-domains-list .nav-link.active {
+    background: #e61c23 !important;
+    border: 1px solid #e61c23 !important;
+    border-radius: 4px !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+ul.meliscms-site-domains-list .nav-link.active span,
+ul.meliscms-site-domains-list .nav-link.active i {
+    color: #fff !important;
 }
 
 /** SITE V2 PROPERTIES **/
