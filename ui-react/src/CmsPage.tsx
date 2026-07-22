@@ -525,14 +525,15 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   // POST direct « page seule » sur PageDuplication/duplicate-page (duplique UNIQUEMENT la page courante,
   // SANS ses sous-pages), puis ouvre la page dupliquée. NE PAS confondre avec la modal d'arborescence du
   // clic droit du tree (TreeSites/duplicateTreePage), qui elle recopie toute la descendance.
-  const doDuplicate = useCallback(async () => {
-    if (!current) return
+  const doDuplicate = useCallback(async (sourceId?: number | string) => {
+    const srcId = sourceId ?? current
+    if (!srcId) return
     setSaving(true)
     try {
       const res = await fetch('/melis/MelisCms/PageDuplication/duplicate-page', {
         method: 'POST', credentials: 'same-origin',
         headers: { 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-        body: new URLSearchParams({ id: String(current) }).toString(),
+        body: new URLSearchParams({ id: String(srcId) }).toString(),
       })
       const data = await res.json().catch(() => ({})) as LegacyResp & { pageId?: number | string; response?: { pageId?: number | string; name?: string; openPageAfterDuplicate?: boolean } }
       if (data.success === 1) {
@@ -635,7 +636,26 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
       }, true)
     } catch { /* */ }
   }
-  function onFrameLoad(cid: string, iframe: HTMLIFrameElement) { frameRef.current[cid] = iframe; hookNewPage(iframe); applyIframeChrome(iframe); setRevealed((s) => s.has(cid) ? s : new Set(s).add(cid)); if (cid === current && activeTab && !isNativeTab(activeTab)) driveTab(activeTab) }
+  // Vue « Old » : le bouton Dupliquer legacy (a.melis-pageduplicate → page-duplicate.tool.js) crée bien
+  // la copie mais son handler de succès appelle melisCms.refreshTreeview() qui PLANTE dans la react-tool-page
+  // (aucun arbre → « reading 'ext' ») → l'erreur avorte le reste (tabOpen/notif jamais exécutés) : la page
+  // dupliquée reste invisible et ne s'ouvre pas. On intercepte donc le clic (capture, comme hookNewPage) et
+  // on rejoue le flux REACT doDuplicate (POST + onglet React + refresh arbre React). Le full legacy /melis
+  // n'a PAS d'iframe react-tool-page → hook jamais posé là → comportement legacy inchangé.
+  function hookDuplicate(iframe: HTMLIFrameElement) {
+    try {
+      const doc = iframe.contentDocument as (Document & { __melisDuplicateHooked?: boolean }) | null
+      if (!doc || doc.__melisDuplicateHooked) return
+      doc.__melisDuplicateHooked = true
+      doc.addEventListener('click', (ev) => {
+        const btn = (ev.target as HTMLElement)?.closest?.('a.melis-pageduplicate') as HTMLElement | null
+        if (!btn) return
+        ev.preventDefault(); ev.stopImmediatePropagation()
+        void doDuplicate(btn.getAttribute('data-pagenumber') || undefined)
+      }, true)
+    } catch { /* */ }
+  }
+  function onFrameLoad(cid: string, iframe: HTMLIFrameElement) { frameRef.current[cid] = iframe; hookNewPage(iframe); hookDuplicate(iframe); applyIframeChrome(iframe); setRevealed((s) => s.has(cid) ? s : new Set(s).add(cid)); if (cid === current && activeTab && !isNativeTab(activeTab)) driveTab(activeTab) }
 
   useEffect(() => { const onDoc = () => setOpenMenu(null); if (openMenu) { document.addEventListener('click', onDoc); return () => document.removeEventListener('click', onDoc) } }, [openMenu])
 
