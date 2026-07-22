@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { fetchTreeNodes, type MelisTreeNode } from './cms-tree-api'
+import { peT } from './page-editor-i18n'
 
 /**
  * Sélecteur de page (id) — réutilise l'arbre lazy legacy
@@ -12,6 +13,7 @@ const box: React.CSSProperties = { borderRadius: 8, border: '1px solid var(--col
 const btn: React.CSSProperties = { display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, height: 36, width: '100%', padding: '0 10px', cursor: 'pointer', fontSize: 14, ...box }
 
 function Node({ node, depth, onPick }: { node: MelisTreeNode; depth: number; onPick: (id: number, title: string) => void }) {
+  const tr = peT()
   const [open, setOpen] = useState(false)
   const [children, setChildren] = useState<MelisTreeNode[] | null>(null)
   const [loading, setLoading] = useState(false)
@@ -33,7 +35,7 @@ function Node({ node, depth, onPick }: { node: MelisTreeNode; depth: number; onP
         <button
           onClick={toggle}
           style={{ width: 18, height: 18, border: 0, background: 'transparent', cursor: node.lazy ? 'pointer' : 'default', color: 'var(--color-muted-foreground,#6b7280)', fontSize: 11 }}
-          title={node.lazy ? 'Déplier' : ''}
+          title={node.lazy ? tr.expand : ''}
         >{node.lazy ? (open ? '▾' : '▸') : '·'}</button>
         <button
           onClick={() => onPick(node.key, node.title)}
@@ -56,6 +58,7 @@ export function PagePicker({ value, title, onChange, placeholder }: {
   onChange: (id: number, title: string) => void
   placeholder?: string
 }) {
+  const tr = peT()
   const [open, setOpen] = useState(false)
   const [roots, setRoots] = useState<MelisTreeNode[] | null>(null)
   const ref = useRef<HTMLDivElement>(null)
@@ -71,7 +74,7 @@ export function PagePicker({ value, title, onChange, placeholder }: {
     if (roots === null) setRoots(await fetchTreeNodes(-1))
   }
 
-  const display = value ? (title || `Page #${value}`) : (placeholder || '— choisir une page —')
+  const display = value ? (title || `Page #${value}`) : (placeholder || tr.pickPage)
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
@@ -82,9 +85,9 @@ export function PagePicker({ value, title, onChange, placeholder }: {
       {open && (
         <div style={{ ...box, position: 'absolute', zIndex: 60, top: 40, left: 0, right: 0, maxHeight: 320, overflow: 'auto', boxShadow: '0 8px 24px rgba(0,0,0,.12)', padding: 6 }}>
           {roots === null ? (
-            <div style={{ padding: 12, fontSize: 13, color: 'var(--color-muted-foreground)' }}>Chargement…</div>
+            <div style={{ padding: 12, fontSize: 13, color: 'var(--color-muted-foreground)' }}>{tr.loading}</div>
           ) : roots.length === 0 ? (
-            <div style={{ padding: 12, fontSize: 13, color: 'var(--color-muted-foreground)' }}>Aucune page</div>
+            <div style={{ padding: 12, fontSize: 13, color: 'var(--color-muted-foreground)' }}>{tr.noPage}</div>
           ) : roots.map((n) => (
             <Node key={n.key} node={n} depth={0} onPick={(id, t) => { onChange(id, t); setOpen(false) }} />
           ))}

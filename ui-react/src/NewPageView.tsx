@@ -50,9 +50,9 @@ export default function NewPageView({ father, visible, onCreated }: { father: st
   }, [father])
 
   const create = useCallback(async () => {
-    if (!form.name.trim()) { setErr('Le nom de la page est requis.'); return }
-    if (!form.templateId) { setErr('Le template est requis.'); return }
-    if (!form.langId) { setErr('La langue est requise.'); return }
+    if (!form.name.trim()) { setErr(tr.errNameRequired); return }
+    if (!form.templateId) { setErr(tr.errTemplateRequired); return }
+    if (!form.langId) { setErr(tr.errLangRequired); return }
     setSaving(true); setErr(null)
     try {
       const b = new URLSearchParams()
@@ -72,13 +72,13 @@ export default function NewPageView({ father, visible, onCreated }: { father: st
       })
       const data = await res.json().catch(() => ({})) as { success?: number; textTitle?: string; textMessage?: string; errors?: unknown; datas?: { idPage?: number | string; item_name?: string } }
       if (data.success === 1 && data.datas?.idPage) {
-        notify('ok', (data.textTitle || 'Nouvelle page').trim(), 'La page a été créée.')
+        notify('ok', (data.textTitle || tr.newPage).trim(), tr.pageCreated)
         onCreated(data.datas.idPage, (data.datas.item_name || form.name).trim())
       } else {
         // Détail des erreurs de champ (cf. legacy-errors.ts : le legacy a plusieurs formes d'`errors`).
         const fields = legacyErrorFields(data.errors, tr.errorField)
         const generic = legacyText(data.textMessage, tr.createFailed)
-        notify('ko', (data.textTitle || 'Nouvelle page').trim(), fields.length ? tr.fixErrorsBelow : generic, fields)
+        notify('ko', (data.textTitle || tr.newPage).trim(), fields.length ? tr.fixErrorsBelow : generic, fields)
         setErr(fields.length ? fields.map((f) => `${f.label} : ${f.messages.join(', ')}`).join(' · ') : generic)
       }
     } catch (e) { setErr((e as Error).message) } finally { setSaving(false) }
@@ -89,46 +89,46 @@ export default function NewPageView({ father, visible, onCreated }: { father: st
       {/* En-tête : titre + toggle New/Old (indépendant de l'éditeur) */}
       <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '8px 16px', borderBottom: '1px solid var(--color-border,#e5e7eb)' }}>
         <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--color-foreground,#111827)' }}>
-          Nouvelle page{father ? <span style={{ fontWeight: 400, fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}> — sous la page {father}</span> : ''}
+          {tr.newPage}{father ? <span style={{ fontWeight: 400, fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}> — {tr.underPage} {father}</span> : ''}
         </span>
         <ViewToggle mode={mode} onChange={setMode} />
       </div>
 
       <div style={{ position: 'relative', flex: '1 1 auto', minHeight: 0, overflow: 'auto' }}>
         {mode === 'iframe' ? (
-          <iframe title="Nouvelle page (legacy)" src={`/melis/react-tool-page?key=meliscms_page_creation&idPage=0&idFatherPage=${encodeURIComponent(father)}`}
+          <iframe title={tr.newPageLegacy} src={`/melis/react-tool-page?key=meliscms_page_creation&idPage=0&idFatherPage=${encodeURIComponent(father)}`}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }} />
         ) : !refs ? (
-          <div style={{ padding: 20, color: 'var(--color-muted-foreground,#6b7280)' }}>Chargement…</div>
+          <div style={{ padding: 20, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.loading}</div>
         ) : (
           <div style={{ padding: 20, maxWidth: 640 }}>
-            <label style={label}>Nom *</label>
-            <input style={field} value={form.name} onChange={(e) => set('name', e.target.value)} autoFocus placeholder="Nom de la page" />
+            <label style={label}>{tr.name} *</label>
+            <input style={field} value={form.name} onChange={(e) => set('name', e.target.value)} autoFocus placeholder={tr.namePlaceholder} />
 
-            <label style={label}>Type *</label>
+            <label style={label}>{tr.type} *</label>
             <select style={field} value={form.type} onChange={(e) => set('type', e.target.value)}>{refs.types.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}</select>
 
-            <label style={label}>Template *</label>
-            <select style={field} value={form.templateId} onChange={(e) => set('templateId', Number(e.target.value))}><option value={0}>Choisissez</option>{refs.templates.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.id})</option>)}</select>
+            <label style={label}>{tr.template} *</label>
+            <select style={field} value={form.templateId} onChange={(e) => set('templateId', Number(e.target.value))}><option value={0}>{tr.choose}</option>{refs.templates.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.id})</option>)}</select>
 
-            <label style={label}>Langue *</label>
-            <FlagSelect value={form.langId} onChange={(id) => set('langId', id)} options={refs.languages} placeholder="Choisissez" />
+            <label style={label}>{tr.language} *</label>
+            <FlagSelect value={form.langId} onChange={(id) => set('langId', id)} options={refs.languages} placeholder={tr.choose} />
 
-            <label style={label}>Affichage menu *</label>
+            <label style={label}>{tr.menuDisplay} *</label>
             <select style={field} value={form.menu} onChange={(e) => set('menu', e.target.value)}>{refs.menus.map((m) => <option key={m} value={m}>{m}</option>)}</select>
 
-            <label style={label}>Style</label>
-            <select style={field} value={form.styleId} onChange={(e) => set('styleId', Number(e.target.value))}><option value={0}>Choisissez</option>{refs.styles.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</select>
+            <label style={label}>{tr.style}</label>
+            <select style={field} value={form.styleId} onChange={(e) => set('styleId', Number(e.target.value))}><option value={0}>{tr.choose}</option>{refs.styles.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</select>
 
-            <label style={label}>Taxonomie</label>
-            <input style={field} value={form.taxonomy} onChange={(e) => set('taxonomy', e.target.value)} placeholder="Séparez les mots-clefs avec une virgule" />
+            <label style={label}>{tr.taxonomy}</label>
+            <input style={field} value={form.taxonomy} onChange={(e) => set('taxonomy', e.target.value)} placeholder={tr.taxonomyPlaceholder} />
 
             {err && <div style={{ marginTop: 14, padding: '8px 12px', borderRadius: 6, fontSize: 13, background: '#fee2e2', color: '#991b1b' }}>{err}</div>}
 
             <div style={{ marginTop: 18 }}>
               <button className="melis-pgbtn" onClick={create} disabled={saving}
                 style={{ appearance: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, height: 34, padding: '0 16px', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', border: 0, background: 'var(--color-primary,#dc2626)', color: '#fff', opacity: saving ? 0.6 : 1 }}>
-                {saving ? 'Création…' : 'Créer la page'}
+                {saving ? tr.creating : tr.createPage}
               </button>
             </div>
           </div>

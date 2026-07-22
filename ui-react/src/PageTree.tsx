@@ -480,10 +480,10 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
               {nodeIcon(node.melisData?.page_type)}
             </span>
             {hasDraft && (
-              <span title="Brouillon non publié" style={{ width: 6, height: 6, borderRadius: 999, background: '#f59e0b', flexShrink: 0 }} />
+              <span title={tr.unpublishedDraft} style={{ width: 6, height: 6, borderRadius: 999, background: '#f59e0b', flexShrink: 0 }} />
             )}
             {node.locked && (
-              <span title="Page verrouillée (en cours d'édition par un autre utilisateur)"
+              <span title={tr.lockedTip}
                 style={{ display: 'inline-flex', flexShrink: 0, color: 'var(--color-muted-foreground)' }}>
                 <LockIcon />
               </span>
@@ -511,7 +511,7 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Rechercher…"
+          placeholder={tr.searchPlaceholder}
           style={{
             flex: 1, minWidth: 0, padding: '6px 10px', fontSize: 13, borderRadius: 6,
             border: '1px solid var(--color-border)', background: 'var(--color-background, transparent)',
@@ -520,7 +520,7 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
         />
         <button
           onClick={clearAndReload}
-          title="Rafraîchir"
+          title={tr.refresh}
           style={{
             padding: '0 10px', borderRadius: 6, border: '1px solid var(--color-border)',
             background: 'transparent', color: 'var(--color-foreground)', cursor: 'pointer',
@@ -530,7 +530,7 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
         </button>
         <button
           onClick={() => setUnlocked((u) => !u)}
-          title={unlocked ? 'Verrouiller le glisser-déposer (réorganisation)' : 'Déverrouiller le glisser-déposer (réorganisation)'}
+          title={tr.toggleDndTip}
           aria-pressed={unlocked}
           style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -547,13 +547,13 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
       <div ref={treeRef} style={{ flex: 1, minHeight: 0, overflow: 'auto', padding: 6 }}>
         {searching && search.notFound && (
           <div style={{ padding: '6px 8px', marginBottom: 4, fontSize: 12, color: 'var(--color-muted-foreground)' }}>
-            Aucune page ne correspond à « {query.trim()} ».
+            {tr.noPageMatchPre} « {query.trim()} ».
           </div>
         )}
         {rootLoading ? (
-          <div style={{ padding: 12, fontSize: 13, color: 'var(--color-muted-foreground)' }}>Chargement de l'arbre…</div>
+          <div style={{ padding: 12, fontSize: 13, color: 'var(--color-muted-foreground)' }}>{tr.loadingTree}</div>
         ) : roots.length === 0 ? (
-          <div style={{ padding: 12, fontSize: 13, color: 'var(--color-muted-foreground)' }}>Aucune page.</div>
+          <div style={{ padding: 12, fontSize: 13, color: 'var(--color-muted-foreground)' }}>{tr.noPage}</div>
         ) : (
           renderLevel(-1, 0)
         )}
@@ -576,15 +576,15 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
           }}
         >
           {([
-            { key: 'new',    label: 'Nouvelle page', icon: ICONS.new },
-            { key: 'edit',   label: 'Éditer',        icon: ICONS.edit },
-            { key: 'dupe',   label: 'Dupliquer',     icon: ICONS.dupe },
+            { key: 'new',    label: tr.newPage,   icon: ICONS.new },
+            { key: 'edit',   label: tr.edit,      icon: ICONS.edit },
+            { key: 'dupe',   label: tr.duplicate, icon: ICONS.dupe },
             // Masqués temporairement (peu utilisés en réel) — code conservé pour réactivation future.
             // L'action runAction('export'/'import') et ICONS.export/import restent en place.
             // { key: 'export', label: 'Exporter',      icon: ICONS.export },
             // { key: 'import', label: 'Importer',      icon: ICONS.import },
             { key: 'sep' },
-            { key: 'delete', label: 'Supprimer',     icon: ICONS.delete, danger: true },
+            { key: 'delete', label: tr.deleteBtn, icon: ICONS.delete, danger: true },
           ] as Array<{ key: string; label?: string; icon?: React.ReactNode; danger?: boolean }>).map((it) =>
             it.key === 'sep' ? (
               <div key="sep" style={{ height: 1, margin: '4px 2px', background: 'var(--color-border)' }} />

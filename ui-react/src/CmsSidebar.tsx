@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { useNavigate, useParams } from 'react-router-dom'
 import PageTree, { type CmsTreeAction } from './PageTree'
 import DuplicatePageModal from './DuplicatePageModal'
+import { peT } from './page-editor-i18n'
 import type { MelisTreeNode } from './cms-tree-api'
 
 /**
@@ -11,9 +12,9 @@ import type { MelisTreeNode } from './cms-tree-api'
  * melis-cms/config/app.interface.php; the query param is what its forward reads.
  * `dupe` is now a NATIVE React modal (DuplicatePageModal) — no iframe.
  */
-const MODALS: Record<'export' | 'import', { key: string; param: string; title: string }> = {
-  export: { key: 'meliscms_page_export_modal',             param: 'pageId',       title: 'Exporter la page' },
-  import: { key: 'meliscms_page_import_modal',             param: 'pageId',       title: 'Importer une page' },
+const MODALS: Record<'export' | 'import', { key: string; param: string }> = {
+  export: { key: 'meliscms_page_export_modal',             param: 'pageId' },
+  import: { key: 'meliscms_page_import_modal',             param: 'pageId' },
 }
 
 type OpenTab = (t: { id: string; label: string; path: string }) => void
@@ -28,6 +29,7 @@ type OpenTab = (t: { id: string; label: string; path: string }) => void
  * scroll — so the Site Tools below it stay right under the tree.
  */
 export default function CmsSidebar() {
+  const tr = peT()
   const navigate = useNavigate()
   const { id } = useParams()
   // id may be "<number>" (edit) or "new~<father>" (create) — only a numeric id is "selected".
@@ -44,7 +46,7 @@ export default function CmsSidebar() {
   const handleAction = (action: CmsTreeAction, node: MelisTreeNode) => {
     if (action === 'new') {
       // Create a child page under this node (idFatherPage = node.key).
-      openTab(`/melis-cms/page/new~${node.key}`, 'Nouvelle page')
+      openTab(`/melis-cms/page/new~${node.key}`, tr.newPage)
       return
     }
     if (action === 'dupe') {
@@ -53,7 +55,7 @@ export default function CmsSidebar() {
       return
     }
     const m = MODALS[action]
-    if (m) setModal({ src: `/melis/react-tool-page?key=${m.key}&${m.param}=${node.key}`, title: m.title })
+    if (m) setModal({ src: `/melis/react-tool-page?key=${m.key}&${m.param}=${node.key}`, title: action === 'export' ? tr.exportPage : tr.importPage })
   }
 
   return (
@@ -67,7 +69,7 @@ export default function CmsSidebar() {
       }}
     >
       <div style={{ padding: '6px 10px', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-muted-foreground)' }}>
-        Arborescence des pages
+        {tr.pageTree}
       </div>
       <div style={{ minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <PageTree
@@ -103,7 +105,7 @@ export default function CmsSidebar() {
               <span style={{ fontWeight: 600, fontSize: 14 }}>{modal.title}</span>
               <button
                 onClick={() => setModal(null)}
-                title="Fermer"
+                title={tr.close}
                 style={{ border: 'none', background: 'transparent', color: 'var(--color-muted-foreground)', cursor: 'pointer', fontSize: 18, lineHeight: 1, padding: 4 }}
               >
                 ✕

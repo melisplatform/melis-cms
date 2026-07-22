@@ -224,6 +224,40 @@ const DICT: Record<PeLang, Record<string, string>> = {
     selectPage: "Sélectionnez une page dans l'arbre.",
     newPage: 'Nouvelle page',
     editionLoadingTip: 'Édition en cours de chargement…',
+
+    // ── NewPageView : création de page ──
+    errNameRequired: 'Le nom de la page est requis.',
+    errTemplateRequired: 'Le template est requis.',
+    errLangRequired: 'La langue est requise.',
+    pageCreated: 'La page a été créée.',
+    underPage: 'sous la page',
+    newPageLegacy: 'Nouvelle page (legacy)',
+    language: 'Langue',
+    namePlaceholder: 'Nom de la page',
+    creating: 'Création…',
+    createPage: 'Créer la page',
+
+    // ── PageTree : arbre des pages ──
+    unpublishedDraft: 'Brouillon non publié',
+    lockedTip: "Page verrouillée (en cours d'édition par un autre utilisateur)",
+    searchPlaceholder: 'Rechercher…',
+    refresh: 'Rafraîchir',
+    toggleDndTip: 'Verrouiller/Déverrouiller le glisser-déposer (réorganisation)',
+    noPageMatchPre: 'Aucune page ne correspond à',
+    loadingTree: "Chargement de l'arbre…",
+    noPage: 'Aucune page.',
+    edit: 'Éditer',
+    duplicate: 'Dupliquer',
+
+    // ── PagePicker ──
+    expand: 'Déplier',
+    pickPage: '— choisir une page —',
+
+    // ── CmsSidebar ──
+    exportPage: 'Exporter la page',
+    importPage: 'Importer une page',
+    pageTree: 'Arborescence des pages',
+    close: 'Fermer',
   },
   en: {
     // ── common ──
@@ -436,6 +470,40 @@ const DICT: Record<PeLang, Record<string, string>> = {
     selectPage: 'Select a page in the tree.',
     newPage: 'New page',
     editionLoadingTip: 'Edition loading…',
+
+    // ── NewPageView: page creation ──
+    errNameRequired: 'The page name is required.',
+    errTemplateRequired: 'The template is required.',
+    errLangRequired: 'The language is required.',
+    pageCreated: 'The page has been created.',
+    underPage: 'under page',
+    newPageLegacy: 'New page (legacy)',
+    language: 'Language',
+    namePlaceholder: 'Page name',
+    creating: 'Creating…',
+    createPage: 'Create page',
+
+    // ── PageTree: page tree ──
+    unpublishedDraft: 'Unpublished draft',
+    lockedTip: 'Page locked (being edited by another user)',
+    searchPlaceholder: 'Search…',
+    refresh: 'Refresh',
+    toggleDndTip: 'Lock/Unlock drag-and-drop (reordering)',
+    noPageMatchPre: 'No page matches',
+    loadingTree: 'Loading tree…',
+    noPage: 'No page.',
+    edit: 'Edit',
+    duplicate: 'Duplicate',
+
+    // ── PagePicker ──
+    expand: 'Expand',
+    pickPage: '— choose a page —',
+
+    // ── CmsSidebar ──
+    exportPage: 'Export page',
+    importPage: 'Import page',
+    pageTree: 'Page tree',
+    close: 'Close',
   },
 }
 
