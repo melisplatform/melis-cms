@@ -9,6 +9,14 @@ import type { SiteModule } from '../sites-api'
  * La liste ordonnée est l'état remonté à l'éditeur (`modules`/`setModules`).
  */
 
+/**
+ * Remonte les modules actifs en tête (partition stable : l'ordre relatif — donc l'ordre de
+ * chargement des actifs — est préservé). Appliqué UNIQUEMENT au chargement de l'onglet : ensuite
+ * la liste ne bouge plus toute seule, (dés)activer un module le laisse sur place.
+ */
+export const activeFirst = (list: SiteModule[]): SiteModule[] =>
+  [...list.filter((m) => m.active), ...list.filter((m) => !m.active)]
+
 const tr = (fr: string, en: string) => ((document.documentElement.lang || 'fr').slice(0, 2) === 'en' ? en : fr)
 const card: React.CSSProperties = { borderRadius: 10, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)' }
 const btn: React.CSSProperties = { display: 'inline-flex', alignItems: 'center', gap: 6, height: 32, padding: '0 12px', borderRadius: 8, border: '1px solid var(--color-border,#e5e7eb)', background: 'transparent', cursor: 'pointer', fontSize: 13 }

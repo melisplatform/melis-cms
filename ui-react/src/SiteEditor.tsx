@@ -3,7 +3,7 @@ import { fetchSite, saveSiteEdit, fetchSiteConfig, fetchSiteModules, type SiteEd
 import { PagePicker } from './PagePicker'
 import { type ViewMode } from './ViewToggle'
 import { ConfigTab, buildConfigFields } from './site-tabs/ConfigTab'
-import { ModuleLoaderTab } from './site-tabs/ModuleLoaderTab'
+import { ModuleLoaderTab, activeFirst } from './site-tabs/ModuleLoaderTab'
 import { TranslationsTab } from './site-tabs/TranslationsTab'
 import { useSiteTabs, type SiteTabSaveFn } from './site-tab-registry'
 
@@ -95,7 +95,7 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
 
   useEffect(() => {
     fetchSiteConfig(siteId).then((c) => { setConfigData(c); setConfigFields(buildConfigFields(c)) }).catch(() => null)
-    fetchSiteModules(siteId).then((m) => { setModulesData(m); setModuleList(m.modules) }).catch(() => null)
+    fetchSiteModules(siteId).then((m) => { setModulesData(m); setModuleList(activeFirst(m.modules)) }).catch(() => null)
     fetchSite(siteId).then((d) => {
       setData(d)
       setLabel(d.site.label)
