@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { ViewToggle, type ViewMode } from './ViewToggle'
 import { apiGet, FlagSelect, type Refs } from './PageTabs'
+import { peT } from './page-editor-i18n'
+import { legacyErrorFields, legacyText } from './legacy-errors'
 
 /**
  * Écran « Nouvelle page » — création d'une page CMS, en NATIF React avec toggle New/Old.
@@ -30,6 +32,7 @@ const field: React.CSSProperties = { width: '100%', height: 36, padding: '0 10px
 type Form = { name: string; type: string; templateId: number; langId: number; menu: string; styleId: number; taxonomy: string }
 
 export default function NewPageView({ father, visible, onCreated }: { father: string; visible: boolean; onCreated: (newId: number | string, name: string) => void }) {
+  const tr = peT() // dictionnaire i18n du BO
   const [mode, setMode] = useState<ViewMode>('react')
   const [refs, setRefs] = useState<Refs | null>(null)
   const [form, setForm] = useState<Form>({ name: '', type: father ? 'PAGE' : 'SITE', templateId: 0, langId: 0, menu: 'LINK', styleId: 0, taxonomy: '' })
@@ -67,14 +70,16 @@ export default function NewPageView({ father, visible, onCreated }: { father: st
         headers: { ...XHR, 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
         body: b.toString(),
       })
-      const data = await res.json().catch(() => ({})) as { success?: number; textTitle?: string; textMessage?: string; errors?: Record<string, { errorMessage?: string; label?: string }>; datas?: { idPage?: number | string; item_name?: string } }
+      const data = await res.json().catch(() => ({})) as { success?: number; textTitle?: string; textMessage?: string; errors?: unknown; datas?: { idPage?: number | string; item_name?: string } }
       if (data.success === 1 && data.datas?.idPage) {
         notify('ok', (data.textTitle || 'Nouvelle page').trim(), 'La page a été créée.')
         onCreated(data.datas.idPage, (data.datas.item_name || form.name).trim())
       } else {
-        const fields = Object.values(data.errors || {}).filter((e) => e && e.label).map((e) => ({ label: String(e.label), messages: [String(e.errorMessage || '')] }))
-        notify('ko', (data.textTitle || 'Nouvelle page').trim(), data.textMessage || 'La création a échoué.', fields)
-        setErr(fields.length ? fields.map((f) => `${f.label} : ${f.messages.join(', ')}`).join(' · ') : (data.textMessage || 'La création a échoué.'))
+        // Détail des erreurs de champ (cf. legacy-errors.ts : le legacy a plusieurs formes d'`errors`).
+        const fields = legacyErrorFields(data.errors, tr.errorField)
+        const generic = legacyText(data.textMessage, tr.createFailed)
+        notify('ko', (data.textTitle || 'Nouvelle page').trim(), fields.length ? tr.fixErrorsBelow : generic, fields)
+        setErr(fields.length ? fields.map((f) => `${f.label} : ${f.messages.join(', ')}`).join(' · ') : generic)
       }
     } catch (e) { setErr((e as Error).message) } finally { setSaving(false) }
   }, [form, father, onCreated])

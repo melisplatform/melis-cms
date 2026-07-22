@@ -7,6 +7,7 @@ import {
   apiGet, apiPost, type PropsData, type SeoData, type Refs,
 } from './PageTabs'
 import { peT } from './page-editor-i18n'
+import { legacyErrorFields, legacyText } from './legacy-errors'
 
 /**
  * Éditeur de page CMS — COQUILLE REACT au-dessus de l'outil legacy (UNE iframe, pour l'Édition
@@ -337,7 +338,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   // XML de l'édition — lu depuis la SESSION PHP peuplée par le drag'n'drop de l'iframe — dans
   // melis_cms_page_saved.page_content. saveEdition ne réécrit le contenu QUE si la session est peuplée
   // (sinon l'existant est préservé → pas de perte de contenu).
-  type LegacyResp = { success?: number; textTitle?: string; textMessage?: string; errors?: Record<string, { errorMessage?: string; label?: string }>; datas?: { idPage?: number | string } }
+  type LegacyResp = { success?: number; textTitle?: string; textMessage?: string; errors?: unknown; datas?: { idPage?: number | string } }
 
   // Corps urlencodé attendu par savePage/publishPage, reconstruit depuis l'état React agrégé (`edit`).
   const buildLegacyBody = useCallback((): string => {
@@ -370,8 +371,14 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     return await res.json().catch(() => ({})) as LegacyResp
   }, [buildLegacyBody])
 
-  const errorFields = (data: LegacyResp): NotifField[] =>
-    Object.values(data.errors || {}).filter((e) => e && e.label).map((e) => ({ label: String(e.label), messages: [String(e.errorMessage || '')] }))
+  // Détail des erreurs de champ (URL SEO déjà utilisée, champ requis…) — cf. legacy-errors.ts pour
+  // les formes hétérogènes renvoyées par le legacy.
+  const errorFields = (data: LegacyResp): NotifField[] => legacyErrorFields(data.errors, tr.errorField)
+
+  // Corps du toast d'échec : détail des champs si on en a (le message legacy générique n'explique rien),
+  // sinon le message legacy — jamais une clé `tr_…` brute.
+  const failMessage = (data: LegacyResp, fields: NotifField[], fallback: string): string =>
+    fields.length ? tr.fixErrorsBelow : legacyText(data.textMessage, fallback)
 
   // Recharge l'iframe d'édition de la page courante (refléter l'état serveur après clear/publish).
   // On la retire de readyPages → Sauvegarder/Publier re-bloqués jusqu'au rechargement complet du canvas.
@@ -407,7 +414,8 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         window.dispatchEvent(new CustomEvent('melis:cms-historic-refresh')) // save → nouvelle entrée d'historique
         refreshStructure(current) // rafraîchit le statut/en-tête
       } else {
-        notify('ko', (data.textTitle || tr.notifSave).trim(), data.textMessage || tr.saveFailed, errorFields(data))
+        const fields = errorFields(data)
+        notify('ko', (data.textTitle || tr.notifSave).trim(), failMessage(data, fields, tr.saveFailed), fields)
       }
     } catch (e) { notify('ko', tr.notifSave, (e as Error).message) } finally { setSaving(false) }
   }, [edit, current, editionReady, postLegacyPage, refreshStructure, releaseLock])
@@ -427,7 +435,8 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         window.dispatchEvent(new CustomEvent('melis:cms-historic-refresh')) // publier → nouvelle entrée d'historique
         refreshStructure(current) // en-tête : plus de brouillon, statut publié
       } else {
-        notify('ko', (data.textTitle || tr.notifPublish).trim(), data.textMessage || tr.publishFailed, errorFields(data))
+        const fields = errorFields(data)
+        notify('ko', (data.textTitle || tr.notifPublish).trim(), failMessage(data, fields, tr.publishFailed), fields)
       }
     } catch (e) { notify('ko', tr.notifPublish, (e as Error).message) } finally { setSaving(false) }
   }, [edit, current, editionReady, postLegacyPage, refreshStructure, releaseLock])
@@ -446,7 +455,8 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         window.dispatchEvent(new CustomEvent('melis:cms-historic-refresh')) // passage offline → nouvelle entrée d'historique
         refreshStructure(current) // en-tête : switch → Hors ligne
       } else {
-        notify('ko', (data.textTitle || tr.notifUnpublish).trim(), data.textMessage || tr.unpublishFailed, errorFields(data))
+        const fields = errorFields(data)
+        notify('ko', (data.textTitle || tr.notifUnpublish).trim(), failMessage(data, fields, tr.unpublishFailed), fields)
       }
     } catch (e) { notify('ko', tr.notifUnpublish, (e as Error).message) } finally { setSaving(false) }
   }, [current, refreshStructure])
@@ -500,7 +510,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         navigate(rest.length ? `/melis-cms/page/${rest[rest.length - 1]}` : '/')
         ;(window as unknown as { __melisCloseTab?: (id: string) => void }).__melisCloseTab?.(`/melis-cms/page/${current}`)
         setOpened((o) => o.filter((x) => x !== current))
-      } else notify('ko', (data.textTitle || tr.notifDelete).trim(), data.textMessage || tr.deleteFailedMsg)
+      } else notify('ko', (data.textTitle || tr.notifDelete).trim(), legacyText(data.textMessage, tr.deleteFailedMsg))
     } catch (e) { notify('ko', tr.notifDelete, (e as Error).message) } finally { setSaving(false) }
   }, [current, navigate])
 
@@ -535,9 +545,10 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         }
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: newId ? Number(newId) : undefined } })) // fait apparaître la copie dans l'arbre
         window.dispatchEvent(new CustomEvent('melis:cms-historic-refresh'))
-        notify('ok', (data.textTitle || tr.notifDuplicate).trim(), data.textMessage || tr.pageDuplicated)
+        notify('ok', (data.textTitle || tr.notifDuplicate).trim(), legacyText(data.textMessage, tr.pageDuplicated))
       } else {
-        notify('ko', (data.textTitle || tr.notifDuplicate).trim(), data.textMessage || tr.duplicateFailed, errorFields(data))
+        const fields = errorFields(data)
+        notify('ko', (data.textTitle || tr.notifDuplicate).trim(), failMessage(data, fields, tr.duplicateFailed), fields)
       }
     } catch (e) { notify('ko', tr.notifDuplicate, (e as Error).message) } finally { setSaving(false) }
   }, [current, navigate])

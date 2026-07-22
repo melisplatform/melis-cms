@@ -203,6 +203,10 @@ const DICT: Record<PeLang, Record<string, string>> = {
     draftCleared: 'Le brouillon a été effacé.',
     pageDeleted: 'La page a été supprimée.',
     pageDuplicated: 'La page a été dupliquée.',
+    // Erreurs legacy : bandeau générique + libellé de repli quand le champ fautif n'a pas de label.
+    fixErrorsBelow: 'Corrigez les erreurs ci-dessous :',
+    errorField: 'Erreur',
+    createFailed: 'La création a échoué.',
     saveFailed: 'L’enregistrement a échoué.',
     publishFailed: 'La publication a échoué.',
     unpublishFailed: 'La dépublication a échoué.',
@@ -411,6 +415,10 @@ const DICT: Record<PeLang, Record<string, string>> = {
     draftCleared: 'The draft has been cleared.',
     pageDeleted: 'The page has been deleted.',
     pageDuplicated: 'The page has been duplicated.',
+    // Legacy errors: generic banner + fallback label when the faulty field has no label.
+    fixErrorsBelow: 'Please fix the errors below:',
+    errorField: 'Error',
+    createFailed: 'Creation failed.',
     saveFailed: 'Save failed.',
     publishFailed: 'Publication failed.',
     unpublishFailed: 'Unpublication failed.',
