@@ -58,4 +58,19 @@ return [
             ['melisKey' => 'meliscms_page', 'name' => 'Edition de page', 'icon' => 'fa-file-text-o'],
         ],
     ],
+
+    // Section « hôte de sidebar » : garde la section MelisCms VISIBLE dans le menu de gauche — pour y
+    // accrocher l'arbre des pages React (CmsSidebar) — dès que l'utilisateur a accès à l'éditeur de
+    // page (canAccess('meliscms_page')), MÊME s'il n'a AUCUN outil de site (Sites/Templates/Langues…).
+    // Sans ça, un user à qui on n'accorde QUE des pages voit toute la section élaguée (aucun site-tool
+    // accessible → buildLevel2 vide → section prunée) → arbre invisible → il ne peut PAS atteindre ses
+    // pages (ticket 0010724). Le page tree filtre déjà par droits-page côté backend. Lu par
+    // MelisReactApi\...\buildMenuResponse : si les catégories sont vides mais `requires` est accessible,
+    // la section est émise comme conteneur nu portant `sidebarModule` → l'hôte y attache le panneau.
+    'melisReactSidebarHostSections' => [
+        'meliscms_toolstree_section' => [
+            'requires' => 'meliscms_page',  // gate canAccess (outil « Edition de page »)
+            'module'   => 'MelisCms',       // module propriétaire → l'hôte attache son panneau (page tree)
+        ],
+    ],
 ];
