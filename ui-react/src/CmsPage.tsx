@@ -161,8 +161,16 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   const isCreation = current === 'new' || (current?.startsWith('new~') ?? false)
   const showChrome = mode === 'react' && !isCreation
 
-  const [struct, setStruct] = useState<Structure | null>(null)
-  const [edit, setEdit] = useState<Edit | null>(null)
+  // Multi-tab: struct (structure) and edit (Properties/SEO/refs) are kept PER PAGE and loaded ONCE.
+  // We must NOT refetch them when switching tabs — the user may have unsaved changes on a tab's
+  // Properties/SEO (or be mid-edit), and reloading would silently wipe that work (ticket 0010738).
+  // Switching a tab just re-reads the retained in-memory state; a page is fetched only on first open
+  // (or after an explicit reload via reloadEdition). Save/Publish therefore always act on the
+  // CURRENT page's own state → never publishes page A with page B's data.
+  const [structByPage, setStructByPage] = useState<Record<string, Structure>>({})
+  const [editByPage, setEditByPage] = useState<Record<string, Edit>>({})
+  const struct = current ? (structByPage[current] ?? null) : null
+  const edit = current ? (editByPage[current] ?? null) : null
   const [lock, setLock] = useState<{ locked: boolean; byUser: string | null; byMe: boolean; since: string | null } | null>(null)
   const [activeTab, setActiveTab] = useState<string | null>(null)
   const [mountedTabs, setMountedTabs] = useState<Set<string>>(new Set())
@@ -230,22 +238,31 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     return () => window.clearInterval(iv)
   }, [current, isCreation, readyPages, isEditionLoaded])
 
-  // structure (onglets/boutons/en-tête)
+  // structure (onglets/boutons/en-tête) — stockée PAR PAGE (setStructByPage). Sert à la fois au 1er
+  // chargement et aux rafraîchissements explicites (après save/publish/renommage).
   const refreshStructure = useCallback(async (idPage: string) => {
-    try { const d = await apiGet<Structure>(`structure?idPage=${encodeURIComponent(idPage)}`); setStruct(d); setActiveTab((t) => t ?? d.tabs?.[0]?.key ?? null) } catch { setStruct(null) }
+    try { const d = await apiGet<Structure>(`structure?idPage=${encodeURIComponent(idPage)}`); setStructByPage((m) => ({ ...m, [idPage]: d })); setActiveTab((t) => t ?? d.tabs?.[0]?.key ?? null) } catch { /* garder l'existant */ }
   }, [])
-  useEffect(() => { if (!current || isCreation) { setStruct(null); setEdit(null); return } refreshStructure(current) }, [current, isCreation, refreshStructure])
-
-  // état partagé Propriétés + SEO + refs (chargé UNE fois par page → pas de refetch au switch)
+  // Chargement de la structure UNE SEULE FOIS par page (pas de refetch au switch d'onglet).
   useEffect(() => {
     if (!current || isCreation) return
+    if (!structByPage[current]) refreshStructure(current)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [current, isCreation, refreshStructure])
+
+  // Propriétés + SEO + refs — chargés UNE SEULE FOIS par page, JAMAIS refetch au switch : l'onglet
+  // conserve les saisies non sauvegardées de l'utilisateur (ticket 0010738). Rechargé seulement si
+  // la page n'est pas encore en cache (1re ouverture) ou après invalidation via reloadEdition.
+  useEffect(() => {
+    if (!current || isCreation || editByPage[current]) return
     let x = false; const idPage = current
     Promise.all([
       apiGet<PropsData>(`properties?idPage=${idPage}`),
       apiGet<SeoData>(`seo?idPage=${idPage}`),
       apiGet<Refs>(`refs?idPage=${idPage}`),
-    ]).then(([props, seo, refs]) => { if (!x) setEdit({ props, seo, refs }) }).catch(() => {})
+    ]).then(([props, seo, refs]) => { if (!x) setEditByPage((m) => (m[idPage] ? m : { ...m, [idPage]: { props, seo, refs } })) }).catch(() => {})
     return () => { x = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current, isCreation])
 
   // état de VERROU de la page (modulaire, small-business) → bouton Débloquer + bandeau conditionnels
@@ -386,6 +403,11 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     if (!current) return
     setReadyPages((s) => { if (!s.has(current)) return s; const n = new Set(s); n.delete(current); return n })
     setRevealed((s) => { if (!s.has(current)) return s; const n = new Set(s); n.delete(current); return n }) // re-masquer pendant le rechargement (évite le flash du chrome legacy)
+    // Invalide le cache par-page de CETTE page (clear/publish/reload explicite) → les effets
+    // « chargé une fois » refetchent les Propriétés/SEO + la structure à jour. NB : reloadEdition
+    // n'est JAMAIS appelé sur un simple switch d'onglet — donc le travail non sauvegardé est préservé.
+    setEditByPage((m) => { if (!m[current]) return m; const n = { ...m }; delete n[current]; return n })
+    setStructByPage((m) => { if (!m[current]) return m; const n = { ...m }; delete n[current]; return n })
     const f = frameRef.current[current]
     try { if (f) f.src = toolSrc(current) } catch { /* */ }
   }, [current])
@@ -789,8 +811,8 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
           if (CONTROLLED.has(key)) {
             if (!edit) return <div key={key} style={style}><div style={{ padding: 20 }}>{tr.loading}</div></div>
             return <div key={key} style={style}>{key === KEY_PROPERTIES
-              ? <PropertiesTab value={edit.props} refs={edit.refs} onChange={(v) => setEdit({ ...edit, props: v })} />
-              : <SeoTab value={edit.seo} onChange={(v) => setEdit({ ...edit, seo: v })} />}</div>
+              ? <PropertiesTab value={edit.props} refs={edit.refs} onChange={(v) => setEditByPage((m) => ({ ...m, [current]: { ...(m[current] ?? edit), props: v } }))} />
+              : <SeoTab value={edit.seo} onChange={(v) => setEditByPage((m) => ({ ...m, [current]: { ...(m[current] ?? edit), seo: v } }))} />}</div>
           }
           const Comp = SELF_TABS[key] ?? w.__melisPageTabRegistry?.tabs[key]
           return Comp ? <div key={key} style={style}><Comp idPage={Number(current)} /></div> : null
