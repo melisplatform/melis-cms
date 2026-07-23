@@ -112,6 +112,39 @@ class TreeSitesController extends MelisAbstractActionController
 		return $this->formatTreeResponse($final, true);
 	}
 
+	/**
+	 * Returns the union of breadcrumb page ids (each page + its ancestors up to the root) for the
+	 * given comma-separated page ids. The React user-rights "Pages" tree uses this to show a
+	 * tri-state DASH on a parent page when one of its descendants is granted — mirroring the tools
+	 * tri-state. Read-only, no rights mutation.
+	 *
+	 * GET /melis/MelisCms/TreeSites/getPagesAncestorsForRights?ids=2,4,9
+	 * @return \Laminas\View\Model\JsonModel  { success, data: { ancestorIds: int[] } }
+	 */
+	public function getPagesAncestorsForRightsAction()
+	{
+		$idsParam = (string) $this->params()->fromQuery('ids', '');
+		$ids = array_filter(array_map('intval', array_filter(explode(',', $idsParam), 'strlen')));
+
+		$ancestors = array();
+		if (!empty($ids)) {
+			$melisEngineTree = $this->getServiceManager()->get('MelisEngineTree');
+			foreach ($ids as $pageId) {
+				if ($pageId <= 0) // -1 = "all pages" (no ancestors), 0 = invalid
+					continue;
+				$breadcrumb = $this->cleanBreadcrumb($melisEngineTree->getPageBreadcrumb($pageId, 0, true));
+				foreach ($breadcrumb as $bid) {
+					$ancestors[(int) $bid] = true;
+				}
+			}
+		}
+
+		return new JsonModel(array(
+			'success' => true,
+			'data' => array('ancestorIds' => array_values(array_map('intval', array_keys($ancestors)))),
+		));
+	}
+
 
 	/**
 	 * Get the pages' datas and format them to be sent back
