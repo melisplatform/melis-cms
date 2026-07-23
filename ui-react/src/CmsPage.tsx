@@ -187,6 +187,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   const [deleteOpen, setDeleteOpen] = useState(false) // modal React de confirmation de suppression
   const [clearOpen, setClearOpen] = useState(false) // modal React de confirmation d'effacement du brouillon
   const [wfOpen, setWfOpen] = useState(false) // modal Workflow (mutualisée, fournie par melis-small-business)
+  const [nlOpen, setNlOpen] = useState(false) // modal « Envoyer la newsletter » (mutualisée, fournie par melis-newsletter)
   const [unlocking, setUnlocking] = useState(false)
   const [, bumpTabs] = useState(0)
   useEffect(() => { const on = () => bumpTabs((n) => n + 1); window.addEventListener('melis:page-tabs-changed', on); return () => window.removeEventListener('melis:page-tabs-changed', on) }, [])
@@ -608,6 +609,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     if (b.key.endsWith('action_new')) { openNewPage(); return }             // Nouvelle page → route React de création
     if (b.key.endsWith('action_duplicate')) { await doDuplicate(); return } // Dupliquer → POST « page seule » (legacy), PAS l'arborescence
     if (b.key.includes('workflow')) { setWfOpen(true); return }             // Flux de travail → modal Workflow mutualisée (small-business)
+    if (b.key.includes('newsletter')) { setNlOpen(true); return }           // Envoyer la newsletter → modal React mutualisée (hors iframe, ticket 0010743)
     driveButton(b.key)                                                       // Voir/Affichage → pilotage iframe legacy
   }, [saveAll, doPublish, doClear, openNewPage, doDuplicate, driveButton])
 
@@ -892,6 +894,15 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
             onClose={() => setWfOpen(false)}
           />
         )
+      })()}
+
+      {/* Modal « Envoyer la newsletter » — MUTUALISÉE : composant fourni par melis-newsletter via
+          window.__melisNewsletterSendModal. Rendu ICI (arbre de l'éditeur) → via createPortal il
+          s'ouvre au-dessus de l'onglet actif, HORS de l'iframe d'édition (ticket 0010743). */}
+      {nlOpen && current && !isCreation && (() => {
+        const NL = (window as unknown as { __melisNewsletterSendModal?: React.ComponentType<{ pageId: number | string; appLang: string; onClose: () => void }> }).__melisNewsletterSendModal
+        if (!NL) return null
+        return <NL pageId={current} appLang={(document.documentElement.lang || 'fr').slice(0, 2)} onClose={() => setNlOpen(false)} />
       })()}
     </div>
   )
