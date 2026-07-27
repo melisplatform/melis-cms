@@ -27,12 +27,13 @@ type SubTabW = {
   __melisSetToolView?: (melisKey: string, view: ViewMode) => void
 }
 
-// Identifiant composite (site + name) encodé dans le segment /:id de la route.
-// site (module) et name (validé [a-zA-Z0-9_]) ne contiennent pas de « ~ » → séparateur sûr.
-const idFor = (site: string, name: string) => `${site}~${name}`
+// Le segment /:id de la route = juste le NOM du mini-template (…/mini-templates/<name>).
+// Le site propriétaire est résolu par nom à l'édition (cf. MiniTemplateForm). Les anciens liens
+// composites `site~name` restent compris (rétro-compat).
+const idFor = (_site: string, name: string) => name
 function decodeId(id: string): { site: string; name: string } {
   const i = id.indexOf('~')
-  return i === -1 ? { site: '', name: '' } : { site: id.slice(0, i), name: id.slice(i + 1) }
+  return i === -1 ? { site: '', name: id } : { site: id.slice(0, i), name: id.slice(i + 1) }
 }
 
 // ── i18n minimal ──
@@ -234,7 +235,14 @@ export default function MiniTemplatePage({ active = true }: { active?: boolean }
   useEffect(() => { if (active) setFrozenPath(location.pathname) }, [active, location.pathname])
   const segs = (active ? location.pathname : frozenPath).replace(/^\/+|\/+$/g, '').split('/')
   const base = '/' + segs.slice(0, 2).join('/')
-  const id = segs.length > 2 ? segs.slice(2).join('/') : undefined
+  // Segments après /mini-templates. La modal IA est une SOUS-route du formulaire courant :
+  //   …/mini-templates/<name>/ai-generator (édition)  ·  …/mini-templates/new/ai-generator (création)
+  // Fermer la modal retire juste ce dernier segment → on revient au formulaire (le template édité).
+  const rest = segs.slice(2)
+  const aiOpen = rest[rest.length - 1] === 'ai-generator'
+  const idSegs = aiOpen ? rest.slice(0, -1) : rest
+  // …/mini-templates/ai-generator (nu) = nouveau template + modal ouverte (rétro-compat).
+  const id = idSegs.length ? idSegs.join('/') : (aiOpen ? 'new' : undefined)
 
   // Vue courante du toggle New/Old. Portée par la RACINE (et non par la liste) : la liste est
   // démontée dès qu'un formulaire s'ouvre, et l'hôte doit continuer à connaître la vue active.
@@ -247,10 +255,10 @@ export default function MiniTemplatePage({ active = true }: { active?: boolean }
   const view: ViewMode = id ? 'react' : mode
   useEffect(() => { (window as unknown as SubTabW).__melisSetToolView?.(MELIS_KEY, view) }, [view])
 
-  // key={id} : forcer un remount frais à chaque changement de sous-onglet (l'identité site+name
-  // vient de l'URL et initialise l'état — sans remount, passer d'une édition à l'autre garderait
-  // le site/nom précédent).
-  if (id) return <MiniTemplateForm key={id} id={id} base={base} />
+  // key={id} : forcer un remount frais à chaque changement de sous-onglet (l'identité vient de l'URL
+  // et initialise l'état). L'ouverture/fermeture de la modal IA ne change PAS `id` (juste le segment
+  // ai-generator en plus) → même key → pas de remount → le HTML inséré survit à la fermeture.
+  if (id) return <MiniTemplateForm key={id} id={id} base={base} aiOpen={aiOpen} />
   return <MiniTemplateList base={base} mode={mode} setMode={setMode} />
 }
 
@@ -494,7 +502,8 @@ declare global {
     __melisMiniTemplateExtensions?: {
       renderHtmlActions?: (
         onContent: (html: string, thumbnail?: File) => void,
-        context: { site?: string; name?: string }
+        context: { site?: string; name?: string },
+        controlled?: { open?: boolean; onOpenChange?: (open: boolean) => void }
       ) => import('react').ReactNode
     }
   }
@@ -586,7 +595,7 @@ function TinyMceField({ value, onChange }: { value: string; onChange: (v: string
 }
 
 // ── Form (add / edit) ──
-function MiniTemplateForm({ id, base }: { id: string; base: string }) {
+function MiniTemplateForm({ id, base, aiOpen = false }: { id: string; base: string; aiOpen?: boolean }) {
   const t    = useT()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -602,6 +611,8 @@ function MiniTemplateForm({ id, base }: { id: string; base: string }) {
 
   const [sites, setSites]       = useState<MiniTemplateSiteOption[]>([])
   const [site, setSite]         = useState(editSite)
+  // Site propriétaire d'origine (pour oldSite au save) : résolu par nom si l'URL ne le porte pas.
+  const [origSite, setOrigSite] = useState(editSite)
   const [name, setName]         = useState(editName)
   const [html, setHtml]         = useState('')
   const [thumbUrl, setThumbUrl] = useState<string | null>(null)
@@ -635,16 +646,36 @@ function MiniTemplateForm({ id, base }: { id: string; base: string }) {
     }).catch(() => null)
   }, [])
 
-  // Load existing template HTML on edit
+  // Load existing template HTML on edit. The URL carries only the NAME, so resolve the owning site
+  // by name first (search across all sites); legacy site~name URLs already provide `editSite`.
   useEffect(() => {
     if (!isEdit) return
     setLoading(true)
-    fetchMiniTemplateItem(editSite, editName)
-      .then((d) => {
-        setHtml(d.html)
-        setThumbUrl(d.thumbnailUrl)
-        setThumbPreview(d.thumbnailUrl)
-      })
+    ;(async () => {
+      let resolvedSite = editSite
+      if (!resolvedSite) {
+        // The list endpoint scans ONE site's folder, so a site-less search returns nothing: scan the
+        // sites (last-used first) until one owns a template with this name.
+        try {
+          const siteOpts = await fetchMiniTemplateSites()
+          const seen = new Set<string>()
+          const candidates = [_cache?.site ?? '', ...siteOpts.map((s) => s.module)].filter(Boolean)
+          for (const m of candidates) {
+            if (seen.has(m)) continue
+            seen.add(m)
+            const list = await fetchMiniTemplates({ site: m })
+            if (list.items.some((i) => i.name === editName)) { resolvedSite = m; break }
+          }
+        } catch { /* leave empty → back to list below */ }
+      }
+      if (!resolvedSite) { navigate(base); return }
+      setSite(resolvedSite)
+      setOrigSite(resolvedSite)
+      const d = await fetchMiniTemplateItem(resolvedSite, editName)
+      setHtml(d.html)
+      setThumbUrl(d.thumbnailUrl)
+      setThumbPreview(d.thumbnailUrl)
+    })()
       .catch(() => navigate(base))
       .finally(() => setLoading(false))
   }, [id])
@@ -679,7 +710,7 @@ function MiniTemplateForm({ id, base }: { id: string; base: string }) {
         site,
         name: name.trim(),
         html: window.tinymce?.get(EDITOR_ID)?.getContent() ?? html,
-        oldSite: isEdit ? editSite : undefined,
+        oldSite: isEdit ? origSite : undefined,
         oldName: isEdit ? editName : undefined,
         thumbnail: thumbFile,
         category: categoryParam ? Number(categoryParam) : undefined,
@@ -762,7 +793,11 @@ function MiniTemplateForm({ id, base }: { id: string; base: string }) {
                       setThumbPreview(URL.createObjectURL(thumbnail))
                     }
                   },
-                  { site, name }
+                  { site, name },
+                  // The dialog open state IS the URL, nested under the current form:
+                  //   open → …/<id>/ai-generator, close → …/<id> (back to the edited template / new form).
+                  // Same-key form → no remount → the inserted HTML survives. Reload-safe (SPA regex).
+                  { open: aiOpen, onOpenChange: (o: boolean) => navigate(o ? `${base}/${id}/ai-generator` : `${base}/${id}`) }
                 )}
               </div>
               <TinyMceField value={html} onChange={setHtml} />

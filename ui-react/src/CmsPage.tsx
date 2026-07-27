@@ -244,7 +244,29 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   const refreshStructure = useCallback(async (idPage: string) => {
     try { const d = await apiGet<Structure>(`structure?idPage=${encodeURIComponent(idPage)}`); setStructByPage((m) => ({ ...m, [idPage]: d })); setActiveTab((t) => t ?? d.tabs?.[0]?.key ?? null) } catch { /* garder l'existant */ }
   }, [])
-  // Chargement de la structure UNE SEULE FOIS par page (pas de refetch au switch d'onglet).
+  // Chargement de la structure UNE SEULE FOIS par page (pas de refetch au switch d'onglet) :
+  // `struct` est dérivé de `structByPage[current]`, donc null (et non la page précédente) le temps du
+  // 1er chargement. Le flash « page précédente » de l'ancien modèle mono-`struct` ne peut donc plus se
+  // produire ; `structMatches` reste une garde défensive : on ne considère `struct` pertinent que s'il
+  // porte bien sur la page courante (`struct.idPage === current`).
+  const structMatches = !!struct && String(struct.idPage) === String(current)
+
+  // Libellé de l'onglet = vrai nom de la page. En ouverture depuis l'arbre, PageTree pose déjà le
+  // nom ; mais sur une navigation DIRECTE vers /melis-cms/page/:id (deep-link, F5, ou l'œil du
+  // plugin dashboard Workflow), l'hôte n'a que le fallback « Page N » (deriveTabLabel). Dès que la
+  // structure (de la BONNE page) est chargée, on connaît `header.pageName` → on renomme l'onglet
+  // (upsert par id). Gaté par `structMatches` : sinon le `struct` périmé renommerait l'onglet de la
+  // page courante avec le nom de la page précédente (flash de libellé).
+  useEffect(() => {
+    if (!structMatches) return
+    const name = struct?.header?.pageName?.trim()
+    if (!current || isCreation || !name) return
+    const path = `/melis-cms/page/${current}`
+    ;(window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void })
+      .__melisOpenTab?.({ id: path, label: name, path })
+  }, [structMatches, struct, current, isCreation])
+
+  // état partagé Propriétés + SEO + refs (chargé UNE fois par page → pas de refetch au switch)
   useEffect(() => {
     if (!current || isCreation) return
     if (!structByPage[current]) refreshStructure(current)
@@ -684,7 +706,9 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   useEffect(() => { const onDoc = () => setOpenMenu(null); if (openMenu) { document.addEventListener('click', onDoc); return () => document.removeEventListener('click', onDoc) } }, [openMenu])
 
   // ── rendu ──
-  const header = struct?.header
+  // En-tête (nom/date/auteur/statut) : UNIQUEMENT quand la structure chargée porte sur la page
+  // courante — sinon on montre l'état « chargement » (cf. structMatches) plutôt que la page précédente.
+  const header = structMatches ? struct?.header : undefined
   const statusLabel = header?.status === 'published' ? tr.statusOnline : header?.status === 'draft' ? tr.statusDraft : header?.status === 'unpublished' ? tr.statusOffline : null
   const statusColor = header?.status === 'published' ? '#16a34a' : header?.status === 'draft' ? '#d97706' : '#6b7280'
   const nativeTabActive = !!(showChrome && activeTab && isNativeTab(activeTab))
@@ -710,7 +734,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '8px 16px', borderBottom: showChrome ? 'none' : '1px solid var(--color-border,#e5e7eb)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
             {showChrome && (<>
-              <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--color-foreground,#111827)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{header?.pageName ?? (struct ? `Page ${struct.idPage}` : '')}</span>
+              <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--color-foreground,#111827)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{header?.pageName ?? (structMatches ? `Page ${current}` : '')}</span>
               {statusLabel && <span style={{ fontSize: 11, fontWeight: 600, color: '#fff', background: statusColor, borderRadius: 999, padding: '2px 8px' }}>{statusLabel}</span>}
               {header?.editDate && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.modifiedOn} {header.editDate}{header.editor ? ` ${tr.byWord} ${header.editor}` : ''}</span>}
               {!editionReady && !saving && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.loadingEdition}</span>}
