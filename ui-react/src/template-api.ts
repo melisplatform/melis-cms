@@ -22,7 +22,7 @@ export interface TemplateItem {
 }
 export interface TemplateStats { total: number; sites: number; types: number }
 export interface SiteOption { id: number; name: string }
-export interface TemplateListResult { items: TemplateItem[]; total: number; page: number; limit: number }
+export interface TemplateListResult { items: TemplateItem[]; total: number; nextCursor: string | null }
 
 async function apiFetch<T>(url: string, opts?: RequestInit): Promise<T> {
   const res = await fetch(url, {
@@ -40,12 +40,25 @@ async function apiFetch<T>(url: string, opts?: RequestInit): Promise<T> {
   return data.data as T
 }
 
-export async function fetchTemplates(params: { search?: string; site?: number | null; type?: string } = {}): Promise<TemplateListResult> {
+export interface TemplateListParams {
+  limit?: number
+  search?: string
+  site?: number | null
+  type?: string
+  sort?: string
+  dir?: 'asc' | 'desc'
+  after?: string
+}
+
+export async function fetchTemplates(params: TemplateListParams = {}): Promise<TemplateListResult> {
   const qs = new URLSearchParams()
-  qs.set('limit', '9999')
+  qs.set('limit', String(params.limit ?? 25))
   if (params.search) qs.set('search', params.search)
   if (params.site) qs.set('site', String(params.site))
   if (params.type) qs.set('type', params.type)
+  if (params.sort) qs.set('sort', params.sort)
+  if (params.dir) qs.set('dir', params.dir)
+  if (params.after) qs.set('after', params.after)
   return apiFetch<TemplateListResult>(`/melis/react-api/templates?${qs}`)
 }
 

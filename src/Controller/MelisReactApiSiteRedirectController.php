@@ -6,6 +6,7 @@ use MelisReactApi\Controller\CapabilityGuardTrait;
 
 use Laminas\Http\PhpEnvironment\Response as HttpResponse;
 use MelisCore\Controller\MelisAbstractActionController;
+use MelisCore\Controller\MelisReactKeysetListTrait;
 
 /**
  * API REST pour l'outil Redirections 301 de MelisCms (table melis_cms_site_301).
@@ -29,9 +30,21 @@ use MelisCore\Controller\MelisAbstractActionController;
 class MelisReactApiSiteRedirectController extends MelisAbstractActionController
 {
     use CapabilityGuardTrait;
+    use MelisReactKeysetListTrait;
 
     /** melisKey de l'outil — utilisé par le garde de droits (cf. denyUnlessAccess). */
     private const MELIS_KEY = 'meliscms_tool_site_301';
+
+    /**
+     * Whitelist des colonnes triables (clé front → expression SQL NON-NULL).
+     * Toutes les colonnes de l'en-tête sont triables. Défaut : id DESC (comme l'ancienne liste).
+     */
+    private const SORT_MAP = [
+        'id'   => 'r.s301_id',
+        'site' => "COALESCE(NULLIF(s.site_label, ''), s.site_name, '')",
+        'old'  => "COALESCE(r.s301_old_url, '')",
+        'new'  => "COALESCE(r.s301_new_url, '')",
+    ];
 
     // ─── GET /site-redirects ─────────────────────────────────────────────────────
 
@@ -41,11 +54,12 @@ class MelisReactApiSiteRedirectController extends MelisAbstractActionController
         if ($denyCap = $this->denyUnlessCan('list')) { return $denyCap; }
 
         try {
-            $page   = max(1, (int) $this->params()->fromQuery('page', 1));
             $limit  = min(9999, max(1, (int) $this->params()->fromQuery('limit', 25)));
             $search = trim((string) ($this->params()->fromQuery('search', '') ?? ''));
             $siteId = (int) $this->params()->fromQuery('site', 0) ?: null;
-            $offset = ($page - 1) * $limit;
+            $sort   = (string) $this->params()->fromQuery('sort', 'id');
+            $dir    = (string) $this->params()->fromQuery('dir', 'desc');
+            $after  = (string) $this->params()->fromQuery('after', '');
 
             $db = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
 
@@ -60,28 +74,28 @@ class MelisReactApiSiteRedirectController extends MelisAbstractActionController
                 $where[] = 'r.s301_site_id = ?';
                 $params[] = $siteId;
             }
-            $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
-            $countRow = iterator_to_array($db->query(
-                "SELECT COUNT(*) AS total
-                 FROM melis_cms_site_301 r
-                 LEFT JOIN melis_cms_site s ON s.site_id = r.s301_site_id
-                 $whereClause",
-                $params
-            ));
-            $total = (int) ($countRow[0]['total'] ?? 0);
+            // La jointure sur le domaine (pour baseUrl) porte l'env courant. Le trait keyset ne
+            // supporte pas de param dans les JOINs → on inline la valeur (quotée par le driver).
+            $env = $db->getPlatform()->quoteValue((string) getenv('MELIS_PLATFORM'));
 
-            $rows = $db->query(
-                "SELECT r.s301_id, r.s301_site_id, r.s301_old_url, r.s301_new_url,
-                        s.site_name, s.site_label, d.sdom_scheme, d.sdom_domain
-                 FROM melis_cms_site_301 r
-                 LEFT JOIN melis_cms_site s ON s.site_id = r.s301_site_id
-                 LEFT JOIN melis_cms_site_domain d ON d.sdom_site_id = s.site_id AND d.sdom_env = ?
-                 $whereClause
-                 ORDER BY r.s301_id DESC
-                 LIMIT ? OFFSET ?",
-                array_merge([(string) getenv('MELIS_PLATFORM')], $params, [$limit, $offset])
-            );
+            [$rows, $total, $next] = $this->keysetList([
+                'db'           => $db,
+                'from'         => 'melis_cms_site_301 r',
+                'joins'        => 'LEFT JOIN melis_cms_site s ON s.site_id = r.s301_site_id
+                                  LEFT JOIN melis_cms_site_domain d ON d.sdom_site_id = s.site_id AND d.sdom_env = ' . $env,
+                'selectCols'   => 'r.s301_id, r.s301_site_id, r.s301_old_url, r.s301_new_url,
+                                  s.site_name, s.site_label, d.sdom_scheme, d.sdom_domain',
+                'filterWhere'  => $where,
+                'filterParams' => $params,
+                'sortMap'      => self::SORT_MAP,
+                'idCol'        => 'r.s301_id',
+                'idAlias'      => 's301_id',
+                'sortKey'      => $sort,
+                'dir'          => $dir,
+                'after'        => $after,
+                'limit'        => $limit,
+            ]);
 
             $items = [];
             foreach ($rows as $row) {
@@ -90,7 +104,7 @@ class MelisReactApiSiteRedirectController extends MelisAbstractActionController
 
             return $this->jsonResponse([
                 'success' => true,
-                'data'    => ['items' => $items, 'total' => $total, 'page' => $page, 'limit' => $limit],
+                'data'    => ['items' => $items, 'total' => $total, 'nextCursor' => $next],
             ]);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);

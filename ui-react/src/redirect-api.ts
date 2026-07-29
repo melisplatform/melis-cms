@@ -19,7 +19,15 @@ export interface RedirectItem {
 }
 export interface RedirectStats { total: number; sites: number }
 export interface SiteOption { id: number; name: string }
-export interface RedirectListResult { items: RedirectItem[]; total: number; page: number; limit: number }
+export interface RedirectListResult { items: RedirectItem[]; total: number; nextCursor: string | null }
+export interface RedirectListParams {
+  limit?: number
+  search?: string
+  site?: number | null
+  sort?: string
+  dir?: 'asc' | 'desc'
+  after?: string
+}
 export interface RedirectSavePayload { id?: number | null; siteId: number; oldUrl: string; newUrl: string }
 
 async function apiFetch<T>(url: string, opts?: RequestInit): Promise<T> {
@@ -41,11 +49,14 @@ async function apiFetch<T>(url: string, opts?: RequestInit): Promise<T> {
   return data.data as T
 }
 
-export async function fetchRedirects(params: { search?: string; site?: number | null } = {}): Promise<RedirectListResult> {
+export async function fetchRedirects(params: RedirectListParams = {}): Promise<RedirectListResult> {
   const qs = new URLSearchParams()
-  qs.set('limit', '9999')
+  qs.set('limit', String(params.limit ?? 25))
   if (params.search) qs.set('search', params.search)
   if (params.site) qs.set('site', String(params.site))
+  if (params.sort) qs.set('sort', params.sort)
+  if (params.dir) qs.set('dir', params.dir)
+  if (params.after) qs.set('after', params.after)
   return apiFetch<RedirectListResult>(`/melis/react-api/site-redirects?${qs}`)
 }
 

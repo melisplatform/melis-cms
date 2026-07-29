@@ -6,6 +6,7 @@ use MelisReactApi\Controller\CapabilityGuardTrait;
 
 use Laminas\Http\PhpEnvironment\Response as HttpResponse;
 use MelisCore\Controller\MelisAbstractActionController;
+use MelisCore\Controller\MelisReactKeysetListTrait;
 
 /**
  * API REST (lecture + suppression) pour l'outil Templates de MelisCms (table melis_cms_template).
@@ -24,9 +25,24 @@ use MelisCore\Controller\MelisAbstractActionController;
 class MelisReactApiTemplateController extends MelisAbstractActionController
 {
     use CapabilityGuardTrait;
+    use MelisReactKeysetListTrait;
 
     /** melisKey de l'outil — utilisé par le garde de droits (cf. denyUnlessAccess). */
     private const MELIS_KEY = 'meliscms_tool_templates';
+
+    /**
+     * Whitelist des colonnes triables (clé front → expression SQL NON-NULL).
+     * Défaut d'ordre : id ASC (comme l'ancienne liste).
+     */
+    private const SORT_MAP = [
+        'id'     => 't.tpl_id',
+        'name'   => "COALESCE(t.tpl_name, '')",
+        'type'   => "COALESCE(t.tpl_type, '')",
+        'ctrl'   => "COALESCE(CONCAT_WS('/', NULLIF(t.tpl_zf2_controller, ''), NULLIF(t.tpl_zf2_action, '')), '')",
+        'layout' => "COALESCE(t.tpl_zf2_layout, '')",
+        'site'   => "COALESCE(NULLIF(s.site_label, ''), s.site_name, '')",
+        'date'   => "COALESCE(t.tpl_creation_date, '1000-01-01 00:00:00')",
+    ];
 
     /** Libellé d'affichage du type de template. */
     private const TYPE_LABELS = ['ZF2' => 'Laminas', 'PHP' => 'PHP', 'TWG' => 'Twig'];
@@ -39,12 +55,13 @@ class MelisReactApiTemplateController extends MelisAbstractActionController
         if ($denyCap = $this->denyUnlessCan('list')) { return $denyCap; }
 
         try {
-            $page   = max(1, (int) $this->params()->fromQuery('page', 1));
             $limit  = min(9999, max(1, (int) $this->params()->fromQuery('limit', 25)));
             $search = trim((string) ($this->params()->fromQuery('search', '') ?? ''));
             $siteId = (int) $this->params()->fromQuery('site', 0) ?: null;
             $type   = trim((string) ($this->params()->fromQuery('type', '') ?? ''));
-            $offset = ($page - 1) * $limit;
+            $sort   = (string) $this->params()->fromQuery('sort', 'id');
+            $dir    = (string) $this->params()->fromQuery('dir', 'asc');
+            $after  = (string) $this->params()->fromQuery('after', '');
 
             $db = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
 
@@ -57,26 +74,24 @@ class MelisReactApiTemplateController extends MelisAbstractActionController
             }
             if ($siteId) { $where[] = 't.tpl_site_id = ?'; $params[] = $siteId; }
             if ($type !== '' && in_array($type, ['PHP', 'ZF2', 'TWG'], true)) { $where[] = 't.tpl_type = ?'; $params[] = $type; }
-            $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
-            $countRow = iterator_to_array($db->query(
-                "SELECT COUNT(*) AS total FROM melis_cms_template t
-                 LEFT JOIN melis_cms_site s ON s.site_id = t.tpl_site_id $whereClause",
-                $params
-            ));
-            $total = (int) ($countRow[0]['total'] ?? 0);
-
-            $rows = $db->query(
-                "SELECT t.tpl_id, t.tpl_site_id, t.tpl_name, t.tpl_type, t.tpl_zf2_website_folder,
-                        t.tpl_zf2_layout, t.tpl_zf2_controller, t.tpl_zf2_action, t.tpl_php_path, t.tpl_creation_date,
-                        s.site_name, s.site_label
-                 FROM melis_cms_template t
-                 LEFT JOIN melis_cms_site s ON s.site_id = t.tpl_site_id
-                 $whereClause
-                 ORDER BY t.tpl_id ASC
-                 LIMIT ? OFFSET ?",
-                array_merge($params, [$limit, $offset])
-            );
+            [$rows, $total, $next] = $this->keysetList([
+                'db'           => $db,
+                'from'         => 'melis_cms_template t',
+                'joins'        => 'LEFT JOIN melis_cms_site s ON s.site_id = t.tpl_site_id',
+                'selectCols'   => 't.tpl_id, t.tpl_site_id, t.tpl_name, t.tpl_type, t.tpl_zf2_website_folder,
+                                  t.tpl_zf2_layout, t.tpl_zf2_controller, t.tpl_zf2_action, t.tpl_php_path, t.tpl_creation_date,
+                                  s.site_name, s.site_label',
+                'filterWhere'  => $where,
+                'filterParams' => $params,
+                'sortMap'      => self::SORT_MAP,
+                'idCol'        => 't.tpl_id',
+                'idAlias'      => 'tpl_id',
+                'sortKey'      => $sort,
+                'dir'          => $dir,
+                'after'        => $after,
+                'limit'        => $limit,
+            ]);
 
             $items = [];
             foreach ($rows as $row) {
@@ -85,7 +100,7 @@ class MelisReactApiTemplateController extends MelisAbstractActionController
 
             return $this->jsonResponse([
                 'success' => true,
-                'data'    => ['items' => $items, 'total' => $total, 'page' => $page, 'limit' => $limit],
+                'data'    => ['items' => $items, 'total' => $total, 'nextCursor' => $next],
             ]);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);

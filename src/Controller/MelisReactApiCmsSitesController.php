@@ -79,7 +79,22 @@ class MelisReactApiCmsSitesController extends MelisAbstractActionController
                 ];
             }
 
-            return $this->jsonResponse(['success' => true, 'data' => ['items' => $items, 'total' => count($items)]]);
+            // Tri server-side. La liste est ASSEMBLÉE via des services (pas une requête SQL simple)
+            // et courte → le keyset SQL est inapplicable : on trie $items en PHP. Whitelist des
+            // clés triables (PAS `lang` qui est un tableau) ; défaut = id asc (ordre historique).
+            $sort = (string) $this->params()->fromQuery('sort', 'id');
+            if (!in_array($sort, ['id', 'label', 'name'], true)) { $sort = 'id'; }
+            $dir  = strtolower((string) $this->params()->fromQuery('dir', 'asc')) === 'desc' ? 'desc' : 'asc';
+            usort($items, static function ($a, $b) use ($sort, $dir) {
+                if ($sort === 'id') {
+                    $cmp = $a['id'] <=> $b['id'];
+                } else {
+                    $cmp = strcasecmp((string) $a[$sort], (string) $b[$sort]);
+                }
+                return $dir === 'desc' ? -$cmp : $cmp;
+            });
+
+            return $this->jsonResponse(['success' => true, 'data' => ['items' => $items, 'total' => count($items), 'nextCursor' => null]]);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);
         }

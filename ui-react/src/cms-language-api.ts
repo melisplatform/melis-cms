@@ -15,8 +15,17 @@ export interface LangItem {
   name: string
 }
 export interface LangStats { total: number }
-export interface LangListResult { items: LangItem[]; total: number; page: number; limit: number }
+export interface LangListResult { items: LangItem[]; total: number; nextCursor: string | null }
 export interface LangSavePayload { id?: number | null; locale: string; name: string }
+
+export type LangSortKey = 'id' | 'locale' | 'name'
+export interface LangListParams {
+  limit?: number
+  search?: string
+  sort?: LangSortKey | string
+  dir?: 'asc' | 'desc'
+  after?: string
+}
 
 async function apiFetch<T>(url: string, opts?: RequestInit): Promise<T> {
   const res = await fetch(url, {
@@ -37,10 +46,13 @@ async function apiFetch<T>(url: string, opts?: RequestInit): Promise<T> {
   return data.data as T
 }
 
-export async function fetchLanguages(params: { search?: string } = {}): Promise<LangListResult> {
+export async function fetchLanguages(params: LangListParams = {}): Promise<LangListResult> {
   const qs = new URLSearchParams()
-  qs.set('limit', '9999')
+  qs.set('limit', String(params.limit ?? 25))
   if (params.search) qs.set('search', params.search)
+  if (params.sort) qs.set('sort', String(params.sort))
+  if (params.dir) qs.set('dir', params.dir)
+  if (params.after) qs.set('after', params.after)
   return apiFetch<LangListResult>(`/melis/react-api/cms-languages?${qs}`)
 }
 

@@ -6,6 +6,7 @@ use MelisReactApi\Controller\CapabilityGuardTrait;
 
 use Laminas\Http\PhpEnvironment\Response as HttpResponse;
 use MelisCore\Controller\MelisAbstractActionController;
+use MelisCore\Controller\MelisReactKeysetListTrait;
 
 /**
  * API REST pour l'outil « Platforms IDs » de MelisCms (table melis_cms_platform_ids).
@@ -25,11 +26,27 @@ use MelisCore\Controller\MelisAbstractActionController;
 class MelisReactApiCmsPlatformIdController extends MelisAbstractActionController
 {
     use CapabilityGuardTrait;
+    use MelisReactKeysetListTrait;
 
     private const MELIS_KEY = 'meliscms_tool_platform_ids';
 
-    private const COLS = 'pids_id, pids_page_id_start, pids_page_id_current, pids_page_id_end, '
-                       . 'pids_tpl_id_start, pids_tpl_id_current, pids_tpl_id_end';
+    private const COLS = 'p.pids_id, p.pids_page_id_start, p.pids_page_id_current, p.pids_page_id_end, '
+                       . 'p.pids_tpl_id_start, p.pids_tpl_id_current, p.pids_tpl_id_end';
+
+    /**
+     * Whitelist des colonnes triables (clé front → expression SQL NON-NULL).
+     * Défaut : id DESC (comme l'ancienne liste). name = nom de la plateforme (jointure).
+     */
+    private const SORT_MAP = [
+        'id'          => 'p.pids_id',
+        'name'        => "COALESCE(cp.plf_name, '')",
+        'pageStart'   => 'COALESCE(p.pids_page_id_start, 0)',
+        'pageCurrent' => 'COALESCE(p.pids_page_id_current, 0)',
+        'pageEnd'     => 'COALESCE(p.pids_page_id_end, 0)',
+        'tplStart'    => 'COALESCE(p.pids_tpl_id_start, 0)',
+        'tplCurrent'  => 'COALESCE(p.pids_tpl_id_current, 0)',
+        'tplEnd'      => 'COALESCE(p.pids_tpl_id_end, 0)',
+    ];
     // Le nom de la plateforme n'est PAS dans melis_cms_platform_ids : il vient de melis_core_platform
     // via la relation 1:1 pids_id = plf_id (cf. MelisPlatformIdsTable::getPlatformIdsByPlatformName).
     private const JOIN = ' FROM melis_cms_platform_ids p LEFT JOIN melis_core_platform cp ON cp.plf_id = p.pids_id ';
@@ -40,37 +57,44 @@ class MelisReactApiCmsPlatformIdController extends MelisAbstractActionController
         if ($denyCap = $this->denyUnlessCan('list')) { return $denyCap; }
 
         try {
-            $page   = max(1, (int) $this->params()->fromQuery('page', 1));
             $limit  = min(9999, max(1, (int) $this->params()->fromQuery('limit', 25)));
             $search = trim((string) ($this->params()->fromQuery('search', '') ?? ''));
-            $offset = ($page - 1) * $limit;
+            $sort   = (string) $this->params()->fromQuery('sort', 'id');
+            $dir    = (string) $this->params()->fromQuery('dir', 'desc');
+            $after  = (string) $this->params()->fromQuery('after', '');
 
             $db = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
 
-            $where = '';
+            $where = [];
             $params = [];
             if ($search !== '') {
                 $like  = '%' . $search . '%';
-                $where = 'WHERE (CONCAT_WS(\'|\', p.pids_id, COALESCE(cp.plf_name, \'\'), p.pids_page_id_start, p.pids_page_id_current, p.pids_page_id_end, p.pids_tpl_id_start, p.pids_tpl_id_current, p.pids_tpl_id_end) LIKE ?)';
+                $where[] = "(CONCAT_WS('|', p.pids_id, COALESCE(cp.plf_name, ''), p.pids_page_id_start, p.pids_page_id_current, p.pids_page_id_end, p.pids_tpl_id_start, p.pids_tpl_id_current, p.pids_tpl_id_end) LIKE ?)";
                 $params = [$like];
             }
 
-            $total = (int) (iterator_to_array($db->query(
-                "SELECT COUNT(*) AS total" . self::JOIN . "$where", $params
-            ))[0]['total'] ?? 0);
-
-            $rows = $db->query(
-                "SELECT " . self::COLS . ", cp.plf_name" . self::JOIN . "$where
-                 ORDER BY p.pids_id DESC LIMIT ? OFFSET ?",
-                array_merge($params, [$limit, $offset])
-            );
+            [$rows, $total, $next] = $this->keysetList([
+                'db'           => $db,
+                'from'         => 'melis_cms_platform_ids p',
+                'joins'        => 'LEFT JOIN melis_core_platform cp ON cp.plf_id = p.pids_id',
+                'selectCols'   => self::COLS . ', cp.plf_name',
+                'filterWhere'  => $where,
+                'filterParams' => $params,
+                'sortMap'      => self::SORT_MAP,
+                'idCol'        => 'p.pids_id',
+                'idAlias'      => 'pids_id',
+                'sortKey'      => $sort,
+                'dir'          => $dir,
+                'after'        => $after,
+                'limit'        => $limit,
+            ]);
 
             $items = [];
             foreach ($rows as $row) { $items[] = $this->formatPid((array) $row); }
 
             return $this->jsonResponse([
                 'success' => true,
-                'data'    => ['items' => $items, 'total' => $total, 'page' => $page, 'limit' => $limit],
+                'data'    => ['items' => $items, 'total' => $total, 'nextCursor' => $next],
             ]);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);

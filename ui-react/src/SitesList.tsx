@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { ViewToggle } from './ViewToggle'
 import { ExportModal } from './ExportModal'
+import { useKeysetList } from './use-keyset-list'
 import { fetchSites, deleteSite, minifyAssets, consumeSitesListStale, type SiteItem } from './sites-api'
 
 const MELIS_KEY = 'meliscms_tool_sites'
@@ -83,6 +84,15 @@ function Loader2Icon({ size = 14 }: { size?: number }) {
 const RotateCcwIcon = ({ spinning }: { spinning?: boolean }) => <svg style={{ ...sIcon, ...(spinning ? { animation: 'melis-sites-spin 0.6s linear infinite', transformOrigin: 'center' } : {}) }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>
 // Minifier les assets : Minimize2 lucide (mêmes flèches vers le centre que le fa-compress legacy).
 const MinifyIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" /></svg>
+
+// Icône de tri (mêmes tracés que le core) — asc / desc / neutre (opacité réduite).
+function SortIcon({ dir }: { dir: 'asc' | 'desc' | null }) {
+  const p = { width: 12, height: 12, viewBox: '0 0 24 24', fill: 'none' as const, stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, style: { flexShrink: 0, display: 'inline-block', opacity: dir ? 1 : 0.3 } }
+  if (dir === 'asc')  return <svg {...p}><path d="m5 12 7-7 7 7" /><path d="M12 19V5" /></svg>
+  if (dir === 'desc') return <svg {...p}><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></svg>
+  return <svg {...p}><path d="m21 16-4 4-4-4" /><path d="M17 20V4" /><path d="m3 8 4-4 4 4" /><path d="M7 4v16" /></svg>
+}
+const SORTABLE = new Set(['id', 'label', 'name'])
 
 /** Drapeau de langue (image MelisCore /assets/images/lang/<short>.png). en_EN → en, fr_FR → fr. */
 function LangFlag({ locale, name }: { locale: string; name: string }) {
@@ -201,8 +211,6 @@ export default function SitesList({ active, onEdit, onNew }: {
   onEdit: (id: number, label: string) => void
   onNew: () => void
 }) {
-  const [items, setItems] = useState<SiteItem[]>([])
-  const [loading, setLoading] = useState(false)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [tick, setTick] = useState(0)
@@ -215,10 +223,16 @@ export default function SitesList({ active, onEdit, onNew }: {
   const [showCols, setShowCols] = useState(false)
   const [showExport, setShowExport] = useState(false)
 
-  useEffect(() => {
-    setLoading(true)
-    fetchSites(search).then(setItems).catch(() => null).finally(() => setLoading(false))
-  }, [search, tick])
+  // Tri server-side via le hook mutualisé. La liste est courte (nextCursor toujours null → pas de
+  // scroll infini), mais le tri passe côté serveur et un changement de colonne relance un fetch.
+  const {
+    items, loading, sentinelRef, sortCol, sortDir, toggleSort, reload, removeLocal,
+  } = useKeysetList<SiteItem>({
+    fetcher: (a) => fetchSites({ search, sort: a.sort, dir: a.dir }),
+    deps: [search, tick],
+    defaultSort: 'id',
+    defaultDir: 'asc',
+  })
 
   // Recherche live débouncée (le load dépend de `search`, l'input ne touche que `searchInput`).
   useEffect(() => {
@@ -231,30 +245,26 @@ export default function SitesList({ active, onEdit, onNew }: {
   // Recharge quand la liste redevient active après une création/édition/suppression.
   useEffect(() => { if (active && consumeSitesListStale()) setTick((x) => x + 1) }, [active])
 
-  const sorted = useMemo(() => [...items].sort((a, b) => a.id - b.id), [items])
-
-  // Rafraîchir : vide la liste (→ ré-entre dans la branche « spinner + Chargement », sinon le
-  // stale-while-revalidate garde les lignes et le clic paraît sans effet) + spin le bouton.
+  // Rafraîchir : relance un chargement frais + spin le bouton.
   function handleRefresh() {
-    setItems([])
     setRefreshing(true)
-    setTick((x) => x + 1)
+    reload()
     setTimeout(() => setRefreshing(false), 600)
   }
 
-  // Réinitialiser les filtres : recherche (seul filtre de cette liste ; le tri est fixe, par id),
-  // puis refetch. On vide `items` : sinon les lignes restent affichées pendant le rechargement et
-  // le clic paraît sans effet quand aucune recherche n'était saisie.
+  // Réinitialiser les filtres : recherche (seul filtre de cette liste), puis refetch.
   function resetFilters() {
     setSearchInput(''); setSearch('')
-    setItems([])
-    setTick((x) => x + 1)
+    reload()
   }
 
   async function confirmDelete() {
     if (!toDelete) return
-    try { await deleteSite(toDelete.id) } catch { /* ignore */ }
-    setToDelete(null); setTick((x) => x + 1)
+    const id = toDelete.id
+    try { await deleteSite(id) } catch { /* ignore */ }
+    setToDelete(null)
+    removeLocal((s) => s.id === id)
+    reload()
   }
 
   // Minifier les assets (JS/CSS) du site — même endpoint legacy `/minify-assets` que le bouton
@@ -329,19 +339,25 @@ export default function SitesList({ active, onEdit, onNew }: {
               <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
                 <tr>
                   {visibleCols(cols).map(({ id }) => (
-                    <th key={id} style={{ ...th, ...(id === 'id' ? { width: 60 } : {}) }}>{t(COL_LABEL[id])}</th>
+                    SORTABLE.has(id) ? (
+                      <th key={id} style={{ ...th, ...(id === 'id' ? { width: 60 } : {}), cursor: 'pointer', ...(sortCol === id ? { color: 'var(--color-primary)' } : {}) }} onClick={() => toggleSort(id)}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t(COL_LABEL[id])}<SortIcon dir={sortCol === id ? sortDir : null} /></span>
+                      </th>
+                    ) : (
+                      <th key={id} style={{ ...th }}>{t(COL_LABEL[id])}</th>
+                    )
                   ))}
                   <th style={{ ...th, width: 120 }} />
                 </tr>
               </thead>
               <tbody>
-                {loading && sorted.length === 0 ? (
+                {loading && items.length === 0 ? (
                   <tr><td style={{ ...td, padding: '40px 16px', color: 'var(--color-muted-foreground)' }} colSpan={visibleCols(cols).length + 1}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}><Loader2Icon />{t('loading')}</div>
                   </td></tr>
-                ) : sorted.length === 0 ? (
+                ) : items.length === 0 ? (
                   <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(cols).length + 1}>{t('empty')}</td></tr>
-                ) : sorted.map((s) => (
+                ) : items.map((s) => (
                   <tr key={s.id}>
                     {visibleCols(cols).map(({ id }) => (
                       <td key={id} style={{ ...td, ...(id === 'id' ? { color: 'var(--color-muted-foreground)' } : {}), ...(id === 'label' ? { fontWeight: 600 } : {}), ...(id === 'name' ? { color: 'var(--color-muted-foreground)' } : {}) }}>
@@ -371,6 +387,8 @@ export default function SitesList({ active, onEdit, onNew }: {
                 ))}
               </tbody>
             </table>
+            {/* Sentinel scroll infini (inactif ici : liste courte, nextCursor toujours null). */}
+            <div ref={sentinelRef} style={{ height: 1 }} />
           </div>
         </>)}
       </div>
@@ -393,7 +411,7 @@ export default function SitesList({ active, onEdit, onNew }: {
         <ExportModal<SiteItem>
           cols={cols}
           labelFor={(id) => t(COL_LABEL[id])}
-          fetchAll={async () => fetchSites(search)}
+          fetchAll={async () => (await fetchSites({ search, sort: sortCol, dir: sortDir })).items}
           getCell={(item, id) => getCellExport(item, id)}
           filename="sites"
           sheetName={t('title')}

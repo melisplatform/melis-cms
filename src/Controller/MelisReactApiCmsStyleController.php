@@ -3,6 +3,7 @@
 namespace MelisCms\Controller;
 
 use MelisReactApi\Controller\CapabilityGuardTrait;
+use MelisCore\Controller\MelisReactKeysetListTrait;
 
 use Laminas\Http\PhpEnvironment\Response as HttpResponse;
 use MelisCore\Controller\MelisAbstractActionController;
@@ -27,6 +28,7 @@ use MelisCore\Controller\MelisAbstractActionController;
 class MelisReactApiCmsStyleController extends MelisAbstractActionController
 {
     use CapabilityGuardTrait;
+    use MelisReactKeysetListTrait;
 
     private const MELIS_KEY = 'meliscms_tool_styles';
 
@@ -36,49 +38,54 @@ class MelisReactApiCmsStyleController extends MelisAbstractActionController
         if ($denyCap = $this->denyUnlessCan('list')) { return $denyCap; }
 
         try {
-            $page   = max(1, (int) $this->params()->fromQuery('page', 1));
             $limit  = min(9999, max(1, (int) $this->params()->fromQuery('limit', 25)));
             $search = trim((string) ($this->params()->fromQuery('search', '') ?? ''));
             $siteId = (int) $this->params()->fromQuery('site', 0) ?: null;
             $status = $this->params()->fromQuery('status', '');
-            $offset = ($page - 1) * $limit;
+            $sort   = (string) $this->params()->fromQuery('sort', 'id');
+            $dir    = (string) $this->params()->fromQuery('dir', 'desc');
+            $after  = (string) $this->params()->fromQuery('after', '');
 
             $db = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
 
-            $where = [];
-            $params = [];
+            $filterWhere  = [];
+            $filterParams = [];
             if ($search !== '') {
-                $like    = '%' . $search . '%';
-                $where[] = '(st.style_name LIKE ? OR st.style_path LIKE ? OR s.site_name LIKE ? OR s.site_label LIKE ?)';
-                $params  = array_merge($params, [$like, $like, $like, $like]);
+                $like           = '%' . $search . '%';
+                $filterWhere[]  = '(st.style_name LIKE ? OR st.style_path LIKE ? OR s.site_name LIKE ? OR s.site_label LIKE ?)';
+                $filterParams   = array_merge($filterParams, [$like, $like, $like, $like]);
             }
-            if ($siteId) { $where[] = 'st.style_site_id = ?'; $params[] = $siteId; }
-            if ($status === '0' || $status === '1') { $where[] = 'st.style_status = ?'; $params[] = (int) $status; }
-            $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+            if ($siteId) { $filterWhere[] = 'st.style_site_id = ?'; $filterParams[] = $siteId; }
+            if ($status === '0' || $status === '1') { $filterWhere[] = 'st.style_status = ?'; $filterParams[] = (int) $status; }
 
-            $total = (int) (iterator_to_array($db->query(
-                "SELECT COUNT(*) AS total
-                 FROM melis_cms_style st
-                 LEFT JOIN melis_cms_site s ON s.site_id = st.style_site_id
-                 $whereClause", $params
-            ))[0]['total'] ?? 0);
-
-            $rows = $db->query(
-                "SELECT st.style_id, st.style_site_id, st.style_name, st.style_status, st.style_path,
-                        s.site_name, s.site_label
-                 FROM melis_cms_style st
-                 LEFT JOIN melis_cms_site s ON s.site_id = st.style_site_id
-                 $whereClause
-                 ORDER BY st.style_id DESC LIMIT ? OFFSET ?",
-                array_merge($params, [$limit, $offset])
-            );
+            [$rows, $total, $next] = $this->keysetList([
+                'db'           => $db,
+                'from'         => 'melis_cms_style st',
+                'joins'        => 'LEFT JOIN melis_cms_site s ON s.site_id = st.style_site_id',
+                'selectCols'   => 'st.style_id, st.style_site_id, st.style_name, st.style_status, st.style_path, s.site_name, s.site_label',
+                'filterWhere'  => $filterWhere,
+                'filterParams' => $filterParams,
+                'sortMap'      => [
+                    'id'     => 'st.style_id',
+                    'status' => 'COALESCE(st.style_status, 0)',
+                    'name'   => "COALESCE(st.style_name, '')",
+                    'path'   => "COALESCE(st.style_path, '')",
+                    'site'   => "COALESCE(NULLIF(s.site_label, ''), s.site_name, '')",
+                ],
+                'idCol'        => 'st.style_id',
+                'idAlias'      => 'style_id',
+                'sortKey'      => $sort,
+                'dir'          => $dir,
+                'after'        => $after,
+                'limit'        => $limit,
+            ]);
 
             $items = [];
             foreach ($rows as $row) { $items[] = $this->formatStyle((array) $row); }
 
             return $this->jsonResponse([
                 'success' => true,
-                'data'    => ['items' => $items, 'total' => $total, 'page' => $page, 'limit' => $limit],
+                'data'    => ['items' => $items, 'total' => $total, 'nextCursor' => $next],
             ]);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);

@@ -22,7 +22,14 @@ export interface PlatformIdItem {
 export interface AvailablePlatform { id: number; name: string }
 // availablePlatforms = plateformes SANS plage : on ne peut créer une plage que pour l'une d'elles.
 export interface PlatformIdStats { total: number; availablePlatforms: AvailablePlatform[] }
-export interface PlatformIdListResult { items: PlatformIdItem[]; total: number; page: number; limit: number }
+export interface PlatformIdListResult { items: PlatformIdItem[]; total: number; nextCursor: string | null }
+export interface PlatformIdListParams {
+  limit?: number
+  search?: string
+  sort?: string
+  dir?: 'asc' | 'desc'
+  after?: string
+}
 export interface PlatformIdSavePayload {
   id?: number | null
   platformId?: number | null   // création : plateforme (plf_id) à rattacher (pids_id = plf_id)
@@ -53,10 +60,13 @@ async function apiFetch<T>(url: string, opts?: RequestInit): Promise<T> {
   return data.data as T
 }
 
-export async function fetchPlatformIds(params: { search?: string } = {}): Promise<PlatformIdListResult> {
+export async function fetchPlatformIds(params: PlatformIdListParams = {}): Promise<PlatformIdListResult> {
   const qs = new URLSearchParams()
-  qs.set('limit', '9999')
+  qs.set('limit', String(params.limit ?? 25))
   if (params.search) qs.set('search', params.search)
+  if (params.sort) qs.set('sort', params.sort)
+  if (params.dir) qs.set('dir', params.dir)
+  if (params.after) qs.set('after', params.after)
   return apiFetch<PlatformIdListResult>(`/melis/react-api/cms-platform-ids?${qs}`)
 }
 

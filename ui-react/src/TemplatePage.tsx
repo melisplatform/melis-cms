@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties, type FormEvent } from 'react'
+import { useEffect, useState, type CSSProperties, type FormEvent } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   deleteTemplate, fetchTemplate, fetchTemplates, fetchTemplateSites, fetchTemplateStats, saveTemplate,
@@ -6,6 +6,7 @@ import {
 } from './template-api'
 import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle } from './ViewToggle'
+import { useKeysetList } from './use-keyset-list'
 
 /* ──────────────────────────────────────────────────────────────────────────
  * Brique « Templates » (MelisCms). LISTE + CRÉATION + ÉDITION sont full React (montées à
@@ -83,7 +84,25 @@ const btnPrimary: CSSProperties = { display: 'inline-flex', alignItems: 'center'
 const btnGhost: CSSProperties = { display: 'inline-flex', alignItems: 'center', gap: 6, height: 36, padding: '0 12px', borderRadius: 8, border: '1px solid var(--color-border)', background: 'var(--color-card)', color: 'var(--color-foreground)', fontSize: 14, cursor: 'pointer' }
 const iconBtn: CSSProperties = { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 6, border: 0, background: 'transparent', color: 'var(--color-muted-foreground)', cursor: 'pointer' }
 const th: CSSProperties = { textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.04em', color: 'var(--color-muted-foreground)', whiteSpace: 'nowrap' }
+
+/** Icône de tri unifiée — mêmes tracés que lucide ArrowUpDown/ArrowUp/ArrowDown du core. */
+function SortIcon({ dir }: { dir: 'asc' | 'desc' | null }) {
+  const p = { width: 12, height: 12, viewBox: '0 0 24 24', fill: 'none' as const, stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, style: { flexShrink: 0, display: 'inline-block', opacity: dir ? 1 : 0.3 } }
+  if (dir === 'asc')  return <svg {...p}><path d="m5 12 7-7 7 7" /><path d="M12 19V5" /></svg>
+  if (dir === 'desc') return <svg {...p}><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></svg>
+  return <svg {...p}><path d="m21 16-4 4-4-4" /><path d="M17 20V4" /><path d="m3 8 4-4 4 4" /><path d="M7 4v16" /></svg>
+}
 const td: CSSProperties = { padding: '10px 16px', fontSize: 14, color: 'var(--color-foreground)', borderTop: '1px solid var(--color-border)' }
+
+/** Petit spinner inline (la brique ne peut pas importer lucide/Loader2 de l'hôte). */
+function Spinner() {
+  return (
+    <svg style={{ width: 16, height: 16, verticalAlign: 'middle', animation: 'melis-spin 0.7s linear infinite' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+      <style>{`@keyframes melis-spin{to{transform:rotate(360deg)}}`}</style>
+    </svg>
+  )
+}
 const panelCss: CSSProperties = { display: 'flex', flexDirection: 'column', gap: 2, minHeight: 130, maxHeight: 'min(48vh, 320px)', overflowY: 'auto', minWidth: 0, borderRadius: 8, border: '1px dashed var(--color-border)', padding: 6 }
 const panelTitle: CSSProperties = { padding: '0 6px 4px', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--color-muted-foreground)' }
 
@@ -202,19 +221,15 @@ export default function TemplatePage({ active = true }: { active?: boolean }) {
   return <TemplateList base={base} />
 }
 
-// ── Liste (native) ──────────────────────────────────────────────────────────
+// ── Liste (native, scroll infini keyset + tri server-side) ────────────────────
 function TemplateList({ base }: { base: string }) {
   const t = useT()
   const navigate = useNavigate()
-  const [items, setItems] = useState<TemplateItem[]>([])
   const [stats, setStats] = useState<TemplateStats | null>(null)
   const [sites, setSites] = useState<SiteOption[]>([])
-  const [loading, setLoading] = useState(false)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [site, setSite] = useState<number | null>(null)
-  const [sortCol, setSortCol] = useState<string | null>(null)
-  const [sortAsc, setSortAsc] = useState(true)
   const [toDelete, setToDelete] = useState<TemplateItem | null>(null)
   const [tick, setTick] = useState(0)
   const [cols, setCols] = useState<ColDef[]>(loadCols)
@@ -223,39 +238,30 @@ function TemplateList({ base }: { base: string }) {
   const [mode, setMode] = useState<'react' | 'iframe'>('react')
   const [frameLoaded, setFrameLoaded] = useState(false)
 
+  const { items, total, loading, hasMore, sentinelRef, sortCol, sortDir, toggleSort, reload, removeLocal } =
+    useKeysetList<TemplateItem>({
+      fetcher: (a) => fetchTemplates({ ...a, search, site }),
+      deps: [search, site, tick],
+      defaultSort: 'id',
+      defaultDir: 'asc',
+    })
+
   useEffect(() => { fetchTemplateStats().then(setStats).catch(() => null) }, [tick])
   useEffect(() => { fetchTemplateSites().then(setSites).catch(() => null) }, [])
-  useEffect(() => {
-    setLoading(true)
-    fetchTemplates({ search, site }).then((r) => setItems(r.items)).catch(() => null).finally(() => setLoading(false))
-  }, [search, site, tick])
 
   const cell = (r: TemplateItem, c: string): string | number => (
     c === 'id' ? r.id : c === 'name' ? r.name : c === 'type' ? r.typeLabel : c === 'ctrl' ? r.controllerAction : c === 'layout' ? r.layout : c === 'site' ? r.siteName : c === 'date' ? r.creationDate : ''
   )
-  const sorted = useMemo(() => {
-    if (!sortCol) return items
-    return [...items].sort((a, b) => {
-      const va = cell(a, sortCol), vb = cell(b, sortCol)
-      const na = typeof va === 'number' ? va : parseFloat(String(va)); const nb = typeof vb === 'number' ? vb : parseFloat(String(vb))
-      const cmp = !isNaN(na) && !isNaN(nb) ? na - nb : String(va).localeCompare(String(vb), undefined, { sensitivity: 'base' })
-      return sortAsc ? cmp : -cmp
-    })
-  }, [items, sortCol, sortAsc])
 
-  function toggleSort(id: string) { if (sortCol === id) setSortAsc((v) => !v); else { setSortCol(id); setSortAsc(true) } }
-  // Réinitialiser les filtres : recherche + site + tri par défaut (aucun → ordre de l'API), puis refetch.
-  // On vide `items` : sinon les lignes restent affichées pendant le rechargement et le clic paraît sans effet.
+  // Réinitialiser les filtres : recherche + site (le tri repart au défaut via reload/deps).
   function resetFilters() {
     setSearchInput(''); setSearch('')
     setSite(null)
-    setSortCol(null); setSortAsc(true)
-    setItems([])
     setTick((x) => x + 1)
   }
   async function confirmDelete() {
     if (!toDelete) return
-    try { await deleteTemplate(toDelete.id); setToDelete(null); setTick((x) => x + 1) } catch { setToDelete(null) }
+    try { await deleteTemplate(toDelete.id); removeLocal((r) => r.id === toDelete.id); setToDelete(null); reload() } catch { setToDelete(null) }
   }
   const renderCellNode = (r: TemplateItem, c: string) => {
     if (c === 'type') return <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 6, fontSize: 12, background: 'color-mix(in srgb, var(--color-primary) 10%, transparent)', color: 'var(--color-primary)' }}>{r.typeLabel}</span>
@@ -319,17 +325,17 @@ function TemplateList({ base }: { base: string }) {
           <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
             <tr>
               {visibleCols(cols).map(({ id }) => (
-                <th key={id} style={{ ...th, cursor: 'pointer', ...(id === 'id' ? { width: 60 } : {}) }} onClick={() => toggleSort(id)}>
-                  {t(COL_LABEL[id])}{sortCol === id ? (sortAsc ? ' ↑' : ' ↓') : ''}
+                <th key={id} style={{ ...th, cursor: 'pointer', ...(id === 'id' ? { width: 60 } : {}), ...(sortCol === id ? { color: 'var(--color-primary)' } : {}) }} onClick={() => toggleSort(id)}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t(COL_LABEL[id])}<SortIcon dir={sortCol === id ? sortDir : null} /></span>
                 </th>
               ))}
               <th style={{ ...th, width: 80 }} />
             </tr>
           </thead>
           <tbody>
-            {sorted.length === 0 && !loading ? (
+            {items.length === 0 && !loading ? (
               <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(cols).length + 1}>{t('empty')}</td></tr>
-            ) : sorted.map((r) => (
+            ) : items.map((r) => (
               <tr key={r.id}>
                 {visibleCols(cols).map(({ id }) => (
                   <td key={id} style={{ ...td, ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}) }}>{renderCellNode(r, id)}</td>
@@ -344,8 +350,10 @@ function TemplateList({ base }: { base: string }) {
             ))}
           </tbody>
         </table>
+        {/* Sentinelle du scroll infini + pied (spinner en chargement, compteur en fin de liste). */}
+        <div ref={sentinelRef} style={{ height: 1 }} />
         <div style={{ padding: '10px 16px', textAlign: 'center', fontSize: 12, color: 'var(--color-muted-foreground)' }}>
-          {loading ? t('loading') : t('count', { n: items.length })}
+          {loading ? <Spinner /> : (!hasMore && items.length > 0 ? t('count', { n: total }) : '')}
         </div>
       </div>
       </>)}
@@ -368,11 +376,20 @@ function TemplateList({ base }: { base: string }) {
         <ExportModal<TemplateItem>
           cols={cols}
           labelFor={(id) => t(COL_LABEL[id])}
-          fetchAll={async () => (await fetchTemplates({ search, site })).items}
+          fetchAll={async () => {
+            const all: TemplateItem[] = []
+            let after: string | undefined
+            do {
+              const r = await fetchTemplates({ search, site, sort: sortCol, dir: sortDir, after, limit: 100 })
+              all.push(...r.items)
+              after = r.nextCursor ?? undefined
+            } while (after)
+            return all
+          }}
           getCell={(r, id) => cell(r, id)}
           filename="templates"
           sheetName={t('title')}
-          total={items.length}
+          total={total}
           onClose={() => setShowExport(false)}
         />
       )}

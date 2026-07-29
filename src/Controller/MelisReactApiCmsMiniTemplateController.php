@@ -39,41 +39,139 @@ class MelisReactApiCmsMiniTemplateController extends MelisAbstractActionControll
         try {
             $site   = trim((string) ($this->params()->fromQuery('site', '') ?? ''));
             $search = strtolower(trim((string) ($this->params()->fromQuery('search', '') ?? '')));
-            $page   = max(1, (int) $this->params()->fromQuery('page', 1));
             $limit  = min(9999, max(1, (int) $this->params()->fromQuery('limit', 50)));
+            $sort   = (string) $this->params()->fromQuery('sort', 'path');
+            $dir    = strtolower((string) $this->params()->fromQuery('dir', 'asc')) === 'desc' ? 'desc' : 'asc';
+            $after  = (string) $this->params()->fromQuery('after', '');
 
             if ($site === '') {
                 return $this->jsonResponse([
                     'success' => true,
-                    'data'    => ['items' => [], 'total' => 0, 'page' => $page, 'limit' => $limit],
+                    'data'    => ['items' => [], 'total' => 0, 'nextCursor' => null],
                 ]);
+            }
+
+            // Inventaire = fichiers .phtml sur disque (pas de table DB), donc on ne peut pas passer par
+            // MelisReactKeysetListTrait (SQL). On reproduit le scan du service SANS l'appeler (spec),
+            // puis on trie + pagine en keyset côté PHP sur le tableau en mémoire (contrat identique :
+            // items/total/nextCursor → hook useKeysetList inchangé).
+            $names = $this->scanMiniTemplateNames($site);
+
+            // Search filter (sur le nom / chemin affiché = le nom du template).
+            if ($search !== '') {
+                $names = array_values(array_filter($names, fn ($n) => strpos(strtolower($n), $search) !== false));
+            }
+
+            $total = count($names);
+
+            // Tri server-side whitelisté. Seul « path » (= nom du template) est triable côté UI.
+            $sortAsc = $dir === 'asc';
+            usort($names, function ($a, $b) use ($sortAsc) {
+                $cmp = strcasecmp($a, $b);
+                if ($cmp === 0) { $cmp = strcmp($a, $b); } // tiebreaker stable
+                return $sortAsc ? $cmp : -$cmp;
+            });
+
+            // Keyset : le curseur porte le dernier nom émis ; on reprend STRICTEMENT après.
+            $startIdx = 0;
+            if ($after !== '') {
+                $cur = json_decode((string) base64_decode($after, true), true);
+                $lastName = is_array($cur) ? (string) ($cur['v'] ?? '') : '';
+                if ($lastName !== '') {
+                    foreach ($names as $i => $n) {
+                        $c = strcasecmp($n, $lastName);
+                        if ($c === 0) { $c = strcmp($n, $lastName); }
+                        $strictlyAfter = $sortAsc ? ($c > 0) : ($c < 0);
+                        if ($strictlyAfter) { $startIdx = $i; break; }
+                        $startIdx = $i + 1;
+                    }
+                }
+            }
+
+            $paged = array_slice($names, $startIdx, $limit);
+
+            $nextCursor = null;
+            if (count($paged) === $limit && ($startIdx + $limit) < $total) {
+                $lastEmitted = $paged[count($paged) - 1];
+                $nextCursor  = base64_encode((string) json_encode(['v' => $lastEmitted]));
             }
 
             /** @var \MelisCms\Service\MelisCmsMiniTemplateService $svc */
             $svc   = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
-            $names = $svc->getMiniTemplates($site); // array of template name strings
-
-            // Apply search filter
-            if ($search !== '') {
-                $names = array_filter($names, fn ($n) => strpos(strtolower($n), $search) !== false);
-                $names = array_values($names);
-            }
-
-            $total  = count($names);
-            $paged  = array_slice($names, ($page - 1) * $limit, $limit);
-
-            $items  = [];
+            $items = [];
             foreach ($paged as $name) {
                 $items[] = $this->formatTemplate($svc, $site, $name);
             }
 
             return $this->jsonResponse([
                 'success' => true,
-                'data'    => ['items' => $items, 'total' => $total, 'page' => $page, 'limit' => $limit],
+                'data'    => ['items' => $items, 'total' => $total, 'nextCursor' => $nextCursor],
             ]);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);
         }
+    }
+
+    /**
+     * Reproduit MelisCmsMiniTemplateService::getMiniTemplates() SANS appeler le service (spec) :
+     * scanne le dossier miniTemplatesTinyMce du MODULE + celui du ROOT PUBLIC, ne garde que les
+     * .phtml, et EXCLUT du module ceux déjà « flagged » (déplacés/à jour dans le root public).
+     * La table de flagging est lue en SQL brut (melis_cms_mini_tpl_flagged_template).
+     *
+     * @return string[] noms de templates (dédupliqués)
+     */
+    private function scanMiniTemplateNames(string $site): array
+    {
+        $db = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
+
+        // Templates du module déjà flaggés → à ignorer côté module (leur version à jour est en root public).
+        $flagged = [];
+        foreach (iterator_to_array($db->query(
+            'SELECT mtpft_template_name FROM melis_cms_mini_tpl_flagged_template WHERE mtpft_template_module = ?',
+            [$site]
+        )) as $r) {
+            $flagged[(string) $r['mtpft_template_name']] = true;
+        }
+
+        $modulePath     = $this->moduleMtplPath($site);
+        $rootPublicPath = $this->rootPublicMtplPath($site);
+
+        $names = [];
+        // Ordre : module puis root public (comme le service). $isModulePath contrôle l'exclusion des flaggés.
+        foreach ([[$modulePath, true], [$rootPublicPath, false]] as [$path, $isModulePath]) {
+            if ($path === null || !is_dir($path)) { continue; }
+            foreach (array_diff(scandir($path), ['.', '..']) as $file) {
+                $ext = pathinfo((string) $file, PATHINFO_EXTENSION);
+                if ($ext !== 'phtml') { continue; }
+                $name = pathinfo((string) $file, PATHINFO_FILENAME);
+                if ($name === '') { continue; }
+                if ($isModulePath && isset($flagged[$name])) { continue; }
+                $names[$name] = true; // dédup (module + root public peuvent se recouper)
+            }
+        }
+
+        return array_keys($names);
+    }
+
+    /**
+     * Chemin miniTemplatesTinyMce DU MODULE (site) sans passer par MelisCmsSiteService (spec).
+     * On résout le dossier du module via ModulesService (composer) avec repli module/MelisSites.
+     */
+    private function moduleMtplPath(string $site): ?string
+    {
+        $modRoot = null;
+        try {
+            $modulesSrv = $this->getServiceManager()->get('ModulesService');
+            $composer   = (string) $modulesSrv->getComposerModulePath($site);
+            if ($composer !== '') { $modRoot = $composer; }
+        } catch (\Throwable) {}
+        if ($modRoot === null) {
+            $docRoot = rtrim((string) ($_SERVER['DOCUMENT_ROOT'] ?? ''), '/\\');
+            $modRoot = $docRoot . '/../module/MelisSites/' . $site;
+        }
+        $mtpl = rtrim((string) $modRoot, '/\\') . '/public/miniTemplatesTinyMce';
+        $real = realpath($mtpl);
+        return $real !== false ? $real : (is_dir($mtpl) ? $mtpl : null);
     }
 
     // ─── Stats ────────────────────────────────────────────────────────────────

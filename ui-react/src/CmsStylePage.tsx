@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   deleteStyle, fetchStyleById, fetchStyles, fetchStyleSites, fetchStyleStats,
   saveStyle, type StyleItem, type StyleStats, type SiteOption,
 } from './cms-style-api'
+import { useKeysetList } from './use-keyset-list'
 import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle } from './ViewToggle'
 
@@ -107,6 +108,14 @@ const PencilIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stro
 const TrashIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /></svg>
 const PlusIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
 const ResetIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v6h6" /><path d="M3 13a9 9 0 1 0 3-7.7L3 8" /></svg>
+// Icônes de tri : neutre (ArrowUpDown) sur les en-têtes triables non actives, flèche haut/bas sur l'active.
+const sortSvg = { width: 12, height: 12, flexShrink: 0, marginLeft: 4, verticalAlign: 'middle', display: 'inline-block', opacity: 0.75 } as const
+const ArrowUpDown = () => <svg style={sortSvg} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21 16-4 4-4-4" /><path d="M17 20V4" /><path d="m3 8 4-4 4 4" /><path d="M7 4v16" /></svg>
+const ArrowUp = () => <svg style={sortSvg} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 7-7 7 7" /><path d="M12 19V5" /></svg>
+const ArrowDown = () => <svg style={sortSvg} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></svg>
+const SortArrow = ({ col, sortCol, sortDir }: { col: string; sortCol: string; sortDir: 'asc' | 'desc' }) =>
+  sortCol === col ? (sortDir === 'asc' ? <ArrowUp /> : <ArrowDown />) : <ArrowUpDown />
+const SpinnerIcon = () => <svg style={{ width: 14, height: 14, animation: 'melis-spin 0.7s linear infinite' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
 
 // ── Colonnes (masquer + réordonner par glisser-déposer, persisté) ──
 type ColDef = { id: string; visible: boolean }
@@ -268,15 +277,12 @@ export default function CmsStylePage({ active = true }: { active?: boolean }) {
 function StyleList({ base }: { base: string }) {
   const t = useT()
   const navigate = useNavigate()
-  const [items, setItems] = useState<StyleItem[]>([])
   const [stats, setStats] = useState<StyleStats | null>(null)
   const [sites, setSites] = useState<SiteOption[]>([])
-  const [loading, setLoading] = useState(false)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [site, setSite] = useState<number | null>(null)
   const [status, setStatus] = useState<'' | '0' | '1'>('')
-  const [sortAsc, setSortAsc] = useState(false)
   const [toDelete, setToDelete] = useState<StyleItem | null>(null)
   const [tick, setTick] = useState(0)
   const [cols, setCols] = useState<ColDef[]>(loadCols)
@@ -285,30 +291,32 @@ function StyleList({ base }: { base: string }) {
   const [mode, setMode] = useState<'react' | 'iframe'>('react')
   const [frameLoaded, setFrameLoaded] = useState(false)
 
+  // Scroll infini + tri server-side + keyset (mutualisé). Le fetcher capture les filtres courants ;
+  // `deps` relance un chargement frais à chaque changement de filtre (ou refresh via `tick`).
+  const {
+    items, total, loading, hasMore, sentinelRef, sortCol, sortDir, toggleSort, reload, removeLocal,
+  } = useKeysetList<StyleItem>({
+    fetcher: (a) => fetchStyles({ ...a, search, site, status }),
+    deps: [search, site, status, tick],
+    limit: 25,
+    defaultSort: 'id',
+    defaultDir: 'desc',
+  })
+
   useEffect(() => { fetchStyleStats().then(setStats).catch(() => null) }, [tick])
   useEffect(() => { fetchStyleSites().then(setSites).catch(() => null) }, [])
-  useEffect(() => {
-    setLoading(true)
-    fetchStyles({ search, site, status })
-      .then((r) => setItems(r.items)).catch(() => null).finally(() => setLoading(false))
-  }, [search, site, status, tick])
 
-  const sorted = useMemo(() => [...items].sort((a, b) => sortAsc ? a.id - b.id : b.id - a.id), [items, sortAsc])
-
-  // Réinitialiser les filtres : recherche + statut + site + tri par défaut (id desc), puis refetch.
-  // On vide `items` : sinon les lignes restent affichées pendant le rechargement et le clic paraît sans effet.
+  // Réinitialiser les filtres : recherche + statut + site → refetch frais via bump de `tick`.
   function resetFilters() {
     setSearchInput(''); setSearch('')
     setStatus('')
     setSite(null)
-    setSortAsc(false)
-    setItems([])
     setTick((x) => x + 1)
   }
 
   async function confirmDelete() {
     if (!toDelete) return
-    try { await deleteStyle(toDelete.id); setToDelete(null); setTick((x) => x + 1) }
+    try { await deleteStyle(toDelete.id); removeLocal((r) => r.id === toDelete.id); setToDelete(null); reload() }
     catch { setToDelete(null) }
   }
 
@@ -324,6 +332,7 @@ function StyleList({ base }: { base: string }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
+      <style>{'@keyframes melis-spin{to{transform:rotate(360deg)}}'}</style>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <div>
@@ -388,18 +397,18 @@ function StyleList({ base }: { base: string }) {
           <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
             <tr>
               {visibleCols(cols).map(({ id }) => (
-                <th key={id} style={{ ...th, ...(id === 'id' ? { cursor: 'pointer', width: 70 } : {}), ...(id === 'status' ? { width: 110 } : {}) }}
-                  onClick={id === 'id' ? () => setSortAsc((v) => !v) : undefined}>
-                  {t(COL_LABEL[id])}{id === 'id' ? ` ${sortAsc ? '↑' : '↓'}` : ''}
+                <th key={id} style={{ ...th, cursor: 'pointer', ...(id === 'id' ? { width: 70 } : {}), ...(id === 'status' ? { width: 110 } : {}) }}
+                  onClick={() => toggleSort(id)}>
+                  {t(COL_LABEL[id])}<SortArrow col={id} sortCol={sortCol} sortDir={sortDir} />
                 </th>
               ))}
               <th style={{ ...th, width: 80 }} />
             </tr>
           </thead>
           <tbody>
-            {sorted.length === 0 && !loading ? (
+            {items.length === 0 && !loading ? (
               <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(cols).length + 1}>{t('empty')}</td></tr>
-            ) : sorted.map((r) => (
+            ) : items.map((r) => (
               <tr key={r.id}>
                 {visibleCols(cols).map(({ id }) => (
                   <td key={id} style={{ ...td, ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}), ...(id === 'path' ? { fontFamily: 'monospace', fontSize: 13 } : {}) }}>
@@ -420,9 +429,18 @@ function StyleList({ base }: { base: string }) {
             ))}
           </tbody>
         </table>
-        <div style={{ padding: '10px 16px', textAlign: 'center', fontSize: 12, color: 'var(--color-muted-foreground)' }}>
-          {loading ? t('loading') : t('count', { n: items.length })}
-        </div>
+        {/* Scroll infini : sentinelle observée → charge le lot suivant ; pied = spinner puis compteur final. */}
+        <div ref={sentinelRef} style={{ height: 1 }} />
+        {loading && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px 0', fontSize: 12, color: 'var(--color-muted-foreground)' }}>
+            <SpinnerIcon />{t('loading')}
+          </div>
+        )}
+        {!hasMore && items.length > 0 && (
+          <div style={{ padding: '10px 16px', textAlign: 'center', fontSize: 12, color: 'var(--color-muted-foreground)' }}>
+            {t('count', { n: total })}
+          </div>
+        )}
       </div>
       </>)}
       </div>
@@ -445,7 +463,17 @@ function StyleList({ base }: { base: string }) {
         <ExportModal<StyleItem>
           cols={cols}
           labelFor={(id) => t(COL_LABEL[id])}
-          fetchAll={async () => (await fetchStyles({ search, site, status })).items}
+          fetchAll={async () => {
+            // Export = tout le jeu filtré : on boucle sur le curseur keyset (100/lot) au lieu d'un limit géant.
+            const all: StyleItem[] = []
+            let after: string | undefined
+            do {
+              const r = await fetchStyles({ search, site, status, sort: sortCol, dir: sortDir, limit: 100, after })
+              all.push(...r.items)
+              after = r.nextCursor ?? undefined
+            } while (after)
+            return all
+          }}
           getCell={(r, id) => id === 'id' ? r.id : id === 'status' ? (r.status ? t('status_active') : t('status_inactive')) : id === 'name' ? r.name : id === 'path' ? r.path : id === 'site' ? r.siteName : ''}
           filename={t('export_filename')}
           sheetName={t('title')}

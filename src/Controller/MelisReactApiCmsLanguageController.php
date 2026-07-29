@@ -3,6 +3,7 @@
 namespace MelisCms\Controller;
 
 use MelisReactApi\Controller\CapabilityGuardTrait;
+use MelisCore\Controller\MelisReactKeysetListTrait;
 
 use Laminas\Http\PhpEnvironment\Response as HttpResponse;
 use MelisCore\Controller\MelisAbstractActionController;
@@ -25,6 +26,7 @@ use MelisCore\Controller\MelisAbstractActionController;
 class MelisReactApiCmsLanguageController extends MelisAbstractActionController
 {
     use CapabilityGuardTrait;
+    use MelisReactKeysetListTrait;
 
     private const MELIS_KEY = 'meliscms_tool_language';
 
@@ -34,38 +36,48 @@ class MelisReactApiCmsLanguageController extends MelisAbstractActionController
         if ($denyCap = $this->denyUnlessCan('list')) { return $denyCap; }
 
         try {
-            $page   = max(1, (int) $this->params()->fromQuery('page', 1));
             $limit  = min(9999, max(1, (int) $this->params()->fromQuery('limit', 25)));
             $search = trim((string) ($this->params()->fromQuery('search', '') ?? ''));
-            $offset = ($page - 1) * $limit;
+            $sort   = (string) $this->params()->fromQuery('sort', 'id');
+            $dir    = (string) $this->params()->fromQuery('dir', 'desc');
+            $after  = (string) $this->params()->fromQuery('after', '');
 
             $db = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
 
-            $where = '';
-            $params = [];
+            $filterWhere  = [];
+            $filterParams = [];
             if ($search !== '') {
-                $like   = '%' . $search . '%';
-                $where  = 'WHERE (lang_cms_locale LIKE ? OR lang_cms_name LIKE ?)';
-                $params = [$like, $like];
+                $like           = '%' . $search . '%';
+                $filterWhere[]  = '(lang_cms_locale LIKE ? OR lang_cms_name LIKE ?)';
+                $filterParams[] = $like;
+                $filterParams[] = $like;
             }
 
-            $total = (int) (iterator_to_array($db->query(
-                "SELECT COUNT(*) AS total FROM melis_cms_lang $where", $params
-            ))[0]['total'] ?? 0);
-
-            $rows = $db->query(
-                "SELECT lang_cms_id, lang_cms_locale, lang_cms_name
-                 FROM melis_cms_lang $where
-                 ORDER BY lang_cms_id DESC LIMIT ? OFFSET ?",
-                array_merge($params, [$limit, $offset])
-            );
+            [$rows, $total, $next] = $this->keysetList([
+                'db'           => $db,
+                'from'         => 'melis_cms_lang',
+                'selectCols'   => 'lang_cms_id, lang_cms_locale, lang_cms_name',
+                'filterWhere'  => $filterWhere,
+                'filterParams' => $filterParams,
+                'sortMap'      => [
+                    'id'     => 'lang_cms_id',
+                    'locale' => "COALESCE(lang_cms_locale, '')",
+                    'name'   => "COALESCE(lang_cms_name, '')",
+                ],
+                'idCol'        => 'lang_cms_id',
+                'idAlias'      => 'lang_cms_id',
+                'sortKey'      => $sort,
+                'dir'          => $dir,
+                'after'        => $after,
+                'limit'        => $limit,
+            ]);
 
             $items = [];
             foreach ($rows as $row) { $items[] = $this->formatLang((array) $row); }
 
             return $this->jsonResponse([
                 'success' => true,
-                'data'    => ['items' => $items, 'total' => $total, 'page' => $page, 'limit' => $limit],
+                'data'    => ['items' => $items, 'total' => $total, 'nextCursor' => $next],
             ]);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);

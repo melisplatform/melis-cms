@@ -32,10 +32,22 @@ async function apiFetch<T>(url: string, opts?: RequestInit): Promise<T> {
   return data.data as T
 }
 
-export async function fetchSites(search = ''): Promise<SiteItem[]> {
-  const qs = search ? `?search=${encodeURIComponent(search)}` : ''
-  const data = await apiFetch<{ items: SiteItem[]; total: number }>(`/melis/react-api/cms-sites${qs}`)
-  return data.items
+export interface FetchSitesParams { search?: string; sort?: string; dir?: 'asc' | 'desc' }
+export interface SitesListResult { items: SiteItem[]; total: number; nextCursor: string | null }
+
+/**
+ * Liste des sites. Le tri est SERVER-SIDE (le backend assemble via des services puis trie en PHP :
+ * keyset SQL inapplicable). La liste est courte → `nextCursor` est toujours `null` (pas de scroll
+ * infini), mais le format `{ items, total, nextCursor }` reste compatible avec le hook useKeysetList.
+ */
+export async function fetchSites(params: FetchSitesParams = {}): Promise<SitesListResult> {
+  const q = new URLSearchParams()
+  if (params.search) q.set('search', params.search)
+  if (params.sort) q.set('sort', params.sort)
+  if (params.dir) q.set('dir', params.dir)
+  const qs = q.toString() ? `?${q.toString()}` : ''
+  const data = await apiFetch<{ items: SiteItem[]; total: number; nextCursor?: string | null }>(`/melis/react-api/cms-sites${qs}`)
+  return { items: data.items, total: data.total, nextCursor: data.nextCursor ?? null }
 }
 
 export async function fetchSiteLangs(): Promise<SiteLang[]> {

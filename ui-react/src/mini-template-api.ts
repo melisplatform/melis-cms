@@ -35,8 +35,18 @@ export interface MiniTemplateSiteOption {
 export interface MiniTemplateListResult {
   items: MiniTemplateItem[]
   total: number
-  page: number
-  limit: number
+  nextCursor: string | null
+}
+
+// Seul le chemin (= nom du template) est triable côté UI (les mini-templates sont des fichiers sur disque).
+export type MiniTemplateSortKey = 'path'
+export interface MiniTemplateListParams {
+  site?: string
+  search?: string
+  limit?: number
+  sort?: MiniTemplateSortKey | string
+  dir?: 'asc' | 'desc'
+  after?: string
 }
 
 async function apiFetch<T>(url: string, opts?: RequestInit): Promise<T> {
@@ -58,18 +68,30 @@ async function apiFetch<T>(url: string, opts?: RequestInit): Promise<T> {
   return data.data as T
 }
 
-export async function fetchMiniTemplates(params: {
-  site?: string
-  search?: string
-  page?: number
-  limit?: number
-} = {}): Promise<MiniTemplateListResult> {
+export async function fetchMiniTemplates(params: MiniTemplateListParams = {}): Promise<MiniTemplateListResult> {
   const qs = new URLSearchParams()
-  if (params.site)              qs.set('site', params.site)
-  if (params.search)            qs.set('search', params.search)
-  if (params.page != null)      qs.set('page', String(params.page))
-  qs.set('limit', String(params.limit ?? 9999))
+  if (params.site)   qs.set('site', params.site)
+  if (params.search) qs.set('search', params.search)
+  if (params.sort)   qs.set('sort', String(params.sort))
+  if (params.dir)    qs.set('dir', params.dir)
+  if (params.after)  qs.set('after', params.after)
+  qs.set('limit', String(params.limit ?? 50))
   return apiFetch<MiniTemplateListResult>(`/melis/react-api/cms-mini-templates?${qs}`)
+}
+
+/**
+ * Charge TOUS les templates d'un site en bouclant sur le curseur keyset (100/lot).
+ * Utile là où la liste complète est requise (export, résolution du site propriétaire à l'édition).
+ */
+export async function fetchAllMiniTemplates(params: { site?: string; search?: string } = {}): Promise<MiniTemplateItem[]> {
+  const all: MiniTemplateItem[] = []
+  let after: string | undefined
+  do {
+    const r = await fetchMiniTemplates({ ...params, limit: 100, after })
+    all.push(...r.items)
+    after = r.nextCursor ?? undefined
+  } while (after)
+  return all
 }
 
 export async function fetchMiniTemplateStats(): Promise<MiniTemplateStats> {

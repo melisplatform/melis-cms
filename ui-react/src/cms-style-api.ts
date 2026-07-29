@@ -19,8 +19,19 @@ export interface StyleItem {
 }
 export interface StyleStats { total: number; active: number; inactive: number }
 export interface SiteOption { id: number; name: string }
-export interface StyleListResult { items: StyleItem[]; total: number; page: number; limit: number }
+export interface StyleListResult { items: StyleItem[]; total: number; nextCursor: string | null }
 export interface StyleSavePayload { id?: number | null; siteId: number; name: string; status: number; path: string }
+
+export type StyleSortKey = 'id' | 'status' | 'name' | 'path' | 'site'
+export interface StyleListParams {
+  limit?: number
+  search?: string
+  site?: number | null
+  status?: '' | '0' | '1'
+  sort?: StyleSortKey | string
+  dir?: 'asc' | 'desc'
+  after?: string
+}
 
 async function apiFetch<T>(url: string, opts?: RequestInit): Promise<T> {
   const res = await fetch(url, {
@@ -41,12 +52,15 @@ async function apiFetch<T>(url: string, opts?: RequestInit): Promise<T> {
   return data.data as T
 }
 
-export async function fetchStyles(params: { search?: string; site?: number | null; status?: '' | '0' | '1' } = {}): Promise<StyleListResult> {
+export async function fetchStyles(params: StyleListParams = {}): Promise<StyleListResult> {
   const qs = new URLSearchParams()
-  qs.set('limit', '9999')
+  qs.set('limit', String(params.limit ?? 25))
   if (params.search) qs.set('search', params.search)
   if (params.site) qs.set('site', String(params.site))
   if (params.status) qs.set('status', params.status)
+  if (params.sort) qs.set('sort', String(params.sort))
+  if (params.dir) qs.set('dir', params.dir)
+  if (params.after) qs.set('after', params.after)
   return apiFetch<StyleListResult>(`/melis/react-api/cms-styles?${qs}`)
 }
 

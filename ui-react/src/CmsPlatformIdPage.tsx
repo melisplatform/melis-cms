@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   deletePlatformId, fetchPlatformIdById, fetchPlatformIds, fetchPlatformIdStats,
@@ -6,6 +6,7 @@ import {
 } from './cms-platform-id-api'
 import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle } from './ViewToggle'
+import { useKeysetList } from './use-keyset-list'
 
 // Outil Platforms IDs legacy (vue « Old » en iframe). Voir brick.manifest.json.
 const MELIS_KEY = 'meliscms_tool_platform_ids'
@@ -102,7 +103,25 @@ const btnPrimary: CSSProperties = { display: 'inline-flex', alignItems: 'center'
 const btnGhost: CSSProperties = { display: 'inline-flex', alignItems: 'center', gap: 6, height: 36, padding: '0 12px', borderRadius: 8, border: '1px solid var(--color-border)', background: 'var(--color-card)', color: 'var(--color-foreground)', fontSize: 14, cursor: 'pointer' }
 const iconBtn: CSSProperties = { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 6, border: 0, background: 'transparent', color: 'var(--color-muted-foreground)', cursor: 'pointer' }
 const th: CSSProperties = { textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.04em', color: 'var(--color-muted-foreground)', whiteSpace: 'nowrap' }
+
+/** Icône de tri unifiée — mêmes tracés que lucide ArrowUpDown/ArrowUp/ArrowDown du core. */
+function SortIcon({ dir }: { dir: 'asc' | 'desc' | null }) {
+  const p = { width: 12, height: 12, viewBox: '0 0 24 24', fill: 'none' as const, stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, style: { flexShrink: 0, display: 'inline-block', opacity: dir ? 1 : 0.3 } }
+  if (dir === 'asc')  return <svg {...p}><path d="m5 12 7-7 7 7" /><path d="M12 19V5" /></svg>
+  if (dir === 'desc') return <svg {...p}><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></svg>
+  return <svg {...p}><path d="m21 16-4 4-4-4" /><path d="M17 20V4" /><path d="m3 8 4-4 4 4" /><path d="M7 4v16" /></svg>
+}
 const td: CSSProperties = { padding: '10px 16px', fontSize: 14, color: 'var(--color-foreground)', borderTop: '1px solid var(--color-border)' }
+
+/** Petit spinner inline (la brique ne peut pas importer lucide/Loader2 de l'hôte). */
+function Spinner() {
+  return (
+    <svg style={{ width: 16, height: 16, verticalAlign: 'middle', animation: 'melis-spin 0.7s linear infinite' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+      <style>{`@keyframes melis-spin{to{transform:rotate(360deg)}}`}</style>
+    </svg>
+  )
+}
 const label: CSSProperties = { display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 4, color: 'var(--color-foreground)' }
 const secTitle: CSSProperties = { fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--color-muted-foreground)', margin: '0 0 10px' }
 const numCell: CSSProperties = { fontVariantNumeric: 'tabular-nums' }
@@ -256,13 +275,9 @@ export default function CmsPlatformIdPage({ active = true }: { active?: boolean 
 function CmsPlatformIdList({ base }: { base: string }) {
   const t = useT()
   const navigate = useNavigate()
-  const [items, setItems] = useState<PlatformIdItem[]>([])
   const [stats, setStats] = useState<PlatformIdStats | null>(null)
-  const [loading, setLoading] = useState(false)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
-  const [sortCol, setSortCol] = useState<string>('id')
-  const [sortAsc, setSortAsc] = useState(false)
   const [toDelete, setToDelete] = useState<PlatformIdItem | null>(null)
   const [tick, setTick] = useState(0)
   const [cols, setCols] = useState<ColDef[]>(loadCols)
@@ -271,34 +286,25 @@ function CmsPlatformIdList({ base }: { base: string }) {
   const [mode, setMode] = useState<'react' | 'iframe'>('react')
   const [frameLoaded, setFrameLoaded] = useState(false)
 
+  const { items, total, loading, hasMore, sentinelRef, sortCol, sortDir, toggleSort, reload, removeLocal } =
+    useKeysetList<PlatformIdItem>({
+      fetcher: (a) => fetchPlatformIds({ ...a, search }),
+      deps: [search, tick],
+      defaultSort: 'id',
+      defaultDir: 'desc',
+    })
+
   useEffect(() => { fetchPlatformIdStats().then(setStats).catch(() => null) }, [tick])
-  useEffect(() => {
-    setLoading(true)
-    fetchPlatformIds({ search })
-      .then((r) => setItems(r.items)).catch(() => null).finally(() => setLoading(false))
-  }, [search, tick])
 
-  const sorted = useMemo(() => [...items].sort((a, b) => {
-    const cmp = sortCol === 'name'
-      ? a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
-      : cellValue(a, sortCol) - cellValue(b, sortCol)
-    return sortAsc ? cmp : -cmp
-  }), [items, sortCol, sortAsc])
-
-  function toggleSort(id: string) { if (sortCol === id) setSortAsc((v) => !v); else { setSortCol(id); setSortAsc(true) } }
-
-  // Réinitialiser les filtres : recherche (seul filtre) + tri par défaut (id desc), puis refetch.
-  // On vide `items` : sinon les lignes restent affichées pendant le rechargement et le clic paraît sans effet.
+  // Réinitialiser les filtres : recherche (seul filtre ; le tri repart au défaut via deps).
   function resetFilters() {
     setSearchInput(''); setSearch('')
-    setSortCol('id'); setSortAsc(false)
-    setItems([])
     setTick((x) => x + 1)
   }
 
   async function confirmDelete() {
     if (!toDelete) return
-    try { await deletePlatformId(toDelete.id); setToDelete(null); setTick((x) => x + 1) }
+    try { await deletePlatformId(toDelete.id); removeLocal((r) => r.id === toDelete.id); setToDelete(null); reload() }
     catch { setToDelete(null) }
   }
 
@@ -366,18 +372,18 @@ function CmsPlatformIdList({ base }: { base: string }) {
           <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
             <tr>
               {visibleCols(cols).map(({ id }) => (
-                <th key={id} style={{ ...th, cursor: 'pointer', ...(id === 'id' ? { width: 70 } : {}) }}
+                <th key={id} style={{ ...th, cursor: 'pointer', ...(id === 'id' ? { width: 70 } : {}), ...(sortCol === id ? { color: 'var(--color-primary)' } : {}) }}
                   onClick={() => toggleSort(id)}>
-                  {t(COL_LABEL[id])}{sortCol === id ? (sortAsc ? ' ↑' : ' ↓') : ''}
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t(COL_LABEL[id])}<SortIcon dir={sortCol === id ? sortDir : null} /></span>
                 </th>
               ))}
               <th style={{ ...th, width: 80 }} />
             </tr>
           </thead>
           <tbody>
-            {sorted.length === 0 && !loading ? (
+            {items.length === 0 && !loading ? (
               <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(cols).length + 1}>{t('empty')}</td></tr>
-            ) : sorted.map((r) => (
+            ) : items.map((r) => (
               <tr key={r.id}>
                 {visibleCols(cols).map(({ id }) => (
                   <td key={id} style={{ ...td, ...(id === 'name' ? { fontWeight: 500 } : numCell), ...(id === 'id' ? { color: 'var(--color-muted-foreground)' } : {}) }}>
@@ -394,8 +400,10 @@ function CmsPlatformIdList({ base }: { base: string }) {
             ))}
           </tbody>
         </table>
+        {/* Sentinelle du scroll infini + pied (spinner en chargement, compteur en fin de liste). */}
+        <div ref={sentinelRef} style={{ height: 1 }} />
         <div style={{ padding: '10px 16px', textAlign: 'center', fontSize: 12, color: 'var(--color-muted-foreground)' }}>
-          {loading ? t('loading') : t('count', { n: items.length })}
+          {loading ? <Spinner /> : (!hasMore && items.length > 0 ? t('count', { n: total }) : '')}
         </div>
       </div>
       </>)}
@@ -419,11 +427,20 @@ function CmsPlatformIdList({ base }: { base: string }) {
         <ExportModal<PlatformIdItem>
           cols={cols}
           labelFor={(id) => t(COL_LABEL[id])}
-          fetchAll={async () => (await fetchPlatformIds({ search })).items}
+          fetchAll={async () => {
+            const all: PlatformIdItem[] = []
+            let after: string | undefined
+            do {
+              const r = await fetchPlatformIds({ search, sort: sortCol, dir: sortDir, after, limit: 100 })
+              all.push(...r.items)
+              after = r.nextCursor ?? undefined
+            } while (after)
+            return all
+          }}
           getCell={(r, id) => id === 'name' ? r.name : cellValue(r, id)}
           filename="platform-ids"
           sheetName={t('title')}
-          total={items.length}
+          total={total}
           onClose={() => setShowExport(false)}
         />
       )}
