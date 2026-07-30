@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react'
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   deleteRedirect, fetchRedirectById, fetchRedirects, fetchRedirectStats, fetchSites,
@@ -7,6 +7,8 @@ import {
 import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle } from './ViewToggle'
 import { useKeysetList } from './use-keyset-list'
+import { useIsNarrow } from './shared/useIsNarrow'
+import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
 
 // Outil Redirections 301 legacy (vue « Old » en iframe). Voir brick.manifest.json (cms-site-301).
 const MELIS_KEY = 'meliscms_tool_site_301'
@@ -144,14 +146,28 @@ const GripIcon = () => <svg style={{ width: 13, height: 13, flexShrink: 0, color
 const panelCss: CSSProperties = { display: 'flex', flexDirection: 'column', gap: 2, minHeight: 130, maxHeight: 'min(48vh, 320px)', overflowY: 'auto', minWidth: 0, borderRadius: 8, border: '1px dashed var(--color-border)', padding: 6 }
 const panelTitle: CSSProperties = { padding: '0 6px 4px', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--color-muted-foreground)' }
 
-function ColManager({ cols, labelFor, onChange, onClose }: {
-  cols: ColDef[]; labelFor: (id: string) => string; onChange: (c: ColDef[]) => void; onClose: () => void
+function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
+  anchorRef: RefObject<HTMLElement | null>; cols: ColDef[]; labelFor: (id: string) => string; onChange: (c: ColDef[]) => void; onClose: () => void
 }) {
   const t = useT()
   const [dragId, setDragId] = useState<string | null>(null)
   const [over, setOver] = useState<{ id: string; panel: 'visible' | 'hidden' } | null>(null)
+  const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(null)
   const shown = cols.filter((c) => c.visible)
   const hidden = cols.filter((c) => !c.visible)
+
+  // Clamp `left` explicitly instead of anchoring purely via `right: 0` — the anchor's own right
+  // edge isn't necessarily flush with the true viewport edge (flex-wrapped filter buttons on
+  // narrow), so a right-anchored panel could still push its left edge (and header) off-screen.
+  useLayoutEffect(() => {
+    const anchor = anchorRef.current
+    if (!anchor) return
+    const rect = anchor.getBoundingClientRect()
+    const margin = 8
+    const width = Math.min(380, window.innerWidth - margin * 2)
+    const left = Math.min(Math.max(margin, rect.right - width), window.innerWidth - width - margin)
+    setPos({ top: rect.bottom + 6, left, width })
+  }, [anchorRef])
 
   function drop(panel: 'visible' | 'hidden') {
     if (!dragId) return
@@ -187,8 +203,9 @@ function ColManager({ cols, labelFor, onChange, onClose }: {
     )
   }
 
+  if (!pos) return null
   return (
-    <div style={{ ...card, position: 'absolute', right: 0, top: '100%', marginTop: 6, zIndex: 50, width: 380, maxWidth: 'calc(100vw - 1rem)' }}>
+    <div style={{ ...card, position: 'fixed', top: pos.top, left: pos.left, width: pos.width, zIndex: 50 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderBottom: '1px solid var(--color-border)' }}>
         <span style={{ fontSize: 14, fontWeight: 600 }}>{t('columns')}</span>
         <button style={{ ...iconBtn, width: 22, height: 22 }} onClick={onClose}>✕</button>
@@ -246,6 +263,7 @@ export default function SiteRedirectPage({ active = true }: { active?: boolean }
 function RedirectList({ base }: { base: string }) {
   const t = useT()
   const navigate = useNavigate()
+  const narrow = useIsNarrow()
   const [stats, setStats] = useState<RedirectStats | null>(null)
   const [sites, setSites] = useState<SiteOption[]>([])
   const [searchInput, setSearchInput] = useState('')
@@ -254,10 +272,21 @@ function RedirectList({ base }: { base: string }) {
   const [toDelete, setToDelete] = useState<RedirectItem | null>(null)
   const [tick, setTick] = useState(0)
   const [cols, setCols] = useState<ColDef[]>(loadCols)
+  const colsAnchorRef = useRef<HTMLDivElement>(null)
   const [showCols, setShowCols] = useState(false)
   const [showExport, setShowExport] = useState(false)
   const [mode, setMode] = useState<'react' | 'iframe'>('react')
   const [frameLoaded, setFrameLoaded] = useState(false)
+  // Mobile-only: force the table down to just "old" (the redirected URL, best row identifier)
+  // regardless of the desktop ColManager preference, with the rest reachable via a per-row "+" —
+  // desktop behavior (cols as-is, no "+" column at all) is untouched since hasHidden/displayCols
+  // only diverge from `cols` when narrow.
+  const [expanded, setExpanded] = useState<Set<number>>(new Set())
+  const toggleExpand = (id: number) => setExpanded((s) => {
+    const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n
+  })
+  const displayCols = narrow ? cols.map((c) => ({ ...c, visible: c.id === 'old' })) : cols
+  const hasHidden = narrow
 
   const { items, total, loading, hasMore, sentinelRef, sortCol, sortDir, toggleSort, reload, removeLocal } =
     useKeysetList<RedirectItem>({
@@ -304,16 +333,22 @@ function RedirectList({ base }: { base: string }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
-      {/* Header */}
+      {/* Header — narrow-only additions never remove/replace a desktop style, so at narrow=false
+          every style below renders byte-identical to the original desktop layout. */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-        <div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{t('title')}</h1>
-          <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0' }}>{t('subtitle')}</p>
+        <div style={narrow ? { minWidth: 0 } : undefined}>
+          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{t('title')}</h1>
+          <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0', ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{t('subtitle')}</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
-          <button style={btnGhost} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
-          {can('create') && <button style={btnPrimary} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>}
+        {/* On narrow: icon row (toggle+refresh) stacks above the "+ New" button, which stretches
+            (width 100%) to match that row's width — both stay grouped as a compact column to the
+            right of the title. Desktop keeps the original single row. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, ...(narrow ? { flexShrink: 0, flexDirection: 'column' } : {}) }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <ViewToggle mode={mode} compact={narrow} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
+            <button style={{ ...btnGhost, ...(narrow ? { width: 36, padding: 0, justifyContent: 'center' } : {}) }} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
+          </div>
+          {can('create') && <button style={{ ...btnPrimary, ...(narrow ? { width: '100%', justifyContent: 'center' } : {}) }} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>}
         </div>
       </div>
 
@@ -339,28 +374,32 @@ function RedirectList({ base }: { base: string }) {
 
       {/* Filtres */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <input style={{ ...inputCss, height: 36, flex: 1, minWidth: 220 }} value={searchInput}
+        <input style={{ ...inputCss, height: 36, flex: narrow ? '1 1 100%' : 1, minWidth: narrow ? 0 : 220 }} value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && setSearch(searchInput.trim())}
           placeholder={t('search')} />
-        <select style={{ ...inputCss, height: 36, width: 'auto' }} value={site ?? ''} onChange={(e) => setSite(e.target.value ? Number(e.target.value) : null)}>
+        <select style={{ ...inputCss, height: 36, width: narrow ? '100%' : 'auto', ...(narrow ? { flex: '1 1 100%' } : {}) }} value={site ?? ''} onChange={(e) => setSite(e.target.value ? Number(e.target.value) : null)}>
           <option value="">{t('all_sites')}</option>
           {sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
         </select>
-        <button style={{ ...btnGhost, height: 36 }} onClick={resetFilters}><ResetIcon />{t('reset_filters')}</button>
-        <div style={{ position: 'relative' }}>
-          <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
-          {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
+        {/* "reset_filters" ("Réinitialiser les filtres") runs much longer than "columns"/"export"
+            once translated to French — pairing it 50/50 wraps its label to 2 lines inside a fixed
+            36px-tall button while its sibling stays 1 line. Give it its own full-width row instead. */}
+        <button style={{ ...btnGhost, height: 36, ...(narrow ? { flex: '1 1 100%', justifyContent: 'center' } : {}) }} onClick={resetFilters}><ResetIcon />{t('reset_filters')}</button>
+        <div ref={colsAnchorRef} style={{ position: 'relative', ...(narrow ? { flex: '1 1 calc(50% - 4px)' } : {}) }}>
+          <button style={{ ...btnGhost, height: 36, ...(narrow ? { width: '100%', justifyContent: 'center' } : {}) }} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
+          {showCols && <ColManager anchorRef={colsAnchorRef} cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
         </div>
-        {can('export') && <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>}
+        {can('export') && <button style={{ ...btnGhost, height: 36, ...(narrow ? { flex: '1 1 calc(50% - 4px)', justifyContent: 'center' } : {}) }} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>}
       </div>
 
       {/* Table */}
       <div style={{ ...card, overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 640 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', ...(narrow ? {} : { minWidth: 640 }) }}>
           <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
             <tr>
-              {visibleCols(cols).map(({ id }) => (
+              {hasHidden && <th style={{ ...th, width: 32 }} />}
+              {visibleCols(displayCols).map(({ id }) => (
                 <th key={id} style={{ ...th, cursor: 'pointer', ...(id === 'id' ? { width: 70 } : {}), ...(sortCol === id ? { color: 'var(--color-primary)' } : {}) }}
                   onClick={() => toggleSort(id)}>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t(COL_LABEL[id])}<SortIcon dir={sortCol === id ? sortDir : null} /></span>
@@ -371,29 +410,43 @@ function RedirectList({ base }: { base: string }) {
           </thead>
           <tbody>
             {items.length === 0 && !loading ? (
-              <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(cols).length + 1}>{t('empty')}</td></tr>
+              <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(displayCols).length + (hasHidden ? 1 : 0) + 1}>{t('empty')}</td></tr>
             ) : items.map((r) => (
-              <tr key={r.id}>
-                {visibleCols(cols).map(({ id }) => (
-                  <td key={id} style={{ ...td, ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}), ...(id === 'old' ? { fontFamily: 'monospace', fontSize: 13 } : {}) }}>
-                    {id === 'id' && r.id}
-                    {id === 'site' && r.siteName}
-                    {id === 'old' && r.oldUrl}
-                    {id === 'new' && (
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                        <ArrowRight /><span style={{ fontFamily: 'monospace', fontSize: 13 }}>{r.newUrl}</span>
-                      </span>
-                    )}
+              <Fragment key={r.id}>
+                <tr>
+                  {hasHidden && <td style={td}><ExpandToggle expanded={expanded.has(r.id)} onClick={() => toggleExpand(r.id)} /></td>}
+                  {visibleCols(displayCols).map(({ id }) => (
+                    <td key={id} style={{ ...td, ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}), ...(id === 'old' ? { fontFamily: 'monospace', fontSize: 13 } : {}) }}>
+                      {id === 'id' && r.id}
+                      {id === 'site' && r.siteName}
+                      {id === 'old' && r.oldUrl}
+                      {id === 'new' && (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                          <ArrowRight /><span style={{ fontFamily: 'monospace', fontSize: 13 }}>{r.newUrl}</span>
+                        </span>
+                      )}
+                    </td>
+                  ))}
+                  <td style={td}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
+                      {can('test') && <button style={iconBtn} title={t('test')} onClick={() => testRedirect(r)}><TestIcon /></button>}
+                      {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>}
+                      {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
+                    </div>
                   </td>
-                ))}
-                <td style={td}>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-                    {can('test') && <button style={iconBtn} title={t('test')} onClick={() => testRedirect(r)}><TestIcon /></button>}
-                    {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>}
-                    {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
-                  </div>
-                </td>
-              </tr>
+                </tr>
+                {hasHidden && expanded.has(r.id) && (
+                  <HiddenColsRow cols={displayCols} labelFor={(id) => t(COL_LABEL[id])}
+                    renderValue={(id) => (
+                      id === 'id' ? r.id
+                        : id === 'site' ? r.siteName
+                        : id === 'old' ? r.oldUrl
+                        : id === 'new' ? r.newUrl
+                        : ''
+                    )}
+                    colSpan={visibleCols(displayCols).length + 2} narrow={narrow} />
+                )}
+              </Fragment>
             ))}
           </tbody>
         </table>

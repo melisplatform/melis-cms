@@ -295,7 +295,7 @@ export default function DuplicatePageModal({ sourcePageId, sourceTitle, onClose,
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
       style={{ position: 'fixed', inset: 0, zIndex: 99999, padding: 24, background: 'rgba(15,18,25,.55)', backdropFilter: 'blur(2px)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflow: 'auto' }}
     >
-      <div style={{ ...card, width: 'min(500px, 96vw)', marginTop: '8vh', color: 'var(--color-foreground)' }}>
+      <div style={{ ...card, width: 'min(500px, calc(100vw - 48px))', marginTop: '8vh', color: 'var(--color-foreground)' }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 18px', borderBottom: '1px solid var(--color-border)' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: 9, flexShrink: 0, background: 'color-mix(in srgb, var(--color-primary) 14%, transparent)', color: 'var(--color-primary)' }}>

@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react'
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   deleteLanguage, fetchLanguageById, fetchLanguages, fetchLanguageStats,
@@ -7,6 +7,8 @@ import {
 import { useKeysetList } from './use-keyset-list'
 import { ViewToggle } from './ViewToggle'
 import { Flag } from './PageTabs'
+import { useIsNarrow } from './shared/useIsNarrow'
+import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
 
 // Outil Langues (CMS) legacy (vue « Old » en iframe). Voir brick.manifest.json (cms-languages).
 const MELIS_KEY = 'meliscms_tool_language'
@@ -115,6 +117,9 @@ type ColDef = { id: string; visible: boolean }
 const COL_ORDER = ['id', 'locale', 'name'] as const
 const COL_LABEL: Record<string, string> = { id: 'col_id', locale: 'col_locale', name: 'col_name' }
 const DEFAULT_COLS: ColDef[] = COL_ORDER.map((id) => ({ id, visible: id !== 'id' }))
+// Single essential column on narrow viewports: just enough to identify the row (name), the
+// rest reachable via the per-row "+" — see `hasHidden`/`displayCols` below.
+const ESSENTIAL_COLS: ReadonlySet<string> = new Set(['name'])
 const COL_KEY = 'melis-cmslanguage-cols-v1'
 function loadCols(): ColDef[] {
   try {
@@ -134,14 +139,35 @@ const GripIcon = () => <svg style={{ width: 13, height: 13, flexShrink: 0, color
 const panelCss: CSSProperties = { display: 'flex', flexDirection: 'column', gap: 2, minHeight: 130, maxHeight: 'min(48vh, 320px)', overflowY: 'auto', minWidth: 0, borderRadius: 8, border: '1px dashed var(--color-border)', padding: 6 }
 const panelTitle: CSSProperties = { padding: '0 6px 4px', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--color-muted-foreground)' }
 
-function ColManager({ cols, labelFor, onChange, onClose }: {
-  cols: ColDef[]; labelFor: (id: string) => string; onChange: (c: ColDef[]) => void; onClose: () => void
+function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
+  anchorRef: RefObject<HTMLElement | null>; cols: ColDef[]; labelFor: (id: string) => string; onChange: (c: ColDef[]) => void; onClose: () => void
 }) {
   const t = useT()
   const [dragId, setDragId] = useState<string | null>(null)
   const [over, setOver] = useState<{ id: string; panel: 'visible' | 'hidden' } | null>(null)
+  const [pos, setPos] = useState<{ top?: number; bottom?: number; left: number; width: number; maxHeight: number } | null>(null)
   const shown = cols.filter((c) => c.visible)
   const hidden = cols.filter((c) => !c.visible)
+
+  useLayoutEffect(() => {
+    const anchor = anchorRef.current
+    if (!anchor) return
+    const rect = anchor.getBoundingClientRect()
+    const margin = 8
+    const spaceBelow = window.innerHeight - rect.bottom - margin
+    const spaceAbove = rect.top - margin
+    // Right-align the panel with the anchor by default, but clamp `left` so the panel can never
+    // overflow the viewport's left edge — the anchor's own right edge isn't necessarily flush
+    // with the true viewport edge (page padding, flex-wrapped buttons), so anchoring purely via
+    // `right: viewportWidth - rect.right` let the panel's left edge go negative on narrow screens.
+    const width = Math.min(380, window.innerWidth - margin * 2)
+    const left = Math.min(Math.max(margin, rect.right - width), window.innerWidth - width - margin)
+    if (spaceBelow >= 200 || spaceBelow >= spaceAbove) {
+      setPos({ top: rect.bottom + 6, left, width, maxHeight: Math.max(160, spaceBelow - 6) })
+    } else {
+      setPos({ bottom: window.innerHeight - rect.top + 6, left, width, maxHeight: Math.max(160, spaceAbove - 6) })
+    }
+  }, [anchorRef])
 
   function drop(panel: 'visible' | 'hidden') {
     if (!dragId) return
@@ -177,8 +203,13 @@ function ColManager({ cols, labelFor, onChange, onClose }: {
     )
   }
 
+  if (!pos) return null
   return (
-    <div style={{ ...card, position: 'absolute', right: 0, top: '100%', marginTop: 6, zIndex: 50, width: 380, maxWidth: 'calc(100vw - 1rem)' }}>
+    <div style={{
+      ...card, position: 'fixed', left: pos.left, width: pos.width, zIndex: 50,
+      maxHeight: pos.maxHeight, overflowY: 'auto', display: 'flex', flexDirection: 'column',
+      ...(pos.top != null ? { top: pos.top } : { bottom: pos.bottom }),
+    }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderBottom: '1px solid var(--color-border)' }}>
         <span style={{ fontSize: 14, fontWeight: 600 }}>{t('columns')}</span>
         <button style={{ ...iconBtn, width: 22, height: 22 }} onClick={onClose}>✕</button>
@@ -236,15 +267,26 @@ export default function CmsLanguagePage({ active = true }: { active?: boolean })
 function CmsLanguageList({ base }: { base: string }) {
   const t = useT()
   const navigate = useNavigate()
+  const narrow = useIsNarrow()
   const [stats, setStats] = useState<LangStats | null>(null)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [toDelete, setToDelete] = useState<LangItem | null>(null)
   const [tick, setTick] = useState(0)
   const [cols, setCols] = useState<ColDef[]>(loadCols)
+  const colsAnchorRef = useRef<HTMLDivElement>(null)
   const [showCols, setShowCols] = useState(false)
   const [mode, setMode] = useState<'react' | 'iframe'>('react')
   const [frameLoaded, setFrameLoaded] = useState(false)
+  // Mobile-only: force the table down to just "name" regardless of the desktop ColManager
+  // preference, with the rest reachable via a per-row "+" — desktop behavior (cols as-is, no
+  // "+" column at all) is untouched since hasHidden/displayCols only diverge from `cols` when narrow.
+  const [expanded, setExpanded] = useState<Set<number>>(new Set())
+  const toggleExpand = (id: number) => setExpanded((s) => {
+    const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n
+  })
+  const displayCols = narrow ? cols.map((c) => ({ ...c, visible: ESSENTIAL_COLS.has(c.id) })) : cols
+  const hasHidden = narrow
 
   // Scroll infini + tri server-side + keyset (mutualisé). Le fetcher capture le filtre `search` ;
   // `deps` relance un chargement frais à chaque changement de filtre (ou refresh via `tick`).
@@ -275,16 +317,22 @@ function CmsLanguageList({ base }: { base: string }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
       <style>{'@keyframes melis-spin{to{transform:rotate(360deg)}}'}</style>
-      {/* Header */}
+      {/* Header — narrow-only additions never remove/replace a desktop style, so at narrow=false
+          every style below renders byte-identical to the original desktop layout. */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-        <div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{t('title')}</h1>
-          <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0' }}>{t('subtitle')}</p>
+        <div style={narrow ? { minWidth: 0 } : undefined}>
+          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{t('title')}</h1>
+          <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0', ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{t('subtitle')}</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
-          <button style={btnGhost} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
-          {can('create') && <button style={btnPrimary} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>}
+        {/* On narrow: icon row (toggle+refresh) stacks above the "+ New" button, which stretches
+            (width 100%) to match that row's width — both stay grouped as a compact column to the
+            right of the title. Desktop keeps the original single row. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, ...(narrow ? { flexShrink: 0, flexDirection: 'column' } : {}) }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <ViewToggle mode={mode} compact={narrow} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
+            <button style={btnGhost} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
+          </div>
+          {can('create') && <button style={{ ...btnPrimary, ...(narrow ? { width: '100%', justifyContent: 'center' } : {}) }} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>}
         </div>
       </div>
 
@@ -309,23 +357,29 @@ function CmsLanguageList({ base }: { base: string }) {
 
       {/* Filtres */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <input style={{ ...inputCss, height: 36, flex: 1, minWidth: 220 }} value={searchInput}
+        <input style={{ ...inputCss, height: 36, flex: 1, minWidth: narrow ? '100%' : 220 }} value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && setSearch(searchInput.trim())}
           placeholder={t('search')} />
-        <button style={{ ...btnGhost, height: 36 }} onClick={resetFilters}><ResetIcon />{t('reset_filters')}</button>
-        <div style={{ position: 'relative' }}>
-          <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
-          {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
+        {/* "reset_filters" ("Réinitialiser les filtres") runs much longer than "columns" once
+            translated to French — pairing it 50/50 wraps its label to 2 lines inside a fixed
+            36px-tall button while its sibling stays 1 line. Give it its own full-width row;
+            with only one other button (Columns), that one also gets its own row (nothing to
+            pair it with 50/50). */}
+        <button style={{ ...btnGhost, height: 36, ...(narrow ? { flex: '1 1 100%', justifyContent: 'center' } : {}) }} onClick={resetFilters}><ResetIcon />{t('reset_filters')}</button>
+        <div ref={colsAnchorRef} style={{ position: 'relative', ...(narrow ? { flex: '1 1 100%' } : {}) }}>
+          <button style={{ ...btnGhost, height: 36, ...(narrow ? { width: '100%', justifyContent: 'center' } : {}) }} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
+          {showCols && <ColManager anchorRef={colsAnchorRef} cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
         </div>
       </div>
 
       {/* Table */}
       <div style={{ ...card, overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 480 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', ...(narrow ? {} : { minWidth: 480 }) }}>
           <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
             <tr>
-              {visibleCols(cols).map(({ id }) => (
+              {hasHidden && <th style={{ ...th, width: 32 }} />}
+              {visibleCols(displayCols).map(({ id }) => (
                 <th key={id} style={{ ...th, cursor: 'pointer', ...(id === 'id' ? { width: 70 } : {}) }} onClick={() => toggleSort(id)}>
                   {t(COL_LABEL[id])}<SortArrow col={id} sortCol={sortCol} sortDir={sortDir} />
                 </th>
@@ -335,23 +389,31 @@ function CmsLanguageList({ base }: { base: string }) {
           </thead>
           <tbody>
             {items.length === 0 && !loading ? (
-              <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(cols).length + 1}>{t('empty')}</td></tr>
+              <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(displayCols).length + (hasHidden ? 1 : 0) + 1}>{t('empty')}</td></tr>
             ) : items.map((r) => (
-              <tr key={r.id}>
-                {visibleCols(cols).map(({ id }) => (
-                  <td key={id} style={{ ...td, ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}), ...(id === 'locale' ? { fontFamily: 'monospace', fontSize: 13 } : {}), ...(id === 'name' ? { fontWeight: 500 } : {}) }}>
-                    {id === 'id' && r.id}
-                    {id === 'locale' && r.locale}
-                    {id === 'name' && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}><Flag locale={r.locale} />{r.name}</span>}
+              <Fragment key={r.id}>
+                <tr>
+                  {hasHidden && <td style={td}><ExpandToggle expanded={expanded.has(r.id)} onClick={() => toggleExpand(r.id)} /></td>}
+                  {visibleCols(displayCols).map(({ id }) => (
+                    <td key={id} style={{ ...td, ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}), ...(id === 'locale' ? { fontFamily: 'monospace', fontSize: 13 } : {}), ...(id === 'name' ? { fontWeight: 500 } : {}) }}>
+                      {id === 'id' && r.id}
+                      {id === 'locale' && r.locale}
+                      {id === 'name' && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}><Flag locale={r.locale} />{r.name}</span>}
+                    </td>
+                  ))}
+                  <td style={td}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
+                      {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>}
+                      {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
+                    </div>
                   </td>
-                ))}
-                <td style={td}>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-                    {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>}
-                    {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
-                  </div>
-                </td>
-              </tr>
+                </tr>
+                {hasHidden && expanded.has(r.id) && (
+                  <HiddenColsRow cols={displayCols} labelFor={(id) => t(COL_LABEL[id])}
+                    renderValue={(id) => (id === 'id' ? r.id : id === 'locale' ? r.locale : id === 'name' ? r.name : '')}
+                    colSpan={visibleCols(displayCols).length + 2} narrow={narrow} />
+                )}
+              </Fragment>
             ))}
           </tbody>
         </table>

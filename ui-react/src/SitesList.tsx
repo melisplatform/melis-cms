@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import { ViewToggle } from './ViewToggle'
 import { ExportModal } from './ExportModal'
 import { useKeysetList } from './use-keyset-list'
+import { useIsNarrow } from './shared/useIsNarrow'
+import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
 import { fetchSites, deleteSite, minifyAssets, consumeSitesListStale, type SiteItem } from './sites-api'
 
 const MELIS_KEY = 'meliscms_tool_sites'
@@ -128,13 +130,28 @@ const visibleCols = (c: ColDef[]) => c.filter((x) => x.visible)
 const panelCss: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: 2, minHeight: 130, maxHeight: 'min(48vh, 320px)', overflowY: 'auto', minWidth: 0, borderRadius: 8, border: '1px dashed var(--color-border)', padding: 6 }
 const panelTitle: React.CSSProperties = { padding: '0 6px 4px', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--color-muted-foreground)' }
 
-function ColManager({ cols, labelFor, onChange, onClose }: {
+function ColManager({ cols, labelFor, onChange, onClose, anchorRef }: {
   cols: ColDef[]; labelFor: (id: string) => string; onChange: (c: ColDef[]) => void; onClose: () => void
+  anchorRef: React.RefObject<HTMLElement | null>
 }) {
   const [dragId, setDragId] = useState<string | null>(null)
   const [over, setOver] = useState<{ id: string; panel: 'visible' | 'hidden' } | null>(null)
   const shown = cols.filter((c) => c.visible)
   const hidden = cols.filter((c) => !c.visible)
+
+  // Positionnement clampé au viewport (calculé depuis l'ancre) — évite que le panneau (large,
+  // ancré right:0) sorte à gauche de l'écran et coupe son propre titre une fois la barre de
+  // filtres wrappée sur narrow. No-op sur desktop (déjà assez de place).
+  const [pos, setPos] = useState<{ left: number; top: number; width: number } | null>(null)
+  useLayoutEffect(() => {
+    const margin = 8
+    const el = anchorRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const width = Math.min(340, window.innerWidth - margin * 2)
+    const left = Math.min(Math.max(margin, rect.right - width), window.innerWidth - width - margin)
+    setPos({ left, top: rect.bottom + 6, width })
+  }, [anchorRef])
 
   function drop(panel: 'visible' | 'hidden') {
     if (!dragId) return
@@ -171,7 +188,7 @@ function ColManager({ cols, labelFor, onChange, onClose }: {
   }
 
   return (
-    <div style={{ ...card, position: 'absolute', right: 0, top: '100%', marginTop: 6, zIndex: 50, width: 340, maxWidth: 'calc(100vw - 1rem)' }}>
+    <div style={{ ...card, position: 'fixed', left: pos?.left ?? 0, top: pos?.top ?? 0, width: pos?.width ?? 340, zIndex: 50, visibility: pos ? 'visible' : 'hidden' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderBottom: '1px solid var(--color-border)' }}>
         <span style={{ fontSize: 14, fontWeight: 600 }}>{t('columns')}</span>
         <button style={{ ...iconBtn, width: 22, height: 22 }} onClick={onClose}>✕</button>
@@ -206,6 +223,21 @@ function getCellExport(item: SiteItem, id: string): string | number {
   return ''
 }
 
+/** Contenu de cellule (partagé entre la ligne visible et la ligne "+" des colonnes masquées narrow). */
+function cellContent(s: SiteItem, id: string): React.ReactNode {
+  if (id === 'id') return s.id
+  if (id === 'label') return s.label
+  if (id === 'name') return s.name
+  if (id === 'lang') {
+    return s.languages && s.languages.length > 0 ? (
+      <span style={{ display: 'inline-flex', gap: 5, flexWrap: 'wrap', alignItems: 'center' }}>
+        {s.languages.map((l) => <LangFlag key={l.id} locale={l.locale} name={l.name} />)}
+      </span>
+    ) : <span style={{ color: 'var(--color-muted-foreground)' }}>—</span>
+  }
+  return null
+}
+
 export default function SitesList({ active, onEdit, onNew }: {
   active: boolean
   onEdit: (id: number, label: string) => void
@@ -222,6 +254,17 @@ export default function SitesList({ active, onEdit, onNew }: {
   const [cols, setCols] = useState<ColDef[]>(loadCols)
   const [showCols, setShowCols] = useState(false)
   const [showExport, setShowExport] = useState(false)
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set())
+  const colsBtnRef = useRef<HTMLButtonElement | null>(null)
+
+  const narrow = useIsNarrow()
+  // Collapse à la SEULE colonne essentielle (nom du site) sur narrow, quelle que soit la
+  // préférence de colonnes desktop de l'utilisateur — hasHidden tenu à `narrow` seul.
+  const displayCols = narrow ? cols.map((c) => ({ ...c, visible: c.id === 'label' })) : cols
+  const hasHidden = narrow
+  function toggleExpand(id: number) {
+    setExpandedIds((prev) => { const next = new Set(prev); if (next.has(id)) next.delete(id); else next.add(id); return next })
+  }
 
   // Tri server-side via le hook mutualisé. La liste est courte (nextCursor toujours null → pas de
   // scroll infini), mais le tri passe côté serveur et un changement de colonne relance un fetch.
@@ -282,15 +325,15 @@ export default function SitesList({ active, onEdit, onNew }: {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: narrow ? 14 : 20, padding: narrow ? 14 : 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-        <div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{t('title')}</h1>
-          <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0' }}>{t('subtitle')}</p>
+        <div style={narrow ? { minWidth: 0, flex: 1 } : undefined}>
+          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{t('title')}</h1>
+          <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0', ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{t('subtitle')}</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} compact={narrow} />
           <button style={{ ...btnGhost, width: 32, padding: 0, justifyContent: 'center' }} onClick={handleRefresh} title={t('refresh')}><RotateCcwIcon spinning={refreshing} /></button>
           {can('create') && <button style={btnPrimary} onClick={onNew}>+ {t('new')}</button>}
         </div>
@@ -311,7 +354,7 @@ export default function SitesList({ active, onEdit, onNew }: {
           <div style={{ ...card, padding: '40px 16px', textAlign: 'center', fontSize: 14, color: 'var(--color-muted-foreground)' }}>{t('no_access')}</div>
         ) : (<>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <div style={{ position: 'relative', flex: 1, minWidth: 220, maxWidth: 384 }}>
+            <div style={{ position: 'relative', flex: 1, minWidth: narrow ? '100%' : 220, maxWidth: narrow ? 'none' : 384 }}>
               <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--color-muted-foreground)', display: 'flex', pointerEvents: 'none' }}>
                 <SearchIcon />
               </span>
@@ -325,20 +368,22 @@ export default function SitesList({ active, onEdit, onNew }: {
                 </button>
               )}
             </div>
-            <div style={{ flex: 1 }} />
-            <button style={{ ...btnGhost, height: 36 }} onClick={resetFilters}><ResetIcon />{t('reset_filters')}</button>
-            <div style={{ position: 'relative' }}>
-              <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowCols((v) => !v)}><Columns3Icon />{t('columns')}</button>
-              {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
+            {!narrow && <div style={{ flex: 1 }} />}
+            {/* reset_filters : libellé FR long ("Réinitialiser les filtres") → toujours sa propre ligne pleine largeur sur narrow, jamais pairé 50/50. */}
+            <button style={{ ...btnGhost, height: 36, ...(narrow ? { flex: '1 1 100%' } : {}) }} onClick={resetFilters}><ResetIcon />{t('reset_filters')}</button>
+            <div style={{ position: 'relative', ...(narrow ? { flex: '1 1 calc(50% - 4px)' } : {}) }}>
+              <button ref={colsBtnRef} style={{ ...btnGhost, height: 36, ...(narrow ? { width: '100%', justifyContent: 'center' } : {}) }} onClick={() => setShowCols((v) => !v)}><Columns3Icon />{t('columns')}</button>
+              {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} anchorRef={colsBtnRef} />}
             </div>
-            {can('export') && <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowExport(true)}><FileDownIcon />{t('export')}</button>}
+            {can('export') && <button style={{ ...btnGhost, height: 36, ...(narrow ? { flex: '1 1 calc(50% - 4px)', justifyContent: 'center' } : {}) }} onClick={() => setShowExport(true)}><FileDownIcon />{t('export')}</button>}
           </div>
 
           <div style={{ ...card, overflow: 'hidden' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 640 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', ...(narrow ? {} : { minWidth: 640 }) }}>
               <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
                 <tr>
-                  {visibleCols(cols).map(({ id }) => (
+                  {hasHidden && <th style={{ ...th, width: 36 }} />}
+                  {visibleCols(displayCols).map(({ id }) => (
                     SORTABLE.has(id) ? (
                       <th key={id} style={{ ...th, ...(id === 'id' ? { width: 60 } : {}), cursor: 'pointer', ...(sortCol === id ? { color: 'var(--color-primary)' } : {}) }} onClick={() => toggleSort(id)}>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t(COL_LABEL[id])}<SortIcon dir={sortCol === id ? sortDir : null} /></span>
@@ -352,38 +397,40 @@ export default function SitesList({ active, onEdit, onNew }: {
               </thead>
               <tbody>
                 {loading && items.length === 0 ? (
-                  <tr><td style={{ ...td, padding: '40px 16px', color: 'var(--color-muted-foreground)' }} colSpan={visibleCols(cols).length + 1}>
+                  <tr><td style={{ ...td, padding: '40px 16px', color: 'var(--color-muted-foreground)' }} colSpan={visibleCols(displayCols).length + 1 + (hasHidden ? 1 : 0)}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}><Loader2Icon />{t('loading')}</div>
                   </td></tr>
                 ) : items.length === 0 ? (
-                  <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(cols).length + 1}>{t('empty')}</td></tr>
+                  <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(displayCols).length + 1 + (hasHidden ? 1 : 0)}>{t('empty')}</td></tr>
                 ) : items.map((s) => (
-                  <tr key={s.id}>
-                    {visibleCols(cols).map(({ id }) => (
-                      <td key={id} style={{ ...td, ...(id === 'id' ? { color: 'var(--color-muted-foreground)' } : {}), ...(id === 'label' ? { fontWeight: 600 } : {}), ...(id === 'name' ? { color: 'var(--color-muted-foreground)' } : {}) }}>
-                        {id === 'id' && s.id}
-                        {id === 'label' && s.label}
-                        {id === 'name' && s.name}
-                        {id === 'lang' && (
-                          s.languages && s.languages.length > 0 ? (
-                            <span style={{ display: 'inline-flex', gap: 5, flexWrap: 'wrap', alignItems: 'center' }}>
-                              {s.languages.map((l) => <LangFlag key={l.id} locale={l.locale} name={l.name} />)}
-                            </span>
-                          ) : <span style={{ color: 'var(--color-muted-foreground)' }}>—</span>
-                        )}
+                  <Fragment key={s.id}>
+                    <tr>
+                      {hasHidden && (
+                        <td style={{ ...td, width: 36 }}>
+                          <ExpandToggle expanded={expandedIds.has(s.id)} onClick={() => toggleExpand(s.id)} />
+                        </td>
+                      )}
+                      {visibleCols(displayCols).map(({ id }) => (
+                        <td key={id} style={{ ...td, ...(id === 'id' ? { color: 'var(--color-muted-foreground)' } : {}), ...(id === 'label' ? { fontWeight: 600 } : {}), ...(id === 'name' ? { color: 'var(--color-muted-foreground)' } : {}) }}>
+                          {cellContent(s, id)}
+                        </td>
+                      ))}
+                      <td style={{ ...td, whiteSpace: 'nowrap', textAlign: 'right' }}>
+                        <button style={{ ...iconBtn, opacity: s.moduleFound ? 1 : 0.4, cursor: s.moduleFound ? 'pointer' : 'not-allowed' }}
+                          title={s.moduleFound ? t('minify') : t('minify_disabled')}
+                          disabled={!s.moduleFound || minifyingId === s.id}
+                          onClick={() => handleMinify(s)}>
+                          {minifyingId === s.id ? <Loader2Icon /> : <MinifyIcon />}
+                        </button>
+                        <button style={iconBtn} title={t('edit')} onClick={() => onEdit(s.id, s.label || s.name)}><PencilIcon /></button>
+                        {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(s)}><TrashIcon /></button>}
                       </td>
-                    ))}
-                    <td style={{ ...td, whiteSpace: 'nowrap', textAlign: 'right' }}>
-                      <button style={{ ...iconBtn, opacity: s.moduleFound ? 1 : 0.4, cursor: s.moduleFound ? 'pointer' : 'not-allowed' }}
-                        title={s.moduleFound ? t('minify') : t('minify_disabled')}
-                        disabled={!s.moduleFound || minifyingId === s.id}
-                        onClick={() => handleMinify(s)}>
-                        {minifyingId === s.id ? <Loader2Icon /> : <MinifyIcon />}
-                      </button>
-                      <button style={iconBtn} title={t('edit')} onClick={() => onEdit(s.id, s.label || s.name)}><PencilIcon /></button>
-                      {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(s)}><TrashIcon /></button>}
-                    </td>
-                  </tr>
+                    </tr>
+                    {hasHidden && expandedIds.has(s.id) && (
+                      <HiddenColsRow cols={displayCols} labelFor={(id) => t(COL_LABEL[id])} renderValue={(id) => cellContent(s, id)}
+                        colSpan={visibleCols(displayCols).length + 2} narrow={narrow} />
+                    )}
+                  </Fragment>
                 ))}
               </tbody>
             </table>

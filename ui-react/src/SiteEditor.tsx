@@ -6,6 +6,7 @@ import { ConfigTab, buildConfigFields } from './site-tabs/ConfigTab'
 import { ModuleLoaderTab, activeFirst } from './site-tabs/ModuleLoaderTab'
 import { TranslationsTab } from './site-tabs/TranslationsTab'
 import { useSiteTabs, type SiteTabSaveFn } from './site-tab-registry'
+import { useIsNarrow } from './shared/useIsNarrow'
 
 const MELIS_KEY = 'meliscms_tool_sites'
 function can(cap: string): boolean {
@@ -56,6 +57,7 @@ interface Props {
 }
 
 export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
+  const narrow = useIsNarrow()
   const [data, setData] = useState<SiteEditData | null>(null)
   const [loadErr, setLoadErr] = useState<string | null>(null)
   const [tab, setTab] = useState<string>('props')
@@ -204,14 +206,14 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
   if (!data) return <div style={{ padding: 24, fontSize: 14, color: 'var(--color-muted-foreground)' }}>{tr('Chargement…', 'Loading…')}</div>
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: narrow ? 14 : 20, padding: narrow ? 14 : 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <div style={{ minWidth: 0 }}>
           <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tr('Éditer le site', 'Edit site')} — {data.site.label}</h1>
           <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0', fontFamily: 'monospace' }}>{data.site.name} · #{data.site.id}</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           {/* Pas de toggle New/Old en ÉDITION (uniquement sur la liste). */}
           {savedAt > 0 && mode === 'react' && <span style={{ fontSize: 12, color: '#15803d' }}>✓ {tr('Enregistré', 'Saved')}</span>}
           {can('edit') && mode === 'react' && (
@@ -222,11 +224,11 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div style={{ display: mode === 'react' ? 'flex' : 'none', gap: 4, borderBottom: '1px solid var(--color-border,#e5e7eb)' }}>
+      {/* Tabs — wrap sur 2ᵉ ligne sur narrow (jamais de scroll horizontal) */}
+      <div style={{ display: mode === 'react' ? 'flex' : 'none', gap: 4, borderBottom: '1px solid var(--color-border,#e5e7eb)', flexWrap: narrow ? 'wrap' : 'nowrap' }}>
         {TABS.map((t) => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            style={{ height: 38, padding: '0 16px', border: 0, background: 'transparent', cursor: 'pointer', fontSize: 14, fontWeight: 600,
+            style={{ height: 38, padding: narrow ? '0 10px' : '0 16px', border: 0, background: 'transparent', cursor: 'pointer', fontSize: narrow ? 13 : 14, fontWeight: 600,
               color: tab === t.id ? 'var(--color-primary,#cb4040)' : 'var(--color-muted-foreground)',
               borderBottom: tab === t.id ? '2px solid var(--color-primary,#cb4040)' : '2px solid transparent', marginBottom: -1 }}>
             {tr(t.fr, t.en)}
@@ -234,7 +236,7 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
         ))}
         {extraTabs.map((et) => (
           <button key={et.id} onClick={() => openExtraTab(et.id)}
-            style={{ height: 38, padding: '0 16px', border: 0, background: 'transparent', cursor: 'pointer', fontSize: 14, fontWeight: 600,
+            style={{ height: 38, padding: narrow ? '0 10px' : '0 16px', border: 0, background: 'transparent', cursor: 'pointer', fontSize: narrow ? 13 : 14, fontWeight: 600,
               color: tab === et.id ? 'var(--color-primary,#cb4040)' : 'var(--color-muted-foreground)',
               borderBottom: tab === et.id ? '2px solid var(--color-primary,#cb4040)' : '2px solid transparent', marginBottom: -1 }}>
             {tabLabelOf(et.label)}
@@ -246,8 +248,8 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
 
       {/* PROPRIÉTÉS */}
       {mode === 'react' && tab === 'props' && (
-        <div style={{ ...card, padding: 20, maxWidth: 760, display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div style={{ ...card, padding: narrow ? 14 : 20, maxWidth: narrow ? '100%' : 760, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: narrow ? '1fr' : '1fr 1fr', gap: 16 }}>
             <div>
               <label style={lbl}>{tr('Libellé du site', 'Site label')} *</label>
               <input style={input} value={label} onChange={(e) => setLabel(e.target.value)} />
@@ -258,7 +260,7 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
               <p style={hint}>{tr('Non modifiable après création.', 'Cannot be changed after creation.')}</p>
             </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: narrow ? '1fr' : '1fr 1fr', gap: 16 }}>
             <div>
               <label style={lbl}>{tr('Page d’accueil principale', 'Main home page')} *</label>
               <PagePicker value={mainPage.id} title={mainPage.title} onChange={(id, t) => setMainPage({ id, title: t })} />
@@ -291,7 +293,7 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
               {activeLangIds.length === 0 ? (
                 <p style={hint}>{tr('Aucune langue active — activez-en dans l’onglet Langues.', 'No active language — enable one in the Languages tab.')}</p>
               ) : data.languages.filter((l) => activeLangIds.includes(l.id)).map((l) => (
-                <div key={l.id} style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 12, alignItems: 'center' }}>
+                <div key={l.id} style={{ display: 'grid', gridTemplateColumns: narrow ? '1fr' : '220px 1fr', gap: 12, alignItems: narrow ? 'start' : 'center' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14 }}>
                     <Flag locale={l.locale} />
                     {l.name} <span style={{ color: 'var(--color-muted-foreground)', fontSize: 12 }}>({l.locale})</span>
@@ -308,10 +310,10 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
 
       {/* DOMAINES */}
       {mode === 'react' && tab === 'domains' && (
-        <div style={{ ...card, padding: 20, maxWidth: 760, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ ...card, padding: narrow ? 14 : 20, maxWidth: narrow ? '100%' : 760, display: 'flex', flexDirection: 'column', gap: 16 }}>
           <p style={hint}>{tr('Un domaine par environnement. Le domaine de l’environnement courant est obligatoire et doit être unique.', 'One domain per environment. The current environment domain is required and must be unique.')}</p>
           {domains.map((d) => (
-            <div key={d.env} style={{ display: 'grid', gridTemplateColumns: '120px 110px 1fr', gap: 12, alignItems: 'end' }}>
+            <div key={d.env} style={{ display: 'grid', gridTemplateColumns: narrow ? '1fr' : '120px 110px 1fr', gap: 12, alignItems: narrow ? 'stretch' : 'end' }}>
               <div>
                 <label style={lbl}>{tr('Environnement', 'Environment')}</label>
                 <div style={{ ...input, display: 'flex', alignItems: 'center', fontWeight: 600 }}>
@@ -336,7 +338,7 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
 
       {/* LANGUES */}
       {mode === 'react' && tab === 'langs' && (
-        <div style={{ ...card, padding: 20, maxWidth: 760, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ ...card, padding: narrow ? 14 : 20, maxWidth: narrow ? '100%' : 760, display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
             <label style={lbl}>{tr('Langues actives', 'Active languages')}</label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -375,7 +377,7 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
 
       {/* CONFIG */}
       {mode === 'react' && tab === 'config' && (
-        <div style={{ ...card, padding: 20 }}>
+        <div style={{ ...card, padding: narrow ? 14 : 20 }}>
           {!configData ? <span style={{ fontSize: 14, color: 'var(--color-muted-foreground)' }}>{tr('Chargement…', 'Loading…')}</span>
             : <ConfigTab data={configData} fields={configFields} setField={setConfigField} />}
         </div>

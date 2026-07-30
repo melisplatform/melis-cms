@@ -95,7 +95,7 @@ export default function CmsSidebar() {
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              width: 'min(960px, 96vw)', height: 'min(80vh, 720px)',
+              width: 'min(960px, calc(100vw - 48px))', height: 'min(720px, calc(100vh - 48px))',
               display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRadius: 10,
               background: 'var(--color-background, #fff)', color: 'var(--color-foreground)',
               boxShadow: '0 20px 60px rgba(0,0,0,.35)',

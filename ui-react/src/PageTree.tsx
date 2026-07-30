@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { deletePage, fetchTreeNodes, movePage, nodeCache, searchTreePages, type MelisTreeNode } from './cms-tree-api'
 import { peT } from './page-editor-i18n'
+import { useIsNarrow } from './shared/useIsNarrow'
 
 /* ── Tiny inline icons (the brick can't use host Tailwind/lucide; SVG uses currentColor) ── */
 const sIcon = { width: 15, height: 15, flexShrink: 0 } as const
@@ -121,6 +122,8 @@ export interface PageTreeProps {
  */
 export default function PageTree({ selectedId, onSelect, onAction }: PageTreeProps) {
   const tr = peT() // dictionnaire i18n partagé (référence stable → sûr hors deps des useCallback)
+  const narrow = useIsNarrow()
+  const indentStep = narrow ? 10 : 16
   const [childrenByParent, setChildrenByParent] = useState<Record<number, MelisTreeNode[]>>({})
   const [expanded, setExpanded] = useState<Set<number>>(new Set())
   const [loading, setLoading] = useState<Set<number>>(new Set())
@@ -453,7 +456,7 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
             title={node.title}
             style={{
               display: 'flex', alignItems: 'center', gap: 6,
-              padding: '4px 8px', paddingLeft: 8 + depth * 16,
+              padding: '4px 8px', paddingLeft: 8 + depth * indentStep,
               cursor: draggable ? 'grab' : 'pointer', borderRadius: 6, userSelect: 'none',
               color: offline ? 'var(--color-muted-foreground)' : 'var(--color-foreground)',
               background: dropMode === 'over' ? 'color-mix(in srgb, var(--color-primary) 24%, transparent)'
@@ -488,14 +491,14 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
                 <LockIcon />
               </span>
             )}
-            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', minWidth: narrow ? 0 : undefined, whiteSpace: narrow ? 'nowrap' : undefined }}>
               {searching ? highlight(node.title, query) : node.title}
             </span>
             {/* No actions button — right-click opens the context menu. */}
           </div>
           {open && childrenByParent[node.key] && renderLevel(node.key, depth + 1)}
           {open && loading.has(node.key) && (
-            <div style={{ paddingLeft: 8 + (depth + 1) * 16, fontSize: 12, color: 'var(--color-muted-foreground)' }}>…</div>
+            <div style={{ paddingLeft: 8 + (depth + 1) * indentStep, fontSize: 12, color: 'var(--color-muted-foreground)' }}>…</div>
           )}
         </div>
       )
@@ -615,7 +618,7 @@ export default function PageTree({ selectedId, onSelect, onAction }: PageTreePro
           onClick={(e) => { if (e.target === e.currentTarget && !deleting) setDelNode(null) }}
           style={{ position: 'fixed', inset: 0, zIndex: 100001, padding: 24, background: 'rgba(15,18,25,.55)', backdropFilter: 'blur(2px)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflow: 'auto' }}
         >
-          <div style={{ width: 'min(440px, 96vw)', marginTop: '12vh', border: '1px solid var(--color-border)', background: 'var(--color-card,var(--color-background,#fff))', color: 'var(--color-foreground)', borderRadius: 14, boxShadow: '0 24px 70px rgba(0,0,0,.4)', overflow: 'hidden' }}>
+          <div style={{ width: 'min(440px, calc(100vw - 48px))', marginTop: '12vh', border: '1px solid var(--color-border)', background: 'var(--color-card,var(--color-background,#fff))', color: 'var(--color-foreground)', borderRadius: 14, boxShadow: '0 24px 70px rgba(0,0,0,.4)', overflow: 'hidden' }}>
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 18px', borderBottom: '1px solid var(--color-border)' }}>
               <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: 9, flexShrink: 0, background: 'color-mix(in srgb, var(--color-destructive,#c0392b) 14%, transparent)', color: 'var(--color-destructive,#c0392b)' }}>

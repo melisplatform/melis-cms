@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { peT } from './page-editor-i18n'
+import { useIsNarrow } from './shared/useIsNarrow'
 
 /**
  * Contenus NATIFS des onglets de l'éditeur de page CMS.
@@ -147,11 +148,13 @@ function Fieldset({ label: lbl, children, first, hint }: { label: string; childr
     </div>
   )
 }
-/** Grille 2 colonnes fixes (les champs se réduisent via minmax(0,1fr) au lieu de déborder). */
-const grid2: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', columnGap: 20, rowGap: 0 }
 export function SeoTab({ value, onChange }: { value: SeoData; onChange: (v: SeoData) => void }) {
   const tr = peT()
+  const narrow = useIsNarrow()
   const set = (k: keyof SeoData, v: string) => onChange({ ...value, [k]: v })
+  // Grille 2 colonnes fixes (les champs se réduisent via minmax(0,1fr) au lieu de déborder) → 1 seule
+  // colonne sur narrow (pattern 7 : grille de champs).
+  const grid2: React.CSSProperties = { display: 'grid', gridTemplateColumns: narrow ? '1fr' : 'repeat(2, minmax(0, 1fr))', columnGap: 20, rowGap: 0 }
   return (
     <div style={{ ...wrap, maxWidth: 1000 }}>
       <Section title={tr.seoSectionMeta} hint={tr.seoSectionMetaHint}>
@@ -308,6 +311,7 @@ type WfVersion = { id: number; number: number; name: string | null; editDate: st
 type VersData = { items: WfVersion[]; page: number; perPage: number; total: number }
 export function VersioningTab({ idPage }: { idPage: number }) {
   const tr = peT()
+  const narrow = useIsNarrow()
   const [d, setD] = useState<VersData | null>(null)
   const [pageNum, setPageNum] = useState(1) // pagination serveur — jamais tout chargé
   const [reloadKey, setReloadKey] = useState(0)
@@ -372,7 +376,31 @@ export function VersioningTab({ idPage }: { idPage: number }) {
   return (
     <div style={wrap}>
       <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>{tr.pageVersions}</div>
-      {total === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.noVersion}</div> : (
+      {total === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.noVersion}</div> : narrow ? (
+        // Table simple (non configurable, pas de ColManager) → repli en cartes label/valeur empilées
+        // sous 640px plutôt qu'un tableau qui déborderait horizontalement.
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, opacity: loading ? 0.5 : 1, transition: 'opacity .15s' }}>
+          {d.items.map((r) => (
+            <div key={r.id} style={{ border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 8, padding: '10px 12px' }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.colNumber} {r.number}</div>
+              {editing?.id === r.id
+                ? <input autoFocus value={editing.name} onChange={(e) => setEditing({ id: r.id, name: e.target.value })} onKeyDown={(e) => { if (e.key === 'Enter') doRename(); if (e.key === 'Escape') setEditing(null) }} style={{ ...field, height: 30, width: '100%', marginTop: 6 }} placeholder={tr.versionNamePlaceholder} />
+                : <div style={{ fontSize: 13, marginTop: 4 }}>{r.name || <span style={{ color: 'var(--color-muted-foreground,#6b7280)' }}>—</span>}</div>}
+              <div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)', marginTop: 4 }}>{fmtDate(r.editDate)} · {r.user}</div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
+                {editing?.id === r.id ? (<>
+                  <button style={{ ...smallBtn, border: 0, background: 'var(--color-primary,#dc2626)', color: '#fff' }} disabled={busy === r.id} onClick={doRename}>{tr.save}</button>
+                  <button style={smallBtn} onClick={() => setEditing(null)}>{tr.cancel}</button>
+                </>) : (<>
+                  <button style={smallBtn} disabled={busy === r.id} onClick={() => doView(r.id)} title={tr.viewTip}>{tr.view}</button>
+                  <button style={smallBtn} disabled={busy === r.id} onClick={() => setConfirmRestore(r.id)} title={tr.restoreTip}>{tr.restore}</button>
+                  <button style={smallBtn} disabled={busy === r.id} onClick={() => setEditing({ id: r.id, name: r.name || '' })} title={tr.renameTip}>{tr.rename}</button>
+                </>)}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
         <table style={{ width: '100%', borderCollapse: 'collapse', opacity: loading ? 0.5 : 1, transition: 'opacity .15s' }}>
           <thead><tr><th style={th}>{tr.colNumber}</th><th style={th}>{tr.colName}</th><th style={th}>{tr.colModifiedOn}</th><th style={th}>{tr.colBy}</th><th style={{ ...th, textAlign: 'right' }}>{tr.colActions}</th></tr></thead>
           <tbody>{d.items.map((r) => (
@@ -448,6 +476,7 @@ function wfMeta(): Record<string, { label: string; color: string; bg: string }> 
 const COMMENTS_PER_PAGE = 20
 export function CommentsTab({ idPage }: { idPage: number }) {
   const tr = peT()
+  const narrow = useIsNarrow()
   const WF_META = wfMeta()
   const [items, setItems] = useState<TLItem[] | null>(null)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
@@ -480,8 +509,9 @@ export function CommentsTab({ idPage }: { idPage: number }) {
     <div style={wrap}>
       <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>{tr.pageActivity}</div>
 
-      {/* Ajouter un commentaire */}
-      <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', marginBottom: 18 }}>
+      {/* Ajouter un commentaire — colonne sur narrow (le bouton pleine largeur sous la zone de texte
+          plutôt que compressé à côté d'elle, pattern 7). */}
+      <div style={{ display: 'flex', flexDirection: narrow ? 'column' : 'row', gap: 8, alignItems: narrow ? 'stretch' : 'flex-end', marginBottom: 18 }}>
         <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder={tr.addCommentPlaceholder} rows={2}
           style={{ flex: 1, resize: 'vertical', minHeight: 40, borderRadius: 6, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', padding: 10, fontSize: 13, boxSizing: 'border-box' }} />
         <button onClick={add} disabled={sending || !text.trim()} style={{ appearance: 'none', height: 36, padding: '0 16px', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: (sending || !text.trim()) ? 'not-allowed' : 'pointer', border: 0, background: 'var(--color-primary,#dc2626)', color: '#fff', opacity: (sending || !text.trim()) ? 0.6 : 1, whiteSpace: 'nowrap' }}>{sending ? tr.sending : tr.comment}</button>
@@ -550,6 +580,7 @@ function ActionBadge({ action }: { action: string }) {
 }
 export function HistoricTab({ idPage }: { idPage: number }) {
   const tr = peT()
+  const narrow = useIsNarrow()
   const [d, setD] = useState<HistData | null>(null)
   const [pageNum, setPageNum] = useState(1) // pagination serveur — jamais tout chargé
   const [filter, setFilter] = useState('')  // filtre SERVEUR par type d'action ('' = toutes)
@@ -581,14 +612,25 @@ export function HistoricTab({ idPage }: { idPage: number }) {
         {(d.actionTypes?.length ?? 0) > 0 && (
           <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: 'var(--color-muted-foreground,#6b7280)' }}>
             {tr.filter}
-            <select value={filter} onChange={(e) => { setFilter(e.target.value); setPageNum(1) }} style={{ ...field, height: 32, width: 'auto', minWidth: 170 }}>
+            <select value={filter} onChange={(e) => { setFilter(e.target.value); setPageNum(1) }} style={{ ...field, height: 32, width: narrow ? '100%' : 'auto', minWidth: 170 }}>
               <option value="">{tr.allActions}</option>
               {d.actionTypes.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
           </label>
         )}
       </div>
-      {total === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>{filter ? tr.noEntryForAction : tr.noHistory}</div> : (
+      {total === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>{filter ? tr.noEntryForAction : tr.noHistory}</div> : narrow ? (
+        // Table simple (non configurable) → repli en cartes label/valeur empilées sous 640px.
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, opacity: loading ? 0.5 : 1, transition: 'opacity .15s' }}>
+          {d.items.map((r) => (
+            <div key={r.id} style={{ border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={{ fontSize: 13, fontWeight: 600 }}>{fmtDate(r.date)}</div>
+              <div><ActionBadge action={r.action} /></div>
+              <div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{r.user}</div>
+            </div>
+          ))}
+        </div>
+      ) : (
         <table style={{ width: '100%', borderCollapse: 'collapse', opacity: loading ? 0.5 : 1, transition: 'opacity .15s' }}>
           <thead><tr><th style={th}>{tr.colDate}</th><th style={th}>{tr.colAction}</th><th style={th}>{tr.colUser}</th></tr></thead>
           <tbody>{d.items.map((r) => <tr key={r.id}><td style={td}>{fmtDate(r.date)}</td><td style={td}><ActionBadge action={r.action} /></td><td style={td}>{r.user}</td></tr>)}</tbody>
@@ -612,6 +654,7 @@ type Version = { pageId: number; langId: number; langName: string; locale: strin
 type Langs = { idPage: number; initial: number; versions: Version[]; creatable: Ref[] }
 export function LanguagesTab({ idPage }: { idPage: number }) {
   const tr = peT()
+  const narrow = useIsNarrow()
   const navigate = useNavigate()
   const [d, setD] = useState<Langs | null>(null)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
@@ -652,29 +695,54 @@ export function LanguagesTab({ idPage }: { idPage: number }) {
   return (
     <div style={wrap}>
       <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>{tr.langVersions}</div>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead><tr><th style={th}>{tr.colLanguage}</th><th style={th}>{tr.colLocale}</th><th style={th}>{tr.colPageName}</th><th style={th}>{tr.colId}</th></tr></thead>
-        <tbody>{d.versions.map((v) => {
-          const isCurrent = v.pageId === idPage
-          const open = () => openPage(v.pageId, v.pageName)
-          const rowStyle: React.CSSProperties = isCurrent ? { background: 'color-mix(in srgb, var(--color-primary,#dc2626) 7%, transparent)' } : { cursor: 'pointer' }
-          return (
-            <tr key={v.pageId} style={rowStyle} title={isCurrent ? undefined : tr.openPageTitle}
-              onClick={isCurrent ? undefined : open}
-              onMouseEnter={isCurrent ? undefined : (e) => { (e.currentTarget as HTMLElement).style.background = 'var(--color-accent, rgba(127,127,127,.08))' }}
-              onMouseLeave={isCurrent ? undefined : (e) => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}>
-              <td style={td}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}><Flag locale={v.locale} />{v.langName || v.langId}</span></td>
-              <td style={td}>{v.locale}</td>
-              <td style={td}>
-                {isCurrent
-                  ? <span>{v.pageName || '—'} <span style={{ fontSize: 11, color: 'var(--color-muted-foreground,#6b7280)', fontWeight: 500 }}>· {tr.currentPage}</span></span>
-                  : <a style={linkStyle} onClick={(e) => { e.stopPropagation(); open() }}>{v.pageName || `Page ${v.pageId}`}</a>}
-              </td>
-              <td style={td}>{v.pageId}</td>
-            </tr>
-          )
-        })}</tbody>
-      </table>
+      {narrow ? (
+        // Table simple (non configurable) → repli en cartes label/valeur empilées sous 640px.
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {d.versions.map((v) => {
+            const isCurrent = v.pageId === idPage
+            const open = () => openPage(v.pageId, v.pageName)
+            return (
+              <div key={v.pageId} onClick={isCurrent ? undefined : open}
+                style={{ border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 8, padding: '10px 12px', cursor: isCurrent ? 'default' : 'pointer', background: isCurrent ? 'color-mix(in srgb, var(--color-primary,#dc2626) 7%, transparent)' : 'var(--color-card,#fff)' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600 }}>
+                  <Flag locale={v.locale} />{v.langName || v.langId}
+                  <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--color-muted-foreground,#6b7280)' }}>({v.locale})</span>
+                </div>
+                <div style={{ fontSize: 13, marginTop: 4 }}>
+                  {isCurrent
+                    ? <span>{v.pageName || '—'} <span style={{ fontSize: 11, color: 'var(--color-muted-foreground,#6b7280)', fontWeight: 500 }}>· {tr.currentPage}</span></span>
+                    : <a style={linkStyle} onClick={(e) => { e.stopPropagation(); open() }}>{v.pageName || `Page ${v.pageId}`}</a>}
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--color-muted-foreground,#6b7280)', marginTop: 2 }}>{tr.colId} {v.pageId}</div>
+              </div>
+            )
+          })}
+        </div>
+      ) : (
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead><tr><th style={th}>{tr.colLanguage}</th><th style={th}>{tr.colLocale}</th><th style={th}>{tr.colPageName}</th><th style={th}>{tr.colId}</th></tr></thead>
+          <tbody>{d.versions.map((v) => {
+            const isCurrent = v.pageId === idPage
+            const open = () => openPage(v.pageId, v.pageName)
+            const rowStyle: React.CSSProperties = isCurrent ? { background: 'color-mix(in srgb, var(--color-primary,#dc2626) 7%, transparent)' } : { cursor: 'pointer' }
+            return (
+              <tr key={v.pageId} style={rowStyle} title={isCurrent ? undefined : tr.openPageTitle}
+                onClick={isCurrent ? undefined : open}
+                onMouseEnter={isCurrent ? undefined : (e) => { (e.currentTarget as HTMLElement).style.background = 'var(--color-accent, rgba(127,127,127,.08))' }}
+                onMouseLeave={isCurrent ? undefined : (e) => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}>
+                <td style={td}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}><Flag locale={v.locale} />{v.langName || v.langId}</span></td>
+                <td style={td}>{v.locale}</td>
+                <td style={td}>
+                  {isCurrent
+                    ? <span>{v.pageName || '—'} <span style={{ fontSize: 11, color: 'var(--color-muted-foreground,#6b7280)', fontWeight: 500 }}>· {tr.currentPage}</span></span>
+                    : <a style={linkStyle} onClick={(e) => { e.stopPropagation(); open() }}>{v.pageName || `Page ${v.pageId}`}</a>}
+                </td>
+                <td style={td}>{v.pageId}</td>
+              </tr>
+            )
+          })}</tbody>
+        </table>
+      )}
       <div style={{ marginTop: 20 }}>
         <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{tr.creatableLangs}</div>
         {d.creatable.length > 0 ? (

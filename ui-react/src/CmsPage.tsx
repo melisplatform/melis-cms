@@ -7,6 +7,7 @@ import {
   apiGet, apiPost, type PropsData, type SeoData, type Refs,
 } from './PageTabs'
 import { peT } from './page-editor-i18n'
+import { useIsNarrow } from './shared/useIsNarrow'
 import { legacyErrorFields, legacyText } from './legacy-errors'
 
 /**
@@ -146,6 +147,7 @@ function orderOf(key: string): number {
 
 export default function CmsPage({ active = true }: { active?: boolean }) {
   const tr = peT() // dictionnaire i18n (référence stable : DICT[lang] du BO) → sûr hors deps des useCallback
+  const narrow = useIsNarrow()
   const { id } = useParams()
   const navigate = useNavigate()
   const { can, loaded: capsLoaded } = useCaps(TOOL_KEY)
@@ -732,17 +734,20 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
       `}</style>
       {!isCreation && (
         <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '8px 16px', borderBottom: showChrome ? 'none' : '1px solid var(--color-border,#e5e7eb)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: narrow ? 0 : undefined, overflow: narrow ? 'hidden' : undefined }}>
             {showChrome && (<>
-              <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--color-foreground,#111827)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{header?.pageName ?? (structMatches ? `Page ${current}` : '')}</span>
-              {statusLabel && <span style={{ fontSize: 11, fontWeight: 600, color: '#fff', background: statusColor, borderRadius: 999, padding: '2px 8px' }}>{statusLabel}</span>}
-              {header?.editDate && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.modifiedOn} {header.editDate}{header.editor ? ` ${tr.byWord} ${header.editor}` : ''}</span>}
-              {!editionReady && !saving && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.loadingEdition}</span>}
-              {saving && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.savingEdition}</span>}
-              {toast && <span style={{ fontSize: 12, fontWeight: 600, color: toast.ok ? '#16a34a' : '#dc2626' }}>{toast.text}</span>}
+              <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--color-foreground,#111827)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: narrow ? 0 : undefined }}>{header?.pageName ?? (structMatches ? `Page ${current}` : '')}</span>
+              {statusLabel && <span style={{ fontSize: 11, fontWeight: 600, color: '#fff', background: statusColor, borderRadius: 999, padding: '2px 8px', flexShrink: 0 }}>{statusLabel}</span>}
+              {/* Métadonnées secondaires (date/auteur, chargement, toast local) : masquées sur narrow pour
+                  garder l'en-tête sur UNE seule ligne (règle pattern 1) — les notifications importantes
+                  passent de toute façon par le toast global de la coquille (notify() → postMessage). */}
+              {!narrow && header?.editDate && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.modifiedOn} {header.editDate}{header.editor ? ` ${tr.byWord} ${header.editor}` : ''}</span>}
+              {!narrow && !editionReady && !saving && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.loadingEdition}</span>}
+              {!narrow && saving && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.savingEdition}</span>}
+              {!narrow && toast && <span style={{ fontSize: 12, fontWeight: 600, color: toast.ok ? '#16a34a' : '#dc2626' }}>{toast.text}</span>}
             </>)}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: narrow ? 8 : 12, flexShrink: 0 }}>
             {/* Switch Publié / Dépublié (comme le legacy .page-publishunpublish). ON=En ligne (publie), OFF=Hors ligne (dépublie).
                 Gaté par la capacité `status` (droits avancés) → masquable dans Users→Droits comme les boutons. */}
             {showChrome && header && (!capsLoaded || can('status')) && (() => {
@@ -751,16 +756,16 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
               return (
                 <button type="button" onClick={() => togglePublish(!online)} disabled={disabled}
                   title={online ? tr.onlineTip : tr.offlineTip}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 8, appearance: 'none', border: 0, background: 'transparent', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.6 : 1, padding: 0 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: .3, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.statusLabel}</span>
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: narrow ? 6 : 8, appearance: 'none', border: 0, background: 'transparent', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.6 : 1, padding: 0 }}>
+                  {!narrow && <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: .3, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.statusLabel}</span>}
                   <span style={{ position: 'relative', width: 40, height: 21, borderRadius: 999, background: online ? '#16a34a' : '#dc2626', transition: 'background .15s', flex: '0 0 auto' }}>
                     <span style={{ position: 'absolute', top: 2, left: 2, width: 17, height: 17, borderRadius: '50%', background: '#fff', boxShadow: '0 1px 2px rgba(0,0,0,.3)', transform: online ? 'translateX(19px)' : 'translateX(0)', transition: 'transform .15s' }} />
                   </span>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: online ? '#16a34a' : '#dc2626', minWidth: 54, textAlign: 'left' }}>{online ? tr.statusOnline : tr.statusOffline}</span>
+                  {!narrow && <span style={{ fontSize: 11, fontWeight: 600, color: online ? '#16a34a' : '#dc2626', minWidth: 54, textAlign: 'left' }}>{online ? tr.statusOnline : tr.statusOffline}</span>}
                 </button>
               )
             })()}
-            <ViewToggle mode={mode} onChange={setMode} />
+            <ViewToggle mode={mode} onChange={setMode} compact={narrow} />
           </div>
         </div>
       )}
@@ -781,7 +786,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         <div style={{ flex: '0 0 auto', background: 'var(--color-background,#fff)', borderBottom: '1px solid var(--color-border,#e5e7eb)' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px 4px', padding: '0 16px 12px' }}>
             {btnGroups.map((group, gi) => (
-              <div key={gi} style={{ display: 'flex', flexWrap: 'nowrap', alignItems: 'center', gap: 8 }}>
+              <div key={gi} style={{ display: 'flex', flexWrap: narrow ? 'wrap' : 'nowrap', alignItems: 'center', gap: 8 }}>
                 {gi > 0 && <div style={{ width: 1, minHeight: 24, alignSelf: 'stretch', background: 'var(--color-border,#e5e7eb)', margin: '0 6px' }} />}
                 {group.map((b) => (
                   // Dropdown seulement pour de VRAIS sous-menus (Voir/Affichage) ; un enfant "modal"/
@@ -804,7 +809,9 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
               </div>
             ))}
           </div>
-          <div style={{ display: 'flex', gap: 2, padding: '0 12px', overflowX: 'auto' }}>
+          {/* Onglets : wrap sur 2ᵉ ligne sur narrow (tous visibles) plutôt qu'un défilement horizontal
+              qui masque les onglets tant que l'utilisateur n'a pas swipé (pattern 6). */}
+          <div style={{ display: 'flex', gap: 2, padding: '0 12px', flexWrap: narrow ? 'wrap' : 'nowrap', overflowX: narrow ? 'visible' : 'auto' }}>
             {visibleTabs.map((t) => {
               const isActive = t.key === activeTab
               return <button key={t.key} className="melis-pgtab" onClick={() => driveTab(t.key)} title={t.label} style={{ appearance: 'none', border: 0, background: 'transparent', cursor: 'pointer', padding: '8px 12px', fontSize: 13, whiteSpace: 'nowrap', color: isActive ? 'var(--color-primary,#dc2626)' : 'var(--color-muted-foreground,#6b7280)', borderBottom: isActive ? '2px solid var(--color-primary,#dc2626)' : '2px solid transparent', fontWeight: isActive ? 600 : 400 }}>{t.label}</button>

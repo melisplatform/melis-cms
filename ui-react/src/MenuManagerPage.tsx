@@ -7,6 +7,7 @@ import {
 } from './menu-manager-api'
 import { ViewToggle } from './ViewToggle'
 import { Flag, FlagSelect } from './PageTabs'
+import { useIsNarrow } from './shared/useIsNarrow'
 
 /* ──────────────────────────────────────────────────────────────────────────
  * Menu Manager (MelisCms) — brique full React, montée à /melis-cms/menu-manager.
@@ -247,11 +248,17 @@ type RowDnDProps = {
 // entre frères. Chaque niveau ajoute son propre paddingLeft → indentation cumulée.
 const ROW_MID = 19 // centre vertical d'une ligne (~hauteur/2) : position du té horizontal
 function Branch({ connector, children }: { connector?: 'mid' | 'last'; children: ReactNode }) {
+  // Indentation réduite sur narrow : un arbre profond pousserait sinon les libellés hors écran
+  // (cumul paddingLeft × niveaux) — le texte tronque déjà (voir CategoryRow/TemplateRow), mais
+  // moins d'indent par niveau laisse plus de place au texte avant la troncature.
+  const narrow = useIsNarrow()
+  const indent = narrow ? 14 : 22
+  const teeWidth = narrow ? 8 : 13
   return (
-    <div style={{ position: 'relative', paddingLeft: connector ? 22 : 0 }}>
+    <div style={{ position: 'relative', paddingLeft: connector ? indent : 0 }}>
       {connector && (<>
         <span style={{ position: 'absolute', left: 7, top: 0, height: connector === 'last' ? ROW_MID : '100%', width: 1, background: 'var(--color-border)' }} />
-        <span style={{ position: 'absolute', left: 7, top: ROW_MID, width: 13, height: 1, background: 'var(--color-border)' }} />
+        <span style={{ position: 'absolute', left: 7, top: ROW_MID, width: teeWidth, height: 1, background: 'var(--color-border)' }} />
       </>)}
       {children}
     </div>
@@ -264,6 +271,7 @@ function TemplateRow({ node, dragId, overTarget, onDragStart, onDragEnd, onRowDr
   onEditTemplate: (node: TreeNode) => void
 }) {
   const isOver = overTarget?.id === node.id
+  const narrow = useIsNarrow()
   return (
     <div
       draggable
@@ -272,7 +280,7 @@ function TemplateRow({ node, dragId, overTarget, onDragStart, onDragEnd, onRowDr
       onDragOver={(e) => onRowDragOver(node, false, e)}
       onDrop={(e) => onRowDrop(node, e)}
       style={{
-        display: 'flex', alignItems: 'center', gap: 10, padding: '7px 10px',
+        display: 'flex', alignItems: 'center', gap: narrow ? 6 : 10, padding: narrow ? '7px 6px' : '7px 10px',
         borderRadius: 8, cursor: 'grab', opacity: dragId === node.id ? 0.4 : 1,
         borderTop: isOver && overTarget?.edge === 'top' ? '2px solid var(--color-primary)' : '2px solid transparent',
         borderBottom: isOver && overTarget?.edge === 'bottom' ? '2px solid var(--color-primary)' : '2px solid transparent',
@@ -300,6 +308,7 @@ function CategoryRow({ node, kids, expanded, onToggle, dragId, overTarget, onDra
 }) {
   const isOver = overTarget?.id === node.id
   const hasKids = kids.length > 0
+  const narrow = useIsNarrow()
   return (
     <div
       draggable
@@ -308,7 +317,7 @@ function CategoryRow({ node, kids, expanded, onToggle, dragId, overTarget, onDra
       onDragOver={(e) => onRowDragOver(node, true, e)}
       onDrop={(e) => onRowDrop(node, e)}
       style={{
-        display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', cursor: 'grab', borderRadius: 8,
+        display: 'flex', alignItems: 'center', gap: narrow ? 6 : 8, padding: narrow ? '8px 6px' : '8px 10px', cursor: 'grab', borderRadius: 8,
         background: isOver && overTarget?.edge === 'inside' ? 'color-mix(in srgb, var(--color-primary) 12%, transparent)' : 'var(--color-muted,rgba(0,0,0,.03))',
         opacity: dragId === node.id ? 0.4 : 1,
         borderTop: isOver && overTarget?.edge === 'top' ? '2px solid var(--color-primary)' : '2px solid transparent',
@@ -333,6 +342,7 @@ function CategoryRow({ node, kids, expanded, onToggle, dragId, overTarget, onDra
 // ── Arbre (liste) ──────────────────────────────────────────────────────────────
 function MenuManagerTree({ base }: { base: string }) {
   const t = useT()
+  const narrow = useIsNarrow()
   const navigate = useNavigate()
   const [sites, setSites] = useState<SiteOption[]>([])
   const [languages, setLanguages] = useState<LanguageOption[]>([])
@@ -464,20 +474,37 @@ function MenuManagerTree({ base }: { base: string }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
-        <div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{t('title')}</h1>
-          <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0' }}>{t('subtitle')}</p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: narrow ? 16 : 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
+      {/* Header — même rangée sur desktop ; sur narrow, gros bloc titre + sous-rangées de contrôles
+          (icônes) puis le bouton primaire « Nouvelle catégorie » en pleine largeur, comme le
+          « + New » d'un pattern déjà en place ailleurs. */}
+      {narrow ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ minWidth: 0 }}>
+            <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t('title')}</h1>
+            <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0' }}>{t('subtitle')}</p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} compact />
+            <button style={btnGhost} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
+            {can('create') && <button style={btnGhost} onClick={() => navigate(`${miniTemplateManagerRoute()}/new?site=${siteId ?? ''}`)} disabled={!siteId} title={t('add_minitemplate')}><PlusIcon /></button>}
+          </div>
+          {can('create') && <button style={{ ...btnPrimary, width: '100%', justifyContent: 'center' }} onClick={() => navigate(`${base}/new?site=${siteId ?? ''}`)} disabled={!siteId}><PlusIcon />{t('new_category')}</button>}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
-          <button style={btnGhost} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
-          {can('create') && <button style={btnGhost} onClick={() => navigate(`${miniTemplateManagerRoute()}/new?site=${siteId ?? ''}`)} disabled={!siteId}><PlusIcon />{t('add_minitemplate')}</button>}
-          {can('create') && <button style={btnPrimary} onClick={() => navigate(`${base}/new?site=${siteId ?? ''}`)} disabled={!siteId}><PlusIcon />{t('new_category')}</button>}
+      ) : (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+          <div>
+            <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{t('title')}</h1>
+            <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0' }}>{t('subtitle')}</p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
+            <button style={btnGhost} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
+            {can('create') && <button style={btnGhost} onClick={() => navigate(`${miniTemplateManagerRoute()}/new?site=${siteId ?? ''}`)} disabled={!siteId}><PlusIcon />{t('add_minitemplate')}</button>}
+            {can('create') && <button style={btnPrimary} onClick={() => navigate(`${base}/new?site=${siteId ?? ''}`)} disabled={!siteId}><PlusIcon />{t('new_category')}</button>}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Vue « Old » : outil legacy en iframe */}
       {frameLoaded && (
@@ -493,12 +520,12 @@ function MenuManagerTree({ base }: { base: string }) {
         <div style={{ ...card, padding: '40px 16px', textAlign: 'center', fontSize: 14, color: 'var(--color-muted-foreground)' }}>{t('no_access')}</div>
       ) : (<>
       {/* Filtres */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <select style={{ ...inputCss, height: 36, width: 'auto', minWidth: 200 }} value={siteId ?? ''} onChange={(e) => setSiteId(e.target.value ? Number(e.target.value) : null)}>
+      <div style={{ display: 'flex', flexDirection: narrow ? 'column' : 'row', gap: 8, flexWrap: narrow ? 'nowrap' : 'wrap' }}>
+        <select style={{ ...inputCss, height: 36, width: narrow ? '100%' : 'auto', minWidth: narrow ? undefined : 200 }} value={siteId ?? ''} onChange={(e) => setSiteId(e.target.value ? Number(e.target.value) : null)}>
           <option value="">{t('select_site')}</option>
           {sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
         </select>
-        <div style={{ width: 190 }}>
+        <div style={{ width: narrow ? '100%' : 190 }}>
           <FlagSelect
             value={languages.find((l) => l.locale === locale)?.id ?? 0}
             onChange={(id) => { const l = languages.find((x) => x.id === id); if (l) setLocale(l.locale) }}
@@ -577,6 +604,7 @@ function MenuManagerTree({ base }: { base: string }) {
 // "Category name" à droite pour la langue sélectionnée (une langue à la fois).
 function CategoryForm({ id, base }: { id: string; base: string }) {
   const t = useT()
+  const narrow = useIsNarrow()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const isEdit = id !== 'new'
@@ -647,9 +675,9 @@ function CategoryForm({ id, base }: { id: string; base: string }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: narrow ? 16 : 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
       {/* Header — pas de bouton « retour » : la barre de sous-onglets de l'hôte le fournit déjà. */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: narrow ? 'wrap' : 'nowrap' }}>
         <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{isEdit ? t('edit_title') : t('new_title')}</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {saved && <span style={{ fontSize: 14, color: '#059669' }}>{t('saved')}</span>}
@@ -664,7 +692,7 @@ function CategoryForm({ id, base }: { id: string; base: string }) {
         <div style={{ padding: 48, textAlign: 'center', color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>
       ) : (<>
         {/* Site — indépendant des onglets de langue, fixé à la création (comme en legacy) */}
-        <div style={{ ...card, padding: 20, maxWidth: 420 }}>
+        <div style={{ ...card, padding: 20, maxWidth: narrow ? undefined : 420 }}>
           <label style={label}>{t('f_site')}</label>
           <select style={{ ...inputCss, borderColor: siteError ? '#fca5a5' : undefined }}
             value={siteId ?? ''} disabled={isEdit}
@@ -677,7 +705,7 @@ function CategoryForm({ id, base }: { id: string; base: string }) {
             : <p style={hint}>{t('f_site_hint')}</p>}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 20, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: narrow ? '1fr' : '260px 1fr', gap: 20, alignItems: 'start' }}>
           {/* Colonne gauche : liste des langues (drapeau + surbrillance) */}
           <div style={{ ...card, overflow: 'hidden' }}>
             {languages.map((l) => {

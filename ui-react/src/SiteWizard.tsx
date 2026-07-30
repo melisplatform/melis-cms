@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { fetchSiteMeta, createSite, type SiteLang } from './sites-api'
+import { useIsNarrow } from './shared/useIsNarrow'
 
 /**
  * Assistant de création de site (brique MelisCms) — reprise FIDÈLE du wizard legacy en 5 étapes :
@@ -53,6 +54,7 @@ const STEPS = [
 ]
 
 export default function SiteWizard({ onCancel, onCreated }: Props) {
+  const narrow = useIsNarrow()
   const [langs, setLangs] = useState<SiteLang[]>([])
   const [modules, setModules] = useState<string[]>([])
   const [defaultDomain, setDefaultDomain] = useState('')
@@ -153,7 +155,7 @@ export default function SiteWizard({ onCancel, onCreated }: Props) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: narrow ? 14 : 20, padding: narrow ? 14 : 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
       {/* Header — le retour se fait via la barre de sous-onglets (← Retour) ; pas de bouton redondant ici. */}
       <div>
         <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{tr('Nouveau site', 'New site')}</h1>
@@ -162,24 +164,26 @@ export default function SiteWizard({ onCancel, onCreated }: Props) {
         </p>
       </div>
 
-      {/* Stepper (5 étapes) */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      {/* Stepper (5 étapes) — toutes les étapes restent nommées sur narrow (l'utilisateur doit voir
+          où il va/d'où il vient, pas juste un numéro) : pastilles plus compactes + wrap sur 2 lignes,
+          seules les flèches de liaison disparaissent (inutiles une fois le retour à la ligne actif). */}
+      <div style={{ display: 'flex', gap: narrow ? 6 : 8, flexWrap: 'wrap' }}>
         {STEPS.map((s, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', borderRadius: 999,
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: narrow ? 6 : 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: narrow ? 6 : 8, padding: narrow ? '5px 10px' : '6px 12px', borderRadius: 999,
               background: i === step ? 'var(--color-primary,#cb4040)' : i < step ? 'rgba(0,0,0,.06)' : 'transparent',
-              color: i === step ? '#fff' : 'var(--color-foreground)', border: '1px solid var(--color-border,#e5e7eb)', fontSize: 13, fontWeight: 600 }}>
+              color: i === step ? '#fff' : 'var(--color-foreground)', border: '1px solid var(--color-border,#e5e7eb)', fontSize: narrow ? 12 : 13, fontWeight: 600 }}>
               <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 20, height: 20, borderRadius: 999,
-                background: i === step ? 'rgba(255,255,255,.25)' : 'rgba(0,0,0,.06)', fontSize: 12 }}>{i < step ? '✓' : i + 1}</span>
+                background: i === step ? 'rgba(255,255,255,.25)' : 'rgba(0,0,0,.06)', fontSize: 12, flexShrink: 0 }}>{i < step ? '✓' : i + 1}</span>
               {tr(s.fr, s.en)}
             </div>
-            {i < STEPS.length - 1 && <span style={{ color: 'var(--color-muted-foreground)' }}>→</span>}
+            {i < STEPS.length - 1 && !narrow && <span style={{ color: 'var(--color-muted-foreground)' }}>→</span>}
           </div>
         ))}
       </div>
 
       {/* Contenu d'étape */}
-      <div style={{ ...card, padding: 20, maxWidth: 720 }}>
+      <div style={{ ...card, padding: narrow ? 14 : 20, maxWidth: narrow ? '100%' : 720 }}>
         {/* ── Étape 1 : Multilingue ? ── */}
         {step === 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -323,15 +327,15 @@ export default function SiteWizard({ onCancel, onCreated }: Props) {
 
         {/* ── Étape 5 : Récapitulatif ── */}
         {step === 4 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: narrow ? 14 : 10, fontSize: 14 }}>
             <p style={{ margin: 0, color: 'var(--color-muted-foreground)' }}>{tr('Un nouveau site va être créé avec les paramètres suivants :', 'A new site will be created with the following parameters:')}</p>
             <Row k={tr('Libellé', 'Label')} v={label} />
             <Row k={tr('Module', 'Module')} v={isCreateNew ? `${moduleName} ${tr('(nouveau)', '(new)')}` : `${existingModule} ${tr('(existant)', '(existing)')}`} />
             <Row k={tr('Multilingue', 'Multilingual')} v={multiLang ? tr('Oui', 'Yes') : tr('Non', 'No')} />
             <Row k={tr('Langues', 'Languages')} v={selectedLangs.map((l) => l.name).join(', ') || '—'} />
             {multiLang && <Row k={tr('URLs', 'URLs')} v={urlSetting === 1 ? tr('Locale après le domaine', 'Locale after domain') : urlSetting === 2 ? tr('Un domaine par langue', 'One domain per language') : tr('Nom de page seul', 'Page name only')} />}
-            <Row k={tr('Domaines', 'Domains')}
-              v={`${perLangDomains ? tr('Un domaine par langue', 'One domain per language') : tr('Domaine unique', 'Single domain')} — ${perLangDomains ? selectedLangs.map((l) => `${l.locale}: ${domainsByLocale[l.locale] || ''}`).join(' · ') : singleDomain}`} />
+            <Row k={tr('Domaines', 'Domains')} sub={perLangDomains ? tr('Un domaine par langue', 'One domain per language') : tr('Domaine unique', 'Single domain')}
+              v={perLangDomains ? selectedLangs.map((l) => `${l.locale}: ${domainsByLocale[l.locale] || ''}`).join(' · ') : singleDomain} />
             <Row k={tr('Mode Drag & Drop', 'Drag & Drop mode')} v={dndRenderMode ? tr('Oui', 'Yes') : tr('Non', 'No')} />
             {isCreateNew && <Row k={tr('Créer les fichiers', 'Create files')} v={createFile ? tr('Oui', 'Yes') : tr('Non', 'No')} />}
             {error && <div style={{ color: '#b91c1c', fontSize: 13, marginTop: 6 }}>{error}</div>}
@@ -340,7 +344,7 @@ export default function SiteWizard({ onCancel, onCreated }: Props) {
       </div>
 
       {/* Navigation */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: 720 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: narrow ? '100%' : 720 }}>
         <button style={btn} onClick={() => (step === 0 ? onCancel() : setStep((s) => s - 1))}>
           {step === 0 ? tr('Annuler', 'Cancel') : tr('Précédent', 'Back')}
         </button>
@@ -358,11 +362,20 @@ export default function SiteWizard({ onCancel, onCreated }: Props) {
   )
 }
 
-function Row({ k, v }: { k: string; v: string }) {
+/**
+ * Summary recap row — label above value stacked on narrow (a fixed-width label column next to
+ * a long value like "Single domain — devsf6.melisplatform.com" wraps awkwardly on mobile).
+ * `sub`, when present, renders as a small caption line above the value (e.g. "Single domain").
+ */
+function Row({ k, v, sub }: { k: string; v: string; sub?: string }) {
+  const narrow = useIsNarrow()
   return (
-    <div style={{ display: 'flex', gap: 12 }}>
-      <div style={{ width: 160, color: 'var(--color-muted-foreground)' }}>{k}</div>
-      <div style={{ fontWeight: 600 }}>{v || '—'}</div>
+    <div style={narrow
+      ? { display: 'flex', flexDirection: 'column', gap: 2, padding: '8px 0', borderBottom: '1px solid var(--color-border,#e5e7eb)' }
+      : { display: 'flex', gap: 12 }}>
+      <div style={narrow ? { fontSize: 12, color: 'var(--color-muted-foreground)' } : { width: 160, flexShrink: 0, color: 'var(--color-muted-foreground)' }}>{k}</div>
+      {narrow && sub && <div style={{ fontSize: 12, color: 'var(--color-muted-foreground)' }}>{sub}</div>}
+      <div style={{ fontWeight: 600, overflowWrap: 'break-word' }}>{sub && !narrow ? `${sub} — ${v || '—'}` : (v || '—')}</div>
     </div>
   )
 }

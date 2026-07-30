@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { SiteConfigData, ConfigSection } from '../sites-api'
+import { useIsNarrow } from '../shared/useIsNarrow'
 
 /**
  * Onglet "Config" : configuration fusionnée (fichier + DB) éditable, sous-onglets Général + langues.
@@ -55,12 +56,13 @@ export function buildConfigFields(data: SiteConfigData): Record<string, string> 
 }
 
 function SectionForm({ sect, fields, setField }: { sect: ConfigSection; fields: Record<string, string>; setField: (n: string, v: string) => void }) {
+  const narrow = useIsNarrow()
   const sk = sectionKey(sect)
   if (sect.items.length === 0) {
     return <div style={{ ...hint, padding: '16px 0' }}>{tr('Aucune donnée de configuration.', 'No configuration data.')}</div>
   }
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 520 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxWidth: narrow ? '100%' : 520 }}>
       {sect.items.map((it) => it.type === 'scalar' ? (
         <div key={it.key}>
           <label style={lbl}>{it.key}</label>

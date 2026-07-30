@@ -524,6 +524,11 @@ var melisCms = (function() {
 				//var tree = $("#id-mod-menu-dynatree").fancytree("getTree");
 				var tree = $.ui.fancytree.getTree("#id-mod-menu-dynatree");
 
+					// no sitemap tree in this context (e.g. newsletter pages) → nothing to refresh
+					if (!tree || typeof tree.reload !== "function") {
+						return;
+					}
+
 					// clear persist data for expanded state before reload to avoid assertion error
 					if (tree.ext && tree.ext.persist) {
 						tree.clearPersistData("expanded");

@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties, type FormEvent } from 'react'
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type FormEvent, type RefObject } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   deleteTemplate, fetchTemplate, fetchTemplates, fetchTemplateSites, fetchTemplateStats, saveTemplate,
@@ -7,6 +7,8 @@ import {
 import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle } from './ViewToggle'
 import { useKeysetList } from './use-keyset-list'
+import { useIsNarrow } from './shared/useIsNarrow'
+import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
 
 /* ──────────────────────────────────────────────────────────────────────────
  * Brique « Templates » (MelisCms). LISTE + CRÉATION + ÉDITION sont full React (montées à
@@ -132,14 +134,29 @@ function loadCols(): ColDef[] {
 function saveCols(c: ColDef[]) { try { localStorage.setItem(COL_KEY, JSON.stringify(c)) } catch { /* */ } }
 const visibleCols = (c: ColDef[]) => c.filter((x) => x.visible)
 
-function ColManager({ cols, labelFor, onChange, onClose }: {
+function ColManager({ cols, labelFor, onChange, onClose, anchorRef }: {
   cols: ColDef[]; labelFor: (id: string) => string; onChange: (c: ColDef[]) => void; onClose: () => void
+  anchorRef: RefObject<HTMLButtonElement | null>
 }) {
   const t = useT()
   const [dragId, setDragId] = useState<string | null>(null)
   const [over, setOver] = useState<{ id: string; panel: 'visible' | 'hidden' } | null>(null)
   const shown = cols.filter((c) => c.visible)
   const hidden = cols.filter((c) => !c.visible)
+
+  // Position clampée (viewport), calculée depuis le bouton ancre plutôt qu'un simple `right: 0` —
+  // sinon le popover peut border son propre bord gauche hors écran une fois les boutons du filtre
+  // wrappés sur narrow (cf. skill melis-react-mobile-responsive, piège ColManager).
+  const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(null)
+  useLayoutEffect(() => {
+    const margin = 8
+    const width = Math.min(380, window.innerWidth - margin * 2)
+    const rect = anchorRef.current?.getBoundingClientRect()
+    const right = rect ? rect.right : window.innerWidth - margin
+    const top = rect ? rect.bottom + 6 : margin
+    const left = Math.min(Math.max(margin, right - width), window.innerWidth - width - margin)
+    setPos({ top, left, width })
+  }, [anchorRef])
 
   function drop(panel: 'visible' | 'hidden') {
     if (!dragId) return
@@ -168,8 +185,9 @@ function ColManager({ cols, labelFor, onChange, onClose }: {
     )
   }
   const ph = (txt: string) => <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--color-muted-foreground)', opacity: 0.5, padding: '16px 0' }}>{txt}</div>
+  if (!pos) return null
   return (
-    <div style={{ ...card, position: 'absolute', right: 0, top: '100%', marginTop: 6, zIndex: 50, width: 380, maxWidth: 'calc(100vw - 1rem)' }}>
+    <div style={{ ...card, position: 'fixed', top: pos.top, left: pos.left, zIndex: 50, width: pos.width }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderBottom: '1px solid var(--color-border)' }}>
         <span style={{ fontSize: 14, fontWeight: 600 }}>{t('columns')}</span>
         <button style={{ ...iconBtn, width: 22, height: 22 }} onClick={onClose}>✕</button>
@@ -225,6 +243,7 @@ export default function TemplatePage({ active = true }: { active?: boolean }) {
 function TemplateList({ base }: { base: string }) {
   const t = useT()
   const navigate = useNavigate()
+  const narrow = useIsNarrow()
   const [stats, setStats] = useState<TemplateStats | null>(null)
   const [sites, setSites] = useState<SiteOption[]>([])
   const [searchInput, setSearchInput] = useState('')
@@ -237,6 +256,15 @@ function TemplateList({ base }: { base: string }) {
   const [showExport, setShowExport] = useState(false)
   const [mode, setMode] = useState<'react' | 'iframe'>('react')
   const [frameLoaded, setFrameLoaded] = useState(false)
+  const colBtnRef = useRef<HTMLButtonElement>(null)
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set())
+  function toggleExpanded(id: number) {
+    setExpandedRows((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next })
+  }
+  // Collapse à la seule colonne essentielle (nom) sur narrow, quel que soit le réglage ColManager
+  // de l'utilisateur — cf. skill melis-react-mobile-responsive.
+  const displayCols = narrow ? cols.map((c) => ({ ...c, visible: c.id === 'name' })) : cols
+  const hasHidden = narrow
 
   const { items, total, loading, hasMore, sentinelRef, sortCol, sortDir, toggleSort, reload, removeLocal } =
     useKeysetList<TemplateItem>({
@@ -272,16 +300,16 @@ function TemplateList({ base }: { base: string }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: narrow ? 14 : 20, padding: narrow ? 14 : 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-        <div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{t('title')}</h1>
-          <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0' }}>{t('subtitle')}</p>
+        <div style={narrow ? { minWidth: 0 } : undefined}>
+          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{t('title')}</h1>
+          <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0', ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{t('subtitle')}</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} compact={narrow} />
           <button style={btnGhost} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
-          {can('create') && <button style={btnPrimary} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>}
+          {can('create') && <button style={btnPrimary} onClick={() => navigate(`${base}/new`)} title={t('new')}><PlusIcon />{!narrow && t('new')}</button>}
         </div>
       </div>
 
@@ -306,25 +334,28 @@ function TemplateList({ base }: { base: string }) {
       </div>
 
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <input style={{ ...inputCss, flex: 1, minWidth: 220 }} value={searchInput} onChange={(e) => setSearchInput(e.target.value)}
+        <input style={{ ...inputCss, flex: narrow ? '1 1 100%' : 1, minWidth: narrow ? undefined : 220 }} value={searchInput} onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && setSearch(searchInput.trim())} placeholder={t('search')} />
-        <select style={{ ...inputCss, width: 'auto' }} value={site ?? ''} onChange={(e) => setSite(e.target.value ? Number(e.target.value) : null)}>
+        <select style={{ ...inputCss, width: narrow ? '100%' : 'auto', flex: narrow ? '1 1 100%' : undefined }} value={site ?? ''} onChange={(e) => setSite(e.target.value ? Number(e.target.value) : null)}>
           <option value="">{t('all_sites')}</option>
           {sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
         </select>
-        <button style={btnGhost} onClick={resetFilters}><ResetIcon />{t('reset_filters')}</button>
-        <div style={{ position: 'relative' }}>
-          <button style={btnGhost} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
-          {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
+        {/* reset_filters : toujours sur sa propre ligne pleine largeur sur narrow — le libellé FR
+            est trop long pour partager une ligne 50/50 avec Colonnes/Exporter (cf. skill). */}
+        <button style={{ ...btnGhost, flex: narrow ? '1 1 100%' : undefined, justifyContent: narrow ? 'center' : undefined }} onClick={resetFilters}><ResetIcon />{t('reset_filters')}</button>
+        <div style={{ position: 'relative', flex: narrow ? '1 1 calc(50% - 4px)' : undefined }}>
+          <button ref={colBtnRef} style={{ ...btnGhost, width: narrow ? '100%' : undefined, justifyContent: narrow ? 'center' : undefined }} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
+          {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} anchorRef={colBtnRef} />}
         </div>
-        {can('export') && <button style={btnGhost} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>}
+        {can('export') && <button style={{ ...btnGhost, flex: narrow ? '1 1 calc(50% - 4px)' : undefined, justifyContent: narrow ? 'center' : undefined }} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>}
       </div>
 
       <div style={{ ...card, overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 720 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', ...(!narrow ? { minWidth: 720 } : {}) }}>
           <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
             <tr>
-              {visibleCols(cols).map(({ id }) => (
+              {hasHidden && <th style={{ ...th, width: 36 }} />}
+              {visibleCols(displayCols).map(({ id }) => (
                 <th key={id} style={{ ...th, cursor: 'pointer', ...(id === 'id' ? { width: 60 } : {}), ...(sortCol === id ? { color: 'var(--color-primary)' } : {}) }} onClick={() => toggleSort(id)}>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t(COL_LABEL[id])}<SortIcon dir={sortCol === id ? sortDir : null} /></span>
                 </th>
@@ -334,19 +365,26 @@ function TemplateList({ base }: { base: string }) {
           </thead>
           <tbody>
             {items.length === 0 && !loading ? (
-              <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(cols).length + 1}>{t('empty')}</td></tr>
+              <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={(hasHidden ? 1 : 0) + visibleCols(displayCols).length + 1}>{t('empty')}</td></tr>
             ) : items.map((r) => (
-              <tr key={r.id}>
-                {visibleCols(cols).map(({ id }) => (
-                  <td key={id} style={{ ...td, ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}) }}>{renderCellNode(r, id)}</td>
-                ))}
-                <td style={td}>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-                    {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>}
-                    {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
-                  </div>
-                </td>
-              </tr>
+              <Fragment key={r.id}>
+                <tr>
+                  {hasHidden && <td style={td}><ExpandToggle expanded={expandedRows.has(r.id)} onClick={() => toggleExpanded(r.id)} /></td>}
+                  {visibleCols(displayCols).map(({ id }) => (
+                    <td key={id} style={{ ...td, ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}) }}>{renderCellNode(r, id)}</td>
+                  ))}
+                  <td style={td}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
+                      {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>}
+                      {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
+                    </div>
+                  </td>
+                </tr>
+                {hasHidden && expandedRows.has(r.id) && (
+                  <HiddenColsRow cols={displayCols} labelFor={(id) => t(COL_LABEL[id])} renderValue={(id) => renderCellNode(r, id)}
+                    colSpan={1 + visibleCols(displayCols).length + 1} narrow={narrow} />
+                )}
+              </Fragment>
             ))}
           </tbody>
         </table>
@@ -408,6 +446,7 @@ const sectionTitle: CSSProperties = { fontSize: 11, fontWeight: 600, textTransfo
 function TemplateForm({ id, base }: { id: string; base: string }) {
   const t = useT()
   const navigate = useNavigate()
+  const narrow = useIsNarrow()
   const isNew = id === 'new'
   const numId = parseInt(id, 10)
   const [item, setItem] = useState<TemplateItem | null>(null)
@@ -481,25 +520,28 @@ function TemplateForm({ id, base }: { id: string; base: string }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, overflow: 'auto' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 24px', borderBottom: '1px solid var(--color-border)', flexShrink: 0 }}>
-        <h1 style={{ fontSize: 16, fontWeight: 600, margin: 0, flex: 1 }}>{isNew ? t('form_new') : `${t('form_edit')} — ${item!.name}`}</h1>
-        {!isNew && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground)' }}>ID {item!.id}</span>}
-        {saveErr && <span style={{ fontSize: 13, color: 'var(--color-destructive,#ef4444)' }}>{saveErr}</span>}
-        <button type="submit" form="template-edit-form" style={{ ...btnPrimary, minWidth: 120 }} disabled={saving}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: narrow ? '12px 14px' : '12px 24px', borderBottom: '1px solid var(--color-border)', flexShrink: 0 }}>
+        <h1 style={{ fontSize: 16, fontWeight: 600, margin: 0, flex: 1, minWidth: 0, ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{isNew ? t('form_new') : `${t('form_edit')} — ${item!.name}`}</h1>
+        {!isNew && !narrow && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground)', flexShrink: 0 }}>ID {item!.id}</span>}
+        {saveErr && !narrow && <span style={{ fontSize: 13, color: 'var(--color-destructive,#ef4444)' }}>{saveErr}</span>}
+        <button type="submit" form="template-edit-form" style={{ ...btnPrimary, minWidth: narrow ? undefined : 120, flexShrink: 0 }} disabled={saving}>
           {saving ? t('saving') : saved ? t('saved') : t('save')}
         </button>
       </div>
+      {saveErr && narrow && (
+        <div style={{ padding: '8px 14px', fontSize: 13, color: 'var(--color-destructive,#ef4444)' }}>{saveErr}</div>
+      )}
 
       {/* Form */}
-      <form id="template-edit-form" onSubmit={handleSubmit} style={{ flex: 1, padding: 24, display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 720 }}>
+      <form id="template-edit-form" onSubmit={handleSubmit} style={{ flex: 1, padding: narrow ? 14 : 24, display: 'flex', flexDirection: 'column', gap: narrow ? 16 : 24, maxWidth: 720 }}>
         {/* Informations de base */}
-        <div style={{ ...card, padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ ...card, padding: narrow ? 14 : 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
           <p style={sectionTitle}>{t('field_name')} / {t('field_type')} / {t('field_site')}</p>
           <div>
             <label style={labelCss}>{t('field_name')}</label>
             <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box' }} value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
-          <div style={{ display: 'flex', gap: 12 }}>
+          <div style={{ display: 'flex', flexDirection: narrow ? 'column' : 'row', gap: 12 }}>
             <div style={{ flex: 1 }}>
               <label style={labelCss}>{t('field_type')}</label>
               {/* Legacy : le type ne propose que « Laminas » (ZF2). Pas d'autres options. */}
@@ -518,13 +560,13 @@ function TemplateForm({ id, base }: { id: string; base: string }) {
         </div>
 
         {/* Layout / Contrôleur / Action (type Laminas) */}
-        <div style={{ ...card, padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ ...card, padding: narrow ? 14 : 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
           <p style={sectionTitle}>{t('field_layout')} / {t('field_ctrl')} / {t('field_action')}</p>
           <div>
             <label style={labelCss}>{t('field_layout')}</label>
             <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: 13 }} value={layout} onChange={(e) => setLayout(e.target.value)} />
           </div>
-          <div style={{ display: 'flex', gap: 12 }}>
+          <div style={{ display: 'flex', flexDirection: narrow ? 'column' : 'row', gap: 12 }}>
             <div style={{ flex: 1 }}>
               <label style={labelCss}>{t('field_ctrl')}</label>
               <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: 13 }} value={controller} onChange={(e) => setController(e.target.value)} />

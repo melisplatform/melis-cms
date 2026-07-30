@@ -3,6 +3,7 @@ import { ViewToggle, type ViewMode } from './ViewToggle'
 import { apiGet, FlagSelect, type Refs } from './PageTabs'
 import { peT } from './page-editor-i18n'
 import { legacyErrorFields, legacyText } from './legacy-errors'
+import { useIsNarrow } from './shared/useIsNarrow'
 
 /**
  * Écran « Nouvelle page » — création d'une page CMS, en NATIF React avec toggle New/Old.
@@ -33,6 +34,7 @@ type Form = { name: string; type: string; templateId: number; langId: number; me
 
 export default function NewPageView({ father, visible, onCreated }: { father: string; visible: boolean; onCreated: (newId: number | string, name: string) => void }) {
   const tr = peT() // dictionnaire i18n du BO
+  const narrow = useIsNarrow()
   const [mode, setMode] = useState<ViewMode>('react')
   const [refs, setRefs] = useState<Refs | null>(null)
   const [form, setForm] = useState<Form>({ name: '', type: father ? 'PAGE' : 'SITE', templateId: 0, langId: 0, menu: 'LINK', styleId: 0, taxonomy: '' })
@@ -88,10 +90,17 @@ export default function NewPageView({ father, visible, onCreated }: { father: st
     <div style={{ position: 'absolute', inset: 0, display: visible ? 'flex' : 'none', flexDirection: 'column', background: 'var(--color-background,#fff)' }}>
       {/* En-tête : titre + toggle New/Old (indépendant de l'éditeur) */}
       <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '8px 16px', borderBottom: '1px solid var(--color-border,#e5e7eb)' }}>
-        <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--color-foreground,#111827)' }}>
+        <span style={{
+          fontWeight: 600, fontSize: 15, color: 'var(--color-foreground,#111827)',
+          minWidth: narrow ? 0 : undefined, overflow: narrow ? 'hidden' : undefined,
+          textOverflow: narrow ? 'ellipsis' : undefined, whiteSpace: narrow ? 'nowrap' : undefined,
+          flex: narrow ? '1 1 auto' : undefined,
+        }}>
           {tr.newPage}{father ? <span style={{ fontWeight: 400, fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}> — {tr.underPage} {father}</span> : ''}
         </span>
-        <ViewToggle mode={mode} onChange={setMode} />
+        <span style={{ flexShrink: 0 }}>
+          <ViewToggle mode={mode} onChange={setMode} compact={narrow} />
+        </span>
       </div>
 
       <div style={{ position: 'relative', flex: '1 1 auto', minHeight: 0, overflow: 'auto' }}>

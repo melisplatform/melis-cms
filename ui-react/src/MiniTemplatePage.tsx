@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState, type CSSProperties, type ChangeEvent } from 'react'
+﻿import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ChangeEvent, type RefObject } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import {
   consumeMiniTemplateListStale, deleteMiniTemplate, fetchAllMiniTemplates, fetchMiniTemplateItem,
@@ -8,6 +8,8 @@ import {
 import { useKeysetList } from './use-keyset-list'
 import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle, type ViewMode } from './ViewToggle'
+import { useIsNarrow } from './shared/useIsNarrow'
+import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
 
 /* ──────────────────────────────────────────────────────────────────────────
  * Mini-Template Manager (MelisCms) — brique full React
@@ -156,14 +158,29 @@ const GripIcon = () => <svg style={{ width: 13, height: 13, color: 'var(--color-
 const panelCss: CSSProperties = { display: 'flex', flexDirection: 'column', gap: 2, minHeight: 120, maxHeight: 'min(48vh, 320px)', overflowY: 'auto', minWidth: 0, borderRadius: 8, border: '1px dashed var(--color-border)', padding: 6 }
 const panelTitle: CSSProperties = { padding: '0 6px 4px', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--color-muted-foreground)' }
 
-function ColManager({ cols, labelFor, onChange, onClose }: {
+function ColManager({ cols, labelFor, onChange, onClose, anchorRef }: {
   cols: ColDef[]; labelFor: (id: string) => string; onChange: (c: ColDef[]) => void; onClose: () => void
+  anchorRef: RefObject<HTMLButtonElement | null>
 }) {
   const t = useT()
   const [dragId, setDragId] = useState<string | null>(null)
   const [over, setOver] = useState<{ id: string; panel: 'visible' | 'hidden' } | null>(null)
   const shown = cols.filter((c) => c.visible)
   const hidden = cols.filter((c) => !c.visible)
+
+  // Position clampée (viewport), calculée depuis le bouton ancre plutôt qu'un simple `right: 0` —
+  // sinon le popover peut border son propre bord gauche hors écran une fois les boutons du filtre
+  // wrappés sur narrow (cf. skill melis-react-mobile-responsive, piège ColManager).
+  const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(null)
+  useLayoutEffect(() => {
+    const margin = 8
+    const width = Math.min(380, window.innerWidth - margin * 2)
+    const rect = anchorRef.current?.getBoundingClientRect()
+    const right = rect ? rect.right : window.innerWidth - margin
+    const top = rect ? rect.bottom + 6 : margin
+    const left = Math.min(Math.max(margin, right - width), window.innerWidth - width - margin)
+    setPos({ top, left, width })
+  }, [anchorRef])
 
   function drop(panel: 'visible' | 'hidden') {
     if (!dragId) return
@@ -193,8 +210,9 @@ function ColManager({ cols, labelFor, onChange, onClose }: {
     )
   }
 
+  if (!pos) return null
   return (
-    <div style={{ ...card, position: 'absolute', right: 0, top: '100%', marginTop: 6, zIndex: 50, width: 380, maxWidth: 'calc(100vw - 1rem)' }}>
+    <div style={{ ...card, position: 'fixed', top: pos.top, left: pos.left, zIndex: 50, width: pos.width }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderBottom: '1px solid var(--color-border)' }}>
         <span style={{ fontSize: 14, fontWeight: 600 }}>{t('columns')}</span>
         <button style={{ ...iconBtn, width: 22, height: 22 }} onClick={onClose}>✕</button>
@@ -296,6 +314,12 @@ let _cache: ListCache | null = null
 function MiniTemplateList({ base, mode, setMode }: { base: string; mode: ViewMode; setMode: (m: ViewMode) => void }) {
   const t = useT()
   const navigate = useNavigate()
+  const narrow = useIsNarrow()
+  const colBtnRef = useRef<HTMLButtonElement>(null)
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
+  function toggleExpanded(key: string) {
+    setExpandedRows((prev) => { const next = new Set(prev); next.has(key) ? next.delete(key) : next.add(key); return next })
+  }
 
   const [stats, setStats]             = useState<MiniTemplateStats | null>(_cache?.stats ?? null)
   const [sites, setSites]             = useState<MiniTemplateSiteOption[]>(_cache?.sites ?? [])
@@ -371,19 +395,24 @@ function MiniTemplateList({ base, mode, setMode }: { base: string; mode: ViewMod
     } catch { setToDelete(null) }
   }
 
+  // Collapse à la seule colonne essentielle (chemin) sur narrow, quel que soit le réglage
+  // ColManager de l'utilisateur — cf. skill melis-react-mobile-responsive.
+  const displayCols = narrow ? cols.map((c) => ({ ...c, visible: c.id === 'path' })) : cols
+  const hasHidden = narrow
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: narrow ? 14 : 20, padding: narrow ? 14 : 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
       <style>{'@keyframes melis-spin{to{transform:rotate(360deg)}}'}</style>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-        <div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{t('title')}</h1>
-          <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0' }}>{t('subtitle')}</p>
+        <div style={narrow ? { minWidth: 0 } : undefined}>
+          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{t('title')}</h1>
+          <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0', ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{t('subtitle')}</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} compact={narrow} />
           <button style={btnGhost} onClick={() => { _cache = null; setTick((x) => x + 1) }} title={t('refresh')}>↻</button>
-          {can('create') && <button style={btnPrimary} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>}
+          {can('create') && <button style={btnPrimary} onClick={() => navigate(`${base}/new`)} title={t('new')}><PlusIcon />{!narrow && t('new')}</button>}
         </div>
       </div>
 
@@ -409,22 +438,24 @@ function MiniTemplateList({ base, mode, setMode }: { base: string; mode: ViewMod
 
         {/* Filtres */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-          <input style={{ ...inputCss, height: 36, flex: 1, minWidth: 180 }} value={searchInput}
+          <input style={{ ...inputCss, height: 36, flex: narrow ? '1 1 100%' : 1, minWidth: narrow ? undefined : 180 }} value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && setSearch(searchInput.trim())}
             placeholder={t('search')} />
-          <select style={{ ...inputCss, height: 36, width: 'auto', minWidth: 160 }}
+          <select style={{ ...inputCss, height: 36, width: narrow ? '100%' : 'auto', minWidth: narrow ? undefined : 160, flex: narrow ? '1 1 100%' : undefined }}
             value={site} onChange={(e) => setSite(e.target.value)}>
             <option value="">{t('all_sites')}</option>
             {sites.map((s) => <option key={s.module} value={s.module}>{s.name}</option>)}
           </select>
-          <button style={{ ...btnGhost, height: 36 }} onClick={resetFilters}><ResetIcon />{t('reset_filters')}</button>
-          <div style={{ position: 'relative' }}>
-            <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
-            {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
+          {/* reset_filters : toujours sur sa propre ligne pleine largeur sur narrow — le libellé FR
+              est trop long pour partager une ligne 50/50 avec Colonnes/Exporter (cf. skill). */}
+          <button style={{ ...btnGhost, height: 36, flex: narrow ? '1 1 100%' : undefined, justifyContent: narrow ? 'center' : undefined }} onClick={resetFilters}><ResetIcon />{t('reset_filters')}</button>
+          <div style={{ position: 'relative', flex: narrow ? '1 1 calc(50% - 4px)' : undefined }}>
+            <button ref={colBtnRef} style={{ ...btnGhost, height: 36, width: narrow ? '100%' : undefined, justifyContent: narrow ? 'center' : undefined }} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
+            {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} anchorRef={colBtnRef} />}
           </div>
           {can('export') && (
-            <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>
+            <button style={{ ...btnGhost, height: 36, flex: narrow ? '1 1 calc(50% - 4px)' : undefined, justifyContent: narrow ? 'center' : undefined }} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>
           )}
         </div>
 
@@ -433,10 +464,11 @@ function MiniTemplateList({ base, mode, setMode }: { base: string; mode: ViewMod
           {!site ? (
             <div style={{ padding: '48px 16px', textAlign: 'center', fontSize: 14, color: 'var(--color-muted-foreground)' }}>{t('empty_site')}</div>
           ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 480 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', ...(!narrow ? { minWidth: 480 } : {}) }}>
               <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
                 <tr>
-                  {visibleCols(cols).map(({ id }) => (
+                  {hasHidden && <th style={{ ...th, width: 36 }} />}
+                  {visibleCols(displayCols).map(({ id }) => (
                     <th key={id} style={{ ...th, ...(id === 'path' ? { cursor: 'pointer' } : {}), ...(id === 'thumbnail' ? { width: 80 } : {}) }}
                       onClick={id === 'path' ? () => toggleSort('path') : undefined}>
                       {t(COL_LABEL[id])}{id === 'path' ? <SortArrow col="path" sortCol={sortCol} sortDir={sortDir} /> : null}
@@ -447,27 +479,42 @@ function MiniTemplateList({ base, mode, setMode }: { base: string; mode: ViewMod
               </thead>
               <tbody>
                 {items.length === 0 && !loading ? (
-                  <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(cols).length + 1}>{t('empty')}</td></tr>
-                ) : items.map((r) => (
-                  <tr key={`${r.site}:${r.name}`}>
-                    {visibleCols(cols).map(({ id }) => (
-                      <td key={id} style={td}>
-                        {id === 'thumbnail' && (
-                          r.thumbnailUrl
-                            ? <img src={r.thumbnailUrl} alt={r.name} style={{ width: 52, height: 40, objectFit: 'cover', borderRadius: 4, display: 'block' }} />
-                            : <div style={{ width: 52, height: 40, borderRadius: 4, background: 'var(--color-muted,rgba(0,0,0,.06))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: 'var(--color-muted-foreground)' }}>—</div>
-                        )}
-                        {id === 'path' && <span style={{ fontFamily: 'monospace', fontSize: 13 }}>{r.path}</span>}
-                      </td>
-                    ))}
-                    <td style={td}>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-                        {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${idFor(r.site, r.name)}`)}><PencilIcon /></button>}
-                        {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                  <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={(hasHidden ? 1 : 0) + visibleCols(displayCols).length + 1}>{t('empty')}</td></tr>
+                ) : items.map((r) => {
+                  const rowKey = `${r.site}:${r.name}`
+                  return (
+                    <Fragment key={rowKey}>
+                      <tr>
+                        {hasHidden && <td style={td}><ExpandToggle expanded={expandedRows.has(rowKey)} onClick={() => toggleExpanded(rowKey)} /></td>}
+                        {visibleCols(displayCols).map(({ id }) => (
+                          <td key={id} style={td}>
+                            {id === 'thumbnail' && (
+                              r.thumbnailUrl
+                                ? <img src={r.thumbnailUrl} alt={r.name} style={{ width: 52, height: 40, objectFit: 'cover', borderRadius: 4, display: 'block' }} />
+                                : <div style={{ width: 52, height: 40, borderRadius: 4, background: 'var(--color-muted,rgba(0,0,0,.06))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: 'var(--color-muted-foreground)' }}>—</div>
+                            )}
+                            {id === 'path' && <span style={{ fontFamily: 'monospace', fontSize: 13 }}>{r.path}</span>}
+                          </td>
+                        ))}
+                        <td style={td}>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
+                            {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${idFor(r.site, r.name)}`)}><PencilIcon /></button>}
+                            {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
+                          </div>
+                        </td>
+                      </tr>
+                      {hasHidden && expandedRows.has(rowKey) && (
+                        <HiddenColsRow cols={displayCols} labelFor={(id) => t(COL_LABEL[id])}
+                          renderValue={(id) => id === 'thumbnail' ? (
+                            r.thumbnailUrl
+                              ? <img src={r.thumbnailUrl} alt={r.name} style={{ width: 52, height: 40, objectFit: 'cover', borderRadius: 4, display: 'block' }} />
+                              : '—'
+                          ) : r.path}
+                          colSpan={1 + visibleCols(displayCols).length + 1} narrow={narrow} />
+                      )}
+                    </Fragment>
+                  )
+                })}
               </tbody>
             </table>
           )}
@@ -626,6 +673,7 @@ function TinyMceField({ value, onChange }: { value: string; onChange: (v: string
 function MiniTemplateForm({ id, base, aiOpen = false }: { id: string; base: string; aiOpen?: boolean }) {
   const t    = useT()
   const navigate = useNavigate()
+  const narrow = useIsNarrow()
   const [searchParams] = useSearchParams()
   const isEdit = id !== 'new'
   const { site: editSite, name: editName } = isEdit ? decodeId(id) : { site: '', name: '' }
@@ -755,16 +803,16 @@ function MiniTemplateForm({ id, base, aiOpen = false }: { id: string; base: stri
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: narrow ? 14 : 20, padding: narrow ? 14 : 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
           {/* Pas de bouton « retour » ici : la barre de sous-onglets de l'hôte fournit déjà « ← Back ». */}
-          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{isEdit ? t('edit_title') : t('new_title')}</h1>
+          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, ...(narrow ? { minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{isEdit ? t('edit_title') : t('new_title')}</h1>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {saved && <span style={{ fontSize: 14, color: '#059669' }}>{t('saved')}</span>}
-          <button style={btnPrimary} onClick={submit} disabled={saving || loading}>{saving ? '…' : t('save')}</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+          {saved && !narrow && <span style={{ fontSize: 14, color: '#059669' }}>{t('saved')}</span>}
+          <button style={btnPrimary} onClick={submit} disabled={saving || loading}>{saving ? '…' : saved && narrow ? t('saved') : t('save')}</button>
         </div>
       </div>
 
@@ -781,7 +829,7 @@ function MiniTemplateForm({ id, base, aiOpen = false }: { id: string; base: stri
       {loading ? (
         <div style={{ padding: 48, textAlign: 'center', color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 20, alignItems: 'start' }}>
+        <div style={{ display: narrow ? 'flex' : 'grid', flexDirection: narrow ? 'column' : undefined, gridTemplateColumns: narrow ? undefined : '2fr 1fr', gap: 20, alignItems: 'start' }}>
           {/* Colonne gauche : site + nom + HTML */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ ...card, padding: 20 }}>

@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { fetchTranslations, saveTranslation, deleteTranslation, type TransKey } from '../sites-api'
 import { Flag } from '../PageTabs'
+import { useIsNarrow } from '../shared/useIsNarrow'
+import { ExpandToggle, HiddenColsRow } from '../shared/ExpandableRow'
 
 /**
  * Onglet "Traductions de site" : CRUD autonome (endpoints legacy dédiés saveTranslation /
@@ -20,6 +22,7 @@ interface Lang { id: number; locale: string; name: string }
 interface Draft { key: string; isNew: boolean; texts: Record<number, { mstId: number; msttId: number; text: string }> }
 
 export function TranslationsTab({ siteId, langs }: { siteId: number; langs: Lang[] }) {
+  const narrow = useIsNarrow()
   const [rows, setRows] = useState<TransKey[]>([])
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
@@ -27,6 +30,13 @@ export function TranslationsTab({ siteId, langs }: { siteId: number; langs: Lang
   const [toDelete, setToDelete] = useState<TransKey | null>(null)
   const [saving, setSaving] = useState(false)
   const [err, setErr] = useState<string | null>(null)
+  const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set())
+  function toggleExpand(key: string) {
+    setExpandedKeys((prev) => { const next = new Set(prev); if (next.has(key)) next.delete(key); else next.add(key); return next })
+  }
+  // Table sans ColManager (pas de préférence de colonnes) — collapse à la seule clé sur narrow,
+  // toutes les langues révélées via le "+" (pattern « sous-page sans ColManager »).
+  const colCount = narrow ? 3 : langs.length + 2
 
   const load = () => { setLoading(true); fetchTranslations(siteId).then(setRows).catch(() => setRows([])).finally(() => setLoading(false)) }
   useEffect(load, [siteId])
@@ -75,33 +85,46 @@ export function TranslationsTab({ siteId, langs }: { siteId: number; langs: Lang
   }
 
   return (
-    <div style={{ maxWidth: 900, display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ display: 'flex', gap: 8 }}>
-        <input style={{ ...input, flex: 1 }} placeholder={tr('Rechercher une clé ou un texte…', 'Search a key or text…')} value={search} onChange={(e) => setSearch(e.target.value)} />
-        <button style={btnPrimary} onClick={openNew}>+ {tr('Nouvelle clé', 'New key')}</button>
+    <div style={{ maxWidth: narrow ? '100%' : 900, display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <input style={{ ...input, flex: '1 1 220px' }} placeholder={tr('Rechercher une clé ou un texte…', 'Search a key or text…')} value={search} onChange={(e) => setSearch(e.target.value)} />
+        <button style={{ ...btnPrimary, ...(narrow ? { flex: '1 1 100%' } : {}) }} onClick={openNew}>+ {tr('Nouvelle clé', 'New key')}</button>
       </div>
 
       <div style={{ ...card, overflow: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 640 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', ...(narrow ? {} : { minWidth: 640 }) }}>
           <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
             <tr>
+              {narrow && <th style={{ ...th, width: 36 }} />}
               <th style={th}>{tr('Clé', 'Key')}</th>
-              {langs.map((l) => <th key={l.id} style={th}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><Flag locale={l.locale} size={16} />{l.name}</span></th>)}
-              <th style={{ ...th, width: 80 }} />
+              {!narrow && langs.map((l) => <th key={l.id} style={th}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><Flag locale={l.locale} size={16} />{l.name}</span></th>)}
+              <th style={{ ...th, width: narrow ? 60 : 80 }} />
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 && !loading ? (
-              <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '32px' }} colSpan={langs.length + 2}>{tr('Aucune traduction.', 'No translation.')}</td></tr>
+              <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '32px' }} colSpan={colCount}>{tr('Aucune traduction.', 'No translation.')}</td></tr>
             ) : filtered.map((r) => (
-              <tr key={r.key}>
+              <Fragment key={r.key}>
+              <tr>
+                {narrow && <td style={{ ...td, width: 36 }}><ExpandToggle expanded={expandedKeys.has(r.key)} onClick={() => toggleExpand(r.key)} /></td>}
                 <td style={{ ...td, fontWeight: 600, fontFamily: 'monospace' }}>{r.key}</td>
-                {langs.map((l) => <td key={l.id} style={{ ...td, color: 'var(--color-muted-foreground)' }}>{(r.texts[l.id]?.text || '—').slice(0, 60)}</td>)}
+                {!narrow && langs.map((l) => <td key={l.id} style={{ ...td, color: 'var(--color-muted-foreground)' }}>{(r.texts[l.id]?.text || '—').slice(0, 60)}</td>)}
                 <td style={{ ...td, whiteSpace: 'nowrap', textAlign: 'right' }}>
                   <button style={{ ...btn, height: 28 }} onClick={() => openEdit(r)} title={tr('Éditer', 'Edit')}>✎</button>
                   <button style={{ ...btn, height: 28, marginLeft: 6, color: '#b91c1c' }} onClick={() => setToDelete(r)} title={tr('Supprimer', 'Delete')}>🗑</button>
                 </td>
               </tr>
+              {narrow && expandedKeys.has(r.key) && (
+                <HiddenColsRow
+                  cols={langs.map((l) => ({ id: String(l.id), visible: false }))}
+                  labelFor={(id) => langs.find((l) => String(l.id) === id)?.name ?? id}
+                  renderValue={(id) => r.texts[Number(id)]?.text || '—'}
+                  colSpan={colCount}
+                  narrow={narrow}
+                />
+              )}
+              </Fragment>
             ))}
           </tbody>
         </table>
