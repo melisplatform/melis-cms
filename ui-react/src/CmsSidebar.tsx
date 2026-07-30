@@ -19,6 +19,16 @@ const MODALS: Record<'export' | 'import', { key: string; param: string }> = {
 
 type OpenTab = (t: { id: string; label: string; path: string }) => void
 
+// Pli/dépli de l'arbre (ticket 0010822 : "expand/retract the site tree view", façon legacy).
+// Persisté en sessionStorage → l'état survit à un reload / réouverture de l'outil.
+const TREE_OPEN_KEY = 'melis-cms-tree-open'
+function getTreeOpen(): boolean {
+  try { const v = sessionStorage.getItem(TREE_OPEN_KEY); return v === null ? true : v === '1' } catch { return true }
+}
+function setTreeOpenStore(v: boolean): void {
+  try { sessionStorage.setItem(TREE_OPEN_KEY, v ? '1' : '0') } catch { /* ignore */ }
+}
+
 /**
  * CMS sidebar panel — the page tree, rendered INSIDE the left navigation under the
  * MelisCms section (reproduces the legacy "Site tree view"). Left-click opens a page in a
@@ -37,6 +47,8 @@ export default function CmsSidebar() {
   const [modal, setModal] = useState<{ src: string; title: string } | null>(null)
   // Native "Duplicate tree" modal (replaces the legacy iframe tool) — holds the source page.
   const [dupNode, setDupNode] = useState<MelisTreeNode | null>(null)
+  // Arbre déplié/replié (persisté).
+  const [open, setOpen] = useState(getTreeOpen)
 
   const openTab = (path: string, label: string) => {
     ;(window as unknown as { __melisOpenTab?: OpenTab }).__melisOpenTab?.({ id: path, label, path })
@@ -68,20 +80,35 @@ export default function CmsSidebar() {
         background: 'color-mix(in srgb, var(--color-foreground) 4%, transparent)',
       }}
     >
-      <div style={{ padding: '6px 10px', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-muted-foreground)' }}>
-        {tr.pageTree}
-      </div>
-      <div style={{ minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        <PageTree
-          selectedId={selectedId}
-          onSelect={(n) => {
-            const path = `/melis-cms/page/${n.key}`
-            const label = n.melisData?.page_title || n.title
-            openTab(path, label)
-          }}
-          onAction={handleAction}
-        />
-      </div>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => { const next = !v; setTreeOpenStore(next); return next })}
+        title={tr.pageTree}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6, width: '100%', textAlign: 'left',
+          border: 0, background: 'transparent', cursor: 'pointer',
+          padding: '6px 10px', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-muted-foreground)',
+        }}
+      >
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+          style={{ flexShrink: 0, transition: 'transform .15s', transform: open ? 'rotate(90deg)' : 'none' }}>
+          <path d="m9 18 6-6-6-6" />
+        </svg>
+        <span style={{ flex: 1 }}>{tr.pageTree}</span>
+      </button>
+      {open && (
+        <div style={{ minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          <PageTree
+            selectedId={selectedId}
+            onSelect={(n) => {
+              const path = `/melis-cms/page/${n.key}`
+              const label = n.melisData?.page_title || n.title
+              openTab(path, label)
+            }}
+            onAction={handleAction}
+          />
+        </div>
+      )}
 
       {/* Modal overlay (dupe / export / import) — legacy tool rendered in an iframe. */}
       {modal && createPortal(
