@@ -626,6 +626,10 @@ function TinyMceField({ value, onChange }: { value: string; onChange: (v: string
   const valueRef    = useRef(value);    valueRef.current    = value
 
   useEffect(() => {
+    // Largeur capturée AU MONTAGE (pas via useIsNarrow) : une dépendance `narrow` re-initialiserait
+    // l'éditeur au moindre resize → contenu en cours d'édition perdu. Le passage mobile↔desktop
+    // en pleine édition est marginal, la ré-ouverture du formulaire recalcule.
+    const narrow = window.innerWidth < 640
     let disposed = false
     ensureMce().then((ok) => {
       if (disposed || !ok || !window.tinymce || !_toolCfg) return
@@ -633,8 +637,19 @@ function TinyMceField({ value, onChange }: { value: string; onChange: (v: string
         ...JSON.parse(JSON.stringify(_toolCfg)),
         selector: `#${EDITOR_ID}`,
         base_url: MCE_BASE,
-        height: 320,
-        min_height: 320,
+        // Sur mobile la barre d'outils (toolbar_mode 'sliding') mange déjà ~130px : 320 ne laisse
+        // que ~185px de zone d'édition. Vérifié en rendu headless à 386px : 360 est le bon compromis.
+        // (⚠️ NE PAS passer toolbar_mode à 'wrap' sur narrow : testé, la barre déroule 6 lignes et
+        // recouvre toute la zone de contenu — 'sliding' est le bon mode en étroit.)
+        height: narrow ? 360 : 320,
+        min_height: narrow ? 360 : 320,
+      }
+      // Le HTML d'un mini-template est du markup desktop (Bootstrap, images à taille naturelle) et
+      // l'iframe de contenu ne charge PAS le CSS du site : à 386px l'image sort du cadre et le bloc
+      // est rogné. On contraint les médias À L'ÉDITION uniquement (content_style n'est jamais
+      // enregistré → zéro impact sur le HTML produit) et seulement en étroit → desktop inchangé.
+      if (narrow) {
+        cfg.content_style = `${(cfg.content_style as string) ?? ''}\nimg,video,iframe,table,pre{max-width:100%!important;height:auto}body{overflow-x:hidden}`
       }
       delete cfg.mode
       // autoresize creates an absolutely-positioned observer that can overlay sibling elements
@@ -826,13 +841,17 @@ function MiniTemplateForm({ id, base, aiOpen = false }: { id: string; base: stri
         </div>
       )}
 
+      {/* ⚠️ `alignItems:'start'` en colonne (narrow) empêcherait l'étirement des cartes sur l'axe
+          horizontal → largeur = contenu (le textarea/TinyMCE impose alors la largeur). En étroit
+          on repasse donc à 'stretch' ; en grid (desktop) 'start' reste nécessaire pour aligner
+          les 2 colonnes en haut. */}
       {loading ? (
         <div style={{ padding: 48, textAlign: 'center', color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>
       ) : (
-        <div style={{ display: narrow ? 'flex' : 'grid', flexDirection: narrow ? 'column' : undefined, gridTemplateColumns: narrow ? undefined : '2fr 1fr', gap: 20, alignItems: 'start' }}>
+        <div style={{ display: narrow ? 'flex' : 'grid', flexDirection: narrow ? 'column' : undefined, gridTemplateColumns: narrow ? undefined : '2fr 1fr', gap: 20, alignItems: narrow ? 'stretch' : 'start' }}>
           {/* Colonne gauche : site + nom + HTML */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ ...card, padding: 20 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, ...(narrow ? { minWidth: 0 } : {}) }}>
+            <div style={{ ...card, padding: narrow ? 14 : 20 }}>
               <div style={{ marginBottom: 16 }}>
                 <label style={lbl}>{t('f_site')}</label>
                 <select style={{ ...inputCss, borderColor: siteError ? '#fca5a5' : undefined }}
@@ -855,8 +874,10 @@ function MiniTemplateForm({ id, base, aiOpen = false }: { id: string; base: stri
                 }
               </div>
             </div>
-            <div style={{ ...card, padding: 20 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+            <div style={{ ...card, padding: narrow ? 14 : 20 }}>
+              {/* flexWrap : le libellé + le bouton « Generate with AI » tiennent à 386px, mais un
+                  libellé traduit plus long doit passer à la ligne plutôt que d'écraser le bouton. */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
                 <label style={{ ...lbl, marginBottom: 0 }}>{t('f_html')}</label>
                 {window.__melisMiniTemplateExtensions?.renderHtmlActions?.(
                   (htmlContent, thumbnail) => {
@@ -881,7 +902,7 @@ function MiniTemplateForm({ id, base, aiOpen = false }: { id: string; base: stri
           </div>
 
           {/* Colonne droite : miniature */}
-          <div style={{ ...card, padding: 20 }}>
+          <div style={{ ...card, padding: narrow ? 14 : 20, ...(narrow ? { width: '100%' } : {}) }}>
             <label style={lbl}>{t('f_thumbnail')}</label>
             {thumbPreview && (
               <div style={{ marginBottom: 12 }}>
