@@ -82,11 +82,9 @@ class MelisReactApiPageController extends MelisAbstractActionController
         // NB : l'éditeur de page ne s'ouvre pas via une clé de menu `meliscms_page` mais via
         // l'arbre du site avec des droits PAR-PAGE (section usr_rights `meliscms_pages`).
         // La structure ne renvoie que le CHROME (labels/icônes d'onglets+boutons) → on exige
-        // juste l'authentification ; l'accès réel par-page reste appliqué par le contenu legacy
-        // (react-tool-page) et par les endpoints d'écriture (à venir) qui vérifient la page ciblée.
-        if (!$this->isAuthenticated()) {
-            return $this->jsonResponse(['success' => false, 'error' => 'Unauthenticated'], 401);
-        }
+        // Exige l'accès à l'outil Pages (canAccess), pas seulement une session — sinon n'importe quel
+        // utilisateur BO pouvait lire/écrire les propriétés/SEO de n'importe quelle page.
+        if ($deny = $this->denyUnlessAccess()) { return $deny; }
 
         try {
             $idPage = (int) $this->params()->fromQuery('idPage', 0);
@@ -114,7 +112,7 @@ class MelisReactApiPageController extends MelisAbstractActionController
     /** GET /cms-page/properties?idPage=X → valeurs courantes (version 'saved', fallback 'published'). */
     public function propertiesAction(): HttpResponse
     {
-        if (!$this->isAuthenticated()) { return $this->jsonResponse(['success' => false, 'error' => 'Unauthenticated'], 401); }
+        if ($deny = $this->denyUnlessAccess()) { return $deny; }
         try {
             $idPage = (int) $this->params()->fromQuery('idPage', 0);
             $tree = $this->pageTree($idPage);
@@ -138,7 +136,8 @@ class MelisReactApiPageController extends MelisAbstractActionController
     /** POST /cms-page/properties/save — UPDATE ciblé des colonnes de propriétés (préserve page_content). */
     public function savePropertiesAction(): HttpResponse
     {
-        if (!$this->isAuthenticated()) { return $this->jsonResponse(['success' => false, 'error' => 'Unauthenticated'], 401); }
+        if ($deny = $this->denyUnlessAccess()) { return $deny; }
+        if ($deny = $this->denyUnlessCan('edit')) { return $deny; }
         try {
             $in = $this->jsonBody();
             $idPage = (int) ($in['idPage'] ?? 0);
@@ -193,7 +192,7 @@ class MelisReactApiPageController extends MelisAbstractActionController
     /** GET /cms-page/seo?idPage=X */
     public function seoAction(): HttpResponse
     {
-        if (!$this->isAuthenticated()) { return $this->jsonResponse(['success' => false, 'error' => 'Unauthenticated'], 401); }
+        if ($deny = $this->denyUnlessAccess()) { return $deny; }
         try {
             $idPage = (int) $this->params()->fromQuery('idPage', 0);
             $rows = iterator_to_array($this->db()->query(
@@ -214,7 +213,8 @@ class MelisReactApiPageController extends MelisAbstractActionController
     /** POST /cms-page/seo/save — upsert melis_cms_page_seo ; supprime si tout vide ; URL unique + nettoyée. */
     public function saveSeoAction(): HttpResponse
     {
-        if (!$this->isAuthenticated()) { return $this->jsonResponse(['success' => false, 'error' => 'Unauthenticated'], 401); }
+        if ($deny = $this->denyUnlessAccess()) { return $deny; }
+        if ($deny = $this->denyUnlessCan('edit')) { return $deny; }
         try {
             $in = $this->jsonBody();
             $idPage = (int) ($in['idPage'] ?? 0);
@@ -260,7 +260,7 @@ class MelisReactApiPageController extends MelisAbstractActionController
     /** GET /cms-page/languages?idPage=X → versions existantes + langues créables. */
     public function languagesAction(): HttpResponse
     {
-        if (!$this->isAuthenticated()) { return $this->jsonResponse(['success' => false, 'error' => 'Unauthenticated'], 401); }
+        if ($deny = $this->denyUnlessAccess()) { return $deny; }
         try {
             $idPage = (int) $this->params()->fromQuery('idPage', 0);
             $db = $this->db();
@@ -299,7 +299,7 @@ class MelisReactApiPageController extends MelisAbstractActionController
      */
     public function ancestorsAction(): HttpResponse
     {
-        if (!$this->isAuthenticated()) { return $this->jsonResponse(['success' => false, 'error' => 'Unauthenticated'], 401); }
+        if ($deny = $this->denyUnlessAccess()) { return $deny; }
         try {
             $idPage = (int) $this->params()->fromQuery('idPage', 0);
             $db = $this->db();
@@ -323,7 +323,7 @@ class MelisReactApiPageController extends MelisAbstractActionController
     /** GET /cms-page/refs?idPage=X → templates (du site), langues, styles (du site), enums type/menu. */
     public function refsAction(): HttpResponse
     {
-        if (!$this->isAuthenticated()) { return $this->jsonResponse(['success' => false, 'error' => 'Unauthenticated'], 401); }
+        if ($deny = $this->denyUnlessAccess()) { return $deny; }
         try {
             $idPage = (int) $this->params()->fromQuery('idPage', 0);
             $db = $this->db();

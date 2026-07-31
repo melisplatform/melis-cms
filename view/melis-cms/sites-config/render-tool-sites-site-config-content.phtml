@@ -80,37 +80,37 @@ $data_melisKey = $this->melisKey;
                                 <?php foreach ($this->config['site'][$this->siteName]['allSites'] as $configKey => $config) : ?>
                                     <?php if (!is_array($config)) : ?>
                                         <?php if (!empty($this->valuesFromDb['allSites'][$configKey])) : ?>
-                                            <label><?= $configKey ?></label>
+                                            <label><?= $this->escapeHtml($configKey) ?></label>
                                             <div class="input-group ">
-                                                <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>" id="gen_<?= $configKey ?>" value="<?= $config ?>">
+                                                <input type="text" class="form-control" name="gen_sconf_<?= $this->escapeHtmlAttr($configKey) ?>" id="gen_<?= $this->escapeHtmlAttr($configKey) ?>" value="<?= $this->escapeHtmlAttr($config) ?>">
                                                 <span class="input-group-addon"><i class="fa fa-database fa-lg" style="width: 20px;" title="<?= $this->translate('tr_melis_cms_sites_tool_database_value') ?>"></i></span>
                                             </div>
                                             <br>
                                         <?php else : ?>
-                                            <label><?= $configKey ?></label>
+                                            <label><?= $this->escapeHtml($configKey) ?></label>
                                             <div class="input-group ">
-                                                <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>" id="gen_<?= $configKey ?>" value="<?= $config ?>">
+                                                <input type="text" class="form-control" name="gen_sconf_<?= $this->escapeHtmlAttr($configKey) ?>" id="gen_<?= $this->escapeHtmlAttr($configKey) ?>" value="<?= $this->escapeHtmlAttr($config) ?>">
                                                 <span class="input-group-addon"><i class="fa fa-cogs fa-lg" style="width: 20px;" title="<?= $this->translate('tr_melis_cms_sites_tool_default_value') ?>"></i></span>
                                             </div>
                                             <br>
                                         <?php endif; ?>
                                     <?php else : ?>
-                                        <label><?= $configKey ?> (array)</label>
+                                        <label><?= $this->escapeHtml($configKey) ?> (array)</label>
                                         <br>
                                         <?php foreach ($config as $key => $value) : ?>
                                             <?php if (!is_array($value)) : ?>
                                                 <div>
                                                     <?php if (!is_int($key)) : ?>
-                                                        <label style="margin-left: 50px;"><?= $key ?></label>
+                                                        <label style="margin-left: 50px;"><?= $this->escapeHtml($key) ?></label>
                                                     <?php endif; ?>
                                                     <?php if (isset($this->valuesFromDb['allSites'][$configKey][$key])) : ?>
                                                         <div class="input-group" style="left: 50px;">
-                                                            <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>[<?= $key ?>]" id="gen_<?= $key ?>" value="<?= $value ?>">
+                                                            <input type="text" class="form-control" name="gen_sconf_<?= $this->escapeHtmlAttr($configKey) ?>[<?= $this->escapeHtmlAttr($key) ?>]" id="gen_<?= $this->escapeHtmlAttr($key) ?>" value="<?= $this->escapeHtmlAttr($value) ?>">
                                                             <span class="input-group-addon"><i class="fa fa-database fa-lg" style="width: 20px;" title="<?= $this->translate('tr_melis_cms_sites_tool_database_value') ?>"></i></span>
                                                         </div>
                                                     <?php else : ?>
                                                         <div class="input-group" style="left: 50px;">
-                                                            <input type="text" class="form-control" name="gen_sconf_<?= $configKey ?>[<?= $key ?>]" id="gen_<?= $key ?>" value="<?= $value ?>">
+                                                            <input type="text" class="form-control" name="gen_sconf_<?= $this->escapeHtmlAttr($configKey) ?>[<?= $this->escapeHtmlAttr($key) ?>]" id="gen_<?= $this->escapeHtmlAttr($key) ?>" value="<?= $this->escapeHtmlAttr($value) ?>">
                                                             <span class="input-group-addon"><i class="fa fa-cogs fa-lg" style="width: 20px;" title="<?= $this->translate('tr_melis_cms_sites_tool_default_value') ?>"></i></span>
                                                         </div>
                                                     <?php endif; ?>
@@ -163,37 +163,37 @@ $data_melisKey = $this->melisKey;
                                     <?php foreach ($this->config['site'][$this->siteName][$this->siteId][$lang['lang_cms_locale']] as $configKey => $config) : ?>
                                         <?php if (!is_array($config)) : ?>
                                             <?php if (!empty($this->valuesFromDb[$lang['lang_cms_locale']][$configKey])) : ?>
-                                                <label><?= $configKey ?></label>
+                                                <label><?= $this->escapeHtml($configKey) ?></label>
                                                 <div class="input-group ">
-                                                    <input type="text" class="form-control col-md-10" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" value="<?= $config ?>">
+                                                    <input type="text" class="form-control col-md-10" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $this->escapeHtmlAttr($configKey) ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $this->escapeHtmlAttr($configKey) ?>" value="<?= $this->escapeHtmlAttr($config) ?>">
                                                     <span class="input-group-addon"><i class="fa fa-database fa-lg" style="width: 20px;" title="<?= $this->translate('tr_melis_cms_sites_tool_database_value') ?>"></i></span>
                                                 </div>
                                                 <br>
                                             <?php else : ?>
-                                                <label><?= $configKey ?></label>
+                                                <label><?= $this->escapeHtml($configKey) ?></label>
                                                 <div class="input-group ">
-                                                    <input type="text" class="form-control col-md-10" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>" value="<?= $config ?>">
+                                                    <input type="text" class="form-control col-md-10" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $this->escapeHtmlAttr($configKey) ?>" id="<?= $lang['slang_lang_id'] ?>_sconf_<?= $this->escapeHtmlAttr($configKey) ?>" value="<?= $this->escapeHtmlAttr($config) ?>">
                                                     <span class="input-group-addon"><i class="fa fa-cogs fa-lg" style="width: 20px;" title="<?= $this->translate('tr_melis_cms_sites_tool_default_value') ?>"></i></span>
                                                 </div>
                                                 <br>
                                             <?php endif; ?>
                                         <?php else : ?>
-                                            <label><?= $configKey ?> (array)</label>
+                                            <label><?= $this->escapeHtml($configKey) ?> (array)</label>
                                             <br>
                                             <?php foreach ($config as $key => $value) : ?>
                                                 <?php if (!is_array($value)) : ?>
                                                     <div>
                                                         <?php if (!is_int($key)) : ?>
-                                                            <label style="margin-left: 50px;"><?= $key ?></label>
+                                                            <label style="margin-left: 50px;"><?= $this->escapeHtml($key) ?></label>
                                                         <?php endif; ?>
                                                         <?php if (isset($this->valuesFromDb[$lang['lang_cms_locale']][$configKey][$key])) : ?>
                                                             <div class="input-group" style="left: 50px;">
-                                                                <input type="text" class="form-control" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>[<?= $key ?>]" id="gen_<?= $key ?>" value="<?= $value ?>">
+                                                                <input type="text" class="form-control" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $this->escapeHtmlAttr($configKey) ?>[<?= $this->escapeHtmlAttr($key) ?>]" id="gen_<?= $this->escapeHtmlAttr($key) ?>" value="<?= $this->escapeHtmlAttr($value) ?>">
                                                                 <span class="input-group-addon"><i class="fa fa-database fa-lg" style="width: 20px;" title="<?= $this->translate('tr_melis_cms_sites_tool_database_value') ?>"></i></span>
                                                             </div>
                                                         <?php else : ?>
                                                             <div class="input-group" style="left: 50px;">
-                                                                <input type="text" class="form-control" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $configKey ?>[<?= $key ?>]" id="gen_<?= $key ?>" value="<?= $value ?>">
+                                                                <input type="text" class="form-control" name="<?= $lang['slang_lang_id'] ?>_sconf_<?= $this->escapeHtmlAttr($configKey) ?>[<?= $this->escapeHtmlAttr($key) ?>]" id="gen_<?= $this->escapeHtmlAttr($key) ?>" value="<?= $this->escapeHtmlAttr($value) ?>">
                                                                 <span class="input-group-addon"><i class="fa fa-cogs fa-lg" style="width: 20px;" title="<?= $this->translate('tr_melis_cms_sites_tool_default_value') ?>"></i></span>
                                                             </div>
                                                         <?php endif; ?>
