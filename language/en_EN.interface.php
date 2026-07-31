@@ -1,5 +1,6 @@
 <?php
 return array(
+    'tr_meliscms_ws_desc_site' => 'CMS sites: list of a site\'s pages.',
 	'tr_meliscms_menu_sitetree_Name' => 'Site tree view',
 	'tr_meliscms_sites_tools' => 'Site Tools',
 

@@ -5,6 +5,7 @@ return array(
 			'MelisCms' => array(
 				
 				'MelisCmsSiteService' => array(
+				    '_description' => 'tr_meliscms_ws_desc_site',
 					/**
 					 * @param $siteId
 					 * 
