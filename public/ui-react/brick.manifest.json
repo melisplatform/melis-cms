@@ -55,7 +55,8 @@
       "label": "Sites",
       "forwardKey": "MelisCms/Sites",
       "melisKey": "meliscms_tool_sites",
-      "persistent": true
+      "persistent": true,
+      "subTabs": true
     },
     {
       "id": "cms-mini-templates",

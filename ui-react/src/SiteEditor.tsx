@@ -7,6 +7,7 @@ import { ModuleLoaderTab, activeFirst } from './site-tabs/ModuleLoaderTab'
 import { TranslationsTab } from './site-tabs/TranslationsTab'
 import { useSiteTabs, type SiteTabSaveFn } from './site-tab-registry'
 import { useIsNarrow } from './shared/useIsNarrow'
+import { parseSiteSaveErrors, byKey, type SiteFieldError } from './site-errors'
 
 const MELIS_KEY = 'meliscms_tool_sites'
 function can(cap: string): boolean {
@@ -24,6 +25,19 @@ const btnPrimary: React.CSSProperties = { ...btn, border: 0, background: 'var(--
 const input: React.CSSProperties = { height: 36, width: '100%', borderRadius: 8, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-background,#fff)', padding: '0 10px', fontSize: 14, boxSizing: 'border-box' }
 const lbl: React.CSSProperties = { display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }
 const hint: React.CSSProperties = { fontSize: 12, color: 'var(--color-muted-foreground)', margin: '6px 0 0' }
+const inputErr: React.CSSProperties = { borderColor: '#dc2626', boxShadow: '0 0 0 1px #dc2626' }
+
+/** Messages d'erreur d'un champ, affichés juste sous lui (rouge). */
+function FieldError({ messages }: { messages?: string[] }) {
+  if (!messages?.length) return null
+  return (
+    <>
+      {messages.map((m, i) => (
+        <p key={i} style={{ margin: '6px 0 0', fontSize: 12, color: '#b91c1c' }}>{m}</p>
+      ))}
+    </>
+  )
+}
 
 /** Drapeau de langue (image servie par MelisCore, comme dans les autres outils). */
 function Flag({ locale }: { locale: string }) {
@@ -54,9 +68,11 @@ interface Props {
   onSaved: () => void
   /** Remonte le libellé du site au conteneur (pour le sous-onglet). */
   onLabel: (label: string) => void
+  /** Le site n'a pas pu être chargé (supprimé entre-temps, id bidon dans l'URL) → le conteneur ferme le sous-onglet. */
+  onLoadFail?: () => void
 }
 
-export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
+export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Props) {
   const narrow = useIsNarrow()
   const [data, setData] = useState<SiteEditData | null>(null)
   const [loadErr, setLoadErr] = useState<string | null>(null)
@@ -78,6 +94,16 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
   const [saving, setSaving] = useState(false)
   const [savedAt, setSavedAt] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  // Erreurs PAR CHAMP renvoyées par le save legacy (domaine déjà pris, champ requis…) : affichées
+  // sous le champ concerné + récapitulées dans le bandeau, avec bascule sur l'onglet fautif.
+  const [fieldErrors, setFieldErrors] = useState<SiteFieldError[]>([])
+  const errsByKey = useMemo(() => byKey(fieldErrors), [fieldErrors])
+  /** Efface l'erreur d'un champ dès que l'utilisateur le corrige. */
+  const clearFieldError = (key: string) => setFieldErrors((prev) => prev.filter((e) => e.key !== key))
+  // Champs qui savent afficher leur propre erreur (voir <FieldError> plus bas) ; les AUTRES clés
+  // restent listées dans le bandeau, faute de quoi elles n'apparaîtraient nulle part.
+  const ANCHORED_FIELDS = ['sdom_domain', 'sdom_scheme', 'site_label', 'site_main_page_id', 's404_page_id', 'shome_page_id']
+  const orphanErrors = fieldErrors.filter((e) => !ANCHORED_FIELDS.includes(e.field))
 
   // form state
   const [label, setLabel] = useState('')
@@ -119,7 +145,7 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
         return ex ? { ...ex } : { id: 0, env, scheme: 'http', domain: '' }
       })
       setDomains(doms)
-    }).catch((e) => setLoadErr(String((e as Error)?.message ?? e)))
+    }).catch((e) => { setLoadErr(String((e as Error)?.message ?? e)); onLoadFail?.() })
   }, [siteId])
 
   const langById = useMemo(() => Object.fromEntries((data?.languages ?? []).map((l) => [l.id, l])), [data])
@@ -142,6 +168,23 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
     [activeLangIds, langById],
   )
 
+  /** Libellé lisible d'un champ en erreur (le legacy ne renvoie que le nom technique). */
+  function fieldLabel(f: SiteFieldError): string {
+    const NAMES: Record<string, string> = {
+      sdom_domain: tr('Domaine', 'Domain'),
+      sdom_scheme: tr('Schéma', 'Scheme'),
+      site_label: tr('Libellé du site', 'Site label'),
+      site_name: tr('Nom du module', 'Module name'),
+      s404_page_id: tr('Page 404', '404 page'),
+      site_main_page_id: tr('Page d’accueil principale', 'Main home page'),
+      shome_page_id: tr('Page d’accueil', 'Home page'),
+    }
+    const base = NAMES[f.field] ?? f.field
+    if (f.field.startsWith('sdom_')) return `${base} (${f.scope})`
+    if (f.field.startsWith('shome_')) return `${base} (${langById[Number(f.scope)]?.name ?? f.scope})`
+    return base
+  }
+
   function validate(): string | null {
     if (!label.trim()) return tr('Le libellé est requis.', 'Label is required.')
     if (!s404.id) return tr('La page 404 est requise.', '404 page is required.')
@@ -161,7 +204,7 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
     const v = validate()
     if (v) { setError(v); return }
     if (!data) return
-    setSaving(true); setError(null)
+    setSaving(true); setError(null); setFieldErrors([])
     try {
       const res = await saveSiteEdit({
         id: siteId,
@@ -189,7 +232,12 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
         window.postMessage({ __melisNotif: true, kind: 'ok', title: tr('Sites', 'Sites'), message: tr('Enregistré ✓', 'Saved ✓') }, '*')
         onSaved()
       } else {
+        // Détail par champ : sans ça l'utilisateur n'a qu'un « Unable to save the site. » opaque.
+        const fields = parseSiteSaveErrors(res.errors)
+        setFieldErrors(fields)
         setError(res.textMessage || tr('Échec de l’enregistrement.', 'Save failed.'))
+        // Bascule sur l'onglet du 1ᵉʳ champ fautif (l'erreur peut venir d'un onglet non affiché).
+        if (fields.length > 0) setTab(fields[0].tab)
       }
     } catch (e) {
       setError(String((e as Error)?.message ?? e))
@@ -244,7 +292,26 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
         ))}
       </div>
 
-      {mode === 'react' && error && <div style={{ ...card, padding: '12px 16px', color: '#b91c1c', fontSize: 13, borderColor: '#fca5a5' }}>{error}</div>}
+      {mode === 'react' && error && (
+        <div style={{ ...card, padding: '12px 16px', color: '#b91c1c', fontSize: 13, borderColor: '#fca5a5' }}>
+          <div>{error}</div>
+          {/* Les erreurs ancrées sont déjà affichées SOUS leur champ → on ne répète ici que celles
+              qui n'ont pas de champ correspondant dans l'UI (sinon elles seraient invisibles). */}
+          {orphanErrors.length > 0 && (
+            <ul style={{ margin: '8px 0 0', paddingLeft: 18 }}>
+              {orphanErrors.map((f) => (
+                <li key={f.key} style={{ marginTop: 2 }}>
+                  <button onClick={() => setTab(f.tab)}
+                    style={{ border: 0, background: 'transparent', padding: 0, color: 'inherit', font: 'inherit', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}>
+                    {fieldLabel(f)}
+                  </button>
+                  {' — '}{f.messages.join(' ')}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       {/* PROPRIÉTÉS */}
       {mode === 'react' && tab === 'props' && (
@@ -252,7 +319,9 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
           <div style={{ display: 'grid', gridTemplateColumns: narrow ? '1fr' : '1fr 1fr', gap: 16 }}>
             <div>
               <label style={lbl}>{tr('Libellé du site', 'Site label')} *</label>
-              <input style={input} value={label} onChange={(e) => setLabel(e.target.value)} />
+              <input style={{ ...input, ...(errsByKey['siteprop_site_label'] ? inputErr : null) }} value={label}
+                onChange={(e) => { setLabel(e.target.value); clearFieldError('siteprop_site_label') }} />
+              <FieldError messages={errsByKey['siteprop_site_label']} />
             </div>
             <div>
               <label style={lbl}>{tr('Nom du module', 'Module name')}</label>
@@ -263,11 +332,15 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
           <div style={{ display: 'grid', gridTemplateColumns: narrow ? '1fr' : '1fr 1fr', gap: 16 }}>
             <div>
               <label style={lbl}>{tr('Page d’accueil principale', 'Main home page')} *</label>
-              <PagePicker value={mainPage.id} title={mainPage.title} onChange={(id, t) => setMainPage({ id, title: t })} />
+              <PagePicker value={mainPage.id} title={mainPage.title}
+                onChange={(id, t) => { setMainPage({ id, title: t }); clearFieldError('siteprop_site_main_page_id') }} />
+              <FieldError messages={errsByKey['siteprop_site_main_page_id']} />
             </div>
             <div>
               <label style={lbl}>{tr('Page 404', '404 page')} *</label>
-              <PagePicker value={s404.id} title={s404.title} onChange={(id, t) => setS404({ id, title: t })} />
+              <PagePicker value={s404.id} title={s404.title}
+                onChange={(id, t) => { setS404({ id, title: t }); clearFieldError('siteprop_s404_page_id') }} />
+              <FieldError messages={errsByKey['siteprop_s404_page_id']} />
             </div>
           </div>
           {/* Drag & Drop mode : choisi UNIQUEMENT à la création (comme le legacy) → lecture seule ici. */}
@@ -298,9 +371,12 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
                     <Flag locale={l.locale} />
                     {l.name} <span style={{ color: 'var(--color-muted-foreground)', fontSize: 12 }}>({l.locale})</span>
                   </span>
-                  <PagePicker value={homes[l.id]?.pageId ?? 0} title={homes[l.id]?.title}
-                    placeholder={tr('— page d’accueil —', '— home page —')}
-                    onChange={(id, t) => setHome(l.id, id, t)} />
+                  <div>
+                    <PagePicker value={homes[l.id]?.pageId ?? 0} title={homes[l.id]?.title}
+                      placeholder={tr('— page d’accueil —', '— home page —')}
+                      onChange={(id, t) => { setHome(l.id, id, t); clearFieldError(`${l.id}_shome_page_id`) }} />
+                    <FieldError messages={errsByKey[`${l.id}_shome_page_id`]} />
+                  </div>
                 </div>
               ))}
             </div>
@@ -322,14 +398,19 @@ export default function SiteEditor({ siteId, onSaved, onLabel }: Props) {
               </div>
               <div>
                 <label style={lbl}>{tr('Schéma', 'Scheme')}</label>
-                <select style={input} value={d.scheme} onChange={(e) => setDomain(d.env, { scheme: e.target.value })}>
+                <select style={{ ...input, ...(errsByKey[`${d.env}_sdom_scheme`] ? inputErr : null) }} value={d.scheme}
+                  onChange={(e) => { setDomain(d.env, { scheme: e.target.value }); clearFieldError(`${d.env}_sdom_scheme`) }}>
                   <option value="http">http</option>
                   <option value="https">https</option>
                 </select>
+                <FieldError messages={errsByKey[`${d.env}_sdom_scheme`]} />
               </div>
               <div>
                 <label style={lbl}>{tr('Domaine', 'Domain')}{d.env === data.currentEnv ? ' *' : ''}</label>
-                <input style={input} value={d.domain} onChange={(e) => setDomain(d.env, { domain: e.target.value })} placeholder="exemple.com" />
+                <input style={{ ...input, ...(errsByKey[`${d.env}_sdom_domain`] ? inputErr : null) }} value={d.domain}
+                  onChange={(e) => { setDomain(d.env, { domain: e.target.value }); clearFieldError(`${d.env}_sdom_domain`) }}
+                  placeholder="exemple.com" />
+                <FieldError messages={errsByKey[`${d.env}_sdom_domain`]} />
               </div>
             </div>
           ))}

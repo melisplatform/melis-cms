@@ -62,6 +62,45 @@ function SiteSubTabBar({ tabs, activeId, onBack, onSelect, onClose }: {
 const NEW_TAB = 0
 
 /**
+ * Survie au RECHARGEMENT (F5). Les sous-onglets sont de l'état d'outil, PAS des routes : un reload
+ * reboote le SPA et les perdrait. On les persiste donc en `sessionStorage` (per-onglet-navigateur,
+ * comme le store d'onglets de l'hôte — `localStorage` les ressusciterait dans chaque fenêtre).
+ *
+ * ⚠️ L'id de l'URL est capturé ICI, au CHARGEMENT DU BUNDLE (module-scope), pas au 1er rendu :
+ * la brique est chargée en `React.lazy`, et au moment où SitesPage rend, l'URL a déjà pu être
+ * réécrite sans le `/:id` (par l'effet de reflet ci-dessous, qui tourne d'abord avec « aucun
+ * onglet ouvert »). Lire l'URL plus tard = perdre la course.
+ */
+const SUBTABS_KEY = 'melis-sites-subtabs'
+const URL_BOOT_SEG = /\/sites\/(new|\d+)\/?$/.exec(window.location.pathname)?.[1] ?? null
+const URL_BOOT_ID = URL_BOOT_SEG == null ? null : URL_BOOT_SEG === 'new' ? NEW_TAB : Number(URL_BOOT_SEG)
+
+interface BootState { open: OpenTab[]; activeId: number | null }
+
+function loadBootState(): BootState {
+  let open: OpenTab[] = []
+  let activeId: number | null = null
+  try {
+    const p = JSON.parse(sessionStorage.getItem(SUBTABS_KEY) ?? 'null') as Partial<BootState> | null
+    if (p && Array.isArray(p.open)) open = p.open.filter((o) => o && typeof o.id === 'number')
+    if (p && typeof p.activeId === 'number') activeId = p.activeId
+  } catch { /* storage indisponible / corrompu → on repart de zéro */ }
+  if (URL_BOOT_ID != null) {
+    if (!open.some((o) => o.id === URL_BOOT_ID)) {
+      open = [...open, { id: URL_BOOT_ID, label: URL_BOOT_ID === NEW_TAB ? tr('Nouveau site', 'New site') : `Site #${URL_BOOT_ID}` }]
+    }
+    activeId = URL_BOOT_ID
+  }
+  // Un actif qui n'est plus dans la liste (storage incohérent) → on retombe sur la liste.
+  if (activeId != null && !open.some((o) => o.id === activeId)) activeId = null
+  return { open, activeId }
+}
+
+function saveBootState(open: OpenTab[], activeId: number | null) {
+  try { sessionStorage.setItem(SUBTABS_KEY, JSON.stringify({ open, activeId })) } catch { /* quota / mode privé */ }
+}
+
+/**
  * Reflète le sous-onglet actif dans l'URL : /[section]/[tool]/:id (ou /new), comme l'outil
  * Utilisateurs. COSMÉTIQUE (history.replaceState) — PAS de navigation React Router, sinon le host
  * créerait un onglet de shell par id (le pattern « sous-onglets in-tool » garde l'état en local).
@@ -74,8 +113,13 @@ function reflectSubTabUrl(seg: string | number | null) {
 }
 
 export default function SitesPage() {
-  const [view, setView] = useState<View>({ kind: 'list' })
-  const [open, setOpen] = useState<OpenTab[]>([])
+  // Initialiseurs PARESSEUX : l'état restauré doit exister avant tout effet (notamment celui qui
+  // reflète l'URL, qui effacerait le /:id s'il tournait sur un état vide).
+  const [boot] = useState(loadBootState)
+  const [view, setView] = useState<View>(
+    boot.activeId == null ? { kind: 'list' } : boot.activeId === NEW_TAB ? { kind: 'new' } : { kind: 'edit', id: boot.activeId },
+  )
+  const [open, setOpen] = useState<OpenTab[]>(boot.open)
 
   function openEditor(id: number, label: string) {
     setOpen((prev) => (prev.some((o) => o.id === id) ? prev : [...prev, { id, label }]))
@@ -117,6 +161,22 @@ export default function SitesPage() {
     reflectSubTabUrl(view.kind === 'edit' ? view.id : view.kind === 'new' ? 'new' : null)
   }, [view])
 
+  // Persistance des sous-onglets (survie au F5) — cf. SUBTABS_KEY.
+  useEffect(() => { saveBootState(open, activeId) }, [open, activeId])
+
+  // Fermer l'onglet de shell « Sites » doit VIDER ses sous-onglets, sinon rouvrir l'outil les
+  // ressusciterait. L'hôte (Topbar) émet `melis:tab-closed` avec le path de l'onglet fermé.
+  useEffect(() => {
+    const onClosed = (e: Event) => {
+      const path = (e as CustomEvent<{ path?: string }>).detail?.path ?? ''
+      if (!/\/sites\/?$/.test(path)) return
+      setOpen([])
+      setView({ kind: 'list' })
+    }
+    window.addEventListener('melis:tab-closed', onClosed)
+    return () => window.removeEventListener('melis:tab-closed', onClosed)
+  }, [])
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {open.length > 0 && (
@@ -140,7 +200,8 @@ export default function SitesPage() {
 
         {open.filter((o) => o.id !== NEW_TAB).map((o) => (
           <div key={o.id} style={{ height: '100%', display: activeId === o.id ? 'block' : 'none' }}>
-            <SiteEditor siteId={o.id} onSaved={() => markSitesListStale()} onLabel={(l) => setLabel(o.id, l)} />
+            <SiteEditor siteId={o.id} onSaved={() => markSitesListStale()} onLabel={(l) => setLabel(o.id, l)}
+              onLoadFail={() => closeTab(o.id)} />
           </div>
         ))}
       </div>
