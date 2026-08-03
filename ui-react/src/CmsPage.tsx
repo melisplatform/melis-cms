@@ -318,6 +318,9 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     .filter((b) => !lockedByOther || !LOCK_HIDDEN_BTN.some((k) => b.key.endsWith(k))) // actions d'édition cachées si verrou d'un autre
     // « Envoyer la newsletter » UNIQUEMENT si la page est de type NEWSLETTER (parité legacy MelisNewsletterSendTool).
     .filter((b) => !b.key.includes('newsletter') || edit?.props.type === 'NEWSLETTER')
+    // « Affichage » (aperçu desktop/tablette/mobile) n'a aucun sens sur mobile — on est déjà sur mobile
+    // (ticket 0010840). Masqué UNIQUEMENT en viewport étroit ; conservé aux autres résolutions.
+    .filter((b) => !narrow || !b.key.endsWith('action_display'))
   // Boutons regroupés en sections (Édition/publication · Page · Aperçu · Modulaires), séparées par un trait.
   const btnGroups = [0, 1, 2, 3]
     .map((gi) => visibleButtons.filter((b) => groupOf(b.key) === gi).sort((a, b) => orderOf(a.key) - orderOf(b.key)))
