@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { peT } from './page-editor-i18n'
 import { useIsNarrow } from './shared/useIsNarrow'
+import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
 
 /**
  * Contenus NATIFS des onglets de l'éditeur de page CMS.
@@ -307,6 +308,8 @@ const smallBtn: React.CSSProperties = { appearance: 'none', display: 'inline-fle
 
 // ═══ VERSIONING (modulaire) — pagination SERVEUR 20/page, dates locale BO — Voir / Restaurer / Renommer ═══
 const VERSIONING_PER_PAGE = 20
+/** Colonnes du tableau des versions — ordre desktop ; `number` est la colonne essentielle sur narrow. */
+const VERSION_COLS = [{ id: 'number' }, { id: 'name' }, { id: 'date' }, { id: 'user' }]
 type WfVersion = { id: number; number: number; name: string | null; editDate: string; user: string }
 type VersData = { items: WfVersion[]; page: number; perPage: number; total: number }
 export function VersioningTab({ idPage }: { idPage: number }) {
@@ -320,6 +323,7 @@ export function VersioningTab({ idPage }: { idPage: number }) {
   const [busy, setBusy] = useState<number | null>(null)
   const [editing, setEditing] = useState<{ id: number; name: string } | null>(null)
   const [confirmRestore, setConfirmRestore] = useState<number | null>(null) // modal React de confirmation de restauration
+  const [openRows, setOpenRows] = useState<Set<number>>(new Set()) // lignes dépliées (colonnes repliées sur narrow)
   const reload = useCallback(() => setReloadKey((k) => k + 1), []) // re-fetch la PAGE courante
   useEffect(() => { setPageNum(1) }, [idPage])
   useEffect(() => {
@@ -373,56 +377,67 @@ export function VersioningTab({ idPage }: { idPage: number }) {
   const curPage = Math.min(Math.max(1, pageNum), totalPages)
   const th: React.CSSProperties = { textAlign: 'left', fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)', padding: '8px 10px', borderBottom: '1px solid var(--color-border,#e5e7eb)' }
   const td: React.CSSProperties = { fontSize: 13, padding: '8px 10px', borderBottom: '1px solid var(--color-border,#f3f4f6)', verticalAlign: 'middle' }
+  // Repli de colonnes « maison » (cf. skill melis-react-mobile-responsive) : sous 640px on ne garde
+  // QU'UNE colonne essentielle (le n° de version, seul identifiant fiable — le nom est souvent vide)
+  // + la colonne d'actions, et les autres passent dans la ligne dépliable « + » la plus à gauche.
+  // `hasHidden` est lié à `narrow` SEUL : pas de colonne « + » qui apparaîtrait sur desktop.
+  const cols = VERSION_COLS.map((c) => ({ ...c, visible: narrow ? c.id === 'number' : true }))
+  const hasHidden = narrow
+  const labelFor = (id: string) => ({ number: tr.colNumber, name: tr.colName, date: tr.colModifiedOn, user: tr.colBy }[id] ?? id)
+  const nameCell = (r: WfVersion, width: number) => (editing?.id === r.id
+    ? <input autoFocus value={editing.name} onChange={(e) => setEditing({ id: r.id, name: e.target.value })} onKeyDown={(e) => { if (e.key === 'Enter') doRename(); if (e.key === 'Escape') setEditing(null) }} style={{ ...field, height: 28, width }} placeholder={tr.versionNamePlaceholder} />
+    : (r.name || <span style={{ color: 'var(--color-muted-foreground,#6b7280)' }}>—</span>))
+  const cellFor = (r: WfVersion, id: string): React.ReactNode => id === 'number' ? r.number
+    : id === 'name' ? nameCell(r, narrow ? 180 : 200)
+      : id === 'date' ? fmtDate(r.editDate) : r.user
+  // Desktop : espacement d'origine par `marginLeft` (le conteneur reste inline) ; narrow : pas de
+  // marge, c'est le `gap` du conteneur flex qui espace les boutons quand ils passent à la ligne.
+  const nextBtn = narrow ? smallBtn : { ...smallBtn, marginLeft: 6 }
+  const rowActions = (r: WfVersion) => (editing?.id === r.id ? (<>
+    <button style={{ ...smallBtn, border: 0, background: 'var(--color-primary,#dc2626)', color: '#fff' }} disabled={busy === r.id} onClick={doRename}>{tr.save}</button>
+    <button style={nextBtn} onClick={() => setEditing(null)}>{tr.cancel}</button>
+  </>) : (<>
+    <button style={smallBtn} disabled={busy === r.id} onClick={() => doView(r.id)} title={tr.viewTip}>{tr.view}</button>
+    <button style={nextBtn} disabled={busy === r.id} onClick={() => setConfirmRestore(r.id)} title={tr.restoreTip}>{tr.restore}</button>
+    <button style={nextBtn} disabled={busy === r.id} onClick={() => setEditing({ id: r.id, name: r.name || '' })} title={tr.renameTip}>{tr.rename}</button>
+  </>))
   return (
     <div style={wrap}>
       <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>{tr.pageVersions}</div>
-      {total === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.noVersion}</div> : narrow ? (
-        // Table simple (non configurable, pas de ColManager) → repli en cartes label/valeur empilées
-        // sous 640px plutôt qu'un tableau qui déborderait horizontalement.
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, opacity: loading ? 0.5 : 1, transition: 'opacity .15s' }}>
-          {d.items.map((r) => (
-            <div key={r.id} style={{ border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 8, padding: '10px 12px' }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.colNumber} {r.number}</div>
-              {editing?.id === r.id
-                ? <input autoFocus value={editing.name} onChange={(e) => setEditing({ id: r.id, name: e.target.value })} onKeyDown={(e) => { if (e.key === 'Enter') doRename(); if (e.key === 'Escape') setEditing(null) }} style={{ ...field, height: 30, width: '100%', marginTop: 6 }} placeholder={tr.versionNamePlaceholder} />
-                : <div style={{ fontSize: 13, marginTop: 4 }}>{r.name || <span style={{ color: 'var(--color-muted-foreground,#6b7280)' }}>—</span>}</div>}
-              <div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)', marginTop: 4 }}>{fmtDate(r.editDate)} · {r.user}</div>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
-                {editing?.id === r.id ? (<>
-                  <button style={{ ...smallBtn, border: 0, background: 'var(--color-primary,#dc2626)', color: '#fff' }} disabled={busy === r.id} onClick={doRename}>{tr.save}</button>
-                  <button style={smallBtn} onClick={() => setEditing(null)}>{tr.cancel}</button>
-                </>) : (<>
-                  <button style={smallBtn} disabled={busy === r.id} onClick={() => doView(r.id)} title={tr.viewTip}>{tr.view}</button>
-                  <button style={smallBtn} disabled={busy === r.id} onClick={() => setConfirmRestore(r.id)} title={tr.restoreTip}>{tr.restore}</button>
-                  <button style={smallBtn} disabled={busy === r.id} onClick={() => setEditing({ id: r.id, name: r.name || '' })} title={tr.renameTip}>{tr.rename}</button>
-                </>)}
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
+      {total === 0 ? <div style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.noVersion}</div> : (
         <table style={{ width: '100%', borderCollapse: 'collapse', opacity: loading ? 0.5 : 1, transition: 'opacity .15s' }}>
-          <thead><tr><th style={th}>{tr.colNumber}</th><th style={th}>{tr.colName}</th><th style={th}>{tr.colModifiedOn}</th><th style={th}>{tr.colBy}</th><th style={{ ...th, textAlign: 'right' }}>{tr.colActions}</th></tr></thead>
-          <tbody>{d.items.map((r) => (
-            <tr key={r.id}>
-              <td style={td}>{r.number}</td>
-              <td style={td}>{editing?.id === r.id
-                ? <input autoFocus value={editing.name} onChange={(e) => setEditing({ id: r.id, name: e.target.value })} onKeyDown={(e) => { if (e.key === 'Enter') doRename(); if (e.key === 'Escape') setEditing(null) }} style={{ ...field, height: 28, width: 200 }} placeholder={tr.versionNamePlaceholder} />
-                : (r.name || <span style={{ color: 'var(--color-muted-foreground,#6b7280)' }}>—</span>)}</td>
-              <td style={td}>{fmtDate(r.editDate)}</td>
-              <td style={td}>{r.user}</td>
-              <td style={{ ...td, textAlign: 'right', whiteSpace: 'nowrap' }}>
-                {editing?.id === r.id ? (<>
-                  <button style={{ ...smallBtn, border: 0, background: 'var(--color-primary,#dc2626)', color: '#fff' }} disabled={busy === r.id} onClick={doRename}>{tr.save}</button>
-                  <button style={{ ...smallBtn, marginLeft: 6 }} onClick={() => setEditing(null)}>{tr.cancel}</button>
-                </>) : (<>
-                  <button style={smallBtn} disabled={busy === r.id} onClick={() => doView(r.id)} title={tr.viewTip}>{tr.view}</button>
-                  <button style={{ ...smallBtn, marginLeft: 6 }} disabled={busy === r.id} onClick={() => setConfirmRestore(r.id)} title={tr.restoreTip}>{tr.restore}</button>
-                  <button style={{ ...smallBtn, marginLeft: 6 }} disabled={busy === r.id} onClick={() => setEditing({ id: r.id, name: r.name || '' })} title={tr.renameTip}>{tr.rename}</button>
-                </>)}
-              </td>
-            </tr>
-          ))}</tbody>
+          <thead><tr>
+            {/* Colonne « + » la PLUS À GAUCHE (jamais repliée dans la cellule d'actions : à droite,
+                noyée parmi les boutons, personne ne la découvre). */}
+            {hasHidden && <th style={{ ...th, width: 34 }} aria-label="" />}
+            {cols.filter((c) => c.visible).map((c) => <th key={c.id} style={th}>{labelFor(c.id)}</th>)}
+            <th style={{ ...th, textAlign: 'right' }}>{tr.colActions}</th>
+          </tr></thead>
+          <tbody>{d.items.map((r) => {
+            // Une ligne en cours de RENOMMAGE est dépliée d'office : sur narrow le champ « Nom » vit
+            // dans la ligne dépliable, sinon on éditerait un champ invisible.
+            const expanded = openRows.has(r.id) || (narrow && editing?.id === r.id)
+            return (
+              <Fragment key={r.id}>
+                <tr>
+                  {hasHidden && (
+                    <td style={{ ...td, width: 34, paddingRight: 0 }}>
+                      <ExpandToggle expanded={expanded} onClick={() => setOpenRows((s) => { const n = new Set(s); n.has(r.id) ? n.delete(r.id) : n.add(r.id); return n })} />
+                    </td>
+                  )}
+                  {cols.filter((c) => c.visible).map((c) => <td key={c.id} style={td}>{cellFor(r, c.id)}</td>)}
+                  {/* Desktop : boutons sur une ligne (nowrap, comme avant). Narrow : ils s'empilent
+                      dans la cellule plutôt que d'élargir le tableau au-delà du viewport. */}
+                  <td style={{ ...td, textAlign: 'right', whiteSpace: narrow ? 'normal' : 'nowrap' }}>
+                    {narrow
+                      ? <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'flex-end' }}>{rowActions(r)}</div>
+                      : rowActions(r)}
+                  </td>
+                </tr>
+                {expanded && <HiddenColsRow cols={cols} labelFor={labelFor} renderValue={(id) => cellFor(r, id)} colSpan={cols.filter((c) => c.visible).length + (hasHidden ? 2 : 1)} narrow={narrow} />}
+              </Fragment>
+            )
+          })}</tbody>
         </table>
       )}
       {/* Pagination serveur — 20 versions par page */}

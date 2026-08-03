@@ -334,6 +334,29 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   // legacy (barre de boutons + onglets) soit masqué (applyIframeChrome au `load`) → sinon on voit la
   // barre d'actions legacy « flasher » à l'ouverture avant d'être cachée. Révélée juste après.
   const [revealed, setRevealed] = useState<Set<string>>(new Set())
+  // Tableaux legacy (DataTables) des onglets — Versioning, Historique, Commentaires… : l'extension
+  // **Responsive** est bien chargée (`dt-responsive dtr-inline`) mais elle calcule les largeurs à
+  // l'INIT, alors que l'onglet est encore masqué / que l'iframe n'a pas sa largeur finale. Résultat
+  // sous 640px : le tableau garde sa largeur « desktop » (562px mesurés dans un conteneur de 348px),
+  // déborde et fait défiler toute la page latéralement — au lieu de replier ses colonnes.
+  // Un simple événement `resize` DANS l'iframe suffit à le faire recalculer (vérifié : le tableau
+  // repasse à 348px, prend la classe `collapsed` et les colonnes en trop passent dans la ligne
+  // dépliable « + »). On ne touche donc à AUCUNE API DataTables : pas de dépendance à sa version.
+  // Déclenché à l'ouverture puis à chaque clic dans la barre d'onglets legacy — les deux moments où
+  // un tableau jusqu'ici masqué devient visible avec une largeur périmée (le pilotage React d'un
+  // onglet passe par un .click() sur le lien legacy, il est donc couvert lui aussi).
+  // Narrow uniquement : sur desktop le tableau tient déjà, le recalcul serait un no-op.
+  const installNarrowTableFix = useCallback((iframe: HTMLIFrameElement, doc: Document) => {
+    const win = iframe.contentWindow as (Window & { __melisNarrowTables?: boolean }) | null
+    if (!narrow || !win) return
+    const kick = () => [0, 200, 700].forEach((ms) => win.setTimeout(() => { try { win.dispatchEvent(new win.Event('resize')) } catch { /* */ } }, ms))
+    if (!win.__melisNarrowTables) {
+      win.__melisNarrowTables = true
+      doc.addEventListener('click', (e) => { if ((e.target as HTMLElement | null)?.closest?.('ul.tabs-label')) kick() }, true)
+    }
+    kick()
+  }, [narrow])
+
   const applyIframeChrome = useCallback((iframe: HTMLIFrameElement) => {
     try {
       const doc = iframe.contentDocument as (Document & { __melisChromeStyle?: HTMLStyleElement }) | null
@@ -348,9 +371,20 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
           + `ul.tabs-label.nav-tabs{display:none !important;}`
           + `[data-melisKey='meliscms_tabs'] > .widget-tabs > .widget-head{display:none !important;}`
           + `[data-melisKey='meliscms_page_edition']{padding-top:0 !important;}`
-        : ''
+        // Mode « Old » (chrome legacy visible) sur narrow : la barre d'onglets legacy est faite de
+        // `li` FLOTTANTS dans un `ul` et un `.widget-head` à HAUTEUR FIXE (69/70px = une ligne).
+        // Sous 640px les 9 onglets passent sur 3 lignes : les lignes 2 et 3 débordent hors du head
+        // et sont recouvertes par le `.widget-body` (fond blanc) → seuls Edition/Propriétés/SEO
+        // restent visibles. `height:auto` suffit (le `ul` est inline-block = BFC, il contient donc
+        // bien ses flottants) et le body reprend sa place dans le flux. Gardé sur narrow seulement :
+        // en une seule ligne, `auto` vaudrait 70px contre 69px déclarés → 1px de décalage desktop.
+        : narrow
+          ? `[data-melisKey='meliscms_tabs'] > .widget-tabs > .widget-head{height:auto !important;}`
+            + `[data-melisKey='meliscms_tabs'] ul.tabs-label.nav-tabs{height:auto !important;}`
+          : ''
+      installNarrowTableFix(iframe, doc)
     } catch { /* */ }
-  }, [showChrome])
+  }, [showChrome, narrow, installNarrowTableFix])
 
   const driveTab = useCallback((tabKey: string) => {
     setActiveTab(tabKey)
