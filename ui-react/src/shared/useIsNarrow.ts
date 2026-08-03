@@ -14,3 +14,18 @@ export function useIsNarrow(breakpoint = 640): boolean {
   }, [breakpoint])
   return narrow
 }
+
+/**
+ * Largeur courante du viewport. `useIsNarrow` ne re-rend que quand le booléen BASCULE — pour une
+ * décision qui dépend des pixels disponibles (ex. un libellé tient-il dans un demi-bouton ?), il
+ * faut la largeur elle-même, réactive à chaque redimensionnement.
+ */
+export function useViewportWidth(): number {
+  const [w, setW] = useState(() => window.innerWidth)
+  useEffect(() => {
+    const onResize = () => setW(window.innerWidth)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+  return w
+}

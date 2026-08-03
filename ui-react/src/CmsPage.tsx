@@ -7,7 +7,7 @@ import {
   apiGet, apiPost, type PropsData, type SeoData, type Refs,
 } from './PageTabs'
 import { peT } from './page-editor-i18n'
-import { useIsNarrow } from './shared/useIsNarrow'
+import { useIsNarrow, useViewportWidth } from './shared/useIsNarrow'
 import { legacyErrorFields, legacyText } from './legacy-errors'
 
 /**
@@ -148,6 +148,7 @@ function orderOf(key: string): number {
 export default function CmsPage({ active = true }: { active?: boolean }) {
   const tr = peT() // dictionnaire i18n (référence stable : DICT[lang] du BO) → sûr hors deps des useCallback
   const narrow = useIsNarrow()
+  const vw = useViewportWidth()
   const { id } = useParams()
   const navigate = useNavigate()
   const { can, loaded: capsLoaded } = useCaps(TOOL_KEY)
@@ -722,6 +723,18 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     if (b.key.endsWith('action_delete')) return { ...btnBase, border: '1px solid #fecaca', background: 'var(--color-card,#fff)', color: '#dc2626' }
     return { ...btnBase, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)' }
   }
+  // Largeur des boutons d'action sur narrow : 2 par ligne (`calc(50% - 4px)` = gap de colonne du
+  // conteneur), SAUF les libellés qui ne tiennent PAS dans un demi-bouton (whiteSpace:nowrap → ils
+  // déborderaient) : ligne entière. Le seuil est géométrique et non « > N caractères » : mesuré,
+  // le plus long libellé FR (« Envoyer la newsletter », 116px) tient à 390px mais pas à 320px —
+  // un seuil fixe sacrifierait donc une ligne pour rien sur un téléphone standard.
+  // dispo = (viewport − 2×16 padding conteneur − 4 gap) / 2 − 18 padding bouton − 19 icône+gap.
+  // Desktop : objet vide → styles d'origine strictement inchangés.
+  function narrowSlot(label: string): React.CSSProperties {
+    if (!narrow) return {}
+    const avail = (vw - 36) / 2 - 37
+    return { flex: label.length * 5.8 > avail ? '1 1 100%' : '1 1 calc(50% - 4px)', minWidth: 0, justifyContent: 'center' }
+  }
 
   return (
     <div style={{ position: 'relative', height: '100%', width: '100%', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
@@ -786,23 +799,31 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         <div style={{ flex: '0 0 auto', background: 'var(--color-background,#fff)', borderBottom: '1px solid var(--color-border,#e5e7eb)' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px 4px', padding: '0 16px 12px' }}>
             {btnGroups.map((group, gi) => (
-              <div key={gi} style={{ display: 'flex', flexWrap: narrow ? 'wrap' : 'nowrap', alignItems: 'center', gap: 8 }}>
-                {gi > 0 && <div style={{ width: 1, minHeight: 24, alignSelf: 'stretch', background: 'var(--color-border,#e5e7eb)', margin: '0 6px' }} />}
+              // narrow : `display:contents` → les boutons du groupe deviennent des enfants DIRECTS
+              // du conteneur qui wrap, donc la grille 2-par-ligne est continue d'un groupe à
+              // l'autre (au lieu d'un wrap ragged par groupe). Séparateurs verticaux masqués :
+              // étirés sur un groupe multi-lignes ils volaient une place et rognaient le bouton
+              // suivant. Desktop : la branche `flex/nowrap` d'origine, à l'identique.
+              <div key={gi} style={narrow ? { display: 'contents' } : { display: 'flex', flexWrap: 'nowrap', alignItems: 'center', gap: 8 }}>
+                {gi > 0 && !narrow && <div style={{ width: 1, minHeight: 24, alignSelf: 'stretch', background: 'var(--color-border,#e5e7eb)', margin: '0 6px' }} />}
                 {group.map((b) => (
                   // Dropdown seulement pour de VRAIS sous-menus (Voir/Affichage) ; un enfant "modal"/
                   // "container" (ex. bouton Newsletter modulaire) → bouton DIRECT qui pilote la clé parente.
                   b.children && b.children.length && !b.children.some((cc) => /modal|container/i.test(cc.key)) ? (
-                    <div key={b.key} style={{ position: 'relative' }}>
-                      <button className="melis-pgbtn" style={btnStyle(b)} onClick={(e) => { e.stopPropagation(); setOpenMenu(openMenu === b.key ? null : b.key) }}><Icon name={iconFor(b)} />{b.label} <span style={{ fontSize: 10, opacity: .7 }}>▾</span></button>
+                    <div key={b.key} style={{ position: 'relative', ...narrowSlot(b.label) }}>
+                      <button className="melis-pgbtn" style={{ ...btnStyle(b), ...(narrow ? { width: '100%', justifyContent: 'center' } : null) }} onClick={(e) => { e.stopPropagation(); setOpenMenu(openMenu === b.key ? null : b.key) }}><Icon name={iconFor(b)} />{b.label} <span style={{ fontSize: 10, opacity: .7 }}>▾</span></button>
                       {openMenu === b.key && (
-                        <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: 4, background: 'var(--color-card,#fff)', border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 8, boxShadow: '0 6px 18px rgba(0,0,0,.13)', zIndex: 50, minWidth: 190, overflow: 'hidden', padding: 4 }}>
+                        // narrow : le menu épouse la largeur du bouton (left+right à 0, minWidth
+                        // levé) — ancré uniquement à gauche avec minWidth:190 il débordait à droite
+                        // de l'écran quand le bouton occupe la colonne de droite.
+                        <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: 4, background: 'var(--color-card,#fff)', border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 8, boxShadow: '0 6px 18px rgba(0,0,0,.13)', zIndex: 50, minWidth: narrow ? 0 : 190, right: narrow ? 0 : undefined, overflow: 'hidden', padding: 4 }}>
                           {b.children.map((cch) => <button key={cch.key} className="melis-pgmenu" style={{ ...btnBase, border: 0, width: '100%', justifyContent: 'flex-start', borderRadius: 5, background: 'transparent' }} onClick={() => driveButton(cch.key)}><Icon name={childIcon(cch.key, cch.label)} />{cch.label}</button>)}
                         </div>
                       )}
                     </div>
                   ) : (
                     (() => { const gated = b.key.endsWith('action_save') || b.key.endsWith('action_publish'); const dis = gated && (saving || !editionReady); return (
-                    <button key={b.key} className="melis-pgbtn" style={{ ...btnStyle(b), ...(dis ? { opacity: .55, cursor: 'not-allowed' } : null) }} disabled={dis} title={gated && !editionReady ? tr.editionLoadingTip : undefined} onClick={() => onButton(b)}><Icon name={iconFor(b)} />{b.label}</button>
+                    <button key={b.key} className="melis-pgbtn" style={{ ...btnStyle(b), ...narrowSlot(b.label), ...(dis ? { opacity: .55, cursor: 'not-allowed' } : null) }} disabled={dis} title={gated && !editionReady ? tr.editionLoadingTip : undefined} onClick={() => onButton(b)}><Icon name={iconFor(b)} />{b.label}</button>
                     ) })()
                   )
                 ))}
