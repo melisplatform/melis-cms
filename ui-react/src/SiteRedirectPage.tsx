@@ -288,6 +288,14 @@ function RedirectList({ base }: { base: string }) {
   const displayCols = narrow ? cols.map((c) => ({ ...c, visible: c.id === 'old' })) : cols
   const hasHidden = narrow
 
+  // Colonne essentielle = une URL monospace potentiellement longue et insécable : sans
+  // `tableLayout:'fixed'` + césure la table dépasse la carte (`overflow:hidden`) et la colonne
+  // d'actions (tester / modifier / supprimer) sort de l'écran — cf. le même correctif sur
+  // MiniTemplatePage. Desktop inchangé (tout est gardé par `narrow`).
+  const thCss: CSSProperties = narrow ? { ...th, padding: '10px 8px' } : th
+  const tdCss: CSSProperties = narrow ? { ...td, padding: '10px 8px' } : td
+  const actionBtn: CSSProperties = narrow ? { ...iconBtn, width: 26, height: 26 } : iconBtn
+
   const { items, total, loading, hasMore, sentinelRef, sortCol, sortDir, toggleSort, reload, removeLocal } =
     useKeysetList<RedirectItem>({
       fetcher: (a) => fetchRedirects({ ...a, search, site }),
@@ -395,28 +403,28 @@ function RedirectList({ base }: { base: string }) {
 
       {/* Table */}
       <div style={{ ...card, overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', ...(narrow ? {} : { minWidth: 640 }) }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', ...(narrow ? { tableLayout: 'fixed' } : { minWidth: 640 }) }}>
           <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
             <tr>
-              {hasHidden && <th style={{ ...th, width: 32 }} />}
+              {hasHidden && <th style={{ ...thCss, width: narrow ? 30 : 32 }} />}
               {visibleCols(displayCols).map(({ id }) => (
-                <th key={id} style={{ ...th, cursor: 'pointer', ...(id === 'id' ? { width: 70 } : {}), ...(sortCol === id ? { color: 'var(--color-primary)' } : {}) }}
+                <th key={id} style={{ ...thCss, cursor: 'pointer', ...(id === 'id' ? { width: 70 } : {}), ...(sortCol === id ? { color: 'var(--color-primary)' } : {}) }}
                   onClick={() => toggleSort(id)}>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t(COL_LABEL[id])}<SortIcon dir={sortCol === id ? sortDir : null} /></span>
                 </th>
               ))}
-              <th style={{ ...th, width: 80 }} />
+              <th style={{ ...thCss, width: narrow ? 100 : 80 }} />
             </tr>
           </thead>
           <tbody>
             {items.length === 0 && !loading ? (
-              <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(displayCols).length + (hasHidden ? 1 : 0) + 1}>{t('empty')}</td></tr>
+              <tr><td style={{ ...tdCss, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(displayCols).length + (hasHidden ? 1 : 0) + 1}>{t('empty')}</td></tr>
             ) : items.map((r) => (
               <Fragment key={r.id}>
                 <tr>
-                  {hasHidden && <td style={td}><ExpandToggle expanded={expanded.has(r.id)} onClick={() => toggleExpand(r.id)} /></td>}
+                  {hasHidden && <td style={tdCss}><ExpandToggle expanded={expanded.has(r.id)} onClick={() => toggleExpand(r.id)} /></td>}
                   {visibleCols(displayCols).map(({ id }) => (
-                    <td key={id} style={{ ...td, ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}), ...(id === 'old' ? { fontFamily: 'monospace', fontSize: 13 } : {}) }}>
+                    <td key={id} style={{ ...tdCss, ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}), ...(id === 'old' ? { fontFamily: 'monospace', fontSize: 13, ...(narrow ? { overflowWrap: 'anywhere' } : {}) } : {}) }}>
                       {id === 'id' && r.id}
                       {id === 'site' && r.siteName}
                       {id === 'old' && r.oldUrl}
@@ -427,11 +435,11 @@ function RedirectList({ base }: { base: string }) {
                       )}
                     </td>
                   ))}
-                  <td style={td}>
+                  <td style={tdCss}>
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-                      {can('test') && <button style={iconBtn} title={t('test')} onClick={() => testRedirect(r)}><TestIcon /></button>}
-                      {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>}
-                      {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
+                      {can('test') && <button style={actionBtn} title={t('test')} onClick={() => testRedirect(r)}><TestIcon /></button>}
+                      {can('edit') && <button style={actionBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>}
+                      {can('delete') && <button style={{ ...actionBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
                     </div>
                   </td>
                 </tr>

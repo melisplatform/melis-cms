@@ -400,6 +400,14 @@ function MiniTemplateList({ base, mode, setMode }: { base: string; mode: ViewMod
   const displayCols = narrow ? cols.map((c) => ({ ...c, visible: c.id === 'path' })) : cols
   const hasHidden = narrow
 
+  // En étroit le chemin est un long token monospace insécable : sans `tableLayout:'fixed'` +
+  // césure, la table dépasse la carte (`overflow:hidden`) et la colonne d'actions (modifier /
+  // supprimer) sort de l'écran, invisible et inatteignable. Padding et largeurs resserrés pour
+  // que [+][chemin][actions] tienne à ~320px. Desktop strictement inchangé (ternaires narrow).
+  const thCss: CSSProperties = narrow ? { ...th, padding: '10px 8px' } : th
+  const tdCss: CSSProperties = narrow ? { ...td, padding: '10px 8px' } : td
+  const actionBtn: CSSProperties = narrow ? { ...iconBtn, width: 26, height: 26 } : iconBtn
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: narrow ? 14 : 20, padding: narrow ? 14 : 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
       <style>{'@keyframes melis-spin{to{transform:rotate(360deg)}}'}</style>
@@ -464,42 +472,42 @@ function MiniTemplateList({ base, mode, setMode }: { base: string; mode: ViewMod
           {!site ? (
             <div style={{ padding: '48px 16px', textAlign: 'center', fontSize: 14, color: 'var(--color-muted-foreground)' }}>{t('empty_site')}</div>
           ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse', ...(!narrow ? { minWidth: 480 } : {}) }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', ...(narrow ? { tableLayout: 'fixed' } : { minWidth: 480 }) }}>
               <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
                 <tr>
-                  {hasHidden && <th style={{ ...th, width: 36 }} />}
+                  {hasHidden && <th style={{ ...thCss, width: narrow ? 30 : 36 }} />}
                   {visibleCols(displayCols).map(({ id }) => (
-                    <th key={id} style={{ ...th, ...(id === 'path' ? { cursor: 'pointer' } : {}), ...(id === 'thumbnail' ? { width: 80 } : {}) }}
+                    <th key={id} style={{ ...thCss, ...(id === 'path' ? { cursor: 'pointer' } : {}), ...(id === 'thumbnail' ? { width: 80 } : {}) }}
                       onClick={id === 'path' ? () => toggleSort('path') : undefined}>
                       {t(COL_LABEL[id])}{id === 'path' ? <SortArrow col="path" sortCol={sortCol} sortDir={sortDir} /> : null}
                     </th>
                   ))}
-                  <th style={{ ...th, width: 80 }} />
+                  <th style={{ ...thCss, width: narrow ? 72 : 80 }} />
                 </tr>
               </thead>
               <tbody>
                 {items.length === 0 && !loading ? (
-                  <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={(hasHidden ? 1 : 0) + visibleCols(displayCols).length + 1}>{t('empty')}</td></tr>
+                  <tr><td style={{ ...tdCss, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={(hasHidden ? 1 : 0) + visibleCols(displayCols).length + 1}>{t('empty')}</td></tr>
                 ) : items.map((r) => {
                   const rowKey = `${r.site}:${r.name}`
                   return (
                     <Fragment key={rowKey}>
                       <tr>
-                        {hasHidden && <td style={td}><ExpandToggle expanded={expandedRows.has(rowKey)} onClick={() => toggleExpanded(rowKey)} /></td>}
+                        {hasHidden && <td style={tdCss}><ExpandToggle expanded={expandedRows.has(rowKey)} onClick={() => toggleExpanded(rowKey)} /></td>}
                         {visibleCols(displayCols).map(({ id }) => (
-                          <td key={id} style={td}>
+                          <td key={id} style={tdCss}>
                             {id === 'thumbnail' && (
                               r.thumbnailUrl
                                 ? <img src={r.thumbnailUrl} alt={r.name} style={{ width: 52, height: 40, objectFit: 'cover', borderRadius: 4, display: 'block' }} />
                                 : <div style={{ width: 52, height: 40, borderRadius: 4, background: 'var(--color-muted,rgba(0,0,0,.06))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: 'var(--color-muted-foreground)' }}>—</div>
                             )}
-                            {id === 'path' && <span style={{ fontFamily: 'monospace', fontSize: 13 }}>{r.path}</span>}
+                            {id === 'path' && <span style={{ fontFamily: 'monospace', fontSize: 13, ...(narrow ? { overflowWrap: 'anywhere', display: 'block', minWidth: 0 } : {}) }}>{r.path}</span>}
                           </td>
                         ))}
-                        <td style={td}>
+                        <td style={tdCss}>
                           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-                            {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${idFor(r.site, r.name)}`)}><PencilIcon /></button>}
-                            {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
+                            {can('edit') && <button style={actionBtn} title={t('edit')} onClick={() => navigate(`${base}/${idFor(r.site, r.name)}`)}><PencilIcon /></button>}
+                            {can('delete') && <button style={{ ...actionBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
                           </div>
                         </td>
                       </tr>
