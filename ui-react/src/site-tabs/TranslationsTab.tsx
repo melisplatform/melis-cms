@@ -17,6 +17,14 @@ const btnPrimary: React.CSSProperties = { ...btn, border: 0, background: 'var(--
 const input: React.CSSProperties = { height: 36, width: '100%', borderRadius: 8, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-background,#fff)', padding: '0 10px', fontSize: 14, boxSizing: 'border-box' }
 const td: React.CSSProperties = { fontSize: 13, padding: '8px 12px', borderTop: '1px solid var(--color-border,#f0f0f0)', verticalAlign: 'top' }
 const th: React.CSSProperties = { textAlign: 'left', fontSize: 12, fontWeight: 600, color: 'var(--color-muted-foreground)', padding: '8px 12px' }
+// Boutons d'action alignés sur les autres outils React (SitesList, CmsLanguagePage…) : icônes Lucide + iconBtn.
+const iconBtn: React.CSSProperties = { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 6, border: 0, background: 'transparent', color: 'var(--color-muted-foreground)', cursor: 'pointer' }
+const sIcon = { width: 15, height: 15, flexShrink: 0 } as const
+const PencilIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
+const TrashIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /></svg>
+// Sur mobile, la clé peut être très longue et repousser les boutons d'action hors de l'écran → on la tronque (titre = clé complète).
+const KEY_MAX_NARROW = 22
+const truncKey = (key: string, narrow: boolean) => (narrow && key.length > KEY_MAX_NARROW ? key.slice(0, KEY_MAX_NARROW) + '…' : key)
 
 interface Lang { id: number; locale: string; name: string }
 interface Draft { key: string; isNew: boolean; texts: Record<number, { mstId: number; msttId: number; text: string }> }
@@ -108,11 +116,11 @@ export function TranslationsTab({ siteId, langs }: { siteId: number; langs: Lang
               <Fragment key={r.key}>
               <tr>
                 {narrow && <td style={{ ...td, width: 36 }}><ExpandToggle expanded={expandedKeys.has(r.key)} onClick={() => toggleExpand(r.key)} /></td>}
-                <td style={{ ...td, fontWeight: 600, fontFamily: 'monospace' }}>{r.key}</td>
+                <td style={{ ...td, fontWeight: 600, fontFamily: 'monospace', whiteSpace: 'nowrap' }} title={narrow ? r.key : undefined}>{truncKey(r.key, narrow)}</td>
                 {!narrow && langs.map((l) => <td key={l.id} style={{ ...td, color: 'var(--color-muted-foreground)' }}>{(r.texts[l.id]?.text || '—').slice(0, 60)}</td>)}
                 <td style={{ ...td, whiteSpace: 'nowrap', textAlign: 'right' }}>
-                  <button style={{ ...btn, height: 28 }} onClick={() => openEdit(r)} title={tr('Éditer', 'Edit')}>✎</button>
-                  <button style={{ ...btn, height: 28, marginLeft: 6, color: '#b91c1c' }} onClick={() => setToDelete(r)} title={tr('Supprimer', 'Delete')}>🗑</button>
+                  <button style={iconBtn} onClick={() => openEdit(r)} title={tr('Éditer', 'Edit')}><PencilIcon /></button>
+                  <button style={{ ...iconBtn, marginLeft: 6, color: 'var(--color-destructive,#ef4444)' }} onClick={() => setToDelete(r)} title={tr('Supprimer', 'Delete')}><TrashIcon /></button>
                 </td>
               </tr>
               {narrow && expandedKeys.has(r.key) && (
