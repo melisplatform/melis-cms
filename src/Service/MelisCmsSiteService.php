@@ -728,7 +728,7 @@ class MelisCmsSiteService extends MelisGeneralService
              * make sure language folder is exist
              */
             if (!file_exists($languagePath)) {
-                mkdir($languagePath, 0777, true);
+                mkdir($languagePath, 0755, true);
             }
             $transFileName = $languagePath . '/' . $langLocale . '.php';
             /**
@@ -888,7 +888,7 @@ class MelisCmsSiteService extends MelisGeneralService
 	            {
 	                if (!is_dir($melisSitesDir.'/'.$siteName))
 	                {
-	                    $res = $this->xcopy($siteSampleDir, $melisSitesDir.'/'.$siteName, 0777);
+	                    $res = $this->xcopy($siteSampleDir, $melisSitesDir.'/'.$siteName, 0755);
 	                    
 	                    if ($res)
 	                    {

@@ -1120,7 +1120,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService
 
         $mtplPath = $publicPath . '/miniTemplatesTinyMce';
         if (! file_exists($path . '/public' . '/miniTemplatesTinyMce')) {
-            if (! mkdir($mtplPath, 0777, true))
+            if (! mkdir($mtplPath, 0755, true))
                 return 'e4';
         }
 
@@ -1157,7 +1157,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService
 
         $mtplPath = $publicPath . '/miniTemplatesTinyMce';
         if (! file_exists($mtplPath)) {
-            if (! mkdir($mtplPath, 0777, true))
+            if (! mkdir($mtplPath, 0755, true))
                 return 'e11';
         }
 
@@ -1302,7 +1302,7 @@ class MelisCmsMiniTemplateService extends MelisGeneralService
 
         $mtplPath = $publicPath . '/miniTemplatesTinyMce/' . $module;
         if (! file_exists($mtplPath)) {
-            if (! mkdir($mtplPath, 0777, true)) {
+            if (! mkdir($mtplPath, 0755, true)) {
                 return $this->getErrorMessage('e4');
             }
         }

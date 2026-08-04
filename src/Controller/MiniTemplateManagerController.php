@@ -429,7 +429,21 @@ class MiniTemplateManagerController extends MelisAbstractActionController
         $mtpl_service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
         //$path = $site_service->getModulePath($data['module']) . '/public/miniTemplatesTinyMce';
 
-        //get the path of the template if from root public or module       
+        // Sécurité : module/template composent un chemin de fichier .phtml passé à unlink() → seul
+        // un identifiant simple est accepté (même règle que la création), sinon une chaîne de
+        // traversée (« ../../… ») permettrait de supprimer un .phtml arbitraire hors du dossier.
+        $nameRe = '/^[A-Za-z_][A-Za-z0-9_]*$/';
+        if (empty($data['template']) || !preg_match($nameRe, (string) $data['template'])
+            || (!empty($data['module']) && !preg_match($nameRe, (string) $data['module']))) {
+            return new JsonModel([
+                'success' => 0,
+                'textTitle' => 'Mini-template',
+                'textMessage' => 'tr_meliscms_mini_template_delete_fail',
+                'errors' => ['template' => ['invalid' => 'Invalid template identifier']],
+            ]);
+        }
+
+        //get the path of the template if from root public or module
         $path = $mtpl_service->getMiniTemplatePathByTemplateName($data['module'], $data['template']);
         $minitemplate = $path . '/' . $data['template'] . '.phtml';
         $minitemplate_thumbnail = $mtpl_service->getMiniTemplateThumbnail($path, $data['template']);

@@ -246,6 +246,11 @@ class MelisReactApiCmsMiniTemplateController extends MelisAbstractActionControll
             if ($site === '' || $name === '') {
                 return $this->jsonResponse(['success' => false, 'error' => 'Paramètres site et name requis.'], 400);
             }
+            // Sécurité : $name compose un chemin de fichier .phtml passé à unlink() → même garde que
+            // saveAction (identifiant simple), sinon traversée de répertoire via un « ../… ».
+            if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $name)) {
+                return $this->jsonResponse(['success' => false, 'error' => 'Nom de template invalide.'], 400);
+            }
 
             /** @var \MelisCms\Service\MelisCmsMiniTemplateService $svc */
             $svc  = $this->getServiceManager()->get('MelisCmsMiniTemplateService');

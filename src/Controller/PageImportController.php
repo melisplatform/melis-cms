@@ -195,7 +195,7 @@ class PageImportController extends MelisAbstractActionController
         $target = $_SERVER['DOCUMENT_ROOT'] . '/xml';
 
         if (! is_dir($target))
-            mkdir($target, 0777);
+            mkdir($target, 0755);
 
         $fileInput = new \Laminas\InputFilter\FileInput($input);
         $fileInput->setRequired(true);

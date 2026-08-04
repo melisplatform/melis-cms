@@ -103,7 +103,7 @@ class PageExportController extends MelisAbstractActionController
                     if(is_writable($rootFolder)){
                         $folderPath = $rootFolder.'/PageExport';
                         if(!file_exists($folderPath)) {
-                            mkdir($folderPath, 0777);
+                            mkdir($folderPath, 0755);
                         }
                         /**
                          * insert all the files to the

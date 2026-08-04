@@ -460,7 +460,7 @@ class MelisCmsPageExportService extends MelisGeneralService
          * is already created
          */
         if (!file_exists($folderPath)) {
-            mkdir($folderPath, 0777);
+            mkdir($folderPath, 0755);
         }
 
         /**
@@ -477,7 +477,7 @@ class MelisCmsPageExportService extends MelisGeneralService
                      * create the folder path if not exist
                      */
                     if (!file_exists($fileNewPath)) {
-                        mkdir($fileNewPath, 0777, true);
+                        mkdir($fileNewPath, 0755, true);
                     }
                     /**
                      * copy the file to the temporary folder

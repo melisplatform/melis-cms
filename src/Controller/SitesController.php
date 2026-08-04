@@ -613,6 +613,11 @@ class SitesController extends MelisAbstractActionController
                 //field the site data
                 if (!empty($siteData)) {
                     $siteName = (!empty($siteData['site_name'])) ? $cmsSiteSrv->generateModuleNameCase($siteData['site_name']) : '';
+                    // Sécurité : $siteName sert de nom de MODULE et construit des chemins (mkdir/copy du
+                    // squelette SiteSample, écriture de config). generateModuleNameCase/cleanString ne
+                    // retirent PAS « . » « / » « \ » → on force ici un identifiant strictement
+                    // alphanumérique pour empêcher toute traversée de répertoire hors module/MelisSites.
+                    $siteName = preg_replace('/[^A-Za-z0-9]/', '', (string) $siteName);
                     $siteLabel = (!empty($siteData['site_label'])) ? $siteData['site_label'] : $siteName;
                     $siteData['site_label'] = $siteLabel;
                     $siteData['site_name'] = $siteName;
