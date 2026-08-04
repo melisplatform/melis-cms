@@ -25,6 +25,8 @@ import { legacyErrorFields, legacyText } from './legacy-errors'
  * Modularité : onglets/boutons viennent de /cms-page/structure (config mergée). Capabilities : gating.
  */
 const NEW_PAGE_ROUTE = '/melis-cms/page/new'
+/** Préférence « en-tête replié » (mobile) — persistée : le choix vaut pour toutes les pages ouvertes. */
+const HEADER_PREF_KEY = 'melis-cms-page-header-open'
 const TOOL_KEY = 'meliscms_page'
 const KEY_PROPERTIES = 'meliscms_page_properties'
 const KEY_SEO = 'meliscms_page_seo'
@@ -83,8 +85,8 @@ function toolSrc(id: string): string {
 }
 
 // ── Icônes d'action (SVG inline, lucide-like) ──
-function Icon({ name }: { name: string }) {
-  const c = { width: 13, height: 13, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const }
+function Icon({ name, size = 13 }: { name: string; size?: number }) {
+  const c = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const }
   const P: Record<string, JSX.Element> = {
     plus: <><path d="M12 5v14M5 12h14" /></>,
     save: <><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /><path d="M17 21v-8H7v8M7 3v5h8" /></>,
@@ -101,6 +103,9 @@ function Icon({ name }: { name: string }) {
     tablet: <><rect x="4" y="2" width="16" height="20" rx="2" /><path d="M12 18h.01" /></>,
     globe: <><circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20" /></>,
     online: <><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" /><circle cx="12" cy="12" r="3" /></>,
+    // Replier/déplier l'en-tête : simple chevron (^ = replier, v = déplier).
+    'chevron-up': <><path d="m6 15 6-6 6 6" /></>,
+    'chevron-down': <><path d="m6 9 6 6 6-6" /></>,
   }
   return <svg {...c}>{P[name] ?? <circle cx="12" cy="12" r="9" />}</svg>
 }
@@ -163,6 +168,18 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
 
   const isCreation = current === 'new' || (current?.startsWith('new~') ?? false)
   const showChrome = mode === 'react' && !isCreation
+
+  // ── En-tête repliable (MOBILE uniquement) ──────────────────────────────────
+  // Sur téléphone, le chrome de l'éditeur (titre + ~5 rangées de boutons + 2 rangées d'onglets)
+  // occupait la moitié de l'écran, ne laissant presque rien pour éditer le contenu. Le chevron
+  // replie tout sauf une barre compacte (nom de page + statut + chevron) — l'affordance reste
+  // donc toujours visible. Préférence persistée : replier une fois vaut pour les pages suivantes.
+  // Desktop : `narrow` est faux → `chromeCollapsed` toujours faux, rendu strictement inchangé.
+  const [headerOpen, setHeaderOpen] = useState(() => {
+    try { return localStorage.getItem(HEADER_PREF_KEY) !== '0' } catch { return true }
+  })
+  useEffect(() => { try { localStorage.setItem(HEADER_PREF_KEY, headerOpen ? '1' : '0') } catch { /* quota/privé */ } }, [headerOpen])
+  const chromeCollapsed = narrow && !headerOpen
 
   // Multi-tab: struct (structure) and edit (Properties/SEO/refs) are kept PER PAGE and loaded ONCE.
   // We must NOT refetch them when switching tabs — the user may have unsaved changes on a tab's
@@ -783,7 +800,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         .melis-pgtab:hover{color:var(--color-foreground,#111827)!important}
       `}</style>
       {!isCreation && (
-        <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '8px 16px', borderBottom: showChrome ? 'none' : '1px solid var(--color-border,#e5e7eb)' }}>
+        <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: chromeCollapsed ? '5px 12px' : '8px 16px', borderBottom: showChrome && !chromeCollapsed ? 'none' : '1px solid var(--color-border,#e5e7eb)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: narrow ? 0 : undefined, overflow: narrow ? 'hidden' : undefined }}>
             {showChrome && (<>
               <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--color-foreground,#111827)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: narrow ? 0 : undefined }}>{header?.pageName ?? (structMatches ? `Page ${current}` : '')}</span>
@@ -800,7 +817,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: narrow ? 8 : 12, flexShrink: 0 }}>
             {/* Switch Publié / Dépublié (comme le legacy .page-publishunpublish). ON=En ligne (publie), OFF=Hors ligne (dépublie).
                 Gaté par la capacité `status` (droits avancés) → masquable dans Users→Droits comme les boutons. */}
-            {showChrome && header && (!capsLoaded || can('status')) && (() => {
+            {showChrome && header && !chromeCollapsed && (!capsLoaded || can('status')) && (() => {
               const online = !!header.online
               const disabled = saving || (!online && !editionReady) // pour publier (OFF→ON) il faut l'édition chargée
               return (
@@ -815,7 +832,19 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
                 </button>
               )
             })()}
-            <ViewToggle mode={mode} onChange={setMode} compact={narrow} />
+            {!chromeCollapsed && <ViewToggle mode={mode} onChange={setMode} compact={narrow} />}
+            {/* Chevron « masquer/afficher l'en-tête » — mobile uniquement (ticket : sur mobile la zone
+                d'édition est trop petite, la moitié de l'écran est prise par les boutons). */}
+            {narrow && showChrome && (
+              <button type="button" onClick={() => setHeaderOpen((o) => !o)}
+                aria-expanded={!chromeCollapsed} title={chromeCollapsed ? tr.showHeader : tr.hideHeader} aria-label={chromeCollapsed ? tr.showHeader : tr.hideHeader}
+                // Aligné sur le chevron « encoche » de la barre du haut (hôte) : même couleur
+                // (muted-foreground), même taille (16px) et même retrait droit (12px) — d'où la marge
+                // négative qui compense le padding du conteneur (12px replié / 16px déplié).
+                style={{ appearance: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 28, padding: 0, marginRight: chromeCollapsed ? -4 : -8, border: 0, background: 'transparent', color: 'var(--color-muted-foreground,#6b7280)', cursor: 'pointer', flex: '0 0 auto' }}>
+                <Icon name={chromeCollapsed ? 'chevron-down' : 'chevron-up'} size={16} />
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -832,7 +861,8 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         </div>
       )}
 
-      {showChrome && struct && (
+      {/* Boutons d'action + onglets : repliés par le chevron sur mobile (chromeCollapsed). */}
+      {showChrome && struct && !chromeCollapsed && (
         <div style={{ flex: '0 0 auto', background: 'var(--color-background,#fff)', borderBottom: '1px solid var(--color-border,#e5e7eb)' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px 4px', padding: '0 16px 12px' }}>
             {btnGroups.map((group, gi) => (

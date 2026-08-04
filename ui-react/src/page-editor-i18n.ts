@@ -152,6 +152,8 @@ const DICT: Record<PeLang, Record<string, string>> = {
     statusLabel: 'STATUT',
     onlineTip: 'En ligne — cliquer pour dépublier',
     offlineTip: 'Hors ligne — cliquer pour publier',
+    hideHeader: "Masquer l'en-tête",
+    showHeader: "Afficher l'en-tête",
 
     // ── CmsPage : bandeau verrou ──
     pageLocked: 'Page verrouillée',
@@ -398,6 +400,8 @@ const DICT: Record<PeLang, Record<string, string>> = {
     statusLabel: 'STATUS',
     onlineTip: 'Online — click to unpublish',
     offlineTip: 'Offline — click to publish',
+    hideHeader: 'Hide header',
+    showHeader: 'Show header',
 
     // ── CmsPage: lock banner ──
     pageLocked: 'Page locked',
