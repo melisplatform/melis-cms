@@ -9,6 +9,7 @@ import { ViewToggle } from './ViewToggle'
 import { useKeysetList } from './use-keyset-list'
 import { useIsNarrow } from './shared/useIsNarrow'
 import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
+import { FormErrorBanner, koNotify, okNotify, type FormIssue } from './shared/melis-form-errors'
 
 // Outil Platforms IDs legacy (vue « Old » en iframe). Voir brick.manifest.json.
 const MELIS_KEY = 'meliscms_tool_platform_ids'
@@ -57,6 +58,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     sec_page: 'IDs de pages', sec_tpl: 'IDs de templates',
     f_start: 'Début', f_current: 'Courant', f_end: 'Fin',
     err_save: 'Erreur lors de la sauvegarde',
+    err_check: 'Veuillez corriger les champs suivants :',
     err_int: 'Les valeurs doivent être des entiers ≥ 0.',
     err_order_page: 'Pour les pages : début ≤ courant ≤ fin.',
     err_order_tpl: 'Pour les templates : début ≤ courant ≤ fin.',
@@ -80,6 +82,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     sec_page: 'Page IDs', sec_tpl: 'Template IDs',
     f_start: 'Start', f_current: 'Current', f_end: 'End',
     err_save: 'Error while saving',
+    err_check: 'Please check the following fields:',
     err_int: 'Values must be integers ≥ 0.',
     err_order_page: 'For pages: start ≤ current ≤ end.',
     err_order_tpl: 'For templates: start ≤ current ≤ end.',
@@ -540,6 +543,7 @@ function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [issues, setIssues] = useState<FormIssue[]>([]) // champs fautifs listés dans le bandeau
   const [saved, setSaved] = useState(false)
 
   const subTabId = `${base}/${id}`
@@ -587,13 +591,20 @@ function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
   }
 
   async function submit() {
-    setError(null)
-    if (!isEdit && !newPlatform) { setError(t('err_platform')); return }
+    setError(null); setIssues([])
+    // Validation client → un item par champ/section fautif, listé dans le bandeau (pattern unifié).
+    const iss: FormIssue[] = []
+    if (!isEdit && !newPlatform) iss.push({ label: t('f_platform'), message: t('err_platform') })
     const ps = parseInt0(pageStart), pc = parseInt0(pageCurrent), pe = parseInt0(pageEnd)
     const ts = parseInt0(tplStart), tc = parseInt0(tplCurrent), te = parseInt0(tplEnd)
-    if ([ps, pc, pe, ts, tc, te].some((n) => n === null)) { setError(t('err_int')); return }
-    if (!(ps! <= pc! && pc! <= pe!)) { setError(t('err_order_page')); return }
-    if (!(ts! <= tc! && tc! <= te!)) { setError(t('err_order_tpl')); return }
+    const nums: [string, string, number | null][] = [
+      [t('sec_page'), t('f_start'), ps], [t('sec_page'), t('f_current'), pc], [t('sec_page'), t('f_end'), pe],
+      [t('sec_tpl'), t('f_start'), ts], [t('sec_tpl'), t('f_current'), tc], [t('sec_tpl'), t('f_end'), te],
+    ]
+    for (const [sec, f, v] of nums) if (v === null) iss.push({ label: `${sec} · ${f}`, message: t('err_int') })
+    if (ps !== null && pc !== null && pe !== null && !(ps <= pc && pc <= pe)) iss.push({ label: t('sec_page'), message: t('err_order_page') })
+    if (ts !== null && tc !== null && te !== null && !(ts <= tc && tc <= te)) iss.push({ label: t('sec_tpl'), message: t('err_order_tpl') })
+    if (iss.length) { setError(t('err_check')); setIssues(iss); return }
     setSaving(true)
     try {
       await savePlatformId({
@@ -603,12 +614,14 @@ function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
         tplStart: ts!, tplCurrent: tc!, tplEnd: te!,
       })
       setSaved(true)
-      notify('ok', t('title'), t('saved'))
+      okNotify(t('title'), t('saved'))
       setTimeout(() => navigate(base), 500)
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('err_save'))
+      const msg = e instanceof Error ? e.message : t('err_save')
+      setError(msg); koNotify(t('title'), msg)
     } finally { setSaving(false) }
   }
+  const hasIssue = (lbl: string) => issues.some((i) => i.label === lbl)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
@@ -623,7 +636,7 @@ function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
         </div>
       </div>
 
-      {error && <div style={{ ...card, borderColor: '#fca5a5', background: '#fef2f2', color: '#b91c1c', padding: '8px 14px', fontSize: 14 }}>{error}</div>}
+      <FormErrorBanner title={error ?? undefined} issues={issues} />
 
       {loading ? (
         <div style={{ padding: 48, textAlign: 'center', color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>
@@ -638,7 +651,7 @@ function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
           ) : (
             <div>
               <label style={label}>{t('f_platform')}</label>
-              <select style={inputCss} value={newPlatform} onChange={(e) => setNewPlatform(e.target.value ? Number(e.target.value) : '')}>
+              <select style={{ ...inputCss, ...(hasIssue(t('f_platform')) ? { borderColor: '#dc2626' } : {}) }} value={newPlatform} onChange={(e) => setNewPlatform(e.target.value ? Number(e.target.value) : '')}>
                 <option value="">{t('f_platform_ph')}</option>
                 {avail.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>

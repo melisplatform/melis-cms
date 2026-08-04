@@ -9,6 +9,7 @@ import { ViewToggle } from './ViewToggle'
 import { useKeysetList } from './use-keyset-list'
 import { useIsNarrow } from './shared/useIsNarrow'
 import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
+import { FormErrorBanner, koNotify, okNotify, type FormIssue } from './shared/melis-form-errors'
 
 /* ──────────────────────────────────────────────────────────────────────────
  * Brique « Templates » (MelisCms). LISTE + CRÉATION + ÉDITION sont full React (montées à
@@ -51,6 +52,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     field_name: "Nom", field_type: "Type", field_site: "Site", field_folder: "Dossier site (website_folder)",
     field_layout: "Layout", field_ctrl: "Contrôleur", field_action: "Action", field_php_path: "Chemin PHP",
     save: "Enregistrer", saving: "Enregistrement…", saved: "Enregistré ✓", save_err: "Erreur lors de l'enregistrement.",
+    err_check: 'Veuillez corriger les champs suivants :', err_required: 'Ce champ est requis.',
     no_edit_access: "Vous n'avez pas les droits pour modifier ce template.",
   },
   en: {
@@ -67,6 +69,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     field_name: "Name", field_type: "Type", field_site: "Site", field_folder: "Website folder",
     field_layout: "Layout", field_ctrl: "Controller", field_action: "Action", field_php_path: "PHP path",
     save: "Save", saving: "Saving…", saved: "Saved ✓", save_err: "Error while saving.",
+    err_check: 'Please check the following fields:', err_required: 'This field is required.',
     no_edit_access: "You do not have permission to edit this template.",
   },
 }
@@ -455,6 +458,7 @@ function TemplateForm({ id, base }: { id: string; base: string }) {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [saveErr, setSaveErr] = useState('')
+  const [issues, setIssues] = useState<FormIssue[]>([]) // champs fautifs listés dans le bandeau
 
   // Form fields
   const [name, setName] = useState('')
@@ -496,15 +500,18 @@ function TemplateForm({ id, base }: { id: string; base: string }) {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!isNew && !item) return
-    setSaving(true); setSaveErr(''); setSaved(false)
+    setSaveErr(''); setIssues([]); setSaved(false)
+    // Validation client → un item par champ fautif, listé dans le bandeau (pattern unifié).
+    if (!name.trim()) { setIssues([{ label: t('field_name'), message: t('err_required') }]); setSaveErr(t('err_check')); return }
+    setSaving(true)
     try {
       const savedId = await saveTemplate({ id: isNew ? 0 : item!.id, name, type, siteId, websiteFolder, layout, controller, action, phpPath })
-      notify('ok', t('title'), t('saved'))
+      okNotify(t('title'), t('saved'))
       if (isNew) navigate(`${base}/${savedId}`) // création → bascule sur l'édition du template créé
       else setSaved(true)
     } catch (e) {
       setSaveErr(String(e))
-      notify('ko', t('title'), t('save_err'))
+      koNotify(t('title'), t('save_err'))
     } finally {
       setSaving(false)
     }
@@ -523,23 +530,21 @@ function TemplateForm({ id, base }: { id: string; base: string }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: narrow ? '12px 14px' : '12px 24px', borderBottom: '1px solid var(--color-border)', flexShrink: 0 }}>
         <h1 style={{ fontSize: 16, fontWeight: 600, margin: 0, flex: 1, minWidth: 0, ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{isNew ? t('form_new') : `${t('form_edit')} — ${item!.name}`}</h1>
         {!isNew && !narrow && <span style={{ fontSize: 12, color: 'var(--color-muted-foreground)', flexShrink: 0 }}>ID {item!.id}</span>}
-        {saveErr && !narrow && <span style={{ fontSize: 13, color: 'var(--color-destructive,#ef4444)' }}>{saveErr}</span>}
         <button type="submit" form="template-edit-form" style={{ ...btnPrimary, minWidth: narrow ? undefined : 120, flexShrink: 0 }} disabled={saving}>
           {saving ? t('saving') : saved ? t('saved') : t('save')}
         </button>
       </div>
-      {saveErr && narrow && (
-        <div style={{ padding: '8px 14px', fontSize: 13, color: 'var(--color-destructive,#ef4444)' }}>{saveErr}</div>
-      )}
 
       {/* Form */}
       <form id="template-edit-form" onSubmit={handleSubmit} style={{ flex: 1, padding: narrow ? 14 : 24, display: 'flex', flexDirection: 'column', gap: narrow ? 16 : 24, maxWidth: 720 }}>
+        {/* Bandeau d'erreur unifié (validation client + erreur serveur), en tête de formulaire. */}
+        <FormErrorBanner title={saveErr || undefined} issues={issues} />
         {/* Informations de base */}
         <div style={{ ...card, padding: narrow ? 14 : 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
           <p style={sectionTitle}>{t('field_name')} / {t('field_type')} / {t('field_site')}</p>
           <div>
             <label style={labelCss}>{t('field_name')}</label>
-            <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box' }} value={name} onChange={(e) => setName(e.target.value)} required />
+            <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box', ...(issues.some((i) => i.label === t('field_name')) ? { borderColor: '#dc2626' } : {}) }} value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
           <div style={{ display: 'flex', flexDirection: narrow ? 'column' : 'row', gap: 12 }}>
             <div style={{ flex: 1 }}>

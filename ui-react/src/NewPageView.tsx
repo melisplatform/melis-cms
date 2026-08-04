@@ -4,6 +4,7 @@ import { apiGet, FlagSelect, type Refs } from './PageTabs'
 import { peT } from './page-editor-i18n'
 import { legacyErrorFields, legacyText } from './legacy-errors'
 import { useIsNarrow } from './shared/useIsNarrow'
+import { FormErrorBanner, koNotify, okNotify, type FormIssue } from './shared/melis-form-errors'
 
 /**
  * Écran « Nouvelle page » — création d'une page CMS, en NATIF React avec toggle New/Old.
@@ -40,6 +41,7 @@ export default function NewPageView({ father, visible, onCreated }: { father: st
   const [form, setForm] = useState<Form>({ name: '', type: father ? 'PAGE' : 'SITE', templateId: 0, langId: 0, menu: 'LINK', styleId: 0, taxonomy: '' })
   const [saving, setSaving] = useState(false)
   const [err, setErr] = useState<string | null>(null)
+  const [issues, setIssues] = useState<FormIssue[]>([]) // champs fautifs listés dans le bandeau
   const set = <K extends keyof Form>(k: K, v: Form[K]) => setForm((f) => ({ ...f, [k]: v }))
 
   // Références du SITE du père (templates/styles) + langues. Père absent (page racine) → refs global (idPage=0).
@@ -52,10 +54,13 @@ export default function NewPageView({ father, visible, onCreated }: { father: st
   }, [father])
 
   const create = useCallback(async () => {
-    if (!form.name.trim()) { setErr(tr.errNameRequired); return }
-    if (!form.templateId) { setErr(tr.errTemplateRequired); return }
-    if (!form.langId) { setErr(tr.errLangRequired); return }
-    setSaving(true); setErr(null)
+    // Validation client → un item par champ fautif, listé dans le bandeau (pattern unifié).
+    const cv: FormIssue[] = []
+    if (!form.name.trim()) cv.push({ label: tr.name, message: tr.errNameRequired })
+    if (!form.templateId) cv.push({ label: tr.template, message: tr.errTemplateRequired })
+    if (!form.langId) cv.push({ label: tr.language, message: tr.errLangRequired })
+    if (cv.length) { setErr(tr.fixErrorsBelow); setIssues(cv); return }
+    setSaving(true); setErr(null); setIssues([])
     try {
       const b = new URLSearchParams()
       b.set('page_id', '0')
@@ -74,16 +79,19 @@ export default function NewPageView({ father, visible, onCreated }: { father: st
       })
       const data = await res.json().catch(() => ({})) as { success?: number; textTitle?: string; textMessage?: string; errors?: unknown; datas?: { idPage?: number | string; item_name?: string } }
       if (data.success === 1 && data.datas?.idPage) {
-        notify('ok', (data.textTitle || tr.newPage).trim(), tr.pageCreated)
+        okNotify((data.textTitle || tr.newPage).trim(), tr.pageCreated)
         onCreated(data.datas.idPage, (data.datas.item_name || form.name).trim())
       } else {
         // Détail des erreurs de champ (cf. legacy-errors.ts : le legacy a plusieurs formes d'`errors`).
+        // On aplatit en FormIssue[] (label + message) → même liste dans le bandeau ET le toast.
         const fields = legacyErrorFields(data.errors, tr.errorField)
+        const iss: FormIssue[] = fields.map((f) => ({ label: f.label, message: f.messages.join(', ') }))
         const generic = legacyText(data.textMessage, tr.createFailed)
-        notify('ko', (data.textTitle || tr.newPage).trim(), fields.length ? tr.fixErrorsBelow : generic, fields)
-        setErr(fields.length ? fields.map((f) => `${f.label} : ${f.messages.join(', ')}`).join(' · ') : generic)
+        koNotify((data.textTitle || tr.newPage).trim(), iss.length ? tr.fixErrorsBelow : generic, iss)
+        setErr(iss.length ? tr.fixErrorsBelow : generic)
+        setIssues(iss)
       }
-    } catch (e) { setErr((e as Error).message) } finally { setSaving(false) }
+    } catch (e) { setErr((e as Error).message); setIssues([]) } finally { setSaving(false) }
   }, [form, father, onCreated])
 
   return (
@@ -111,14 +119,17 @@ export default function NewPageView({ father, visible, onCreated }: { father: st
           <div style={{ padding: 20, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.loading}</div>
         ) : (
           <div style={{ padding: 20, maxWidth: 640 }}>
+            {/* Bandeau d'erreur unifié : liste les champs requis manquants (client) ou les erreurs legacy. */}
+            <FormErrorBanner title={err ?? undefined} issues={issues} style={{ marginBottom: 4 }} />
+
             <label style={label}>{tr.name} *</label>
-            <input style={field} value={form.name} onChange={(e) => set('name', e.target.value)} autoFocus placeholder={tr.namePlaceholder} />
+            <input style={{ ...field, ...(issues.some((i) => i.label === tr.name) ? { borderColor: '#dc2626' } : {}) }} value={form.name} onChange={(e) => set('name', e.target.value)} autoFocus placeholder={tr.namePlaceholder} />
 
             <label style={label}>{tr.type} *</label>
             <select style={field} value={form.type} onChange={(e) => set('type', e.target.value)}>{refs.types.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}</select>
 
             <label style={label}>{tr.template} *</label>
-            <select style={field} value={form.templateId} onChange={(e) => set('templateId', Number(e.target.value))}><option value={0}>{tr.choose}</option>{refs.templates.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.id})</option>)}</select>
+            <select style={{ ...field, ...(issues.some((i) => i.label === tr.template) ? { borderColor: '#dc2626' } : {}) }} value={form.templateId} onChange={(e) => set('templateId', Number(e.target.value))}><option value={0}>{tr.choose}</option>{refs.templates.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.id})</option>)}</select>
 
             <label style={label}>{tr.language} *</label>
             <FlagSelect value={form.langId} onChange={(id) => set('langId', id)} options={refs.languages} placeholder={tr.choose} />
@@ -131,8 +142,6 @@ export default function NewPageView({ father, visible, onCreated }: { father: st
 
             <label style={label}>{tr.taxonomy}</label>
             <input style={field} value={form.taxonomy} onChange={(e) => set('taxonomy', e.target.value)} placeholder={tr.taxonomyPlaceholder} />
-
-            {err && <div style={{ marginTop: 14, padding: '8px 12px', borderRadius: 6, fontSize: 13, background: '#fee2e2', color: '#991b1b' }}>{err}</div>}
 
             <div style={{ marginTop: 18 }}>
               <button className="melis-pgbtn" onClick={create} disabled={saving}

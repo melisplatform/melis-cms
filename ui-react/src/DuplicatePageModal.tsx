@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { PagePicker } from './PagePicker'
 import { duplicateTreePage } from './cms-tree-api'
 import { fetchLanguages, type LangItem } from './cms-language-api'
+import { FormErrorBanner, type FormIssue } from './shared/melis-form-errors'
 
 /* ──────────────────────────────────────────────────────────────────────────
  * Modale « Dupliquer l'arborescence » — remplace en natif React l'outil legacy
@@ -38,6 +39,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     save: 'Dupliquer',
     saving: 'Duplication…',
     required: 'Champ obligatoire',
+    check_fields: 'Veuillez corriger les champs suivants :',
     fail: "Échec de la duplication de l'arborescence",
     affected: 'Pages concernées :',
   },
@@ -61,6 +63,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     save: 'Duplicate',
     saving: 'Duplicating…',
     required: 'This field is required',
+    check_fields: 'Please check the following fields:',
     fail: 'Failed to duplicate page tree',
     affected: 'Affected pages:',
   },
@@ -265,6 +268,18 @@ export default function DuplicatePageModal({ sourcePageId, sourceTitle, onClose,
   const destMissing = !useRoot && !destId
   const invalid = srcMissing || langMissing || destMissing
 
+  // Bandeau unifié : après une tentative de soumission, on liste les champs requis manquants ;
+  // en cas d'échec serveur, le message + les pages concernées. (Les repères inline restent.)
+  const missingIssues: FormIssue[] = touched && invalid ? [
+    ...(srcMissing ? [{ label: tr('source'), message: tr('required') }] : []),
+    ...(langMissing ? [{ label: tr('language'), message: tr('required') }] : []),
+    ...(destMissing ? [{ label: tr('destination'), message: tr('required') }] : []),
+  ] : []
+  const bannerTitle = error ?? (missingIssues.length ? tr('check_fields') : undefined)
+  const bannerIssues: FormIssue[] = error
+    ? affected.map((a) => ({ label: tr('affected'), message: a }))
+    : missingIssues
+
   async function submit() {
     setTouched(true)
     if (invalid || submitting) return
@@ -310,16 +325,7 @@ export default function DuplicatePageModal({ sourcePageId, sourceTitle, onClose,
 
         {/* Body */}
         <div style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 15 }}>
-          {error && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '8px 12px', borderRadius: 9, fontSize: 12.5, background: 'color-mix(in srgb, var(--color-destructive,#c0392b) 12%, transparent)', color: 'var(--color-destructive,#c0392b)', border: '1px solid color-mix(in srgb, var(--color-destructive,#c0392b) 40%, transparent)' }}>
-              <span>{error}</span>
-              {affected.length > 0 && (
-                <span style={{ fontSize: 11.5, opacity: 0.85 }}>
-                  <strong style={{ fontWeight: 600 }}>{tr('affected')}</strong> {affected.join(', ')}
-                </span>
-              )}
-            </div>
-          )}
+          <FormErrorBanner title={bannerTitle} issues={bannerIssues} />
 
           <div>
             <FieldLabel label={tr('source')} tip={tr('source_tt')} required />

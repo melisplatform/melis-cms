@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { fetchSiteMeta, createSite, type SiteLang } from './sites-api'
 import { useIsNarrow } from './shared/useIsNarrow'
+import { FormErrorBanner, koNotify } from './shared/melis-form-errors'
 
 /**
  * Assistant de création de site (brique MelisCms) — reprise FIDÈLE du wizard legacy en 5 étapes :
@@ -150,7 +151,8 @@ export default function SiteWizard({ onCancel, onCreated }: Props) {
       window.dispatchEvent(new CustomEvent('melis:cms-page-created', { detail: {} }))
       onCreated(r.siteLabel || label)
     } catch (e) {
-      setError(String((e as Error)?.message ?? e))
+      const msg = String((e as Error)?.message ?? e)
+      setError(msg); koNotify(tr('Nouveau site', 'New site'), msg)
     } finally { setSaving(false) }
   }
 
@@ -338,7 +340,7 @@ export default function SiteWizard({ onCancel, onCreated }: Props) {
               v={perLangDomains ? selectedLangs.map((l) => `${l.locale}: ${domainsByLocale[l.locale] || ''}`).join(' · ') : singleDomain} />
             <Row k={tr('Mode Drag & Drop', 'Drag & Drop mode')} v={dndRenderMode ? tr('Oui', 'Yes') : tr('Non', 'No')} />
             {isCreateNew && <Row k={tr('Créer les fichiers', 'Create files')} v={createFile ? tr('Oui', 'Yes') : tr('Non', 'No')} />}
-            {error && <div style={{ color: '#b91c1c', fontSize: 13, marginTop: 6 }}>{error}</div>}
+            {error && <div style={{ marginTop: 6 }}><FormErrorBanner title={error} /></div>}
           </div>
         )}
       </div>

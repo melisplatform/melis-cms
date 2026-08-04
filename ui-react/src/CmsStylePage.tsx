@@ -9,6 +9,7 @@ import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle } from './ViewToggle'
 import { useIsNarrow } from './shared/useIsNarrow'
 import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
+import { FormErrorBanner, koNotify, okNotify, type FormIssue } from './shared/melis-form-errors'
 
 // Outil Styles (CSS) legacy (vue « Old » en iframe). Voir brick.manifest.json (meliscms_tool_styles).
 const MELIS_KEY = 'meliscms_tool_styles'
@@ -58,6 +59,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_path: 'Chemin', f_path_ph: '/chemin/vers/style.css', f_status: 'Actif',
     f_name_hint: 'Le nom affiché du style.', f_path_hint: 'Le chemin du fichier CSS.',
     f_status_hint: 'Activer ou désactiver ce style.', err_save: 'Erreur lors de la sauvegarde',
+    err_check: 'Veuillez corriger les champs suivants :', err_required: 'Ce champ est requis.',
     export_filename: 'styles',
     no_access: 'Vous n’avez pas les droits pour consulter cette liste.',
   },
@@ -78,6 +80,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_path: 'Path', f_path_ph: '/path/to/style.css', f_status: 'Active',
     f_name_hint: 'The displayed name of the style.', f_path_hint: 'The CSS file path.',
     f_status_hint: 'Enable or disable this style.', err_save: 'Error while saving',
+    err_check: 'Please check the following fields:', err_required: 'This field is required.',
     export_filename: 'styles',
     no_access: 'You do not have permission to view this list.',
   },
@@ -553,6 +556,7 @@ function StyleForm({ id, base }: { id: string; base: string }) {
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [issues, setIssues] = useState<FormIssue[]>([]) // champs fautifs listés dans le bandeau
   const [saved, setSaved] = useState(false)
 
   // Sous-onglet nommé (look Users) : ouvert au montage, renommé avec le nom du style au chargement.
@@ -576,19 +580,25 @@ function StyleForm({ id, base }: { id: string; base: string }) {
   }, [styleId])
 
   async function submit() {
-    setError(null)
-    if (!siteId) { setError(DICT[currentLang()].f_site + ' *'); return }
-    if (!name.trim() || !path.trim()) { setError(t('err_save')); return }
+    setError(null); setIssues([])
+    // Validation client → un item par champ fautif, listé dans le bandeau (pattern unifié).
+    const iss: FormIssue[] = []
+    if (!siteId) iss.push({ label: t('f_site'), message: t('err_required') })
+    if (!name.trim()) iss.push({ label: t('f_name'), message: t('err_required') })
+    if (!path.trim()) iss.push({ label: t('f_path'), message: t('err_required') })
+    if (iss.length) { setError(t('err_check')); setIssues(iss); return }
     setSaving(true)
     try {
       await saveStyle({ id: styleId, siteId: Number(siteId), name: name.trim(), status: status ? 1 : 0, path: path.trim() })
       setSaved(true)
-      notify('ok', t('title'), t('saved'))
+      okNotify(t('title'), t('saved'))
       setTimeout(() => navigate(base), 500)
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('err_save'))
+      const msg = e instanceof Error ? e.message : t('err_save')
+      setError(msg); koNotify(t('title'), msg)
     } finally { setSaving(false) }
   }
+  const hasIssue = (lbl: string) => issues.some((i) => i.label === lbl)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
@@ -603,7 +613,7 @@ function StyleForm({ id, base }: { id: string; base: string }) {
         </div>
       </div>
 
-      {error && <div style={{ ...card, borderColor: '#fca5a5', background: '#fef2f2', color: '#b91c1c', padding: '8px 14px', fontSize: 14 }}>{error}</div>}
+      <FormErrorBanner title={error ?? undefined} issues={issues} />
 
       {loading ? (
         <div style={{ padding: 48, textAlign: 'center', color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>
@@ -611,19 +621,19 @@ function StyleForm({ id, base }: { id: string; base: string }) {
         <div style={{ ...card, padding: 20, maxWidth: 640 }}>
           <div style={{ marginBottom: 16 }}>
             <label style={label}>{t('f_site')}</label>
-            <select style={inputCss} value={siteId} onChange={(e) => setSiteId(e.target.value ? Number(e.target.value) : '')}>
+            <select style={{ ...inputCss, ...(hasIssue(t('f_site')) ? { borderColor: '#dc2626' } : {}) }} value={siteId} onChange={(e) => setSiteId(e.target.value ? Number(e.target.value) : '')}>
               <option value="">{t('f_site_ph')}</option>
               {sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
           <div style={{ marginBottom: 16 }}>
             <label style={label}>{t('f_name')}</label>
-            <input style={inputCss} value={name} onChange={(e) => setName(e.target.value)} placeholder={t('f_name_ph')} maxLength={255} autoComplete="off" />
+            <input style={{ ...inputCss, ...(hasIssue(t('f_name')) ? { borderColor: '#dc2626' } : {}) }} value={name} onChange={(e) => setName(e.target.value)} placeholder={t('f_name_ph')} maxLength={255} autoComplete="off" />
             <p style={hint}>{t('f_name_hint')}</p>
           </div>
           <div style={{ marginBottom: 16 }}>
             <label style={label}>{t('f_path')}</label>
-            <input style={{ ...inputCss, fontFamily: 'monospace' }} value={path} onChange={(e) => setPath(e.target.value)} placeholder={t('f_path_ph')} maxLength={255} autoComplete="off" />
+            <input style={{ ...inputCss, fontFamily: 'monospace', ...(hasIssue(t('f_path')) ? { borderColor: '#dc2626' } : {}) }} value={path} onChange={(e) => setPath(e.target.value)} placeholder={t('f_path_ph')} maxLength={255} autoComplete="off" />
             <p style={hint}>{t('f_path_hint')}</p>
           </div>
           <div>

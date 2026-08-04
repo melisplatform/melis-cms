@@ -8,6 +8,7 @@ import { TranslationsTab } from './site-tabs/TranslationsTab'
 import { useSiteTabs, type SiteTabSaveFn } from './site-tab-registry'
 import { useIsNarrow } from './shared/useIsNarrow'
 import { parseSiteSaveErrors, byKey, type SiteFieldError } from './site-errors'
+import { FormErrorBanner, koNotify, okNotify, type FormIssue } from './shared/melis-form-errors'
 
 const MELIS_KEY = 'meliscms_tool_sites'
 function can(cap: string): boolean {
@@ -94,6 +95,8 @@ export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Pro
   const [saving, setSaving] = useState(false)
   const [savedAt, setSavedAt] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  // Erreurs de validation CLIENT (un item par champ requis manquant) — listées dans le bandeau unifié.
+  const [clientIssues, setClientIssues] = useState<FormIssue[]>([])
   // Erreurs PAR CHAMP renvoyées par le save legacy (domaine déjà pris, champ requis…) : affichées
   // sous le champ concerné + récapitulées dans le bandeau, avec bascule sur l'onglet fautif.
   const [fieldErrors, setFieldErrors] = useState<SiteFieldError[]>([])
@@ -185,26 +188,28 @@ export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Pro
     return base
   }
 
-  function validate(): string | null {
-    if (!label.trim()) return tr('Le libellé est requis.', 'Label is required.')
-    if (!s404.id) return tr('La page 404 est requise.', '404 page is required.')
-    if (!mainPage.id) return tr('La page d’accueil principale est requise.', 'Main home page is required.')
-    if (activeLangIds.length === 0) return tr('Au moins une langue doit être active.', 'At least one language must be active.')
+  // Validation client → un item par champ requis manquant (label + message), listé dans le bandeau.
+  function validate(): FormIssue[] {
+    const iss: FormIssue[] = []
+    if (!label.trim()) iss.push({ label: tr('Libellé du site', 'Site label'), message: tr('Le libellé est requis.', 'Label is required.') })
+    if (!s404.id) iss.push({ label: tr('Page 404', '404 page'), message: tr('La page 404 est requise.', '404 page is required.') })
+    if (!mainPage.id) iss.push({ label: tr('Page d’accueil principale', 'Main home page'), message: tr('La page d’accueil principale est requise.', 'Main home page is required.') })
+    if (activeLangIds.length === 0) iss.push({ label: tr('Langues', 'Languages'), message: tr('Au moins une langue doit être active.', 'At least one language must be active.') })
     for (const id of activeLangIds) {
-      if (!homes[id]?.pageId) return tr(`Page d’accueil manquante pour ${langById[id]?.name ?? id}.`, `Missing home page for ${langById[id]?.name ?? id}.`)
+      if (!homes[id]?.pageId) iss.push({ label: `${tr('Page d’accueil', 'Home page')} (${langById[id]?.name ?? id})`, message: tr('Page d’accueil manquante.', 'Missing home page.') })
     }
     if (data) {
       const cur = domains.find((d) => d.env === data.currentEnv)
-      if (!cur || !cur.domain.trim()) return tr(`Le domaine de l’environnement « ${data.currentEnv} » est requis.`, `Domain for environment "${data.currentEnv}" is required.`)
+      if (!cur || !cur.domain.trim()) iss.push({ label: `${tr('Domaine', 'Domain')} (${data.currentEnv})`, message: tr('Le domaine de l’environnement courant est requis.', 'The current environment domain is required.') })
     }
-    return null
+    return iss
   }
 
   async function submit() {
     const v = validate()
-    if (v) { setError(v); return }
+    if (v.length) { setError(tr('Veuillez corriger les champs suivants :', 'Please check the following fields:')); setClientIssues(v); return }
     if (!data) return
-    setSaving(true); setError(null); setFieldErrors([])
+    setSaving(true); setError(null); setClientIssues([]); setFieldErrors([])
     try {
       const res = await saveSiteEdit({
         id: siteId,
@@ -229,7 +234,7 @@ export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Pro
         }
         onLabel(label.trim() || `Site #${siteId}`)
         setSavedAt(Date.now())
-        window.postMessage({ __melisNotif: true, kind: 'ok', title: tr('Sites', 'Sites'), message: tr('Enregistré ✓', 'Saved ✓') }, '*')
+        okNotify(tr('Sites', 'Sites'), tr('Enregistré ✓', 'Saved ✓'))
         onSaved()
       } else {
         // Détail par champ : sans ça l'utilisateur n'a qu'un « Unable to save the site. » opaque.
@@ -240,7 +245,8 @@ export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Pro
         if (fields.length > 0) setTab(fields[0].tab)
       }
     } catch (e) {
-      setError(String((e as Error)?.message ?? e))
+      const msg = String((e as Error)?.message ?? e)
+      setError(msg); koNotify(tr('Sites', 'Sites'), msg)
     } finally { setSaving(false) }
   }
 
@@ -292,25 +298,14 @@ export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Pro
         ))}
       </div>
 
-      {mode === 'react' && error && (
-        <div style={{ ...card, padding: '12px 16px', color: '#b91c1c', fontSize: 13, borderColor: '#fca5a5' }}>
-          <div>{error}</div>
-          {/* Les erreurs ancrées sont déjà affichées SOUS leur champ → on ne répète ici que celles
-              qui n'ont pas de champ correspondant dans l'UI (sinon elles seraient invisibles). */}
-          {orphanErrors.length > 0 && (
-            <ul style={{ margin: '8px 0 0', paddingLeft: 18 }}>
-              {orphanErrors.map((f) => (
-                <li key={f.key} style={{ marginTop: 2 }}>
-                  <button onClick={() => setTab(f.tab)}
-                    style={{ border: 0, background: 'transparent', padding: 0, color: 'inherit', font: 'inherit', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}>
-                    {fieldLabel(f)}
-                  </button>
-                  {' — '}{f.messages.join(' ')}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+      {/* Bandeau d'erreur unifié : liste les champs fautifs (validation client OU erreurs serveur par
+          champ). Les champs ancrés restent surlignés inline sous leur input ; le bandeau est le
+          récapitulatif scannable au-dessus. submit() bascule déjà sur l'onglet du 1ᵉʳ champ fautif. */}
+      {mode === 'react' && (
+        <FormErrorBanner
+          title={error ?? undefined}
+          issues={clientIssues.length ? clientIssues : fieldErrors.map((f) => ({ label: fieldLabel(f), message: f.messages.join(' ') }))}
+        />
       )}
 
       {/* PROPRIÉTÉS */}

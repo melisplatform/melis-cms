@@ -9,6 +9,7 @@ import { ViewToggle } from './ViewToggle'
 import { Flag } from './PageTabs'
 import { useIsNarrow } from './shared/useIsNarrow'
 import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
+import { FormErrorBanner, koNotify, okNotify, type FormIssue } from './shared/melis-form-errors'
 
 // Outil Langues (CMS) legacy (vue « Old » en iframe). Voir brick.manifest.json (cms-languages).
 const MELIS_KEY = 'meliscms_tool_language'
@@ -54,6 +55,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_locale: 'Locale', f_locale_ph: 'en_EN', f_name: 'Nom', f_name_ph: 'English',
     f_locale_hint: 'Code de la langue au format xx_XX (ex. fr_FR).',
     f_name_hint: 'Le libellé de la langue.', err_save: 'Erreur lors de la sauvegarde',
+    err_check: 'Veuillez corriger les champs suivants :',
     err_name: 'Le nom est requis.', err_locale: 'La locale doit être au format xx_XX (ex. fr_FR).',
     no_access: 'Vous n’avez pas les droits pour consulter cette liste.',
   },
@@ -71,6 +73,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_locale: 'Locale', f_locale_ph: 'en_EN', f_name: 'Name', f_name_ph: 'English',
     f_locale_hint: 'Language code in xx_XX format (e.g. en_EN).',
     f_name_hint: 'The language label.', err_save: 'Error while saving',
+    err_check: 'Please check the following fields:',
     err_name: 'Name is required.', err_locale: 'Locale must be in xx_XX format (e.g. en_EN).',
     no_access: 'You do not have permission to view this list.',
   },
@@ -462,6 +465,7 @@ function CmsLanguageForm({ id, base }: { id: string; base: string }) {
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [issues, setIssues] = useState<FormIssue[]>([]) // champs fautifs listés dans le bandeau
   const [saved, setSaved] = useState(false)
 
   // Sous-onglet nommé (look Users) : ouvert au montage, renommé avec le nom de la langue au chargement.
@@ -484,19 +488,25 @@ function CmsLanguageForm({ id, base }: { id: string; base: string }) {
   }, [langId])
 
   async function submit() {
-    setError(null)
-    if (!name.trim()) { setError(t('err_name')); return }
-    if (!/^[a-z]{2}_[A-Z]{2}$/.test(locale.trim())) { setError(t('err_locale')); return }
+    setError(null); setIssues([])
+    // Validation client → un item par champ fautif, listé dans le bandeau (pattern unifié).
+    const iss: FormIssue[] = []
+    if (!name.trim()) iss.push({ label: t('f_name'), message: t('err_name') })
+    if (!/^[a-z]{2}_[A-Z]{2}$/.test(locale.trim())) iss.push({ label: t('f_locale'), message: t('err_locale') })
+    if (iss.length) { setError(t('err_check')); setIssues(iss); return }
     setSaving(true)
     try {
       await saveLanguage({ id: langId, locale: locale.trim(), name: name.trim() })
       setSaved(true)
-      notify('ok', t('title'), t('saved'))
+      okNotify(t('title'), t('saved'))
       setTimeout(() => navigate(base), 500)
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('err_save'))
+      const msg = e instanceof Error ? e.message : t('err_save')
+      setError(msg); koNotify(t('title'), msg)
     } finally { setSaving(false) }
   }
+  // Surbrillance inline : un champ est en erreur s'il figure dans la liste d'items.
+  const hasIssue = (lbl: string) => issues.some((i) => i.label === lbl)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
@@ -511,7 +521,7 @@ function CmsLanguageForm({ id, base }: { id: string; base: string }) {
         </div>
       </div>
 
-      {error && <div style={{ ...card, borderColor: '#fca5a5', background: '#fef2f2', color: '#b91c1c', padding: '8px 14px', fontSize: 14 }}>{error}</div>}
+      <FormErrorBanner title={error ?? undefined} issues={issues} />
 
       {loading ? (
         <div style={{ padding: 48, textAlign: 'center', color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>
@@ -519,12 +529,12 @@ function CmsLanguageForm({ id, base }: { id: string; base: string }) {
         <div style={{ ...card, padding: 20, maxWidth: 640 }}>
           <div style={{ marginBottom: 16 }}>
             <label style={label}>{t('f_locale')}</label>
-            <input style={{ ...inputCss, fontFamily: 'monospace' }} value={locale} onChange={(e) => setLocale(e.target.value)} placeholder={t('f_locale_ph')} maxLength={5} autoComplete="off" />
+            <input style={{ ...inputCss, fontFamily: 'monospace', ...(hasIssue(t('f_locale')) ? { borderColor: '#dc2626' } : {}) }} value={locale} onChange={(e) => setLocale(e.target.value)} placeholder={t('f_locale_ph')} maxLength={5} autoComplete="off" />
             <p style={hint}>{t('f_locale_hint')}</p>
           </div>
           <div>
             <label style={label}>{t('f_name')}</label>
-            <input style={inputCss} value={name} onChange={(e) => setName(e.target.value)} placeholder={t('f_name_ph')} maxLength={255} autoComplete="off" />
+            <input style={{ ...inputCss, ...(hasIssue(t('f_name')) ? { borderColor: '#dc2626' } : {}) }} value={name} onChange={(e) => setName(e.target.value)} placeholder={t('f_name_ph')} maxLength={255} autoComplete="off" />
             <p style={hint}>{t('f_name_hint')}</p>
           </div>
         </div>

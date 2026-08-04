@@ -8,6 +8,7 @@ import {
 import { ViewToggle } from './ViewToggle'
 import { Flag, FlagSelect } from './PageTabs'
 import { useIsNarrow } from './shared/useIsNarrow'
+import { FormErrorBanner, koNotify, okNotify, type FormIssue } from './shared/melis-form-errors'
 
 /* ──────────────────────────────────────────────────────────────────────────
  * Menu Manager (MelisCms) — brique full React, montée à /melis-cms/menu-manager.
@@ -74,6 +75,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     err_site: 'Le site est obligatoire.',
     f_category_name: 'Category name', f_category_name_hint: 'Un nom par langue (au moins une langue requise).',
     err_save: 'Erreur lors de la sauvegarde', err_move: 'Erreur lors du déplacement — arbre rechargé.',
+    err_check: 'Veuillez corriger les champs suivants :',
     err_name: 'Au moins un nom de catégorie est requis.',
     no_access: 'Vous n’avez pas les droits pour consulter cet outil.',
   },
@@ -96,6 +98,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     err_site: 'Site is required.',
     f_category_name: 'Category name', f_category_name_hint: 'One name per language (at least one required).',
     err_save: 'Error while saving', err_move: 'Error while moving — tree reloaded.',
+    err_check: 'Please check the following fields:',
     err_name: 'At least one category name is required.',
     no_access: 'You do not have permission to view this tool.',
   },
@@ -621,6 +624,7 @@ function CategoryForm({ id, base }: { id: string; base: string }) {
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [issues, setIssues] = useState<FormIssue[]>([]) // champs fautifs listés dans le bandeau
   const [saved, setSaved] = useState(false)
 
   // Sous-onglet hôte : ouvre un onglet dédié à cette édition (édition multiple en parallèle).
@@ -651,12 +655,15 @@ function CategoryForm({ id, base }: { id: string; base: string }) {
   }, [id])
 
   async function submit() {
-    setError(null)
+    setError(null); setIssues([])
     const noSite = !isEdit && !siteId
     setSiteError(noSite)
     const hasName = Object.values(translations).some((v) => (v ?? '').trim() !== '')
-    if (noSite) return
-    if (!hasName) { setError(t('err_name')); return }
+    // Validation client → un item par champ fautif, listé dans le bandeau (repère inline du site conservé).
+    const iss: FormIssue[] = []
+    if (noSite) iss.push({ label: t('f_site'), message: t('err_site') })
+    if (!hasName) iss.push({ label: t('f_category_name'), message: t('err_name') })
+    if (iss.length) { setError(t('err_check')); setIssues(iss); return }
     setSaving(true)
     try {
       const activeLang = languages.find((l) => l.id === activeLangId)
@@ -668,9 +675,11 @@ function CategoryForm({ id, base }: { id: string; base: string }) {
         translations,
       })
       setSaved(true)
+      okNotify(t('title'), t('saved'))
       setTimeout(() => navigate(base), 500)
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('err_save'))
+      const msg = e instanceof Error ? e.message : t('err_save')
+      setError(msg); koNotify(t('title'), msg)
     } finally { setSaving(false) }
   }
 
@@ -686,7 +695,8 @@ function CategoryForm({ id, base }: { id: string; base: string }) {
         </div>
       </div>
 
-      {error && <div style={{ ...card, borderColor: '#fca5a5', background: '#fef2f2', color: '#b91c1c', padding: '8px 14px', fontSize: 14 }}>{error}</div>}
+      {/* Bandeau d'erreur unifié : liste les champs fautifs (client) ou l'erreur serveur. */}
+      <FormErrorBanner title={error ?? undefined} issues={issues} />
 
       {loading ? (
         <div style={{ padding: 48, textAlign: 'center', color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>

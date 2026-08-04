@@ -3,6 +3,7 @@ import { fetchTranslations, saveTranslation, deleteTranslation, type TransKey } 
 import { Flag } from '../PageTabs'
 import { useIsNarrow } from '../shared/useIsNarrow'
 import { ExpandToggle, HiddenColsRow } from '../shared/ExpandableRow'
+import { FormErrorBanner, koNotify, okNotify, type FormIssue } from '../shared/melis-form-errors'
 
 /**
  * Onglet "Traductions de site" : CRUD autonome (endpoints legacy dédiés saveTranslation /
@@ -38,6 +39,7 @@ export function TranslationsTab({ siteId, langs }: { siteId: number; langs: Lang
   const [toDelete, setToDelete] = useState<TransKey | null>(null)
   const [saving, setSaving] = useState(false)
   const [err, setErr] = useState<string | null>(null)
+  const [issues, setIssues] = useState<FormIssue[]>([]) // champs fautifs listés dans le bandeau
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set())
   function toggleExpand(key: string) {
     setExpandedKeys((prev) => { const next = new Set(prev); if (next.has(key)) next.delete(key); else next.add(key); return next })
@@ -62,7 +64,7 @@ export function TranslationsTab({ siteId, langs }: { siteId: number; langs: Lang
   function openNew() {
     const texts: Draft['texts'] = {}
     for (const l of langs) texts[l.id] = { mstId: 0, msttId: 0, text: '' }
-    setDraft({ key: '', isNew: true, texts }); setErr(null)
+    setDraft({ key: '', isNew: true, texts }); setErr(null); setIssues([])
   }
   function openEdit(r: TransKey) {
     const texts: Draft['texts'] = {}
@@ -70,20 +72,26 @@ export function TranslationsTab({ siteId, langs }: { siteId: number; langs: Lang
       const t = r.texts[l.id]
       texts[l.id] = { mstId: t?.mstId ?? r.mstId, msttId: t?.msttId ?? 0, text: t?.text ?? '' }
     }
-    setDraft({ key: r.key, isNew: false, texts }); setErr(null)
+    setDraft({ key: r.key, isNew: false, texts }); setErr(null); setIssues([])
   }
 
   async function save() {
     if (!draft) return
-    if (!draft.key.trim()) { setErr(tr('La clé est requise.', 'Key is required.')); return }
-    setSaving(true); setErr(null)
+    setErr(null); setIssues([])
+    // Validation client → un item par champ fautif, listé dans le bandeau (pattern unifié).
+    if (!draft.key.trim()) {
+      setErr(tr('Veuillez corriger les champs suivants :', 'Please check the following fields:'))
+      setIssues([{ label: tr('Clé', 'Key'), message: tr('La clé est requise.', 'Key is required.') }])
+      return
+    }
+    setSaving(true)
     try {
       const res = await saveTranslation(siteId, draft.key.trim(), langs.map((l) => ({
         langId: l.id, mstId: draft.texts[l.id]?.mstId ?? 0, msttId: draft.texts[l.id]?.msttId ?? 0, text: draft.texts[l.id]?.text ?? '',
       })))
-      if (res.success === true || (res.success as unknown) === 1) { setDraft(null); load() }
-      else setErr(tr('Échec de l’enregistrement.', 'Save failed.'))
-    } catch (e) { setErr(String((e as Error)?.message ?? e)) } finally { setSaving(false) }
+      if (res.success === true || (res.success as unknown) === 1) { okNotify(tr('Traductions', 'Translations'), tr('Enregistré ✓', 'Saved ✓')); setDraft(null); load() }
+      else { const m = tr('Échec de l’enregistrement.', 'Save failed.'); setErr(m); koNotify(tr('Traductions', 'Translations'), m) }
+    } catch (e) { const m = String((e as Error)?.message ?? e); setErr(m); koNotify(tr('Traductions', 'Translations'), m) } finally { setSaving(false) }
   }
 
   async function confirmDelete() {
@@ -143,8 +151,9 @@ export function TranslationsTab({ siteId, langs }: { siteId: number; langs: Lang
         <div style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,.5)' }}>
           <div style={{ ...card, width: '100%', maxWidth: 560, padding: 24, maxHeight: '90vh', overflow: 'auto' }}>
             <h3 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 600 }}>{draft.isNew ? tr('Nouvelle traduction', 'New translation') : tr('Éditer la traduction', 'Edit translation')}</h3>
+            <div style={{ marginBottom: 12 }}><FormErrorBanner title={err ?? undefined} issues={issues} /></div>
             <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{tr('Clé', 'Key')} *</label>
-            <input style={{ ...input, fontFamily: 'monospace', marginBottom: 14 }} value={draft.key} disabled={!draft.isNew}
+            <input style={{ ...input, fontFamily: 'monospace', marginBottom: 14, ...(issues.some((i) => i.label === tr('Clé', 'Key')) ? { borderColor: '#dc2626' } : {}) }} value={draft.key} disabled={!draft.isNew}
               onChange={(e) => setDraft({ ...draft, key: e.target.value })} placeholder="my_translation_key" />
             {langs.map((l) => (
               <div key={l.id} style={{ marginBottom: 12 }}>
@@ -153,7 +162,6 @@ export function TranslationsTab({ siteId, langs }: { siteId: number; langs: Lang
                   onChange={(e) => setDraft({ ...draft, texts: { ...draft.texts, [l.id]: { ...draft.texts[l.id], text: e.target.value } } })} />
               </div>
             ))}
-            {err && <div style={{ color: '#b91c1c', fontSize: 13, marginBottom: 10 }}>{err}</div>}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
               <button style={btn} onClick={() => setDraft(null)}>{tr('Annuler', 'Cancel')}</button>
               <button style={{ ...btnPrimary, opacity: saving ? 0.6 : 1 }} disabled={saving} onClick={save}>{saving ? tr('Enregistrement…', 'Saving…') : tr('Enregistrer', 'Save')}</button>

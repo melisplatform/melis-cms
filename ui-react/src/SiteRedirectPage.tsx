@@ -9,6 +9,7 @@ import { ViewToggle } from './ViewToggle'
 import { useKeysetList } from './use-keyset-list'
 import { useIsNarrow } from './shared/useIsNarrow'
 import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
+import { FormErrorBanner, koNotify, okNotify, type FormIssue } from './shared/melis-form-errors'
 
 // Outil Redirections 301 legacy (vue « Old » en iframe). Voir brick.manifest.json (cms-site-301).
 const MELIS_KEY = 'meliscms_tool_site_301'
@@ -47,6 +48,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_site: 'Site', f_site_ph: '— Choisir un site —', f_old: 'Ancienne URL', f_old_ph: '/ancienne-url',
     f_new: 'Nouvelle URL', f_new_ph: '/nouvelle-url', f_old_hint: 'L’URL à rediriger (unique pour ce site).',
     f_new_hint: 'La destination de la redirection.', err_save: 'Erreur lors de la sauvegarde',
+    err_check: 'Veuillez corriger les champs suivants :', err_required: 'Ce champ est requis.',
     no_access: 'Vous n’avez pas les droits pour consulter cette liste.',
   },
   en: {
@@ -63,6 +65,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_site: 'Site', f_site_ph: '— Choose a site —', f_old: 'Old URL', f_old_ph: '/old-url',
     f_new: 'New URL', f_new_ph: '/new-url', f_old_hint: 'The URL to redirect (unique for this site).',
     f_new_hint: 'The redirect destination.', err_save: 'Error while saving',
+    err_check: 'Please check the following fields:', err_required: 'This field is required.',
     no_access: 'You do not have permission to view this list.',
   },
 }
@@ -520,6 +523,7 @@ function RedirectForm({ id, base }: { id: string; base: string }) {
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [issues, setIssues] = useState<FormIssue[]>([]) // champs fautifs listés dans le bandeau
   const [saved, setSaved] = useState(false)
 
   // Sous-onglet nommé (look Users) : ouvert au montage, renommé avec l'ancienne URL au chargement.
@@ -543,19 +547,25 @@ function RedirectForm({ id, base }: { id: string; base: string }) {
   }, [redirectId])
 
   async function submit() {
-    setError(null)
-    if (!siteId) { setError(DICT[currentLang()].f_site + ' *'); return }
-    if (!oldUrl.trim() || !newUrl.trim()) { setError(t('err_save')); return }
+    setError(null); setIssues([])
+    // Validation client → un item par champ fautif, listé dans le bandeau (pattern unifié).
+    const iss: FormIssue[] = []
+    if (!siteId) iss.push({ label: t('f_site'), message: t('err_required') })
+    if (!oldUrl.trim()) iss.push({ label: t('f_old'), message: t('err_required') })
+    if (!newUrl.trim()) iss.push({ label: t('f_new'), message: t('err_required') })
+    if (iss.length) { setError(t('err_check')); setIssues(iss); return }
     setSaving(true)
     try {
       await saveRedirect({ id: redirectId, siteId: Number(siteId), oldUrl: oldUrl.trim(), newUrl: newUrl.trim() })
       setSaved(true)
-      notify('ok', t('title'), t('saved'))
+      okNotify(t('title'), t('saved'))
       setTimeout(() => navigate(base), 500)
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('err_save'))
+      const msg = e instanceof Error ? e.message : t('err_save')
+      setError(msg); koNotify(t('title'), msg)
     } finally { setSaving(false) }
   }
+  const hasIssue = (lbl: string) => issues.some((i) => i.label === lbl)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
@@ -570,7 +580,7 @@ function RedirectForm({ id, base }: { id: string; base: string }) {
         </div>
       </div>
 
-      {error && <div style={{ ...card, borderColor: '#fca5a5', background: '#fef2f2', color: '#b91c1c', padding: '8px 14px', fontSize: 14 }}>{error}</div>}
+      <FormErrorBanner title={error ?? undefined} issues={issues} />
 
       {loading ? (
         <div style={{ padding: 48, textAlign: 'center', color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>
@@ -578,19 +588,19 @@ function RedirectForm({ id, base }: { id: string; base: string }) {
         <div style={{ ...card, padding: 20, maxWidth: 640 }}>
           <div style={{ marginBottom: 16 }}>
             <label style={label}>{t('f_site')}</label>
-            <select style={inputCss} value={siteId} onChange={(e) => setSiteId(e.target.value ? Number(e.target.value) : '')} disabled={isEdit}>
+            <select style={{ ...inputCss, ...(hasIssue(t('f_site')) ? { borderColor: '#dc2626' } : {}) }} value={siteId} onChange={(e) => setSiteId(e.target.value ? Number(e.target.value) : '')} disabled={isEdit}>
               <option value="">{t('f_site_ph')}</option>
               {sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
           <div style={{ marginBottom: 16 }}>
             <label style={label}>{t('f_old')}</label>
-            <input style={{ ...inputCss, fontFamily: 'monospace' }} value={oldUrl} onChange={(e) => setOldUrl(e.target.value)} placeholder={t('f_old_ph')} maxLength={255} autoComplete="off" />
+            <input style={{ ...inputCss, fontFamily: 'monospace', ...(hasIssue(t('f_old')) ? { borderColor: '#dc2626' } : {}) }} value={oldUrl} onChange={(e) => setOldUrl(e.target.value)} placeholder={t('f_old_ph')} maxLength={255} autoComplete="off" />
             <p style={hint}>{t('f_old_hint')}</p>
           </div>
           <div>
             <label style={label}>{t('f_new')}</label>
-            <input style={{ ...inputCss, fontFamily: 'monospace' }} value={newUrl} onChange={(e) => setNewUrl(e.target.value)} placeholder={t('f_new_ph')} maxLength={255} autoComplete="off" />
+            <input style={{ ...inputCss, fontFamily: 'monospace', ...(hasIssue(t('f_new')) ? { borderColor: '#dc2626' } : {}) }} value={newUrl} onChange={(e) => setNewUrl(e.target.value)} placeholder={t('f_new_ph')} maxLength={255} autoComplete="off" />
             <p style={hint}>{t('f_new_hint')}</p>
           </div>
         </div>

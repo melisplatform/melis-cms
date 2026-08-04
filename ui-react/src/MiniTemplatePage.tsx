@@ -10,6 +10,7 @@ import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle, type ViewMode } from './ViewToggle'
 import { useIsNarrow } from './shared/useIsNarrow'
 import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
+import { FormErrorBanner, koNotify, okNotify, type FormIssue } from './shared/melis-form-errors'
 
 /* ──────────────────────────────────────────────────────────────────────────
  * Mini-Template Manager (MelisCms) — brique full React
@@ -69,6 +70,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_thumbnail: 'Miniature (png, jpg, gif)', f_thumbnail_hint: 'Optionnel. Formats acceptés : PNG, JPG, JPEG, GIF.',
     f_thumbnail_change: 'Changer la miniature',
     err_site: 'Le site est obligatoire.', err_name: 'Le nom est obligatoire.', err_save: 'Erreur lors de la sauvegarde.',
+    err_check: 'Veuillez corriger les champs suivants :',
     export_filename: 'mini-templates',
     no_access: "Vous n’avez pas les droits pour consulter cette liste.",
   },
@@ -95,6 +97,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_thumbnail: 'Thumbnail (png, jpg, gif)', f_thumbnail_hint: 'Optional. Accepted formats: PNG, JPG, JPEG, GIF.',
     f_thumbnail_change: 'Change thumbnail',
     err_site: 'Site is required.', err_name: 'Name is required.', err_save: 'Error while saving.',
+    err_check: 'Please check the following fields:',
     export_filename: 'mini-templates',
     no_access: 'You do not have permission to view this list.',
   },
@@ -720,6 +723,7 @@ function MiniTemplateForm({ id, base, aiOpen = false }: { id: string; base: stri
   const [loading, setLoading]   = useState(false)
   const [saving, setSaving]     = useState(false)
   const [error, setError]       = useState<string | null>(null)
+  const [issues, setIssues]     = useState<FormIssue[]>([]) // champs fautifs listés dans le bandeau
   const [saved, setSaved]       = useState(false)
   const [nameError, setNameError] = useState(false)
   const [siteError, setSiteError] = useState(false)
@@ -797,12 +801,17 @@ function MiniTemplateForm({ id, base, aiOpen = false }: { id: string; base: stri
   }
 
   async function submit() {
-    setError(null)
+    setError(null); setIssues([])
     const noSite = !site
     const noName = !name.trim()
     setSiteError(noSite)
     setNameRequired(noName)
-    if (noSite || noName || nameError) return
+    // Validation client → un item par champ fautif, listé dans le bandeau (les repères inline restent).
+    const iss: FormIssue[] = []
+    if (noSite) iss.push({ label: t('f_site'), message: t('err_site') })
+    if (noName) iss.push({ label: t('f_name'), message: t('err_name') })
+    else if (nameError) iss.push({ label: t('f_name'), message: t('f_name_invalid') })
+    if (iss.length) { setError(t('err_check')); setIssues(iss); return }
     setSaving(true)
     try {
       await saveMiniTemplate({
@@ -819,9 +828,11 @@ function MiniTemplateForm({ id, base, aiOpen = false }: { id: string; base: stri
       // Fermer le sous-onglet de création : après save on revient à la liste,
       // l'onglet « Nouveau » vide ne doit pas subsister (cf. commerce ContactPage).
       if (!isEdit) (window as unknown as SubTabW).__melisCloseSubTab?.(base, subTabId)
+      okNotify(t('title'), t('saved'))
       setTimeout(() => navigate(base), 600)
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('err_save'))
+      const msg = e instanceof Error ? e.message : t('err_save')
+      setError(msg); koNotify(t('title'), msg)
     } finally { setSaving(false) }
   }
 
@@ -839,9 +850,8 @@ function MiniTemplateForm({ id, base, aiOpen = false }: { id: string; base: stri
         </div>
       </div>
 
-      {error && (
-        <div style={{ ...card, borderColor: '#fca5a5', background: '#fef2f2', color: '#b91c1c', padding: '8px 14px', fontSize: 14 }}>{error}</div>
-      )}
+      {/* Bandeau d'erreur unifié : liste les champs fautifs (client) ou l'erreur serveur. */}
+      <FormErrorBanner title={error ?? undefined} issues={issues} />
 
       {categoryParam && (
         <div style={{ ...card, borderColor: '#bfdbfe', background: '#eff6ff', color: '#1d4ed8', padding: '8px 14px', fontSize: 14 }}>
