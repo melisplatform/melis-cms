@@ -189,6 +189,11 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   // CURRENT page's own state → never publishes page A with page B's data.
   const [structByPage, setStructByPage] = useState<Record<string, Structure>>({})
   const [editByPage, setEditByPage] = useState<Record<string, Edit>>({})
+  // Incrémenté par reloadEdition : les effets de chargement (structure + Propriétés/SEO) l'écoutent
+  // pour REFETCH après invalidation. Sans ça, vider structByPage/editByPage ne suffit pas (les effets
+  // ne dépendent que de `current`) → l'onglet Propriétés/SEO restait bloqué sur « Chargement… »
+  // après un changement de template (ticket 0010873, retour).
+  const [reloadNonce, setReloadNonce] = useState(0)
   const struct = current ? (structByPage[current] ?? null) : null
   const edit = current ? (editByPage[current] ?? null) : null
   const [lock, setLock] = useState<{ locked: boolean; byUser: string | null; byMe: boolean; since: string | null } | null>(null)
@@ -291,7 +296,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     if (!current || isCreation) return
     if (!structByPage[current]) refreshStructure(current)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [current, isCreation, refreshStructure])
+  }, [current, isCreation, refreshStructure, reloadNonce])
 
   // Propriétés + SEO + refs — chargés UNE SEULE FOIS par page, JAMAIS refetch au switch : l'onglet
   // conserve les saisies non sauvegardées de l'utilisateur (ticket 0010738). Rechargé seulement si
@@ -313,7 +318,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     }).catch(() => {})
     return () => { x = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [current, isCreation])
+  }, [current, isCreation, reloadNonce])
 
   // état de VERROU de la page (modulaire, small-business) → bouton Débloquer + bandeau conditionnels
   useEffect(() => {
@@ -501,6 +506,9 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     setEditByPage((m) => { if (!m[current]) return m; const n = { ...m }; delete n[current]; return n })
     setStructByPage((m) => { if (!m[current]) return m; const n = { ...m }; delete n[current]; return n })
     delete renderedTplRef.current[current] // baseline recapturée au refetch des propriétés
+    // Force le REFETCH des effets « chargés une fois » (structure + Propriétés/SEO) : ils écoutent
+    // reloadNonce. Sans ça, l'onglet Propriétés/SEO restait bloqué sur « Chargement… » (ticket 0010873).
+    setReloadNonce((n) => n + 1)
     const f = frameRef.current[current]
     try { if (f) f.src = toolSrc(current) } catch { /* */ }
   }, [current])
