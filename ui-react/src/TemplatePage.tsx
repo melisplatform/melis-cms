@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type FormEvent, type RefObject } from 'react'
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type FormEvent, type ReactNode, type RefObject } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   deleteTemplate, fetchTemplate, fetchTemplates, fetchTemplateSites, fetchTemplateStats, saveTemplate,
@@ -10,6 +10,7 @@ import { useKeysetList } from './use-keyset-list'
 import { useIsNarrow } from './shared/useIsNarrow'
 import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
 import { FormErrorBanner, koNotify, okNotify, type FormIssue } from './shared/melis-form-errors'
+import { useDragReorder } from './shared/use-drag-reorder'
 
 /* ──────────────────────────────────────────────────────────────────────────
  * Brique « Templates » (MelisCms). LISTE + CRÉATION + ÉDITION sont full React (montées à
@@ -46,6 +47,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     col_id: "ID", col_name: "Nom", col_type: "Type", col_ctrl: "Contrôleur / Action", col_layout: "Layout", col_site: "Site", col_date: "Création",
     columns: "Colonnes", export: "Exporter", cols_visible: "Visibles", cols_hidden: "Masquées", drag_here: "Glisser ici", reset: "Réinitialiser", reset_filters: "Réinitialiser les filtres",
     edit: "Modifier", del: "Supprimer", cancel: "Annuler", back: "retour", refresh: "Rafraîchir", loading: "Chargement…",
+    view_new: "Nouveau", view_old: "Ancien",
     del_title: "Supprimer le template", del_confirm: "Supprimer « {n} » ? Cette action est irréversible.",
     no_access: "Vous n'avez pas les droits pour consulter cette liste.",
     form_edit: "Modifier le template", form_new: "Nouveau template",
@@ -63,6 +65,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     col_id: "ID", col_name: "Name", col_type: "Type", col_ctrl: "Controller / Action", col_layout: "Layout", col_site: "Site", col_date: "Created",
     columns: "Columns", export: "Export", cols_visible: "Visible", cols_hidden: "Hidden", drag_here: "Drag here", reset: "Reset", reset_filters: "Reset filters",
     edit: "Edit", del: "Delete", cancel: "Cancel", back: "back", refresh: "Refresh", loading: "Loading…",
+    view_new: "New", view_old: "Old",
     del_title: "Delete template", del_confirm: "Delete \"{n}\"? This action is irreversible.",
     no_access: "You do not have permission to view this list.",
     form_edit: "Edit template", form_new: "New template",
@@ -142,8 +145,11 @@ function ColManager({ cols, labelFor, onChange, onClose, anchorRef }: {
   anchorRef: RefObject<HTMLButtonElement | null>
 }) {
   const t = useT()
-  const [dragId, setDragId] = useState<string | null>(null)
-  const [over, setOver] = useState<{ id: string; panel: 'visible' | 'hidden' } | null>(null)
+  // Touch-compatible drag (mouse + touch events, not native HTML5 draggable — that API never
+  // fires from touch input) — see shared/use-drag-reorder.ts.
+  const { draggingId: dragId, overTarget: over, dragPos, startDragMouse, startDragTouch } = useDragReorder({
+    cols, onChange: (next) => { onChange(next); saveCols(next) },
+  })
   const shown = cols.filter((c) => c.visible)
   const hidden = cols.filter((c) => !c.visible)
 
@@ -161,28 +167,11 @@ function ColManager({ cols, labelFor, onChange, onClose, anchorRef }: {
     setPos({ top, left, width })
   }, [anchorRef])
 
-  function drop(panel: 'visible' | 'hidden') {
-    if (!dragId) return
-    const src = cols.find((c) => c.id === dragId)!
-    const upd = { ...src, visible: panel === 'visible' }
-    let vList = shown.filter((c) => c.id !== dragId)
-    const hList = hidden.filter((c) => c.id !== dragId)
-    if (panel === 'visible') {
-      const dst = over?.id
-      if (!dst || dst === '__panel__') vList = [...vList, upd]
-      else { const i = vList.findIndex((c) => c.id === dst); vList = i === -1 ? [...vList, upd] : [...vList.slice(0, i), upd, ...vList.slice(i)] }
-      const next = [...vList, ...hList]; onChange(next); saveCols(next)
-    } else { const next = [...vList, ...hList, upd]; onChange(next); saveCols(next) }
-    setDragId(null); setOver(null)
-  }
   function item(col: ColDef, panel: 'visible' | 'hidden') {
     const isOver = over?.id === col.id && over?.panel === panel
     return (
-      <div key={col.id} draggable
-        onDragStart={() => setDragId(col.id)} onDragEnd={() => { setDragId(null); setOver(null) }}
-        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); if (over?.id !== col.id || over?.panel !== panel) setOver({ id: col.id, panel }) }}
-        onDrop={(e) => { e.preventDefault(); drop(panel) }}
-        style={{ display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 8px', fontSize: 14, cursor: 'grab', userSelect: 'none', opacity: dragId === col.id ? 0.4 : 1, background: isOver ? 'color-mix(in srgb, var(--color-primary) 12%, transparent)' : 'transparent', boxShadow: isOver ? '0 0 0 1px color-mix(in srgb, var(--color-primary) 35%, transparent)' : 'none' }}>
+      <div key={col.id} data-col-item={col.id} onMouseDown={startDragMouse(col.id)} onTouchStart={startDragTouch(col.id)}
+        style={{ display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 8px', fontSize: 14, cursor: 'grab', userSelect: 'none', touchAction: 'none', opacity: dragId === col.id ? 0.4 : 1, background: isOver ? 'color-mix(in srgb, var(--color-primary) 12%, transparent)' : 'transparent', boxShadow: isOver ? '0 0 0 1px color-mix(in srgb, var(--color-primary) 35%, transparent)' : 'none' }}>
         <GripIcon /><span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{labelFor(col.id)}</span>
       </div>
     )
@@ -190,17 +179,18 @@ function ColManager({ cols, labelFor, onChange, onClose, anchorRef }: {
   const ph = (txt: string) => <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--color-muted-foreground)', opacity: 0.5, padding: '16px 0' }}>{txt}</div>
   if (!pos) return null
   return (
+    <>
     <div style={{ ...card, position: 'fixed', top: pos.top, left: pos.left, zIndex: 50, width: pos.width }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderBottom: '1px solid var(--color-border)' }}>
         <span style={{ fontSize: 14, fontWeight: 600 }}>{t('columns')}</span>
         <button style={{ ...iconBtn, width: 22, height: 22 }} onClick={onClose}>✕</button>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, padding: 12 }}>
-        <div style={panelCss} onDragOver={(e) => { e.preventDefault(); if (over?.id !== '__panel__' || over?.panel !== 'hidden') setOver({ id: '__panel__', panel: 'hidden' }) }} onDrop={(e) => { e.preventDefault(); drop('hidden') }}>
+        <div data-col-panel="hidden" style={{ ...panelCss, ...(over?.id === '__panel__' && over.panel === 'hidden' ? { borderColor: 'color-mix(in srgb, var(--color-primary) 40%, transparent)', background: 'color-mix(in srgb, var(--color-primary) 5%, transparent)' } : {}) }}>
           <p style={panelTitle}>{t('cols_hidden')}</p>
           {hidden.length === 0 ? ph(t('drag_here')) : hidden.map((c) => item(c, 'hidden'))}
         </div>
-        <div style={panelCss} onDragOver={(e) => { e.preventDefault(); if (over?.id !== '__panel__' || over?.panel !== 'visible') setOver({ id: '__panel__', panel: 'visible' }) }} onDrop={(e) => { e.preventDefault(); drop('visible') }}>
+        <div data-col-panel="visible" style={{ ...panelCss, ...(over?.id === '__panel__' && over.panel === 'visible' ? { borderColor: 'color-mix(in srgb, var(--color-primary) 40%, transparent)', background: 'color-mix(in srgb, var(--color-primary) 5%, transparent)' } : {}) }}>
           <p style={panelTitle}>{t('cols_visible')}</p>
           {shown.length === 0 ? ph(t('drag_here')) : shown.map((c) => item(c, 'visible'))}
         </div>
@@ -209,14 +199,38 @@ function ColManager({ cols, labelFor, onChange, onClose, anchorRef }: {
         <button style={{ ...btnGhost, width: '100%', height: 30, border: 0, justifyContent: 'center', color: 'var(--color-muted-foreground)' }} onClick={() => { onChange(DEFAULT_COLS); saveCols(DEFAULT_COLS) }}>{t('reset')}</button>
       </div>
     </div>
+    {dragId && dragPos && (
+      <div style={{ position: 'fixed', zIndex: 60, left: dragPos.x, top: dragPos.y, transform: 'translate(-50%, -50%)', pointerEvents: 'none', display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 10px', fontSize: 14, fontWeight: 500, background: 'var(--color-card)', border: '1px solid color-mix(in srgb, var(--color-primary) 40%, transparent)', boxShadow: '0 4px 16px rgba(0,0,0,.25)' }}>
+        <GripIcon />{labelFor(dragId)}
+      </div>
+    )}
+    </>
   )
 }
 
-function Kpi({ label: lbl, value }: { label: string; value: number | null }) {
+function IconTotal({ size = 18 }: { size?: number }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M8 6h13" /><path d="M8 12h13" /><path d="M8 18h13" /><path d="M3 6h.01" /><path d="M3 12h.01" /><path d="M3 18h.01" /></svg>
+}
+function IconSites({ size = 18 }: { size?: number }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M2 12h20" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+}
+function IconTypes({ size = 18 }: { size?: number }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z" /><circle cx="7.5" cy="7.5" r="1.5" /></svg>
+}
+
+function Kpi({ label: lbl, value, icon, tint }: { label: string; value: number | null; icon?: ReactNode; tint?: string }) {
+  const color = tint ?? 'var(--color-primary)'
   return (
-    <div style={{ ...card, display: 'flex', flexDirection: 'column', gap: 2, padding: 16, flex: 1, minWidth: 130 }}>
-      <span style={{ fontSize: 12, color: 'var(--color-muted-foreground)' }}>{lbl}</span>
-      <span style={{ fontSize: 22, fontWeight: 700 }}>{value == null ? '…' : value}</span>
+    <div style={{ ...card, display: 'flex', alignItems: 'center', gap: 12, padding: 16, flex: 1, minWidth: 130 }}>
+      {icon && (
+        <div style={{ width: 38, height: 38, borderRadius: 10, display: 'grid', placeItems: 'center', flexShrink: 0, color, background: `color-mix(in srgb, ${color} 14%, transparent)` }}>
+          {icon}
+        </div>
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+        <span style={{ fontSize: 12, color: 'var(--color-muted-foreground)' }}>{lbl}</span>
+        <span style={{ fontSize: 22, fontWeight: 700 }}>{value == null ? '…' : value}</span>
+      </div>
     </div>
   )
 }
@@ -264,10 +278,13 @@ function TemplateList({ base }: { base: string }) {
   function toggleExpanded(id: number) {
     setExpandedRows((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next })
   }
-  // Collapse à la seule colonne essentielle (nom) sur narrow, quel que soit le réglage ColManager
-  // de l'utilisateur — cf. skill melis-react-mobile-responsive.
-  const displayCols = narrow ? cols.map((c) => ({ ...c, visible: c.id === 'name' })) : cols
-  const hasHidden = narrow
+  // A Hidden column disappears entirely on both desktop and mobile — same rule everywhere, no "+"
+  // peek at Hidden ones. Desktop shows every Visible column inline. Mobile can't fit many columns,
+  // so only the FIRST Visible column (by the user's dragged order in ColManager) anchors inline;
+  // every OTHER Visible column surfaces behind the per-row "+" instead, in that same order.
+  const shownColsList = cols.filter((c) => c.visible)
+  const displayCols = narrow ? shownColsList.map((c, i) => ({ ...c, visible: i === 0 })) : shownColsList
+  const hasHidden = narrow && shownColsList.length > 1
 
   const { items, total, loading, hasMore, sentinelRef, sortCol, sortDir, toggleSort, reload, removeLocal } =
     useKeysetList<TemplateItem>({
@@ -304,15 +321,19 @@ function TemplateList({ base }: { base: string }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: narrow ? 14 : 20, padding: narrow ? 14 : 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-        <div style={narrow ? { minWidth: 0 } : undefined}>
+      <div style={{ display: 'flex', alignItems: narrow ? 'flex-start' : 'center', justifyContent: 'space-between', gap: narrow ? 8 : 16 }}>
+        <div style={narrow ? { minWidth: 0, flex: '1 1 0' } : undefined}>
           <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{t('title')}</h1>
           <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0', ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{t('subtitle')}</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} compact={narrow} />
-          <button style={btnGhost} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
-          {can('create') && <button style={btnPrimary} onClick={() => navigate(`${base}/new`)} title={t('new')}><PlusIcon />{!narrow && t('new')}</button>}
+        {/* Nouveau : sous la bascule New/Old + rafraîchir en étroit, à côté en large — et libellé
+            toujours visible (bouton plus long) plutôt que réduit à l'icône seule. */}
+        <div style={{ display: 'flex', flexDirection: narrow ? 'column' : 'row', alignItems: narrow ? 'flex-end' : 'center', gap: 8, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} compact={narrow} labels={{ react: t('view_new'), iframe: t('view_old') }} />
+            <button style={btnGhost} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
+          </div>
+          {can('create') && <button style={btnPrimary} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>}
         </div>
       </div>
 
@@ -331,9 +352,9 @@ function TemplateList({ base }: { base: string }) {
         <div style={{ ...card, padding: '40px 16px', textAlign: 'center', fontSize: 14, color: 'var(--color-muted-foreground)' }}>{t('no_access')}</div>
       ) : (<>
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-        <Kpi label={t('kpi_total')} value={stats?.total ?? null} />
-        <Kpi label={t('kpi_sites')} value={stats?.sites ?? null} />
-        <Kpi label={t('kpi_types')} value={stats?.types ?? null} />
+        <Kpi label={t('kpi_total')} value={stats?.total ?? null} icon={<IconTotal />} tint="var(--color-primary)" />
+        <Kpi label={t('kpi_sites')} value={stats?.sites ?? null} icon={<IconSites />} tint="#2563eb" />
+        <Kpi label={t('kpi_types')} value={stats?.types ?? null} icon={<IconTypes />} tint="#7c3aed" />
       </div>
 
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>

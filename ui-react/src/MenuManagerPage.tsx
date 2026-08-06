@@ -60,6 +60,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     title: 'Menu manager', subtitle: 'Gérez ici les catégories de mini-templates depuis le menu du plugin',
     f_site: 'Site', select_site: '— Choisir un site —',
     f_lang: 'Langue', refresh: 'Rafraîchir', loading: 'Chargement…',
+    view_new: 'Nouveau', view_old: 'Ancien',
     new_category: 'Nouvelle catégorie', add_minitemplate: 'Ajouter un mini-template',
     edit_minitemplate: 'Modifier le mini-template', collapse: 'Réduire', expand: 'Développer',
     empty_site: 'Sélectionnez un site pour voir son arborescence.',
@@ -83,6 +84,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     title: 'Menu manager', subtitle: 'Manage here the categories of mini-templates from the plugin menu',
     f_site: 'Site', select_site: '— Choose a site —',
     f_lang: 'Language', refresh: 'Refresh', loading: 'Loading…',
+    view_new: 'New', view_old: 'Old',
     new_category: 'New category', add_minitemplate: 'Add mini-template',
     edit_minitemplate: 'Edit mini-template', collapse: 'Collapse', expand: 'Expand',
     empty_site: 'Select a site to view its tree.',
@@ -488,7 +490,7 @@ function MenuManagerTree({ base }: { base: string }) {
             <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0' }}>{t('subtitle')}</p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} compact />
+            <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} compact labels={{ react: t('view_new'), iframe: t('view_old') }} />
             <button style={btnGhost} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
             {can('create') && <button style={btnGhost} onClick={() => navigate(`${miniTemplateManagerRoute()}/new?site=${siteId ?? ''}`)} disabled={!siteId} title={t('add_minitemplate')}><PlusIcon /></button>}
           </div>
@@ -501,7 +503,7 @@ function MenuManagerTree({ base }: { base: string }) {
             <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0' }}>{t('subtitle')}</p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
+            <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} labels={{ react: t('view_new'), iframe: t('view_old') }} />
             <button style={btnGhost} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
             {can('create') && <button style={btnGhost} onClick={() => navigate(`${miniTemplateManagerRoute()}/new?site=${siteId ?? ''}`)} disabled={!siteId}><PlusIcon />{t('add_minitemplate')}</button>}
             {can('create') && <button style={btnPrimary} onClick={() => navigate(`${base}/new?site=${siteId ?? ''}`)} disabled={!siteId}><PlusIcon />{t('new_category')}</button>}

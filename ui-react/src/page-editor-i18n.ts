@@ -21,6 +21,8 @@ const DICT: Record<PeLang, Record<string, string>> = {
     prev: '‹ Précédent',
     next: 'Suivant ›',
     pageWord: 'Page',
+    view_new: 'Nouveau',
+    view_old: 'Ancien',
 
     // ── FlagSelect (PageTabs) ──
     choose: 'Choisissez',
@@ -269,6 +271,8 @@ const DICT: Record<PeLang, Record<string, string>> = {
     prev: '‹ Previous',
     next: 'Next ›',
     pageWord: 'Page',
+    view_new: 'New',
+    view_old: 'Old',
 
     // ── FlagSelect (PageTabs) ──
     choose: 'Choose',

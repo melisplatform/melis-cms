@@ -1,5 +1,6 @@
 import { useState, type CSSProperties } from 'react'
 import { useIsNarrow } from './shared/useIsNarrow'
+import { useDragReorder } from './shared/use-drag-reorder'
 
 /* ──────────────────────────────────────────────────────────────────────────
  * Modale d'export partagée par les briques MelisCms (Redirections, Templates…).
@@ -55,7 +56,7 @@ const CsvIcon = () => <svg style={{ width: 16, height: 16, flexShrink: 0 }} view
 
 export type ExportCol = { id: string; visible: boolean }
 
-export function ExportModal<T>({ cols, labelFor, fetchAll, getCell, filename, sheetName, total, onClose }: {
+export function ExportModal<T>({ cols: colsProp, labelFor, fetchAll, getCell, filename, sheetName, total, onClose }: {
   cols: ExportCol[]
   labelFor: (id: string) => string
   fetchAll: () => Promise<T[]>
@@ -67,34 +68,22 @@ export function ExportModal<T>({ cols, labelFor, fetchAll, getCell, filename, sh
 }) {
   const xlsx = getXLSX()
   const narrow = useIsNarrow()
-  const [included, setIncluded] = useState<ExportCol[]>(() => cols.filter(c => c.visible))
-  const [excluded, setExcluded] = useState<ExportCol[]>(() => cols.filter(c => !c.visible))
+  const [cols, setCols] = useState<ExportCol[]>(colsProp)
+  // Touch-compatible drag (mouse + touch events, not native HTML5 draggable — that API never
+  // fires from touch input) — see shared/use-drag-reorder.ts.
+  const { draggingId: dragId, overTarget: over, dragPos, startDragMouse, startDragTouch } = useDragReorder({
+    cols, onChange: setCols,
+  })
+  const included = cols.filter(c => c.visible)
+  const excluded = cols.filter(c => !c.visible)
   const [format, setFormat] = useState<'csv' | 'xlsx'>(xlsx ? 'xlsx' : 'csv')
   const [exporting, setExporting] = useState(false)
-  const [dragId, setDragId] = useState<string | null>(null)
-  const [over, setOver] = useState<{ id: string; panel: 'included' | 'excluded' } | null>(null)
 
-  function drop(panel: 'included' | 'excluded') {
-    if (!dragId) return
-    const src = [...included, ...excluded].find(c => c.id === dragId)!
-    let inc = included.filter(c => c.id !== dragId)
-    let exc = excluded.filter(c => c.id !== dragId)
-    if (panel === 'included') {
-      const dst = over?.id
-      if (!dst || dst === '__panel__') inc = [...inc, src]
-      else { const i = inc.findIndex(c => c.id === dst); inc = i === -1 ? [...inc, src] : [...inc.slice(0, i), src, ...inc.slice(i)] }
-    } else { exc = [...exc, src] }
-    setIncluded(inc); setExcluded(exc); setDragId(null); setOver(null)
-  }
-
-  function item(col: ExportCol, panel: 'included' | 'excluded') {
+  function item(col: ExportCol, panel: 'visible' | 'hidden') {
     const isOver = over?.id === col.id && over?.panel === panel
     return (
-      <div key={col.id} draggable
-        onDragStart={() => setDragId(col.id)} onDragEnd={() => { setDragId(null); setOver(null) }}
-        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); if (over?.id !== col.id || over?.panel !== panel) setOver({ id: col.id, panel }) }}
-        onDrop={(e) => { e.preventDefault(); drop(panel) }}
-        style={{ display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 8px', fontSize: 14, cursor: 'grab', userSelect: 'none', opacity: dragId === col.id ? 0.4 : 1, background: isOver ? 'color-mix(in srgb, var(--color-primary) 12%, transparent)' : 'transparent', boxShadow: isOver ? '0 0 0 1px color-mix(in srgb, var(--color-primary) 35%, transparent)' : 'none' }}>
+      <div key={col.id} data-col-item={col.id} onMouseDown={startDragMouse(col.id)} onTouchStart={startDragTouch(col.id)}
+        style={{ display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 8px', fontSize: 14, cursor: 'grab', userSelect: 'none', touchAction: 'none', opacity: dragId === col.id ? 0.4 : 1, background: isOver ? 'color-mix(in srgb, var(--color-primary) 12%, transparent)' : 'transparent', boxShadow: isOver ? '0 0 0 1px color-mix(in srgb, var(--color-primary) 35%, transparent)' : 'none' }}>
         <GripIcon /><span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{labelFor(col.id)}</span>
       </div>
     )
@@ -151,17 +140,13 @@ export function ExportModal<T>({ cols, labelFor, fetchAll, getCell, filename, sh
             <button style={tab(format === 'csv')} onClick={() => setFormat('csv')}><CsvIcon />CSV (.csv)</button>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: narrow ? '1fr' : '1fr 1fr', gap: 8 }}>
-            <div style={panelCss}
-              onDragOver={(e) => { e.preventDefault(); if (over?.id !== '__panel__' || over?.panel !== 'excluded') setOver({ id: '__panel__', panel: 'excluded' }) }}
-              onDrop={(e) => { e.preventDefault(); drop('excluded') }}>
+            <div data-col-panel="hidden" style={{ ...panelCss, ...(over?.id === '__panel__' && over.panel === 'hidden' ? { borderColor: 'color-mix(in srgb, var(--color-primary) 40%, transparent)', background: 'color-mix(in srgb, var(--color-primary) 5%, transparent)' } : {}) }}>
               <p style={panelTitle}>{tr('excluded')}</p>
-              {excluded.length === 0 ? ph() : excluded.map(c => item(c, 'excluded'))}
+              {excluded.length === 0 ? ph() : excluded.map(c => item(c, 'hidden'))}
             </div>
-            <div style={panelCss}
-              onDragOver={(e) => { e.preventDefault(); if (over?.id !== '__panel__' || over?.panel !== 'included') setOver({ id: '__panel__', panel: 'included' }) }}
-              onDrop={(e) => { e.preventDefault(); drop('included') }}>
+            <div data-col-panel="visible" style={{ ...panelCss, ...(over?.id === '__panel__' && over.panel === 'visible' ? { borderColor: 'color-mix(in srgb, var(--color-primary) 40%, transparent)', background: 'color-mix(in srgb, var(--color-primary) 5%, transparent)' } : {}) }}>
               <p style={panelTitle}>{tr('included')}</p>
-              {included.length === 0 ? ph() : included.map(c => item(c, 'included'))}
+              {included.length === 0 ? ph() : included.map(c => item(c, 'visible'))}
             </div>
           </div>
         </div>
@@ -171,6 +156,11 @@ export function ExportModal<T>({ cols, labelFor, fetchAll, getCell, filename, sh
             <DownloadIcon />{exporting ? tr('exporting') : tr('download', { fmt: format.toUpperCase() })}
           </button>
         </div>
+        {dragId && dragPos && (
+          <div style={{ position: 'fixed', zIndex: 60, left: dragPos.x, top: dragPos.y, transform: 'translate(-50%, -50%)', pointerEvents: 'none', display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 10px', fontSize: 14, fontWeight: 500, background: 'var(--color-card)', border: '1px solid color-mix(in srgb, var(--color-primary) 40%, transparent)', boxShadow: '0 4px 16px rgba(0,0,0,.25)' }}>
+            <GripIcon />{labelFor(dragId)}
+          </div>
+        )}
       </div>
     </div>
   )
