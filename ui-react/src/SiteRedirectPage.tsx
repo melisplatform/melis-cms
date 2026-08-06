@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   deleteRedirect, fetchRedirectById, fetchRedirects, fetchRedirectStats, fetchSites,
@@ -10,6 +10,7 @@ import { useKeysetList } from './use-keyset-list'
 import { useIsNarrow } from './shared/useIsNarrow'
 import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
 import { FormErrorBanner, koNotify, okNotify, type FormIssue } from './shared/melis-form-errors'
+import { useDragReorder } from './shared/use-drag-reorder'
 
 // Outil Redirections 301 legacy (vue « Old » en iframe). Voir brick.manifest.json (cms-site-301).
 const MELIS_KEY = 'meliscms_tool_site_301'
@@ -43,6 +44,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     columns: 'Colonnes', export: 'Exporter', cols_visible: 'Visibles', cols_hidden: 'Masquées', drag_here: 'Glisser ici', reset: 'Réinitialiser', reset_filters: 'Réinitialiser les filtres',
     edit: 'Modifier', del: 'Supprimer', cancel: 'Annuler', save: 'Enregistrer', back: 'retour', test: 'Tester la redirection',
     refresh: 'Rafraîchir', loading: 'Chargement…', saved: 'Enregistré ✓',
+    view_new: 'Nouveau', view_old: 'Ancien',
     del_title: 'Supprimer la redirection', del_confirm: 'Supprimer « {u} » ? Cette action est irréversible.',
     new_title: 'Nouvelle redirection', edit_title: 'Modifier la redirection',
     f_site: 'Site', f_site_ph: '— Choisir un site —', f_old: 'Ancienne URL', f_old_ph: '/ancienne-url',
@@ -60,6 +62,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     columns: 'Columns', export: 'Export', cols_visible: 'Visible', cols_hidden: 'Hidden', drag_here: 'Drag here', reset: 'Reset', reset_filters: 'Reset filters',
     edit: 'Edit', del: 'Delete', cancel: 'Cancel', save: 'Save', back: 'back', test: 'Test the redirect',
     refresh: 'Refresh', loading: 'Loading…', saved: 'Saved ✓',
+    view_new: 'New', view_old: 'Old',
     del_title: 'Delete redirect', del_confirm: 'Delete “{u}”? This action is irreversible.',
     new_title: 'New redirect', edit_title: 'Edit redirect',
     f_site: 'Site', f_site_ph: '— Choose a site —', f_old: 'Old URL', f_old_ph: '/old-url',
@@ -153,8 +156,11 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
   anchorRef: RefObject<HTMLElement | null>; cols: ColDef[]; labelFor: (id: string) => string; onChange: (c: ColDef[]) => void; onClose: () => void
 }) {
   const t = useT()
-  const [dragId, setDragId] = useState<string | null>(null)
-  const [over, setOver] = useState<{ id: string; panel: 'visible' | 'hidden' } | null>(null)
+  // Touch-compatible drag (mouse + touch events, not native HTML5 draggable — that API never
+  // fires from touch input) — see shared/use-drag-reorder.ts.
+  const { draggingId: dragId, overTarget: over, dragPos, startDragMouse, startDragTouch } = useDragReorder({
+    cols, onChange: (next) => { onChange(next); saveCols(next) },
+  })
   const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(null)
   const shown = cols.filter((c) => c.visible)
   const hidden = cols.filter((c) => !c.visible)
@@ -172,31 +178,12 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
     setPos({ top: rect.bottom + 6, left, width })
   }, [anchorRef])
 
-  function drop(panel: 'visible' | 'hidden') {
-    if (!dragId) return
-    const src = cols.find((c) => c.id === dragId)!
-    const upd = { ...src, visible: panel === 'visible' }
-    let vList = shown.filter((c) => c.id !== dragId)
-    const hList = hidden.filter((c) => c.id !== dragId)
-    if (panel === 'visible') {
-      const dst = over?.id
-      if (!dst || dst === '__panel__') vList = [...vList, upd]
-      else { const i = vList.findIndex((c) => c.id === dst); vList = i === -1 ? [...vList, upd] : [...vList.slice(0, i), upd, ...vList.slice(i)] }
-      const next = [...vList, ...hList]; onChange(next); saveCols(next)
-    } else { const next = [...vList, ...hList, upd]; onChange(next); saveCols(next) }
-    setDragId(null); setOver(null)
-  }
-
   function item(col: ColDef, panel: 'visible' | 'hidden') {
     const isOver = over?.id === col.id && over?.panel === panel
     return (
-      <div key={col.id} draggable
-        onDragStart={() => setDragId(col.id)}
-        onDragEnd={() => { setDragId(null); setOver(null) }}
-        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); if (over?.id !== col.id || over?.panel !== panel) setOver({ id: col.id, panel }) }}
-        onDrop={(e) => { e.preventDefault(); drop(panel) }}
+      <div key={col.id} data-col-item={col.id} onMouseDown={startDragMouse(col.id)} onTouchStart={startDragTouch(col.id)}
         style={{
-          display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 8px', fontSize: 14, cursor: 'grab', userSelect: 'none',
+          display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 8px', fontSize: 14, cursor: 'grab', userSelect: 'none', touchAction: 'none',
           opacity: dragId === col.id ? 0.4 : 1,
           background: isOver ? 'color-mix(in srgb, var(--color-primary) 12%, transparent)' : 'transparent',
           boxShadow: isOver ? '0 0 0 1px color-mix(in srgb, var(--color-primary) 35%, transparent)' : 'none',
@@ -208,21 +195,18 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
 
   if (!pos) return null
   return (
+    <>
     <div style={{ ...card, position: 'fixed', top: pos.top, left: pos.left, width: pos.width, zIndex: 50 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderBottom: '1px solid var(--color-border)' }}>
         <span style={{ fontSize: 14, fontWeight: 600 }}>{t('columns')}</span>
         <button style={{ ...iconBtn, width: 22, height: 22 }} onClick={onClose}>✕</button>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, padding: 12 }}>
-        <div style={panelCss}
-          onDragOver={(e) => { e.preventDefault(); if (over?.id !== '__panel__' || over?.panel !== 'hidden') setOver({ id: '__panel__', panel: 'hidden' }) }}
-          onDrop={(e) => { e.preventDefault(); drop('hidden') }}>
+        <div data-col-panel="hidden" style={{ ...panelCss, ...(over?.id === '__panel__' && over.panel === 'hidden' ? { borderColor: 'color-mix(in srgb, var(--color-primary) 40%, transparent)', background: 'color-mix(in srgb, var(--color-primary) 5%, transparent)' } : {}) }}>
           <p style={panelTitle}>{t('cols_hidden')}</p>
           {hidden.length === 0 ? <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--color-muted-foreground)', opacity: 0.5, padding: '16px 0' }}>{t('drag_here')}</div> : hidden.map((c) => item(c, 'hidden'))}
         </div>
-        <div style={panelCss}
-          onDragOver={(e) => { e.preventDefault(); if (over?.id !== '__panel__' || over?.panel !== 'visible') setOver({ id: '__panel__', panel: 'visible' }) }}
-          onDrop={(e) => { e.preventDefault(); drop('visible') }}>
+        <div data-col-panel="visible" style={{ ...panelCss, ...(over?.id === '__panel__' && over.panel === 'visible' ? { borderColor: 'color-mix(in srgb, var(--color-primary) 40%, transparent)', background: 'color-mix(in srgb, var(--color-primary) 5%, transparent)' } : {}) }}>
           <p style={panelTitle}>{t('cols_visible')}</p>
           {shown.length === 0 ? <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--color-muted-foreground)', opacity: 0.5, padding: '16px 0' }}>{t('drag_here')}</div> : shown.map((c) => item(c, 'visible'))}
         </div>
@@ -232,15 +216,36 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
           onClick={() => { onChange(DEFAULT_COLS); saveCols(DEFAULT_COLS) }}>{t('reset')}</button>
       </div>
     </div>
+    {dragId && dragPos && (
+      <div style={{ position: 'fixed', zIndex: 60, left: dragPos.x, top: dragPos.y, transform: 'translate(-50%, -50%)', pointerEvents: 'none', display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 10px', fontSize: 14, fontWeight: 500, background: 'var(--color-card)', border: '1px solid color-mix(in srgb, var(--color-primary) 40%, transparent)', boxShadow: '0 4px 16px rgba(0,0,0,.25)' }}>
+        <GripIcon />{labelFor(dragId)}
+      </div>
+    )}
+    </>
   )
 }
 
 // ── KPI ──
-function Kpi({ label: lbl, value }: { label: string; value: number | null }) {
+function IconTotal({ size = 18 }: { size?: number }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M15 4 20 9l-5 5" /><path d="M4 20v-7a4 4 0 0 1 4-4h12" /></svg>
+}
+function IconSites({ size = 18 }: { size?: number }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M2 12h20" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+}
+
+function Kpi({ label: lbl, value, icon, tint }: { label: string; value: number | null; icon?: ReactNode; tint?: string }) {
+  const color = tint ?? 'var(--color-primary)'
   return (
-    <div style={{ ...card, display: 'flex', flexDirection: 'column', gap: 2, padding: 16, flex: 1, minWidth: 140 }}>
-      <span style={{ fontSize: 12, color: 'var(--color-muted-foreground)' }}>{lbl}</span>
-      <span style={{ fontSize: 22, fontWeight: 700 }}>{value == null ? '…' : value}</span>
+    <div style={{ ...card, display: 'flex', alignItems: 'center', gap: 12, padding: 16, flex: 1, minWidth: 140 }}>
+      {icon && (
+        <div style={{ width: 38, height: 38, borderRadius: 10, display: 'grid', placeItems: 'center', flexShrink: 0, color, background: `color-mix(in srgb, ${color} 14%, transparent)` }}>
+          {icon}
+        </div>
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+        <span style={{ fontSize: 12, color: 'var(--color-muted-foreground)' }}>{lbl}</span>
+        <span style={{ fontSize: 22, fontWeight: 700 }}>{value == null ? '…' : value}</span>
+      </div>
     </div>
   )
 }
@@ -288,8 +293,13 @@ function RedirectList({ base }: { base: string }) {
   const toggleExpand = (id: number) => setExpanded((s) => {
     const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n
   })
-  const displayCols = narrow ? cols.map((c) => ({ ...c, visible: c.id === 'old' })) : cols
-  const hasHidden = narrow
+  // A Hidden column disappears entirely on both desktop and mobile — same rule everywhere, no "+"
+  // peek at Hidden ones. Desktop shows every Visible column inline. Mobile can't fit many columns,
+  // so only the FIRST Visible column (by the user's dragged order in ColManager) anchors inline;
+  // every OTHER Visible column surfaces behind the per-row "+" instead, in that same order.
+  const shownColsList = cols.filter((c) => c.visible)
+  const displayCols = narrow ? shownColsList.map((c, i) => ({ ...c, visible: i === 0 })) : shownColsList
+  const hasHidden = narrow && shownColsList.length > 1
 
   // Colonne essentielle = une URL monospace potentiellement longue et insécable : sans
   // `tableLayout:'fixed'` + césure la table dépasse la carte (`overflow:hidden`) et la colonne
@@ -356,7 +366,7 @@ function RedirectList({ base }: { base: string }) {
             right of the title. Desktop keeps the original single row. */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, ...(narrow ? { flexShrink: 0, flexDirection: 'column' } : {}) }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <ViewToggle mode={mode} compact={narrow} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
+            <ViewToggle mode={mode} compact={narrow} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} labels={{ react: t('view_new'), iframe: t('view_old') }} />
             <button style={{ ...btnGhost, ...(narrow ? { width: 36, padding: 0, justifyContent: 'center' } : {}) }} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
           </div>
           {can('create') && <button style={{ ...btnPrimary, ...(narrow ? { width: '100%', justifyContent: 'center' } : {}) }} onClick={() => navigate(`${base}/new`)}><PlusIcon />{t('new')}</button>}
@@ -379,8 +389,8 @@ function RedirectList({ base }: { base: string }) {
       ) : (<>
       {/* KPI */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-        <Kpi label={t('kpi_total')} value={stats?.total ?? null} />
-        <Kpi label={t('kpi_sites')} value={stats?.sites ?? null} />
+        <Kpi label={t('kpi_total')} value={stats?.total ?? null} icon={<IconTotal />} tint="var(--color-primary)" />
+        <Kpi label={t('kpi_sites')} value={stats?.sites ?? null} icon={<IconSites />} tint="#2563eb" />
       </div>
 
       {/* Filtres */}

@@ -5,6 +5,7 @@ import { ExportModal } from './ExportModal'
 import { useKeysetList } from './use-keyset-list'
 import { useIsNarrow } from './shared/useIsNarrow'
 import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
+import { useDragReorder } from './shared/use-drag-reorder'
 import { fetchSites, deleteSite, minifyAssets, consumeSitesListStale, type SiteItem } from './sites-api'
 
 const MELIS_KEY = 'meliscms_tool_sites'
@@ -19,6 +20,8 @@ const DICT: Record<string, { fr: string; en: string }> = {
   title: { fr: 'Sites', en: 'Sites' },
   subtitle: { fr: 'Gérer les sites de la plateforme.', en: 'Manage the platform sites.' },
   refresh: { fr: 'Rafraîchir', en: 'Refresh' },
+  view_new: { fr: 'Nouveau', en: 'New' },
+  view_old: { fr: 'Ancien', en: 'Old' },
   new: { fr: 'Nouveau site', en: 'New site' },
   search: { fr: 'Rechercher un site…', en: 'Search a site…' },
   reset_filters: { fr: 'Réinitialiser les filtres', en: 'Reset filters' },
@@ -134,8 +137,11 @@ function ColManager({ cols, labelFor, onChange, onClose, anchorRef }: {
   cols: ColDef[]; labelFor: (id: string) => string; onChange: (c: ColDef[]) => void; onClose: () => void
   anchorRef: React.RefObject<HTMLElement | null>
 }) {
-  const [dragId, setDragId] = useState<string | null>(null)
-  const [over, setOver] = useState<{ id: string; panel: 'visible' | 'hidden' } | null>(null)
+  // Touch-compatible drag (mouse + touch events, not native HTML5 draggable — that API never
+  // fires from touch input) — see shared/use-drag-reorder.ts.
+  const { draggingId: dragId, overTarget: over, dragPos, startDragMouse, startDragTouch } = useDragReorder({
+    cols, onChange: (next) => { onChange(next); saveCols(next) },
+  })
   const shown = cols.filter((c) => c.visible)
   const hidden = cols.filter((c) => !c.visible)
 
@@ -153,31 +159,12 @@ function ColManager({ cols, labelFor, onChange, onClose, anchorRef }: {
     setPos({ left, top: rect.bottom + 6, width })
   }, [anchorRef])
 
-  function drop(panel: 'visible' | 'hidden') {
-    if (!dragId) return
-    const src = cols.find((c) => c.id === dragId)!
-    const upd = { ...src, visible: panel === 'visible' }
-    let vList = shown.filter((c) => c.id !== dragId)
-    const hList = hidden.filter((c) => c.id !== dragId)
-    if (panel === 'visible') {
-      const dst = over?.id
-      if (!dst || dst === '__panel__') vList = [...vList, upd]
-      else { const i = vList.findIndex((c) => c.id === dst); vList = i === -1 ? [...vList, upd] : [...vList.slice(0, i), upd, ...vList.slice(i)] }
-      const next = [...vList, ...hList]; onChange(next); saveCols(next)
-    } else { const next = [...vList, ...hList, upd]; onChange(next); saveCols(next) }
-    setDragId(null); setOver(null)
-  }
-
   function item(col: ColDef, panel: 'visible' | 'hidden') {
     const isOver = over?.id === col.id && over?.panel === panel
     return (
-      <div key={col.id} draggable
-        onDragStart={() => setDragId(col.id)}
-        onDragEnd={() => { setDragId(null); setOver(null) }}
-        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); if (over?.id !== col.id || over?.panel !== panel) setOver({ id: col.id, panel }) }}
-        onDrop={(e) => { e.preventDefault(); drop(panel) }}
+      <div key={col.id} data-col-item={col.id} onMouseDown={startDragMouse(col.id)} onTouchStart={startDragTouch(col.id)}
         style={{
-          display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 8px', fontSize: 14, cursor: 'grab', userSelect: 'none',
+          display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 8px', fontSize: 14, cursor: 'grab', userSelect: 'none', touchAction: 'none',
           opacity: dragId === col.id ? 0.4 : 1,
           background: isOver ? 'color-mix(in srgb, var(--color-primary) 12%, transparent)' : 'transparent',
           boxShadow: isOver ? '0 0 0 1px color-mix(in srgb, var(--color-primary) 35%, transparent)' : 'none',
@@ -188,21 +175,18 @@ function ColManager({ cols, labelFor, onChange, onClose, anchorRef }: {
   }
 
   return (
+    <>
     <div style={{ ...card, position: 'fixed', left: pos?.left ?? 0, top: pos?.top ?? 0, width: pos?.width ?? 340, zIndex: 50, visibility: pos ? 'visible' : 'hidden' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderBottom: '1px solid var(--color-border)' }}>
         <span style={{ fontSize: 14, fontWeight: 600 }}>{t('columns')}</span>
         <button style={{ ...iconBtn, width: 22, height: 22 }} onClick={onClose}>✕</button>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, padding: 12 }}>
-        <div style={panelCss}
-          onDragOver={(e) => { e.preventDefault(); if (over?.id !== '__panel__' || over?.panel !== 'hidden') setOver({ id: '__panel__', panel: 'hidden' }) }}
-          onDrop={(e) => { e.preventDefault(); drop('hidden') }}>
+        <div data-col-panel="hidden" style={{ ...panelCss, ...(over?.id === '__panel__' && over.panel === 'hidden' ? { borderColor: 'color-mix(in srgb, var(--color-primary) 40%, transparent)', background: 'color-mix(in srgb, var(--color-primary) 5%, transparent)' } : {}) }}>
           <p style={panelTitle}>{t('cols_hidden')}</p>
           {hidden.length === 0 ? <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--color-muted-foreground)', opacity: 0.5, padding: '16px 0' }}>{t('drag_here')}</div> : hidden.map((c) => item(c, 'hidden'))}
         </div>
-        <div style={panelCss}
-          onDragOver={(e) => { e.preventDefault(); if (over?.id !== '__panel__' || over?.panel !== 'visible') setOver({ id: '__panel__', panel: 'visible' }) }}
-          onDrop={(e) => { e.preventDefault(); drop('visible') }}>
+        <div data-col-panel="visible" style={{ ...panelCss, ...(over?.id === '__panel__' && over.panel === 'visible' ? { borderColor: 'color-mix(in srgb, var(--color-primary) 40%, transparent)', background: 'color-mix(in srgb, var(--color-primary) 5%, transparent)' } : {}) }}>
           <p style={panelTitle}>{t('cols_visible')}</p>
           {shown.length === 0 ? <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--color-muted-foreground)', opacity: 0.5, padding: '16px 0' }}>{t('drag_here')}</div> : shown.map((c) => item(c, 'visible'))}
         </div>
@@ -212,6 +196,12 @@ function ColManager({ cols, labelFor, onChange, onClose, anchorRef }: {
           onClick={() => { onChange(DEFAULT_COLS); saveCols(DEFAULT_COLS) }}>{t('reset')}</button>
       </div>
     </div>
+    {dragId && dragPos && (
+      <div style={{ position: 'fixed', zIndex: 60, left: dragPos.x, top: dragPos.y, transform: 'translate(-50%, -50%)', pointerEvents: 'none', display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 10px', fontSize: 14, fontWeight: 500, background: 'var(--color-card)', border: '1px solid color-mix(in srgb, var(--color-primary) 40%, transparent)', boxShadow: '0 4px 16px rgba(0,0,0,.25)' }}>
+        <GripIcon />{labelFor(dragId)}
+      </div>
+    )}
+    </>
   )
 }
 
@@ -258,10 +248,13 @@ export default function SitesList({ active, onEdit, onNew }: {
   const colsBtnRef = useRef<HTMLButtonElement | null>(null)
 
   const narrow = useIsNarrow()
-  // Collapse à la SEULE colonne essentielle (nom du site) sur narrow, quelle que soit la
-  // préférence de colonnes desktop de l'utilisateur — hasHidden tenu à `narrow` seul.
-  const displayCols = narrow ? cols.map((c) => ({ ...c, visible: c.id === 'label' })) : cols
-  const hasHidden = narrow
+  // A Hidden column disappears entirely on both desktop and mobile — same rule everywhere, no "+"
+  // peek at Hidden ones. Desktop shows every Visible column inline. Mobile can't fit many columns,
+  // so only the FIRST Visible column (by the user's dragged order in ColManager) anchors inline;
+  // every OTHER Visible column surfaces behind the per-row "+" instead, in that same order.
+  const shownColsList = cols.filter((c) => c.visible)
+  const displayCols = narrow ? shownColsList.map((c, i) => ({ ...c, visible: i === 0 })) : shownColsList
+  const hasHidden = narrow && shownColsList.length > 1
   function toggleExpand(id: number) {
     setExpandedIds((prev) => { const next = new Set(prev); if (next.has(id)) next.delete(id); else next.add(id); return next })
   }
@@ -333,7 +326,7 @@ export default function SitesList({ active, onEdit, onNew }: {
           <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0', ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{t('subtitle')}</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} compact={narrow} />
+          <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} compact={narrow} labels={{ react: t('view_new'), iframe: t('view_old') }} />
           <button style={{ ...btnGhost, width: 32, padding: 0, justifyContent: 'center' }} onClick={handleRefresh} title={t('refresh')}><RotateCcwIcon spinning={refreshing} /></button>
           {can('create') && <button style={btnPrimary} onClick={onNew}>+ {t('new')}</button>}
         </div>

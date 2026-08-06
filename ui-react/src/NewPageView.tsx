@@ -107,7 +107,7 @@ export default function NewPageView({ father, visible, onCreated }: { father: st
           {tr.newPage}{father ? <span style={{ fontWeight: 400, fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}> — {tr.underPage} {father}</span> : ''}
         </span>
         <span style={{ flexShrink: 0 }}>
-          <ViewToggle mode={mode} onChange={setMode} compact={narrow} />
+          <ViewToggle mode={mode} onChange={setMode} compact={narrow} labels={{ react: tr.view_new, iframe: tr.view_old }} />
         </span>
       </div>
 

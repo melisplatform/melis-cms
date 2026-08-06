@@ -859,7 +859,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
                 </button>
               )
             })()}
-            {!chromeCollapsed && <ViewToggle mode={mode} onChange={setMode} compact={narrow} />}
+            {!chromeCollapsed && <ViewToggle mode={mode} onChange={setMode} compact={narrow} labels={{ react: tr.view_new, iframe: tr.view_old }} />}
             {/* Chevron « masquer/afficher l'en-tête » — mobile uniquement (ticket : sur mobile la zone
                 d'édition est trop petite, la moitié de l'écran est prise par les boutons). */}
             {narrow && showChrome && (
