@@ -64,6 +64,11 @@ class PageImportController extends MelisAbstractActionController
 
     public function checkImportFormAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_page')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $data = array_merge($this->getRequest()->getPost()->toArray(), $this->params()->fromFiles());
         $form = $this->getImportForm();
         $formConfig = $this->getFormConfig(self::FORM_CONFIG_PATH, self::FORM_KEY);
@@ -94,6 +99,11 @@ class PageImportController extends MelisAbstractActionController
      */
     public function importTestAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_page')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $translator = $this->getServiceManager()->get('translator');
         $pageImportSvc = $this->getServiceManager()->get('MelisCmsPageImportService');
         $data = $this->getRequest()->getPost()->toArray();
@@ -134,6 +144,11 @@ class PageImportController extends MelisAbstractActionController
      */
     public function importPageAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_page')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $translator = $this->getServiceManager()->get('translator');
         $pageImportSvc = $this->getServiceManager()->get('MelisCmsPageImportService');
         $data = $this->getRequest()->getPost()->toArray();
@@ -376,5 +391,11 @@ class PageImportController extends MelisAbstractActionController
         }
 
         return $newKey;
+    }
+
+    /** @INFO: Tool access check (CWE-862). */
+    private function hasAccess($key)
+    {
+        return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
     }
 }

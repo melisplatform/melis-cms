@@ -98,8 +98,8 @@ class MelisReactApiPageController extends MelisAbstractActionController
                 'data'    => [
                     'idPage'  => $idPage,
                     'header'  => $this->buildHeader($idPage),
-                    'tabs'    => $this->buildEntries($tabsCfg['interface'] ?? [], self::TAB_CAP, true),
-                    'buttons' => $this->buildEntries($btnsCfg['interface'] ?? [], self::BTN_CAP, false),
+                    'tabs'    => $this->buildEntries($tabsCfg['interface'] ?? [], self::TAB_CAP, true, $idPage),
+                    'buttons' => $this->buildEntries($btnsCfg['interface'] ?? [], self::BTN_CAP, false, $idPage),
                 ],
             ]);
         } catch (\Throwable $e) {
@@ -413,9 +413,10 @@ class MelisReactApiPageController extends MelisAbstractActionController
      * @param array<string,array> $interface  clés = melisKey, valeurs = {conf,forward,interface?}
      * @param array<string,string> $capMap    melisKey → capacité (gating React)
      * @param bool $isTab                      true = onglet (drapeau iframe/edition), false = bouton
+     * @param int  $idPage                     page courante (pour les conditions modulaires par page)
      * @return array<int,array>
      */
-    private function buildEntries(array $interface, array $capMap, bool $isTab): array
+    private function buildEntries(array $interface, array $capMap, bool $isTab, int $idPage = 0): array
     {
         $out = [];
         foreach ($interface as $melisKey => $node) {
@@ -423,6 +424,23 @@ class MelisReactApiPageController extends MelisAbstractActionController
             // Un noeud `type`-link résolu par getItem peut porter son melisKey dans conf.
             $key = $conf['melisKey'] ?? (is_string($melisKey) ? $melisKey : '');
             if ($key === '') { continue; }
+
+            // Condition modulaire par PAGE (optionnelle) : un onglet/bouton peut déclarer
+            // `react_condition => ['service' => 'X', 'method' => 'y']` — appelé avec l'idPage, il
+            // n'est émis que si la méthode renvoie vrai. Permet à un module de conditionner sa
+            // présence à un état par site/page (ex. l'onglet Google Analytics n'apparaît que si GA
+            // est le module d'analytics affecté au site). Fail-closed : toute erreur = masqué.
+            $cond = $node['react_condition'] ?? null;
+            if (is_array($cond) && !empty($cond['service']) && !empty($cond['method'])) {
+                $show = false;
+                try {
+                    $svc = $this->getServiceManager()->get($cond['service']);
+                    $show = (bool) $svc->{$cond['method']}($idPage);
+                } catch (\Throwable $e) {
+                    $show = false;
+                }
+                if (!$show) { continue; }
+            }
 
             $entry = [
                 'key'    => $key,

@@ -19,6 +19,12 @@ class MiniTemplateManagerController extends MelisAbstractActionController
     public $tool_key = 'meliscms_mini_template_manager_tool';
     public $form_key = 'mini_template_manager_tool_add_form';
 
+    /** @INFO: Tool access check (CWE-862). */
+    private function hasAccess($key)
+    {
+        return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
+    }
+
     public function renderMiniTemplateManagerToolAction() {}
     public function renderMiniTemplateManagerToolHeaderAction() {}
     public function renderMiniTemplateManagerToolHeaderAddBtnAction() {}
@@ -70,6 +76,11 @@ class MiniTemplateManagerController extends MelisAbstractActionController
      */
     public function renderMiniTemplateManagerToolAddBodyFormAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_mini_template_manager_tool')) {
+            return new ViewModel();
+        }
+
         $params = $this->params()->fromQuery();
         $form = $this->getForm($this->module, $this->tool_key, $this->form_key);
         $form->get('miniTemplateSiteModule')->setValueOptions($this->getSiteModules());
@@ -136,6 +147,11 @@ class MiniTemplateManagerController extends MelisAbstractActionController
      */
     public function getMiniTemplatesAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_mini_template_manager_tool')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $post = $this->getRequest()->getPost();
         $total = $filtered = 0;
         $filtered_templates = [];
@@ -218,6 +234,11 @@ class MiniTemplateManagerController extends MelisAbstractActionController
      */
     public function createMiniTemplateAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_mini_template_manager_tool')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $data = array_merge((array) $this->getRequest()->getPost(), $this->params()->fromFiles());
 
         $this->getEventManager()->trigger('meliscms_mini_template_manager_create_start', $this, $data);
@@ -296,6 +317,11 @@ class MiniTemplateManagerController extends MelisAbstractActionController
      */
     public function updateMiniTemplateAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_mini_template_manager_tool')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $data = array_merge((array) $this->getRequest()->getPost(), $this->params()->fromFiles());
         $this->getEventManager()->trigger('meliscms_mini_template_manager_update_start', $this, $data);
 
@@ -424,6 +450,11 @@ class MiniTemplateManagerController extends MelisAbstractActionController
      */
     public function deleteMiniTemplateAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_mini_template_manager_tool')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $data = (array) $this->getRequest()->getPost();
         $this->getEventManager()->trigger('meliscms_mini_template_manager_delete_start', $this, $data);
         $mtpl_service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');

@@ -62,6 +62,11 @@ class PageExportController extends MelisAbstractActionController
      */
     public function exportPageAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_page')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $translator = $this->getServiceManager()->get('translator');
 
         $result = [
@@ -211,5 +216,11 @@ class PageExportController extends MelisAbstractActionController
         }
 
         return substr($pageName, 0, 20);
+    }
+
+    /** @INFO: Tool access check (CWE-862). */
+    private function hasAccess($key)
+    {
+        return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
     }
 }

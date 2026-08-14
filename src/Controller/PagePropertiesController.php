@@ -125,6 +125,11 @@ class PagePropertiesController extends MelisAbstractActionController
      */
     public function savePageTreeAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_page')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $fatherPageId = $this->params()->fromRoute('fatherPageId', $this->params()->fromQuery('fatherPageId', -1));
         $translator = $this->getServiceManager()->get('translator');
@@ -388,6 +393,11 @@ class PagePropertiesController extends MelisAbstractActionController
      */
     public function savePropertiesAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_page')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $isNew = $this->params()->fromRoute('isNew', $this->params()->fromQuery('isNew', ''));
         $translator = $this->getServiceManager()->get('translator');
@@ -569,5 +579,11 @@ class PagePropertiesController extends MelisAbstractActionController
         $this->getEventManager()->trigger('meliscms_page_saveproperties_end', null, $result);
 
         return new JsonModel($result);
+    }
+
+    /** @INFO: Tool access check (CWE-862). */
+    private function hasAccess($key)
+    {
+        return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
     }
 }

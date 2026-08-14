@@ -167,6 +167,11 @@ class SitesTranslationController extends MelisAbstractActionController
      */
     public function deleteTranslationAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_sites')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $success = false;
         //get the request
         $request = $this->getRequest();
@@ -209,6 +214,11 @@ class SitesTranslationController extends MelisAbstractActionController
      */
     public function saveTranslationAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_sites')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $siteId = 0;
         $success = false;
         $errors = array();
@@ -340,6 +350,11 @@ class SitesTranslationController extends MelisAbstractActionController
      */
     public function getTranslationAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_sites')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $dataCount = 0;
         $data = array();
         $draw = 0;
@@ -608,5 +623,11 @@ class SitesTranslationController extends MelisAbstractActionController
             }
         }
         return $modifiedError;
+    }
+
+    /** @INFO: Tool access check (CWE-862). */
+    private function hasAccess($key)
+    {
+        return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
     }
 }

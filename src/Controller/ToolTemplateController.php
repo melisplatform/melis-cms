@@ -34,6 +34,12 @@ class ToolTemplateController extends MelisAbstractActionController
     const TEMPLATE_FORM = 'meliscms/tools/meliscms_tool_templates/forms/meliscms_tool_template_generic_form';
     const TEMPLATE_FORM_CONFIG_MODIFY = 'meliscms_template_form_config';
 
+    /** @INFO: Tool access check (CWE-862). */
+    private function hasAccess($key)
+    {
+        return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
+    }
+
     /**
      * This is the main view of the Tool,
      * View File Name: render-tool-template-manager.phtml
@@ -370,6 +376,11 @@ class ToolTemplateController extends MelisAbstractActionController
      */
     public function getTemplateByPageIdAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_templates')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $success = 0;
         $request = $this->getRequest();
         $data    = array();
@@ -398,6 +409,11 @@ class ToolTemplateController extends MelisAbstractActionController
      */
     public function newTemplateDataAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_templates')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $request = $this->getRequest();
         $tplId = null;
         $status  = 0;
@@ -617,6 +633,11 @@ class ToolTemplateController extends MelisAbstractActionController
      */
     public function getToolTemplateDataAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_templates')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $draw = 0;
         $dataCount = 0;
         $dataFilteredCount = 0;
@@ -861,6 +882,11 @@ class ToolTemplateController extends MelisAbstractActionController
      */
     public function updateTemplateDataAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_templates')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $request = $this->getRequest();
         $templateId = null;
         $status  = 0;
@@ -1065,6 +1091,11 @@ class ToolTemplateController extends MelisAbstractActionController
      */
     public function deleteTemplateDataAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_templates')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $translator = $this->getServiceManager()->get('translator');
 
     	$eventDatas = array();
@@ -1109,6 +1140,11 @@ class ToolTemplateController extends MelisAbstractActionController
      */
     public function getTemplateDataByIdAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_templates')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $request = $this->getRequest();
         $data    = array();
 
@@ -1135,6 +1171,11 @@ class ToolTemplateController extends MelisAbstractActionController
 
     public function exportToCsvAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_templates')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $templatesModel = $this->getServiceManager()->get('MelisEngineTableTemplate');
         $translator = $this->getServiceManager()->get('translator');
         $melisTool = $this->getServiceManager()->get('MelisCoreTool');

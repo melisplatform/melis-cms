@@ -45,6 +45,11 @@ class PageDuplicationController extends MelisAbstractActionController
      */
     public function getOriginOfPageByPageIdAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_page')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $data = array();
         $tool = $this->getServiceManager()->get('MelisCmsPage');
         $data = $tool->getOriginOfPage()->toArray();
@@ -59,6 +64,11 @@ class PageDuplicationController extends MelisAbstractActionController
      */
     public function duplicatePageAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_page')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $success = 0;
         $title   = 'tr_meliscms_duplicate_page_title';
         $message = 'tr_meliscms_duplicate_error';
@@ -176,5 +186,11 @@ class PageDuplicationController extends MelisAbstractActionController
     {
         $tool = $this->getServiceManager()->get('MelisCoreTool');
         return $tool;
+    }
+
+    /** @INFO: Tool access check (CWE-862). */
+    private function hasAccess($key)
+    {
+        return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
     }
 }

@@ -192,9 +192,14 @@ class PageEditionController extends MelisAbstractActionController
      */
     public function savePageSessionPluginAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_page')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $translator = $this->getServiceManager()->get('translator');
-    
+
         $postValues = array();
         $request = $this->getRequest();
         if (!empty($idPage) && $request->isPost())
@@ -232,6 +237,11 @@ class PageEditionController extends MelisAbstractActionController
      */
     public function removePageSessionPluginAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_page')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $module = $this->getRequest()->getQuery('module', null);
         $pluginName = $this->getRequest()->getQuery('pluginName', '');
         $pageId = $this->getRequest()->getQuery('pageId', null);
@@ -354,9 +364,14 @@ class PageEditionController extends MelisAbstractActionController
 	 */
 	public function saveEditionAction()
 	{
+		/** @INFO: Access check (tool right) — CWE-862 */
+		if (! $this->hasAccess('meliscms_page')) {
+			return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+		}
+
 		$idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
 		$translator = $this->getServiceManager()->get('translator');
-		
+
 		$eventDatas = array('idPage' => $idPage);
 		$this->getEventManager()->trigger('meliscms_page_saveedition_start', null, $eventDatas);
 		
@@ -550,6 +565,12 @@ class PageEditionController extends MelisAbstractActionController
         }
 
         return $prefix;
+    }
+
+    /** @INFO: Tool access check (CWE-862). */
+    private function hasAccess($key)
+    {
+        return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
     }
 }
 
