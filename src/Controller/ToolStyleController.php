@@ -28,6 +28,12 @@ class ToolStyleController extends MelisAbstractActionController
     const TOOL_TEMPLATES_CONFIG_PATH = 'meliscms/tools/meliscms_tool_styles';
     const TOOL_KEY = 'meliscms_tool_styles';
 
+    /** @INFO: Tool access check (CWE-862). */
+    private function hasAccess($key)
+    {
+        return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
+    }
+
     /**
      * This is the main view of the Tool,
      * View File Name: render-tool-template-manager.phtml
@@ -248,6 +254,11 @@ class ToolStyleController extends MelisAbstractActionController
      */
     public function getStyleDataAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_styles')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         // declare the Tool service that we will be using to completely create our tool.
         $melisTool = $this->getServiceManager()->get('MelisCoreTool');
 
@@ -397,6 +408,10 @@ class ToolStyleController extends MelisAbstractActionController
      */
     public function saveStyleDetailsAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_styles')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
 
         $response = array();
         $success = 0;
@@ -556,6 +571,11 @@ class ToolStyleController extends MelisAbstractActionController
      */
     public function deleteStyleAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_styles')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $translator = $this->getServiceManager()->get('translator');
 
         $eventDatas = array();

@@ -194,6 +194,11 @@ class PageLanguagesController extends MelisAbstractActionController
      */
     public function createNewPageLangVersionAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_page')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $request = $this->getRequest();
         $status  = 0;
         $textMessage = 'tr_meliscms_page_lang_create_failed';
@@ -409,8 +414,13 @@ class PageLanguagesController extends MelisAbstractActionController
      */
     public function setInitialPageLanguageAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_page')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
-        
+
         $cmsPageLangTbl = $this->getServiceManager()->get('MelisEngineTablePageLang');
         $cmsPageLang = $cmsPageLangTbl->getEntryByField('plang_page_id', $idPage)->current();
         
@@ -446,6 +456,10 @@ class PageLanguagesController extends MelisAbstractActionController
         return new JsonModel(array('success' => 1));
     }
 
-
+    /** @INFO: Tool access check (CWE-862). */
+    private function hasAccess($key)
+    {
+        return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
+    }
 
 }

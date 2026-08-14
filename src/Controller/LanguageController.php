@@ -23,7 +23,13 @@ class LanguageController extends MelisAbstractActionController
 	const TOOL_INDEX = 'meliscms';
     const TOOL_KEY = 'meliscms_language_tool';
     const INTERFACE_KEY = 'meliscms_tool_language';
-    
+
+    /** @INFO: Tool access check (CWE-862). */
+    private function hasAccess($key)
+    {
+        return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
+    }
+
 
     public function renderToolLanguageContainerAction()
     {
@@ -218,7 +224,10 @@ class LanguageController extends MelisAbstractActionController
     
     public function getLanguagesAction()
     {
-
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_language')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
 
         $langTable = $this->getServiceManager()->get('MelisEngineTableCmsLang');
         $translator = $this->getServiceManager()->get('translator');
@@ -293,6 +302,11 @@ class LanguageController extends MelisAbstractActionController
     
     public function getLanguageByIdAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_language')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $data = array();
         if($this->getRequest()->isPost())
         {
@@ -315,6 +329,11 @@ class LanguageController extends MelisAbstractActionController
    
     public function addLanguageAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_language')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $response = array();
         $this->getEventManager()->trigger('meliscms_language_new_start', $this, $response);
         $langTable = $this->getServiceManager()->get('MelisEngineTableCmsLang');
@@ -390,6 +409,11 @@ class LanguageController extends MelisAbstractActionController
      */
     public function editLanguageAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_language')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $response = [];
         $this->getEventManager()->trigger('meliscms_platform_update_start', $this, $response);
         $platformTable = $this->getServiceManager()->get('MelisEngineTableCmsLang');
@@ -454,6 +478,11 @@ class LanguageController extends MelisAbstractActionController
     
     public function deleteLanguageAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_language')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $response = array();
         $this->getEventManager()->trigger('meliscms_language_delete_start', $this, $response);
         $translator = $this->getServiceManager()->get('translator');

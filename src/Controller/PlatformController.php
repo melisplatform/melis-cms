@@ -21,7 +21,13 @@ class PlatformController extends MelisAbstractActionController
     const TOOL_INDEX = 'meliscms';
     const TOOL_KEY = 'meliscms_platform_tool';
     const INTERFACE_KEY = 'meliscms_tool_platform_ids';
-    
+
+    /** @INFO: Tool access check (CWE-862). */
+    private function hasAccess($key)
+    {
+        return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
+    }
+
     /*
      * Render Tool Platform Container
      */
@@ -218,8 +224,13 @@ class PlatformController extends MelisAbstractActionController
      * @return Json Array
      */
     public function savePlatformIdsRangeAction(){
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_platform_ids')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $translator = $this->getServiceManager()->get('translator');
-        
+
         $request = $this->getRequest();
         // Default Values
         $pids_id = null;
@@ -381,6 +392,11 @@ class PlatformController extends MelisAbstractActionController
      *
      */
     public function deletePlatformIdAction(){
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_platform_ids')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $translator = $this->getServiceManager()->get('translator');
         $this->getEventManager()->trigger('meliscms_platform_IDs_delete_start', $this, array());
         $request = $this->getRequest();
@@ -405,6 +421,11 @@ class PlatformController extends MelisAbstractActionController
      */
     public function getPlatformDataAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_platform_ids')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $melisEngineTablePlatformIds = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
         $translator = $this->getServiceManager()->get('translator');
         $melisTool = $this->getServiceManager()->get('MelisCoreTool');

@@ -24,6 +24,11 @@ class SitesModuleLoaderController extends MelisAbstractActionController
      */
     public function getDependentsAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_sites')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $success = 0;
         $modules = array();
         $request = $this->getRequest();
@@ -53,6 +58,11 @@ class SitesModuleLoaderController extends MelisAbstractActionController
 
     public function getRequiredDependenciesAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_sites')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $success = 0;
         $modules = array();
         $requiredModules = array();
@@ -110,6 +120,11 @@ class SitesModuleLoaderController extends MelisAbstractActionController
      * @return void|ViewModel
      */
     public function renderToolSitesModuleLoadContentAction() {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_sites')) {
+            return new ViewModel();
+        }
+
         $siteId = (int) $this->params()->fromQuery('siteId', '');
         $moduleName = $this->params()->fromQuery('moduleName', '');
         $siteModuleLoadSvc = $this->getServiceManager()->get("MelisCmsSiteModuleLoadService");
@@ -177,6 +192,12 @@ class SitesModuleLoaderController extends MelisAbstractActionController
         $toolSvc = $this->getServiceManager()->get('MelisCoreTool');
         $toolSvc->setMelisToolKey('MelisCmsUserAccount', 'melis_cms_user_account');
         return $toolSvc;
+    }
+
+    /** @INFO: Tool access check (CWE-862). */
+    private function hasAccess($key)
+    {
+        return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
     }
 
 }

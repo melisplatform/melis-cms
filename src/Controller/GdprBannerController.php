@@ -25,6 +25,12 @@ class GdprBannerController extends MelisAbstractActionController
     const MODULE_NAME = 'MelisCmsGdprBanner';
     const LOG_UPDATE = 'UDPATE';
 
+    /** @INFO: Tool access check (CWE-862). */
+    private function hasAccess($key)
+    {
+        return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
+    }
+
     /**
      * @return ViewModel
      */
@@ -106,6 +112,11 @@ class GdprBannerController extends MelisAbstractActionController
      */
     public function bannerDetailsAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('melis_core_gdpr')) {
+            return new ViewModel();
+        }
+
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $siteId = $this->params()->fromQuery('siteId', null);
         $view = new ViewModel();
@@ -146,6 +157,11 @@ class GdprBannerController extends MelisAbstractActionController
      */
     public function saveBannerAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('melis_core_gdpr')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $tool = $this->getTool();
         $request = $this->getRequest();
         $logItemId = 0;

@@ -363,6 +363,11 @@ class SitesController extends MelisAbstractActionController
      */
     public function getSiteDataAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_sites')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $cmsSiteSrv = $this->getServiceManager()->get('MelisCmsSiteService');
         $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
         $translator = $this->getServiceManager()->get('translator');
@@ -440,6 +445,11 @@ class SitesController extends MelisAbstractActionController
      */
     public function createNewSiteAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_sites')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $sId = null;
         $errors = array();
         $status = false;
@@ -703,6 +713,11 @@ class SitesController extends MelisAbstractActionController
      */
     public function saveSiteAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_sites')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $eventDatas = array();
         $this->getEventManager()->trigger('meliscms_sites_save_start', $this, $eventDatas);
 
@@ -938,6 +953,11 @@ class SitesController extends MelisAbstractActionController
      */
     public function deleteSiteAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_sites')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $request = $this->getRequest();
         $status  = false;
         $textMessage = 'tr_meliscms_tool_site_delete_failed';
@@ -1687,6 +1707,11 @@ class SitesController extends MelisAbstractActionController
      */
     public function deleteSiteDomainPlatformAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('meliscms_tool_sites')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+
         $platform   = $this->params()->fromRoute('platform', $this->params()->fromQuery('platform', ''));
         $id         = $this->params()->fromRoute('id', $this->params()->fromQuery('id', ''));
         $success    = (int) $this->params()->fromRoute('success', $this->params()->fromQuery('success', ''));
@@ -1732,5 +1757,11 @@ class SitesController extends MelisAbstractActionController
         $melisEngineCacheSystem = $this->getServiceManager()->get('MelisEngineCacheSystem');
         foreach($cacheKeys as $preFix)
             $melisEngineCacheSystem->deleteCacheByPrefix($preFix, $cacheConfig);
+    }
+
+    /** @INFO: Tool access check (CWE-862). */
+    private function hasAccess($key)
+    {
+        return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
     }
 }
