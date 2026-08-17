@@ -33,7 +33,7 @@ return [
                 ['key' => 'save',      'label' => 'tr_meliscms_page_actions_Save'],
                 ['key' => 'clear',     'label' => 'tr_meliscms_page_action_clear'],
                 ['key' => 'publish',   'label' => 'tr_meliscms_page_actions_Publish'],
-                ['key' => 'status',    'label' => 'Switch offline/online'], // switch En ligne / Hors ligne
+                ['key' => 'status',    'label' => 'tr_meliscms_page_actions_status'], // switch En ligne / Hors ligne
                 ['key' => 'delete',    'label' => 'tr_meliscms_page_actions_Delete Page'],
                 ['key' => 'duplicate', 'label' => 'tr_meliscms_page_action_duplicate'],
                 ['key' => 'view',      'label' => 'tr_meliscms_page_actions_See'],
@@ -55,7 +55,7 @@ return [
     // par MelisReactApi\...\buildMenuResponse quand ?full=1. Cf. react.capabilities.php des autres modules.
     'melisReactRightsTools' => [
         'meliscms_toolstree_section' => [
-            ['melisKey' => 'meliscms_page', 'name' => 'Edition de page', 'icon' => 'fa-file-text-o'],
+            ['melisKey' => 'meliscms_page', 'name' => 'tr_meliscms_page_edition_rights_label', 'icon' => 'fa-file-text-o'],
         ],
     ],
 

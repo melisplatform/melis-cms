@@ -883,5 +883,12 @@ return array(
 
 	'tr_meliscms_site_properties_dnd_mode_deactivate' => 'Deactivate',
 	'tr_meliscms_site_properties_dnd_mode_confirmation_title' => 'Warning',
-	'tr_meliscms_site_properties_dnd_mode_confirmation_msg' => 'Deactivating this may lead to unexpected results. Are you sure you want to proceed?'
+	'tr_meliscms_site_properties_dnd_mode_confirmation_msg' => 'Deactivating this may lead to unexpected results. Are you sure you want to proceed?',
+
+	'tr_melis_cms_sites_domains_content' => 'Domain Content',
+	'tr_meliscms_tool_sites_modal_container' => 'Add site',
+	'tr_meliscms_tool_sites_edit_site' => 'Edit Site',
+	'tr_melis_cms_sites_site_translations_modal_edit' => 'Site Translation Content',
+	'tr_meliscms_page_actions_status' => 'Switch offline/online',
+	'tr_meliscms_page_edition_rights_label' => 'Page editing'
 );

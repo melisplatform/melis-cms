@@ -68,7 +68,7 @@ return array(
                     'conf' => array(
                         'id' => 'id_meliscms_tool_sites_site_translations_modal_edit',
                         'melisKey' => 'meliscms_tool_sites_site_translations_modal_edit',
-                        'name' => 'Site Translation Content',
+                        'name' => 'tr_melis_cms_sites_site_translations_modal_edit',
                         'icon' => 'fa fa-pencil',
                     ),
                     'forward' => array(
