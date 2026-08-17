@@ -288,7 +288,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     if (!current || isCreation || !name) return
     const path = `/melis-cms/page/${current}`
     ;(window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void })
-      .__melisOpenTab?.({ id: path, label: name, path })
+      .__melisOpenTab?.({ id: path, label: `${current} - ${name}`, path })
   }, [structMatches, struct, current, isCreation])
 
   // état partagé Propriétés + SEO + refs (chargé UNE fois par page → pas de refetch au switch)
@@ -669,7 +669,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         const newId = data.response?.pageId ?? data.pageId
         if (newId && data.response?.openPageAfterDuplicate !== false) {
           const editPath = `/melis-cms/page/${newId}`
-          const label = (data.response?.name || `${tr.pageWord} ${newId}`).trim()
+          const label = `${newId} - ${(data.response?.name || `${tr.pageWord} ${newId}`).trim()}`
           ;(window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void }).__melisOpenTab?.({ id: editPath, label, path: editPath })
           navigate(editPath)
         }
@@ -733,7 +733,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     const newTabId = openedRef.current.find((x) => x === 'new' || x.startsWith('new~')) ?? 'new'
     const editPath = `/melis-cms/page/${newId}`
     const wg = window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void; __melisCloseTab?: (id: string) => void }
-    wg.__melisOpenTab?.({ id: editPath, label: (name || `Page ${newId}`).trim(), path: editPath })
+    wg.__melisOpenTab?.({ id: editPath, label: `${newId} - ${(name || `Page ${newId}`).trim()}`, path: editPath })
     navigate(editPath); wg.__melisCloseTab?.(`/melis-cms/page/${newTabId}`)
     setOpened((o) => o.filter((x) => x !== newTabId))
     window.dispatchEvent(new CustomEvent('melis:cms-page-created', { detail: { idPage: newId, father: newTabId.startsWith('new~') ? newTabId.slice('new~'.length) : '' } }))
@@ -830,7 +830,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: chromeCollapsed ? '5px 12px' : '8px 16px', borderBottom: showChrome && !chromeCollapsed ? 'none' : '1px solid var(--color-border,#e5e7eb)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: narrow ? 0 : undefined, overflow: narrow ? 'hidden' : undefined }}>
             {showChrome && (<>
-              <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--color-foreground,#111827)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: narrow ? 0 : undefined }}>{header?.pageName ?? (structMatches ? `Page ${current}` : '')}</span>
+              <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--color-foreground,#111827)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: narrow ? 0 : undefined }}>{header?.pageName ? `${current} - ${header.pageName}` : (structMatches ? `Page ${current}` : '')}</span>
               {statusLabel && <span style={{ fontSize: 11, fontWeight: 600, color: '#fff', background: statusColor, borderRadius: 999, padding: '2px 8px', flexShrink: 0 }}>{statusLabel}</span>}
               {/* Métadonnées secondaires (date/auteur, chargement, toast local) : masquées sur narrow pour
                   garder l'en-tête sur UNE seule ligne (règle pattern 1) — les notifications importantes
