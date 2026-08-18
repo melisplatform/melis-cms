@@ -54,10 +54,28 @@ function notify(kind: 'ok' | 'ko', title: string, message: string, fields?: Noti
 
 // Registre modulaire (pour futurs bricks de modules qui fourniront leur onglet natif).
 type PageTabRegistry = { tabs: Record<string, PageTabComp>; v: number }
-const w = window as unknown as { __melisPageTabRegistry?: PageTabRegistry; __melisRegisterPageTab?: (k: string, c: PageTabComp) => void }
+// Hook de sauvegarde d'un onglet modulaire : la sauvegarde TRANSVERSE (« Sauvegarder »/« Publier »
+// en haut de l'éditeur) invoque ces hooks pour que chaque onglet (ex. Open Graph de melis-cms-share)
+// persiste ses données SANS bouton propre — sauvegarde centralisée, comme en legacy.
+type PageSaveHook = (idPage: number) => Promise<void>
+const w = window as unknown as {
+  __melisPageTabRegistry?: PageTabRegistry
+  __melisRegisterPageTab?: (k: string, c: PageTabComp) => void
+  __melisPageSaveHooks?: Record<string, PageSaveHook>
+  __melisRegisterPageSaveHook?: (k: string, hook: PageSaveHook | null) => void
+}
 if (!w.__melisPageTabRegistry) {
   w.__melisPageTabRegistry = { tabs: {}, v: 0 }
   w.__melisRegisterPageTab = (k, c) => { w.__melisPageTabRegistry!.tabs[k] = c; w.__melisPageTabRegistry!.v++; window.dispatchEvent(new CustomEvent('melis:page-tabs-changed')) }
+}
+if (!w.__melisPageSaveHooks) {
+  w.__melisPageSaveHooks = {}
+  w.__melisRegisterPageSaveHook = (k, hook) => { if (hook) w.__melisPageSaveHooks![k] = hook; else delete w.__melisPageSaveHooks![k] }
+}
+// Exécute les hooks de sauvegarde des onglets modulaires montés (séquentiel ; une erreur remonte
+// à l'appelant → notification KO du shell). Appelé APRÈS un savePage/publishPage legacy réussi.
+async function runPageSaveHooks(idPage: number): Promise<void> {
+  for (const hook of Object.values(w.__melisPageSaveHooks ?? {})) await hook(idPage)
 }
 function isNativeTab(key: string): boolean {
   return CONTROLLED.has(key) || !!SELF_TABS[key] || !!w.__melisPageTabRegistry?.tabs[key]
@@ -531,6 +549,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     try {
       const data = await postLegacyPage(`/melis/MelisCms/Page/savePage?idPage=${encodeURIComponent(current)}&fatherPageId=`)
       if (data.success === 1) {
+        await runPageSaveHooks(Number(current)) // onglets modulaires (ex. Open Graph) : save transverse
         notify('ok', (data.textTitle || tr.notifSave).trim(), tr.pageSaved) // notif du shell (comme Publier)
         await releaseLock(current) // libère le verrou → le cadenas du tree disparaît
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // nom/statut + cadenas → maj + déploie jusqu'à la page
@@ -554,6 +573,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     try {
       const data = await postLegacyPage(`/melis/MelisCms/Page/publishPage?idPage=${encodeURIComponent(current)}`)
       if (data.success === 1) {
+        await runPageSaveHooks(Number(current)) // onglets modulaires (ex. Open Graph) : save transverse
         notify('ok', (data.textTitle || tr.notifPublish).trim(), tr.pagePublished)
         await releaseLock(current) // libère le verrou (comme le legacy à la publication)
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // statut online + cadenas → maj + déploie jusqu'à la page
