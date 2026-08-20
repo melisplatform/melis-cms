@@ -90,7 +90,7 @@ return array(
                         'meliscms_tool_sites_modal_container' => array(
                             'conf' => array(
                                 'id' => 'id_meliscms_tool_sites_modal_container',
-                                'name' => 'meliscms_tool_sites_modal_container',
+                                'name' => 'tr_meliscms_tool_sites_modal_container',
                                 'melisKey' => 'meliscms_tool_sites_modal_container',
                             ),
                             'forward' => array(
@@ -206,7 +206,7 @@ return array(
                             'conf' => array(
                                 'id' => 'id_meliscms_tool_sites_edit_site',
                                 'melisKey' => 'meliscms_tool_sites_edit_site',
-                                'name' => 'Edit Site',
+                                'name' => 'tr_meliscms_tool_sites_edit_site',
                                 'rights_checkbox_disable' => true,
                                 'follow_regular_rendering' => false,
                             ),

@@ -688,7 +688,7 @@ export function LanguagesTab({ idPage }: { idPage: number }) {
         notify('ok', tr.langVersions, tr.langCreated)
         setReloadKey((k) => k + 1) // rafraîchit la liste des versions
         const path = `/melis-cms/page/${info.pageid}`
-        ;(window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void }).__melisOpenTab?.({ id: path, label: (info.name || `Page ${info.pageid}`).toString().trim(), path })
+        ;(window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void }).__melisOpenTab?.({ id: path, label: `${info.pageid} - ${(info.name || `Page ${info.pageid}`).toString().trim()}`, path })
         navigate(path)
       } else {
         const t = r.textMessage && !r.textMessage.startsWith('tr_') ? r.textMessage : tr.langCreateFailed
@@ -700,7 +700,7 @@ export function LanguagesTab({ idPage }: { idPage: number }) {
   // Ouvre une AUTRE version de langue dans un onglet du shell (même mécanisme que l'arbre).
   const openPage = useCallback((pageId: number, name: string) => {
     const path = `/melis-cms/page/${pageId}`
-    ;(window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void }).__melisOpenTab?.({ id: path, label: (name || `Page ${pageId}`).toString().trim(), path })
+    ;(window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void }).__melisOpenTab?.({ id: path, label: `${pageId} - ${(name || `Page ${pageId}`).toString().trim()}`, path })
     navigate(path)
   }, [navigate])
   if (!d) return <div style={wrap}>{tr.loading}</div>

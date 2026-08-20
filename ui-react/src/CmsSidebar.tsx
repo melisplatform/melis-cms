@@ -102,7 +102,7 @@ export default function CmsSidebar() {
             selectedId={selectedId}
             onSelect={(n) => {
               const path = `/melis-cms/page/${n.key}`
-              const label = n.melisData?.page_title || n.title
+              const label = `${n.key} - ${n.melisData?.page_title || n.title}`
               openTab(path, label)
             }}
             onAction={handleAction}

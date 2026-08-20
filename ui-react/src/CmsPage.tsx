@@ -54,10 +54,28 @@ function notify(kind: 'ok' | 'ko', title: string, message: string, fields?: Noti
 
 // Registre modulaire (pour futurs bricks de modules qui fourniront leur onglet natif).
 type PageTabRegistry = { tabs: Record<string, PageTabComp>; v: number }
-const w = window as unknown as { __melisPageTabRegistry?: PageTabRegistry; __melisRegisterPageTab?: (k: string, c: PageTabComp) => void }
+// Hook de sauvegarde d'un onglet modulaire : la sauvegarde TRANSVERSE (« Sauvegarder »/« Publier »
+// en haut de l'éditeur) invoque ces hooks pour que chaque onglet (ex. Open Graph de melis-cms-share)
+// persiste ses données SANS bouton propre — sauvegarde centralisée, comme en legacy.
+type PageSaveHook = (idPage: number) => Promise<void>
+const w = window as unknown as {
+  __melisPageTabRegistry?: PageTabRegistry
+  __melisRegisterPageTab?: (k: string, c: PageTabComp) => void
+  __melisPageSaveHooks?: Record<string, PageSaveHook>
+  __melisRegisterPageSaveHook?: (k: string, hook: PageSaveHook | null) => void
+}
 if (!w.__melisPageTabRegistry) {
   w.__melisPageTabRegistry = { tabs: {}, v: 0 }
   w.__melisRegisterPageTab = (k, c) => { w.__melisPageTabRegistry!.tabs[k] = c; w.__melisPageTabRegistry!.v++; window.dispatchEvent(new CustomEvent('melis:page-tabs-changed')) }
+}
+if (!w.__melisPageSaveHooks) {
+  w.__melisPageSaveHooks = {}
+  w.__melisRegisterPageSaveHook = (k, hook) => { if (hook) w.__melisPageSaveHooks![k] = hook; else delete w.__melisPageSaveHooks![k] }
+}
+// Exécute les hooks de sauvegarde des onglets modulaires montés (séquentiel ; une erreur remonte
+// à l'appelant → notification KO du shell). Appelé APRÈS un savePage/publishPage legacy réussi.
+async function runPageSaveHooks(idPage: number): Promise<void> {
+  for (const hook of Object.values(w.__melisPageSaveHooks ?? {})) await hook(idPage)
 }
 function isNativeTab(key: string): boolean {
   return CONTROLLED.has(key) || !!SELF_TABS[key] || !!w.__melisPageTabRegistry?.tabs[key]
@@ -288,7 +306,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     if (!current || isCreation || !name) return
     const path = `/melis-cms/page/${current}`
     ;(window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void })
-      .__melisOpenTab?.({ id: path, label: name, path })
+      .__melisOpenTab?.({ id: path, label: `${current} - ${name}`, path })
   }, [structMatches, struct, current, isCreation])
 
   // état partagé Propriétés + SEO + refs (chargé UNE fois par page → pas de refetch au switch)
@@ -531,6 +549,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     try {
       const data = await postLegacyPage(`/melis/MelisCms/Page/savePage?idPage=${encodeURIComponent(current)}&fatherPageId=`)
       if (data.success === 1) {
+        await runPageSaveHooks(Number(current)) // onglets modulaires (ex. Open Graph) : save transverse
         notify('ok', (data.textTitle || tr.notifSave).trim(), tr.pageSaved) // notif du shell (comme Publier)
         await releaseLock(current) // libère le verrou → le cadenas du tree disparaît
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // nom/statut + cadenas → maj + déploie jusqu'à la page
@@ -554,6 +573,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     try {
       const data = await postLegacyPage(`/melis/MelisCms/Page/publishPage?idPage=${encodeURIComponent(current)}`)
       if (data.success === 1) {
+        await runPageSaveHooks(Number(current)) // onglets modulaires (ex. Open Graph) : save transverse
         notify('ok', (data.textTitle || tr.notifPublish).trim(), tr.pagePublished)
         await releaseLock(current) // libère le verrou (comme le legacy à la publication)
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // statut online + cadenas → maj + déploie jusqu'à la page
@@ -669,7 +689,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         const newId = data.response?.pageId ?? data.pageId
         if (newId && data.response?.openPageAfterDuplicate !== false) {
           const editPath = `/melis-cms/page/${newId}`
-          const label = (data.response?.name || `${tr.pageWord} ${newId}`).trim()
+          const label = `${newId} - ${(data.response?.name || `${tr.pageWord} ${newId}`).trim()}`
           ;(window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void }).__melisOpenTab?.({ id: editPath, label, path: editPath })
           navigate(editPath)
         }
@@ -733,7 +753,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     const newTabId = openedRef.current.find((x) => x === 'new' || x.startsWith('new~')) ?? 'new'
     const editPath = `/melis-cms/page/${newId}`
     const wg = window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void; __melisCloseTab?: (id: string) => void }
-    wg.__melisOpenTab?.({ id: editPath, label: (name || `Page ${newId}`).trim(), path: editPath })
+    wg.__melisOpenTab?.({ id: editPath, label: `${newId} - ${(name || `Page ${newId}`).trim()}`, path: editPath })
     navigate(editPath); wg.__melisCloseTab?.(`/melis-cms/page/${newTabId}`)
     setOpened((o) => o.filter((x) => x !== newTabId))
     window.dispatchEvent(new CustomEvent('melis:cms-page-created', { detail: { idPage: newId, father: newTabId.startsWith('new~') ? newTabId.slice('new~'.length) : '' } }))
@@ -830,7 +850,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: chromeCollapsed ? '5px 12px' : '8px 16px', borderBottom: showChrome && !chromeCollapsed ? 'none' : '1px solid var(--color-border,#e5e7eb)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: narrow ? 0 : undefined, overflow: narrow ? 'hidden' : undefined }}>
             {showChrome && (<>
-              <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--color-foreground,#111827)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: narrow ? 0 : undefined }}>{header?.pageName ?? (structMatches ? `Page ${current}` : '')}</span>
+              <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--color-foreground,#111827)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: narrow ? 0 : undefined }}>{header?.pageName ? `${current} - ${header.pageName}` : (structMatches ? `Page ${current}` : '')}</span>
               {statusLabel && <span style={{ fontSize: 11, fontWeight: 600, color: '#fff', background: statusColor, borderRadius: 999, padding: '2px 8px', flexShrink: 0 }}>{statusLabel}</span>}
               {/* Métadonnées secondaires (date/auteur, chargement, toast local) : masquées sur narrow pour
                   garder l'en-tête sur UNE seule ligne (règle pattern 1) — les notifications importantes
