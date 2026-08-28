@@ -182,6 +182,9 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const editInlineRef = useRef<((zoneId: string, refId: string) => void) | null>(null)
   const injectControlsRef = useRef<(() => void) | null>(null) // (re)inject the in-canvas reorder arrows
   const tinyConfigsRef = useRef<Record<string, any> | null>(null) // the real Melis tinymce configs by type
+  const docEmptyRef = useRef(false)   // the fetched document had NO zones (fresh, unsaved page)
+  const seedTriedRef = useRef(false)  // guard: only seed a page's template zones once
+  const maybeSeedZonesRef = useRef<(() => void) | null>(null) // called from onFrameLoad once the canvas is up
 
   // On a phone-narrow viewport the structure panel can't sit next to the canvas (360px would eat the
   // whole screen and there's nowhere to close it). Switch it to a right-side DRAWER: full page preview
@@ -356,6 +359,9 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     })
     // Inject the in-canvas reorder arrows once the fresh render is in the DOM (gone after every reload).
     injectControlsRef.current?.()
+    // Fresh page: its template drag-drop zones are rendered here but absent from the (empty) document —
+    // seed them so the structure panel lists them. The canvas is guaranteed in the DOM now.
+    maybeSeedZonesRef.current?.()
   }, [])
 
   // Keep the selection ref current for the canvas click listener (attached once per iframe load).
@@ -604,13 +610,42 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const highlight = useCallback((id: string, on: boolean) => { locate(id)?.classList.toggle('melis-react-hl', on) }, [locate])
   const reveal = useCallback((id: string) => { locate(id)?.scrollIntoView({ block: 'center', behavior: 'smooth' }) }, [locate])
 
+  // A FRESH page has an empty <document/>: its drag-drop zones exist only in the template render, so the
+  // structure panel would stay empty until the first save. Seed them — read the top-level zone ids off the
+  // rendered canvas and persist empty zone nodes into the edit session, so the panel lists them right away
+  // AND ops (add plugin / apply layout) can target them. Idempotent (guarded); a no-op once zones exist.
+  const maybeSeedZones = useCallback(async () => {
+    if (seedTriedRef.current || !docEmptyRef.current) return
+    const d = iframeRef.current?.contentDocument
+    if (!d) return
+    const ids = Array.from(d.querySelectorAll('[data-dragdropzone-id]'))
+      .filter((el) => !(el as HTMLElement).parentElement?.closest('[data-dragdropzone-id]')) // top-level zones only
+      .map((el) => (el as HTMLElement).getAttribute('data-dragdropzone-id') || '')
+      .filter(Boolean)
+    const uniq = Array.from(new Set(ids))
+    if (uniq.length === 0) return
+    seedTriedRef.current = true
+    try {
+      await apiPost('edition/save', { idPage, ops: [{ op: 'ensureZones', zones: uniq }] })
+      const d2 = await apiGet<Doc>(`edition/document?idPage=${idPage}`)
+      const zoneNodes = (d2.nodes || []).filter((n) => n.kind === 'zone' && n.id)
+      if (zoneNodes.length) { docEmptyRef.current = false; setTree(zoneNodes.map((z) => toCell(z, d2.pluginTitles || {}))) }
+    } catch { /* leave the panel empty — same as before the seed */ }
+  }, [idPage])
+  maybeSeedZonesRef.current = maybeSeedZones
+
   useEffect(() => {
     let cancelled = false
+    seedTriedRef.current = false
     setDoc(null); setErr(null); setSelected(null)
     apiGet<Doc>(`edition/document?idPage=${idPage}`).then((d) => {
       if (cancelled) return
       const zoneNodes = (d.nodes || []).filter((n) => n.kind === 'zone' && n.id)
       setTree(zoneNodes.map((z) => toCell(z, d.pluginTitles || {})))
+      // Fresh, zoneless page → try to seed the template zones (also attempted from onFrameLoad; whichever
+      // fires with the canvas ready wins, the other early-returns).
+      docEmptyRef.current = zoneNodes.length === 0
+      void maybeSeedZones()
       setLayouts(d.layouts || [])
       // responsive widths per plugin DATA node (top-level siblings; the ref id === the node id) —
       // covers blocks in every cell since all data nodes are top-level whatever cell references them.

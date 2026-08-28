@@ -281,6 +281,36 @@ final class PageContentDocument
         return false;
     }
 
+    /**
+     * Ensure a TOP-LEVEL drag-drop zone with this id exists (empty). Seeds a fresh page's
+     * template-defined zones into the model so the structure panel shows them AND the structural ops
+     * (addPlugin/applyLayout/setZoneRefs) can target them BEFORE the page has any saved content — the
+     * zones otherwise live only in the template render, never in an empty `<document/>`. No-op if the
+     * zone is already a top-level node. Returns true when a zone was added.
+     */
+    public function ensureZone(string $id): bool
+    {
+        if ($id === '') {
+            return false;
+        }
+        foreach ($this->nodes as $n) {
+            if (($n['kind'] ?? '') === 'zone' && (string) ($n['id'] ?? '') === $id) {
+                return false; // already present
+            }
+        }
+        $this->nodes[] = [
+            'kind'     => 'zone',
+            'tag'      => 'melisDragDropZone',
+            'id'       => $id,
+            'attrs'    => ['id' => $id],
+            'items'    => [],
+            'innerRaw' => '',
+            'raw'      => '<melisDragDropZone id="' . htmlspecialchars($id, ENT_QUOTES | ENT_XML1, 'UTF-8') . '"/>',
+            'dirty'    => true,
+        ];
+        return true;
+    }
+
     /** Reorder top-level nodes by id; unknown ids ignored, missing kept in order. */
     public function reorderNodes(array $idsInOrder): void
     {

@@ -81,6 +81,17 @@ class EditionSaveController extends MelisAbstractActionController
                         $doc->setZoneRefs((string) ($op['zoneId'] ?? ''), array_values(array_map('strval', (array) ($op['refIds'] ?? []))));
                         $applied++;
                         break;
+                    case 'ensureZones':
+                        // Seed a FRESH page's template drag-drop zones into the model (they live only in
+                        // the template render until the page has content) so the structure panel shows them
+                        // and later ops can target them. Client sends the top-level zone ids read off the
+                        // rendered canvas. No-op for zones already present.
+                        foreach ((array) ($op['zones'] ?? []) as $zid) {
+                            if ($doc->ensureZone((string) $zid)) {
+                                $applied++;
+                            }
+                        }
+                        break;
                     case 'addPlugin':
                         // Add ANY active plugin to a zone (from the React "+" palette). Tag blocks
                         // (html/textarea/media) get a CDATA node; generic plugins an empty node they
