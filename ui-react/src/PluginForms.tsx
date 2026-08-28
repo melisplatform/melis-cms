@@ -10,11 +10,14 @@ import { registerMelisFrontPlugins } from '../../../melis-front/ui-react/plugin-
 import { registerMelisCmsNewsPlugins } from '../../../melis-cms-news/ui-react/plugin-config/MelisCmsNewsPlugins'
 import { registerMelisCmsSliderPlugins } from '../../../melis-cms-slider/ui-react/plugin-config/MelisCmsSliderPlugins'
 import { registerMelisCmsProspectsPlugins } from '../../../melis-cms-prospects/ui-react/plugin-config/MelisCmsProspectsPlugins'
+// melis-cache-internal contributes a GLOBAL tab ("Cache partiel") shown on every plugin — modular proof.
+import { registerMelisCacheInternalPlugins } from '../../../melis-cache-internal/ui-react/plugin-config/MelisCacheInternalPartialCaching'
 
 registerMelisFrontPlugins()
 registerMelisCmsNewsPlugins()
 registerMelisCmsSliderPlugins()
 registerMelisCmsProspectsPlugins()
+registerMelisCacheInternalPlugins()
 
 export { hasPluginForm, PluginTabbedForm }
 export type { PluginFormProps }

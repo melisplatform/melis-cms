@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import type { ReactNode } from 'react'
 import { PagePicker } from './PagePicker'
 
@@ -191,6 +191,9 @@ export type PluginTab = {
   title: string
   icon?: string // a FontAwesome class, e.g. 'fa fa-cog' (loaded in the BO)
   order?: number // lower = earlier; the plugin's own tab(s) default to 0
+  /** Owning Melis module. When set, the tab is shown only while that module is ACTIVE — mirrors the
+   *  legacy `isModuleLoaded(...)` gate. Used by GLOBAL tabs contributed by another module. */
+  module?: string
   Component: (p: { ctx: PluginTabContext }) => ReactNode
 }
 
@@ -209,14 +212,66 @@ export function registerPluginTab(pluginName: string, tab: PluginTab): void {
   else list.push(tab)
 }
 
-/** Whether a plugin has at least one native React config tab (→ use the React form, not the iframe). */
+/**
+ * GLOBAL tabs contributed to EVERY plugin's config (e.g. melis-cache-internal's "Cache partiel" tab, which
+ * the legacy config listener injects into every plugin's `modal_form`). Appended after the plugin's own
+ * tabs. They only surface on plugins that ALREADY have a native React form — plugins on the legacy iframe
+ * fallback keep showing these tabs the legacy way (via createOptionsForms), so nothing is duplicated.
+ */
+export const GLOBAL_PLUGIN_TABS: PluginTab[] = []
+
+/** Register a config tab shown on EVERY plugin (idempotent per tab.id). Give it a high `order` to sit last. */
+export function registerGlobalPluginTab(tab: PluginTab): void {
+  const i = GLOBAL_PLUGIN_TABS.findIndex((t) => t.id === tab.id)
+  if (i >= 0) GLOBAL_PLUGIN_TABS[i] = tab
+  else GLOBAL_PLUGIN_TABS.push(tab)
+}
+
+// ── Active Melis modules ───────────────────────────────────────────────────────
+// A module-gated tab (PluginTab.module) must vanish when its module is disabled — same as the legacy
+// listener's `isModuleLoaded()` gate. The BO's /react-api/react-modules lists a module ONLY while it is
+// active (and ships a brick), so its `module` values are our active-module set. Fetched once (cached),
+// re-fetchable on demand; the shell has no window bridge for this, so the brick fetches it itself.
+let _activeModules: Set<string> | null = null
+let _activeInFlight: Promise<void> | null = null
+const _activeListeners = new Set<() => void>()
+
+function fetchActiveModules(): Promise<void> {
+  if (_activeInFlight) return _activeInFlight
+  _activeInFlight = (async () => {
+    try {
+      const r = await fetch('/melis/react-api/react-modules', { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      const j: any = await r.json().catch(() => null)
+      const arr: any[] = Array.isArray(j) ? j : (j?.data ?? j?.bricks ?? [])
+      _activeModules = new Set(arr.map((m) => String(m?.module ?? '')).filter(Boolean))
+    } catch {
+      _activeModules = new Set()
+    }
+    _activeListeners.forEach((l) => l())
+  })()
+  return _activeInFlight
+}
+
+/** The set of active Melis modules (null until loaded). Fetches once on first use. */
+function useActiveModules(): Set<string> | null {
+  const [, force] = useReducer((x: number) => x + 1, 0)
+  useEffect(() => {
+    _activeListeners.add(force)
+    void fetchActiveModules()
+    return () => { _activeListeners.delete(force) }
+  }, [])
+  return _activeModules
+}
+
+/** Whether a plugin has at least one native React config tab (→ use the React form, not the iframe).
+ *  Global tabs do NOT count: they only augment plugins that already have their own React form. */
 export function hasPluginForm(pluginName: string): boolean {
   return (PLUGIN_FORM_TABS[pluginName]?.length ?? 0) > 0
 }
 
-/** Tabs for a plugin, ordered (own tabs first via `order`, then registration order). */
+/** Tabs for a plugin, ordered (own tabs first via `order`, then global tabs, all sorted by `order`). */
 function tabsFor(pluginName: string): PluginTab[] {
-  return (PLUGIN_FORM_TABS[pluginName] || []).slice().sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+  return (PLUGIN_FORM_TABS[pluginName] || []).concat(GLOBAL_PLUGIN_TABS).slice().sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
 }
 
 /**
@@ -226,7 +281,11 @@ function tabsFor(pluginName: string): PluginTab[] {
  * included in the save even if never opened — same semantics as the legacy multi-tab modal.
  */
 export function PluginTabbedForm(props: PluginFormProps) {
-  const tabs = tabsFor(props.pluginName)
+  const activeModules = useActiveModules()
+  // Hide a module-gated tab when its module is disabled (legacy `isModuleLoaded` parity). While the
+  // active-module set is still loading (null) we keep all tabs — for an ACTIVE module that avoids any
+  // flash; a DISABLED module's tab shows for the fetch's brief moment, then drops.
+  const tabs = tabsFor(props.pluginName).filter((t) => !t.module || activeModules === null || activeModules.has(t.module))
   const { saving, fieldErrors, message, submit } = useSubmit(props)
   const [values, setValues] = useState<Record<string, FieldValue>>({})
   const [active, setActive] = useState(0)
@@ -382,10 +441,10 @@ export function TemplateField({ ctx, name = 'template_path', label = 'Template',
  * vars so it works inside the standalone melis-cms brick (no Tailwind pipeline here) and follows dark mode.
  * A visually-hidden native <input> drives state + keyboard focus for accessibility.
  */
-export function CheckBox({ checked, disabled, onChange, title }: { checked: boolean; disabled?: boolean; onChange: (v: boolean) => void; title?: string }) {
+export function CheckBox({ checked, disabled, onChange, title, label }: { checked: boolean; disabled?: boolean; onChange: (v: boolean) => void; title?: string; label?: ReactNode }) {
   const [focus, setFocus] = useState(false)
   return (
-    <label title={title} style={{ display: 'inline-flex', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? .5 : 1 }}>
+    <label title={title} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? .5 : 1 }}>
       <input
         type="checkbox" checked={checked} disabled={disabled}
         onChange={(e) => onChange(e.target.checked)}
@@ -393,7 +452,7 @@ export function CheckBox({ checked, disabled, onChange, title }: { checked: bool
         style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap', border: 0 }}
       />
       <span aria-hidden style={{
-        width: 16, height: 16, borderRadius: 4, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        width: 16, height: 16, flex: '0 0 auto', borderRadius: 4, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
         border: `1px solid ${checked ? 'var(--color-primary,#2563eb)' : 'var(--color-input,#e5e7eb)'}`,
         background: checked ? 'var(--color-primary,#2563eb)' : 'var(--color-card,#fff)',
         boxShadow: focus ? '0 0 0 2px color-mix(in srgb, var(--color-ring,#2563eb) 40%, transparent)' : '0 1px 1px rgba(0,0,0,.04)',
@@ -405,7 +464,35 @@ export function CheckBox({ checked, disabled, onChange, title }: { checked: bool
           </svg>
         )}
       </span>
+      {label != null ? <span style={{ fontSize: 13, color: 'var(--color-foreground,#111827)' }}>{label}</span> : null}
     </label>
+  )
+}
+
+/**
+ * A ctx-bound, self-prefilling CHECKBOX field (label + themed CheckBox), posting '1'/'0' so the plugin /
+ * a listener reads a truthy/falsy value. Prefill: checked when the server-resolved form rendered the box
+ * `checked` (its name is present in fieldValues) or the page XML holds a truthy `<name>`.
+ */
+export function CheckboxField({ ctx, name, label, boxLabel, hint }: { ctx: PluginTabContext; name: string; label: string; boxLabel?: string; hint?: string }) {
+  useEffect(() => {
+    let cancelled = false
+    const raw = readTag(ctx.props.rawXml, name)
+    if (raw) ctx.setValue(name, raw === '0' ? '0' : '1')
+    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName }).then((o) => {
+      if (cancelled) return
+      // parseFieldValues only emits a checkbox's name when it was rendered `checked` → presence = on.
+      if (Object.prototype.hasOwnProperty.call(o.fieldValues, name)) ctx.setValue(name, '1')
+    })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  // The box carries its OWN clear, actionable label next to it (the section `label` is the heading) —
+  // mirrors the legacy layout where the checkbox has a distinct inline caption.
+  return (
+    <Field label={label} error={ctx.error(name)} hint={hint}>
+      <CheckBox checked={ctx.value(name) === '1'} label={boxLabel ?? label} title={boxLabel ?? label} onChange={(v) => ctx.setValue(name, v ? '1' : '0')} />
+    </Field>
   )
 }
 

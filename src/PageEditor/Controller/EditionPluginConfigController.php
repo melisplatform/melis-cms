@@ -142,33 +142,65 @@ class EditionPluginConfigController extends MelisAbstractActionController
                 return $this->jsonResponse(['success' => false, 'errors' => $errorsTabs], 200);
             }
 
-            // Authoritative XML fragment, produced by the plugin itself.
+            // Authoritative XML fragment, produced by the plugin itself. Also grab its xmlDbKey (tag).
             $fragment = '';
-            $this->withRequest($post, false, function () use ($sm, $module, $pluginName, $pluginId, $idPage, $draftXml, $post, &$fragment) {
+            $tag = '';
+            $this->withRequest($post, false, function () use ($sm, $module, $pluginName, $pluginId, $idPage, $draftXml, $post, &$fragment, &$tag) {
                 $plugin = $this->loadPlugin($sm, $module, $pluginName, $pluginId, $idPage, $draftXml);
                 $fragment = (string) $plugin->savePluginConfigToXml($post);
+                if (method_exists($plugin, 'getPluginXmlDbKey')) {
+                    $tag = (string) $plugin->getPluginXmlDbKey();
+                }
             });
 
             $fragment = trim($fragment);
-            if ($fragment === '') {
-                // Nothing to persist (plugin decided no change) — not an error.
-                return $this->jsonResponse(['success' => true, 'data' => ['idPage' => $idPage, 'changed' => false]]);
+            $store = new SessionContentStore($sm);
+            $changed = false;
+            if ($fragment !== '') {
+                // Persist into the working edit session (NOT the DB), exactly like EditionSaveController.
+                $doc = $store->readDocument($idPage);
+                if ($doc === null) {
+                    return $this->jsonResponse(['success' => false, 'error' => 'page has no content'], 422);
+                }
+                if (!$doc->setPluginXml($pluginId, $fragment)) {
+                    return $this->jsonResponse(['success' => false, 'error' => 'plugin fragment rejected (empty/malformed)'], 422);
+                }
+                $store->writeDocument($idPage, $doc);
+                $changed = true;
+            } else {
+                // Plugin decided no change to its own fields — still seed the session so a contributed
+                // tab (below) has the plugin node to enrich.
+                $store->readDocument($idPage);
             }
 
-            // Persist into the working edit session (NOT the DB), exactly like EditionSaveController.
-            $store = new SessionContentStore($sm);
-            $doc = $store->readDocument($idPage);
-            if ($doc === null) {
-                return $this->jsonResponse(['success' => false, 'error' => 'page has no content'], 422);
+            // GENERIC post-save seam: let OTHER modules react to a React plugin-config save. Mirrors the
+            // legacy `meliscms_page_savesession_plugin_start` chain, but WITHOUT re-writing the plugin
+            // fragment (so the width_* attrs setPluginXml preserved are kept). melis-cache-internal listens
+            // here to persist its "Cache partiel" tab (partial_caching_code) into the session plugin XML.
+            try {
+                $em = $this->getEventManager();
+                $em->addIdentifiers(['MelisCms']);
+                $em->trigger('meliscms_react_plugin_config_saved', $this, [
+                    'idPage'     => $idPage,
+                    'module'     => $module,
+                    'pluginName' => $pluginName,
+                    'pluginId'   => $pluginId,
+                    'tag'        => $tag,
+                    'postValues' => array_merge($values, [
+                        'melisPluginName' => $pluginName,
+                        'melisPluginTag'  => $tag,
+                        'melisPluginId'   => $pluginId,
+                        'melisIdPage'     => (string) $idPage,
+                        'idPage'          => $idPage,
+                    ]),
+                ]);
+            } catch (\Throwable) {
+                // Post-processing is best-effort; the plugin's own save already succeeded.
             }
-            if (!$doc->setPluginXml($pluginId, $fragment)) {
-                return $this->jsonResponse(['success' => false, 'error' => 'plugin fragment rejected (empty/malformed)'], 422);
-            }
-            $store->writeDocument($idPage, $doc);
 
             return $this->jsonResponse([
                 'success' => true,
-                'data'    => ['idPage' => $idPage, 'changed' => true, 'pluginId' => $pluginId],
+                'data'    => ['idPage' => $idPage, 'changed' => $changed, 'pluginId' => $pluginId],
             ]);
         } catch (\Throwable $e) {
             return $this->jsonResponse([
