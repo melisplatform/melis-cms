@@ -34,6 +34,35 @@ export interface MelisTreeNode {
 /** Nodes seen so far, keyed by page id — lets the content page show a title without an extra call. */
 export const nodeCache = new Map<number, MelisTreeNode>()
 
+// Resolved page titles by id (cached promise), for showing a page's NAME where only its id is known.
+const _pageTitleCache = new Map<number, Promise<string>>()
+
+/**
+ * A page's display title ("<id> - <name>") by id — used by PagePicker to show the page NAME for a
+ * prefilled id. Reuses the tree nodeCache when the page was already seen; otherwise a lightweight
+ * server lookup (edition/page-title). Returns '' when unknown.
+ */
+export function fetchPageTitle(id: number): Promise<string> {
+  if (!id || id <= 0) return Promise.resolve('')
+  const cached = nodeCache.get(id)
+  if (cached?.title) return Promise.resolve(cached.title)
+  let p = _pageTitleCache.get(id)
+  if (!p) {
+    p = (async () => {
+      try {
+        const r = await fetch(`/melis/react-api/cms-page/edition/page-title?id=${encodeURIComponent(String(id))}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'include' })
+        const d = await r.json().catch(() => ({}))
+        const name = String(d?.data?.title || '')
+        return name ? `${id} - ${name}` : ''
+      } catch {
+        return ''
+      }
+    })()
+    _pageTitleCache.set(id, p)
+  }
+  return p
+}
+
 /**
  * Deletes a page (legacy endpoint, no backend change):
  *   GET /melis/MelisCms/Page/deletePage?idPage=<id>

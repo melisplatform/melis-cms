@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { fetchTreeNodes, type MelisTreeNode } from './cms-tree-api'
+import { fetchTreeNodes, fetchPageTitle, type MelisTreeNode } from './cms-tree-api'
 import { peT } from './page-editor-i18n'
 
 /**
@@ -61,7 +61,17 @@ export function PagePicker({ value, title, onChange, placeholder }: {
   const tr = peT()
   const [open, setOpen] = useState(false)
   const [roots, setRoots] = useState<MelisTreeNode[] | null>(null)
+  // When only a page id is known (title not supplied, e.g. a prefilled config field), resolve its NAME.
+  const [resolvedTitle, setResolvedTitle] = useState<string | undefined>(title)
   const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (title) { setResolvedTitle(title); return }
+    if (!value) { setResolvedTitle(undefined); return }
+    let cancelled = false
+    fetchPageTitle(value).then((t) => { if (!cancelled) setResolvedTitle(t || undefined) })
+    return () => { cancelled = true }
+  }, [value, title])
 
   useEffect(() => {
     function onDoc(e: MouseEvent) { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
@@ -74,7 +84,7 @@ export function PagePicker({ value, title, onChange, placeholder }: {
     if (roots === null) setRoots(await fetchTreeNodes(-1))
   }
 
-  const display = value ? (title || `Page #${value}`) : (placeholder || tr.pickPage)
+  const display = value ? (resolvedTitle || `Page #${value}`) : (placeholder || tr.pickPage)
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>

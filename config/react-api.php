@@ -489,6 +489,52 @@ return [
                                 'type' => 'Segment',
                                 'options' => ['route' => '/cms-page/ancestors[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPage', 'action' => 'ancestors']],
                             ],
+                            // ── NOUVELLE COUCHE éditeur React (evo/page-edition-react) — rendu STATELESS d'un plugin.
+                            // Logique dans MelisCms\PageEditor\Controller\EditionRenderController (namespace séparé).
+                            'cms-page-edition-render-plugin' => [
+                                'type' => 'Segment',
+                                'options' => ['route' => '/cms-page/edition/render-plugin[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPageEditorRender', 'action' => 'render-plugin']],
+                            ],
+                            // Modèle JSON de la page (PageContentDocument::toArray()) que consommera le canvas React.
+                            'cms-page-edition-document' => [
+                                'type' => 'Segment',
+                                'options' => ['route' => '/cms-page/edition/document[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPageEditorDocument', 'action' => 'document']],
+                            ],
+                            // Save stateless : applique des ops structurelles (reorder/resize/zone) et écrit le brouillon.
+                            'cms-page-edition-save' => [
+                                'type' => 'Segment',
+                                'options' => ['route' => '/cms-page/edition/save[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPageEditorSave', 'action' => 'save']],
+                            ],
+                            // Rendu d'édition PROPRE (path C) : page templatée + CSS, SANS le JS d'édition legacy, avec marqueurs → le canvas React possède l'interaction.
+                            'cms-page-edition-render' => [
+                                'type' => 'Segment',
+                                'options' => ['route' => '/cms-page/edition/render[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPageEditorRenderPage', 'action' => 'page']],
+                            ],
+                            // Palette : liste des plugins actifs/ajoutables (config plugins[*].melis) pour le bouton "+".
+                            'cms-page-edition-plugins' => [
+                                'type' => 'Segment',
+                                'options' => ['route' => '/cms-page/edition/plugins[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPageEditorPalette', 'action' => 'plugins']],
+                            ],
+                            // Titre d'une page par id → le sélecteur de page (PagePicker) affiche le NOM en React.
+                            'cms-page-edition-page-title' => [
+                                'type' => 'Segment',
+                                'options' => ['route' => '/cms-page/edition/page-title[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPageEditorPluginConfig', 'action' => 'page-title']],
+                            ],
+                            // Options des champs (template_path…) pour les FORMS natifs React (PluginFormKit.fetchFieldOptions).
+                            'cms-page-edition-plugin-config-options' => [
+                                'type' => 'Segment',
+                                'options' => ['route' => '/cms-page/edition/plugin-config/options[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPageEditorPluginConfig', 'action' => 'options']],
+                            ],
+                            // Config plugin (Part 2, générique) : page HTML autonome (iframe) prefill depuis le brouillon.
+                            'cms-page-edition-plugin-config' => [
+                                'type' => 'Segment',
+                                'options' => ['route' => '/cms-page/edition/plugin-config[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPageEditorPluginConfig', 'action' => 'form']],
+                            ],
+                            // Config plugin : valide via createOptionsForms() puis savePluginConfigToXml() → setPluginXml (brouillon).
+                            'cms-page-edition-plugin-config-save' => [
+                                'type' => 'Segment',
+                                'options' => ['route' => '/cms-page/edition/plugin-config/save[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPageEditorPluginConfig', 'action' => 'save']],
+                            ],
                         ],
                     ],
                 ],
@@ -507,6 +553,12 @@ return [
             'MelisCms\Controller\MelisReactApiCmsMiniTemplate' => \MelisCms\Controller\MelisReactApiCmsMiniTemplateController::class,
             'MelisCms\Controller\MelisReactApiCmsMenuManager' => \MelisCms\Controller\MelisReactApiCmsMenuManagerController::class,
             'MelisCms\Controller\MelisReactApiPage' => \MelisCms\Controller\MelisReactApiPageController::class,
+            'MelisCms\Controller\MelisReactApiPageEditorRender' => \MelisCms\PageEditor\Controller\EditionRenderController::class,
+            'MelisCms\Controller\MelisReactApiPageEditorDocument' => \MelisCms\PageEditor\Controller\EditionDocumentController::class,
+            'MelisCms\Controller\MelisReactApiPageEditorSave' => \MelisCms\PageEditor\Controller\EditionSaveController::class,
+            'MelisCms\Controller\MelisReactApiPageEditorRenderPage' => \MelisCms\PageEditor\Controller\EditionRenderPageController::class,
+            'MelisCms\Controller\MelisReactApiPageEditorPluginConfig' => \MelisCms\PageEditor\Controller\EditionPluginConfigController::class,
+            'MelisCms\Controller\MelisReactApiPageEditorPalette' => \MelisCms\PageEditor\Controller\EditionPaletteController::class,
         ],
     ],
 ];
