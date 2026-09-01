@@ -70,12 +70,23 @@ class EditionPaletteController extends MelisAbstractActionController
             } catch (\Throwable) {
             }
 
+            // SITE SCOPING: a plugin can only render on the FRONT if its module is loaded for the page's
+            // site, so the palette must only offer those. `allowedSiteModules()` = always-loaded core/front
+            // modules + the modules the site enables in its own config/module.load.php. Null (no page/site
+            // context) → no filter. NB the legacy palette never scoped by site (harmless on a single-site
+            // demo where every module is loaded, but on a fresh site it offered plugins that can't render).
+            $idPage = (int) $this->params()->fromQuery('idPage', 0);
+            $allowedModules = $this->allowedSiteModules($sm, $idPage);
+
             // Build the tree: sectionKey → moduleKey → groupId → {id,title,plugins[]}.
             $tree = [];
             $moduleLabels = [];
             foreach ((array) ($config['plugins'] ?? []) as $module => $modConf) {
                 if ($module === 'MelisMiniTemplate') {
                     continue; // per-site dynamic tree — handled separately (mini-templates)
+                }
+                if ($allowedModules !== null && !isset($allowedModules[strtolower((string) $module)])) {
+                    continue; // module not loaded for this site → its plugins can't render on the front
                 }
                 foreach ((array) ($modConf['plugins'] ?? []) as $name => $pconf) {
                     if (in_array($name, self::EXCLUDE, true)) {
@@ -156,6 +167,50 @@ class EditionPaletteController extends MelisAbstractActionController
                 'where'   => basename($e->getFile()) . ':' . $e->getLine(),
             ], 500);
         }
+    }
+
+    /**
+     * The set (keys = lowercased module keys) of plugin modules that can render on the FRONT for this
+     * page's site: the always-loaded core/front modules + the modules the site enables in its own
+     * config/module.load.php (MelisCmsSiteModuleLoadService::getModules — the per-site "Modules" tool).
+     * Config-key ↔ module-name is matched case-insensitively (Melis convention: `meliscmsnews` ↔
+     * `MelisCmsNews`, `melisfront` ↔ `MelisFront`). Returns null when there is no site context (idPage 0
+     * or a lookup fails) → the caller then applies NO filter (safer than hiding wrongly).
+     */
+    private function allowedSiteModules($sm, int $idPage): ?array
+    {
+        if ($idPage <= 0) {
+            return null;
+        }
+        try {
+            $tree = $sm->get('MelisEngineTree');
+            $site = $tree->getSiteByPageId($idPage);
+            if (empty($site)) {
+                $site = $tree->getSiteByPageId($idPage, 'saved');
+            }
+            if (empty($site) || empty($site->site_id)) {
+                return null;
+            }
+            $siteId = (int) $site->site_id;
+        } catch (\Throwable) {
+            return null;
+        }
+
+        // Core / front modules always loaded on any site's front → their plugins are always available.
+        $allowed = ['melisfront', 'meliscms', 'meliscore', 'melisengine', 'melisassetmanager', 'melismarketplace', 'melismoduleconfig', 'melisminitemplate'];
+        if (!empty($site->site_name)) {
+            $allowed[] = strtolower(str_replace(' ', '', (string) $site->site_name));
+        }
+        try {
+            foreach ((array) $sm->get('MelisCmsSiteModuleLoadService')->getModules($siteId) as $mod => $active) {
+                if ((int) $active === 1) {
+                    $allowed[] = strtolower((string) $mod);
+                }
+            }
+        } catch (\Throwable) {
+            return null; // service unavailable → don't hide anything
+        }
+        return array_flip(array_values(array_unique($allowed)));
     }
 
     /**
