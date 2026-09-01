@@ -323,9 +323,9 @@ return array(
     'tr_meliscms_tool_platform_pids_tpl_id_end tooltip' => 'Les identifiants de templates se terminent à cet identifiant pour la plateforme sélectionnée',
     'tr_meliscms_tool_platform_ids_btn_add' => 'Ajouter une plage d\'IDs',
     'tr_meliscms_tool_platform_ids_btn_edit' => 'Editer une plage IDs',
-    'tr_meliscms_tool_platform_pids_name_empty' => 'Choose platform',
+    'tr_meliscms_tool_platform_pids_name_empty' => 'Veuillez choisir une plateforme',
     'tr_meliscms_tool_platform_ids_table' => 'Tableau',
-    'tr_meliscms_tool_platform_ids_modal_content' => 'Add and update modal',
+    'tr_meliscms_tool_platform_ids_modal_content' => 'Ajout et mise à jour',
     'tr_meliscms_tool_platform_modal_info' => 'Déclarez ici la plage d\'identifiants d\'une plateforme spécifique',
     'tr_meliscms_tool_platform_modal_info_assigned_page_ids' => 'Toutes les plateformes ont déjà des plages d\'identifiants assigné.',
     'tr_meliscms_platform_id_save' => 'Enregistrer',
@@ -336,16 +336,16 @@ return array(
 
     // Platform Error Messages
     'tr_meliscms_tool_platform_add_error' => 'Impossible de rajouter la plage d\'IDs de la plateforme de MelisCms',
-    'tr_meliscms_tool_platform_update_error' => 'Unable to update MelisCms platform ID\'s',
+    'tr_meliscms_tool_platform_update_error' => 'Impossible de mettre à jour les identifiants de plateforme MelisCms',
     'tr_meliscms_tool_platform_conflict_error' => 'La plage d\'IDs de la plateforme de la page ou du template est en conflit avec l\'une des plages d\'IDs de la plateforme existante',
-    'tr_meliscms_tool_platform_invalid' => 'Invalid Platform',
+    'tr_meliscms_tool_platform_invalid' => 'Plateforme invalide',
 
     // Delete Messages
     'tr_meliscms_tool_platform_ids_confirm_msg' => 'Etes-vous sûr de vouloir supprimer cette plage d\'IDs ?',
     'tr_meliscms_tool_platform_ids_deleted_title' => 'ID plateformes',
     'tr_meliscms_tool_platform_ids_delete_success_msg' => 'Plage d\'IDs de la plateforme supprimée avec succès',
     // Platform Id validation Messages
-    'tr_meliscms_tool_platform_value_too_long' => 'Value is too long, it should be less than 11 digits',
+    'tr_meliscms_tool_platform_value_too_long' => 'La valeur est trop longue, elle doit comporter moins de 11 chiffres',
     'tr_meliscms_tool_platform_not_digit' => 'Champ requis, ne peut être vide',
     'tr_meliscms_tool_platform_empty' => 'Le champ ne peut être vide',
     'tr_meliscms_tool_platform_pageIdStart_must_lessThan_or_equalTo_pageIdEnd' => 'l\'ID de la page de début doit être inférieure ou égale à l\'ID de page de Fin',
@@ -402,7 +402,7 @@ return array(
     'meliscms_tool_site_301_value_empty' => 'Le champ est requis et ne peut être vide',
     'meliscms_tool_site_301_old_url_exist' => 'L\'ancienne URL existe déjà pour ce site',
     'meliscms_tool_site_301_delete_confirm_msg' => 'Etes-vous sûr de vouloir supprimer cette redirection 301?',
-    'tr_meliscms_tool_site_301_s301_new_url_mismatch' => 'The new url domain does not match the site domain',
+    'tr_meliscms_tool_site_301_s301_new_url_mismatch' => 'Le domaine de la nouvelle URL ne correspond pas au domaine du site',
 
     // Tool Sitetree view modal
     'tr_meliscms_form_btn_select' => 'Insérer',
@@ -412,6 +412,7 @@ return array(
     'tr_meliscms_duplicate_error' => 'Impossible de dupliquer la page',
     'tr_melis_cms_duplicate_success' => 'Page "%s" dupliquée avec succès',
     'tr_melis_cms_duplicate_text_identifier' => '[Dupliquée]',
+    'tr_meliscms_tree_sites_duplication_root tooltip' => 'Cochez cette case pour placer les pages à la racine.',
     'tr_meliscms_tree_sites_duplication_page_relation' => 'Relation avec une page initiale',
     'tr_meliscms_tree_sites_duplication_page_relation tooltip' => 'Permer de créer une page en relation avec une page initiale',
 
@@ -419,7 +420,7 @@ return array(
     'tr_meliscms_plugins_modal_cancel' => 'Annuler',
     'tr_meliscms_plugins_modal_apply' => 'Appliquer',
 
-    'tr_meliscms_page_tree_no_selected_page' => 'No page selected, please select a page and try again',
+    'tr_meliscms_page_tree_no_selected_page' => 'Aucune page sélectionnée, veuillez sélectionner une page et réessayer',
 
     // tool style
     'tr_meliscms_tool_styles' => 'Styles',
