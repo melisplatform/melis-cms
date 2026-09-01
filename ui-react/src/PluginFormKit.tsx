@@ -336,7 +336,7 @@ export function PluginTabbedForm(props: PluginFormProps) {
 /** Prefill a field's value once on mount. Instantly from the page XML fragment (props.rawXml), then
  *  corrected to the SERVER-resolved value (fieldValues) — which carries template params / front-config
  *  defaults the page XML lacks, so HARDCODED plugins (menu…) prefill their real current value. */
-function usePrefill(ctx: PluginTabContext, name: string) {
+export function usePrefill(ctx: PluginTabContext, name: string) {
   useEffect(() => {
     let cancelled = false
     const rawv = readTag(ctx.props.rawXml, name)
