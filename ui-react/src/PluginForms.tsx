@@ -1,6 +1,6 @@
 import { Component } from 'react'
 import type { ReactNode } from 'react'
-import { hasPluginForm, PluginTabbedForm } from './PluginFormKit'
+import { hasPluginForm, PluginTabbedForm, SchemaForm } from './PluginFormKit'
 import type { PluginFormProps } from './PluginFormKit'
 // Per-module native config tabs. Each plugin's config lives in ITS OWN module as one or more TABS,
 // registered into the shared tab registry (PluginFormKit). A module's registration fn is imported here
@@ -28,7 +28,7 @@ registerMelisCmsCommentsPlugins()
 registerMelisCmsCategory2Plugins()
 registerMelisCacheInternalPlugins()
 
-export { hasPluginForm, PluginTabbedForm }
+export { hasPluginForm, PluginTabbedForm, SchemaForm }
 export type { PluginFormProps }
 
 /**

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { apiGet, apiPost } from './PageTabs'
-import { hasPluginForm, PluginTabbedForm, PluginFormBoundary } from './PluginForms'
+import { hasPluginForm, PluginTabbedForm, SchemaForm, PluginFormBoundary } from './PluginForms'
 import { PagePicker } from './PagePicker'
 import { ViewToggle } from './ViewToggle'
 import { peT } from './page-editor-i18n'
@@ -510,8 +510,9 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       notify('ko', 'MelisCms', peT().ecPluginNotFound)
       return
     }
-    const hasReactForm = hasPluginForm(meta.name)
-    setConfig({ zoneId, ref, node, module: meta.module, pluginName: meta.name, tag, useIframe: !hasReactForm, v: Date.now() })
+    // React-first for EVERY plugin: a hand-written form if it has one, else the runtime SchemaForm
+    // (which itself falls back to the legacy iframe when the plugin exposes no usable schema).
+    setConfig({ zoneId, ref, node, module: meta.module, pluginName: meta.name, tag, useIframe: false, v: Date.now() })
     selectBlock(zoneId, ref.id)
   }, [doc, editInline, selectBlock])
 
@@ -523,7 +524,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     // Prefill: a hardcoded plugin may still have a top-level data node in the document (its page-XML
     // config override) — pass it so the native/iframe form prefills from the current values, not defaults.
     const node = (doc?.nodes || []).find((n) => n.id === id) || null
-    setConfig({ zoneId: '', ref: { id, label: label || name }, node, module, pluginName: name, tag: node?.tag || '', useIframe: !hasPluginForm(name), v: Date.now() })
+    setConfig({ zoneId: '', ref: { id, label: label || name }, node, module, pluginName: name, tag: node?.tag || '', useIframe: false, v: Date.now() })
   }, [doc])
   const openConfigDirectRef = useRef<((module: string, name: string, id: string, label?: string) => void) | null>(null)
   useEffect(() => { openConfigDirectRef.current = openConfigDirect }, [openConfigDirect])
@@ -1063,32 +1064,39 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
         const iframeSrc = `/melis/react-api/cms-page/edition/plugin-config?idPage=${idPage}`
           + `&module=${encodeURIComponent(config.module)}&pluginName=${encodeURIComponent(config.pluginName)}`
           + `&pluginId=${encodeURIComponent(config.ref.id)}&theme=${theme}&_=${config.v}`
-        const ReactForm = config.useIframe ? null : (hasPluginForm(config.pluginName) ? PluginTabbedForm : null)
+        const useReact = !config.useIframe
+        const isBespoke = hasPluginForm(config.pluginName)
+        const formProps = {
+          idPage, module: config.module, pluginName: config.pluginName, pluginId: config.ref.id,
+          tag: config.tag, rawXml: config.node?.raw || '', accent,
+          onSaved: onConfigSaved, onCancel: () => setConfig(null),
+        }
+        const toIframe = () => setConfig((c) => (c ? { ...c, useIframe: true } : c))
         return (
           <div style={{ position: 'fixed', inset: 0, zIndex: 80, background: 'rgba(0,0,0,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setConfig(null)}>
             <div onClick={(e) => e.stopPropagation()} style={{ width: 'min(760px, 94vw)', maxHeight: '88vh', display: 'flex', flexDirection: 'column', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 12, boxShadow: '0 24px 70px rgba(0,0,0,.45)', overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', borderBottom: '1px solid var(--color-border,#e5e7eb)' }}>
                 <span style={{ fontWeight: 700, fontSize: 14 }}>{tr.ecPluginPrefix} · {config.ref.label}</span>
                 <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  {/* New/Old toggle — only when a native React form exists for this plugin: lets you switch
-                      to the legacy iframe form (Old) and back (New), like the toggles elsewhere. */}
-                  {hasPluginForm(config.pluginName) && (
-                    <ViewToggle compact mode={config.useIframe ? 'iframe' : 'react'}
-                      onChange={(m) => setConfig((c) => (c ? { ...c, useIframe: m === 'iframe', v: Date.now() } : c))} />
-                  )}
+                  {/* New/Old toggle — every plugin now has a React config (a hand-written form OR the runtime
+                      schema form) AND the legacy iframe; this switches between them (New = React, Old = iframe). */}
+                  <ViewToggle compact mode={config.useIframe ? 'iframe' : 'react'}
+                    onChange={(m) => setConfig((c) => (c ? { ...c, useIframe: m === 'iframe', v: Date.now() } : c))} />
                   <button onClick={() => setConfig(null)} title={tr.ecClose} style={{ ...iconBtn, width: 26, height: 26 }}>✕</button>
                 </div>
               </div>
-              <div style={{ padding: ReactForm ? 16 : 0, overflow: 'auto', flex: '1 1 auto', minHeight: 220 }}>
-                {ReactForm ? (
-                  <PluginFormBoundary onError={() => setConfig((c) => (c ? { ...c, useIframe: true } : c))}>
-                    <ReactForm idPage={idPage} module={config.module} pluginName={config.pluginName} pluginId={config.ref.id}
-                      tag={config.tag} rawXml={config.node?.raw || ''} accent={accent}
-                      onSaved={onConfigSaved} onCancel={() => setConfig(null)} />
-                  </PluginFormBoundary>
-                ) : (
+              <div style={{ padding: useReact ? 16 : 0, overflow: 'auto', flex: '1 1 auto', minHeight: 220 }}>
+                {!useReact ? (
                   <iframe data-testid={`config-iframe-${config.ref.id}`} title={`${tr.ecConfigFor} ${config.ref.label}`} src={iframeSrc}
                     style={{ width: '100%', height: '62vh', border: 0, display: 'block', background: 'var(--color-background,#fff)' }} />
+                ) : isBespoke ? (
+                  <PluginFormBoundary onError={toIframe}>
+                    <PluginTabbedForm {...formProps} />
+                  </PluginFormBoundary>
+                ) : (
+                  <PluginFormBoundary onError={toIframe}>
+                    <SchemaForm {...formProps} onUnavailable={toIframe} />
+                  </PluginFormBoundary>
                 )}
               </div>
             </div>

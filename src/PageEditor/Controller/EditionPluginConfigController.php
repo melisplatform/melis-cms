@@ -276,6 +276,51 @@ class EditionPluginConfigController extends MelisAbstractActionController
     }
 
     /**
+     * The full declarative FORM SCHEMA of a plugin's config, derived from its OWN createOptionsForms()
+     * HTML — the SAME source the legacy iframe renders, so this is the legacy declaration verbatim, just
+     * expressed as JSON. The React SchemaForm renders it natively at RUNTIME → a plugin created live (no
+     * build) gets a React config for free, while the legacy editor keeps rendering the identical form and
+     * both read/write the same byte-compatible XML (golden rule: legacy never breaks).
+     * GET …/edition/plugin-config/schema?idPage&module&pluginName&pluginId
+     *   → { tabs:[{id,title,fields:[{name,type,label,hint,required,value,options?,rows?}]}], tag }
+     */
+    public function schemaAction(): HttpResponse
+    {
+        if ($deny = $this->denyUnlessAccess()) {
+            return $deny;
+        }
+        try {
+            $module     = (string) $this->params()->fromQuery('module', '');
+            $pluginName = (string) $this->params()->fromQuery('pluginName', '');
+            $pluginId   = (string) $this->params()->fromQuery('pluginId', '');
+            $idPage     = (int) $this->params()->fromQuery('idPage', 0);
+
+            $draftXml = $this->draftContentXml($idPage);
+            [$tabs, $tag] = $this->buildTabs($idPage, $module, $pluginName, $pluginId, $draftXml);
+
+            $out = [];
+            foreach ((array) $tabs as $i => $t) {
+                if (!empty($t['empty'])) {
+                    continue;
+                }
+                $fields = $this->parseSchemaFields((string) ($t['html'] ?? ''));
+                if ($fields === []) {
+                    continue;
+                }
+                $out[] = [
+                    'id'     => 'tab' . $i,
+                    'title'  => (string) ($t['name'] ?? ('Tab ' . ($i + 1))),
+                    'fields' => $fields,
+                ];
+            }
+
+            return $this->jsonResponse(['success' => true, 'data' => ['tabs' => $out, 'tag' => $tag]]);
+        } catch (\Throwable $e) {
+            return $this->jsonResponse(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
      * A page's display name by id — so the React page-picker fields (PagePicker) can show the page NAME
      * instead of just its id. Draft-first (saved → published). Route:
      * GET /melis/react-api/cms-page/edition/page-title?id=X → { id, title }.
@@ -448,6 +493,101 @@ class EditionPluginConfigController extends MelisAbstractActionController
             ];
         }
         return $out;
+    }
+
+    /**
+     * Turn ONE rendered config-tab's HTML into an ordered list of field descriptors for the React
+     * SchemaForm: {name,type,label,hint,required,value,options?,rows?}. Types map to the shared field kit
+     * (text/number/date/select/page/textarea/checkbox/fieldlist). Everything is READ from the plugin's own
+     * rendered form (labels already translated, selects already resolved, values prefilled) — no config
+     * guessing, so it stays identical to what the legacy iframe shows.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    private function parseSchemaFields(string $html): array
+    {
+        if (trim($html) === '') {
+            return [];
+        }
+        $list = $this->parseFieldList($html);         // fields[]/required_fields[] grid → ONE composite field
+        $options = $this->parseSelectOptions($html);
+        $values  = $this->parseFieldValues($html);
+
+        $dom  = new \DOMDocument();
+        $prev = libxml_use_internal_errors(true);
+        $dom->loadHTML('<?xml encoding="utf-8"?><div>' . $html . '</div>', LIBXML_NOERROR | LIBXML_NOWARNING);
+        libxml_use_internal_errors($prev);
+        $xp = new \DOMXPath($dom);
+
+        $labels = [];
+        foreach ($xp->query('//label[@for]') as $lab) {
+            /** @var \DOMElement $lab */
+            $labels[$lab->getAttribute('for')] = trim($lab->textContent);
+        }
+
+        $fields = [];
+        $seen = [];
+        $listDone = false;
+        foreach ($xp->query('//input | //select | //textarea') as $el) {
+            /** @var \DOMElement $el */
+            $tag  = strtolower($el->nodeName);
+            $name = $el->getAttribute('name');
+            $type = strtolower($el->getAttribute('type'));
+
+            if ($name === '' || in_array($type, ['submit', 'button', 'hidden'], true)) {
+                continue;
+            }
+            if ($name === 'fields[]' || $name === 'required_fields[]') {
+                if ($list && !$listDone) {
+                    $fields[] = ['name' => 'fields', 'type' => 'fieldlist', 'label' => '', 'hint' => '', 'required' => false, 'rows' => $list];
+                    $listDone = true;
+                }
+                continue;
+            }
+            if (isset($seen[$name])) {
+                continue;   // radio groups / duplicates: first wins
+            }
+
+            $id    = $el->getAttribute('id');
+            $label = trim(rtrim($labels[$id] ?? '', " *"));
+            $hint  = $el->getAttribute('data-bs-title') ?: $el->getAttribute('title');
+
+            if ($tag === 'select') {
+                $kind = 'select';
+            } elseif ($tag === 'textarea') {
+                $kind = 'textarea';
+            } elseif ($type === 'checkbox') {
+                $kind = 'checkbox';
+            } elseif ($type === 'number') {
+                $kind = 'number';
+            } elseif ($type === 'date') {
+                $kind = 'date';
+            } else {
+                $class = $el->getAttribute('class');
+                if ($el->getAttribute('data-button-id') === 'meliscms-site-selector') {
+                    $kind = 'page';
+                } elseif (stripos($class, 'datepicker') !== false || $el->hasAttribute('data-date-format')) {
+                    $kind = 'date';
+                } else {
+                    $kind = 'text';
+                }
+            }
+
+            $f = [
+                'name'     => $name,
+                'type'     => $kind,
+                'label'    => $label !== '' ? $label : $name,
+                'hint'     => (string) $hint,
+                'required' => $el->hasAttribute('required'),
+                'value'    => (string) ($values[$name] ?? ''),
+            ];
+            if ($kind === 'select') {
+                $f['options'] = $options[$name] ?? [];
+            }
+            $fields[] = $f;
+            $seen[$name] = true;
+        }
+        return $fields;
     }
 
     // ------------------------------------------------------------- internals ---

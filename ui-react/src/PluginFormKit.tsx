@@ -283,12 +283,17 @@ function tabsFor(pluginName: string): PluginTab[] {
  * submits every field. ALL tabs stay mounted (inactive ones hidden) so their fields prefill and are
  * included in the save even if never opened — same semantics as the legacy multi-tab modal.
  */
-export function PluginTabbedForm(props: PluginFormProps) {
+export function PluginTabbedForm(props: PluginFormProps & { tabs?: PluginTab[] }) {
   const activeModules = useActiveModules()
+  // Tab source: an explicit list (the runtime SchemaForm passes schema-derived tabs) OR the registry
+  // (hand-written per-module tabs). Either way GLOBAL tabs (e.g. cache-internal) are appended + sorted.
+  const source = props.tabs ?? (PLUGIN_FORM_TABS[props.pluginName] || [])
   // Hide a module-gated tab when its module is disabled (legacy `isModuleLoaded` parity). While the
   // active-module set is still loading (null) we keep all tabs — for an ACTIVE module that avoids any
   // flash; a DISABLED module's tab shows for the fetch's brief moment, then drops.
-  const tabs = tabsFor(props.pluginName).filter((t) => !t.module || activeModules === null || activeModules.has(t.module))
+  const tabs = source.concat(GLOBAL_PLUGIN_TABS).slice()
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    .filter((t) => !t.module || activeModules === null || activeModules.has(t.module))
   const { saving, fieldErrors, message, submit } = useSubmit(props)
   const [values, setValues] = useState<Record<string, FieldValue>>({})
   const [active, setActive] = useState(0)
@@ -586,4 +591,94 @@ export function PageField({ ctx, name, label, hint, placeholder }: { ctx: Plugin
       </div>
     </Field>
   )
+}
+
+/** A multi-line text field bound to ctx[name]. */
+export function TextareaField({ ctx, name, label, hint }: { ctx: PluginTabContext; name: string; label: string; hint?: string }) {
+  usePrefill(ctx, name)
+  return (
+    <Field label={label} error={ctx.error(name)} hint={hint}>
+      <textarea data-testid={`field-${name}`} value={ctx.value(name)} onChange={(e) => ctx.setValue(name, e.target.value)}
+        style={{ ...inputStyle, minHeight: 90, resize: 'vertical', fontFamily: 'inherit' }} />
+    </Field>
+  )
+}
+
+// =============================================================================
+// RUNTIME schema-driven form — the no-build path for plugins created LIVE.
+// A plugin's config is DERIVED (server-side) from its own createOptionsForms() into a JSON schema
+// (edition/plugin-config/schema), and rendered here by the SAME field kit as the hand-written forms.
+// So a plugin created on a live platform (no build) gets a native React config for free, while the
+// legacy iframe keeps rendering the identical form (golden rule) — same declaration, two renderers.
+// =============================================================================
+
+export type SchemaField = { name: string; type: string; label: string; hint?: string; required?: boolean; value?: string; options?: Option[]; rows?: FieldListRow[] }
+export type SchemaTab = { id: string; title: string; fields: SchemaField[] }
+
+const _schemaCache = new Map<string, Promise<SchemaTab[]>>()
+
+/** GET a plugin's declarative config schema (tabs → fields), once per plugin/page (cached promise). */
+export function fetchSchema(args: { idPage: number; module: string; pluginName: string; pluginId: string }): Promise<SchemaTab[]> {
+  const key = `${args.idPage}|${args.module}|${args.pluginName}|${args.pluginId}`
+  let p = _schemaCache.get(key)
+  if (!p) {
+    p = (async () => {
+      try {
+        const q = `idPage=${args.idPage}&module=${encodeURIComponent(args.module)}&pluginName=${encodeURIComponent(args.pluginName)}&pluginId=${encodeURIComponent(args.pluginId)}`
+        const r = await fetch(`/melis/react-api/cms-page/edition/plugin-config/schema?${q}`, { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        const res: any = await r.json().catch(() => ({}))
+        return (res?.data?.tabs || []) as SchemaTab[]
+      } catch {
+        return []
+      }
+    })()
+    _schemaCache.set(key, p)
+  }
+  return p
+}
+
+/** Render one schema field via the shared kit (type → component). template_path always gets TemplateField. */
+function SchemaFieldView({ f, ctx }: { f: SchemaField; ctx: PluginTabContext }) {
+  const label = f.label || f.name
+  if (f.name === 'template_path') return <TemplateField ctx={ctx} label={label} hint={f.hint} />
+  switch (f.type) {
+    case 'select':   return <RemoteSelectField ctx={ctx} name={f.name} label={label} hint={f.hint} />
+    case 'page':     return <PageField ctx={ctx} name={f.name} label={label} hint={f.hint} placeholder={peT().pickPage} />
+    case 'date':     return <DateField ctx={ctx} name={f.name} label={label} hint={f.hint} />
+    case 'number':   return <TextField ctx={ctx} name={f.name} label={label} hint={f.hint} type="number" />
+    case 'textarea': return <TextareaField ctx={ctx} name={f.name} label={label} hint={f.hint} />
+    case 'checkbox': return <CheckboxField ctx={ctx} name={f.name} label={label} hint={f.hint} />
+    case 'fieldlist':return <FieldListField ctx={ctx} label={label} hint={f.hint} />
+    default:         return <TextField ctx={ctx} name={f.name} label={label} hint={f.hint} />
+  }
+}
+
+function SchemaFields({ fields, ctx }: { fields: SchemaField[]; ctx: PluginTabContext }) {
+  return (<div>{fields.map((f) => <SchemaFieldView key={f.name} f={f} ctx={ctx} />)}</div>)
+}
+
+/**
+ * The runtime schema-driven config form. Fetches the plugin's schema, turns each tab into a PluginTab
+ * (whose Component renders its fields via the kit) and hands them to PluginTabbedForm — so it inherits the
+ * exact same tabs UX, shared values, single Save (byte-compatible XML) and GLOBAL tabs. If no schema is
+ * available it calls onUnavailable() so the caller can fall back to the legacy iframe.
+ */
+export function SchemaForm(props: PluginFormProps & { onUnavailable?: () => void }) {
+  const [tabs, setTabs] = useState<PluginTab[] | null>(null)
+  useEffect(() => {
+    let cancelled = false
+    fetchSchema(props).then((schemaTabs) => {
+      if (cancelled) return
+      if (!schemaTabs.length) { props.onUnavailable?.(); return }
+      setTabs(schemaTabs.map((t, i): PluginTab => ({
+        id: t.id, title: t.title, order: i,
+        Component: ({ ctx }) => <SchemaFields fields={t.fields} ctx={ctx} />,
+      })))
+    }).catch(() => { if (!cancelled) props.onUnavailable?.() })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.idPage, props.module, props.pluginName, props.pluginId])
+
+  if (!tabs) return <div style={{ padding: 20, fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>{peT().loading}</div>
+  return <PluginTabbedForm {...props} tabs={tabs} />
 }

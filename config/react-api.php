@@ -525,6 +525,12 @@ return [
                                 'type' => 'Segment',
                                 'options' => ['route' => '/cms-page/edition/plugin-config/options[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPageEditorPluginConfig', 'action' => 'options']],
                             ],
+                            // Declarative FORM SCHEMA (derived from createOptionsForms) → the runtime React
+                            // SchemaForm renders any plugin's config natively, no per-plugin code / build.
+                            'cms-page-edition-plugin-config-schema' => [
+                                'type' => 'Segment',
+                                'options' => ['route' => '/cms-page/edition/plugin-config/schema[/]', 'defaults' => ['__NAMESPACE__' => 'MelisCms\Controller', 'controller' => 'MelisReactApiPageEditorPluginConfig', 'action' => 'schema']],
+                            ],
                             // Config plugin (Part 2, générique) : page HTML autonome (iframe) prefill depuis le brouillon.
                             'cms-page-edition-plugin-config' => [
                                 'type' => 'Segment',
