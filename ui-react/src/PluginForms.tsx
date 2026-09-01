@@ -10,6 +10,11 @@ import { registerMelisFrontPlugins } from '../../../melis-front/ui-react/plugin-
 import { registerMelisCmsNewsPlugins } from '../../../melis-cms-news/ui-react/plugin-config/MelisCmsNewsPlugins'
 import { registerMelisCmsSliderPlugins } from '../../../melis-cms-slider/ui-react/plugin-config/MelisCmsSliderPlugins'
 import { registerMelisCmsProspectsPlugins } from '../../../melis-cms-prospects/ui-react/plugin-config/MelisCmsProspectsPlugins'
+import { registerMelisCmsBlogPlugins } from '../../../melis-cms-blog/ui-react/plugin-config/MelisCmsBlogPlugins'
+import { registerMelisCmsUserAccountPlugins } from '../../../melis-cms-user-account/ui-react/plugin-config/MelisCmsUserAccountPlugins'
+import { registerMelisCmsCommentsPlugins } from '../../../melis-cms-comments/ui-react/plugin-config/MelisCmsCommentsPlugins'
+// melis-cms-category2 registers its own plugin AND contributes a category filter tab to the news plugins.
+import { registerMelisCmsCategory2Plugins } from '../../../melis-cms-category2/ui-react/plugin-config/MelisCmsCategory2Plugins'
 // melis-cache-internal contributes a GLOBAL tab ("Cache partiel") shown on every plugin — modular proof.
 import { registerMelisCacheInternalPlugins } from '../../../melis-cache-internal/ui-react/plugin-config/MelisCacheInternalPartialCaching'
 
@@ -17,6 +22,10 @@ registerMelisFrontPlugins()
 registerMelisCmsNewsPlugins()
 registerMelisCmsSliderPlugins()
 registerMelisCmsProspectsPlugins()
+registerMelisCmsBlogPlugins()
+registerMelisCmsUserAccountPlugins()
+registerMelisCmsCommentsPlugins()
+registerMelisCmsCategory2Plugins()
 registerMelisCacheInternalPlugins()
 
 export { hasPluginForm, PluginTabbedForm }
