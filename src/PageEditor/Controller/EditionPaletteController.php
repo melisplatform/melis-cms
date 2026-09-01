@@ -85,9 +85,6 @@ class EditionPaletteController extends MelisAbstractActionController
                 if ($module === 'MelisMiniTemplate') {
                     continue; // per-site dynamic tree — handled separately (mini-templates)
                 }
-                if ($allowedModules !== null && !isset($allowedModules[strtolower((string) $module)])) {
-                    continue; // module not loaded for this site → its plugins can't render on the front
-                }
                 foreach ((array) ($modConf['plugins'] ?? []) as $name => $pconf) {
                     if (in_array($name, self::EXCLUDE, true)) {
                         continue;
@@ -95,6 +92,14 @@ class EditionPaletteController extends MelisAbstractActionController
                     $melis = $pconf['melis'] ?? null;
                     if (!is_array($melis) || empty($melis['name'])) {
                         continue; // not a user-facing, addable plugin
+                    }
+                    // Site scoping — PER PLUGIN (not per config key): only offer a plugin whose OWNING
+                    // module is loaded for this page's site, else it can't render on the front. The owning
+                    // module is the plugin's view namespace (template_path first segment, e.g. "MelisCmsNews"
+                    // in "MelisCmsNews/latestnews"), NOT the config key — templating-plugin-creator plugins
+                    // ALL register under the 'melisfront' config key yet each belongs to its OWN module.
+                    if ($allowedModules !== null && !isset($allowedModules[$this->pluginOwningModule($pconf, (string) $module)])) {
+                        continue;
                     }
                     $sectionKey = (string) ($publicModules[$module]['section'] ?? ($melis['section'] ?? 'Others'));
                     if ($sectionKey === '' || !in_array($sectionKey, $sectionOrder, true)) {
@@ -211,6 +216,24 @@ class EditionPaletteController extends MelisAbstractActionController
             return null; // service unavailable → don't hide anything
         }
         return array_flip(array_values(array_unique($allowed)));
+    }
+
+    /**
+     * The lowercased OWNING module of a plugin = its view/template namespace, read from the first segment
+     * of its front `template_path` (e.g. "MelisCmsNews/latestnews" → meliscmsnews, "MyNewTempPlugin/plugins/…"
+     * → mynewtempplugin, "MelisFront/menu" → melisfront). This is the module that must be loaded on the
+     * site's front for the plugin to render — unlike the CONFIG key, which every templating-plugin-creator
+     * plugin sets to 'melisfront'. Falls back to the config key when there is no template_path.
+     */
+    private function pluginOwningModule(array $pconf, string $configKey): string
+    {
+        $tp = $pconf['front']['template_path'] ?? null;
+        $first = is_array($tp) ? (string) reset($tp) : (string) $tp;
+        $slash = strpos($first, '/');
+        if ($first !== '' && $slash !== false) {
+            return strtolower(substr($first, 0, $slash));
+        }
+        return strtolower($configKey);
     }
 
     /**
