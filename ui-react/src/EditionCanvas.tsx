@@ -842,14 +842,19 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     } catch (e) { notify('ko', 'MelisCms', (e as Error).message) } finally { setSaving(false) }
   }, [idPage])
 
-  // Open the "+" plugin palette for a cell; fetch the catalog once (lazy).
+  // The addable-plugins palette is PER SITE (it lists only plugins whose module is loaded for THIS
+  // page's site) → drop the cached catalog whenever the edited page changes, so switching to a page of
+  // another site refetches the right list instead of reusing the first page's.
+  useEffect(() => { setCatalog(null) }, [idPage])
+
+  // Open the "+" plugin palette for a cell; fetch the catalog once per page (lazy).
   const openPluginPicker = useCallback(async (cellId: string) => {
     setPluginPicker({ cellId }); setPickerQuery(''); setPickerSection(null)
     if (catalog === null) {
       try { setCatalog(await apiGet<Palette>(`edition/plugins?idPage=${idPage}`)) }
       catch (e) { notify('ko', 'MelisCms', (e as Error).message) }
     }
-  }, [catalog])
+  }, [catalog, idPage])
 
   // Add the chosen plugin to the cell: persist the addPlugin op, reload the canvas (the new plugin is
   // server-rendered — no live inject). Same immediate-save shape as applyLayout.
