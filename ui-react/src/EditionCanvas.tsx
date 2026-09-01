@@ -304,7 +304,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       const btn = d.createElement('button')
       btn.className = 'melis-react-cfg'; btn.type = 'button'; btn.textContent = '⚙'
       btn.title = peT().ecConfigurePluginNamed + ' (' + name + ')'
-      btn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openConfigDirectRef.current?.(module, name, pid, name) })
+      btn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openConfigDirectRef.current?.(module, name, pid) })
       // Hovering the ⚙ outlines the plugin's block (like selecting it from the panel), only while hovered.
       btn.addEventListener('mouseenter', () => wrap.classList.add('melis-react-cfg-hl'))
       btn.addEventListener('mouseleave', () => wrap.classList.remove('melis-react-cfg-hl'))
@@ -524,7 +524,10 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     // Prefill: a hardcoded plugin may still have a top-level data node in the document (its page-XML
     // config override) — pass it so the native/iframe form prefills from the current values, not defaults.
     const node = (doc?.nodes || []).find((n) => n.id === id) || null
-    setConfig({ zoneId: '', ref: { id, label: label || name }, node, module, pluginName: name, tag: node?.tag || '', useIframe: false, v: Date.now() })
+    // Prefer the resolved, translated plugin TITLE (same source as the right panel) over the raw plugin
+    // CLASS name — otherwise the in-canvas ⚙ showed the doubled class name (e.g. "FooFooPlugin").
+    const nice = label || doc?.pluginTitles?.[id] || name
+    setConfig({ zoneId: '', ref: { id, label: nice }, node, module, pluginName: name, tag: node?.tag || '', useIframe: false, v: Date.now() })
   }, [doc])
   const openConfigDirectRef = useRef<((module: string, name: string, id: string, label?: string) => void) | null>(null)
   useEffect(() => { openConfigDirectRef.current = openConfigDirect }, [openConfigDirect])
