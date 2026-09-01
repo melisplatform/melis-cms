@@ -43,6 +43,8 @@ class EditionPaletteController extends MelisAbstractActionController
                 if ($k === '') {
                     return '';
                 }
+                // Melis convention: a leading "\" marks a translatable string — strip it before lookup.
+                if ($k[0] === '\\') $k = substr($k, 1);
                 try { return (string) $translator->translate($k); } catch (\Throwable) { return $k; }
             };
 
