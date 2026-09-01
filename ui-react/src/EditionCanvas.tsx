@@ -252,7 +252,10 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       + '.melis-react-cfg:hover{transform:scale(1.1);filter:brightness(1.08)}'
       // In-canvas reorder arrows (top-RIGHT, opposite the config ⚙), injected on every plugin that sits
       // in a drag-drop zone holding >1 block. Same reorder as the right panel's drag → move()/setZoneRefs.
-      + '.melis-react-move{position:absolute;top:8px;right:8px;z-index:2147483000;display:flex;flex-direction:column;gap:3px}'
+      // HIDDEN by default, revealed only for the HOVERED or SELECTED plugin — otherwise adjacent plugins'
+      // bars stack and overlap when the blocks are short/tightly spaced (only one shows at a time now).
+      + '.melis-react-move{position:absolute;top:8px;right:8px;z-index:2147483000;display:flex;flex-direction:column;gap:3px;opacity:0;pointer-events:none;transition:opacity .12s}'
+      + '.melis-react-has-cfg:hover>.melis-react-move,.melis-react-sel>.melis-react-move{opacity:1;pointer-events:auto}'
       + '.melis-react-mv{display:flex;align-items:center;justify-content:center;width:30px;height:26px;padding:0;'
       + 'border:2px solid #fff;background:var(--melis-accent,#dc2626);color:#fff;font-size:12px;line-height:1;cursor:pointer;'
       + 'box-shadow:0 3px 14px rgba(0,0,0,.35);opacity:1;transition:filter .1s}'

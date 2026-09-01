@@ -174,6 +174,12 @@ class EditionRenderPageController extends MelisAbstractActionController
             . '.dnd-plugins-row > div[class*="dnd-plugins-col-"] > .melis-ui-outlined{float:left;box-sizing:border-box;max-width:100%}'
             . '.dnd-plugins-row > div[class*="dnd-plugins-col-"] > .melis-ui-outlined:not([class*="plugin-width"]){width:100%}'
             . '.melis-ui-outlined [data-melis-plugin-tag-id]{width:100%!important;float:none!important;margin:0!important;max-width:100%!important}'
+            // Reorder arrows (client-injected `.melis-react-move`): show ONLY for the hovered/selected
+            // plugin, otherwise adjacent short/tight blocks stack their bars and overlap. Injected here
+            // (server render is no-store) with !important so it applies even against a stale cached brick.js
+            // (max-age 86400, no ETag) that still forces the bars visible — no brick rebuild needed to fix it.
+            . '.melis-react-move{opacity:0!important;pointer-events:none!important;transition:opacity .12s}'
+            . '.melis-react-has-cfg:hover>.melis-react-move,.melis-react-sel>.melis-react-move{opacity:1!important;pointer-events:auto!important}'
             . '</style>';
         if (stripos($html, '</head>') !== false) {
             return (string) preg_replace('#</head>#i', $inject . '</head>', $html, 1);
