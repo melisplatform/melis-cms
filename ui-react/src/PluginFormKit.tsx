@@ -1,6 +1,7 @@
 import { useEffect, useReducer, useState } from 'react'
 import type { ReactNode } from 'react'
 import { PagePicker } from './PagePicker'
+import { peT } from './page-editor-i18n'
 
 /**
  * PluginFormKit — the SHARED toolkit for full-React plugin config forms (evo/page-edition-react).
@@ -60,9 +61,10 @@ export async function savePluginConfig(
       }
     }
   }
+  const tr = peT()
   const message = res?.error
     ? String(res.error)
-    : (tabNames.length ? `Veuillez corriger les champs (${tabNames.join(', ')}).` : 'Échec de l’enregistrement.')
+    : (tabNames.length ? `${tr.pfFixFields} (${tabNames.join(', ')}).` : tr.pfSaveFailed)
   return { ok: false, fieldErrors, message }
 }
 
@@ -146,7 +148,7 @@ export function useSubmit(props: PluginFormProps) {
       if (r.ok) { props.onSaved(r.changed); return }
       setFieldErrors(r.fieldErrors); setMessage(r.message)
     } catch (e) {
-      setMessage((e as Error).message || 'Erreur réseau')
+      setMessage((e as Error).message || peT().pfNetworkError)
     } finally { setSaving(false) }
   }
   return { saving, fieldErrors, message, submit }
@@ -154,10 +156,11 @@ export function useSubmit(props: PluginFormProps) {
 
 /** Footer with Cancel / Save buttons, shared look with the modal. */
 export function FormFooter({ saving, accent, onCancel, onSave }: { saving: boolean; accent: string; onCancel: () => void; onSave: () => void }) {
+  const tr = peT()
   return (
     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 18 }}>
-      <button type="button" data-testid="plugin-form-cancel" onClick={onCancel} style={{ border: '1px solid var(--color-border,#e5e7eb)', background: 'transparent', color: 'inherit', borderRadius: 6, padding: '7px 14px', fontSize: 12, cursor: 'pointer' }}>Annuler</button>
-      <button type="button" data-testid="plugin-form-save" onClick={onSave} disabled={saving} style={{ border: 0, borderRadius: 6, padding: '7px 16px', fontSize: 12, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', background: accent, color: '#fff', opacity: saving ? .6 : 1 }}>{saving ? 'Enregistrement…' : 'Enregistrer'}</button>
+      <button type="button" data-testid="plugin-form-cancel" onClick={onCancel} style={{ border: '1px solid var(--color-border,#e5e7eb)', background: 'transparent', color: 'inherit', borderRadius: 6, padding: '7px 14px', fontSize: 12, cursor: 'pointer' }}>{tr.cancel}</button>
+      <button type="button" data-testid="plugin-form-save" onClick={onSave} disabled={saving} style={{ border: 0, borderRadius: 6, padding: '7px 16px', fontSize: 12, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', background: accent, color: '#fff', opacity: saving ? .6 : 1 }}>{saving ? tr.savingScripts : tr.save}</button>
     </div>
   )
 }
@@ -390,12 +393,12 @@ export function HiddenField({ ctx, name }: { ctx: PluginTabContext; name: string
 }
 
 /** A select bound to ctx[name] with the given options. */
-export function SelectField({ ctx, name, label, options, hint, empty = '— Choisir —' }: { ctx: PluginTabContext; name: string; label: string; options: Option[]; hint?: string; empty?: string }) {
+export function SelectField({ ctx, name, label, options, hint, empty }: { ctx: PluginTabContext; name: string; label: string; options: Option[]; hint?: string; empty?: string }) {
   usePrefill(ctx, name)
   return (
     <Field label={label} error={ctx.error(name)} hint={hint}>
       <select data-testid={`field-${name}`} value={ctx.value(name)} onChange={(e) => ctx.setValue(name, e.target.value)} style={inputStyle}>
-        <option value="">{empty}</option>
+        <option value="">{empty ?? peT().pfChoose}</option>
         {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </Field>
@@ -416,7 +419,10 @@ export function RemoteSelectField({ ctx, name, label, hint, empty }: { ctx: Plug
 }
 
 /** The `template_path` select — self-contained (loads template options; defaults to the sole one). */
-export function TemplateField({ ctx, name = 'template_path', label = 'Template', hint = 'Gabarit de rendu du plugin.' }: { ctx: PluginTabContext; name?: string; label?: string; hint?: string }) {
+export function TemplateField({ ctx, name = 'template_path', label, hint }: { ctx: PluginTabContext; name?: string; label?: string; hint?: string }) {
+  const tr = peT()
+  label = label ?? tr.template
+  hint = hint ?? tr.pfTemplateHint
   usePrefill(ctx, name) // value comes from the server-resolved fieldValues (incl. defaults)
   const [options, setOptions] = useState<Option[]>([])
   useEffect(() => {
@@ -428,7 +434,7 @@ export function TemplateField({ ctx, name = 'template_path', label = 'Template',
   return (
     <Field label={label} error={ctx.error(name)} hint={hint}>
       <select data-testid={`field-${name}`} value={ctx.value(name)} onChange={(e) => ctx.setValue(name, e.target.value)} style={inputStyle}>
-        <option value="">— Choisir un template —</option>
+        <option value="">{tr.pfChooseTemplate}</option>
         {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </Field>
@@ -503,7 +509,9 @@ export function CheckboxField({ ctx, name, label, boxLabel, hint }: { ctx: Plugi
  * shared values on change: `fields` (shown field names, IN ORDER) and `required_fields` (mandatory ones).
  * The plugin's savePluginConfigToXml() reads `$post['fields']` / `$post['required_fields']`.
  */
-export function FieldListField({ ctx, label = 'Champs du formulaire', hint }: { ctx: PluginTabContext; label?: string; hint?: string }) {
+export function FieldListField({ ctx, label, hint }: { ctx: PluginTabContext; label?: string; hint?: string }) {
+  const tr = peT()
+  label = label ?? tr.pfFormFields
   const [rows, setRows] = useState<FieldListRow[]>([])
   const [dragIdx, setDragIdx] = useState<number | null>(null)
   const [overIdx, setOverIdx] = useState<number | null>(null)
@@ -533,10 +541,10 @@ export function FieldListField({ ctx, label = 'Champs du formulaire', hint }: { 
     <Field label={label} error={ctx.error('fields')} hint={hint}>
       <div style={{ border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 8, overflow: 'hidden' }}>
         <div style={{ display: 'grid', gridTemplateColumns: cols, gap: 8, alignItems: 'center', padding: '7px 10px', background: 'color-mix(in srgb, var(--color-muted-foreground,#6b7280) 7%, transparent)' }}>
-          <span /><span style={cellHead}>Champ</span>
-          <span style={{ ...cellHead, textAlign: 'center' }}>Afficher</span><span style={{ ...cellHead, textAlign: 'center' }}>Obligatoire</span>
+          <span /><span style={cellHead}>{tr.pfColField}</span>
+          <span style={{ ...cellHead, textAlign: 'center' }}>{tr.pfColShow}</span><span style={{ ...cellHead, textAlign: 'center' }}>{tr.pfColRequired}</span>
         </div>
-        {rows.length === 0 && <div style={{ padding: 10, fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>Aucun champ.</div>}
+        {rows.length === 0 && <div style={{ padding: 10, fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.pfNoField}</div>}
         {rows.map((r, i) => (
           <div
             key={r.name}
@@ -552,14 +560,14 @@ export function FieldListField({ ctx, label = 'Champs du formulaire', hint }: { 
           >
             <span
               draggable
-              title="Glisser pour réordonner"
+              title={tr.pfDragToReorder}
               onDragStart={(e) => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(i)); setDragIdx(i) }}
               onDragEnd={endDrag}
               style={{ cursor: 'grab', color: 'var(--color-muted-foreground,#9ca3af)', fontSize: 13, lineHeight: 1, textAlign: 'center', userSelect: 'none' }}
             >⠿</span>
             <span style={{ fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.label}</span>
-            <span style={{ display: 'inline-flex', justifyContent: 'center' }}><CheckBox checked={r.shown} title="Afficher ce champ" onChange={(v) => setRow(r.name, { shown: v, ...(v ? {} : { required: false }) })} /></span>
-            <span style={{ display: 'inline-flex', justifyContent: 'center' }}><CheckBox checked={r.required} disabled={!r.shown} title="Rendre obligatoire" onChange={(v) => setRow(r.name, { required: v })} /></span>
+            <span style={{ display: 'inline-flex', justifyContent: 'center' }}><CheckBox checked={r.shown} title={tr.pfShowField} onChange={(v) => setRow(r.name, { shown: v, ...(v ? {} : { required: false }) })} /></span>
+            <span style={{ display: 'inline-flex', justifyContent: 'center' }}><CheckBox checked={r.required} disabled={!r.shown} title={tr.pfMakeRequired} onChange={(v) => setRow(r.name, { required: v })} /></span>
           </div>
         ))}
       </div>

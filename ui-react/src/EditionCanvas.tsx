@@ -3,6 +3,7 @@ import { apiGet, apiPost } from './PageTabs'
 import { hasPluginForm, PluginTabbedForm, PluginFormBoundary } from './PluginForms'
 import { PagePicker } from './PagePicker'
 import { ViewToggle } from './ViewToggle'
+import { peT } from './page-editor-i18n'
 
 /**
  * EditionCanvas — vue « New » de l'onglet Édition (evo/page-edition-react), path C.
@@ -302,7 +303,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       wrap.classList.add('melis-react-has-cfg')
       const btn = d.createElement('button')
       btn.className = 'melis-react-cfg'; btn.type = 'button'; btn.textContent = '⚙'
-      btn.title = 'Configurer ce plugin (' + name + ')'
+      btn.title = peT().ecConfigurePluginNamed + ' (' + name + ')'
       btn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openConfigDirectRef.current?.(module, name, pid, name) })
       // Hovering the ⚙ outlines the plugin's block (like selecting it from the panel), only while hovered.
       btn.addEventListener('mouseenter', () => wrap.classList.add('melis-react-cfg-hl'))
@@ -506,7 +507,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     if (tag === 'melisTag') { editInline(zoneId, ref.id); return }
     const meta = findPluginRef(doc?.nodes, ref.id)
     if (!meta || !meta.name || !meta.module) {
-      notify('ko', 'MelisCms', 'Plugin introuvable dans le document — configuration impossible.')
+      notify('ko', 'MelisCms', peT().ecPluginNotFound)
       return
     }
     const hasReactForm = hasPluginForm(meta.name)
@@ -768,6 +769,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const injectControls = useCallback(() => {
     const d = iframeRef.current?.contentDocument
     if (!d) return
+    const tr = peT()
     d.querySelectorAll('.melis-react-move').forEach((b) => b.remove())
     const build = (cells: Cell[]) => {
       for (const c of cells) {
@@ -784,8 +786,8 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
               if (!disabled) b.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); move(c.id, i, i + dir) })
               return b
             }
-            bar.appendChild(mk('▲', 'Monter le bloc', -1, i === 0))
-            bar.appendChild(mk('▼', 'Descendre le bloc', 1, i === c.refs.length - 1))
+            bar.appendChild(mk('▲', tr.ecMoveBlockUp, -1, i === 0))
+            bar.appendChild(mk('▼', tr.ecMoveBlockDown, 1, i === c.refs.length - 1))
             wrap.appendChild(bar)
           })
         }
@@ -868,9 +870,10 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     move(zoneId, from, targetIdx)
   }
 
+  const tr = peT()
   const msg: React.CSSProperties = { padding: 20, fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }
-  if (err) return <div style={{ ...msg, color: '#dc2626' }}>Erreur : {err}</div>
-  if (!doc) return <div style={msg}>Chargement de l'éditeur…</div>
+  if (err) return <div style={{ ...msg, color: '#dc2626' }}>{tr.ecErrorPrefix}{err}</div>
+  if (!doc) return <div style={msg}>{tr.ecLoadingEditor}</div>
 
   const iconBtn: React.CSSProperties = { appearance: 'none', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', borderRadius: 5, width: 22, height: 22, lineHeight: '1', cursor: 'pointer', fontSize: 12, color: 'var(--color-foreground,#111827)' }
 
@@ -889,7 +892,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   // A compact trigger (current layout icon) that sits in the zone header row; clicking DEPLOYS the full
   // schema list (popover) instead of flooding every zone with 27 icons.
   const LayoutTrigger = ({ cell }: { cell: Cell }) => (
-    <div role="button" tabIndex={0} data-testid={`layout-trigger-${cell.id}`} title="Disposition (colonnes / lignes)"
+    <div role="button" tabIndex={0} data-testid={`layout-trigger-${cell.id}`} title={tr.ecLayoutTitle}
       onClick={(e) => openPicker(e, cell.id)}
       style={{ display: 'inline-flex', alignItems: 'center', gap: 2, cursor: saving ? 'not-allowed' : 'pointer', border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 5, padding: '1px 3px', background: 'var(--color-card,#fff)', opacity: saving ? .6 : 1 }}>
       <span className="melis-di melis-di-mini" dangerouslySetInnerHTML={{ __html: iconFor(cell.template) }} />
@@ -908,14 +911,14 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const CellView = ({ cell, depth, path }: { cell: Cell; depth: number; path: string }) => {
     const isLeaf = cell.cells.length === 0
     const isSel = selected?.zoneId === cell.id
-    const zoneName = `Drag'n'drop Zone ${path}`
+    const zoneName = `${tr.ecZonePrefix} ${path}`
     return (
       <div key={cell.id} data-testid={`zone-${cell.id}`} style={{ marginBottom: depth === 0 ? 12 : 8, marginLeft: depth ? 8 : 0, border: '1px solid var(--color-border,#e5e7eb)', borderLeft: depth ? '3px solid color-mix(in srgb, var(--color-primary,#dc2626) 35%, #e5e7eb)' : '1px solid var(--color-border,#e5e7eb)', borderRadius: 8, overflow: 'hidden', boxShadow: isSel ? '0 0 0 2px var(--color-primary,#dc2626)' : undefined }}>
-        <div data-testid={`zone-head-${cell.id}`} onClick={() => selectZone(cell.id)} title={`Sélectionner ${zoneName} (${cell.id})`}
+        <div data-testid={`zone-head-${cell.id}`} onClick={() => selectZone(cell.id)} title={`${tr.ecSelectZone} ${zoneName} (${cell.id})`}
           style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, fontWeight: 600, color: 'var(--color-muted-foreground,#6b7280)', background: isSel ? 'color-mix(in srgb, var(--color-primary,#dc2626) 16%, transparent)' : 'color-mix(in srgb, var(--color-primary,#dc2626) 6%, transparent)', padding: '4px 8px', cursor: 'pointer' }}>
           <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={cell.id}>{depth ? '▫' : '⛶'} {zoneName}</span>
           {isLeaf && (
-            <button data-testid={`add-${cell.id}`} title="Ajouter un plugin" onClick={(e) => { e.stopPropagation(); openPluginPicker(cell.id) }}
+            <button data-testid={`add-${cell.id}`} title={tr.ecAddPlugin} onClick={(e) => { e.stopPropagation(); openPluginPicker(cell.id) }}
               style={{ appearance: 'none', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 5, height: 18, minWidth: 20, padding: '0 6px', fontSize: 12, fontWeight: 700, cursor: 'pointer', lineHeight: '1' }}>+</button>
           )}
           {/* compact schema picker — deploys the full list; each cell reconfigurable */}
@@ -940,7 +943,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
               ) : null}
               {r.mini ? (
                 <span style={{ flex: 1, minWidth: 0, lineHeight: 1.2 }} title={r.id}>
-                  <span style={{ display: 'block', fontWeight: selected?.refId === r.id ? 700 : 600 }}>Mini-template</span>
+                  <span style={{ display: 'block', fontWeight: selected?.refId === r.id ? 700 : 600 }}>{tr.ecMiniTemplate}</span>
                   <span style={{ display: 'block', fontSize: 10, color: 'var(--color-muted-foreground,#6b7280)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.label}</span>
                 </span>
               ) : (
@@ -949,19 +952,19 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
               {/* classic (html/media/textarea) blocks are edited by CLICKING in them (WYSIWYG) — no button;
                   only non-classic plugins get a config button */}
               {(doc?.nodes.find((n) => n.id === r.id)?.tag || '') !== 'melisTag' && (
-                <button data-testid={`config-${r.id}`} title="Configurer le plugin" onClick={(e) => { e.stopPropagation(); openConfig(cell.id, r) }} style={{ ...iconBtn, borderColor: 'var(--color-border,#e5e7eb)' }}>⚙</button>
+                <button data-testid={`config-${r.id}`} title={tr.ecConfigurePlugin} onClick={(e) => { e.stopPropagation(); openConfig(cell.id, r) }} style={{ ...iconBtn, borderColor: 'var(--color-border,#e5e7eb)' }}>⚙</button>
               )}
               {/* responsive-width toggle — the 3 inputs are deployed on demand (they're rarely used and
                   take up room otherwise). Highlighted when open. */}
-              <button data-testid={`width-toggle-${r.id}`} title="Largeurs responsive (desktop / tablette / mobile)"
+              <button data-testid={`width-toggle-${r.id}`} title={tr.ecResponsiveWidths}
                 onClick={(e) => { e.stopPropagation(); setOpenWidth((w) => (w === r.id ? null : r.id)) }}
                 style={{ ...iconBtn, borderColor: openWidth === r.id ? 'var(--color-primary,#dc2626)' : 'var(--color-border,#e5e7eb)', color: openWidth === r.id ? 'var(--color-primary,#dc2626)' : 'var(--color-foreground,#111827)' }}>↔</button>
-              <button data-testid={`remove-${r.id}`} title="Retirer de la zone" onClick={(e) => { e.stopPropagation(); setConfirmRemove({ zoneId: cell.id, refId: r.id, label: r.label }) }} style={{ ...iconBtn, borderColor: '#fecaca', color: '#dc2626' }}>×</button>
+              <button data-testid={`remove-${r.id}`} title={tr.ecRemoveFromZone} onClick={(e) => { e.stopPropagation(); setConfirmRemove({ zoneId: cell.id, refId: r.id, label: r.label }) }} style={{ ...iconBtn, borderColor: '#fecaca', color: '#dc2626' }}>×</button>
             </div>
             {openWidth === r.id && (
               <div data-testid={`widths-${r.id}`} onClick={(e) => e.stopPropagation()} style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6, paddingLeft: 18 }}>
                 {(['d', 't', 'm'] as const).map((dim) => (
-                  <label key={dim} style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 10, color: 'var(--color-muted-foreground,#6b7280)' }} title={dim === 'd' ? 'Largeur desktop %' : dim === 't' ? 'Largeur tablette %' : 'Largeur mobile %'}>
+                  <label key={dim} style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 10, color: 'var(--color-muted-foreground,#6b7280)' }} title={dim === 'd' ? tr.ecWidthDesktop : dim === 't' ? tr.ecWidthTablet : tr.ecWidthMobile}>
                     {dim === 'd' ? '🖥' : dim === 't' ? '📱' : '📲'}
                     <input data-testid={`width-${dim}-${r.id}`} type="number" min={0} max={100} step={1}
                       value={blockW[r.id]?.[dim] ?? '100'} onClick={(e) => e.stopPropagation()} onChange={(e) => setWidth(r.id, dim, e.target.value)}
@@ -973,7 +976,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
             )}
           </div>
         ))}
-        {isLeaf && cell.refs.length === 0 && <div style={{ fontSize: 11, color: 'var(--color-muted-foreground,#9ca3af)', padding: '6px 8px' }}>Cellule vide — choisissez une disposition ou ajoutez un bloc.</div>}
+        {isLeaf && cell.refs.length === 0 && <div style={{ fontSize: 11, color: 'var(--color-muted-foreground,#9ca3af)', padding: '6px 8px' }}>{tr.ecEmptyCell}</div>}
 
         {/* nested sub-cells (columns/rows), recursive */}
         {cell.cells.length > 0 && (
@@ -988,7 +991,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--color-background,#fff)' }}>
       {/* discreet saving indicator, floated (no header bar) */}
-      {saving && <div style={{ position: 'absolute', top: 6, right: 12, zIndex: 5, fontSize: 11, fontWeight: 600, color: 'var(--color-muted-foreground,#6b7280)', background: 'var(--color-card,#fff)', border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 6, padding: '2px 8px' }}>Enregistrement…</div>}
+      {saving && <div style={{ position: 'absolute', top: 6, right: 12, zIndex: 5, fontSize: 11, fontWeight: 600, color: 'var(--color-muted-foreground,#6b7280)', background: 'var(--color-card,#fff)', border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 6, padding: '2px 8px' }}>{tr.ecSaving}</div>}
       <div style={{ flex: '1 1 auto', minHeight: 0, display: 'flex', position: 'relative' }}>
         {/* Device-preview frame: desktop = full bleed; tablet/mobile = fixed width, centered on a
             neutral backdrop (like the legacy responsive preview), so the page reflows to that width. */}
@@ -1008,26 +1011,26 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
             : { flex: `0 0 ${panelCollapsed ? 32 : 360}px`, borderLeft: '1px solid var(--color-border,#e5e7eb)', overflow: panelCollapsed ? 'hidden' : 'auto', padding: panelCollapsed ? '8px 3px' : 10, background: 'var(--color-card,#fff)', transition: 'flex-basis .15s ease' }
         }>
           {(!isMobile && panelCollapsed) ? (
-            <button data-testid="panel-expand" title="Déployer le panneau structure" onClick={() => setPanelCollapsed(false)}
+            <button data-testid="panel-expand" title={tr.ecExpandPanel} onClick={() => setPanelCollapsed(false)}
               style={{ ...iconBtn, width: 26, height: 26, margin: '0 auto', display: 'block' }}>«</button>
           ) : (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                 <span style={{ flex: '0 0 auto', width: 26 }} />
-                <span style={{ flex: 1, textAlign: 'center', fontSize: 12, fontWeight: 700, letterSpacing: .2, color: 'var(--color-foreground,#111827)' }}>Contenus des zones Drag'n'Drop</span>
-                <button data-testid="panel-collapse" title={isMobile ? 'Fermer' : 'Réduire le panneau'} onClick={() => setPanelCollapsed(true)}
+                <span style={{ flex: 1, textAlign: 'center', fontSize: 12, fontWeight: 700, letterSpacing: .2, color: 'var(--color-foreground,#111827)' }}>{tr.ecPanelTitle}</span>
+                <button data-testid="panel-collapse" title={isMobile ? tr.ecClosePanel : tr.ecCollapsePanel} onClick={() => setPanelCollapsed(true)}
                   style={{ ...iconBtn, flex: '0 0 auto', width: 26, height: 26 }}>{isMobile ? '✕' : '»'}</button>
               </div>
-              {tree.length === 0 && <div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)', padding: 6 }}>Aucune zone drag-drop sur cette page.</div>}
+              {tree.length === 0 && <div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)', padding: 6 }}>{tr.ecNoZones}</div>}
               {tree.map((z, i) => CellView({ cell: z, depth: 0, path: String(i + 1) }))}
             </>
           )}
         </div>
         {/* Mobile: floating button to (re)open the drawer when it's closed. */}
         {isMobile && panelCollapsed && (
-          <button data-testid="panel-open-mobile" title="Zones drag'n'drop" onClick={() => setPanelCollapsed(false)}
+          <button data-testid="panel-open-mobile" title={tr.ecOpenDrawer} onClick={() => setPanelCollapsed(false)}
             style={{ position: 'absolute', bottom: 16, right: 16, zIndex: 42, display: 'inline-flex', alignItems: 'center', gap: 6, height: 44, padding: '0 16px', borderRadius: 22, border: 'none', background: 'var(--color-primary,#dc2626)', color: 'var(--color-primary-foreground,#fff)', fontSize: 13, fontWeight: 600, boxShadow: '0 6px 20px rgba(0,0,0,.28)', cursor: 'pointer' }}>
-            ☰ Zones
+            ☰ {tr.ecZonesButton}
           </button>
         )}
       </div>
@@ -1039,7 +1042,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
           <>
             <div onClick={() => setPicker(null)} style={{ position: 'fixed', inset: 0, zIndex: 60 }} />
             <div style={{ position: 'fixed', left: picker.x, top: picker.y, zIndex: 61, width: 300, maxHeight: '62vh', overflow: 'auto', background: 'var(--color-card,#fff)', border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 8, boxShadow: '0 12px 34px rgba(0,0,0,.18)', padding: 8 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: .3, color: 'var(--color-muted-foreground,#6b7280)', margin: '2px 2px 6px' }}>DISPOSITION DE LA ZONE</div>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: .3, color: 'var(--color-muted-foreground,#6b7280)', margin: '2px 2px 6px' }}>{tr.ecZoneLayoutHeader}</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {layouts.map((l) => (
                   <div key={l.key} role="button" data-testid={`layout-${picker.cellId}-${l.key}`} title={`${l.key} (${l.cols || 1})`}
@@ -1065,7 +1068,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
           <div style={{ position: 'fixed', inset: 0, zIndex: 80, background: 'rgba(0,0,0,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setConfig(null)}>
             <div onClick={(e) => e.stopPropagation()} style={{ width: 'min(760px, 94vw)', maxHeight: '88vh', display: 'flex', flexDirection: 'column', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 12, boxShadow: '0 24px 70px rgba(0,0,0,.45)', overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', borderBottom: '1px solid var(--color-border,#e5e7eb)' }}>
-                <span style={{ fontWeight: 700, fontSize: 14 }}>Plugin · {config.ref.label}</span>
+                <span style={{ fontWeight: 700, fontSize: 14 }}>{tr.ecPluginPrefix} · {config.ref.label}</span>
                 <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
                   {/* New/Old toggle — only when a native React form exists for this plugin: lets you switch
                       to the legacy iframe form (Old) and back (New), like the toggles elsewhere. */}
@@ -1073,7 +1076,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
                     <ViewToggle compact mode={config.useIframe ? 'iframe' : 'react'}
                       onChange={(m) => setConfig((c) => (c ? { ...c, useIframe: m === 'iframe', v: Date.now() } : c))} />
                   )}
-                  <button onClick={() => setConfig(null)} title="Fermer" style={{ ...iconBtn, width: 26, height: 26 }}>✕</button>
+                  <button onClick={() => setConfig(null)} title={tr.ecClose} style={{ ...iconBtn, width: 26, height: 26 }}>✕</button>
                 </div>
               </div>
               <div style={{ padding: ReactForm ? 16 : 0, overflow: 'auto', flex: '1 1 auto', minHeight: 220 }}>
@@ -1084,7 +1087,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
                       onSaved={onConfigSaved} onCancel={() => setConfig(null)} />
                   </PluginFormBoundary>
                 ) : (
-                  <iframe data-testid={`config-iframe-${config.ref.id}`} title={`Config ${config.ref.label}`} src={iframeSrc}
+                  <iframe data-testid={`config-iframe-${config.ref.id}`} title={`${tr.ecConfigFor} ${config.ref.label}`} src={iframeSrc}
                     style={{ width: '100%', height: '62vh', border: 0, display: 'block', background: 'var(--color-background,#fff)' }} />
                 )}
               </div>
@@ -1103,9 +1106,9 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
           <div data-testid="plugin-picker" style={{ position: 'fixed', inset: 0, zIndex: 85, background: 'rgba(0,0,0,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setPluginPicker(null)}>
             <div onClick={(e) => e.stopPropagation()} style={{ width: 'min(820px, 95vw)', maxHeight: '88vh', display: 'flex', flexDirection: 'column', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 12, boxShadow: '0 24px 70px rgba(0,0,0,.45)', overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', borderBottom: '1px solid var(--color-border,#e5e7eb)' }}>
-                <span style={{ fontWeight: 700, fontSize: 14 }}>Ajouter un plugin</span>
-                <span style={{ fontSize: 11, color: 'var(--color-muted-foreground,#6b7280)' }}>zone {pluginPicker.cellId}</span>
-                <button onClick={() => setPluginPicker(null)} title="Fermer" style={{ ...iconBtn, marginLeft: 'auto', width: 26, height: 26 }}>✕</button>
+                <span style={{ fontWeight: 700, fontSize: 14 }}>{tr.ecAddPlugin}</span>
+                <span style={{ fontSize: 11, color: 'var(--color-muted-foreground,#6b7280)' }}>{tr.ecZoneWord} {pluginPicker.cellId}</span>
+                <button onClick={() => setPluginPicker(null)} title={tr.ecClose} style={{ ...iconBtn, marginLeft: 'auto', width: 26, height: 26 }}>✕</button>
               </div>
               {/* marketplace-style section filter chips (above the search) */}
               {allSecs.length > 1 && (
@@ -1121,7 +1124,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
                       <>
                         <button data-testid="picker-section-all" onClick={() => setPickerSection(null)} style={chip(pickerSection === null)}>
                           <MelisSectionIcon sectionKey="__all__" size={16} />
-                          All groups
+                          {tr.ecAllGroups}
                         </button>
                         {allSecs.map((s) => (
                           <button key={s.key} data-testid={`picker-section-${s.key}`} onClick={() => setPickerSection((cur) => cur === s.key ? null : s.key)} style={chip(pickerSection === s.key)}>
@@ -1136,13 +1139,13 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
               )}
               <div style={{ padding: '10px 16px', borderBottom: '1px solid var(--color-border,#e5e7eb)' }}>
                 <input data-testid="plugin-picker-search" autoFocus value={pickerQuery} onChange={(e) => setPickerQuery(e.target.value)}
-                  placeholder="Rechercher un plugin…" style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-background,#fff)', color: 'inherit', fontSize: 13, boxSizing: 'border-box' }} />
+                  placeholder={tr.ecSearchPlugin} style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-background,#fff)', color: 'inherit', fontSize: 13, boxSizing: 'border-box' }} />
               </div>
               <div style={{ padding: 12, overflow: 'auto', flex: '1 1 auto' }}>
                 {catalog === null ? (
-                  <div style={{ ...msg }}>Chargement des plugins…</div>
+                  <div style={{ ...msg }}>{tr.ecLoadingPlugins}</div>
                 ) : secs.length === 0 ? (
-                  <div style={{ ...msg }}>Aucun plugin ne correspond.</div>
+                  <div style={{ ...msg }}>{tr.ecNoPluginMatch}</div>
                 ) : secs.map((sec) => (
                   <div key={sec.key} style={{ marginBottom: 18 }}>
                     {/* section header — the Melis section logo + label, like the legacy plugin menu */}
@@ -1197,8 +1200,8 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
         <div style={{ position: 'fixed', inset: 0, zIndex: 92, background: 'rgba(0,0,0,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setPagePicker(null)}>
           <div onClick={(e) => e.stopPropagation()} style={{ width: 'min(460px, 94vw)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 12, boxShadow: '0 24px 70px rgba(0,0,0,.45)', overflow: 'visible' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', borderBottom: '1px solid var(--color-border,#e5e7eb)' }}>
-              <span style={{ fontWeight: 700, fontSize: 14 }}>Sélectionner une page</span>
-              <button onClick={() => setPagePicker(null)} title="Fermer" style={{ ...iconBtn, marginLeft: 'auto', width: 26, height: 26 }}>✕</button>
+              <span style={{ fontWeight: 700, fontSize: 14 }}>{tr.ecSelectPage}</span>
+              <button onClick={() => setPagePicker(null)} title={tr.ecClose} style={{ ...iconBtn, marginLeft: 'auto', width: 26, height: 26 }}>✕</button>
             </div>
             <div style={{ padding: 16 }}>
               <PagePicker value={Number(pagePicker.value) || 0}
@@ -1212,15 +1215,15 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       {confirmRemove && (
         <div data-testid="confirm-remove" style={{ position: 'fixed', inset: 0, zIndex: 95, background: 'rgba(0,0,0,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setConfirmRemove(null)}>
           <div onClick={(e) => e.stopPropagation()} style={{ width: 'min(420px, 94vw)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 12, boxShadow: '0 24px 70px rgba(0,0,0,.45)', overflow: 'hidden' }}>
-            <div style={{ padding: '16px 18px 6px', fontWeight: 700, fontSize: 15 }}>Retirer ce plugin ?</div>
+            <div style={{ padding: '16px 18px 6px', fontWeight: 700, fontSize: 15 }}>{tr.ecRemovePluginTitle}</div>
             <div style={{ padding: '0 18px 16px', fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>
-              « {confirmRemove.label} » sera retiré de la zone. Vous pourrez le rajouter, mais sa configuration sera perdue.
+              « {confirmRemove.label} » {tr.ecRemovePluginBody1}
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '12px 16px', borderTop: '1px solid var(--color-border,#e5e7eb)' }}>
               <button data-testid="confirm-remove-cancel" onClick={() => setConfirmRemove(null)}
-                style={{ appearance: 'none', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 6, padding: '7px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Annuler</button>
+                style={{ appearance: 'none', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 6, padding: '7px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>{tr.cancel}</button>
               <button data-testid="confirm-remove-ok" onClick={() => { removeBlock(confirmRemove.zoneId, confirmRemove.refId); setConfirmRemove(null) }}
-                style={{ appearance: 'none', border: '1px solid #dc2626', background: '#dc2626', color: '#fff', borderRadius: 6, padding: '7px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Retirer</button>
+                style={{ appearance: 'none', border: '1px solid #dc2626', background: '#dc2626', color: '#fff', borderRadius: 6, padding: '7px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>{tr.ecRemoveBtn}</button>
             </div>
           </div>
         </div>
