@@ -705,6 +705,13 @@ textarea{min-height:90px}
 .d-flex{display:flex}.flex-row{flex-direction:row}.flex-column{flex-direction:column}
 .justify-content-between{justify-content:space-between}.justify-content-center{justify-content:center}.align-items-center{align-items:center}
 input[type=checkbox],input[type=radio]{width:auto !important;height:auto;margin:0;vertical-align:middle}
+/* Bootstrap-5 tooltips: the JS (Popper) is loaded but NOT Bootstrap's CSS, so the info bubbles had no
+   background and no positioning — the text left the flow and sprawled across the form. Provide the
+   minimal tooltip skin (position + background box + wrapping) here. */
+.tooltip{position:absolute;z-index:100001;display:block;margin:0;font-family:inherit;font-size:12px;line-height:1.45;text-align:left;white-space:normal;word-wrap:break-word;opacity:1}
+.tooltip.fade:not(.show){opacity:0}
+.tooltip .tooltip-inner{max-width:280px;padding:7px 10px;color:#f9fafb;text-align:left;background:#1f2937;border:1px solid rgba(255,255,255,.14);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.tooltip .tooltip-arrow{display:none}
 /* Legacy widget popovers must FLOAT (the `dropdown-menu` class dropped their position to static, with
    no Bootstrap loaded here) AND be fully themed (their panel background came from Bootstrap too). */
 .datepicker.datepicker-dropdown{position:absolute !important;z-index:100000;background:$field;border:1px solid $border;border-radius:8px;padding:8px;box-shadow:0 12px 34px rgba(0,0,0,.35);color:$fg;width:auto;min-width:0}
