@@ -127,8 +127,12 @@ class EditionRenderPageController extends MelisAbstractActionController
         // <script src="…/MelisCms/js/…"></script>  and any tinymce script
         $html = (string) preg_replace('#<script\b[^>]*\bsrc="[^"]*/MelisCms/js/[^"]*"[^>]*>\s*</script>#i', '', $html);
         $html = (string) preg_replace('#<script\b[^>]*\bsrc="[^"]*tinymce[^"]*"[^>]*>\s*</script>#i', '', $html);
-        // Edit-mode CSS (drag-drop / jquery-ui chrome styling) — display uses the SITE css only.
-        $html = (string) preg_replace('#<link\b[^>]*\bhref="[^"]*/MelisCms/css/[^"]*"[^>]*>#i', '', $html);
+        // Edit-mode CSS (drag-drop / jquery-ui chrome styling) — display uses the SITE css only. EXCEPT
+        // `dynamic-dragndrop.css`: it carries the empty drag-drop ZONE look (pale background + the "+"
+        // add-hint icon + placeholder) that must match the LEGACY editor. Keep it so the React canvas'
+        // empty zones look identical to Old. The edit chrome it also styles stays hidden by the block
+        // injected below.
+        $html = (string) preg_replace('#<link\b[^>]*\bhref="[^"]*/MelisCms/css/(?![^"]*dynamic-dragndrop)[^"]*"[^>]*>#i', '', $html);
         // Drop the site's responsive viewport meta, then (for a device preview) bake an explicit
         // fixed-width one. In an iframe `width=device-width` = the SCREEN width, so the page never
         // reflows to the frame; a fixed `width=375`/`768` forces the layout viewport → deterministic
@@ -180,6 +184,31 @@ class EditionRenderPageController extends MelisAbstractActionController
             // (max-age 86400, no ETag) that still forces the bars visible — no brick rebuild needed to fix it.
             . '.melis-react-move{opacity:0!important;pointer-events:none!important;transition:opacity .12s}'
             . '.melis-react-has-cfg:hover>.melis-react-move,.melis-react-sel>.melis-react-move{opacity:1!important;pointer-events:auto!important}'
+            // Column gutter parity with the FRONT. Inside a split zone the `.dnd-layout-wrapper` (legacy edit
+            // chrome, present only in melis mode) carries `margin:0 .5rem` — an extra 8px each side ON TOP of
+            // the bootstrap column padding (12px). So two adjacent columns showed a 40px gap where the
+            // published front (no wrapper) has the plain 24px bootstrap gutter. Zero the wrapper's horizontal
+            // margin inside the layout columns so the canvas gap matches the front. Scoped to `.dnd-plugins-row`
+            // (only exists for multi-column layouts), so single full-width zones are untouched.
+            . '.dnd-plugins-row .dnd-layout-wrapper{margin-left:0!important;margin-right:0!important}'
+            // Drag-drop COLUMNS equal height. dynamic-dragndrop.css sets the row `align-items:center`, so a
+            // short/empty column floats mid-height next to a tall one instead of matching it. Stretch the row
+            // and let each cell fill its (now-stretched) column → every column of a split zone ends at the
+            // tallest column's height. Scoped to the layout columns.
+            . '.dnd-plugins-row{align-items:stretch!important}'
+            . '.dnd-plugins-row>[class*="col-"]{display:flex;flex-direction:column}'
+            . '.dnd-plugins-row>[class*="col-"]>.melis-dragdropzone-container{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}'
+            . '.dnd-plugins-row>[class*="col-"]>.melis-dragdropzone-container>*{flex:1 1 auto;min-height:0}'
+            // …but do NOT distribute STACKED sub-zones. In layouts like "1 col left + 3 cols right" the
+            // right side is a column holding N nested `.dnd-plugins-row`s stacked vertically. dynamic-
+            // dragndrop.css (kept) gives those nested rows `flex:1;height:100%;align-items:center`, so when the
+            // OTHER column is very tall (a full hero) each stacked block gets an equal SLICE of that height and
+            // floats centered in it → huge vertical holes between blocks. The published front has none of this
+            // CSS: the blocks stack at their natural height at the top. So force nested rows back to natural
+            // height, top-aligned — the blocks sit together like the front, empty space stays below. Only
+            // matches nested rows (a `.dnd-plugins-row` inside a column of a `.dnd-plugins-row`), so the
+            // top-level side-by-side equal-height above is untouched.
+            . '.dnd-plugins-row>[class*="dnd-plugins-col-"]>.dnd-plugins-row{flex:0 0 auto!important;height:auto!important;align-items:flex-start!important;justify-content:flex-start!important}'
             . '</style>';
         if (stripos($html, '</head>') !== false) {
             return (string) preg_replace('#</head>#i', $inject . '</head>', $html, 1);

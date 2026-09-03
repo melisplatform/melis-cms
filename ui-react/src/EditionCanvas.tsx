@@ -155,6 +155,28 @@ function outlineBlockInCanvas(d: Document, refId: string): void {
 // desktop/tablet/mobile device preview, but resizes THIS canvas iframe (the legacy one is hidden under it).
 const DEVICE_W: Record<'desktop' | 'tablet' | 'mobile', string> = { desktop: '100%', tablet: '768px', mobile: '375px' }
 
+// Is the current BO theme dark? Decided by the BACKGROUND luminance, NOT the accent colour: the accent
+// (`--color-primary`) is the CSS keyword `red` in the light "platform" theme (and a hex/other value in
+// custom themes), so an exact `=== '#dc2626'` test wrongly read light-mode as dark and served the plugin
+// config iframe its dark palette on a light app. Any theme (custom brand colours included) is classified
+// right from its resolved background: a probe element normalises keyword/hex/rgb to rgb, then perceived
+// luminance < 128 → dark. The config iframe (its own document, no theme vars) gets `theme=light|dark`.
+function isDarkTheme(): boolean {
+  try {
+    const cs = getComputedStyle(document.documentElement)
+    const bg = (cs.getPropertyValue('--color-background') || '').trim() || getComputedStyle(document.body).backgroundColor
+    const probe = document.createElement('span')
+    probe.style.color = bg; probe.style.display = 'none'
+    document.body.appendChild(probe)
+    const rgb = getComputedStyle(probe).color
+    probe.remove()
+    const m = rgb.match(/[\d.]+/g)
+    if (!m || m.length < 3) return false
+    const [r, g, b] = m.map(Number)
+    return (0.2126 * r + 0.7152 * g + 0.0722 * b) < 128
+  } catch { return false }
+}
+
 export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: number; device?: 'desktop' | 'tablet' | 'mobile' }) {
   const [doc, setDoc] = useState<Doc | null>(null)
   const [tree, setTree] = useState<Cell[]>([])
@@ -178,6 +200,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const iframeRef = useRef<HTMLIFrameElement | null>(null)
   const panelRef = useRef<HTMLDivElement | null>(null)
   const [accent, setAccent] = useState<string>('#dc2626') // theme primary: red (platform/light) / blue (studio/dark)
+  const [dark, setDark] = useState<boolean>(false) // BO theme is dark — from background luminance (see isDarkTheme)
   const accentRef = useRef('#dc2626')
   const selectedRef = useRef<{ zoneId: string; refId: string | null } | null>(null)
   const editInlineRef = useRef<((zoneId: string, refId: string) => void) | null>(null)
@@ -575,7 +598,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       const cs = getComputedStyle(document.documentElement)
       return (cs.getPropertyValue('--color-primary') || cs.getPropertyValue('--primary') || '#dc2626').trim()
     }
-    const upd = () => { const a = read(); accentRef.current = a; setAccent(a) }
+    const upd = () => { const a = read(); accentRef.current = a; setAccent(a); setDark(isDarkTheme()) }
     upd()
     const obs = new MutationObserver(upd)
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class', 'style'] })
@@ -809,7 +832,19 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     const z = findCell(tree, zoneId)
     const refs = (z?.refs || []).filter((r) => r.id !== refId).map((r) => r.id)
     setTree((t) => mapCell(t, zoneId, (zz) => ({ ...zz, refs: zz.refs.filter((r) => r.id !== refId) })))
-    queueMicrotask(() => domRemove(refId))
+    queueMicrotask(() => {
+      domRemove(refId)
+      // A fresh server render marks an empty zone `no-content` (pale bg + "+" placeholder), but remove is a
+      // LIVE DOM patch with no reload — so a zone that just lost its last block would stay blank. Re-add the
+      // class when nothing is left, restoring the empty drop-zone look without a reload.
+      const d = iframeRef.current?.contentDocument
+      if (d) {
+        const esc = zoneId.replace(/["\\]/g, '\\$&')
+        const cont = d.querySelector(`[data-dragdropzone-id="${esc}"]`)
+        const zoneEl = (cont?.matches('.melis-dragdropzone') ? cont : cont?.querySelector('.melis-dragdropzone')) as HTMLElement | null
+        if (zoneEl && !zoneEl.querySelector('.melis-ui-outlined, [data-melis-plugin-tag-id]')) zoneEl.classList.add('no-content')
+      }
+    })
     persistZoneRefs(zoneId, refs) // immediate draft save (exact set drops the removed ref)
   }, [tree, domRemove, persistZoneRefs])
 
@@ -1068,7 +1103,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       {/* Plugin CONFIG modal. Full-React form (registered plugin) OR generic legacy iframe (any other
           plugin), each owning its own Save/Cancel. Both persist via edition/plugin-config/save. */}
       {config && (() => {
-        const theme = accent.toLowerCase() === '#dc2626' ? 'light' : 'dark'
+        const theme = dark ? 'dark' : 'light'
         const iframeSrc = `/melis/react-api/cms-page/edition/plugin-config?idPage=${idPage}`
           + `&module=${encodeURIComponent(config.module)}&pluginName=${encodeURIComponent(config.pluginName)}`
           + `&pluginId=${encodeURIComponent(config.ref.id)}&theme=${theme}&_=${config.v}`

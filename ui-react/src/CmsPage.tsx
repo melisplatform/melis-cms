@@ -545,6 +545,31 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     try { if (f) f.src = toolSrc(current) } catch { /* */ }
   }, [current])
 
+  // Recharge UNIQUEMENT l'iframe legacy (la vue « Old » de l'édition), SANS invalider l'état React
+  // (Propriétés/SEO/structure/readyPages conservés — le save vient de les figer côté serveur). L'iframe
+  // legacy est chargée une seule fois et ne se resynchronise pas seule : après un Sauvegarder/Publier
+  // fait dans le canvas React (New), elle montre encore l'ancien contenu. On la re-masque le temps du
+  // rechargement (pas de flash du chrome legacy), onFrameLoad la ré-affiche.
+  const reloadLegacyEdition = useCallback(() => {
+    if (!current) return
+    setRevealed((s) => { if (!s.has(current)) return s; const n = new Set(s); n.delete(current); return n })
+    const f = frameRef.current[current]
+    try { if (f) f.src = toolSrc(current) } catch { /* */ }
+  }, [current])
+
+  // La vue « Old » devient PÉRIMÉE dès qu'un Sauvegarder/Publier écrit le contenu pendant qu'elle est
+  // masquée (édition faite dans le canvas React). On la MARQUE ici et on la recharge PARESSEUSEMENT au
+  // prochain passage en « Old » — pas à chaque édit, seulement après un save/publish (demande user). La
+  // vue « New » (EditionCanvas), elle, se remonte à neuf à chaque entrée → toujours fraîche, rien à faire.
+  const legacyEditionDirty = useRef(false)
+  const revealLegacyIfDirty = useCallback(() => {
+    if (legacyEditionDirty.current) { legacyEditionDirty.current = false; reloadLegacyEdition() }
+  }, [reloadLegacyEdition])
+  // Les DEUX toggles peuvent révéler l'iframe legacy : le toggle global New/Old (`mode`) et le toggle
+  // propre à l'onglet Édition (`editionCanvas`). On intercepte le passage vers « Old » (iframe) des deux.
+  const onModeChange = useCallback((next: ViewMode) => { if (next === 'iframe') revealLegacyIfDirty(); setMode(next) }, [revealLegacyIfDirty])
+  const onEditionCanvasChange = useCallback((next: ViewMode) => { if (next === 'iframe') revealLegacyIfDirty(); setEditionCanvas(next) }, [revealLegacyIfDirty])
+
   // Libère le VERROU de la page (supprime la ligne melis_sb_page_locked) — comme le legacy à la
   // publication (meliscms_page_publish_end → PageLock::unlockPage). On le fait après un save/publish
   // réussi : le verrou est un état d'édition en cours, pas de raison de le garder une fois figé. Effet
@@ -565,6 +590,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
       if (data.success === 1) {
         await runPageSaveHooks(Number(current)) // onglets modulaires (ex. Open Graph) : save transverse
         notify('ok', (data.textTitle || tr.notifSave).trim(), tr.pageSaved) // notif du shell (comme Publier)
+        legacyEditionDirty.current = true // la vue « Old » devra se recharger au prochain passage (contenu figé)
         await releaseLock(current) // libère le verrou → le cadenas du tree disparaît
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // nom/statut + cadenas → maj + déploie jusqu'à la page
         window.dispatchEvent(new CustomEvent('melis:cms-historic-refresh')) // save → nouvelle entrée d'historique
@@ -589,6 +615,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
       if (data.success === 1) {
         await runPageSaveHooks(Number(current)) // onglets modulaires (ex. Open Graph) : save transverse
         notify('ok', (data.textTitle || tr.notifPublish).trim(), tr.pagePublished)
+        legacyEditionDirty.current = true // la vue « Old » devra se recharger au prochain passage (contenu figé)
         await releaseLock(current) // libère le verrou (comme le legacy à la publication)
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // statut online + cadenas → maj + déploie jusqu'à la page
         window.dispatchEvent(new CustomEvent('melis:cms-versioning-refresh')) // publier crée une version → recharge l'onglet Versioning
@@ -896,7 +923,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
                 </button>
               )
             })()}
-            {!chromeCollapsed && <ViewToggle mode={mode} onChange={setMode} compact={narrow} labels={{ react: tr.view_new, iframe: tr.view_old }} />}
+            {!chromeCollapsed && <ViewToggle mode={mode} onChange={onModeChange} compact={narrow} labels={{ react: tr.view_new, iframe: tr.view_old }} />}
             {/* Chevron « masquer/afficher l'en-tête » — mobile uniquement (ticket : sur mobile la zone
                 d'édition est trop petite, la moitié de l'écran est prise par les boutons). */}
             {narrow && showChrome && (
@@ -971,7 +998,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
             {/* Toggle New/Old propre à l'onglet Édition (aligné à droite de la barre d'onglets). */}
             {editionActive && (
               <div style={{ marginLeft: 'auto', paddingLeft: 8, alignSelf: 'center' }}>
-                <ViewToggle mode={editionCanvas} onChange={setEditionCanvas} compact labels={{ react: tr.view_new, iframe: tr.view_old }} />
+                <ViewToggle mode={editionCanvas} onChange={onEditionCanvasChange} compact labels={{ react: tr.view_new, iframe: tr.view_old }} />
               </div>
             )}
           </div>
