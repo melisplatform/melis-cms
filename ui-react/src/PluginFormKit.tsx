@@ -46,6 +46,13 @@ export async function savePluginConfig(
   })
   const res: any = await r.json().catch(() => ({}))
   if (res && res.success) {
+    // The save just changed this instance's config server-side (draft session) — drop any cached
+    // options/schema fetch for it so the NEXT time this modal opens, it re-fetches instead of replaying
+    // the pre-save promise (fieldOptions/fieldValues/fieldList and the schema are both cached per
+    // idPage|module|pluginName|pluginId, keyed identically — see fetchFieldOptions/fetchSchema below).
+    const cacheKey = `${args.idPage}|${args.module}|${args.pluginName}|${args.pluginId}`
+    _optionsCache.delete(cacheKey)
+    _schemaCache.delete(cacheKey)
     return { ok: true, changed: !!(res.data && res.data.changed) }
   }
   const fieldErrors: Record<string, string> = {}
@@ -89,15 +96,16 @@ export type PluginOptions = { templateOptions: Option[]; fieldOptions: Record<st
 const _optionsCache = new Map<string, Promise<PluginOptions>>()
 
 /** GET the option lists a plugin's config SELECT fields need (template_path + custom selects) from the
- *  server, once per plugin/page. `fieldOptions[name]` holds a field's options; `templateOptions` is a
- *  convenience alias for the template_path field. */
-export function fetchFieldOptions(args: { idPage: number; module: string; pluginName: string }): Promise<PluginOptions> {
-  const key = `${args.idPage}|${args.module}|${args.pluginName}`
+ *  server, once per plugin INSTANCE/page (keyed by pluginId too — a page can hold several instances of
+ *  the SAME plugin, e.g. two Sliders, each with its own saved config). `fieldOptions[name]` holds a
+ *  field's options; `templateOptions` is a convenience alias for the template_path field. */
+export function fetchFieldOptions(args: { idPage: number; module: string; pluginName: string; pluginId: string }): Promise<PluginOptions> {
+  const key = `${args.idPage}|${args.module}|${args.pluginName}|${args.pluginId}`
   let p = _optionsCache.get(key)
   if (!p) {
     p = (async () => {
       try {
-        const q = `idPage=${args.idPage}&module=${encodeURIComponent(args.module)}&pluginName=${encodeURIComponent(args.pluginName)}`
+        const q = `idPage=${args.idPage}&module=${encodeURIComponent(args.module)}&pluginName=${encodeURIComponent(args.pluginName)}&pluginId=${encodeURIComponent(args.pluginId)}`
         const r = await fetch(`/melis/react-api/cms-page/edition/plugin-config/options?${q}`, { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         const res: any = await r.json().catch(() => ({}))
         const fieldOptions = (res?.data?.fieldOptions || {}) as Record<string, Option[]>
@@ -349,7 +357,7 @@ export function usePrefill(ctx: PluginTabContext, name: string) {
     let cancelled = false
     const rawv = readTag(ctx.props.rawXml, name)
     if (rawv) ctx.setValue(name, rawv)
-    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName }).then((o) => {
+    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName, pluginId: ctx.props.pluginId }).then((o) => {
       if (cancelled) return
       const sv = o.fieldValues[name]
       if (sv !== undefined && sv !== '') ctx.setValue(name, sv)
@@ -415,11 +423,11 @@ export function RemoteSelectField({ ctx, name, label, hint, empty }: { ctx: Plug
   const [options, setOptions] = useState<Option[]>([])
   useEffect(() => {
     let c = false
-    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName })
+    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName, pluginId: ctx.props.pluginId })
       .then((o) => { if (!c) setOptions(o.fieldOptions[name] || []) })
     return () => { c = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ctx.props.idPage, ctx.props.module, ctx.props.pluginName, name])
+  }, [ctx.props.idPage, ctx.props.module, ctx.props.pluginName, ctx.props.pluginId, name])
   return <SelectField ctx={ctx} name={name} label={label} options={options} hint={hint} empty={empty} />
 }
 
@@ -432,10 +440,10 @@ export function TemplateField({ ctx, name = 'template_path', label, hint }: { ct
   const [options, setOptions] = useState<Option[]>([])
   useEffect(() => {
     let c = false
-    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName }).then((o) => { if (!c) setOptions(o.templateOptions) })
+    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName, pluginId: ctx.props.pluginId }).then((o) => { if (!c) setOptions(o.templateOptions) })
     return () => { c = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ctx.props.idPage, ctx.props.module, ctx.props.pluginName])
+  }, [ctx.props.idPage, ctx.props.module, ctx.props.pluginName, ctx.props.pluginId])
   return (
     <Field label={label} error={ctx.error(name)} hint={hint}>
       <select data-testid={`field-${name}`} value={ctx.value(name)} onChange={(e) => ctx.setValue(name, e.target.value)} style={inputStyle}>
@@ -490,7 +498,7 @@ export function CheckboxField({ ctx, name, label, boxLabel, hint }: { ctx: Plugi
     let cancelled = false
     const raw = readTag(ctx.props.rawXml, name)
     if (raw) ctx.setValue(name, raw === '0' ? '0' : '1')
-    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName }).then((o) => {
+    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName, pluginId: ctx.props.pluginId }).then((o) => {
       if (cancelled) return
       // parseFieldValues only emits a checkbox's name when it was rendered `checked` → presence = on.
       if (Object.prototype.hasOwnProperty.call(o.fieldValues, name)) ctx.setValue(name, '1')
@@ -527,7 +535,7 @@ export function FieldListField({ ctx, label, hint }: { ctx: PluginTabContext; la
   }
   useEffect(() => {
     let c = false
-    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName }).then((o) => { if (!c) apply(o.fieldList) })
+    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName, pluginId: ctx.props.pluginId }).then((o) => { if (!c) apply(o.fieldList) })
     return () => { c = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
