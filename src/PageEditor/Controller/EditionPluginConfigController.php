@@ -307,6 +307,18 @@ class EditionPluginConfigController extends MelisAbstractActionController
                 if ($fields === []) {
                     continue;
                 }
+                // MelisCacheInternal's legacy "Partial Caching" tab (injected into every plugin's
+                // modal_form by MelisCacheInternalPartialCachingFormConfigListener) is intentionally
+                // dropped from the SCHEMA specifically — the React side already contributes an
+                // equivalent native "Partial cache" tab globally (PluginFormKit's GLOBAL_PLUGIN_TABS,
+                // registered from melis-cache-internal/ui-react/plugin-config/MelisCacheInternalPartialCaching).
+                // Without this, a plugin whose schema is used natively in React shows both. The legacy
+                // iframe path (formAction/optionsAction) is untouched — it still renders this tab itself.
+                // Matched by the `partial_caching_code` field name (stable, unlike the tab TITLE which is
+                // already translated to a locale string by the time it reaches here).
+                if (in_array('partial_caching_code', array_column($fields, 'name'), true)) {
+                    continue;
+                }
                 $out[] = [
                     'id'     => 'tab' . $i,
                     'title'  => (string) ($t['name'] ?? ('Tab ' . ($i + 1))),
