@@ -217,6 +217,10 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   // CURRENT page's own state → never publishes page A with page B's data.
   const [structByPage, setStructByPage] = useState<Record<string, Structure>>({})
   const [editByPage, setEditByPage] = useState<Record<string, Edit>>({})
+  // Pages whose Edition tab (New/React canvas) has been visited at least once — one EditionCanvas
+  // per entry, kept mounted (visibility toggled) exactly like mountedTabs below, instead of the
+  // canvas remounting from scratch on every page-tab switch.
+  const [editionMountedFor, setEditionMountedFor] = useState<Set<string>>(new Set())
   // Incrémenté par reloadEdition : les effets de chargement (structure + Propriétés/SEO) l'écoutent
   // pour REFETCH après invalidation. Sans ça, vider structByPage/editByPage ne suffit pas (les effets
   // ne dépendent que de `current`) → l'onglet Propriétés/SEO restait bloqué sur « Chargement… »
@@ -359,6 +363,15 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
 
   // marque l'onglet actif comme monté (il le reste → pas de refetch)
   useEffect(() => { if (activeTab && isNativeTab(activeTab)) setMountedTabs((s) => (s.has(activeTab) ? s : new Set(s).add(activeTab))) }, [activeTab])
+
+  // marque la page courante comme ayant visité l'onglet Édition (New) — même principe, son
+  // EditionCanvas reste monté ensuite (visibilité togglée plus bas) au lieu de se remonter à
+  // chaque passage d'un onglet-page à l'autre.
+  useEffect(() => {
+    if (showChrome && current && activeTab === KEY_EDITION) {
+      setEditionMountedFor((s) => (s.has(current) ? s : new Set(s).add(current)))
+    }
+  }, [showChrome, current, activeTab])
 
   // VERROU (mécanisme PageLock, small-business) — comme le legacy (MelisSBPageLockPageActionButtonsAndTabsListener) :
   //  • verrou d'un AUTRE utilisateur → cacher Sauvegarder/Effacer/Publier/Supprimer + montrer « Débloquer » (reprise) + bandeau.
@@ -700,6 +713,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         navigate(rest.length ? `/melis-cms/page/${rest[rest.length - 1]}` : '/')
         ;(window as unknown as { __melisCloseTab?: (id: string) => void }).__melisCloseTab?.(`/melis-cms/page/${current}`)
         setOpened((o) => o.filter((x) => x !== current))
+        setEditionMountedFor((s) => { if (!s.has(current)) return s; const n = new Set(s); n.delete(current); return n })
       } else notify('ko', (data.textTitle || tr.notifDelete).trim(), legacyText(data.textMessage, tr.deleteFailedMsg))
     } catch (e) { notify('ko', tr.notifDelete, (e as Error).message) } finally { setSaving(false) }
   }, [current, navigate])
@@ -784,7 +798,14 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
 
   // ── flux legacy conservés ──
   useEffect(() => {
-    const onClosed = (e: Event) => { const path = (e as CustomEvent<{ path?: string }>).detail?.path ?? ''; const m = path.match(/^\/melis-cms\/page\/(.+)$/); if (m) { const cid = decodeURIComponent(m[1]); setOpened((o) => o.filter((x) => x !== cid)) } }
+    const onClosed = (e: Event) => {
+      const path = (e as CustomEvent<{ path?: string }>).detail?.path ?? ''
+      const m = path.match(/^\/melis-cms\/page\/(.+)$/)
+      if (!m) return
+      const cid = decodeURIComponent(m[1])
+      setOpened((o) => o.filter((x) => x !== cid))
+      setEditionMountedFor((s) => { if (!s.has(cid)) return s; const n = new Set(s); n.delete(cid); return n })
+    }
     window.addEventListener('melis:tab-closed', onClosed); return () => window.removeEventListener('melis:tab-closed', onClosed)
   }, [])
   const openedRef = useRef(opened); openedRef.current = opened
@@ -1036,12 +1057,14 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
           return Comp ? <div key={key} style={style}><Comp idPage={Number(current)} /></div> : null
         })}
         {/* Vue « New » de l'Édition : canvas React (lecture seule) par-dessus l'iframe legacy (gardée montée
-            dessous → Sauvegarder/Publier inchangés). Uniquement quand l'onglet Édition est actif. */}
-        {editionActive && editionCanvas === 'react' && current && (
-          <div style={{ position: 'absolute', inset: 0, zIndex: 5, background: 'var(--color-background,#fff)', overflow: 'hidden' }}>
-            <EditionCanvas idPage={Number(current)} device={canvasDevice} />
+            dessous → Sauvegarder/Publier inchangés). Une instance par page ayant déjà visité l'onglet
+            Édition (editionMountedFor), TOUTES montées, visibilité togglée → passer d'un onglet-page
+            ouvert à un autre ne remonte plus le canvas (état, sélection, éditeurs TinyMCE conservés). */}
+        {editionCanvas === 'react' && [...editionMountedFor].map((oid) => (
+          <div key={oid} style={{ position: 'absolute', inset: 0, zIndex: 5, background: 'var(--color-background,#fff)', overflow: 'hidden', display: (editionActive && oid === current) ? 'block' : 'none' }}>
+            <EditionCanvas idPage={Number(oid)} device={canvasDevice} />
           </div>
-        )}
+        ))}
         {current == null && <div style={{ padding: 24, color: 'var(--color-muted-foreground)', fontSize: 14 }}>{tr.selectPage}</div>}
       </div>
 
