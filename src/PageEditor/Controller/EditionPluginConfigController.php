@@ -69,10 +69,13 @@ class EditionPluginConfigController extends MelisAbstractActionController
             }
 
             $sm = $this->getServiceManager();
-            $config = $sm->get('config');
-            if (empty($config['plugins'][$module]['plugins'][$pluginName])) {
-                return $this->html($response, 404, $this->errorPage("Configuration du plugin introuvable : $module / $pluginName", $theme));
-            }
+            // NOT a pre-check against $sm->get('config')['plugins'][$module]['plugins'][$pluginName] —
+            // that array is merged from the site MODULE's own config, which (for this admin-domain
+            // request, MELIS_MODULE resolving to the platform default, not the page's own site) may
+            // simply not be in the merged config yet even though the plugin resolves and renders fine.
+            // loadPlugin()/buildTabs() resolve the plugin via the ControllerPluginManager instead (a
+            // separate mechanism, keyed by class registration, not this array) and already have their
+            // own try/catch below — this was a false-negative 404 for a plugin that actually works.
 
             // Prefill source = our stateless draft (saved-first, published fallback).
             $draftXml = $this->draftContentXml($idPage);
@@ -109,10 +112,10 @@ class EditionPluginConfigController extends MelisAbstractActionController
             }
 
             $sm = $this->getServiceManager();
-            $config = $sm->get('config');
-            if (empty($config['plugins'][$module]['plugins'][$pluginName])) {
-                return $this->jsonResponse(['success' => false, 'error' => "plugin config not found: $module/$pluginName"], 404);
-            }
+            // See the matching note in formAction(): no pre-check against
+            // $sm->get('config')['plugins'][$module]['plugins'][$pluginName] here either — it produced
+            // false-negative 404s for plugins that resolve and save fine via loadPlugin()'s
+            // ControllerPluginManager lookup, which is caught by this method's own top-level try/catch.
 
             // The plugin reads its values from the request POST + a `validate` query flag.
             // Feed our submitted values through the shared request singleton (mirrors the
