@@ -369,6 +369,49 @@ final class PageContentDocument
     }
 
     /**
+     * Move a <plugin> reference from one zone/cell to another (drag-and-drop between drop
+     * zones). setZoneRefs/reorderZoneRefs only ever reorder refs a zone ALREADY owns — they
+     * can't relocate one, since orderRefs() matches ids against that zone's own items. Here
+     * the ref item is spliced out of the source zone's items and into the target zone's, at
+     * $position (clamped; end when omitted). The referenced data node (its actual plugin
+     * content) lives as a top-level sibling regardless of which zone points to it, so it is
+     * untouched — only the lightweight <plugin module name id/> pointer moves.
+     */
+    public function moveRef(string $fromZoneId, string $toZoneId, string $refId, ?int $position = null): void
+    {
+        if ($fromZoneId === $toZoneId || $refId === '') {
+            return; // same-zone reorder goes through setZoneRefs/reorderZoneRefs instead
+        }
+
+        $moved = null;
+        $this->walk($this->nodes, $fromZoneId, function (array &$n) use ($refId, &$moved): void {
+            if ($n['kind'] !== 'zone') {
+                return;
+            }
+            foreach ($n['items'] as $i => $item) {
+                if (($item['kind'] ?? '') === 'ref' && (($item['ref']['id'] ?? null) === $refId)) {
+                    $moved = $item;
+                    array_splice($n['items'], $i, 1);
+                    break;
+                }
+            }
+        });
+
+        if ($moved === null) {
+            return; // ref wasn't in the source zone — nothing to move
+        }
+
+        $this->walk($this->nodes, $toZoneId, function (array &$n) use ($moved, $position): void {
+            if ($n['kind'] !== 'zone') {
+                return;
+            }
+            $pos = ($position === null || $position < 0 || $position > count($n['items']))
+                ? count($n['items']) : $position;
+            array_splice($n['items'], $pos, 0, [$moved]);
+        });
+    }
+
+    /**
      * Reorder/select a zone's ref items. Refs are keyed by id and re-emitted in
      * $order; non-ref items (nested zones, opaque) keep their relative order after
      * the refs. When $drop is false, refs absent from $order are kept (appended
