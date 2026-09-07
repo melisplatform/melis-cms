@@ -11,6 +11,11 @@ import path from 'node:path'
  */
 export default defineConfig({
   esbuild: { jsx: 'automatic' },
+  // Keep the on-disk (symlink) path as a module's identity instead of following it to its real
+  // location. A per-module plugin-config source (e.g. melis-cache-internal, installed as a Composer
+  // `path` symlink) imports the kit via a relative `../../../melis-cms/…` path that is only correct
+  // from the vendor tree — following the symlink to local-modules/ would break that resolution.
+  resolve: { preserveSymlinks: true },
   build: {
     outDir: path.resolve(import.meta.dirname, '..', 'public', 'ui-react'),
     emptyOutDir: false,

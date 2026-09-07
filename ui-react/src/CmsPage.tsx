@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ViewToggle, type ViewMode } from './ViewToggle'
 import NewPageView from './NewPageView'
+import EditionCanvas from './EditionCanvas'
 import {
   PropertiesTab, SeoTab, LanguagesTab, HistoricTab, AnalyticsTab, ScriptsTab, VersioningTab, CommentsTab,
   apiGet, apiPost, type PropsData, type SeoData, type Refs,
@@ -30,6 +31,8 @@ const HEADER_PREF_KEY = 'melis-cms-page-header-open'
 const TOOL_KEY = 'meliscms_page'
 const KEY_PROPERTIES = 'meliscms_page_properties'
 const KEY_SEO = 'meliscms_page_seo'
+/** Onglet Édition (drag'n'drop legacy en iframe) — porte un toggle New/Old propre : « New » = canvas React. */
+const KEY_EDITION = 'meliscms_page_edition'
 
 type PageTabComp = (p: { idPage: number }) => JSX.Element
 /** Onglets modulaires (vues auto-fetch, données de leur module). Propriétés/SEO sont gérés à part (contrôlés). */
@@ -176,6 +179,13 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   const navigate = useNavigate()
   const { can, loaded: capsLoaded } = useCaps(TOOL_KEY)
   const [mode, setMode] = useState<ViewMode>('react')
+  // Toggle New/Old SCOPÉ à l'onglet Édition : « New » = canvas React, « Old » = l'éditeur drag'n'drop
+  // legacy dans l'iframe. Défaut « New » (le nouvel éditeur est celui présenté par défaut). L'iframe Old
+  // reste montée dessous quand « New » est actif (le canvas la recouvre) → Sauvegarder/Publier legacy inchangés.
+  const [editionCanvas, setEditionCanvas] = useState<ViewMode>('react')
+  // Responsive preview device for the React canvas (top toolbar « Affichage » desktop/tablette/mobile).
+  // In « Old » the same button drives the legacy iframe; in « New » it resizes the canvas instead.
+  const [canvasDevice, setCanvasDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
 
   const [frozenId, setFrozenId] = useState<string | undefined>(id)
   useEffect(() => { if (active) setFrozenId(id) }, [active, id])
@@ -454,6 +464,10 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
 
   const driveButton = useCallback((btnKey: string) => {
     setOpenMenu(null)
+    // « Affichage » desktop/tablette/mobile : en mode « New » le canvas React recouvre l'iframe legacy,
+    // donc piloter l'iframe (invisible) ne fait rien. On redimensionne le canvas à la place.
+    const dev = /action_display_(mobile|tablet|desktop)$/.exec(btnKey)
+    if (dev && editionCanvas === 'react') { setCanvasDevice(dev[1] as 'desktop' | 'tablet' | 'mobile'); return }
     try {
       const doc = current ? frameRef.current[current]?.contentDocument : null
       if (!doc) return
@@ -461,7 +475,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
       const clickable = (el?.querySelector('a,button') as HTMLElement | null) ?? el
       clickable?.click()
     } catch { /* */ }
-  }, [current])
+  }, [current, editionCanvas])
 
   // ── Sauvegarde / publication : REBRANCHÉES sur les endpoints LEGACY (aucun PHP historique modifié).
   // Un seul bouton « Sauvegarder » envoie TOUTES les infos des onglets d'un coup, exactement comme le
@@ -531,6 +545,31 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     try { if (f) f.src = toolSrc(current) } catch { /* */ }
   }, [current])
 
+  // Recharge UNIQUEMENT l'iframe legacy (la vue « Old » de l'édition), SANS invalider l'état React
+  // (Propriétés/SEO/structure/readyPages conservés — le save vient de les figer côté serveur). L'iframe
+  // legacy est chargée une seule fois et ne se resynchronise pas seule : après un Sauvegarder/Publier
+  // fait dans le canvas React (New), elle montre encore l'ancien contenu. On la re-masque le temps du
+  // rechargement (pas de flash du chrome legacy), onFrameLoad la ré-affiche.
+  const reloadLegacyEdition = useCallback(() => {
+    if (!current) return
+    setRevealed((s) => { if (!s.has(current)) return s; const n = new Set(s); n.delete(current); return n })
+    const f = frameRef.current[current]
+    try { if (f) f.src = toolSrc(current) } catch { /* */ }
+  }, [current])
+
+  // La vue « Old » devient PÉRIMÉE dès qu'un Sauvegarder/Publier écrit le contenu pendant qu'elle est
+  // masquée (édition faite dans le canvas React). On la MARQUE ici et on la recharge PARESSEUSEMENT au
+  // prochain passage en « Old » — pas à chaque édit, seulement après un save/publish (demande user). La
+  // vue « New » (EditionCanvas), elle, se remonte à neuf à chaque entrée → toujours fraîche, rien à faire.
+  const legacyEditionDirty = useRef(false)
+  const revealLegacyIfDirty = useCallback(() => {
+    if (legacyEditionDirty.current) { legacyEditionDirty.current = false; reloadLegacyEdition() }
+  }, [reloadLegacyEdition])
+  // Les DEUX toggles peuvent révéler l'iframe legacy : le toggle global New/Old (`mode`) et le toggle
+  // propre à l'onglet Édition (`editionCanvas`). On intercepte le passage vers « Old » (iframe) des deux.
+  const onModeChange = useCallback((next: ViewMode) => { if (next === 'iframe') revealLegacyIfDirty(); setMode(next) }, [revealLegacyIfDirty])
+  const onEditionCanvasChange = useCallback((next: ViewMode) => { if (next === 'iframe') revealLegacyIfDirty(); setEditionCanvas(next) }, [revealLegacyIfDirty])
+
   // Libère le VERROU de la page (supprime la ligne melis_sb_page_locked) — comme le legacy à la
   // publication (meliscms_page_publish_end → PageLock::unlockPage). On le fait après un save/publish
   // réussi : le verrou est un état d'édition en cours, pas de raison de le garder une fois figé. Effet
@@ -551,6 +590,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
       if (data.success === 1) {
         await runPageSaveHooks(Number(current)) // onglets modulaires (ex. Open Graph) : save transverse
         notify('ok', (data.textTitle || tr.notifSave).trim(), tr.pageSaved) // notif du shell (comme Publier)
+        legacyEditionDirty.current = true // la vue « Old » devra se recharger au prochain passage (contenu figé)
         await releaseLock(current) // libère le verrou → le cadenas du tree disparaît
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // nom/statut + cadenas → maj + déploie jusqu'à la page
         window.dispatchEvent(new CustomEvent('melis:cms-historic-refresh')) // save → nouvelle entrée d'historique
@@ -575,6 +615,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
       if (data.success === 1) {
         await runPageSaveHooks(Number(current)) // onglets modulaires (ex. Open Graph) : save transverse
         notify('ok', (data.textTitle || tr.notifPublish).trim(), tr.pagePublished)
+        legacyEditionDirty.current = true // la vue « Old » devra se recharger au prochain passage (contenu figé)
         await releaseLock(current) // libère le verrou (comme le legacy à la publication)
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } })) // statut online + cadenas → maj + déploie jusqu'à la page
         window.dispatchEvent(new CustomEvent('melis:cms-versioning-refresh')) // publier crée une version → recharge l'onglet Versioning
@@ -816,6 +857,9 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   const statusLabel = header?.status === 'published' ? tr.statusOnline : header?.status === 'draft' ? tr.statusDraft : header?.status === 'unpublished' ? tr.statusOffline : null
   const statusColor = header?.status === 'published' ? '#16a34a' : header?.status === 'draft' ? '#d97706' : '#6b7280'
   const nativeTabActive = !!(showChrome && activeTab && isNativeTab(activeTab))
+  // Onglet Édition actif (dans le chrome React) → affiche le toggle New/Old propre à l'édition et,
+  // en « New », l'overlay canvas React par-dessus l'iframe legacy.
+  const editionActive = !!(showChrome && activeTab === KEY_EDITION)
 
   const btnBase: React.CSSProperties = { appearance: 'none', display: 'inline-flex', alignItems: 'center', gap: 5, height: 28, padding: '0 9px', borderRadius: 6, fontSize: 12, fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap', transition: 'background .12s' }
   function btnStyle(b: StructBtn): React.CSSProperties {
@@ -879,7 +923,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
                 </button>
               )
             })()}
-            {!chromeCollapsed && <ViewToggle mode={mode} onChange={setMode} compact={narrow} labels={{ react: tr.view_new, iframe: tr.view_old }} />}
+            {!chromeCollapsed && <ViewToggle mode={mode} onChange={onModeChange} compact={narrow} labels={{ react: tr.view_new, iframe: tr.view_old }} />}
             {/* Chevron « masquer/afficher l'en-tête » — mobile uniquement (ticket : sur mobile la zone
                 d'édition est trop petite, la moitié de l'écran est prise par les boutons). */}
             {narrow && showChrome && (
@@ -946,11 +990,17 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
           </div>
           {/* Onglets : wrap sur 2ᵉ ligne sur narrow (tous visibles) plutôt qu'un défilement horizontal
               qui masque les onglets tant que l'utilisateur n'a pas swipé (pattern 6). */}
-          <div style={{ display: 'flex', gap: 2, padding: '0 12px', flexWrap: narrow ? 'wrap' : 'nowrap', overflowX: narrow ? 'visible' : 'auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 2, padding: '0 12px', flexWrap: narrow ? 'wrap' : 'nowrap', overflowX: narrow ? 'visible' : 'auto' }}>
             {visibleTabs.map((t) => {
               const isActive = t.key === activeTab
               return <button key={t.key} className="melis-pgtab" onClick={() => driveTab(t.key)} title={t.label} style={{ appearance: 'none', border: 0, background: 'transparent', cursor: 'pointer', padding: '8px 12px', fontSize: 13, whiteSpace: 'nowrap', color: isActive ? 'var(--color-primary,#dc2626)' : 'var(--color-muted-foreground,#6b7280)', borderBottom: isActive ? '2px solid var(--color-primary,#dc2626)' : '2px solid transparent', fontWeight: isActive ? 600 : 400 }}>{t.label}</button>
             })}
+            {/* Toggle New/Old propre à l'onglet Édition (aligné à droite de la barre d'onglets). */}
+            {editionActive && (
+              <div style={{ marginLeft: 'auto', paddingLeft: 8, alignSelf: 'center' }}>
+                <ViewToggle mode={editionCanvas} onChange={onEditionCanvasChange} compact labels={{ react: tr.view_new, iframe: tr.view_old }} />
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -985,6 +1035,13 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
           const Comp = SELF_TABS[key] ?? w.__melisPageTabRegistry?.tabs[key]
           return Comp ? <div key={key} style={style}><Comp idPage={Number(current)} /></div> : null
         })}
+        {/* Vue « New » de l'Édition : canvas React (lecture seule) par-dessus l'iframe legacy (gardée montée
+            dessous → Sauvegarder/Publier inchangés). Uniquement quand l'onglet Édition est actif. */}
+        {editionActive && editionCanvas === 'react' && current && (
+          <div style={{ position: 'absolute', inset: 0, zIndex: 5, background: 'var(--color-background,#fff)', overflow: 'hidden' }}>
+            <EditionCanvas idPage={Number(current)} device={canvasDevice} />
+          </div>
+        )}
         {current == null && <div style={{ padding: 24, color: 'var(--color-muted-foreground)', fontSize: 14 }}>{tr.selectPage}</div>}
       </div>
 
