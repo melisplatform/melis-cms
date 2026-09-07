@@ -564,7 +564,18 @@ class EditionPluginConfigController extends MelisAbstractActionController
             $label = trim(rtrim($labels[$id] ?? '', " *"));
             $hint  = $el->getAttribute('data-bs-title') ?: $el->getAttribute('title');
 
-            if ($tag === 'select') {
+            // MelisFieldRow's special-cased branches (tinymce, switch) render this same generic HTML
+            // plus a widget-specific marker/wrapper — detect those FIRST so they don't fall through to
+            // the generic tag/type kinds below (a MelisCoreTinyMCE field is still a <textarea>, a
+            // MelisToggleButton/switchOptions field is still <input type=checkbox>).
+            $isTinyMce = $tag === 'textarea' && $el->hasAttribute('data-tinymce-id');
+            $isSwitch  = $type === 'checkbox' && $xp->query('ancestor::*[contains(concat(" ",normalize-space(@class)," ")," make-switch ")]', $el)->length > 0;
+
+            if ($isTinyMce) {
+                $kind = 'tinymce';
+            } elseif ($isSwitch) {
+                $kind = 'switch';
+            } elseif ($tag === 'select') {
                 $kind = 'select';
             } elseif ($tag === 'textarea') {
                 $kind = 'textarea';
@@ -576,10 +587,24 @@ class EditionPluginConfigController extends MelisAbstractActionController
                 $kind = 'date';
             } else {
                 $class = $el->getAttribute('class');
+                // A field the generator writes as plain MelisText but wires to a jQuery datetimepicker
+                // via its own hardcoded inline script (`$('#id').datetimepicker(...)`, templating-plugin-
+                // creator's generated tab .phtml) has no attribute/class marker of its own — the only
+                // signal is that script, naming this exact field id. Its `format` option ALSO tells us
+                // what string the field actually stores (the generator always emits `YYYY-MM-DD`, i.e.
+                // ISO — unlike the OTHER date paths below, whose fields store the legacy `mm/dd/yyyy`).
+                $dtpMatch = $id !== '' && preg_match(
+                    '/\$\(\s*[\'"]#' . preg_quote($id, '/') . '[\'"]\s*\)\s*\.\s*datetimepicker\s*\(\s*\{[^}]*format\s*:\s*[\'"]([^\'"]+)[\'"]/is',
+                    $html,
+                    $dtpFormatMatch
+                ) === 1;
                 if ($el->getAttribute('data-button-id') === 'meliscms-site-selector') {
                     $kind = 'page';
-                } elseif (stripos($class, 'datepicker') !== false || $el->hasAttribute('data-date-format')) {
+                } elseif (stripos($class, 'datepicker') !== false || $el->hasAttribute('data-date-format') || $dtpMatch) {
                     $kind = 'date';
+                    if ($dtpMatch && strcasecmp($dtpFormatMatch[1], 'YYYY-MM-DD') === 0) {
+                        $dateFormat = 'iso';
+                    }
                 } else {
                     $kind = 'text';
                 }
@@ -595,6 +620,10 @@ class EditionPluginConfigController extends MelisAbstractActionController
             ];
             if ($kind === 'select') {
                 $f['options'] = $options[$name] ?? [];
+            }
+            if ($kind === 'date' && isset($dateFormat)) {
+                $f['format'] = $dateFormat;
+                unset($dateFormat);
             }
             $fields[] = $f;
             $seen[$name] = true;
@@ -755,19 +784,39 @@ class EditionPluginConfigController extends MelisAbstractActionController
      */
     private function widgetAssets(): string
     {
-        // The COMMON BO form-widget runtime — a deliberately MINIMAL, standalone set (jQuery + jQuery UI +
-        // bootstrap-datepicker + select2 + font-awesome). Each config field self-initialises via its own
-        // inline script; we just provide the same libs the BO has. Covers the widespread field types
-        // (date fields, searchable selects, jQuery-UI widgets) across ALL plugins, including custom ones.
+        // The COMMON BO form-widget runtime for this generic config iframe. Each config field
+        // self-initialises via its own inline script (emitted by MelisFieldRow, the SAME view helper
+        // every Melis form uses) — we just need the right libs present for those calls to resolve:
         //
-        // Deliberately NOT loaded: libs that drag heavy BO dependencies. Verified failures when added
-        // naively — datetimepicker needs moment.js; `melisHelper.js` throws `initCategorySelectField is
-        // not defined` (needs melisCore + more) and so the functional clear/eraser button and the global
-        // `melisHelper` some plugin JS calls are NOT wired here. To support such a widget for a project
-        // plugin: add its lib AND its real dependencies below (or do a proper BO-form-runtime pass).
+        //   - date fields (MelisFieldRow's `meliscore-datetimepicker` branch, and the inline
+        //     `.datetimepicker(...)` call templating-plugin-creator bakes into a generated tab's own
+        //     .phtml) need the EONASDAN bootstrap-datetimepicker + moment.js — NOT the unrelated
+        //     bootstrap-datepicker (`.bdatepicker()`) library previously loaded here, which nothing
+        //     in this codebase actually calls.
+        //   - switch/toggle fields (MelisFieldRow's `switchOptions` branch) render a plain
+        //     `<input type="checkbox">` inside a `.make-switch` wrapper and call `.bootstrapSwitch()`
+        //     on it. That library is built for Bootstrap 3 (glyphicons, `.btn`/`.badge` base classes)
+        //     and renders broken next to the Bootstrap 5 bundle already loaded here — see pageStyle()'s
+        //     own note on why full Bootstrap CSS isn't loaded. Rather than fight that mismatch, we skin
+        //     the checkbox directly with pure CSS below (a standard styled-checkbox toggle) and never
+        //     load bootstrap-switch at all; its `.bootstrapSwitch()` call in the rendered HTML throws
+        //     a contained, harmless console error ("not a function") — the checkbox itself is unaffected.
+        //   - MelisCoreTinyMCE fields (MelisFieldRow's `meliscore-tinymce-textarea` branch) call
+        //     `melisTinyMCE.createTinyMCE(type, selector, options)`. The real `melis_tinymce.js` reads
+        //     its config from `window.parent.melisTinyMCE` (built for the classic BO's nested-iframe
+        //     shell) and AJAX-preloads config only `if (window.self === window.top)` — neither holds
+        //     for this standalone iframe, and melis-core isn't a live checkout in this project to patch
+        //     safely. Instead we load the raw tinymce.js core directly and define OUR OWN minimal
+        //     `window.melisTinyMCE` shim with the same `createTinyMCE` signature, so the exact inline
+        //     call MelisFieldRow already emits just works — a real rich-text editor, without the
+        //     classic wrapper's site-tree/media-library integrations.
+        //
+        // Still deliberately NOT loaded: melisHelper.js itself (throws `initCategorySelectField is not
+        // defined` without melisCore + more) — category/site tree pickers stay on their iframe/postMessage
+        // bridges below.
         $css = [
             '/MelisCore/assets/components/library/jquery-ui/css/jquery-ui.min.css',
-            '/MelisCore/assets/components/modules/admin/forms/elements/bootstrap-datepicker/assets/lib/css/bootstrap-datepicker.css',
+            '/MelisCore/assets/components/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css',
             '/MelisCore/assets/components/plugins/select2/css/select2.min.css',
             '/MelisCore/assets/components/library/icons/fontawesome/assets/css/font-awesome.min.css', // form icons (eraser…)
         ];
@@ -775,8 +824,10 @@ class EditionPluginConfigController extends MelisAbstractActionController
             '/MelisCore/assets/components/library/jquery/jquery.min.js',
             '/MelisCore/assets/components/library/jquery-ui/js/jquery-ui.min.js',
             '/MelisCore/assets/components/library/bootstrap/js/bootstrap.bundle.min.js', // Popper incl. → tooltips
-            '/MelisCore/assets/components/modules/admin/forms/elements/bootstrap-datepicker/assets/lib/js/bootstrap-datepicker.js',
+            '/MelisCore/assets/components/library/moment/moment.js',
+            '/MelisCore/assets/components/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js',
             '/MelisCore/assets/components/plugins/select2/js/select2.full.min.js',
+            '/MelisCore/js/library/tinymce/tinymce.min.js',
         ];
         $out = '';
         foreach ($css as $u) {
@@ -785,15 +836,23 @@ class EditionPluginConfigController extends MelisAbstractActionController
         foreach ($js as $u) {
             $out .= '<script src="' . $u . '"></script>';
         }
-        // Anchor any datepicker popover directly UNDER its field and scroll it into view. In this short
-        // iframe bootstrap-datepicker's `auto` orientation flips the calendar UPWARD and overlaps the
-        // header; this re-anchors it downward generically (jQuery is loaded above). No plugin code touched.
+        // Minimal melisTinyMCE shim — see docblock above. Kept tiny on purpose: a sane default toolbar,
+        // no site-tree/media-library wiring (those need the classic BO shell this iframe doesn't have).
+        $out .= '<script>window.melisTinyMCE=window.melisTinyMCE||{createTinyMCE:function(type,selector,options){'
+            . 'if(!window.tinymce)return;'
+            . 'tinymce.init(Object.assign({selector:selector,menubar:false,branding:false,'
+            . 'plugins:"lists link image table code",'
+            . 'toolbar:"undo redo | bold italic | bullist numlist | link image | code"},options||{}));'
+            . '}};</script>';
+        // Anchor any date/switch popover directly UNDER its field and scroll it into view. In this short
+        // iframe the default "auto" orientation can flip the widget UPWARD and overlap the header; this
+        // re-anchors it downward generically (jQuery is loaded above). No plugin code touched.
         $out .= '<script>(function(){function b(){if(!window.jQuery){return setTimeout(b,30);}'
-            // datepicker popover: anchor under its field + scroll into view (the short iframe flips its auto orientation up)
-            . 'jQuery(document).on("show",function(e){var t=e.target;if(!t||!t.getBoundingClientRect)return;'
-            . 'var dp=document.querySelector(".datepicker-dropdown");if(!dp)return;var r=t.getBoundingClientRect();'
+            // Eonasdan datetimepicker widget: anchor under its field + scroll into view.
+            . 'jQuery(document).on("dp.show",function(e){var t=e.target;if(!t||!t.getBoundingClientRect)return;'
+            . 'var dp=document.querySelector(".bootstrap-datetimepicker-widget");if(!dp)return;var r=t.getBoundingClientRect();'
             . 'dp.style.position="absolute";dp.style.top=(window.scrollY+r.bottom+2)+"px";dp.style.left=(window.scrollX+r.left)+"px";'
-            . 'dp.classList.remove("datepicker-orient-bottom");dp.classList.add("datepicker-orient-top");'
+            . 'dp.classList.remove("top");dp.classList.add("bottom");'
             . 'setTimeout(function(){try{t.scrollIntoView({block:"center"});}catch(x){}},0);});'
             // Bootstrap-5 tooltips: the fields use data-bs-toggle="tooltip" with the text in data-bs-title (title
             // is empty) — they need an explicit init (the BO does it globally; we do it once the form DOM is ready).
@@ -838,7 +897,10 @@ input[type=text],input[type=number],input[type=url],input[type=email],select,tex
   width:100%;padding:7px 9px;border:1px solid $border;border-radius:6px;background:$field;color:$fg;font:inherit}
 textarea{min-height:90px}
 .form-group,.form-control-wrapper{margin-bottom:6px}
-.pcf-actions{position:sticky;bottom:0;background:$bg;display:flex;gap:8px;justify-content:flex-end;padding-top:14px;margin-top:14px;border-top:1px solid $border}
+/* padding-bottom here (not just body's own): a `position:sticky` element sticks flush to the
+   scrollport edge, bypassing the ancestor's bottom padding — without its OWN bottom padding the
+   buttons end up jammed against the iframe's very bottom edge with no breathing room. */
+.pcf-actions{position:sticky;bottom:0;background:$bg;display:flex;gap:8px;justify-content:flex-end;padding-top:14px;padding-bottom:14px;margin-top:14px;border-top:1px solid $border}
 .pcf-btn{padding:8px 16px;border-radius:6px;border:1px solid $border;background:transparent;color:$fg;cursor:pointer;font:inherit}
 .pcf-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 .pcf-btn[disabled]{opacity:.5;cursor:default}
@@ -866,16 +928,47 @@ input[type=checkbox],input[type=radio]{width:auto !important;height:auto;margin:
 .tooltip .tooltip-arrow{display:none}
 /* Legacy widget popovers must FLOAT (the `dropdown-menu` class dropped their position to static, with
    no Bootstrap loaded here) AND be fully themed (their panel background came from Bootstrap too). */
-.datepicker.datepicker-dropdown{position:absolute !important;z-index:100000;background:$field;border:1px solid $border;border-radius:8px;padding:8px;box-shadow:0 12px 34px rgba(0,0,0,.35);color:$fg;width:auto;min-width:0}
-.datepicker table{margin:0;width:auto;background:transparent}
-.datepicker table tr td,.datepicker table tr th{color:$fg;width:34px;height:30px;text-align:center;border-radius:6px;border:0;background:transparent;font-weight:500;padding:0}
-.datepicker table tr th.dow{color:$muted;font-weight:700;font-size:11px}
-.datepicker table tr th.datepicker-switch{font-weight:700}
-.datepicker table tr th.prev,.datepicker table tr th.next{font-size:16px;color:$fg}
-.datepicker table tr td.day:hover,.datepicker table tr td.focused,.datepicker table tr th.datepicker-switch:hover,.datepicker table tr th.prev:hover,.datepicker table tr th.next:hover{background:color-mix(in srgb,var(--accent) 18%,transparent);cursor:pointer}
-.datepicker table tr td.old,.datepicker table tr td.new{color:$muted}
-.datepicker table tr td.today{background:color-mix(in srgb,var(--accent) 22%,transparent);color:$fg}
-.datepicker table tr td.active,.datepicker table tr td.active:hover,.datepicker table tr td.active.active{background:var(--accent) !important;color:#fff !important}
+.bootstrap-datetimepicker-widget{position:absolute !important;z-index:100000;background:$field;border:1px solid $border;border-radius:10px;padding:10px;box-shadow:0 16px 40px rgba(0,0,0,.4);color:$fg;width:auto;min-width:0;list-style:none;margin:6px 0 0}
+.bootstrap-datetimepicker-widget:before,.bootstrap-datetimepicker-widget:after{display:none !important}
+/* CONFIRMED via computed-style inspection (jQuery('#date').datetimepicker('show') + getComputedStyle):
+   the two dots at the top/bottom-left of the popup are the browser's own default disc bullets on the
+   widget's TWO li wrappers (ul.list-unstyled > li, one for the date panel, one presumably for a time
+   panel we never surface) — list-style:none on the ANCESTOR .bootstrap-datetimepicker-widget div above
+   does NOT cascade here: the UA stylesheet's own ul/li{list-style:disc} rule targets the ul/li
+   DIRECTLY, and a direct rule on an element is never overridden by inheritance from an ancestor, no
+   matter that ancestor's specificity (the exact same reason the glyphicon fix above had to target
+   .glyphicon directly instead of the parent th). Reset the li itself. */
+.bootstrap-datetimepicker-widget ul{list-style:none !important;margin:0;padding:0}
+.bootstrap-datetimepicker-widget li{list-style:none !important;display:block !important;margin:0;padding:0}
+.bootstrap-datetimepicker-widget table{margin:0;width:auto;background:transparent;border-collapse:separate;border-spacing:2px}
+.bootstrap-datetimepicker-widget table td,.bootstrap-datetimepicker-widget table th{color:$fg;width:34px;height:32px;text-align:center;border-radius:7px;border:0;background:transparent;font-weight:500;padding:0;transition:background .1s}
+.bootstrap-datetimepicker-widget table th.dow{color:$muted;font-weight:700;font-size:10px;letter-spacing:.4px;text-transform:uppercase;height:24px}
+.bootstrap-datetimepicker-widget thead tr:first-child{border-bottom:1px solid $border}
+.bootstrap-datetimepicker-widget thead tr:first-child th{padding-bottom:8px;margin-bottom:4px}
+.bootstrap-datetimepicker-widget table th.picker-switch{font-weight:700;font-size:12.5px;letter-spacing:.2px;width:auto;padding:0 10px}
+/* The eonasdan widget's prev/next arrows are span.glyphicon.glyphicon-chevron-left|right —
+   Bootstrap-3's icon font, which isn't loaded here (see widgetAssets()), so the SPAN itself (its
+   own bundled CSS sets an explicit font-size on .glyphicon directly, which a font-size set on the
+   ancestor th can't override — inheritance only applies where nothing targets the element itself)
+   renders as a stray fallback glyph instead of a chevron. Target the glyphicon span directly:
+   shrink it to nothing and draw a clean chevron of our own via :after. */
+.bootstrap-datetimepicker-widget .glyphicon{position:relative;display:inline-block;width:14px;height:14px;font-size:0 !important;color:transparent !important}
+.bootstrap-datetimepicker-widget .glyphicon:after{content:'';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:$fg}
+.bootstrap-datetimepicker-widget .glyphicon-chevron-left:after{content:'‹'}
+.bootstrap-datetimepicker-widget .glyphicon-chevron-right:after{content:'›'}
+.bootstrap-datetimepicker-widget table td.day:hover,.bootstrap-datetimepicker-widget table th.picker-switch:hover,.bootstrap-datetimepicker-widget table th.prev:hover,.bootstrap-datetimepicker-widget table th.next:hover{background:color-mix(in srgb,var(--accent) 18%,transparent);cursor:pointer}
+.bootstrap-datetimepicker-widget table td.old,.bootstrap-datetimepicker-widget table td.new{color:$muted;opacity:.55}
+.bootstrap-datetimepicker-widget table td.today:before{display:none}
+.bootstrap-datetimepicker-widget table td.today{box-shadow:inset 0 0 0 1.5px var(--accent);font-weight:700}
+.bootstrap-datetimepicker-widget table td.active,.bootstrap-datetimepicker-widget table td.active:hover{background:var(--accent) !important;color:#fff !important;font-weight:700;text-shadow:none}
+/* Switch/toggle fields (MelisFieldRow's `switchOptions` branch): a plain checkbox inside `.make-switch`
+   — bootstrap-switch is deliberately not loaded (Bootstrap-3-era, breaks next to Bootstrap 5; see
+   widgetAssets()), skinned here instead with a standard hidden-checkbox toggle. */
+.make-switch{display:inline-block;line-height:0}
+.make-switch input[type=checkbox]{appearance:none;-webkit-appearance:none;width:44px;height:24px;min-width:44px;border-radius:999px;background:$border !important;position:relative;cursor:pointer;outline:none;margin:0;vertical-align:middle;transition:background .15s;border:0 !important}
+.make-switch input[type=checkbox]::before{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.make-switch input[type=checkbox]:checked{background:#22c55e !important}
+.make-switch input[type=checkbox]:checked::before{transform:translateX(20px)}
 .select2-container{z-index:100001;width:100% !important}
 .select2-dropdown{background:$field;color:$fg;border-color:$border;z-index:100002}
 .select2-container--default .select2-selection--single{background:$field;border-color:$border;height:36px}

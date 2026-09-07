@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useState } from 'react'
+import { useEffect, useReducer, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { PagePicker } from './PagePicker'
 import { peT } from './page-editor-i18n'
@@ -15,6 +15,13 @@ import { peT } from './page-editor-i18n'
  * generic legacy iframe uses (`edition/plugin-config/save`), which runs the plugin's own input filters and
  * `savePluginConfigToXml()` → the persisted XML stays byte-compatible with the legacy reader.
  */
+
+declare global {
+  interface Window {
+    /** The tinymce core, lazy-loaded by TinyMceField below (same script the legacy iframe serves). */
+    tinymce?: any
+  }
+}
 
 export type PluginFormProps = {
   idPage: number
@@ -388,13 +395,20 @@ function isoToMdy(v: string): string {
   return m ? `${m[2]}/${m[3]}/${m[1]}` : ''
 }
 
-/** A date field — native date picker in the UI, stored in the plugin's `mm/dd/yyyy` format (ctx[name]). */
-export function DateField({ ctx, name, label, hint }: { ctx: PluginTabContext; name: string; label: string; hint?: string }) {
+/**
+ * A date field — native date picker in the UI. Storage format varies by source: hand-written plugin
+ * forms store the legacy `mm/dd/yyyy` (the default), but a schema field the templating-plugin-creator
+ * generated stores plain ISO `yyyy-mm-dd` (its inline script configures the jQuery datetimepicker with
+ * `format: 'YYYY-MM-DD'`, matched server-side in parseSchemaFields() and passed through as `iso`) — pass
+ * `iso` to skip the mm/dd/yyyy conversion and bind the native input's value straight through.
+ */
+export function DateField({ ctx, name, label, hint, iso }: { ctx: PluginTabContext; name: string; label: string; hint?: string; iso?: boolean }) {
   usePrefill(ctx, name)
+  const raw = ctx.value(name)
   return (
     <Field label={label} error={ctx.error(name)} hint={hint}>
-      <input data-testid={`field-${name}`} type="date" value={mdyToIso(ctx.value(name))}
-        onChange={(e) => ctx.setValue(name, e.target.value ? isoToMdy(e.target.value) : '')} style={inputStyle} />
+      <input data-testid={`field-${name}`} type="date" value={iso ? raw : mdyToIso(raw)}
+        onChange={(e) => ctx.setValue(name, iso ? e.target.value : (e.target.value ? isoToMdy(e.target.value) : ''))} style={inputStyle} />
     </Field>
   )
 }
@@ -516,6 +530,62 @@ export function CheckboxField({ ctx, name, label, boxLabel, hint }: { ctx: Plugi
 }
 
 /**
+ * A themed ON/OFF toggle — the React counterpart of the legacy iframe's platform-switch skin (see
+ * EditionPluginConfigController::pageStyle()'s `.make-switch input[type=checkbox]` rule): a pill track
+ * that fills with `--color-primary` and slides a white knob when on. Same visually-hidden-input +
+ * decorative-span accessibility pattern as `CheckBox` above, just shaped as a track instead of a box.
+ */
+export function Switch({ checked, disabled, onChange, title }: { checked: boolean; disabled?: boolean; onChange: (v: boolean) => void; title?: string }) {
+  const [focus, setFocus] = useState(false)
+  return (
+    <label title={title} style={{ display: 'inline-flex', alignItems: 'center', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? .5 : 1 }}>
+      <input
+        type="checkbox" checked={checked} disabled={disabled}
+        onChange={(e) => onChange(e.target.checked)}
+        onFocus={() => setFocus(true)} onBlur={() => setFocus(false)}
+        style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap', border: 0 }}
+      />
+      <span aria-hidden style={{
+        width: 40, height: 22, flex: '0 0 auto', borderRadius: 999, position: 'relative',
+        background: checked ? '#22c55e' : 'var(--color-input,#e5e7eb)',
+        boxShadow: focus ? '0 0 0 2px color-mix(in srgb, #22c55e 40%, transparent)' : 'inset 0 1px 2px rgba(0,0,0,.06)',
+        transition: 'background .15s, box-shadow .12s',
+      }}>
+        <span style={{
+          position: 'absolute', top: 2, left: checked ? 20 : 2, width: 18, height: 18, borderRadius: '50%',
+          background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,.35)', transition: 'left .15s',
+        }} />
+      </span>
+    </label>
+  )
+}
+
+/**
+ * A ctx-bound, self-prefilling SWITCH field (label + themed Switch), posting '1'/'0'. The underlying
+ * widget is a plain `<input type=checkbox>` (MelisFieldRow's `switchOptions` branch just re-skins a
+ * checkbox — see the `Select` + `switchOptions` spec templating-plugin-creator generates), so prefill
+ * mirrors CheckboxField's presence-based logic exactly, not the generic `usePrefill` value hook.
+ */
+export function SwitchField({ ctx, name, label, hint }: { ctx: PluginTabContext; name: string; label: string; hint?: string }) {
+  useEffect(() => {
+    let cancelled = false
+    const raw = readTag(ctx.props.rawXml, name)
+    if (raw) ctx.setValue(name, raw === '0' ? '0' : '1')
+    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName, pluginId: ctx.props.pluginId }).then((o) => {
+      if (cancelled) return
+      if (Object.prototype.hasOwnProperty.call(o.fieldValues, name)) ctx.setValue(name, '1')
+    })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  return (
+    <Field label={label} error={ctx.error(name)} hint={hint}>
+      <Switch checked={ctx.value(name) === '1'} title={label} onChange={(on) => ctx.setValue(name, on ? '1' : '0')} />
+    </Field>
+  )
+}
+
+/**
  * A `fields[]` / `required_fields[]` GRID (e.g. prospects' "Field list"): one row per configurable field
  * with a "show" toggle, a "mandatory" toggle (only when shown) and DRAG-AND-DROP reordering (grab the ⠿
  * handle). Loads the rows from the server (fetchFieldOptions().fieldList) and writes two ARRAYS into the
@@ -612,6 +682,132 @@ export function TextareaField({ ctx, name, label, hint }: { ctx: PluginTabContex
   )
 }
 
+// Editors pending a deferred removal (TinyMceField's StrictMode-safe teardown — see there).
+const _tinymcePendingRemove = new Map<string, ReturnType<typeof setTimeout>>()
+
+let _tinymceLoad: Promise<void> | null = null
+/** Load the same tinymce.min.js core the legacy iframe's widgetAssets() serves (loaded once, cached). */
+function loadTinyMce(): Promise<void> {
+  if (window.tinymce) return Promise.resolve()
+  if (!_tinymceLoad) {
+    _tinymceLoad = new Promise((resolve, reject) => {
+      const s = document.createElement('script')
+      s.src = '/MelisCore/js/library/tinymce/tinymce.min.js'
+      s.onload = () => resolve()
+      s.onerror = () => reject(new Error('failed to load tinymce'))
+      document.head.appendChild(s)
+    })
+  }
+  return _tinymceLoad
+}
+
+/**
+ * A rich-text field bound to ctx[name], backed by a real TinyMCE instance (a `MelisCoreTinyMCE` schema
+ * field — see EditionPluginConfigController's own widgetAssets()/melisTinyMCE shim for the legacy
+ * iframe's equivalent). Loads the tinymce core lazily and mounts/tears down the editor on a plain
+ * <textarea> ref; edits flow back into ctx via TinyMCE's own change/keyup events (not React's onChange,
+ * since TinyMCE detaches the textarea from the DOM's normal input flow).
+ */
+export function TinyMceField({ ctx, name, label, hint }: { ctx: PluginTabContext; name: string; label: string; hint?: string }) {
+  usePrefill(ctx, name)
+  // A STABLE id, computed once (not mutated onto the DOM node from a ref callback) — the mount effect
+  // below needs it available up front to look up/clear any stale editor bound to it.
+  const [id] = useState(() => `tinymce-${name}-${Math.random().toString(36).slice(2)}`)
+  const ref = useRef<HTMLTextAreaElement | null>(null)
+  const value = ctx.value(name)
+  const valueRef = useRef(value)
+  valueRef.current = value
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    // React 18 StrictMode (melis-core's main.tsx wraps the whole app in it) double-invokes this
+    // effect in dev: mount → cleanup → mount again, synchronously, on the SAME element. An earlier
+    // version defended against that by always removing+recreating the editor on every mount — but
+    // tinymce's OWN "reveal once skin CSS is confirmed loaded" handshake (the inline
+    // `visibility:hidden` on `.tox-tinymce`, cleared on a load signal tied to the shared skin
+    // <link>) doesn't reliably refire for a SECOND init() reusing that same already-loaded link,
+    // leaving the editor visually painted (children set their own visibility) but permanently
+    // non-interactive. Fix: never destroy a live editor just because of a remount — defer the
+    // teardown by a tick and cancel it if a new mount arrives before it runs (the standard pattern
+    // for imperative-library integration under StrictMode). A REAL unmount (modal closed) still
+    // tears down normally, just one tick later.
+    const pending = _tinymcePendingRemove.get(id)
+    if (pending) { clearTimeout(pending); _tinymcePendingRemove.delete(id) }
+
+    if (window.tinymce?.get(id)) {
+      // Editor already alive from the previous (StrictMode-throwaway) mount — reuse it as-is.
+      return () => {
+        _tinymcePendingRemove.set(id, setTimeout(() => {
+          _tinymcePendingRemove.delete(id)
+          window.tinymce?.get(id)?.remove()
+        }, 0))
+      }
+    }
+
+    let active = true
+    loadTinyMce().then(() => {
+      if (!active || !ref.current || !window.tinymce || window.tinymce.get(id)) return
+      // `selector` (not `target`) — the SAME init shape as the legacy iframe's proven-working
+      // melisTinyMCE.createTinyMCE() shim (widgetAssets(), same PHP controller). The element is
+      // already mounted with this exact id by the time this async callback runs.
+      // NO explicit `height` — passing one makes TinyMCE force an inline `display:block` onto
+      // `.tox-tinymce` to apply that size, which stomps the skin's own required
+      // `.tox-tinymce{display:flex}` layout rule (no !important on the skin's side) and leaves the
+      // editor visually painted (children set their own visibility) but non-interactive — confirmed
+      // by inspecting the live element, where manually clearing that inline `display:block` restored
+      // it instantly. The legacy shim never sets `height` either, which is why it never hits this.
+      window.tinymce.init({
+        selector: `#${id}`,
+        menubar: false,
+        branding: false,
+        promotion: false,
+        plugins: 'lists link image table code',
+        toolbar: 'undo redo | bold italic | bullist numlist | link image | code',
+        setup: (editor: any) => {
+          // Fail-safes in case the layout/visibility handshake gets stuck for some OTHER reason —
+          // clear both inline overrides ourselves once we know the editor is genuinely ready, so the
+          // skin's own CSS (`.tox-tinymce{display:flex}`) is free to apply. Height is set the SAME
+          // way, by hand, AFTER that — going through tinymce's own `height` init option is what
+          // forced the inline `display:block` in the first place (see the note above init()).
+          const reveal = () => {
+            const c = editor.getContainer?.()
+            if (c) { c.style.removeProperty('visibility'); c.style.removeProperty('display'); c.style.height = '180px' }
+          }
+          editor.on('SkinLoaded', reveal)
+          editor.on('init', () => {
+            reveal()
+            editor.setContent(valueRef.current || '')
+            setReady(true)
+          })
+          editor.on('change keyup undo redo', () => ctx.setValue(name, editor.getContent()))
+        },
+      })
+    }).catch(() => {})
+    return () => {
+      active = false
+      _tinymcePendingRemove.set(id, setTimeout(() => {
+        _tinymcePendingRemove.delete(id)
+        window.tinymce?.get(id)?.remove()
+      }, 0))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // The server may resolve the real value (draft XML / fieldValues) AFTER init — push it in once ready
+  // if the editor is still showing empty (avoid clobbering in-progress typing on every prefill re-fire).
+  useEffect(() => {
+    const ed = window.tinymce?.get(id)
+    if (ready && ed && !ed.getContent() && value) ed.setContent(value)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, value])
+
+  return (
+    <Field label={label} error={ctx.error(name)} hint={hint}>
+      <textarea ref={ref} id={id} data-testid={`field-${name}`} defaultValue={value} style={{ display: ready ? 'none' : 'block', ...inputStyle, minHeight: 90 }} />
+    </Field>
+  )
+}
+
 // =============================================================================
 // RUNTIME schema-driven form — the no-build path for plugins created LIVE.
 // A plugin's config is DERIVED (server-side) from its own createOptionsForms() into a JSON schema
@@ -620,7 +816,7 @@ export function TextareaField({ ctx, name, label, hint }: { ctx: PluginTabContex
 // legacy iframe keeps rendering the identical form (golden rule) — same declaration, two renderers.
 // =============================================================================
 
-export type SchemaField = { name: string; type: string; label: string; hint?: string; required?: boolean; value?: string; options?: Option[]; rows?: FieldListRow[] }
+export type SchemaField = { name: string; type: string; label: string; hint?: string; required?: boolean; value?: string; options?: Option[]; rows?: FieldListRow[]; format?: string }
 export type SchemaTab = { id: string; title: string; fields: SchemaField[] }
 
 const _schemaCache = new Map<string, Promise<SchemaTab[]>>()
@@ -652,10 +848,12 @@ function SchemaFieldView({ f, ctx }: { f: SchemaField; ctx: PluginTabContext }) 
   switch (f.type) {
     case 'select':   return <RemoteSelectField ctx={ctx} name={f.name} label={label} hint={f.hint} />
     case 'page':     return <PageField ctx={ctx} name={f.name} label={label} hint={f.hint} placeholder={peT().pickPage} />
-    case 'date':     return <DateField ctx={ctx} name={f.name} label={label} hint={f.hint} />
+    case 'date':     return <DateField ctx={ctx} name={f.name} label={label} hint={f.hint} iso={f.format === 'iso'} />
     case 'number':   return <TextField ctx={ctx} name={f.name} label={label} hint={f.hint} type="number" />
     case 'textarea': return <TextareaField ctx={ctx} name={f.name} label={label} hint={f.hint} />
     case 'checkbox': return <CheckboxField ctx={ctx} name={f.name} label={label} hint={f.hint} />
+    case 'switch':   return <SwitchField ctx={ctx} name={f.name} label={label} hint={f.hint} />
+    case 'tinymce':  return <TinyMceField ctx={ctx} name={f.name} label={label} hint={f.hint} />
     case 'fieldlist':return <FieldListField ctx={ctx} label={label} hint={f.hint} />
     default:         return <TextField ctx={ctx} name={f.name} label={label} hint={f.hint} />
   }
