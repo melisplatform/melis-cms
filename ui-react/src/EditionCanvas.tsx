@@ -787,6 +787,61 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     persistZoneRefs(zoneId, refs.map((r) => r.id)) // immediate draft save → survives top-toolbar Publish
   }, [tree, domReorder, persistZoneRefs])
 
+  // Drag a block OUT of its zone into a DIFFERENT one. setZoneRefs/move() above only ever reorder
+  // refs a zone already owns (orderRefs matches ids against that zone's own items — it can't inject
+  // one from elsewhere), so a genuine cross-zone relocation needs its own op (moveRef, server-side:
+  // splices the <plugin> ref out of the source zone's items and into the target's; the referenced
+  // data node — the plugin's actual content — is untouched). Same LIVE DOM patch as same-zone move()
+  // (no canvas reload): the dragged wrapper already exists, fully rendered — appendChild it into the
+  // target zone's container (implicitly detaches it from the source), then let domReorder fix the
+  // exact position (its insertBefore chain works once both elements share a parent, same as a
+  // same-zone reorder). Toggle `no-content` on whichever zone lost/gained its last block — a fresh
+  // server render would recompute that class, but a live patch has to do it by hand (see removeBlock,
+  // same reasoning).
+  const moveAcrossZones = useCallback(async (fromZoneId: string, refId: string, toZoneId: string, position: number) => {
+    const fromCell = findCell(tree, fromZoneId)
+    const ref = fromCell?.refs.find((r) => r.id === refId)
+    if (!ref) return
+
+    let targetRefIds: string[] = []
+    setTree((t) => {
+      const removed = mapCell(t, fromZoneId, (zz) => ({ ...zz, refs: zz.refs.filter((r) => r.id !== refId) }))
+      return mapCell(removed, toZoneId, (zz) => {
+        const refs = zz.refs.slice()
+        refs.splice(Math.max(0, Math.min(position, refs.length)), 0, ref)
+        targetRefIds = refs.map((r) => r.id)
+        return { ...zz, refs }
+      })
+    })
+
+    queueMicrotask(() => {
+      const d = iframeRef.current?.contentDocument
+      const el = locate(refId)
+      if (!d || !el || !targetRefIds.length) return
+      const findZoneEl = (zid: string) => {
+        const esc = zid.replace(/["\\]/g, '\\$&')
+        const cont = d.querySelector(`[data-dragdropzone-id="${esc}"]`)
+        return (cont?.matches('.melis-dragdropzone') ? cont : cont?.querySelector('.melis-dragdropzone')) as HTMLElement | null
+      }
+      const targetZoneEl = findZoneEl(toZoneId)
+      if (targetZoneEl) {
+        targetZoneEl.appendChild(el) // moves it in (implicit remove from old parent); order fixed right after
+        targetZoneEl.classList.remove('no-content')
+        domReorder(targetRefIds)
+      }
+      const sourceZoneEl = findZoneEl(fromZoneId)
+      if (sourceZoneEl && !sourceZoneEl.querySelector('.melis-ui-outlined, [data-melis-plugin-tag-id]')) {
+        sourceZoneEl.classList.add('no-content')
+      }
+    })
+
+    setSaving(true)
+    try {
+      await apiPost('edition/save', { idPage, ops: [{ op: 'moveRef', fromZoneId, toZoneId, refId, position }] })
+      window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } }))
+    } catch (e) { notify('ko', 'MelisCms', (e as Error).message) } finally { setSaving(false) }
+  }, [tree, locate, domReorder, idPage])
+
   // Inject ↑/↓ reorder arrows IN THE CANVAS, on each plugin wrapper of a leaf zone holding >1 block.
   // The panel's drag-reorder is unreliable inside the iframe; these arrows give the same move() (→
   // setZoneRefs, immediate draft save) with a single click. Driven by the tree (authoritative order),
@@ -909,9 +964,11 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
 
   const onDrop = (zoneId: string, targetIdx: number, e: React.DragEvent) => {
     e.preventDefault()
-    const from = Number(e.dataTransfer.getData('text/plain'))
-    if (Number.isNaN(from)) return
-    move(zoneId, from, targetIdx)
+    let src: { zoneId: string; refId: string; index: number } | null = null
+    try { src = JSON.parse(e.dataTransfer.getData('text/plain')) } catch { /* not our payload — ignore */ }
+    if (!src || typeof src.index !== 'number') return
+    if (src.zoneId === zoneId) move(zoneId, src.index, targetIdx)
+    else void moveAcrossZones(src.zoneId, src.refId, zoneId, targetIdx)
   }
 
   const tr = peT()
@@ -972,7 +1029,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
         {/* this cell's own blocks (only meaningful for a leaf; a split cell holds sub-cells instead) */}
         {isLeaf && cell.refs.map((r, i) => (
           <div key={r.id} data-testid={`block-${r.id}`} draggable
-            onDragStart={(e) => e.dataTransfer.setData('text/plain', String(i))}
+            onDragStart={(e) => e.dataTransfer.setData('text/plain', JSON.stringify({ zoneId: cell.id, refId: r.id, index: i }))}
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => onDrop(cell.id, i, e)}
             onMouseEnter={() => highlight(r.id, true)}
@@ -1020,7 +1077,10 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
             )}
           </div>
         ))}
-        {isLeaf && cell.refs.length === 0 && <div style={{ fontSize: 11, color: 'var(--color-muted-foreground,#9ca3af)', padding: '6px 8px' }}>{tr.ecEmptyCell}</div>}
+        {isLeaf && cell.refs.length === 0 && (
+          <div onDragOver={(e) => e.preventDefault()} onDrop={(e) => onDrop(cell.id, 0, e)}
+            style={{ fontSize: 11, color: 'var(--color-muted-foreground,#9ca3af)', padding: '6px 8px' }}>{tr.ecEmptyCell}</div>
+        )}
 
         {/* nested sub-cells (columns/rows), recursive */}
         {cell.cells.length > 0 && (

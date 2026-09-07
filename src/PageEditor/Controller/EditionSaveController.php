@@ -19,7 +19,8 @@ use MelisCms\PageEditor\LayoutCatalog;
  * other-module plugin nodes are preserved verbatim (retro-compat).
  *
  * Ops (mirroring PageContentDocument): reorderNodes {ids}, setWidths {id,desktop,tablet,
- * mobile}, reorderZoneRefs {zoneId,refIds}, setZoneRefs, addPlugin, setTagContent, applyLayout.
+ * mobile}, reorderZoneRefs {zoneId,refIds}, setZoneRefs, moveRef {fromZoneId,toZoneId,refId,
+ * position?}, addPlugin, setTagContent, applyLayout.
  *
  * Persistence contract (aligned with legacy): editing writes ONLY the session — it never
  * touches the DB. The melis render reads that session in priority, so edits show live; the
@@ -80,6 +81,18 @@ class EditionSaveController extends MelisAbstractActionController
                         // exact set (drops unlisted refs) — used for reorder AND remove
                         $doc->setZoneRefs((string) ($op['zoneId'] ?? ''), array_values(array_map('strval', (array) ($op['refIds'] ?? []))));
                         $applied++;
+                        break;
+                    case 'moveRef':
+                        // drag a block from one drop zone/cell into another (cross-zone; same-zone
+                        // reorder stays on setZoneRefs). position omitted/out of range → append.
+                        $fromZoneId = (string) ($op['fromZoneId'] ?? '');
+                        $toZoneId   = (string) ($op['toZoneId'] ?? '');
+                        $refId      = (string) ($op['refId'] ?? '');
+                        if ($fromZoneId !== '' && $toZoneId !== '' && $refId !== '') {
+                            $position = isset($op['position']) ? (int) $op['position'] : null;
+                            $doc->moveRef($fromZoneId, $toZoneId, $refId, $position);
+                            $applied++;
+                        }
                         break;
                     case 'ensureZones':
                         // Seed a FRESH page's template drag-drop zones into the model (they live only in
