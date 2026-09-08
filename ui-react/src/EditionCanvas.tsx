@@ -40,6 +40,35 @@ const TINY_BASE = '/MelisCore/js/library/tinymce' // the TinyMCE build the legac
 function notify(kind: 'ok' | 'ko', title: string, message: string) {
   window.postMessage({ __melisNotif: true, kind, title, message }, '*')
 }
+/** Error message + the first couple of real call-site lines from its stack, so a toast is traceable
+ *  back to its throw site without needing devtools open at the exact moment it fires (temporary
+ *  diagnostic aid — TODO remove once the recurring getRng-class crashes are fully root-caused). */
+function errMsg(e: unknown): string {
+  const err = e as Error
+  const at = (err?.stack || '').split('\n').slice(1, 3).map((l) => l.trim()).join(' | ')
+  return at ? `${err.message} [${at}]` : (err?.message || String(e))
+}
+/** Root cause of the recurring getRng-class crash: TinyMCE registers an editor in tinymce.get() as
+ *  soon as init() is called — well BEFORE it's actually ready (`editor.initialized` flips true only
+ *  once its content iframe/selection exist). Calling .focus() on a found-but-not-yet-ready editor
+ *  makes TinyMCE's OWN internals touch selection.getRng() on a selection that doesn't exist yet,
+ *  throwing from inside tinymce.min.js itself (confirmed via the stack trace surfaced by errMsg
+ *  above). Defer the focus to its own 'init' event instead of calling it eagerly. */
+function focusWhenReady(ed: any): void {
+  if (!ed) return
+  if (ed.initialized) { try { ed.focus() } catch { /* best-effort */ } }
+  else ed.once?.('init', () => { try { ed.focus() } catch { /* best-effort */ } })
+}
+/** A friendly "still working" pill — spinner + text — the caller centers via its own container. */
+function LoadingPill({ text }: { text: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 20px', borderRadius: 999, background: 'var(--color-card,#fff)', border: '1px solid var(--color-border,#e5e7eb)', boxShadow: '0 10px 30px rgba(0,0,0,.12)', fontSize: 13, fontWeight: 600, color: 'var(--color-foreground,#111827)', animation: 'melis-ec-fadein .18s ease' }}>
+      <span style={{ width: 16, height: 16, borderRadius: '50%', flex: '0 0 auto', border: '2px solid color-mix(in srgb, var(--color-primary,#dc2626) 22%, transparent)', borderTopColor: 'var(--color-primary,#dc2626)', animation: 'melis-ec-spin .7s linear infinite' }} />
+      {text}
+      <style>{'@keyframes melis-ec-spin{to{transform:rotate(360deg)}}@keyframes melis-ec-fadein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}'}</style>
+    </div>
+  )
+}
 /** Libellé lisible d'un bloc à partir de son nom de plugin. */
 function label(r: Ref): string {
   const n = r.name || r.id || '?'
@@ -183,6 +212,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const [layouts, setLayouts] = useState<Layout[]>([])
   const [err, setErr] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [tinyReady, setTinyReady] = useState(false) // TinyMCE + Melis env + configs preloaded — inline editing is instant once true
   const [nonce, setNonce] = useState(0)
   const [blockW, setBlockW] = useState<Record<string, { d: string; t: string; m: string }>>({}) // refId -> responsive widths
   const [picker, setPicker] = useState<{ cellId: string; x: number; y: number } | null>(null) // open layout popover
@@ -204,8 +234,12 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const accentRef = useRef('#dc2626')
   const selectedRef = useRef<{ zoneId: string; refId: string | null } | null>(null)
   const editInlineRef = useRef<((zoneId: string, refId: string) => void) | null>(null)
+  const eagerInitInlineRef = useRef<(() => Promise<void>) | null>(null) // called from onFrameLoad once the canvas is up
   const injectControlsRef = useRef<(() => void) | null>(null) // (re)inject the in-canvas reorder arrows
   const tinyConfigsRef = useRef<Record<string, any> | null>(null) // the real Melis tinymce configs by type
+  const tinymceLoadRef = useRef<Promise<any> | null>(null)    // in-flight ensureTinymce() load, deduped
+  const melisEnvLoadRef = useRef<Promise<any> | null>(null)   // in-flight ensureMelisEnv() load, deduped
+  const inlineInitRef = useRef<{ refId: string; promise: Promise<void> } | null>(null) // in-flight editInline() attempt, deduped per block
   const docEmptyRef = useRef(false)   // the fetched document had NO zones (fresh, unsaved page)
   const seedTriedRef = useRef(false)  // guard: only seed a page's template zones once
   const maybeSeedZonesRef = useRef<(() => void) | null>(null) // called from onFrameLoad once the canvas is up
@@ -234,6 +268,12 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const onFrameLoad = useCallback(() => {
     const d = iframeRef.current?.contentDocument
     if (!d) return
+    // Fresh iframe (a real reload, not the first mount) → any cached tinymce/melisTinyMCE load promise
+    // above was tied to the OLD, now-dead contentWindow; drop it so the next editInline() re-injects
+    // into the CURRENT one instead of resolving with a stale reference.
+    tinymceLoadRef.current = null
+    melisEnvLoadRef.current = null
+    setTinyReady(false)
     let st = d.getElementById('melis-react-hl') as HTMLStyleElement | null
     if (!st) { st = d.createElement('style'); st.id = 'melis-react-hl'; d.head?.appendChild(st) }
     st.textContent =
@@ -389,6 +429,15 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     // Fresh page: its template drag-drop zones are rendered here but absent from the (empty) document —
     // seed them so the structure panel lists them. The canvas is guaranteed in the DOM now.
     maybeSeedZonesRef.current?.()
+    // Build every block's REAL inline editor now, in the background — not on first click (see
+    // eagerInitInline below for why: this is what makes clicking instant, matching legacy). Called via
+    // a ref here since onFrameLoad has no deps and eagerInitInline's own identity changes with `doc`;
+    // its own [doc]-keyed effect covers the (common) case where the document loads AFTER the iframe,
+    // this covers the reverse (iframe finishes loading after doc was already fetched) — idempotent
+    // (and a no-op — including for the "loading" badge — while `doc` isn't populated yet either way),
+    // so firing from both places whichever runs last just completes the job harmlessly.
+    if (!eagerInitInlineRef.current) setTinyReady(true) // defensive: should never actually be unset here
+    else void eagerInitInlineRef.current()
   }, [])
 
   // Keep the selection ref current for the canvas click listener (attached once per iframe load).
@@ -425,35 +474,48 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   }, [])
 
   // Lazy-load Melis's TinyMCE into the render iframe (its own window; gone after a reload → re-inject).
+  // The in-flight PROMISE itself is cached (not just the final "already loaded" check below) — clicking
+  // a second block while the first click's load is still pending must reuse that same load, never start
+  // a SECOND concurrent <script> tag: two script loads racing into the same document let TinyMCE's own
+  // global init run twice, corrupting whichever editor ends up attaching second (surfaced as internal
+  // TinyMCE errors like `selection.getRng()` on an editor whose state got stomped mid-init). Same fix
+  // PluginFormKit.tsx's loadTinyMce() already applies for its own (separate) TinyMCE load.
   const ensureTinymce = useCallback((): Promise<any> => {
     const w = iframeRef.current?.contentWindow as (Window & { tinymce?: any }) | undefined
     const d = iframeRef.current?.contentDocument
     if (!w || !d) return Promise.reject(new Error('canvas not ready'))
     if (w.tinymce) return Promise.resolve(w.tinymce)
-    return new Promise((resolve, reject) => {
+    if (tinymceLoadRef.current) return tinymceLoadRef.current
+    const p = new Promise((resolve, reject) => {
       const s = d.createElement('script')
       s.src = TINY_BASE + '/tinymce.min.js' // the build the legacy uses (v6.7.0); its plugins match the core
       s.onload = () => resolve(w.tinymce)
-      s.onerror = () => reject(new Error('TinyMCE load failed'))
+      s.onerror = () => { tinymceLoadRef.current = null; reject(new Error('TinyMCE load failed')) }
       d.head.appendChild(s)
     })
+    tinymceLoadRef.current = p
+    return p
   }, [])
 
   // Load melis_tinymce.js into the render iframe (jQuery is already present there) → provides the Melis env
   // the real config's callbacks reference: `melisTinyMCE.tinyMceActionEvent` (setup), `filePickerCallback`
-  // (media library), `tinyMceCleaner` (init). Gone after an iframe reload → re-inject.
+  // (media library), `tinyMceCleaner` (init). Gone after an iframe reload → re-inject. Same in-flight-promise
+  // dedup as ensureTinymce above, same reason.
   const ensureMelisEnv = useCallback((): Promise<any> => {
     const w = iframeRef.current?.contentWindow as (Window & { melisTinyMCE?: any }) | undefined
     const d = iframeRef.current?.contentDocument
     if (!w || !d) return Promise.reject(new Error('canvas not ready'))
     if (w.melisTinyMCE) return Promise.resolve(w.melisTinyMCE)
-    return new Promise((resolve, reject) => {
+    if (melisEnvLoadRef.current) return melisEnvLoadRef.current
+    const p = new Promise((resolve, reject) => {
       const s = d.createElement('script')
       s.src = '/MelisCore/js/tinyMCE/melis_tinymce.js'
       s.onload = () => resolve(w.melisTinyMCE)
-      s.onerror = () => reject(new Error('melis_tinymce.js load failed'))
+      s.onerror = () => { melisEnvLoadRef.current = null; reject(new Error('melis_tinymce.js load failed')) }
       d.head.appendChild(s)
     })
+    melisEnvLoadRef.current = p
+    return p
   }, [])
 
   // Fetch the REAL Melis TinyMCE configs (by type: html/textarea/media/tool), once. Same endpoint the
@@ -475,23 +537,109 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       // No toast on edits — editing only updates the working session; notifications belong to the
       // top toolbar's Save/Publish (like legacy). Errors below still notify.
       window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } }))
-    } catch (e) { notify('ko', 'MelisCms', (e as Error).message) } finally { setSaving(false) }
+    } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
   }, [idPage])
+
+  // Eagerly attach a REAL, live inline editor to EVERY melisTag block on the page at once, as soon as
+  // TinyMCE/configs are ready — this is what legacy actually does (plugin.melistagHTML/TEXTAREA/
+  // MEDIA.init.js each call melisTinyMCE.createTinyMCE(type, "div.<type>-editable", …) UNCONDITIONALLY
+  // the moment their script loads: a SELECTOR-based tinymce.init() that builds an editor for every
+  // matching element on the page in one pass). That's WHY clicking a block in legacy is instant — it
+  // was never building anything on click, only ever focusing an editor already fully built. Our own
+  // per-click lazy init (editInline below) can't match that no matter how much is preloaded/warmed;
+  // the actual construction cost is real and was always happening AFTER the click. This does that
+  // construction upfront instead, grouped by type (html/textarea/media each need their own config,
+  // same as legacy's 3 separate init scripts) via one selector matching all of that type's ids.
+  // Idempotent — skips any block that already has a live editor — so re-running after a fresh nonce/
+  // a newly added plugin only builds what's actually new.
+  const eagerInitInline = useCallback(async () => {
+    const w = iframeRef.current?.contentWindow as any
+    if (!w) return
+    if (!doc) return // nothing to init yet — the [doc] effect below re-runs this once it arrives
+    let tinymce: any
+    try {
+      tinymce = await ensureTinymce()
+      await ensureMelisEnv()
+    } catch { setTinyReady(true); return } // failed to load — don't block the "loading" badge forever; editInline()'s own lazy fallback still covers a click
+    const configs = await loadTinyConfigs()
+
+    const elIdToRefId = new Map<string, string>()
+    const byType: Record<'html' | 'textarea' | 'media', string[]> = { html: [], textarea: [], media: [] }
+    for (const node of doc?.nodes || []) {
+      if (node.tag !== 'melisTag') continue
+      const el = blockContentEl(node.id)
+      if (!el || !el.isConnected) continue
+      const elId = 'melis-inline-' + node.id.replace(/[^A-Za-z0-9_-]/g, '')
+      if (tinymce.get(elId)) continue // already live
+      el.setAttribute('id', elId)
+      elIdToRefId.set(elId, node.id)
+      const rawType = String(el.getAttribute('data-tag-type') || node.attrs?.type || 'html').toLowerCase()
+      const key: 'html' | 'textarea' | 'media' = rawType.includes('media') ? 'media' : rawType.includes('text') ? 'textarea' : 'html'
+      byType[key].push(elId)
+    }
+
+    const legacySetup = w.melisTinyMCE?.tinyMceActionEvent
+    for (const key of ['html', 'textarea', 'media'] as const) {
+      const ids = byType[key]
+      if (!ids.length) continue
+      const cfg: Record<string, any> = { ...(configs[key] || configs.html || {}) }
+      delete cfg.selector
+      cfg.selector = ids.map((id) => '#' + id).join(',')
+      cfg.inline = true; cfg.base_url = TINY_BASE; cfg.suffix = '.min'
+      cfg.branding = false; cfg.promotion = false; cfg.toolbar_mode = 'wrap'
+      cfg.file_picker_callback = w.filePickerCallback
+      cfg.init_instance_callback = w.tinyMceCleaner
+      cfg.setup = (ed: any) => {
+        try { legacySetup?.(ed) } catch { /* legacy setup needs the full BO JS; ignore its failures */ }
+        // save on blur; leave the editor attached (removing it mid-blur-dispatch corrupts TinyMCE).
+        ed.on('blur', () => { const rid = elIdToRefId.get(ed.id); if (rid) saveInline(rid, ed.getContent()) })
+      }
+      try { await tinymce.init(cfg) } catch { /* this type's blocks still get a lazy fallback on click */ }
+    }
+    setTinyReady(true)
+  }, [doc, blockContentEl, ensureTinymce, ensureMelisEnv, loadTinyConfigs, saveInline])
+  useEffect(() => { eagerInitInlineRef.current = eagerInitInline; void eagerInitInline() }, [eagerInitInline])
 
   // WYSIWYG in-block editing for classic (html/text/media) plugins — the whole point of WYSIWYG: TinyMCE
   // attaches INLINE to the block, a floating toolbar appears, you edit directly; blur → save (stateless).
+  // Normally a no-op by the time it's called (eagerInitInline above already built every block's editor
+  // on load) — this is now only the FALLBACK for a block that pass missed (a plugin added afterward,
+  // before the next eager pass catches up) or genuinely fresh construction if eager init itself failed.
   const editInline = useCallback(async (zoneId: string, refId: string) => {
     selectBlock(zoneId, refId)
-    const el = blockContentEl(refId)
+    // A click landing on a block WHILE ITS OWN editor is still initializing (ensureTinymce/ensureMelisEnv
+    // are real network round-trips — repeated clicking during that window is exactly how this was
+    // reproduced) must not re-enter the whole init sequence a second time: two concurrent tinymce.init()
+    // calls targeting the SAME element corrupt each other's setup, surfacing as internal TinyMCE errors
+    // (selection.getRng() included) once either one tries to use a half-built editor. Piggyback on the
+    // in-flight attempt instead — wait for it, then just focus.
+    const inflight = inlineInitRef.current
+    if (inflight && inflight.refId === refId) {
+      await inflight.promise.catch(() => { /* already reported by the original attempt */ })
+      const w = iframeRef.current?.contentWindow as any
+      const elId = 'melis-inline-' + refId.replace(/[^A-Za-z0-9_-]/g, '')
+      focusWhenReady(w?.tinymce?.get(elId))
+      return
+    }
+
+    let el = blockContentEl(refId)
     if (!el) return
     const elId = 'melis-inline-' + refId.replace(/[^A-Za-z0-9_-]/g, '')
+    const attempt = (async () => {
     try {
-      const w = iframeRef.current?.contentWindow as any
       const tinymce = await ensureTinymce()
       // already an editor on this exact block → just focus it (avoids re-init flicker on re-click)
-      if (el.id === elId && tinymce.get(elId)) { tinymce.get(elId).focus(); return }
+      if (el.id === elId && tinymce.get(elId)) { focusWhenReady(tinymce.get(elId)); return }
       await ensureMelisEnv()
       const configs = await loadTinyConfigs()
+      // Re-fetch (don't trust references captured before the awaits above): each is a real network
+      // round-trip, during which an UNRELATED op elsewhere (applyLayout/addPlugin/a fresh nonce) can
+      // reload the canvas iframe — a stale `w`/`el` from the old, torn-down iframe would throw on the
+      // property accesses below ("taking time to load" is exactly the window for this race).
+      const w = iframeRef.current?.contentWindow as any
+      const freshEl = blockContentEl(refId)
+      if (!w || !freshEl || !freshEl.isConnected) return // canvas reloaded/block gone meanwhile — bail quietly
+      el = freshEl
       // the REAL Melis config for this tag TYPE (melis-cms: html/textarea/media), used AS-IS.
       // Read the type from the edited element itself — the `.melis-editable` body carries the
       // authoritative `data-tag-type` — and only fall back to the document model. (The model lookup
@@ -514,10 +662,18 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
         // save on blur; leave the editor attached (removing it mid-blur-dispatch corrupts TinyMCE).
         ed.on('blur', () => saveInline(refId, ed.getContent()))
       }
-      tinymce.remove() // one inline editor at a time
+      // Multiple inline editors coexist simultaneously now (eagerInitInline above builds one per block
+      // up front, same as legacy) — this fallback path must NOT remove any other block's editor before
+      // building its own; never the bare no-arg tinymce.remove() either, which tears down EVERY live
+      // editor process-wide (with several page tabs kept mounted at once — editionMountedFor — that
+      // included other open tabs' editors, throwing from inside TinyMCE's own internals mid-teardown).
       el.setAttribute('id', elId)
       tinymce.init(cfg)
-    } catch (e) { notify('ko', 'MelisCms', (e as Error).message) }
+    } catch (e) { notify('ko', 'MelisCms', errMsg(e)) }
+    })()
+    inlineInitRef.current = { refId, promise: attempt }
+    await attempt
+    if (inlineInitRef.current?.refId === refId) inlineInitRef.current = null
   }, [selectBlock, blockContentEl, ensureTinymce, ensureMelisEnv, loadTinyConfigs, saveInline, doc])
   useEffect(() => { editInlineRef.current = editInline }, [editInline])
 
@@ -689,7 +845,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       }
       setBlockW(w)
       setDoc(d)
-    }).catch((e) => { if (!cancelled) setErr((e as Error).message) })
+    }).catch((e) => { if (!cancelled) setErr(errMsg(e)) })
     return () => { cancelled = true }
   }, [idPage, nonce])
 
@@ -773,12 +929,12 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     try {
       await apiPost('edition/save', { idPage, ops: [{ op: 'setZoneRefs', zoneId, refIds }] })
       window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } }))
-    } catch (e) { notify('ko', 'MelisCms', (e as Error).message) } finally { setSaving(false) }
+    } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
   }, [idPage])
 
   const move = useCallback((zoneId: string, from: number, to: number) => {
     const z = findCell(tree, zoneId)
-    if (!z || to < 0 || to >= z.refs.length) return
+    if (!z || from < 0 || from >= z.refs.length || to < 0 || to >= z.refs.length) return
     const refs = z.refs.slice()
     const [x] = refs.splice(from, 1)
     refs.splice(to, 0, x)
@@ -839,7 +995,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     try {
       await apiPost('edition/save', { idPage, ops: [{ op: 'moveRef', fromZoneId, toZoneId, refId, position }] })
       window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } }))
-    } catch (e) { notify('ko', 'MelisCms', (e as Error).message) } finally { setSaving(false) }
+    } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
   }, [tree, locate, domReorder, idPage])
 
   // Inject ↑/↓ reorder arrows IN THE CANVAS, on each plugin wrapper of a leaf zone holding >1 block.
@@ -918,7 +1074,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     setSaving(true)
     apiPost('edition/save', { idPage, ops: [{ op: 'setWidths', id, desktop: v.d, tablet: v.t, mobile: v.m }] })
       .then(() => window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } })))
-      .catch((e) => notify('ko', 'MelisCms', (e as Error).message))
+      .catch((e) => notify('ko', 'MelisCms', errMsg(e)))
       .finally(() => setSaving(false))
   }, [idPage])
 
@@ -932,7 +1088,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       // No toast on edits (session only) — see saveInline.
       setNonce((n) => n + 1) // re-fetch document + reload canvas → cells/colonnes apparaissent
       window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } }))
-    } catch (e) { notify('ko', 'MelisCms', (e as Error).message) } finally { setSaving(false) }
+    } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
   }, [idPage])
 
   // The addable-plugins palette is PER SITE (it lists only plugins whose module is loaded for THIS
@@ -945,7 +1101,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     setPluginPicker({ cellId }); setPickerQuery(''); setPickerSection(null)
     if (catalog === null) {
       try { setCatalog(await apiGet<Palette>(`edition/plugins?idPage=${idPage}`)) }
-      catch (e) { notify('ko', 'MelisCms', (e as Error).message) }
+      catch (e) { notify('ko', 'MelisCms', errMsg(e)) }
     }
   }, [catalog, idPage])
 
@@ -959,7 +1115,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       // No toast on edits (session only) — see saveInline.
       setNonce((n) => n + 1)
       window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } }))
-    } catch (e) { notify('ko', 'MelisCms', (e as Error).message) } finally { setSaving(false) }
+    } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
   }, [idPage])
 
   const onDrop = (zoneId: string, targetIdx: number, e: React.DragEvent) => {
@@ -974,7 +1130,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const tr = peT()
   const msg: React.CSSProperties = { padding: 20, fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }
   if (err) return <div style={{ ...msg, color: '#dc2626' }}>{tr.ecErrorPrefix}{err}</div>
-  if (!doc) return <div style={msg}>{tr.ecLoadingEditor}</div>
+  if (!doc) return <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LoadingPill text={tr.ecLoadingEditor} /></div>
 
   const iconBtn: React.CSSProperties = { appearance: 'none', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', borderRadius: 5, width: 22, height: 22, lineHeight: '1', cursor: 'pointer', fontSize: 12, color: 'var(--color-foreground,#111827)' }
 
@@ -1099,7 +1255,20 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       <div style={{ flex: '1 1 auto', minHeight: 0, display: 'flex', position: 'relative' }}>
         {/* Device-preview frame: desktop = full bleed; tablet/mobile = fixed width, centered on a
             neutral backdrop (like the legacy responsive preview), so the page reflows to that width. */}
-        <div style={{ flex: '1 1 auto', minWidth: 0, display: 'flex', justifyContent: 'center', overflow: 'auto', background: device === 'desktop' ? undefined : 'var(--color-muted,#f1f5f9)', padding: device === 'desktop' ? 0 : '12px 0' }}>
+        <div style={{ flex: '1 1 auto', minWidth: 0, display: 'flex', justifyContent: 'center', overflow: 'auto', position: 'relative', background: device === 'desktop' ? undefined : 'var(--color-muted,#f1f5f9)', padding: device === 'desktop' ? 0 : '12px 0' }}>
+          {/* TinyMCE (+ Melis env + configs, then a real editor per block — eagerInitInline) preloads in
+              the background as soon as the canvas is up, so clicking a text block is instant once this
+              disappears — a clear "not yet" cue beats a silent short delay the user might click through
+              before it's actually ready. Centered over the CANVAS ITSELF specifically (this wrapper, not
+              the outer row which also contains the side panel as a flex sibling — centering there put it
+              mid-way across canvas+panel combined, visibly off-centre from what's actually shown as the
+              canvas) and non-blocking (pointer-events:none) — everything else (selecting, browsing zones)
+              still works while this shows; only WYSIWYG text editing isn't ready yet. */}
+          {!tinyReady && (
+            <div style={{ position: 'absolute', inset: 0, zIndex: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+              <LoadingPill text={tr.ecLoadingEditor} />
+            </div>
+          )}
           <iframe key={nonce} ref={iframeRef} onLoad={onFrameLoad} src={renderSrc} title={`Canvas page ${idPage}`}
             style={{ width: DEVICE_W[device], maxWidth: '100%', height: '100%', flex: '0 0 auto', border: device === 'desktop' ? 0 : '1px solid var(--color-border,#e5e7eb)', borderRadius: device === 'desktop' ? 0 : 6, background: '#fff', boxShadow: device === 'desktop' ? undefined : '0 4px 18px rgba(0,0,0,.10)', transition: 'width .18s ease' }} />
         </div>

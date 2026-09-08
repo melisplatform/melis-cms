@@ -153,7 +153,19 @@ class EditionRenderPageController extends MelisAbstractActionController
             $html
         );
 
-        $inject = '<style id="melis-react-clean">'
+        // Re-add the TinyMCE CORE library (stripped above with the rest of the legacy edit JS) as a
+        // plain <head> <script> — so the browser fetches it in PARALLEL with the rest of this page,
+        // the same way the legacy edition gets it: embedded in its own initial HTML response, not
+        // injected afterward. The React canvas's own click-to-edit (EditionCanvas.tsx) otherwise only
+        // starts loading it once the WHOLE iframe has already finished loading (onFrameLoad) — a
+        // guaranteed sequential delay after the page visibly "shows up" instead of an overlapping one,
+        // which is exactly why legacy felt instantly editable and the new canvas didn't. Standalone
+        // library, no jQuery dependency, so safe this early regardless of where the site's own jQuery
+        // script sits. melis_tinymce.js (which DOES need jQuery) still loads later, client-side, once
+        // the page is confirmed ready (ensureMelisEnv) — by then this is already cached, so that step
+        // is instant too.
+        $inject = '<script src="/MelisCore/js/library/tinymce/tinymce.min.js"></script>'
+            . '<style id="melis-react-clean">'
             . '.melis-plugin-tools-box,.m-plugin-sub-tools,.dnd-plugin-sub-tools,.melis-plugin-title-box,'
             . '.dnd-layout-buttons,.dnd-plugin-title-and-sub-tools,.melis-plugin-indicator,.dnd-layout-indicator,'
             // Legacy floating plugin-menu bar (`#melisPluginBtn` toggle + JS-loaded palette). Styled/
