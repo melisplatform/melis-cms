@@ -20,7 +20,8 @@ use MelisCms\PageEditor\LayoutCatalog;
  *
  * Ops (mirroring PageContentDocument): reorderNodes {ids}, setWidths {id,desktop,tablet,
  * mobile}, reorderZoneRefs {zoneId,refIds}, setZoneRefs, moveRef {fromZoneId,toZoneId,refId,
- * position?}, addPlugin, setTagContent, applyLayout.
+ * position?}, duplicateZone {zoneId,withContent?}, removeZone {zoneId}, addPlugin, setTagContent,
+ * applyLayout.
  *
  * Persistence contract (aligned with legacy): editing writes ONLY the session — it never
  * touches the DB. The melis render reads that session in priority, so edits show live; the
@@ -63,6 +64,7 @@ class EditionSaveController extends MelisAbstractActionController
             }
 
             $applied = 0;
+            $newZoneId = '';
             foreach ($ops as $op) {
                 switch ($op['op'] ?? '') {
                     case 'reorderNodes':
@@ -91,6 +93,29 @@ class EditionSaveController extends MelisAbstractActionController
                         if ($fromZoneId !== '' && $toZoneId !== '' && $refId !== '') {
                             $position = isset($op['position']) ? (int) $op['position'] : null;
                             $doc->moveRef($fromZoneId, $toZoneId, $refId, $position);
+                            $applied++;
+                        }
+                        break;
+                    case 'duplicateZone':
+                        // create a new top-level zone right after $zoneId (withContent → cloned
+                        // blocks under fresh ids; false → empty) — see PageContentDocument::
+                        // duplicateZone for how this actually renders somewhere without any
+                        // template change (plugin_referer grouping, adopted from legacy verbatim).
+                        $zoneId = (string) ($op['zoneId'] ?? '');
+                        if ($zoneId !== '') {
+                            $createdZoneId = $doc->duplicateZone($zoneId, (bool) ($op['withContent'] ?? true));
+                            if ($createdZoneId !== '') {
+                                $newZoneId = $createdZoneId;
+                                $applied++;
+                            }
+                        }
+                        break;
+                    case 'removeZone':
+                        // Remove a DYNAMICALLY CREATED zone (from duplicateZone) — see
+                        // PageContentDocument::removeZone; refuses the original template zone.
+                        // The React panel confirms with the user before sending this op.
+                        $rmZoneId = (string) ($op['zoneId'] ?? '');
+                        if ($rmZoneId !== '' && $doc->removeZone($rmZoneId)) {
                             $applied++;
                         }
                         break;
@@ -143,9 +168,17 @@ class EditionSaveController extends MelisAbstractActionController
             // Persist into the working edit session (NOT the DB) — no save/publish event here.
             $store->writeDocument($idPage, $doc);
 
+            $data = ['idPage' => $idPage, 'source' => 'session', 'opsApplied' => $applied];
+            if ($newZoneId !== '') {
+                // Lets the client live-patch the new zone into the canvas (fetch its rendered
+                // subtree and splice it in) instead of reloading the whole iframe — see
+                // EditionCanvas.tsx's duplicateZone.
+                $data['newZoneId'] = $newZoneId;
+            }
+
             return $this->jsonResponse([
                 'success' => true,
-                'data'    => ['idPage' => $idPage, 'source' => 'session', 'opsApplied' => $applied],
+                'data'    => $data,
             ]);
         } catch (\Throwable $e) {
             return $this->jsonResponse([
