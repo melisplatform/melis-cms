@@ -27,7 +27,10 @@ type Ref = { id?: string; module?: string; name?: string }
 type DocZone = { kind: string; id: string | null; tag?: string; raw?: string; template?: string; refs?: Ref[]; zones?: DocZone[]; attrs?: Record<string, string> }
 type Layout = { key: string; template: string; cols: number; icon: string }
 type Doc = { idPage: number; source: string | null; namespace: string; nodes: DocZone[]; layouts?: Layout[]; pluginTitles?: Record<string, string>; pluginThumbs?: Record<string, string> }
-type Cell = { id: string; template: string; refs: { id: string; label: string; mini?: boolean }[]; cells: Cell[] }
+// removable: true for a zone DUPLICATE-created via duplicateZone (non-empty plugin_referer attr) —
+// the original template zone (plugin_referer="") would just get silently recreated by
+// MelisDragDropZoneHelper on the next render, so it's never offered for removal (see removeZone).
+type Cell = { id: string; template: string; refs: { id: string; label: string; mini?: boolean }[]; cells: Cell[]; removable?: boolean }
 type PalettePlugin = { module: string; name: string; title: string; description: string; thumbnail: string; type: string }
 type PaletteGroup = { id: string; title: string; plugins: PalettePlugin[] }
 type PaletteModule = { key: string; label: string; groups: PaletteGroup[] }
@@ -85,6 +88,7 @@ function toCell(n: DocZone, titles: Record<string, string>): Cell {
     template: n.template || '',
     refs: (n.refs || []).filter((r) => r.id).map((r) => ({ id: r.id as string, label: titles[r.id as string] || label(r), mini: r.module === 'MelisMiniTemplate' || (r.name || '').startsWith('MiniTemplatePlugin_') })),
     cells: (n.zones || []).filter((z) => z.id).map((z) => toCell(z, titles)),
+    removable: !!(n.attrs?.plugin_referer),
   }
 }
 /** Immutably replace the cell with id === $id via $fn, anywhere in the tree. */
@@ -218,6 +222,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const [picker, setPicker] = useState<{ cellId: string; x: number; y: number } | null>(null) // open layout popover
   const [openWidth, setOpenWidth] = useState<string | null>(null) // block whose responsive-width panel is deployed
   const [confirmRemove, setConfirmRemove] = useState<{ zoneId: string; refId: string; label: string } | null>(null) // remove-plugin confirm
+  const [confirmRemoveZone, setConfirmRemoveZone] = useState<{ zoneId: string; label: string } | null>(null) // remove-zone confirm (dynamically created zones only)
   const [panelCollapsed, setPanelCollapsed] = useState(false) // structure panel collapsed to a thin bar
   const [isMobile, setIsMobile] = useState(false) // real viewport is phone-narrow → panel becomes a drawer
   const [selected, setSelected] = useState<{ zoneId: string; refId: string | null } | null>(null) // canvas→panel locate
@@ -233,6 +238,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const [dark, setDark] = useState<boolean>(false) // BO theme is dark — from background luminance (see isDarkTheme)
   const accentRef = useRef('#dc2626')
   const selectedRef = useRef<{ zoneId: string; refId: string | null } | null>(null)
+  const treeRef = useRef<Cell[]>([]) // current top-level tree, for maybeSeedZones (avoids a stale closure)
   const editInlineRef = useRef<((zoneId: string, refId: string) => void) | null>(null)
   const eagerInitInlineRef = useRef<(() => Promise<void>) | null>(null) // called from onFrameLoad once the canvas is up
   const injectControlsRef = useRef<(() => void) | null>(null) // (re)inject the in-canvas reorder arrows
@@ -240,8 +246,6 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const tinymceLoadRef = useRef<Promise<any> | null>(null)    // in-flight ensureTinymce() load, deduped
   const melisEnvLoadRef = useRef<Promise<any> | null>(null)   // in-flight ensureMelisEnv() load, deduped
   const inlineInitRef = useRef<{ refId: string; promise: Promise<void> } | null>(null) // in-flight editInline() attempt, deduped per block
-  const docEmptyRef = useRef(false)   // the fetched document had NO zones (fresh, unsaved page)
-  const seedTriedRef = useRef(false)  // guard: only seed a page's template zones once
   const maybeSeedZonesRef = useRef<(() => void) | null>(null) // called from onFrameLoad once the canvas is up
 
   // On a phone-narrow viewport the structure panel can't sit next to the canvas (360px would eat the
@@ -264,6 +268,61 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   // (resizing an already-loaded iframe doesn't relayout reliably across browsers).
   const vw = device === 'mobile' ? 375 : device === 'tablet' ? 768 : 0
   const renderSrc = `/melis/react-api/cms-page/edition/render?idPage=${idPage}&_r=${nonce}&vw=${vw}`
+
+  // Per-block DOM decoration, extracted from onFrameLoad so it can also run on a SUBTREE — used to
+  // live-patch a newly duplicated/added zone into the canvas without a full reload (see duplicateZone).
+  // `root` is either the whole iframe Document (full load — original behaviour, unchanged) or a single
+  // just-inserted element (live patch); matched itself too, not just descendants, since a patched zone
+  // element can itself be a `.melis-dragdropzone`/`.melis-ui-outlined` needing the fix.
+  const decorateSubtree = useCallback((d: Document, root: Document | Element) => {
+    const q = (sel: string): Element[] => {
+      const out = root instanceof Element && root.matches(sel) ? [root] : []
+      out.push(...Array.from(root.querySelectorAll(sel)))
+      return out
+    }
+    // Mimic the legacy JS (absent from this clean render): a zone that HAS content (a plugin or a
+    // sub-zone) isn't an empty drop target → drop its `no-content` class, so the red fill + "DRAG & DROP
+    // ZONE" placeholder show ONLY on genuinely empty zones — exactly like the Old editor.
+    q('.melis-dragdropzone.no-content').forEach((z) => {
+      if (z.querySelector('.melis-ui-outlined, .melis-dragdropzone')) z.classList.remove('no-content')
+    })
+    q('.melis-ui-outlined').forEach((wrapEl) => {
+      const wrap = wrapEl as HTMLElement
+      // WYSIWYG width parity (see stripLegacyEdit): mirror each block's plugin-width class onto its
+      // edit-chrome wrapper so THAT becomes the float box carrying the width — like the front. Module
+      // plugins already carry it; tags/mini-templates carry it on their inner wrapper only, so copy it
+      // up from the tools-box `data-plugin-width-{desktop,tablet,mobile}` attrs.
+      if (!/plugin-width/.test(wrap.className)) {
+        const tbw = wrap.querySelector('.melis-plugin-tools-box') as HTMLElement | null
+        if (tbw) {
+          for (const k of ['desktop', 'tablet', 'mobile']) {
+            const c = tbw.getAttribute('data-plugin-width-' + k)
+            if (c) wrap.classList.add(c)
+          }
+        }
+      }
+      // Config ⚙ on EVERY module plugin — the dnd-zone ones AND the template's HARDCODED plugins (menu,
+      // header/footer…) which have no zone and no panel entry. Classic tag plugins (melisTag html/text/
+      // media) edit inline on click → no icon.
+      if (!wrap.querySelector(':scope > .melis-react-cfg')) {
+        const tb = wrap.querySelector('.melis-plugin-tools-box[data-plugin-id]') as HTMLElement | null
+        const module = tb?.getAttribute('data-module') || ''
+        const name = tb?.getAttribute('data-plugin') || ''
+        const pid = tb?.getAttribute('data-plugin-id') || ''
+        if (tb && module && name && pid && tb.getAttribute('data-melis-tag') !== 'melisTag') {
+          wrap.classList.add('melis-react-has-cfg')
+          const btn = d.createElement('button')
+          btn.className = 'melis-react-cfg'; btn.type = 'button'; btn.textContent = '⚙'
+          btn.title = peT().ecConfigurePluginNamed + ' (' + name + ')'
+          btn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openConfigDirectRef.current?.(module, name, pid) })
+          // Hovering the ⚙ outlines the plugin's block (like selecting it from the panel), only while hovered.
+          btn.addEventListener('mouseenter', () => wrap.classList.add('melis-react-cfg-hl'))
+          btn.addEventListener('mouseleave', () => wrap.classList.remove('melis-react-cfg-hl'))
+          wrap.appendChild(btn)
+        }
+      }
+    })
+  }, [])
 
   const onFrameLoad = useCallback(() => {
     const d = iframeRef.current?.contentDocument
@@ -328,51 +387,9 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       + '.melis-react-mv:hover:not(:disabled){filter:brightness(1.12)}'
       + '.melis-react-mv:disabled{opacity:.35;cursor:default}'
     d.documentElement.style.setProperty('--melis-accent', accentRef.current) // iframe has no theme vars → push it
-    // Mimic the legacy JS (absent from this clean render): a zone that HAS content (a plugin or a
-    // sub-zone) isn't an empty drop target → drop its `no-content` class, so the red fill + "DRAG & DROP
-    // ZONE" placeholder show ONLY on genuinely empty zones — exactly like the Old editor.
-    d.querySelectorAll('.melis-dragdropzone.no-content').forEach((z) => {
-      if (z.querySelector('.melis-ui-outlined, .melis-dragdropzone')) z.classList.remove('no-content')
-    })
-    // WYSIWYG width parity (see stripLegacyEdit): mirror each block's plugin-width class onto its
-    // edit-chrome wrapper `.melis-ui-outlined` so THAT becomes the float box carrying the width — like
-    // the front. Module plugins already carry it; tags/mini-templates carry it on their inner wrapper
-    // only, so copy it up from the tools-box `data-plugin-width-{desktop,tablet,mobile}` attrs. The CSS
-    // then floats+sizes the wrapper and forces inner wrappers to 100%. domWidth keeps the matching
-    // breakpoint class (lg/md/xs) in sync on live resize; on reload the server render's data-attrs win.
-    d.querySelectorAll('.melis-ui-outlined').forEach((wrapEl) => {
-      const wrap = wrapEl as HTMLElement
-      if (/plugin-width/.test(wrap.className)) return // module plugins already have it
-      const tbw = wrap.querySelector('.melis-plugin-tools-box') as HTMLElement | null
-      if (!tbw) return
-      for (const k of ['desktop', 'tablet', 'mobile']) {
-        const c = tbw.getAttribute('data-plugin-width-' + k)
-        if (c) wrap.classList.add(c)
-      }
-    })
-    // Config ⚙ on EVERY module plugin — the dnd-zone ones AND the template's HARDCODED plugins (menu,
-    // header/footer…) which have no zone and no panel entry. Each plugin wrapper carries a hidden
-    // `.melis-plugin-tools-box` with data-module/-plugin/-plugin-id; we read those and open the shared
-    // config modal. Classic tag plugins (melisTag html/text/media) edit inline on click → no icon.
-    d.querySelectorAll('.melis-ui-outlined').forEach((wrapEl) => {
-      const wrap = wrapEl as HTMLElement
-      if (wrap.querySelector(':scope > .melis-react-cfg')) return // already injected
-      const tb = wrap.querySelector('.melis-plugin-tools-box[data-plugin-id]') as HTMLElement | null
-      if (!tb) return
-      const module = tb.getAttribute('data-module') || ''
-      const name = tb.getAttribute('data-plugin') || ''
-      const pid = tb.getAttribute('data-plugin-id') || ''
-      if (!module || !name || !pid || tb.getAttribute('data-melis-tag') === 'melisTag') return
-      wrap.classList.add('melis-react-has-cfg')
-      const btn = d.createElement('button')
-      btn.className = 'melis-react-cfg'; btn.type = 'button'; btn.textContent = '⚙'
-      btn.title = peT().ecConfigurePluginNamed + ' (' + name + ')'
-      btn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openConfigDirectRef.current?.(module, name, pid) })
-      // Hovering the ⚙ outlines the plugin's block (like selecting it from the panel), only while hovered.
-      btn.addEventListener('mouseenter', () => wrap.classList.add('melis-react-cfg-hl'))
-      btn.addEventListener('mouseleave', () => wrap.classList.remove('melis-react-cfg-hl'))
-      wrap.appendChild(btn)
-    })
+    // no-content fix / width-class mirror / config ⚙ injection — see decorateSubtree (extracted so a
+    // live-patched new zone can get the exact same treatment without a full reload).
+    decorateSubtree(d, d)
     // Click anything in the render → identify its drag-drop zone + the block if any → select it (outline
     // the zone's CONTENT in the canvas, highlight+scroll in the panel). Clicking an already-selected
     // zone's empty area climbs to the PARENT zone (so nested cells' parent is reachable from the canvas).
@@ -438,10 +455,11 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     // so firing from both places whichever runs last just completes the job harmlessly.
     if (!eagerInitInlineRef.current) setTinyReady(true) // defensive: should never actually be unset here
     else void eagerInitInlineRef.current()
-  }, [])
+  }, [decorateSubtree])
 
   // Keep the selection ref current for the canvas click listener (attached once per iframe load).
   useEffect(() => { selectedRef.current = selected }, [selected])
+  useEffect(() => { treeRef.current = tree }, [tree])
 
   // Select a zone/cell from the PANEL (works for parent zones too, which a canvas leaf-click can't reach
   // directly): highlight it in the panel + outline its content in the canvas.
@@ -797,12 +815,16 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const highlight = useCallback((id: string, on: boolean) => { locate(id)?.classList.toggle('melis-react-hl', on) }, [locate])
   const reveal = useCallback((id: string) => { locate(id)?.scrollIntoView({ block: 'center', behavior: 'smooth' }) }, [locate])
 
-  // A FRESH page has an empty <document/>: its drag-drop zones exist only in the template render, so the
-  // structure panel would stay empty until the first save. Seed them — read the top-level zone ids off the
-  // rendered canvas and persist empty zone nodes into the edit session, so the panel lists them right away
-  // AND ops (add plugin / apply layout) can target them. Idempotent (guarded); a no-op once zones exist.
+  // A page's TEMPLATE can define more top-level drag-drop zones than the model currently knows about —
+  // not just for a brand-new empty page (the original case here), but for an EXISTING page too: the
+  // model only ever learns about a zone once something asks the server to persist it (ensureZones), so
+  // a template zone nobody has touched yet renders fine in the canvas but stays invisible in the
+  // structure panel forever, indistinguishable from "doesn't exist" (Mantis #0010958 — a page's second
+  // zone was unreachable once the first already had saved content, since seeding was gated on the
+  // WHOLE document being empty). Diff the canvas's own top-level zone ids against the tree the model
+  // already has and seed whatever's missing — cheap no-op once nothing is, so safe to call on every
+  // canvas render, not just once for a fresh page.
   const maybeSeedZones = useCallback(async () => {
-    if (seedTriedRef.current || !docEmptyRef.current) return
     const d = iframeRef.current?.contentDocument
     if (!d) return
     const ids = Array.from(d.querySelectorAll('[data-dragdropzone-id]'))
@@ -810,28 +832,30 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       .map((el) => (el as HTMLElement).getAttribute('data-dragdropzone-id') || '')
       .filter(Boolean)
     const uniq = Array.from(new Set(ids))
-    if (uniq.length === 0) return
-    seedTriedRef.current = true
+    const known = new Set(treeRef.current.map((c) => c.id))
+    const missing = uniq.filter((id) => !known.has(id))
+    if (missing.length === 0) return
     try {
-      await apiPost('edition/save', { idPage, ops: [{ op: 'ensureZones', zones: uniq }] })
+      await apiPost('edition/save', { idPage, ops: [{ op: 'ensureZones', zones: missing }] })
       const d2 = await apiGet<Doc>(`edition/document?idPage=${idPage}`)
       const zoneNodes = (d2.nodes || []).filter((n) => n.kind === 'zone' && n.id)
-      if (zoneNodes.length) { docEmptyRef.current = false; setTree(zoneNodes.map((z) => toCell(z, d2.pluginTitles || {}))) }
-    } catch { /* leave the panel empty — same as before the seed */ }
+      if (zoneNodes.length) setTree(zoneNodes.map((z) => toCell(z, d2.pluginTitles || {})))
+    } catch { /* leave the panel as-is — same as before this seed attempt */ }
   }, [idPage])
   maybeSeedZonesRef.current = maybeSeedZones
 
   useEffect(() => {
     let cancelled = false
-    seedTriedRef.current = false
     setDoc(null); setErr(null); setSelected(null)
     apiGet<Doc>(`edition/document?idPage=${idPage}`).then((d) => {
       if (cancelled) return
       const zoneNodes = (d.nodes || []).filter((n) => n.kind === 'zone' && n.id)
-      setTree(zoneNodes.map((z) => toCell(z, d.pluginTitles || {})))
-      // Fresh, zoneless page → try to seed the template zones (also attempted from onFrameLoad; whichever
-      // fires with the canvas ready wins, the other early-returns).
-      docEmptyRef.current = zoneNodes.length === 0
+      const newTree = zoneNodes.map((z) => toCell(z, d.pluginTitles || {}))
+      setTree(newTree)
+      treeRef.current = newTree // maybeSeedZones reads this synchronously below — the mirroring effect hasn't run yet
+      // Any top-level zone the template renders but this fetch didn't come back with → seed it (see
+      // maybeSeedZones; also attempted from onFrameLoad, whichever fires with the canvas ready wins,
+      // the other is a cheap no-op).
       void maybeSeedZones()
       setLayouts(d.layouts || [])
       // responsive widths per plugin DATA node (top-level siblings; the ref id === the node id) —
@@ -1091,6 +1115,88 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
   }, [idPage])
 
+  // Create a new top-level zone right after $zoneId — Mantis #0010958 ("add multiple D&D zones").
+  // A page's template LOOKS fixed to one MelisDragDropZone($pageId, "some_id") call per zone, but
+  // the real view helper behind it (MelisDragDropZoneHelper) renders every zone in the page's XML
+  // whose OWN id OR plugin_referer attribute matches the requested id — so a genuinely new zone
+  // (never in the template) renders fine once it carries the right plugin_referer. See
+  // PageContentDocument::duplicateZone, which adopts legacy's own XML shape verbatim (same
+  // attributes dndLayoutAction's addAction branch writes) rather than reinventing it — confirmed
+  // directly against the real render pipeline, not just the document model. withContent clones the
+  // source zone's blocks under fresh ids (independent afterward); false creates it empty.
+  //
+  // Live-patched, NOT a canvas reload: unlike applyLayout/addPlugin (which reload — their new content
+  // sits inside an EXISTING element the model already tracks, hard to isolate), a new zone is a whole
+  // new server-rendered subtree with no live DOM counterpart to patch — so fetch the fresh render OFF
+  // the iframe, pull out just the new zone's element by id, and splice it in right after the source
+  // zone. decorateSubtree() gives it the same config-⚙/width-class/no-content treatment onFrameLoad
+  // gives a full load; eagerInitInline (already idempotent, re-run via its own [doc] effect once
+  // `setDoc` below lands) builds any cloned blocks' inline editors. Falls back to the old reload if
+  // anything about the patch can't be located — never leaves the canvas silently stale.
+  const duplicateZone = useCallback(async (zoneId: string, withContent: boolean) => {
+    setSaving(true)
+    try {
+      const res = await apiPost<{ newZoneId?: string }>('edition/save', { idPage, ops: [{ op: 'duplicateZone', zoneId, withContent }] })
+      const newZoneId = res?.newZoneId || ''
+
+      const d2 = await apiGet<Doc>(`edition/document?idPage=${idPage}`)
+      const zoneNodes = (d2.nodes || []).filter((n) => n.kind === 'zone' && n.id)
+      const newTree = zoneNodes.map((z) => toCell(z, d2.pluginTitles || {}))
+      setTree(newTree)
+      treeRef.current = newTree
+      const w: Record<string, { d: string; t: string; m: string }> = {}
+      for (const n of d2.nodes || []) {
+        if (n.id && n.kind !== 'zone') {
+          const a = (n as { attrs?: Record<string, string> }).attrs || {}
+          w[n.id] = { d: a.width_desktop ?? '100', t: a.width_tablet ?? '100', m: a.width_mobile ?? '100' }
+        }
+      }
+      setBlockW(w)
+      setDoc(d2) // triggers eagerInitInline's own [doc] effect → builds editors for any cloned blocks
+
+      let patched = false
+      const d = iframeRef.current?.contentDocument
+      if (d && newZoneId) {
+        try {
+          const html = await fetch(`/melis/react-api/cms-page/edition/render?idPage=${idPage}&_r=${Date.now()}&vw=${vw}`, { credentials: 'same-origin' }).then((r) => r.text())
+          const parsed = new DOMParser().parseFromString(html, 'text/html')
+          const escNew = newZoneId.replace(/["\\]/g, '\\$&')
+          const escSrc = zoneId.replace(/["\\]/g, '\\$&')
+          const newEl = parsed.querySelector(`[data-dragdropzone-id="${escNew}"]`)
+          const srcEl = d.querySelector(`[data-dragdropzone-id="${escSrc}"]`)
+          if (newEl && srcEl?.parentElement) {
+            const imported = d.importNode(newEl, true) as HTMLElement
+            srcEl.insertAdjacentElement('afterend', imported)
+            decorateSubtree(d, imported)
+            patched = true
+          }
+        } catch { /* fall through to the reload fallback below */ }
+      }
+      if (!patched) setNonce((n) => n + 1) // couldn't locate/fetch the new zone → fall back to a full reload rather than leaving the canvas stale
+
+      window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } }))
+    } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
+  }, [idPage, vw, decorateSubtree])
+
+  // Remove a DYNAMICALLY CREATED zone (one duplicateZone made — see Cell.removable). Confirmed by the
+  // caller (confirmRemoveZone modal) before this runs. Whole top-level zone, so — unlike removeBlock,
+  // which only edits a zone's own ref list — we drop it straight out of `tree`, live-DOM-remove its
+  // container (no reload, same contract as removeBlock/moveAcrossZones), then persist. Its cloned
+  // content nodes are left orphaned server-side (same as setZoneRefs) — nothing is physically deleted.
+  const removeZone = useCallback((zoneId: string) => {
+    const newTree = tree.filter((c) => c.id !== zoneId)
+    setTree(newTree)
+    treeRef.current = newTree
+    const d = iframeRef.current?.contentDocument
+    const esc = zoneId.replace(/["\\]/g, '\\$&')
+    d?.querySelector(`[data-dragdropzone-id="${esc}"]`)?.remove()
+    setSaving(true)
+    apiPost('edition/save', { idPage, ops: [{ op: 'removeZone', zoneId }] })
+      .then(() => window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } })))
+      .catch((e) => notify('ko', 'MelisCms', errMsg(e)))
+      .finally(() => setSaving(false))
+  }, [tree, idPage])
+
   // The addable-plugins palette is PER SITE (it lists only plugins whose module is loaded for THIS
   // page's site) → drop the cached catalog whenever the edited page changes, so switching to a page of
   // another site refetches the right list instead of reusing the first page's.
@@ -1177,6 +1283,28 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
           {isLeaf && (
             <button data-testid={`add-${cell.id}`} title={tr.ecAddPlugin} onClick={(e) => { e.stopPropagation(); openPluginPicker(cell.id) }}
               style={{ appearance: 'none', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 5, height: 18, minWidth: 20, padding: '0 6px', fontSize: 12, fontWeight: 700, cursor: 'pointer', lineHeight: '1' }}>+</button>
+          )}
+          {/* New sibling zone, right below this one — top-level only (a nested sub-cell from a split
+              layout isn't a page-level zone; duplicateZone works on the page's own zone list). ⧉
+              clones this zone's blocks; + creates an empty one — both always available, since ANY
+              zone can now spawn a new sibling (no second pre-existing template zone required). */}
+          {depth === 0 && (
+            <>
+              <button data-testid={`duplicate-${cell.id}`} title={tr.ecDuplicateZone}
+                onClick={(e) => { e.stopPropagation(); void duplicateZone(cell.id, true) }}
+                style={{ appearance: 'none', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 5, height: 18, minWidth: 20, padding: '0 5px', fontSize: 11, cursor: saving ? 'not-allowed' : 'pointer', lineHeight: '1', opacity: saving ? .6 : 1 }} disabled={saving}>⧉</button>
+              <button data-testid={`new-zone-${cell.id}`} title={tr.ecNewZone}
+                onClick={(e) => { e.stopPropagation(); void duplicateZone(cell.id, false) }}
+                style={{ appearance: 'none', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 5, height: 18, minWidth: 20, padding: '0 5px', fontSize: 11, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', lineHeight: '1', opacity: saving ? .6 : 1 }} disabled={saving}>+▭</button>
+              {/* Only a zone duplicateZone itself created (non-empty plugin_referer) — the original
+                  template zone would just get silently recreated on the next render, so it's never
+                  offered here. Destructive → confirm first (see confirmRemoveZone). */}
+              {cell.removable && (
+                <button data-testid={`remove-zone-${cell.id}`} title={tr.ecRemoveZone}
+                  onClick={(e) => { e.stopPropagation(); setConfirmRemoveZone({ zoneId: cell.id, label: zoneName }) }}
+                  style={{ appearance: 'none', border: '1px solid #fecaca', background: 'var(--color-card,#fff)', color: '#dc2626', borderRadius: 5, height: 18, minWidth: 20, padding: '0 5px', fontSize: 12, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', lineHeight: '1', opacity: saving ? .6 : 1 }} disabled={saving}>×</button>
+              )}
+            </>
           )}
           {/* compact schema picker — deploys the full list; each cell reconfigurable */}
           <LayoutTrigger cell={cell} />
@@ -1328,6 +1456,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
           </>
         )
       })()}
+
 
       {/* Plugin CONFIG modal. Full-React form (registered plugin) OR generic legacy iframe (any other
           plugin), each owning its own Save/Cancel. Both persist via edition/plugin-config/save. */}
@@ -1503,6 +1632,24 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
               <button data-testid="confirm-remove-cancel" onClick={() => setConfirmRemove(null)}
                 style={{ appearance: 'none', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 6, padding: '7px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>{tr.cancel}</button>
               <button data-testid="confirm-remove-ok" onClick={() => { removeBlock(confirmRemove.zoneId, confirmRemove.refId); setConfirmRemove(null) }}
+                style={{ appearance: 'none', border: '1px solid #dc2626', background: '#dc2626', color: '#fff', borderRadius: 6, padding: '7px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>{tr.ecRemoveBtn}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm before removing a DYNAMICALLY CREATED zone (destructive — the zone + everything in it disappears). */}
+      {confirmRemoveZone && (
+        <div data-testid="confirm-remove-zone" style={{ position: 'fixed', inset: 0, zIndex: 95, background: 'rgba(0,0,0,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setConfirmRemoveZone(null)}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: 'min(420px, 94vw)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 12, boxShadow: '0 24px 70px rgba(0,0,0,.45)', overflow: 'hidden' }}>
+            <div style={{ padding: '16px 18px 6px', fontWeight: 700, fontSize: 15 }}>{tr.ecRemoveZoneTitle}</div>
+            <div style={{ padding: '0 18px 16px', fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)' }}>
+              « {confirmRemoveZone.label} » {tr.ecRemoveZoneBody1}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '12px 16px', borderTop: '1px solid var(--color-border,#e5e7eb)' }}>
+              <button data-testid="confirm-remove-zone-cancel" onClick={() => setConfirmRemoveZone(null)}
+                style={{ appearance: 'none', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 6, padding: '7px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>{tr.cancel}</button>
+              <button data-testid="confirm-remove-zone-ok" onClick={() => { removeZone(confirmRemoveZone.zoneId); setConfirmRemoveZone(null) }}
                 style={{ appearance: 'none', border: '1px solid #dc2626', background: '#dc2626', color: '#fff', borderRadius: 6, padding: '7px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>{tr.ecRemoveBtn}</button>
             </div>
           </div>

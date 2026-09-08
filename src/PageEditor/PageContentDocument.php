@@ -219,7 +219,9 @@ final class PageContentDocument
             'tag'   => $n['tag'],
             'id'    => $n['id'],
             'attrs' => $n['attrs'],
-            'raw'   => $n['raw'],
+            // ?? '': a brand-new node (duplicateZone) has no verbatim XML to preserve — it's built
+            // fresh from attrs/items whenever dirty, which a new node always starts as.
+            'raw'   => $n['raw'] ?? '',
         ];
         if ($n['kind'] === 'zone') {
             $out['template'] = $n['attrs']['template'] ?? '';
@@ -409,6 +411,156 @@ final class PageContentDocument
                 ? count($n['items']) : $position;
             array_splice($n['items'], $pos, 0, [$moved]);
         });
+    }
+
+    /**
+     * Create a NEW top-level drag-drop zone, a sibling of $zoneId, positioned immediately after it.
+     * A page's template is static PHP — `$this->MelisDragDropZone($pageId, "some_id")` LOOKS fixed
+     * to one id — but the actual view helper behind it (MelisDragDropZoneHelper::__invoke) does not
+     * render just that one: it scans the WHOLE page XML for every <melisDragDropZone> whose own id
+     * OR plugin_referer ATTRIBUTE matches the requested id, and renders all of them, in XML document
+     * order. So a genuinely new zone the template never explicitly asked for is possible after all
+     * — it just needs plugin_referer set to an existing, template-reachable zone's group. This
+     * adopts legacy's own XML shape verbatim (plugin_container_id/plugin_referer/plugin_position —
+     * see dndLayoutAction's addAction branch and MelisDragDropZoneHelper) rather than reinventing
+     * it, so the two stay interoperable (both read/write the same melis_cms_page.page_content XML).
+     * $withContent clones the source zone's own blocks into the new one (fresh ids — see cloneRefs);
+     * false creates it empty.
+     *
+     * @return string the new zone's id, or '' if $zoneId itself doesn't exist
+     */
+    public function duplicateZone(string $zoneId, bool $withContent): string
+    {
+        $sourceIndex = null;
+        $source = null;
+        foreach ($this->nodes as $i => $n) {
+            if (($n['kind'] ?? '') === 'zone' && ($n['id'] ?? null) === $zoneId) {
+                $sourceIndex = $i;
+                $source = $n;
+                break;
+            }
+        }
+        if ($source === null) {
+            return '';
+        }
+
+        // Same grouping legacy's own JS uses (`if (pluginReferer) dndId = pluginReferer`) — a
+        // duplicate of a duplicate stays in the SAME group as the original, not a chain of
+        // one-off referers each rendering only at their immediate parent's call site.
+        $referer = (string) ($source['attrs']['plugin_referer'] ?? '');
+        $groupId = $referer !== '' ? $referer : $zoneId;
+
+        $existingIds = [];
+        foreach ($this->nodes as $n) {
+            if (!empty($n['id'])) {
+                $existingIds[(string) $n['id']] = true;
+            }
+        }
+        $newZoneId = $groupId . '_' . time();
+        while (isset($existingIds[$newZoneId])) {
+            $newZoneId = $groupId . '_' . time() . substr(bin2hex(random_bytes(2)), 0, 3);
+        }
+
+        $items = $withContent ? $this->cloneRefs($source['items'] ?? [], $existingIds) : [];
+
+        $newZone = [
+            'kind'  => 'zone',
+            'tag'   => 'melisDragDropZone',
+            'id'    => $newZoneId,
+            'attrs' => [
+                'id'                  => $newZoneId,
+                'plugin_container_id' => $newZoneId,
+                'plugin_referer'      => $groupId,
+                'plugin_position'     => '',
+            ],
+            'items' => $items,
+            'dirty' => true, // brand new — no verbatim raw to preserve; renderNode() builds it from attrs/items
+        ];
+
+        array_splice($this->nodes, $sourceIndex + 1, 0, [$newZone]);
+
+        return $newZoneId;
+    }
+
+    /**
+     * Remove a DYNAMICALLY CREATED top-level zone — one produced by duplicateZone (carries a
+     * non-empty plugin_referer). Mirrors legacy's dndRemoveAction verbatim in spirit: a plain
+     * removal of the zone's own entry, nothing else touched. The ORIGINAL template zone
+     * (plugin_referer="") is refused — MelisDragDropZoneHelper's own "create initial dnd zone"
+     * fallback regenerates it on the very next render regardless (the template's own
+     * MelisDragDropZone() call still asks for that id), so removing it would silently do nothing
+     * but orphan its content; refusing avoids that footgun. Its own referenced plugin data nodes
+     * are left in the document, same as setZoneRefs (orphan, unrendered) — nothing is physically
+     * deleted, so a mistaken removal loses nothing before the next Save/Publish.
+     *
+     * @return bool true when the zone was removed
+     */
+    public function removeZone(string $zoneId): bool
+    {
+        foreach ($this->nodes as $i => $n) {
+            if (($n['kind'] ?? '') === 'zone' && ($n['id'] ?? null) === $zoneId) {
+                if ((string) ($n['attrs']['plugin_referer'] ?? '') === '') {
+                    return false; // original template zone — refuse
+                }
+                array_splice($this->nodes, $i, 1);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Clone a zone's ref items under fresh ids — each referenced data node cloned as a new
+     * top-level sibling (a ref is a lightweight pointer; the actual plugin content lives as a
+     * top-level sibling, same as moveRef relies on), so the copy is independent afterward, not a
+     * shared pointer. $existingIds is mutated as ids are claimed, so repeat calls in the same
+     * request never collide. Nested sub-zones (a split-layout zone's own columns) are not
+     * recursed into — only the zone's own direct ref items.
+     *
+     * @param array<int,array<string,mixed>> $items
+     * @param array<string,bool> $existingIds
+     * @return array<int,array<string,mixed>>
+     */
+    private function cloneRefs(array $items, array &$existingIds): array
+    {
+        $clones = [];
+        foreach ($items as $item) {
+            if (($item['kind'] ?? '') !== 'ref') {
+                continue;
+            }
+            $oldId = (string) ($item['ref']['id'] ?? '');
+            if ($oldId === '') {
+                continue;
+            }
+            $source = null;
+            foreach ($this->nodes as $n) {
+                if (($n['id'] ?? null) === $oldId) {
+                    $source = $n;
+                    break;
+                }
+            }
+            if ($source === null) {
+                continue; // orphan ref (its data node is missing) — nothing to clone
+            }
+
+            $newId = $oldId . '_copy_' . time();
+            while (isset($existingIds[$newId])) {
+                $newId = $oldId . '_copy_' . time() . substr(bin2hex(random_bytes(2)), 0, 3);
+            }
+            $existingIds[$newId] = true;
+
+            $clone = $source;
+            $clone['id'] = $newId;
+            $clone['attrs']['id'] = $newId;
+            // Re-target the verbatim XML to the new id too — it stays "clean" (re-emitted byte-for-
+            // byte otherwise), so this is the only place the new id needs to actually take effect.
+            $clone['raw'] = str_replace('id="' . $oldId . '"', 'id="' . $newId . '"', (string) $source['raw']);
+            $clone['dirty'] = false;
+            $this->nodes[] = $clone;
+
+            $clones[] = ['kind' => 'ref', 'ref' => array_merge($item['ref'], ['id' => $newId])];
+        }
+        return $clones;
     }
 
     /**
