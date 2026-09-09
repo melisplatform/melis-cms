@@ -99,12 +99,14 @@ function toCell(n: DocZone, titles: Record<string, string>): Cell {
     groupId: n.attrs?.plugin_referer || (n.id as string),
   }
 }
-/** Immutably replace the cell with id === $id via $fn, anywhere in the tree. */
+/** Immutably replace the cell with id === $id via $fn, anywhere in the tree. Tolerates a stray
+ *  falsy entry in `cells` (seen crashing drag/reorder in production: "can't access property 'id',
+ *  e is undefined") instead of throwing — skip it rather than fail the whole operation. */
 function mapCell(cells: Cell[], id: string, fn: (c: Cell) => Cell): Cell[] {
-  return cells.map((c) => (c.id === id ? fn(c) : { ...c, cells: mapCell(c.cells, id, fn) }))
+  return cells.map((c) => (!c ? c : c.id === id ? fn(c) : { ...c, cells: mapCell(c.cells, id, fn) }))
 }
 function findCell(cells: Cell[], id: string): Cell | null {
-  for (const c of cells) { if (c.id === id) return c; const r = findCell(c.cells, id); if (r) return r }
+  for (const c of cells) { if (!c) continue; if (c.id === id) return c; const r = findCell(c.cells, id); if (r) return r }
   return null
 }
 
@@ -880,6 +882,23 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     }).catch((e) => { if (!cancelled) setErr(errMsg(e)) })
     return () => { cancelled = true }
   }, [idPage, nonce])
+
+  // Mantis #0010974: restoring a page version (Versioning tab) rolled back the DB row and reloaded
+  // the LEGACY iframe + header fine (see CmsPage.tsx's melis:cms-reload-edition listener), but this
+  // canvas stayed on its stale pre-restore content — by design it does NOT refetch on a plain tab
+  // switch (editionMountedFor keeps it mounted so switching tabs never loses unsaved work), so
+  // nothing was telling it the underlying page data actually changed out from under it. Listen for
+  // the same event directly and force a refetch (bump nonce → reloads both /edition/document and
+  // the /edition/render iframe) — scoped to THIS page via the event's idPage so restoring page A
+  // doesn't reload a different page's canvas that merely happens to still be mounted.
+  useEffect(() => {
+    const onReload = (e: Event) => {
+      const detail = (e as CustomEvent<{ idPage?: number }>).detail
+      if (detail?.idPage === idPage) setNonce((n) => n + 1)
+    }
+    window.addEventListener('melis:cms-reload-edition', onReload)
+    return () => window.removeEventListener('melis:cms-reload-edition', onReload)
+  }, [idPage])
 
   // Load the REAL layout-schema icon CSS (the very sheet the legacy Old editor uses) so the
   // `html-button-icon` markup renders with its exact bootstrap-grid proportions (distinct per

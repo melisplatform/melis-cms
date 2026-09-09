@@ -681,7 +681,11 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         notify('ok', tr.notifDraft, tr.draftCleared)
         setClearOpen(false)
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: Number(current) } }))
-        refreshStructure(current); reloadEdition() // le contenu revient à la version publiée
+        // le contenu revient à la version publiée : recharge l'iframe legacy + en-tête (écouteur ci-
+        // dessous) ET le canvas React (EditionCanvas écoute ce même événement, scopé par idPage) — sans
+        // ça le canvas restait sur son contenu pré-clear, même bug que la restauration de version
+        // (Mantis #0010974).
+        window.dispatchEvent(new CustomEvent('melis:cms-reload-edition', { detail: { idPage: Number(current) } }))
       } else {
         // clearSavedPage renvoie des clés tr_ (traduites côté legacy par melisHelper). React n'a pas
         // cette map → on traduit les cas connus, sinon on garde un message non-tr_ ou le générique.
@@ -691,7 +695,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         notify('ko', tr.notifDraft, msg)
       }
     } catch (e) { notify('ko', tr.notifDraft, (e as Error).message) } finally { setSaving(false) }
-  }, [current, refreshStructure, reloadEdition])
+  }, [current])
 
   // Supprimer la page (« Supprimer page ») → deletePage legacy, puis fermeture de l'onglet + refresh arbre.
   // Suppression EFFECTIVE (appelée par la modal React de confirmation). Ferme l'onglet + refresh arbre.
