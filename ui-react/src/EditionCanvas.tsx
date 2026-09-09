@@ -30,7 +30,14 @@ type Doc = { idPage: number; source: string | null; namespace: string; nodes: Do
 // removable: true for a zone DUPLICATE-created via duplicateZone (non-empty plugin_referer attr) —
 // the original template zone (plugin_referer="") would just get silently recreated by
 // MelisDragDropZoneHelper on the next render, so it's never offered for removal (see removeZone).
-type Cell = { id: string; template: string; refs: { id: string; label: string; mini?: boolean }[]; cells: Cell[]; removable?: boolean }
+// groupId: the plugin_referer GROUP this zone renders in — its own id for an original zone, the
+// referer value for a duplicate. CONFIRMED (not just theorised) via a live reorder+publish test on
+// two DIFFERENT original zones: MelisDragDropZoneHelper is called separately, at its own FIXED
+// template location, for each requested id — the reorder persisted correctly all the way into the
+// published XML, byte-verified in the DB, yet the render was completely unaffected, before AND
+// after publish. Document order only matters WITHIN a group (all zones sharing one call site,
+// rendered in that order) — reordering across groups is bytes-only, never visible. See swapZones.
+type Cell = { id: string; template: string; refs: { id: string; label: string; mini?: boolean }[]; cells: Cell[]; removable?: boolean; groupId?: string }
 type PalettePlugin = { module: string; name: string; title: string; description: string; thumbnail: string; type: string }
 type PaletteGroup = { id: string; title: string; plugins: PalettePlugin[] }
 type PaletteModule = { key: string; label: string; groups: PaletteGroup[] }
@@ -89,6 +96,7 @@ function toCell(n: DocZone, titles: Record<string, string>): Cell {
     refs: (n.refs || []).filter((r) => r.id).map((r) => ({ id: r.id as string, label: titles[r.id as string] || label(r), mini: r.module === 'MelisMiniTemplate' || (r.name || '').startsWith('MiniTemplatePlugin_') })),
     cells: (n.zones || []).filter((z) => z.id).map((z) => toCell(z, titles)),
     removable: !!(n.attrs?.plugin_referer),
+    groupId: n.attrs?.plugin_referer || (n.id as string),
   }
 }
 /** Immutably replace the cell with id === $id via $fn, anywhere in the tree. */
@@ -1197,6 +1205,92 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       .finally(() => setSaving(false))
   }, [tree, idPage])
 
+  // Swap two top-level zones — drag-and-drop reorder (see the ⠿ handle in the zone header below).
+  // ONLY between zones sharing a plugin_referer GROUP (see Cell.groupId): confirmed via a live
+  // reorder+publish test (not just theory) that two zones from DIFFERENT template call sites swap
+  // their document order fine — byte-verified all the way into the published XML — yet the render
+  // is completely unaffected, before or after publish (MelisDragDropZoneHelper is invoked
+  // separately, at its own fixed template location, for each requested id; document order only
+  // matters WITHIN the set of zones sharing one call site). Refuse cross-group swaps outright
+  // rather than persisting a change that LOOKS live (client-side DOM patch) but reverts the moment
+  // anything re-renders from the real pipeline — exactly the bug this guard fixes.
+  const swapZones = useCallback((aId: string, bId: string) => {
+    const i = tree.findIndex((c) => c.id === aId)
+    const j = tree.findIndex((c) => c.id === bId)
+    if (i < 0 || j < 0 || i === j || tree[i].groupId !== tree[j].groupId) return
+
+    const newTree = tree.slice()
+    ;[newTree[i], newTree[j]] = [newTree[j], newTree[i]]
+    setTree(newTree)
+    treeRef.current = newTree
+
+    const d = iframeRef.current?.contentDocument
+    if (d) {
+      const escA = aId.replace(/["\\]/g, '\\$&')
+      const escB = bId.replace(/["\\]/g, '\\$&')
+      const a = d.querySelector(`[data-dragdropzone-id="${escA}"]`)
+      const b = d.querySelector(`[data-dragdropzone-id="${escB}"]`)
+      const aParent = a?.parentElement, bParent = b?.parentElement
+      // Capture BOTH parents (and next-siblings) BEFORE moving anything — reading a.parentElement
+      // again after the first insertBefore would return b's parent (a has already been moved into
+      // it by then), silently corrupting the swap whenever a/b don't already share a parent. Two
+      // zones from different template call sites/columns are exactly the common case that hit this.
+      if (a && b && aParent && bParent) {
+        const aNext = a.nextSibling, bNext = b.nextSibling
+        bParent.insertBefore(a, bNext)
+        aParent.insertBefore(b, aNext)
+      }
+    }
+
+    setSaving(true)
+    apiPost('edition/save', { idPage, ops: [{ op: 'reorderZones', zoneIds: newTree.map((c) => c.id) }] })
+      .then(() => window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } })))
+      .catch((e) => notify('ko', 'MelisCms', errMsg(e)))
+      .finally(() => setSaving(false))
+  }, [tree, idPage])
+
+  // Drag a zone header (⠿ handle) onto another zone header → swapZones. Payload is namespaced
+  // (zoneDragId, not zoneId) so it never collides with a block's own drag payload ({zoneId,refId,
+  // index}, dropped on block rows) even though both use the same text/plain dataTransfer channel.
+  // dragover unconditionally preventDefault()s — same minimal pattern the (already working) block
+  // drag-and-drop above uses — rather than conditionally allowing/refusing the drop based on a
+  // live group-match check: that conditional version turned out fragile in practice and broke even
+  // matching-group swaps, so the incompatible-pairing message is given by a toast AFTER the drop
+  // instead of a native "not-allowed" cursor during it.
+  const onZoneDragStart = (zoneId: string, e: React.DragEvent) => {
+    e.dataTransfer.setData('text/plain', JSON.stringify({ zoneDragId: zoneId }))
+    e.dataTransfer.effectAllowed = 'move'
+  }
+  const onZoneDrop = (targetZoneId: string, e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    let src: { zoneDragId?: string } | null = null
+    try { src = JSON.parse(e.dataTransfer.getData('text/plain')) } catch { return }
+    if (!src?.zoneDragId || src.zoneDragId === targetZoneId) return
+    const from = tree.find((c) => c.id === src!.zoneDragId)
+    const to = tree.find((c) => c.id === targetZoneId)
+    if (from && to && from.groupId !== to.groupId) {
+      notify('ko', 'MelisCms', tr.ecZoneReorderBlocked)
+      return
+    }
+    swapZones(src.zoneDragId, targetZoneId)
+  }
+
+  // ▲/▼ click alternative to dragging — legacy's own zone-reorder control (dnd-arrow-up/-down in
+  // dragdropzone-melis-container.phtml) is a pair of caret buttons, not a drag handle; offer the
+  // same click-based affordance here. Finds the nearest SAME-GROUP neighbour in that direction
+  // (skipping any zones of other groups in between) and swaps with it via swapZones — same
+  // persistence + live-DOM-patch path the drag handle uses, just a different trigger.
+  const moveZoneDir = (zoneId: string, dir: -1 | 1) => {
+    const i = tree.findIndex((c) => c.id === zoneId)
+    if (i < 0) return
+    const groupId = tree[i].groupId
+    let j = i + dir
+    while (j >= 0 && j < tree.length && tree[j].groupId !== groupId) j += dir
+    if (j < 0 || j >= tree.length) return
+    swapZones(zoneId, tree[j].id)
+  }
+
   // The addable-plugins palette is PER SITE (it lists only plugins whose module is loaded for THIS
   // page's site) → drop the cached catalog whenever the edited page changes, so switching to a page of
   // another site refetches the right list instead of reusing the first page's.
@@ -1278,7 +1372,37 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     return (
       <div key={cell.id} data-testid={`zone-${cell.id}`} style={{ marginBottom: depth === 0 ? 12 : 8, marginLeft: depth ? 8 : 0, border: '1px solid var(--color-border,#e5e7eb)', borderLeft: depth ? '3px solid color-mix(in srgb, var(--color-primary,#dc2626) 35%, #e5e7eb)' : '1px solid var(--color-border,#e5e7eb)', borderRadius: 8, overflow: 'hidden', boxShadow: isSel ? '0 0 0 2px var(--color-primary,#dc2626)' : undefined }}>
         <div data-testid={`zone-head-${cell.id}`} onClick={() => selectZone(cell.id)} title={`${tr.ecSelectZone} ${zoneName} (${cell.id})`}
+          onDragOver={(e) => { if (depth === 0) e.preventDefault() }}
+          onDrop={(e) => { if (depth === 0) onZoneDrop(cell.id, e) }}
           style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, fontWeight: 600, color: 'var(--color-muted-foreground,#6b7280)', background: isSel ? 'color-mix(in srgb, var(--color-primary,#dc2626) 16%, transparent)' : 'color-mix(in srgb, var(--color-primary,#dc2626) 6%, transparent)', padding: '4px 8px', cursor: 'pointer' }}>
+          {/* Drag handle — shown on EVERY top-level zone (not just ones with a group-mate), so the
+              control is always there and predictable. Reordering only has any visible effect within
+              the same plugin_referer GROUP (see Cell.groupId/swapZones): a zone with no group-mate
+              is still draggable, but dropping it on an unrelated zone is refused (with a toast — see
+              onZoneDrop) rather than reordering something with no visible effect — dimmed + a
+              different tooltip make that clear before the user even starts dragging.
+              ▲/▼ alongside it mirror legacy's own dnd-arrow-up/-down click controls (see
+              moveZoneDir) — shown per-direction only when a same-group neighbour actually exists
+              that way, same as legacy hides them at the first/last position of a group. */}
+          {depth === 0 && tree.length > 1 && (() => {
+            const hasGroupMate = tree.some((c) => c.id !== cell.id && c.groupId === cell.groupId)
+            const zi = tree.findIndex((c) => c.id === cell.id)
+            const hasUp = hasGroupMate && tree.slice(0, zi).some((c) => c.groupId === cell.groupId)
+            const hasDown = hasGroupMate && tree.slice(zi + 1).some((c) => c.groupId === cell.groupId)
+            const arrowBtn: React.CSSProperties = { appearance: 'none', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 5, height: 18, minWidth: 16, padding: 0, fontSize: 10, lineHeight: '1', cursor: saving ? 'not-allowed' : 'pointer' }
+            return (
+              <>
+                <span data-testid={`zone-drag-${cell.id}`} title={hasGroupMate ? tr.ecDragZone : tr.ecDragZoneDisabled} draggable
+                  onClick={(e) => e.stopPropagation()}
+                  onDragStart={(e) => onZoneDragStart(cell.id, e)}
+                  style={{ cursor: saving ? 'not-allowed' : 'grab', color: 'var(--color-muted-foreground,#9ca3af)', opacity: hasGroupMate ? 1 : .35, flex: '0 0 auto' }}>⠿</span>
+                {hasUp && <button data-testid={`zone-up-${cell.id}`} title={tr.ecMoveZoneUp} disabled={saving}
+                  onClick={(e) => { e.stopPropagation(); moveZoneDir(cell.id, -1) }} style={arrowBtn}>▲</button>}
+                {hasDown && <button data-testid={`zone-down-${cell.id}`} title={tr.ecMoveZoneDown} disabled={saving}
+                  onClick={(e) => { e.stopPropagation(); moveZoneDir(cell.id, 1) }} style={arrowBtn}>▼</button>}
+              </>
+            )
+          })()}
           <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={cell.id}>{depth ? '▫' : '⛶'} {zoneName}</span>
           {isLeaf && (
             <button data-testid={`add-${cell.id}`} title={tr.ecAddPlugin} onClick={(e) => { e.stopPropagation(); openPluginPicker(cell.id) }}

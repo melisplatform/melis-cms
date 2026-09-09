@@ -333,6 +333,46 @@ final class PageContentDocument
         $this->nodes = $reordered;
     }
 
+    /**
+     * Reorder the TOP-LEVEL drag-drop ZONE nodes among themselves — legacy's own "reorder D&D
+     * zones" (dndUpdateOrderAction, which reorders the session's flat melisDragDropZone map)
+     * applied to our single flat node list. Only matters WITHIN a plugin_referer group: two zones
+     * with different ids/groups each render at their own fixed template call site regardless of
+     * document order, so reordering across groups is a visual no-op — the client only offers this
+     * between zones that already share a group (see EditionCanvas's moveZone). Every OTHER
+     * top-level node (plugin data) is left exactly where it already was — unlike reorderNodes,
+     * which would shove every unlisted node to the end — so this never disturbs the document
+     * beyond the zone slots actually being reordered. Unknown zone ids are ignored; zones not
+     * named in $zoneIdsInOrder keep their existing relative order, trailing the named ones.
+     */
+    public function reorderZones(array $zoneIdsInOrder): void
+    {
+        $byId = [];
+        foreach ($this->nodes as $n) {
+            if (($n['kind'] ?? '') === 'zone' && !empty($n['id'])) {
+                $byId[(string) $n['id']] = $n;
+            }
+        }
+        $ordered = [];
+        foreach ($zoneIdsInOrder as $zid) {
+            if (isset($byId[$zid])) {
+                $ordered[] = $byId[$zid];
+                unset($byId[$zid]);
+            }
+        }
+        foreach ($byId as $n) {
+            $ordered[] = $n; // any zone not named keeps trailing order
+        }
+
+        $queue = $ordered;
+        foreach ($this->nodes as &$n) {
+            if (($n['kind'] ?? '') === 'zone' && !empty($n['id'])) {
+                $n = array_shift($queue);
+            }
+        }
+        unset($n);
+    }
+
     /** Set responsive widths on any node (plugin data or sub-zone), at any depth. */
     public function setWidths(string $id, string $desktop, string $tablet, string $mobile): void
     {

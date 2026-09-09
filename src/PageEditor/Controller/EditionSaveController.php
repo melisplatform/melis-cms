@@ -20,8 +20,8 @@ use MelisCms\PageEditor\LayoutCatalog;
  *
  * Ops (mirroring PageContentDocument): reorderNodes {ids}, setWidths {id,desktop,tablet,
  * mobile}, reorderZoneRefs {zoneId,refIds}, setZoneRefs, moveRef {fromZoneId,toZoneId,refId,
- * position?}, duplicateZone {zoneId,withContent?}, removeZone {zoneId}, addPlugin, setTagContent,
- * applyLayout.
+ * position?}, duplicateZone {zoneId,withContent?}, removeZone {zoneId}, reorderZones {zoneIds},
+ * addPlugin, setTagContent, applyLayout.
  *
  * Persistence contract (aligned with legacy): editing writes ONLY the session — it never
  * touches the DB. The melis render reads that session in priority, so edits show live; the
@@ -118,6 +118,13 @@ class EditionSaveController extends MelisAbstractActionController
                         if ($rmZoneId !== '' && $doc->removeZone($rmZoneId)) {
                             $applied++;
                         }
+                        break;
+                    case 'reorderZones':
+                        // Reorder top-level zones among themselves (same plugin_referer group) —
+                        // see PageContentDocument::reorderZones. The React panel only ever offers
+                        // this between zones already sharing a group (see moveZone).
+                        $doc->reorderZones(array_values(array_map('strval', (array) ($op['zoneIds'] ?? []))));
+                        $applied++;
                         break;
                     case 'ensureZones':
                         // Seed a FRESH page's template drag-drop zones into the model (they live only in
