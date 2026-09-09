@@ -355,7 +355,10 @@ export function VersioningTab({ idPage }: { idPage: number }) {
       const r = await legacyPost('/melis/MelisSmallBusiness/PageVersioning/rollBackVersion', { idPage, idVersion: id })
       if (r.success === 1) {
         notify('ok', 'Versioning', tr.versionRestored)
-        window.dispatchEvent(new CustomEvent('melis:cms-reload-edition')) // recharge l'iframe d'édition + en-tête
+        // recharge l'iframe d'édition legacy + en-tête (CmsPage.tsx) ET le canvas React (EditionCanvas
+        // écoute ce même événement, scopé par idPage — sinon il restait sur son contenu pré-restauration,
+        // voir Mantis #0010974)
+        window.dispatchEvent(new CustomEvent('melis:cms-reload-edition', { detail: { idPage } }))
         reload()
       } else notify('ko', 'Versioning', r.textMessage && !r.textMessage.startsWith('tr_') ? r.textMessage : tr.restoreFailed)
     } catch (e) { notify('ko', 'Versioning', (e as Error).message) } finally { setBusy(null); setConfirmRestore(null) }
