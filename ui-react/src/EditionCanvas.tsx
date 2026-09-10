@@ -1444,7 +1444,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const LayoutTrigger = ({ cell }: { cell: Cell }) => (
     <div role="button" tabIndex={0} data-testid={`layout-trigger-${cell.id}`} title={tr.ecLayoutTitle}
       onClick={(e) => openPicker(e, cell.id)}
-      style={{ display: 'inline-flex', alignItems: 'center', gap: 2, cursor: saving ? 'not-allowed' : 'pointer', border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 5, padding: '1px 3px', background: 'var(--color-card,#fff)', opacity: saving ? .6 : 1 }}>
+      style={{ display: 'inline-flex', alignItems: 'center', gap: 2, height: 18, cursor: saving ? 'not-allowed' : 'pointer', border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 5, padding: '0 3px', background: 'var(--color-card,#fff)', opacity: saving ? .6 : 1 }}>
       <span className="melis-di melis-di-mini" dangerouslySetInnerHTML={{ __html: iconFor(cell.template) }} />
       <span style={{ fontSize: 8, color: 'var(--color-muted-foreground,#6b7280)' }}>▾</span>
     </div>
@@ -1458,6 +1458,18 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   // <input> lose focus per keystroke AND swallowed its onBlur → persistWidths never fired → widths
   // never reached the session (bug). Calling it as a function inlines its JSX (host <div>, stable
   // type) so React reconciles in place: focus kept, onBlur fires. It uses no hooks, so this is safe.
+  // Shared base for the zone-head action buttons (+, duplicate, new-zone, remove) — sized to match
+  // LayoutTrigger's rendered height exactly (18px icon + 1px border top/bottom, no vertical padding).
+  const zoneHeadBtn: React.CSSProperties = { appearance: 'none', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 5, height: 18, minWidth: 20, padding: '0 5px', lineHeight: '1', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }
+  // Same "copy" icon as the top toolbar's Duplicate-page button (Icon name="copy" in CmsPage.tsx) —
+  // duplicating a zone should look like the same action, not a generic ⧉ glyph.
+  const ZoneCopyIcon = () => (
+    <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  )
+
   const CellView = ({ cell, depth, path }: { cell: Cell; depth: number; path: string }) => {
     const isLeaf = cell.cells.length === 0
     const isSel = selected?.zoneId === cell.id
@@ -1499,27 +1511,31 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
           <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={cell.id}>{depth ? '▫' : '⛶'} {zoneName}</span>
           {isLeaf && (
             <button data-testid={`add-${cell.id}`} title={tr.ecAddPlugin} onClick={(e) => { e.stopPropagation(); openPluginPicker(cell.id) }}
-              style={{ appearance: 'none', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 5, height: 18, minWidth: 20, padding: '0 6px', fontSize: 12, fontWeight: 700, cursor: 'pointer', lineHeight: '1' }}>+</button>
+              style={{ ...zoneHeadBtn, fontSize: 12, fontWeight: 700 }}>+</button>
           )}
           {/* New sibling zone, right below this one — top-level only (a nested sub-cell from a split
-              layout isn't a page-level zone; duplicateZone works on the page's own zone list). ⧉
-              clones this zone's blocks; + creates an empty one — both always available, since ANY
-              zone can now spawn a new sibling (no second pre-existing template zone required). */}
+              layout isn't a page-level zone; duplicateZone works on the page's own zone list). The
+              duplicate icon matches the top toolbar's "Duplicate page" button (Icon name="copy" in
+              CmsPage.tsx) rather than a generic ⧉ glyph, and + creates an empty one — both always
+              available, since ANY zone can now spawn a new sibling (no second pre-existing template
+              zone required). */}
           {depth === 0 && (
             <>
               <button data-testid={`duplicate-${cell.id}`} title={tr.ecDuplicateZone}
                 onClick={(e) => { e.stopPropagation(); void duplicateZone(cell.id, true) }}
-                style={{ appearance: 'none', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 5, height: 18, minWidth: 20, padding: '0 5px', fontSize: 11, cursor: saving ? 'not-allowed' : 'pointer', lineHeight: '1', opacity: saving ? .6 : 1 }} disabled={saving}>⧉</button>
+                style={{ ...zoneHeadBtn, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? .6 : 1 }} disabled={saving}>
+                <ZoneCopyIcon />
+              </button>
               <button data-testid={`new-zone-${cell.id}`} title={tr.ecNewZone}
                 onClick={(e) => { e.stopPropagation(); void duplicateZone(cell.id, false) }}
-                style={{ appearance: 'none', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 5, height: 18, minWidth: 20, padding: '0 5px', fontSize: 11, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', lineHeight: '1', opacity: saving ? .6 : 1 }} disabled={saving}>+▭</button>
+                style={{ ...zoneHeadBtn, fontSize: 11, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? .6 : 1 }} disabled={saving}>+▭</button>
               {/* Only a zone duplicateZone itself created (non-empty plugin_referer) — the original
                   template zone would just get silently recreated on the next render, so it's never
                   offered here. Destructive → confirm first (see confirmRemoveZone). */}
               {cell.removable && (
                 <button data-testid={`remove-zone-${cell.id}`} title={tr.ecRemoveZone}
                   onClick={(e) => { e.stopPropagation(); setConfirmRemoveZone({ zoneId: cell.id, label: zoneName }) }}
-                  style={{ appearance: 'none', border: '1px solid #fecaca', background: 'var(--color-card,#fff)', color: '#dc2626', borderRadius: 5, height: 18, minWidth: 20, padding: '0 5px', fontSize: 12, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', lineHeight: '1', opacity: saving ? .6 : 1 }} disabled={saving}>×</button>
+                  style={{ ...zoneHeadBtn, border: '1px solid #fecaca', color: '#dc2626', fontSize: 12, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? .6 : 1 }} disabled={saving}>×</button>
               )}
             </>
           )}
