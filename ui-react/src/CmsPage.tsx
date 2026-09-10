@@ -776,13 +776,15 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     } catch (e) { setToast({ ok: false, text: (e as Error).message }) } finally { setUnlocking(false) }
   }, [current])
 
-  // Recharge l'édition + l'en-tête sur demande d'un onglet natif (ex. Versioning après une restauration).
+  // Recharge l'édition + l'en-tête sur demande d'un onglet natif (ex. Versioning après une
+  // restauration, ou Effacer brouillon) — et ramène l'utilisateur sur l'onglet Édition pour qu'il
+  // voie tout de suite le résultat, plutôt que de le laisser sur l'onglet Versioning/courant.
   useEffect(() => {
     if (!current) return
-    const onReload = () => { reloadEdition(); refreshStructure(current) }
+    const onReload = () => { reloadEdition(); refreshStructure(current); driveTab(KEY_EDITION) }
     window.addEventListener('melis:cms-reload-edition', onReload)
     return () => window.removeEventListener('melis:cms-reload-edition', onReload)
-  }, [current, reloadEdition, refreshStructure])
+  }, [current, reloadEdition, refreshStructure, driveTab])
 
   const onButton = useCallback(async (b: StructBtn) => {
     setOpenMenu(null)
