@@ -177,21 +177,26 @@ function extractContent(raw: string): string {
  * (hugs the actual drop area) rather than the outer `.melis-dragdropzone-container` (which reserves
  * a ~25px strip for the — hidden — edit chrome above the content).
  */
-function outlineZoneInCanvas(d: Document, zoneId: string): void {
+// `scroll`: bring the element into view — wanted when the selection comes from the PANEL (the block
+// may be anywhere in the page), NOT for a click made IN the canvas: the user clicked something they
+// can already see, so any scroll is a pointless jump — and its smooth animation ran right as
+// TinyMCE positioned/docked the block's inline toolbar, leaving that toolbar docked at the top with
+// a gap to the (now moved) block.
+function outlineZoneInCanvas(d: Document, zoneId: string, scroll = true): void {
   d.querySelectorAll('.melis-react-sel').forEach((el) => el.classList.remove('melis-react-sel'))
   const esc = zoneId.replace(/["\\]/g, '\\$&')
   const el = (d.querySelector(`.melis-dragdropzone[data-dragdropzone-id="${esc}"]`)
     || d.querySelector(`[data-dragdropzone-id="${esc}"]`)) as HTMLElement | null
-  if (el) { el.classList.add('melis-react-sel'); el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }) }
+  if (el) { el.classList.add('melis-react-sel'); if (scroll) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }) }
 }
 
 /** Outline a single plugin/block by its ref id (its outer wrapper `<page>_<mod>_<name>_<refId>`). */
-function outlineBlockInCanvas(d: Document, refId: string): void {
+function outlineBlockInCanvas(d: Document, refId: string, scroll = true): void {
   d.querySelectorAll('.melis-react-sel').forEach((el) => el.classList.remove('melis-react-sel'))
   const esc = refId.replace(/["\\]/g, '\\$&')
   const cands = Array.from(d.querySelectorAll(`[id$="_${esc}"]`)) as HTMLElement[]
   const wrap = cands.find((e) => /plugin-width|melis-ui-outlined/.test(e.className)) || cands[0]
-  if (wrap) { wrap.classList.add('melis-react-sel'); wrap.scrollIntoView({ block: 'nearest', behavior: 'smooth' }) }
+  if (wrap) { wrap.classList.add('melis-react-sel'); if (scroll) wrap.scrollIntoView({ block: 'nearest', behavior: 'smooth' }) }
 }
 
 // Responsive preview widths for the top toolbar's "Display" (Affichage) button — mirrors the legacy
@@ -249,7 +254,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const accentRef = useRef('#dc2626')
   const selectedRef = useRef<{ zoneId: string; refId: string | null } | null>(null)
   const treeRef = useRef<Cell[]>([]) // current top-level tree, for maybeSeedZones (avoids a stale closure)
-  const editInlineRef = useRef<((zoneId: string, refId: string) => void) | null>(null)
+  const editInlineRef = useRef<((zoneId: string, refId: string, scroll?: boolean) => void) | null>(null)
   const eagerInitInlineRef = useRef<(() => Promise<void>) | null>(null) // called from onFrameLoad once the canvas is up
   const injectControlsRef = useRef<(() => void) | null>(null) // (re)inject the in-canvas reorder arrows
   const tinyConfigsRef = useRef<Record<string, any> | null>(null) // the real Melis tinymce configs by type
@@ -396,6 +401,16 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       + '.melis-react-mv:last-child{border-radius:3px 3px 8px 8px}'
       + '.melis-react-mv:hover:not(:disabled){filter:brightness(1.12)}'
       + '.melis-react-mv:disabled{opacity:.35;cursor:default}'
+      // TinyMCE sizes the inline toolbar's OUTER container (.tox-tinymce-inline — the element it
+      // positions above the block) to the edited block's own width via an inline max-width, so for a
+      // block that isn't full-width (a column, a narrow text element) the toolbar was a tall, narrow
+      // stack of wrapped rows docked to that block's left edge instead of a wide bar. Overriding only
+      // the inner header (an earlier attempt) changed nothing — 100% of a narrow parent is still narrow.
+      // Force the OUTER container itself to the full canvas width, flush left; the vertical position
+      // (directly above the block, docking to the viewport top only when there's no room above) is
+      // still TinyMCE's own. toolbar_location:'top' (set per-editor) keeps it above, never below.
+      + '.tox.tox-tinymce-inline{left:0 !important;width:100% !important;max-width:none !important}'
+      + '.tox-tinymce-inline .tox-editor-header{width:100% !important;max-width:100% !important}'
     d.documentElement.style.setProperty('--melis-accent', accentRef.current) // iframe has no theme vars → push it
     // no-content fix / width-class mirror / config ⚙ injection — see decorateSubtree (extracted so a
     // live-patched new zone can get the exact same treatment without a full reload).
@@ -439,15 +454,16 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
         while (p && p.getAttribute('data-dragdropzone-id') === zoneId) p = p.parentElement?.closest('[data-dragdropzone-id]') as HTMLElement | null
         if (p) zoneId = p.getAttribute('data-dragdropzone-id') || zoneId
       }
+      // scroll=false throughout: the click happened IN the canvas, on something already visible.
       if (refId) {
-        outlineBlockInCanvas(d, refId) // a plugin/block → outline the block itself
+        outlineBlockInCanvas(d, refId, false) // a plugin/block → outline the block itself
         setSelected({ zoneId, refId })
         // classic editable block: clicking IN its content enters inline WYSIWYG (no edit button needed).
         // Match `.melis-editable` (shared by html/textarea/media bodies) — `.html-editable` gated out
         // textarea/media tags, so clicking them only selected the block and never started TinyMCE.
-        if (t.closest('.melis-editable')) editInlineRef.current?.(zoneId, refId)
+        if (t.closest('.melis-editable')) editInlineRef.current?.(zoneId, refId, false)
       } else {
-        outlineZoneInCanvas(d, zoneId)       // zone content → outline the zone
+        outlineZoneInCanvas(d, zoneId, false) // zone content → outline the zone
         setSelected({ zoneId, refId })
       }
     })
@@ -480,10 +496,10 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   }, [])
 
   // Select a single plugin/block (from a panel row or the canvas) → outline the block in the canvas.
-  const selectBlock = useCallback((zoneId: string, refId: string) => {
+  const selectBlock = useCallback((zoneId: string, refId: string, scroll = true) => {
     setSelected({ zoneId, refId })
     const d = iframeRef.current?.contentDocument
-    if (d) outlineBlockInCanvas(d, refId)
+    if (d) outlineBlockInCanvas(d, refId, scroll)
   }, [])
 
   // Find a block's live content element in the canvas (the editable body inside its wrapper).
@@ -615,6 +631,10 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       cfg.selector = ids.map((id) => '#' + id).join(',')
       cfg.inline = true; cfg.base_url = TINY_BASE; cfg.suffix = '.min'
       cfg.branding = false; cfg.promotion = false; cfg.toolbar_mode = 'wrap'
+      // Float directly above the block being edited (default inline behavior — see the CSS override
+      // above for making it wide instead of narrow). toolbar_location defaults to 'auto', which for
+      // a block near the top of the viewport picked 'bottom' — force 'top' explicitly.
+      cfg.toolbar_location = 'top'
       cfg.file_picker_callback = w.filePickerCallback
       cfg.init_instance_callback = w.tinyMceCleaner
       cfg.setup = (ed: any) => {
@@ -633,8 +653,8 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   // Normally a no-op by the time it's called (eagerInitInline above already built every block's editor
   // on load) — this is now only the FALLBACK for a block that pass missed (a plugin added afterward,
   // before the next eager pass catches up) or genuinely fresh construction if eager init itself failed.
-  const editInline = useCallback(async (zoneId: string, refId: string) => {
-    selectBlock(zoneId, refId)
+  const editInline = useCallback(async (zoneId: string, refId: string, scroll = true) => {
+    selectBlock(zoneId, refId, scroll)
     // A click landing on a block WHILE ITS OWN editor is still initializing (ensureTinymce/ensureMelisEnv
     // are real network round-trips — repeated clicking during that window is exactly how this was
     // reproduced) must not re-enter the whole init sequence a second time: two concurrent tinymce.init()
@@ -680,6 +700,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       cfg.target = el; cfg.inline = true; cfg.base_url = TINY_BASE; cfg.suffix = '.min'
       cfg.branding = false; cfg.promotion = false
       cfg.toolbar_mode = 'wrap' // show ALL buttons on multiple rows (vs 'sliding' → hidden behind "…")
+      cfg.toolbar_location = 'top' // see eagerInitInline's identical option
       // wire the config's string-named callbacks to the real Melis env functions (in the iframe)
       cfg.file_picker_callback = w.filePickerCallback
       cfg.init_instance_callback = w.tinyMceCleaner
