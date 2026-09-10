@@ -996,7 +996,9 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
                   // "container" (ex. bouton Newsletter modulaire) → bouton DIRECT qui pilote la clé parente.
                   b.children && b.children.length && !b.children.some((cc) => /modal|container/i.test(cc.key)) ? (
                     <div key={b.key} style={{ position: 'relative', ...narrowSlot(b.label) }}>
-                      <button className="melis-pgbtn" style={{ ...btnStyle(b), ...(narrow ? { width: '100%', justifyContent: 'center' } : null) }} onClick={(e) => { e.stopPropagation(); setOpenMenu(openMenu === b.key ? null : b.key) }}><Icon name={iconFor(b)} />{b.label} <span style={{ fontSize: 10, opacity: .7 }}>▾</span></button>
+                      {(() => { const loading = saving || !editionReady; return (
+                      <button className="melis-pgbtn" style={{ ...btnStyle(b), ...(narrow ? { width: '100%', justifyContent: 'center' } : null), ...(loading ? { opacity: .55, cursor: 'not-allowed' } : null) }} disabled={loading} title={loading ? tr.editionLoadingTip : undefined} onClick={(e) => { e.stopPropagation(); setOpenMenu(openMenu === b.key ? null : b.key) }}><Icon name={iconFor(b)} />{b.label} <span style={{ fontSize: 10, opacity: .7 }}>▾</span></button>
+                      ) })()}
                       {openMenu === b.key && (
                         // narrow : le menu épouse la largeur du bouton (left+right à 0, minWidth
                         // levé) — ancré uniquement à gauche avec minWidth:190 il débordait à droite
@@ -1007,9 +1009,22 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
                       )}
                     </div>
                   ) : (
-                    (() => { const gated = b.key.endsWith('action_save') || b.key.endsWith('action_publish'); const dis = gated && (saving || !editionReady); return (
-                    <button key={b.key} className="melis-pgbtn" style={{ ...btnStyle(b), ...narrowSlot(b.label), ...(dis ? { opacity: .55, cursor: 'not-allowed' } : null) }} disabled={dis} title={gated && !editionReady ? tr.editionLoadingTip : undefined} onClick={() => onButton(b)}><Icon name={iconFor(b)} />{b.label}</button>
-                    ) })()
+                    (() => {
+                      // Every toolbar action reads/writes the current page's edition state one way
+                      // or another (Save/Publish/Erase-draft directly, New/Duplicate/Delete/Workflow
+                      // indirectly via idPage) — block all of them until it's actually loaded, not
+                      // just Save/Publish like before.
+                      const loading = saving || !editionReady
+                      // Erase draft specifically: once loaded, also disable it when there's genuinely
+                      // no draft to erase (header.hasDraft) — clicking it otherwise just surfaced a
+                      // "This page has no edition in progress" error from the server.
+                      const noDraft = b.key.endsWith('action_clear') && editionReady && !header?.hasDraft
+                      const dis = loading || noDraft
+                      const tip = loading ? tr.editionLoadingTip : noDraft ? tr.noDraftToClear : undefined
+                      return (
+                    <button key={b.key} className="melis-pgbtn" style={{ ...btnStyle(b), ...narrowSlot(b.label), ...(dis ? { opacity: .55, cursor: 'not-allowed' } : null) }} disabled={dis} title={tip} onClick={() => onButton(b)}><Icon name={iconFor(b)} />{b.label}</button>
+                      )
+                    })()
                   )
                 ))}
               </div>
