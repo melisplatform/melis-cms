@@ -501,7 +501,7 @@ final class PageContentDocument
             $newZoneId = $groupId . '_' . time() . substr(bin2hex(random_bytes(2)), 0, 3);
         }
 
-        $items = $withContent ? $this->cloneRefs($source['items'] ?? [], $existingIds) : [];
+        $items = $withContent ? $this->cloneRefs($source['items'] ?? [], $existingIds, $newZoneId) : [];
 
         $newZone = [
             'kind'  => 'zone',
@@ -550,22 +550,33 @@ final class PageContentDocument
     }
 
     /**
-     * Clone a zone's ref items under fresh ids — each referenced data node cloned as a new
-     * top-level sibling (a ref is a lightweight pointer; the actual plugin content lives as a
-     * top-level sibling, same as moveRef relies on), so the copy is independent afterward, not a
-     * shared pointer. $existingIds is mutated as ids are claimed, so repeat calls in the same
-     * request never collide. Nested sub-zones (a split-layout zone's own columns) are not
-     * recursed into — only the zone's own direct ref items.
+     * Clone a zone's items under fresh ids — recurses into nested sub-zones (a split-layout
+     * zone's own columns, kind='zone' items) so duplicating a zone that's had applyLayout
+     * applied to it actually carries its columns' content along too, not just direct refs (a
+     * zone with a layout applied has ALL its content moved into those columns — see
+     * reconcileLayout — so skipping them meant "duplicate" silently produced an empty copy).
+     * Each ref's referenced data node is cloned as a new top-level sibling (a ref is a
+     * lightweight pointer; the actual plugin content lives as a top-level sibling, same as
+     * moveRef relies on), so the copy is independent afterward, not a shared pointer.
+     * $existingIds is mutated as ids are claimed, so repeat calls in the same request never
+     * collide. $newParentId scopes nested cell ids to "<newParentId>_<n>" (the same convention
+     * applyLayout itself uses/expects — see reconcileLayout's `$zoneId . '_' . $i` lookup), so
+     * re-splitting the duplicate later still recognizes its own cells instead of orphaning them.
      *
      * @param array<int,array<string,mixed>> $items
      * @param array<string,bool> $existingIds
      * @return array<int,array<string,mixed>>
      */
-    private function cloneRefs(array $items, array &$existingIds): array
+    private function cloneRefs(array $items, array &$existingIds, string $newParentId = ''): array
     {
         $clones = [];
         foreach ($items as $item) {
-            if (($item['kind'] ?? '') !== 'ref') {
+            $kind = $item['kind'] ?? '';
+            if ($kind === 'zone') {
+                $clones[] = $this->cloneNestedZone($item, $existingIds, $newParentId);
+                continue;
+            }
+            if ($kind !== 'ref') {
                 continue;
             }
             $oldId = (string) ($item['ref']['id'] ?? '');
@@ -601,6 +612,39 @@ final class PageContentDocument
             $clones[] = ['kind' => 'ref', 'ref' => array_merge($item['ref'], ['id' => $newId])];
         }
         return $clones;
+    }
+
+    /**
+     * Clone one nested layout cell (a split-zone's own column) — id becomes
+     * "<newParentId>_<n>" (n = the cell's own position suffix, e.g. "_2") so a later
+     * applyLayout on the duplicate still matches its existing cells, then recurses via
+     * cloneRefs for that cell's own items (further nesting supported, though not currently
+     * produced by the layout picker).
+     *
+     * @param array<string,mixed> $item
+     * @param array<string,bool> $existingIds
+     */
+    private function cloneNestedZone(array $item, array &$existingIds, string $newParentId): array
+    {
+        $oldId = (string) ($item['id'] ?? '');
+        $suffix = $oldId;
+        if (($pos = strrpos($oldId, '_')) !== false) {
+            $suffix = substr($oldId, $pos); // "_1", "_2"…
+        }
+        $newId = $newParentId !== '' ? $newParentId . $suffix : $oldId . '_copy_' . time();
+        while (isset($existingIds[$newId])) {
+            $newId .= '_' . substr(bin2hex(random_bytes(2)), 0, 3);
+        }
+        $existingIds[$newId] = true;
+
+        $clone = $item;
+        $clone['id'] = $newId;
+        $clone['attrs']['id'] = $newId;
+        $clone['attrs']['plugin_referer'] = $newParentId;
+        $clone['items'] = $this->cloneRefs($item['items'] ?? [], $existingIds, $newId);
+        $clone['dirty'] = true;
+
+        return $clone;
     }
 
     /**
