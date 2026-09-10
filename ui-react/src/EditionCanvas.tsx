@@ -900,6 +900,27 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     return () => window.removeEventListener('melis:cms-reload-edition', onReload)
   }, [idPage])
 
+  // A SEPARATE, non-destructive refresh signal for edits made OUTSIDE this component but still
+  // SESSION-ONLY (e.g. the AI mini-template dialog's insert, via react-bridge.js's edition/save
+  // call) — same effect as melis:cms-reload-edition (bump nonce → refetch /edition/document +
+  // /edition/render) but MUST be a different event name: CmsPage.tsx's OWN melis:cms-reload-edition
+  // listener reloads the hidden LEGACY iframe (reloadEdition()), which hits the legacy
+  // render-pagetab-edition action — and THAT unconditionally WIPES the working session for any
+  // page it already has content for (PageEditionController::renderPagetabEditionAction, "clearing
+  // the session data ... in every open"). That's correct for version-restore/erase-draft (a real
+  // DB-level reset), but firing it after a plain session edit silently destroyed the edit that was
+  // just written — the edition/save response would report opsApplied:1 yet the content would be
+  // gone by the very next read. Reusing melis:cms-reload-edition here was the actual root cause of
+  // "AI insert reports success but never appears anywhere".
+  useEffect(() => {
+    const onRefresh = (e: Event) => {
+      const detail = (e as CustomEvent<{ idPage?: number }>).detail
+      if (detail?.idPage === idPage) setNonce((n) => n + 1)
+    }
+    window.addEventListener('melis:cms-canvas-refresh', onRefresh)
+    return () => window.removeEventListener('melis:cms-canvas-refresh', onRefresh)
+  }, [idPage])
+
   // Load the REAL layout-schema icon CSS (the very sheet the legacy Old editor uses) so the
   // `html-button-icon` markup renders with its exact bootstrap-grid proportions (distinct per
   // schema — column ratios AND extra rows), + a small override to make the icon blocks visible
@@ -1129,18 +1150,67 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       .finally(() => setSaving(false))
   }, [idPage])
 
-  // Apply a drag-and-drop SCHEMA to a zone/cell. Structural → persist immediately then reload the
-  // canvas iframe (nonce) so the columns render. (Everything else already persists on the spot, so
-  // there is nothing to flush first.)
+  // Apply a drag-and-drop SCHEMA to a zone/cell (Mantis #0010973 — "slow to change the layout of
+  // the D&D zone"). Used to reload the whole canvas (nonce) for this: on a page with many blocks
+  // that meant re-fetching/re-parsing the ENTIRE render AND rebuilding every single TinyMCE editor
+  // on the page from scratch (a fresh iframe has no live editors at all, so eagerInitInline's
+  // "already live" skip never kicks in) — for just one zone's column count changing. Live-patch
+  // instead, same approach as duplicateZone: fetch the fresh render off-DOM, replace ONLY this
+  // zone's subtree in place (same top-level id, so it stays exactly where it was among siblings),
+  // and let eagerInitInline's own [doc] effect rebuild just the blocks that actually need it.
   const applyLayout = useCallback(async (zoneId: string, template: string) => {
     setSaving(true)
     try {
       await apiPost('edition/save', { idPage, ops: [{ op: 'applyLayout', zoneId, template }] })
-      // No toast on edits (session only) — see saveInline.
-      setNonce((n) => n + 1) // re-fetch document + reload canvas → cells/colonnes apparaissent
+
+      const d2 = await apiGet<Doc>(`edition/document?idPage=${idPage}`)
+      const zoneNodes = (d2.nodes || []).filter((n) => n.kind === 'zone' && n.id)
+      const newTree = zoneNodes.map((z) => toCell(z, d2.pluginTitles || {}))
+      setTree(newTree)
+      treeRef.current = newTree
+      const w: Record<string, { d: string; t: string; m: string }> = {}
+      for (const n of d2.nodes || []) {
+        if (n.id && n.kind !== 'zone') {
+          const a = (n as { attrs?: Record<string, string> }).attrs || {}
+          w[n.id] = { d: a.width_desktop ?? '100', t: a.width_tablet ?? '100', m: a.width_mobile ?? '100' }
+        }
+      }
+      setBlockW(w)
+      setDoc(d2) // triggers eagerInitInline's own [doc] effect → builds editors for any newly-nested blocks
+
+      let patched = false
+      const d = iframeRef.current?.contentDocument
+      if (d) {
+        try {
+          const html = await fetch(`/melis/react-api/cms-page/edition/render?idPage=${idPage}&_r=${Date.now()}&vw=${vw}`, { credentials: 'same-origin' }).then((r) => r.text())
+          const parsed = new DOMParser().parseFromString(html, 'text/html')
+          const esc = zoneId.replace(/["\\]/g, '\\$&')
+          const newEl = parsed.querySelector(`[data-dragdropzone-id="${esc}"]`)
+          const oldEl = d.querySelector(`[data-dragdropzone-id="${esc}"]`)
+          if (newEl && oldEl?.parentElement) {
+            // Any block INSIDE the old subtree with a live inline editor must be torn down before
+            // the swap — tinymce.get(elId) is a global registry keyed by element id, so it would
+            // otherwise still resolve to the now-orphaned instance once its DOM node is gone,
+            // wrongly making eagerInitInline's "already live" check skip rebuilding it fresh.
+            const tw = iframeRef.current?.contentWindow as any
+            if (tw?.tinymce) {
+              oldEl.querySelectorAll('[id^="melis-inline-"]').forEach((el) => {
+                try { tw.tinymce.get(el.id)?.remove() } catch { /* best-effort cleanup */ }
+              })
+            }
+            const imported = d.importNode(newEl, true) as HTMLElement
+            oldEl.replaceWith(imported)
+            decorateSubtree(d, imported)
+            injectControlsRef.current?.()
+            patched = true
+          }
+        } catch { /* fall through to the reload fallback below */ }
+      }
+      if (!patched) setNonce((n) => n + 1) // couldn't locate/fetch the zone → fall back to a full reload rather than leaving the canvas stale
+
       window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } }))
     } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
-  }, [idPage])
+  }, [idPage, vw, decorateSubtree])
 
   // Create a new top-level zone right after $zoneId — Mantis #0010958 ("add multiple D&D zones").
   // A page's template LOOKS fixed to one MelisDragDropZone($pageId, "some_id") call per zone, but
