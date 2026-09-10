@@ -996,11 +996,14 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   // on to published. So each structural edit (reorder/remove/width) updates the session on the spot; the
   // canvas render reads the session, so it shows live, and the top Save carries it. setZoneRefs is the
   // exact-set op (also drops removed refs).
+  // Mantis #0010995: reordering blocks in a zone is a plain SESSION edit (same class as
+  // setTagContent/setWidths) — it doesn't touch the page's own tree-level metadata (title,
+  // lock, online/offline status), so it must NOT dispatch melis:cms-tree-refresh: that reloads
+  // the left-hand PAGE TREE, which is pointless and was firing on every single drag.
   const persistZoneRefs = useCallback(async (zoneId: string, refIds: string[]) => {
     setSaving(true)
     try {
       await apiPost('edition/save', { idPage, ops: [{ op: 'setZoneRefs', zoneId, refIds }] })
-      window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } }))
     } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
   }, [idPage])
 
@@ -1063,10 +1066,11 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       }
     })
 
+    // Mantis #0010995: see persistZoneRefs — moving a plugin between zones is also a plain
+    // session edit, no page-tree metadata involved, so no melis:cms-tree-refresh here either.
     setSaving(true)
     try {
       await apiPost('edition/save', { idPage, ops: [{ op: 'moveRef', fromZoneId, toZoneId, refId, position }] })
-      window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } }))
     } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
   }, [tree, locate, domReorder, idPage])
 
