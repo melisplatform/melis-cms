@@ -503,16 +503,29 @@ final class PageContentDocument
 
         $items = $withContent ? $this->cloneRefs($source['items'] ?? [], $existingIds, $newZoneId) : [];
 
+        $attrs = [
+            'id'                  => $newZoneId,
+            'plugin_container_id' => $newZoneId,
+            'plugin_referer'      => $groupId,
+            'plugin_position'     => '',
+        ];
+        // A real duplicate (withContent) must also carry the source's LAYOUT SCHEMA — without it
+        // the front render has no idea the new zone is split into columns at all (falls back to a
+        // plain single dropzone, so its cloned nested-cell content — see cloneRefs — never renders
+        // even though it's genuinely in the document). "New Zone" (withContent=false) stays a plain
+        // blank single-cell zone on purpose, so it does NOT inherit the source's template.
+        if ($withContent) {
+            $sourceTemplate = (string) ($source['attrs']['template'] ?? '');
+            if ($sourceTemplate !== '') {
+                $attrs['template'] = $sourceTemplate;
+            }
+        }
+
         $newZone = [
             'kind'  => 'zone',
             'tag'   => 'melisDragDropZone',
             'id'    => $newZoneId,
-            'attrs' => [
-                'id'                  => $newZoneId,
-                'plugin_container_id' => $newZoneId,
-                'plugin_referer'      => $groupId,
-                'plugin_position'     => '',
-            ],
+            'attrs' => $attrs,
             'items' => $items,
             'dirty' => true, // brand new — no verbatim raw to preserve; renderNode() builds it from attrs/items
         ];
