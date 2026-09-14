@@ -20,8 +20,8 @@ use MelisCms\PageEditor\LayoutCatalog;
  *
  * Ops (mirroring PageContentDocument): reorderNodes {ids}, setWidths {id,desktop,tablet,
  * mobile}, reorderZoneRefs {zoneId,refIds}, setZoneRefs, moveRef {fromZoneId,toZoneId,refId,
- * position?}, duplicateZone {zoneId,withContent?}, removeZone {zoneId}, reorderZones {zoneIds},
- * addPlugin, setTagContent, applyLayout.
+ * position?}, duplicateZone {zoneId,withContent?}, duplicateRef {zoneId,refId}, removeZone {zoneId},
+ * reorderZones {zoneIds}, addPlugin, setTagContent, applyLayout.
  *
  * Persistence contract (aligned with legacy): editing writes ONLY the session — it never
  * touches the DB. The melis render reads that session in priority, so edits show live; the
@@ -65,6 +65,7 @@ class EditionSaveController extends MelisAbstractActionController
 
             $applied = 0;
             $newZoneId = '';
+            $newRefId = '';
             foreach ($ops as $op) {
                 switch ($op['op'] ?? '') {
                     case 'reorderNodes':
@@ -106,6 +107,20 @@ class EditionSaveController extends MelisAbstractActionController
                             $createdZoneId = $doc->duplicateZone($zoneId, (bool) ($op['withContent'] ?? true));
                             if ($createdZoneId !== '') {
                                 $newZoneId = $createdZoneId;
+                                $applied++;
+                            }
+                        }
+                        break;
+                    case 'duplicateRef':
+                        // Duplicate ONE block (plugin / mini-template) right after itself, in its own
+                        // zone/cell (Mantis #0011001) — see PageContentDocument::duplicateRef. The new
+                        // id is returned so the client can live-patch the clone into the canvas.
+                        $dupZoneId = (string) ($op['zoneId'] ?? '');
+                        $dupRefId  = (string) ($op['refId'] ?? '');
+                        if ($dupZoneId !== '' && $dupRefId !== '') {
+                            $createdRefId = $doc->duplicateRef($dupZoneId, $dupRefId);
+                            if ($createdRefId !== '') {
+                                $newRefId = $createdRefId;
                                 $applied++;
                             }
                         }
@@ -181,6 +196,10 @@ class EditionSaveController extends MelisAbstractActionController
                 // subtree and splice it in) instead of reloading the whole iframe — see
                 // EditionCanvas.tsx's duplicateZone.
                 $data['newZoneId'] = $newZoneId;
+            }
+            if ($newRefId !== '') {
+                // Same idea for a duplicated block — see EditionCanvas.tsx's duplicateBlock.
+                $data['newRefId'] = $newRefId;
             }
 
             return $this->jsonResponse([

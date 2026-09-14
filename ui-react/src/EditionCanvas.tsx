@@ -1300,6 +1300,63 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
   }, [idPage, vw, decorateSubtree])
 
+  // Duplicate ONE block (typically a mini-template) right after itself, inside its own cell — Mantis
+  // #0011001 ("we can duplicate a zone, but could we duplicate just a mini template?"). Same contract
+  // as duplicateZone: the server clones the block's data node under a fresh id (duplicateRef), then
+  // we live-patch the clone's rendered wrapper right after the source one and refresh tree/widths/doc
+  // from /edition/document. Order matters here: the DOM patch lands BEFORE setDoc, so the [doc]
+  // effect's eager TinyMCE pass actually finds the clone's element and builds its inline editor.
+  // Full iframe reload only if the clone can't be located in the fresh render (never left stale).
+  const duplicateBlock = useCallback(async (zoneId: string, refId: string) => {
+    setSaving(true)
+    try {
+      const res = await apiPost<{ newRefId?: string }>('edition/save', { idPage, ops: [{ op: 'duplicateRef', zoneId, refId }] })
+      const newRefId = res?.newRefId || ''
+      if (!newRefId) throw new Error(peT().ecDuplicateBlockFailed)
+
+      const [d2, html] = await Promise.all([
+        apiGet<Doc>(`edition/document?idPage=${idPage}`),
+        fetch(`/melis/react-api/cms-page/edition/render?idPage=${idPage}&_r=${Date.now()}&vw=${vw}`, { credentials: 'same-origin' }).then((r) => r.text()).catch(() => ''),
+      ])
+
+      let patched = false
+      const d = iframeRef.current?.contentDocument
+      if (d && html) {
+        try {
+          // same wrapper lookup as locate(), on the freshly fetched render instead of the live iframe
+          const parsed = new DOMParser().parseFromString(html, 'text/html')
+          const escNew = newRefId.replace(/["\\]/g, '\\$&')
+          const cands = Array.from(parsed.querySelectorAll(`[id$="_${escNew}"]`)) as HTMLElement[]
+          const newEl = cands.find((e) => /plugin-width|melis-ui-outlined/.test(e.className)) || cands[0] || null
+          const srcEl = locate(refId)
+          if (newEl && srcEl?.parentElement) {
+            const imported = d.importNode(newEl, true) as HTMLElement
+            srcEl.insertAdjacentElement('afterend', imported)
+            decorateSubtree(d, imported)
+            patched = true
+          }
+        } catch { /* fall through to the reload fallback below */ }
+      }
+
+      const zoneNodes = (d2.nodes || []).filter((n) => n.kind === 'zone' && n.id)
+      const newTree = zoneNodes.map((z) => toCell(z, d2.pluginTitles || {}))
+      setTree(newTree)
+      treeRef.current = newTree
+      const w: Record<string, { d: string; t: string; m: string }> = {}
+      for (const n of d2.nodes || []) {
+        if (n.id && n.kind !== 'zone') {
+          const a = (n as { attrs?: Record<string, string> }).attrs || {}
+          w[n.id] = { d: a.width_desktop ?? '100', t: a.width_tablet ?? '100', m: a.width_mobile ?? '100' }
+        }
+      }
+      setBlockW(w)
+      setDoc(d2) // → eagerInitInline's [doc] effect builds the clone's inline editor (its element is already in place)
+
+      if (!patched) setNonce((n) => n + 1)
+      window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } }))
+    } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
+  }, [idPage, vw, decorateSubtree, locate])
+
   // Remove a DYNAMICALLY CREATED zone (one duplicateZone made — see Cell.removable). Confirmed by the
   // caller (confirmRemoveZone modal) before this runs. Whole top-level zone, so — unlike removeBlock,
   // which only edits a zone's own ref list — we drop it straight out of `tree`, live-DOM-remove its
@@ -1598,6 +1655,10 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
               <button data-testid={`width-toggle-${r.id}`} title={tr.ecResponsiveWidths}
                 onClick={(e) => { e.stopPropagation(); setOpenWidth((w) => (w === r.id ? null : r.id)) }}
                 style={{ ...iconBtn, borderColor: openWidth === r.id ? 'var(--color-primary,#dc2626)' : 'var(--color-border,#e5e7eb)', color: openWidth === r.id ? 'var(--color-primary,#dc2626)' : 'var(--color-foreground,#111827)' }}>↔</button>
+              {/* duplicate THIS block only (Mantis #0011001) — the clone lands right below it, in the same cell */}
+              <button data-testid={`duplicate-block-${r.id}`} title={tr.ecDuplicateBlock} disabled={saving}
+                onClick={(e) => { e.stopPropagation(); void duplicateBlock(cell.id, r.id) }}
+                style={{ ...iconBtn, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? .6 : 1 }}><ZoneCopyIcon /></button>
               <button data-testid={`remove-${r.id}`} title={tr.ecRemoveFromZone} onClick={(e) => { e.stopPropagation(); setConfirmRemove({ zoneId: cell.id, refId: r.id, label: r.label }) }} style={{ ...iconBtn, borderColor: '#fecaca', color: '#dc2626' }}>×</button>
             </div>
             {openWidth === r.id && (

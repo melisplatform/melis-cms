@@ -536,6 +536,47 @@ final class PageContentDocument
     }
 
     /**
+     * Duplicate ONE block (a plugin / mini-template ref) in place — Mantis #0011001 ("we can
+     * duplicate a zone, but could we duplicate just a mini template?"). The block's data node is
+     * cloned under a fresh id through the very same cloneRefs path duplicateZone uses (verbatim
+     * XML re-targeted to the new id, so config/CDATA content travel with it), and the clone's ref
+     * is inserted right AFTER the source ref in the same zone/cell — at any depth, since walk()
+     * reaches nested layout cells too. Nothing else in the document moves.
+     *
+     * @return string the new ref's id, or '' when $refId isn't a ref of $zoneId (or has no data node)
+     */
+    public function duplicateRef(string $zoneId, string $refId): string
+    {
+        $existingIds = [];
+        foreach ($this->nodes as $n) {
+            if (!empty($n['id'])) {
+                $existingIds[(string) $n['id']] = true;
+            }
+        }
+
+        $newId = '';
+        $this->walk($this->nodes, $zoneId, function (array &$z) use ($refId, &$existingIds, &$newId): void {
+            if (($z['kind'] ?? '') !== 'zone') {
+                return;
+            }
+            foreach ($z['items'] ?? [] as $i => $item) {
+                if (($item['kind'] ?? '') !== 'ref' || (string) ($item['ref']['id'] ?? '') !== $refId) {
+                    continue;
+                }
+                // cloneRefs appends the cloned data node to $this->nodes and returns the new ref item
+                $clones = $this->cloneRefs([$item], $existingIds);
+                if ($clones !== []) {
+                    array_splice($z['items'], $i + 1, 0, $clones);
+                    $newId = (string) ($clones[0]['ref']['id'] ?? '');
+                }
+                return;
+            }
+        });
+
+        return $newId;
+    }
+
+    /**
      * Remove a DYNAMICALLY CREATED top-level zone — one produced by duplicateZone (carries a
      * non-empty plugin_referer). Mirrors legacy's dndRemoveAction verbatim in spirit: a plain
      * removal of the zone's own entry, nothing else touched. The ORIGINAL template zone
