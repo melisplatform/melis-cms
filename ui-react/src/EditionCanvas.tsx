@@ -262,6 +262,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const melisEnvLoadRef = useRef<Promise<any> | null>(null)   // in-flight ensureMelisEnv() load, deduped
   const inlineInitRef = useRef<{ refId: string; promise: Promise<void> } | null>(null) // in-flight editInline() attempt, deduped per block
   const maybeSeedZonesRef = useRef<(() => void) | null>(null) // called from onFrameLoad once the canvas is up
+  const isMobileRef = useRef(false) // for the canvas click listener (attached once per iframe load, no deps)
 
   // On a phone-narrow viewport the structure panel can't sit next to the canvas (360px would eat the
   // whole screen and there's nowhere to close it). Switch it to a right-side DRAWER: full page preview
@@ -495,6 +496,11 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       } else {
         outlineZoneInCanvas(d, zoneId, false) // zone content → outline the zone
         setSelected({ zoneId, refId })
+        // Mobile (Mantis #0011011): tapping a ZONE is how you reach its tools, so open the structure drawer
+        // for real here. Tapping a BLOCK deliberately does NOT — on a phone the drawer covers the canvas,
+        // and a classic block's tap must leave the inline WYSIWYG editor (just started above) usable.
+        // Before, BOTH taps "opened" the drawer by accident: see the selection effect below.
+        if (isMobileRef.current) setPanelCollapsed(false)
       }
     })
     // Inject the in-canvas reorder arrows once the fresh render is in the DOM (gone after every reload).
@@ -515,6 +521,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
 
   // Keep the selection ref current for the canvas click listener (attached once per iframe load).
   useEffect(() => { selectedRef.current = selected }, [selected])
+  useEffect(() => { isMobileRef.current = isMobile }, [isMobile])
   useEffect(() => { treeRef.current = tree }, [tree])
 
   // Select a zone/cell from the PANEL (works for parent zones too, which a canvas leaf-click can't reach
@@ -845,8 +852,14 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   }, [accent])
 
   // Bring the selected zone/block into view in the panel + (CSS) highlight it there.
+  // NOT while the mobile drawer is closed (Mantis #0011011): the closed drawer is only translated
+  // off-screen, still laid out, and scrollIntoView() happily scrolls its ancestor sideways to reveal the
+  // row — which dragged the whole drawer into view on EVERY tap in the canvas, mini-templates included,
+  // hiding the inline editor the tap had just started. Re-runs when the drawer opens, so the selected
+  // row is still brought into view then.
   useEffect(() => {
     if (!selected) return
+    if (isMobile && panelCollapsed) return
     const root = panelRef.current
     if (!root) return
     const esc = (s: string) => (typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(s) : s.replace(/[^\w-]/g, '\\$&'))
@@ -856,7 +869,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       const bEl = root.querySelector(`[data-testid="block-${esc(selected.refId)}"]`) as HTMLElement | null
       bEl?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
     }
-  }, [selected])
+  }, [selected, isMobile, panelCollapsed])
 
   // Locate a block's outer WRAPPER in the render: it carries id="<page>_<module>_<name>_<refId>" and
   // a plugin-width / melis-ui-outlined class, a SIBLING of the other blocks (so it can be reordered)
@@ -1725,7 +1738,9 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--color-background,#fff)' }}>
       {/* discreet saving indicator, floated (no header bar) */}
       {saving && <div style={{ position: 'absolute', top: 6, right: 12, zIndex: 5, fontSize: 11, fontWeight: 600, color: 'var(--color-muted-foreground,#6b7280)', background: 'var(--color-card,#fff)', border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 6, padding: '2px 8px' }}>{tr.ecSaving}</div>}
-      <div style={{ flex: '1 1 auto', minHeight: 0, display: 'flex', position: 'relative' }}>
+      {/* overflow:hidden — the mobile drawer lives translated off-screen inside this row; never let a
+          programmatic scroll (scrollIntoView on a panel row) drag it into view sideways (Mantis #0011011). */}
+      <div style={{ flex: '1 1 auto', minHeight: 0, display: 'flex', position: 'relative', overflow: 'hidden' }}>
         {/* Device-preview frame: desktop = full bleed; tablet/mobile = fixed width, centered on a
             neutral backdrop (like the legacy responsive preview), so the page reflows to that width. */}
         <div style={{ flex: '1 1 auto', minWidth: 0, display: 'flex', justifyContent: 'center', overflow: 'auto', position: 'relative', background: device === 'desktop' ? undefined : 'var(--color-muted,#f1f5f9)', padding: device === 'desktop' ? 0 : '12px 0' }}>
@@ -1772,10 +1787,13 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
             </>
           )}
         </div>
-        {/* Mobile: floating button to (re)open the drawer when it's closed. */}
+        {/* Mobile: floating button to (re)open the drawer when it's closed. Bottom-LEFT, not bottom-right:
+            the Melis AI assistant's FAB is `position:fixed; right:20; bottom:20; z-index:9000` (melis-ai
+            AiAssistant.tsx) and the AI mini-template dialog host pins there too — bottom-right is taken
+            on a phone and this button sat hidden underneath (Mantis #0011011). */}
         {isMobile && panelCollapsed && (
           <button data-testid="panel-open-mobile" title={tr.ecOpenDrawer} onClick={() => setPanelCollapsed(false)}
-            style={{ position: 'absolute', bottom: 16, right: 16, zIndex: 42, display: 'inline-flex', alignItems: 'center', gap: 6, height: 44, padding: '0 16px', borderRadius: 22, border: 'none', background: 'var(--color-primary,#dc2626)', color: 'var(--color-primary-foreground,#fff)', fontSize: 13, fontWeight: 600, boxShadow: '0 6px 20px rgba(0,0,0,.28)', cursor: 'pointer' }}>
+            style={{ position: 'absolute', bottom: 16, left: 16, zIndex: 42, display: 'inline-flex', alignItems: 'center', gap: 6, height: 44, padding: '0 16px', borderRadius: 22, border: 'none', background: 'var(--color-primary,#dc2626)', color: 'var(--color-primary-foreground,#fff)', fontSize: 13, fontWeight: 600, boxShadow: '0 6px 20px rgba(0,0,0,.28)', cursor: 'pointer' }}>
             ☰ {tr.ecZonesButton}
           </button>
         )}
