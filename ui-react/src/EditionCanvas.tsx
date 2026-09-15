@@ -283,7 +283,11 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   // changing the device changes the src → the iframe RELOADS at the right viewport → deterministic reflow
   // (resizing an already-loaded iframe doesn't relayout reliably across browsers).
   const vw = device === 'mobile' ? 375 : device === 'tablet' ? 768 : 0
-  const renderSrc = `/melis/react-api/cms-page/edition/render?idPage=${idPage}&_r=${nonce}&vw=${vw}`
+  // The iframe follows `frameVw`, not `vw` directly: a device switch first flushes any width edit still
+  // pending in the panel and waits for it to be saved, THEN reloads (Mantis #0010997 — see the
+  // [vw] effect next to persistWidths). Otherwise the reload rendered the session's OLD widths.
+  const [frameVw, setFrameVw] = useState(vw)
+  const renderSrc = `/melis/react-api/cms-page/edition/render?idPage=${idPage}&_r=${nonce}&vw=${frameVw}`
 
   // Every structural edit is issued through here so the live-patchers below can tell whether the server
   // state moved under them: saveSeqRef counts issued saves, lastSaveRef is the latest one still settling.
@@ -1199,16 +1203,8 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     persistZoneRefs(zoneId, refs) // immediate draft save (exact set drops the removed ref)
   }, [tree, domRemove, persistZoneRefs])
 
-  // Typing updates local state + live desktop preview only; the draft is written on blur (persistWidths)
-  // so we don't POST on every keystroke.
-  const setWidth = useCallback((id: string, dim: 'd' | 't' | 'm', v: string) => {
-    setBlockW((w) => ({ ...w, [id]: { ...(w[id] ?? { d: '100', t: '100', m: '100' }), [dim]: v } }))
-    // patch the matching breakpoint class live so the active device preview updates immediately
-    queueMicrotask(() => domWidth(id, dim, v))
-  }, [domWidth])
-
-  // Immediate session save of a block's responsive widths (on blur) — same rationale as persistZoneRefs:
-  // edits go to the working session so the top-toolbar Save can flush them to the draft.
+  // Session save of a block's responsive widths — same rationale as persistZoneRefs: edits go to the
+  // working session so the top-toolbar Save can flush them to the draft.
   const persistWidths = useCallback((id: string, v?: { d: string; t: string; m: string }) => {
     if (!v) return
     setSaving(true)
@@ -1216,7 +1212,49 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       .then(() => window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } })))
       .catch((e) => notify('ko', 'MelisCms', errMsg(e)))
       .finally(() => setSaving(false))
-  }, [idPage])
+  }, [idPage, saveOps])
+
+  // Mantis #0010997 ("set the width per display works, but switch tablet/mobile and back and it's not
+  // displayed properly"): widths used to be saved ONLY on the input's blur. Typing a value and going
+  // straight to the Display menu never blurred the input (a toolbar click doesn't move focus on every
+  // browser, and the dropdown item triggers the reload right away), so the width was never persisted:
+  // the live patch and the panel showed the typed value while every reload rendered the session's old
+  // one. Reproduced with real input events. Now: (1) each change schedules a short debounced save, so
+  // the value reaches the session whether or not the input ever blurs; (2) blur flushes it at once;
+  // (3) a device switch flushes and AWAITS it before reloading the canvas (see the [vw] effect below).
+  const blockWRef = useRef(blockW)
+  useEffect(() => { blockWRef.current = blockW }, [blockW])
+  const widthSaveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
+  const flushWidthSave = useCallback((id: string) => {
+    const t = widthSaveTimers.current[id]
+    if (!t) return
+    clearTimeout(t); delete widthSaveTimers.current[id]
+    persistWidths(id, blockWRef.current[id])
+  }, [persistWidths])
+  const flushAllWidthSaves = useCallback(() => { for (const id of Object.keys(widthSaveTimers.current)) flushWidthSave(id) }, [flushWidthSave])
+
+  // Typing updates local state + the live preview at once; the session save follows ~400ms later
+  // (debounced per block, so we don't POST on every keystroke) or sooner on blur / device switch.
+  const setWidth = useCallback((id: string, dim: 'd' | 't' | 'm', v: string) => {
+    setBlockW((w) => ({ ...w, [id]: { ...(w[id] ?? { d: '100', t: '100', m: '100' }), [dim]: v } }))
+    // patch the matching breakpoint class live so the active device preview updates immediately
+    queueMicrotask(() => domWidth(id, dim, v))
+    const prev = widthSaveTimers.current[id]
+    if (prev) clearTimeout(prev)
+    widthSaveTimers.current[id] = setTimeout(() => { delete widthSaveTimers.current[id]; persistWidths(id, blockWRef.current[id]) }, 400)
+  }, [domWidth, persistWidths])
+
+  // Device switch: flush pending width saves, wait for the save in flight, THEN let the iframe reload
+  // at the new viewport — so the fresh render already carries the widths just typed.
+  useEffect(() => {
+    let alive = true
+    ;(async () => {
+      flushAllWidthSaves()
+      try { await lastSaveRef.current } catch { /* a failed save was already reported */ }
+      if (alive) setFrameVw(vw)
+    })()
+    return () => { alive = false }
+  }, [vw, flushAllWidthSaves])
 
   // Apply a drag-and-drop SCHEMA to a zone/cell (Mantis #0010973 — "slow to change the layout of
   // the D&D zone"). Used to reload the whole canvas (nonce) for this: on a page with many blocks
@@ -1711,7 +1749,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
                     {dim === 'd' ? '🖥' : dim === 't' ? '📱' : '📲'}
                     <input data-testid={`width-${dim}-${r.id}`} type="number" min={0} max={100} step={1}
                       value={blockW[r.id]?.[dim] ?? '100'} onClick={(e) => e.stopPropagation()} onChange={(e) => setWidth(r.id, dim, e.target.value)}
-                      onBlur={() => persistWidths(r.id, blockW[r.id])}
+                      onBlur={() => flushWidthSave(r.id)}
                       style={{ width: 40, height: 20, border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 5, fontSize: 10, textAlign: 'right', padding: '0 3px' }} />
                   </label>
                 ))}
