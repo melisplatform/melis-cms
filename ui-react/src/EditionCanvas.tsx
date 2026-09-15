@@ -1142,6 +1142,53 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
   }, [tree, locate, domReorder, idPage])
 
+  // One drop resolution for BOTH input paths (HTML5 mouse drop below, touch drag next): same cell →
+  // reorder, other cell → cross-zone move.
+  const dropBlock = useCallback((src: { zoneId: string; refId: string; index: number }, zoneId: string, targetIdx: number) => {
+    if (src.zoneId === zoneId) { if (src.index !== targetIdx) move(zoneId, src.index, targetIdx) }
+    else void moveAcrossZones(src.zoneId, src.refId, zoneId, targetIdx)
+  }, [move, moveAcrossZones])
+
+  // Touch drag for the panel's block rows (mobile). The native HTML5 drag events the rows use never
+  // fire from touch input in any browser (mouse-only by spec), so on a phone the ⠿ rows could not be
+  // moved at all. Same gesture tracking as melis-ai's use-drag-reorder: touchstart on the handle
+  // (touch-action:none so the browser doesn't turn it into a scroll), document-level touchmove/
+  // touchend, hit-test with elementFromPoint on the rows' data-drop-zone/data-drop-index, then the
+  // very same dropBlock() the mouse drop uses. A floating chip follows the finger and the row under
+  // it is outlined — without a native drag ghost the gesture otherwise reads as "not working".
+  type TouchDrag = { zoneId: string; refId: string; index: number; label: string; x: number; y: number; over: { zoneId: string; index: number } | null }
+  const [touchDrag, setTouchDrag] = useState<TouchDrag | null>(null)
+  const touchDragRef = useRef<TouchDrag | null>(null)
+  const startBlockTouchDrag = useCallback((zoneId: string, refId: string, index: number, label: string) => (e: React.TouchEvent) => {
+    const t = e.touches[0]
+    if (!t) return
+    const st: TouchDrag = { zoneId, refId, index, label, x: t.clientX, y: t.clientY, over: null }
+    touchDragRef.current = st; setTouchDrag(st)
+    const hit = (x: number, y: number) => {
+      const el = document.elementFromPoint(x, y) as HTMLElement | null
+      const row = el?.closest('[data-drop-zone]') as HTMLElement | null
+      return row ? { zoneId: row.dataset.dropZone || '', index: Number(row.dataset.dropIndex || 0) } : null
+    }
+    const onMove = (ev: Event) => {
+      const te = ev as TouchEvent; const p = te.touches[0]; const cur = touchDragRef.current
+      if (!p || !cur) return
+      if (te.cancelable) te.preventDefault() // we own this gesture — no page/drawer scroll
+      const next = { ...cur, x: p.clientX, y: p.clientY, over: hit(p.clientX, p.clientY) }
+      touchDragRef.current = next; setTouchDrag(next)
+    }
+    const finish = (commit: boolean) => {
+      document.removeEventListener('touchmove', onMove); document.removeEventListener('touchend', onEnd); document.removeEventListener('touchcancel', onCancel)
+      const cur = touchDragRef.current
+      touchDragRef.current = null; setTouchDrag(null)
+      if (commit && cur?.over && !(cur.over.zoneId === cur.zoneId && cur.over.index === cur.index)) dropBlock({ zoneId: cur.zoneId, refId: cur.refId, index: cur.index }, cur.over.zoneId, cur.over.index)
+    }
+    const onEnd = () => finish(true)
+    const onCancel = () => finish(false)
+    document.addEventListener('touchmove', onMove, { passive: false })
+    document.addEventListener('touchend', onEnd)
+    document.addEventListener('touchcancel', onCancel)
+  }, [dropBlock])
+
   // Inject ↑/↓ reorder arrows IN THE CANVAS, on each plugin wrapper of a leaf zone holding >1 block.
   // The panel's drag-reorder is unreliable inside the iframe; these arrows give the same move() (→
   // setZoneRefs, immediate draft save) with a single click. Driven by the tree (authoritative order),
@@ -1575,8 +1622,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     let src: { zoneId: string; refId: string; index: number } | null = null
     try { src = JSON.parse(e.dataTransfer.getData('text/plain')) } catch { /* not our payload — ignore */ }
     if (!src || typeof src.index !== 'number') return
-    if (src.zoneId === zoneId) move(zoneId, src.index, targetIdx)
-    else void moveAcrossZones(src.zoneId, src.refId, zoneId, targetIdx)
+    dropBlock(src, zoneId, targetIdx)
   }
 
   const tr = peT()
@@ -1704,15 +1750,19 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
 
         {/* this cell's own blocks (only meaningful for a leaf; a split cell holds sub-cells instead) */}
         {isLeaf && cell.refs.map((r, i) => (
-          <div key={r.id} data-testid={`block-${r.id}`} draggable
+          <div key={r.id} data-testid={`block-${r.id}`} data-drop-zone={cell.id} data-drop-index={i} draggable
             onDragStart={(e) => e.dataTransfer.setData('text/plain', JSON.stringify({ zoneId: cell.id, refId: r.id, index: i }))}
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => onDrop(cell.id, i, e)}
             onMouseEnter={() => highlight(r.id, true)}
             onMouseLeave={() => highlight(r.id, false)}
-            style={{ padding: '5px 8px', borderTop: '1px solid var(--color-border,#e5e7eb)', fontSize: 12, cursor: 'grab', background: selected?.refId === r.id ? 'color-mix(in srgb, var(--color-primary,#dc2626) 14%, transparent)' : undefined }}>
+            style={{ padding: '5px 8px', borderTop: '1px solid var(--color-border,#e5e7eb)', fontSize: 12, cursor: 'grab', background: selected?.refId === r.id ? 'color-mix(in srgb, var(--color-primary,#dc2626) 14%, transparent)' : undefined,
+              // touch drag (mobile): outline the row the finger is over — the drop target
+              outline: touchDrag?.over && touchDrag.over.zoneId === cell.id && touchDrag.over.index === i && touchDrag.refId !== r.id ? '2px solid var(--color-primary,#dc2626)' : undefined, outlineOffset: -2 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }} onClick={() => selectBlock(cell.id, r.id)}>
-              <span style={{ color: 'var(--color-muted-foreground,#9ca3af)' }}>⠿</span>
+              {/* ⠿ = the TOUCH drag handle (touch-action:none keeps the browser from scrolling instead); mouse drag still works on the whole row */}
+              <span data-testid={`block-handle-${r.id}`} onTouchStart={startBlockTouchDrag(cell.id, r.id, i, r.mini ? tr.ecMiniTemplate : r.label)}
+                style={{ color: 'var(--color-muted-foreground,#9ca3af)', touchAction: 'none', padding: '4px 4px', margin: '-4px -2px', cursor: 'grab' }}>⠿</span>
               {/* plugin / mini-template thumbnail (if any) — small, aspect kept, so the row stays compact */}
               {doc?.pluginThumbs?.[r.id] ? (
                 <img src={doc.pluginThumbs[r.id]} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
@@ -1758,8 +1808,9 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
           </div>
         ))}
         {isLeaf && cell.refs.length === 0 && (
-          <div onDragOver={(e) => e.preventDefault()} onDrop={(e) => onDrop(cell.id, 0, e)}
-            style={{ fontSize: 11, color: 'var(--color-muted-foreground,#9ca3af)', padding: '6px 8px' }}>{tr.ecEmptyCell}</div>
+          <div data-drop-zone={cell.id} data-drop-index={0} onDragOver={(e) => e.preventDefault()} onDrop={(e) => onDrop(cell.id, 0, e)}
+            style={{ fontSize: 11, color: 'var(--color-muted-foreground,#9ca3af)', padding: '6px 8px',
+              outline: touchDrag?.over && touchDrag.over.zoneId === cell.id ? '2px solid var(--color-primary,#dc2626)' : undefined, outlineOffset: -2 }}>{tr.ecEmptyCell}</div>
         )}
 
         {/* nested sub-cells (columns/rows), recursive */}
@@ -2021,6 +2072,12 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
         </div>
       )}
 
+      {/* Touch drag (mobile): chip following the finger with the dragged block's label. */}
+      {touchDrag && (
+        <div data-testid="touch-drag-chip" style={{ position: 'fixed', left: touchDrag.x + 14, top: touchDrag.y - 16, zIndex: 100, pointerEvents: 'none', padding: '5px 10px', borderRadius: 6, background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', border: '1px solid var(--color-primary,#dc2626)', boxShadow: '0 6px 18px rgba(0,0,0,.25)', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          ⠿ {touchDrag.label}
+        </div>
+      )}
       {/* Confirm before removing a plugin from a zone (destructive — the block disappears from the page). */}
       {confirmRemove && (
         <div data-testid="confirm-remove" style={{ position: 'fixed', inset: 0, zIndex: 95, background: 'rgba(0,0,0,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setConfirmRemove(null)}>
