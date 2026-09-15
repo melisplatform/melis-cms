@@ -284,6 +284,36 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const vw = device === 'mobile' ? 375 : device === 'tablet' ? 768 : 0
   const renderSrc = `/melis/react-api/cms-page/edition/render?idPage=${idPage}&_r=${nonce}&vw=${vw}`
 
+  // Every structural edit is issued through here so the live-patchers below can tell whether the server
+  // state moved under them: saveSeqRef counts issued saves, lastSaveRef is the latest one still settling.
+  const saveSeqRef = useRef(0)
+  const lastSaveRef = useRef<Promise<unknown>>(Promise.resolve())
+  const saveOps = useCallback(<T,>(ops: object[]): Promise<T> => {
+    saveSeqRef.current++
+    const p = apiPost<T>('edition/save', { idPage, ops })
+    lastSaveRef.current = p.catch(() => undefined)
+    return p
+  }, [idPage])
+
+  // Fetch the current render for a live DOM patch, but only once the server state is STABLE: wait for any
+  // save still in flight, fetch, and if another save was issued meanwhile, fetch again (bounded).
+  // Mantis #0010987 (plugin lands in cell 1 instead of cell 3): after applyLayout the panel already shows
+  // the new cells (tree/doc refreshed first) while the render used for the DOM swap is still downloading.
+  // A block dragged into another cell during that window IS persisted (moveRef), but the in-flight render
+  // predates it — so swapping that stale subtree in showed the block back in cell 1, out of step with the
+  // panel and the session. Settling the fetch against the save sequence guarantees the patched DOM
+  // reflects every edit made while it loaded. Same protection for duplicateZone/duplicateBlock.
+  const fetchSettledRender = useCallback(async (): Promise<string> => {
+    let html = ''
+    for (let attempt = 0; attempt < 4; attempt++) {
+      await lastSaveRef.current
+      const seq = saveSeqRef.current
+      html = await fetch(`/melis/react-api/cms-page/edition/render?idPage=${idPage}&_r=${Date.now()}&vw=${vw}`, { credentials: 'same-origin' }).then((r) => r.text())
+      if (saveSeqRef.current === seq) break
+    }
+    return html
+  }, [idPage, vw])
+
   // Per-block DOM decoration, extracted from onFrameLoad so it can also run on a SUBTREE — used to
   // live-patch a newly duplicated/added zone into the canvas without a full reload (see duplicateZone).
   // `root` is either the whole iframe Document (full load — original behaviour, unchanged) or a single
@@ -577,7 +607,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const saveInline = useCallback(async (refId: string, html: string) => {
     setSaving(true)
     try {
-      await apiPost('edition/save', { idPage, ops: [{ op: 'setTagContent', id: refId, content: html }] })
+      await saveOps([{ op: 'setTagContent', id: refId, content: html }])
       // No toast on edits — editing only updates the working session; notifications belong to the
       // top toolbar's Save/Publish (like legacy). Errors below still notify.
       window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } }))
@@ -867,7 +897,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     const missing = uniq.filter((id) => !known.has(id))
     if (missing.length === 0) return
     try {
-      await apiPost('edition/save', { idPage, ops: [{ op: 'ensureZones', zones: missing }] })
+      await saveOps([{ op: 'ensureZones', zones: missing }])
       const d2 = await apiGet<Doc>(`edition/document?idPage=${idPage}`)
       const zoneNodes = (d2.nodes || []).filter((n) => n.kind === 'zone' && n.id)
       if (zoneNodes.length) setTree(zoneNodes.map((z) => toCell(z, d2.pluginTitles || {})))
@@ -1024,7 +1054,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const persistZoneRefs = useCallback(async (zoneId: string, refIds: string[]) => {
     setSaving(true)
     try {
-      await apiPost('edition/save', { idPage, ops: [{ op: 'setZoneRefs', zoneId, refIds }] })
+      await saveOps([{ op: 'setZoneRefs', zoneId, refIds }])
     } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
   }, [idPage])
 
@@ -1091,7 +1121,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     // session edit, no page-tree metadata involved, so no melis:cms-tree-refresh here either.
     setSaving(true)
     try {
-      await apiPost('edition/save', { idPage, ops: [{ op: 'moveRef', fromZoneId, toZoneId, refId, position }] })
+      await saveOps([{ op: 'moveRef', fromZoneId, toZoneId, refId, position }])
     } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
   }, [tree, locate, domReorder, idPage])
 
@@ -1169,7 +1199,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const persistWidths = useCallback((id: string, v?: { d: string; t: string; m: string }) => {
     if (!v) return
     setSaving(true)
-    apiPost('edition/save', { idPage, ops: [{ op: 'setWidths', id, desktop: v.d, tablet: v.t, mobile: v.m }] })
+    saveOps([{ op: 'setWidths', id, desktop: v.d, tablet: v.t, mobile: v.m }])
       .then(() => window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } })))
       .catch((e) => notify('ko', 'MelisCms', errMsg(e)))
       .finally(() => setSaving(false))
@@ -1186,7 +1216,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const applyLayout = useCallback(async (zoneId: string, template: string) => {
     setSaving(true)
     try {
-      await apiPost('edition/save', { idPage, ops: [{ op: 'applyLayout', zoneId, template }] })
+      await saveOps([{ op: 'applyLayout', zoneId, template }])
 
       const d2 = await apiGet<Doc>(`edition/document?idPage=${idPage}`)
       const zoneNodes = (d2.nodes || []).filter((n) => n.kind === 'zone' && n.id)
@@ -1207,7 +1237,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       const d = iframeRef.current?.contentDocument
       if (d) {
         try {
-          const html = await fetch(`/melis/react-api/cms-page/edition/render?idPage=${idPage}&_r=${Date.now()}&vw=${vw}`, { credentials: 'same-origin' }).then((r) => r.text())
+          const html = await fetchSettledRender()
           const parsed = new DOMParser().parseFromString(html, 'text/html')
           const esc = zoneId.replace(/["\\]/g, '\\$&')
           const newEl = parsed.querySelector(`[data-dragdropzone-id="${esc}"]`)
@@ -1235,7 +1265,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
 
       window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } }))
     } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
-  }, [idPage, vw, decorateSubtree])
+  }, [idPage, vw, decorateSubtree, fetchSettledRender, saveOps])
 
   // Create a new top-level zone right after $zoneId — Mantis #0010958 ("add multiple D&D zones").
   // A page's template LOOKS fixed to one MelisDragDropZone($pageId, "some_id") call per zone, but
@@ -1258,7 +1288,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const duplicateZone = useCallback(async (zoneId: string, withContent: boolean) => {
     setSaving(true)
     try {
-      const res = await apiPost<{ newZoneId?: string }>('edition/save', { idPage, ops: [{ op: 'duplicateZone', zoneId, withContent }] })
+      const res = await saveOps<{ newZoneId?: string }>([{ op: 'duplicateZone', zoneId, withContent }])
       const newZoneId = res?.newZoneId || ''
 
       const d2 = await apiGet<Doc>(`edition/document?idPage=${idPage}`)
@@ -1280,7 +1310,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       const d = iframeRef.current?.contentDocument
       if (d && newZoneId) {
         try {
-          const html = await fetch(`/melis/react-api/cms-page/edition/render?idPage=${idPage}&_r=${Date.now()}&vw=${vw}`, { credentials: 'same-origin' }).then((r) => r.text())
+          const html = await fetchSettledRender()
           const parsed = new DOMParser().parseFromString(html, 'text/html')
           const escNew = newZoneId.replace(/["\\]/g, '\\$&')
           const escSrc = zoneId.replace(/["\\]/g, '\\$&')
@@ -1298,7 +1328,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
 
       window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } }))
     } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
-  }, [idPage, vw, decorateSubtree])
+  }, [idPage, vw, decorateSubtree, fetchSettledRender, saveOps])
 
   // Duplicate ONE block (typically a mini-template) right after itself, inside its own cell — Mantis
   // #0011001 ("we can duplicate a zone, but could we duplicate just a mini template?"). Same contract
@@ -1310,13 +1340,13 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const duplicateBlock = useCallback(async (zoneId: string, refId: string) => {
     setSaving(true)
     try {
-      const res = await apiPost<{ newRefId?: string }>('edition/save', { idPage, ops: [{ op: 'duplicateRef', zoneId, refId }] })
+      const res = await saveOps<{ newRefId?: string }>([{ op: 'duplicateRef', zoneId, refId }])
       const newRefId = res?.newRefId || ''
       if (!newRefId) throw new Error(peT().ecDuplicateBlockFailed)
 
       const [d2, html] = await Promise.all([
         apiGet<Doc>(`edition/document?idPage=${idPage}`),
-        fetch(`/melis/react-api/cms-page/edition/render?idPage=${idPage}&_r=${Date.now()}&vw=${vw}`, { credentials: 'same-origin' }).then((r) => r.text()).catch(() => ''),
+        fetchSettledRender().catch(() => ''),
       ])
 
       let patched = false
@@ -1355,7 +1385,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       if (!patched) setNonce((n) => n + 1)
       window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } }))
     } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
-  }, [idPage, vw, decorateSubtree, locate])
+  }, [idPage, vw, decorateSubtree, locate, fetchSettledRender, saveOps])
 
   // Remove a DYNAMICALLY CREATED zone (one duplicateZone made — see Cell.removable). Confirmed by the
   // caller (confirmRemoveZone modal) before this runs. Whole top-level zone, so — unlike removeBlock,
@@ -1370,7 +1400,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     const esc = zoneId.replace(/["\\]/g, '\\$&')
     d?.querySelector(`[data-dragdropzone-id="${esc}"]`)?.remove()
     setSaving(true)
-    apiPost('edition/save', { idPage, ops: [{ op: 'removeZone', zoneId }] })
+    saveOps([{ op: 'removeZone', zoneId }])
       .then(() => window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } })))
       .catch((e) => notify('ko', 'MelisCms', errMsg(e)))
       .finally(() => setSaving(false))
@@ -1414,7 +1444,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     }
 
     setSaving(true)
-    apiPost('edition/save', { idPage, ops: [{ op: 'reorderZones', zoneIds: newTree.map((c) => c.id) }] })
+    saveOps([{ op: 'reorderZones', zoneIds: newTree.map((c) => c.id) }])
       .then(() => window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } })))
       .catch((e) => notify('ko', 'MelisCms', errMsg(e)))
       .finally(() => setSaving(false))
@@ -1482,7 +1512,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     setPluginPicker(null)
     setSaving(true)
     try {
-      await apiPost('edition/save', { idPage, ops: [{ op: 'addPlugin', zoneId: cellId, module: entry.module, name: entry.name }] })
+      await saveOps([{ op: 'addPlugin', zoneId: cellId, module: entry.module, name: entry.name }])
       // No toast on edits (session only) — see saveInline.
       setNonce((n) => n + 1)
       window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } }))
