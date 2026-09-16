@@ -1,4 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+// Every fixed overlay below (menus, pickers, modals, confirms) is PORTALED to document.body: the canvas
+// lives inside the host's tool-tab container (position:absolute; z-index:5 — a stacking context), so a
+// position:fixed overlay rendered in place is stacked INSIDE that context and the host's sticky top bar
+// (z-index 20, root context) painted over it — visible on a phone where a tall modal reaches the top
+// (Mantis #0011015: "the modal and the top menu are on top of each other"). Same fix as
+// DuplicatePageModal / PageTree / CmsSidebar.
+import { createPortal } from 'react-dom'
 import { apiGet, apiPost } from './PageTabs'
 import { hasPluginForm, PluginTabbedForm, SchemaForm, PluginFormBoundary } from './PluginForms'
 import { PagePicker } from './PagePicker'
@@ -1975,7 +1982,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
         const rows = 3 + (isTag ? 0 : 1) + (aiEligible ? 1 : 0)
         const menuH = 30 + rows * 32
         const top = rowMenu.y + menuH > window.innerHeight ? Math.max(8, rowMenu.y - 30 - menuH) : rowMenu.y
-        return (
+        return createPortal(
           <>
             <div data-testid="row-menu-backdrop" onClick={close} style={{ position: 'fixed', inset: 0, zIndex: 70 }} />
             <div data-testid={`row-menu-${rowMenu.refId}`} role="menu" style={{ position: 'fixed', right: rowMenu.right, top, zIndex: 71, minWidth: 200, maxWidth: 'calc(100vw - 16px)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,.18)', padding: 4 }}>
@@ -1996,12 +2003,13 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
               <button className="melis-ec-mi" data-testid={`duplicate-block-${rowMenu.refId}`} role="menuitem" style={{ ...item, opacity: saving ? .6 : 1, cursor: saving ? 'not-allowed' : 'pointer' }} disabled={saving} onClick={() => { close(); void duplicateBlock(rowMenu.zoneId, rowMenu.refId) }}><span style={ico}><ZoneCopyIcon /></span>{tr.ecDuplicateBlock}</button>
               <button className="melis-ec-mi" data-testid={`remove-${rowMenu.refId}`} role="menuitem" style={{ ...item, color: '#dc2626' }} onClick={() => { close(); setConfirmRemove({ zoneId: rowMenu.zoneId, refId: rowMenu.refId, label: rowMenu.label }) }}><span style={{ ...ico, color: '#dc2626' }}>×</span>{tr.ecRemoveFromZone}</button>
             </div>
-          </>
+          </>,
+          document.body,
         )
       })()}
       {picker && (() => {
         const cur = (findCell(tree, picker.cellId)?.template) || DEFAULT_TPL
-        return (
+        return createPortal(
           <>
             <div onClick={() => setPicker(null)} style={{ position: 'fixed', inset: 0, zIndex: 60 }} />
             <div style={{ position: 'fixed', left: picker.x, top: picker.y, zIndex: 61, width: 300, maxHeight: '62vh', overflow: 'auto', background: 'var(--color-card,#fff)', border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 8, boxShadow: '0 12px 34px rgba(0,0,0,.18)', padding: 8 }}>
@@ -2015,7 +2023,8 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
                 ))}
               </div>
             </div>
-          </>
+          </>,
+          document.body,
         )
       })()}
 
@@ -2035,7 +2044,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
           onSaved: onConfigSaved, onCancel: () => setConfig(null),
         }
         const toIframe = () => setConfig((c) => (c ? { ...c, useIframe: true } : c))
-        return (
+        return createPortal(
           <div style={{ position: 'fixed', inset: 0, zIndex: 80, background: 'rgba(0,0,0,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setConfig(null)}>
             <div onClick={(e) => e.stopPropagation()} style={{ width: 'min(760px, 94vw)', maxHeight: '88vh', display: 'flex', flexDirection: 'column', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 12, boxShadow: '0 24px 70px rgba(0,0,0,.45)', overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', borderBottom: '1px solid var(--color-border,#e5e7eb)' }}>
@@ -2063,7 +2072,8 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
                 )}
               </div>
             </div>
-          </div>
+          </div>,
+          document.body,
         )
       })()}
 
@@ -2073,7 +2083,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
         const q = pickerQuery.trim().toLowerCase()
         const allSecs = catalog?.sections || []
         const secs = filterPalette(allSecs, q).filter((s) => !pickerSection || s.key === pickerSection)
-        return (
+        return createPortal(
           <div data-testid="plugin-picker" style={{ position: 'fixed', inset: 0, zIndex: 85, background: 'rgba(0,0,0,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setPluginPicker(null)}>
             <div onClick={(e) => e.stopPropagation()} style={{ width: 'min(820px, 95vw)', maxHeight: '88vh', display: 'flex', flexDirection: 'column', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 12, boxShadow: '0 24px 70px rgba(0,0,0,.45)', overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', borderBottom: '1px solid var(--color-border,#e5e7eb)' }}>
@@ -2161,13 +2171,14 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
                 ))}
               </div>
             </div>
-          </div>
+          </div>,
+          document.body,
         )
       })()}
 
       {/* Page picker requested by a config iframe field (bridged via postMessage). Native React tree →
           answers the page id back to the iframe that asked. Above the config modal. */}
-      {pagePicker && (
+      {pagePicker && createPortal(
         <div style={{ position: 'fixed', inset: 0, zIndex: 92, background: 'rgba(0,0,0,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setPagePicker(null)}>
           <div onClick={(e) => e.stopPropagation()} style={{ width: 'min(460px, 94vw)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 12, boxShadow: '0 24px 70px rgba(0,0,0,.45)', overflow: 'visible' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', borderBottom: '1px solid var(--color-border,#e5e7eb)' }}>
@@ -2179,7 +2190,8 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
                 onChange={(id) => { try { pagePicker.source.postMessage({ type: 'melis-page-picked', pageId: String(id) }, '*') } catch { /* iframe gone */ } setPagePicker(null) }} />
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
       {/* Touch drag (mobile): chip following the finger with the dragged block's label. */}
@@ -2189,7 +2201,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
         </div>
       )}
       {/* Confirm before removing a plugin from a zone (destructive — the block disappears from the page). */}
-      {confirmRemove && (
+      {confirmRemove && createPortal(
         <div data-testid="confirm-remove" style={{ position: 'fixed', inset: 0, zIndex: 95, background: 'rgba(0,0,0,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setConfirmRemove(null)}>
           <div onClick={(e) => e.stopPropagation()} style={{ width: 'min(420px, 94vw)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 12, boxShadow: '0 24px 70px rgba(0,0,0,.45)', overflow: 'hidden' }}>
             <div style={{ padding: '16px 18px 6px', fontWeight: 700, fontSize: 15 }}>{tr.ecRemovePluginTitle}</div>
@@ -2203,11 +2215,12 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
                 style={{ appearance: 'none', border: '1px solid #dc2626', background: '#dc2626', color: '#fff', borderRadius: 6, padding: '7px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>{tr.ecRemoveBtn}</button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
       {/* Confirm before removing a DYNAMICALLY CREATED zone (destructive — the zone + everything in it disappears). */}
-      {confirmRemoveZone && (
+      {confirmRemoveZone && createPortal(
         <div data-testid="confirm-remove-zone" style={{ position: 'fixed', inset: 0, zIndex: 95, background: 'rgba(0,0,0,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setConfirmRemoveZone(null)}>
           <div onClick={(e) => e.stopPropagation()} style={{ width: 'min(420px, 94vw)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 12, boxShadow: '0 24px 70px rgba(0,0,0,.45)', overflow: 'hidden' }}>
             <div style={{ padding: '16px 18px 6px', fontWeight: 700, fontSize: 15 }}>{tr.ecRemoveZoneTitle}</div>
@@ -2221,7 +2234,8 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
                 style={{ appearance: 'none', border: '1px solid #dc2626', background: '#dc2626', color: '#fff', borderRadius: 6, padding: '7px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>{tr.ecRemoveBtn}</button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   )
