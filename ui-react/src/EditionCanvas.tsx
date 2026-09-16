@@ -152,6 +152,30 @@ function filterPalette(sections: PaletteSection[], q: string): PaletteSection[] 
 }
 
 /** Find a plugin ref's {module,name} anywhere in the document zones (data nodes don't carry them). */
+// The Melis AI "M" badge the legacy handle shows — served by melis-ai-community-extensions' melisAIIcon
+// view helper (inline SVG, fresh gradient id per call). Fetched once, shared by every canvas instance.
+let aiIconPromise: Promise<string> | null = null
+function loadAiIcon(): Promise<string> {
+  if (!aiIconPromise) {
+    aiIconPromise = fetch('/melis/MelisAICommunityExtensions/MiniTemplate/getAIIcon', { credentials: 'same-origin' })
+      .then((r) => (r.ok ? r.text() : ''))
+      .then((s) => (/^\s*<svg[\s\S]*<\/svg>\s*$/i.test(s) ? s.trim() : ''))
+      .catch(() => '')
+  }
+  return aiIconPromise
+}
+
+// A live inline TinyMCE editor leaves data-mce-* attributes, bogus nodes and contenteditable in the
+// editable's DOM — strip them when the block's markup has to be read straight from innerHTML.
+function cleanEditableHtml(html: string): string {
+  try {
+    const doc = new DOMParser().parseFromString(`<body>${html}</body>`, 'text/html')
+    doc.querySelectorAll('[data-mce-bogus]').forEach((e) => e.remove())
+    doc.querySelectorAll('*').forEach((e) => { for (const a of Array.from(e.attributes)) if (/^data-mce-/.test(a.name) || a.name === 'contenteditable') e.removeAttribute(a.name) })
+    return doc.body.innerHTML
+  } catch { return html }
+}
+
 function findPluginRef(nodes: DocZone[] | undefined, refId: string): { module: string; name: string } | null {
   for (const n of nodes || []) {
     if (n.kind !== 'zone') continue
@@ -239,6 +263,18 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const [confirmRemove, setConfirmRemove] = useState<{ zoneId: string; refId: string; label: string } | null>(null) // remove-plugin confirm
   const [confirmRemoveZone, setConfirmRemoveZone] = useState<{ zoneId: string; label: string } | null>(null) // remove-zone confirm (dynamically created zones only)
   const [panelCollapsed, setPanelCollapsed] = useState(false) // structure panel collapsed to a thin bar
+  // Block row "⋯" menu (one place for every per-block action) — anchored at the row button's rect.
+  const [rowMenu, setRowMenu] = useState<{ zoneId: string; refId: string; label: string; mini: boolean; right: number; y: number } | null>(null)
+  // melis-ai-community-extensions injects react-bridge.js into the canvas render; when its global is
+  // there the row menu offers "Open in Melis AI" (feature-detected — nothing shows if the module is off).
+  const [aiBridgeReady, setAiBridgeReady] = useState(false)
+  const [aiIcon, setAiIcon] = useState('') // the module's own "M" badge SVG, once the bridge is detected
+  useEffect(() => {
+    if (!aiBridgeReady || aiIcon) return
+    let alive = true
+    loadAiIcon().then((s) => { if (alive && s) setAiIcon(s) })
+    return () => { alive = false }
+  }, [aiBridgeReady, aiIcon])
   const [isMobile, setIsMobile] = useState(false) // real viewport is phone-narrow → panel becomes a drawer
   const [selected, setSelected] = useState<{ zoneId: string; refId: string | null } | null>(null) // canvas→panel locate
   const [config, setConfig] = useState<{ zoneId: string; ref: { id: string; label: string }; node: DocZone | null; module: string; pluginName: string; tag: string; useIframe: boolean; v: number } | null>(null) // plugin config modal
@@ -507,6 +543,15 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
         if (isMobileRef.current) setPanelCollapsed(false)
       }
     })
+    // Probe for the Melis AI bridge (its script tag sits in the render, so it lands shortly after load).
+    setAiBridgeReady(false)
+    let aiTries = 0
+    const probeAi = () => {
+      const w = iframeRef.current?.contentWindow as (Window & { __melisAiTryOpenReactDialog?: unknown }) | null | undefined
+      if (w && typeof w.__melisAiTryOpenReactDialog === 'function') setAiBridgeReady(true)
+      else if (++aiTries < 20) setTimeout(probeAi, 250)
+    }
+    probeAi()
     // Inject the in-canvas reorder arrows once the fresh render is in the DOM (gone after every reload).
     injectControlsRef.current?.()
     // Fresh page: its template drag-drop zones are rendered here but absent from the (empty) document —
@@ -1142,6 +1187,35 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
   }, [tree, locate, domReorder, idPage])
 
+  // "Open in Melis AI" for an html-tag / mini-template block — the React counterpart of the legacy
+  // "M" handle (melis-ai-community-extensions/html-tag-minitemplate-btn.js), which is injected into
+  // the legacy tools box that this canvas hides. Same hand-over that handle uses: the module's
+  // react-bridge.js global inside the canvas (__melisAiTryOpenReactDialog, kind 'html-tag') opens the
+  // host's AI dialog with the block's CURRENT content and inserts back into the same block. The
+  // editor id is the canvas's own inline TinyMCE instance (melis-inline-<ref>) when it's live, so the
+  // bridge's insertIntoHtmlTag sets content on the real editor (its legacy [id*=pluginId] lookup would
+  // find our outer wrapper first and fail with "editor is no longer available").
+  const openInMelisAi = useCallback((refId: string) => {
+    const w = iframeRef.current?.contentWindow as (Window & { __melisAiTryOpenReactDialog?: (ctx: object) => boolean; tinymce?: { get: (id: string) => { getContent: () => string } | null } }) | null | undefined
+    const d = iframeRef.current?.contentDocument
+    if (!w || !d || typeof w.__melisAiTryOpenReactDialog !== 'function') { notify('ko', 'MelisCms', peT().ecAiUnavailable); return }
+    const esc = refId.replace(/["\\]/g, '\\$&')
+    const tb = d.querySelector(`.melis-plugin-tools-box[data-plugin-id="${esc}"]`) as HTMLElement | null
+    const container = (tb?.closest('.melis-ui-outlined') as HTMLElement | null) || locate(refId)
+    const editable = container?.querySelector('.melis-editable') as HTMLElement | null
+    const elId = 'melis-inline-' + refId.replace(/[^A-Za-z0-9_-]/g, '')
+    const editorId = w.tinymce?.get(elId) ? elId : (editable?.id || '')
+    // Content: what the block holds RIGHT NOW. The live inline editor's getContent() came back EMPTY
+    // here (measured: 0 chars vs 1984 in the DOM), which sent the dialog a blank preview. Read the
+    // editable's own markup like the legacy handle does, and only prefer the editor's serialisation
+    // when it actually returns something.
+    let htmlContent = ''
+    try { htmlContent = (editorId && w.tinymce?.get(editorId)?.getContent()) || '' } catch { /* editor not ready */ }
+    if (!htmlContent) htmlContent = cleanEditableHtml(editable?.innerHTML || '')
+    const handled = w.__melisAiTryOpenReactDialog({ kind: 'html-tag', siteModule: tb?.getAttribute('data-site-module') || doc?.namespace || '', editorId, htmlContent })
+    if (!handled) notify('ko', 'MelisCms', peT().ecAiUnavailable)
+  }, [locate, doc])
+
   // One drop resolution for BOTH input paths (HTML5 mouse drop below, touch drag next): same cell →
   // reorder, other cell → cross-zone move.
   const dropBlock = useCallback((src: { zoneId: string; refId: string; index: number }, zoneId: string, targetIdx: number) => {
@@ -1776,21 +1850,18 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
               ) : (
                 <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: selected?.refId === r.id ? 700 : 400 }} title={r.id}>{r.label}</span>
               )}
-              {/* classic (html/media/textarea) blocks are edited by CLICKING in them (WYSIWYG) — no button;
-                  only non-classic plugins get a config button */}
-              {(doc?.nodes.find((n) => n.id === r.id)?.tag || '') !== 'melisTag' && (
-                <button data-testid={`config-${r.id}`} title={tr.ecConfigurePlugin} onClick={(e) => { e.stopPropagation(); openConfig(cell.id, r) }} style={{ ...iconBtn, borderColor: 'var(--color-border,#e5e7eb)' }}>⚙</button>
-              )}
-              {/* responsive-width toggle — the 3 inputs are deployed on demand (they're rarely used and
-                  take up room otherwise). Highlighted when open. */}
-              <button data-testid={`width-toggle-${r.id}`} title={tr.ecResponsiveWidths}
-                onClick={(e) => { e.stopPropagation(); setOpenWidth((w) => (w === r.id ? null : r.id)) }}
-                style={{ ...iconBtn, borderColor: openWidth === r.id ? 'var(--color-primary,#dc2626)' : 'var(--color-border,#e5e7eb)', color: openWidth === r.id ? 'var(--color-primary,#dc2626)' : 'var(--color-foreground,#111827)' }}>↔</button>
-              {/* duplicate THIS block only (Mantis #0011001) — the clone lands right below it, in the same cell */}
-              <button data-testid={`duplicate-block-${r.id}`} title={tr.ecDuplicateBlock} disabled={saving}
-                onClick={(e) => { e.stopPropagation(); void duplicateBlock(cell.id, r.id) }}
-                style={{ ...iconBtn, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? .6 : 1 }}><ZoneCopyIcon /></button>
-              <button data-testid={`remove-${r.id}`} title={tr.ecRemoveFromZone} onClick={(e) => { e.stopPropagation(); setConfirmRemove({ zoneId: cell.id, refId: r.id, label: r.label }) }} style={{ ...iconBtn, borderColor: '#fecaca', color: '#dc2626' }}>×</button>
+              {/* Every per-block action lives in ONE ⋯ menu (configure / Melis AI / widths / duplicate /
+                  remove — see the rowMenu render below): five inline icons per row made the panel
+                  unreadable, especially in the phone drawer. Classic html/media/textarea blocks are still
+                  edited by clicking in them (WYSIWYG); the menu only adds what the row can't do inline. */}
+              <button data-testid={`row-menu-btn-${r.id}`} title={tr.ecMoreActions} aria-haspopup="menu" aria-expanded={rowMenu?.refId === r.id}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  const rc = (e.currentTarget as HTMLElement).getBoundingClientRect()
+                  // anchored by its RIGHT edge to the button (labels vary in width; a left anchor overflowed the viewport)
+                  setRowMenu((m) => (m?.refId === r.id ? null : { zoneId: cell.id, refId: r.id, label: r.label, mini: !!r.mini, right: Math.max(8, window.innerWidth - rc.right), y: rc.bottom + 4 }))
+                }}
+                style={{ ...iconBtn, fontWeight: 700, letterSpacing: 1, borderColor: rowMenu?.refId === r.id ? 'var(--color-primary,#dc2626)' : 'var(--color-border,#e5e7eb)', color: rowMenu?.refId === r.id ? 'var(--color-primary,#dc2626)' : 'var(--color-foreground,#111827)' }}>⋯</button>
             </div>
             {openWidth === r.id && (
               <div data-testid={`widths-${r.id}`} onClick={(e) => e.stopPropagation()} style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6, paddingLeft: 18 }}>
@@ -1825,6 +1896,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--color-background,#fff)' }}>
+      <style>{'.melis-ec-mi:hover{background:color-mix(in srgb, var(--color-foreground,#111827) 7%, transparent)}.melis-ec-mi:disabled{cursor:not-allowed}'}</style>
       {/* discreet saving indicator, floated (no header bar) */}
       {saving && <div style={{ position: 'absolute', top: 6, right: 12, zIndex: 5, fontSize: 11, fontWeight: 600, color: 'var(--color-muted-foreground,#6b7280)', background: 'var(--color-card,#fff)', border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 6, padding: '2px 8px' }}>{tr.ecSaving}</div>}
       {/* overflow:hidden — the mobile drawer lives translated off-screen inside this row; never let a
@@ -1889,6 +1961,44 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       </div>
 
       {/* Deployed schema list (fixed → escapes the panel's overflow clip). Real Old-editor icons. */}
+      {/* Block row ⋯ menu — every per-block action in one place (see the row button). Fixed-positioned
+          over the panel so the panel's own scroll never clips it; the transparent backdrop closes it.
+          "Open in Melis AI" only for html-tag / mini-template blocks AND only when the AI module's
+          bridge is present in the canvas (aiBridgeReady) — the React counterpart of the legacy "M" handle. */}
+      {rowMenu && (() => {
+        const node = (doc?.nodes || []).find((n) => n.id === rowMenu.refId) as (DocZone & { attrs?: Record<string, string> }) | undefined
+        const isTag = (node?.tag || '') === 'melisTag'
+        const aiEligible = aiBridgeReady && (rowMenu.mini || (isTag && (node?.attrs?.type || 'html') === 'html'))
+        const item: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 9, width: '100%', padding: '7px 10px', border: 0, background: 'transparent', borderRadius: 6, fontSize: 12, cursor: 'pointer', color: 'var(--color-foreground,#111827)', textAlign: 'left', whiteSpace: 'nowrap' }
+        const ico: React.CSSProperties = { width: 18, display: 'inline-flex', justifyContent: 'center', color: 'var(--color-muted-foreground,#6b7280)', flex: '0 0 auto' }
+        const close = () => setRowMenu(null)
+        const rows = 3 + (isTag ? 0 : 1) + (aiEligible ? 1 : 0)
+        const menuH = 30 + rows * 32
+        const top = rowMenu.y + menuH > window.innerHeight ? Math.max(8, rowMenu.y - 30 - menuH) : rowMenu.y
+        return (
+          <>
+            <div data-testid="row-menu-backdrop" onClick={close} style={{ position: 'fixed', inset: 0, zIndex: 70 }} />
+            <div data-testid={`row-menu-${rowMenu.refId}`} role="menu" style={{ position: 'fixed', right: rowMenu.right, top, zIndex: 71, minWidth: 200, maxWidth: 'calc(100vw - 16px)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,.18)', padding: 4 }}>
+              <div style={{ padding: '4px 10px 6px', fontSize: 10, fontWeight: 700, color: 'var(--color-muted-foreground,#6b7280)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 260 }}>{rowMenu.mini ? tr.ecMiniTemplate : rowMenu.label}</div>
+              {!isTag && (
+                <button className="melis-ec-mi" data-testid={`config-${rowMenu.refId}`} role="menuitem" style={item} onClick={() => { close(); openConfig(rowMenu.zoneId, { id: rowMenu.refId, label: rowMenu.label }) }}><span style={ico}>⚙</span>{tr.ecConfigurePlugin}</button>
+              )}
+              {aiEligible && (
+                <button className="melis-ec-mi" data-testid={`ai-${rowMenu.refId}`} role="menuitem" style={item} onClick={() => { close(); openInMelisAi(rowMenu.refId) }}>
+                  {/* the same "M" badge as the legacy handle (fetched from the AI module); glyph only if it couldn't be loaded */}
+                  {aiIcon
+                    ? <span data-testid="ai-icon" style={{ ...ico, height: 18, alignItems: 'center' }} dangerouslySetInnerHTML={{ __html: aiIcon }} />
+                    : <span style={{ ...ico, color: 'var(--color-primary,#dc2626)' }}>✦</span>}
+                  {tr.ecOpenInMelisAi}
+                </button>
+              )}
+              <button className="melis-ec-mi" data-testid={`width-toggle-${rowMenu.refId}`} role="menuitem" style={item} onClick={() => { close(); setOpenWidth((w) => (w === rowMenu.refId ? null : rowMenu.refId)) }}><span style={ico}>↔</span>{tr.ecResponsiveWidths}</button>
+              <button className="melis-ec-mi" data-testid={`duplicate-block-${rowMenu.refId}`} role="menuitem" style={{ ...item, opacity: saving ? .6 : 1, cursor: saving ? 'not-allowed' : 'pointer' }} disabled={saving} onClick={() => { close(); void duplicateBlock(rowMenu.zoneId, rowMenu.refId) }}><span style={ico}><ZoneCopyIcon /></span>{tr.ecDuplicateBlock}</button>
+              <button className="melis-ec-mi" data-testid={`remove-${rowMenu.refId}`} role="menuitem" style={{ ...item, color: '#dc2626' }} onClick={() => { close(); setConfirmRemove({ zoneId: rowMenu.zoneId, refId: rowMenu.refId, label: rowMenu.label }) }}><span style={{ ...ico, color: '#dc2626' }}>×</span>{tr.ecRemoveFromZone}</button>
+            </div>
+          </>
+        )
+      })()}
       {picker && (() => {
         const cur = (findCell(tree, picker.cellId)?.template) || DEFAULT_TPL
         return (
