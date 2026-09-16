@@ -289,6 +289,10 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const [pluginPicker, setPluginPicker] = useState<{ cellId: string } | null>(null) // "+" add-plugin modal
   const [pickerQuery, setPickerQuery] = useState('')
   const [pickerSection, setPickerSection] = useState<string | null>(null) // marketplace-style section filter
+  // Accordion state of the picker's module "submenus" (Mantis 0011016): the key `${section}/${module}`
+  // of the ONE module currently expanded, null = all closed (the default when the picker opens).
+  // A search query overrides it (every matching module is shown expanded, else results would be hidden).
+  const [pickerOpenModule, setPickerOpenModule] = useState<string | null>(null)
   const [pagePicker, setPagePicker] = useState<{ value: string; source: Window } | null>(null) // page-select bridge for the config iframe
   const iframeRef = useRef<HTMLIFrameElement | null>(null)
   const panelRef = useRef<HTMLDivElement | null>(null)
@@ -1676,11 +1680,25 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   // another site refetches the right list instead of reusing the first page's.
   useEffect(() => { setCatalog(null) }, [idPage])
 
+  // Default accordion on open: the FIRST module of the FIRST section is expanded on desktop (the
+  // picker otherwise looks empty — headers only — until you click one); on mobile every module
+  // stays closed (the drawer is short, an open list would push the other modules below the fold).
+  // Read through isMobileRef (no state dep in the callback). Null when the catalog isn't here yet.
+  const firstModuleKey = (p: Palette | null): string | null => {
+    const sec = p?.sections?.[0]; const mod = sec?.modules?.[0]
+    return sec && mod ? `${sec.key}/${mod.key}` : null
+  }
   // Open the "+" plugin palette for a cell; fetch the catalog once per page (lazy).
   const openPluginPicker = useCallback(async (cellId: string) => {
     setPluginPicker({ cellId }); setPickerQuery(''); setPickerSection(null)
+    setPickerOpenModule(isMobileRef.current ? null : firstModuleKey(catalog))
     if (catalog === null) {
-      try { setCatalog(await apiGet<Palette>(`edition/plugins?idPage=${idPage}`)) }
+      try {
+        const loaded = await apiGet<Palette>(`edition/plugins?idPage=${idPage}`)
+        setCatalog(loaded)
+        // First open of the page: the catalog wasn't known above → apply the default now it is.
+        if (!isMobileRef.current) setPickerOpenModule(firstModuleKey(loaded))
+      }
       catch (e) { notify('ko', 'MelisCms', errMsg(e)) }
     }
   }, [catalog, idPage])
@@ -1976,17 +1994,28 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
         const node = (doc?.nodes || []).find((n) => n.id === rowMenu.refId) as (DocZone & { attrs?: Record<string, string> }) | undefined
         const isTag = (node?.tag || '') === 'melisTag'
         const aiEligible = aiBridgeReady && (rowMenu.mini || (isTag && (node?.attrs?.type || 'html') === 'html'))
-        const item: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 9, width: '100%', padding: '7px 10px', border: 0, background: 'transparent', borderRadius: 6, fontSize: 12, cursor: 'pointer', color: 'var(--color-foreground,#111827)', textAlign: 'left', whiteSpace: 'nowrap' }
+        // Mobile (phone-narrow viewport, the panel is a drawer): the popover anchored to the row button
+        // overflowed the drawer — long labels ("Responsive widths (desktop / tablet / mobile)") plus
+        // `nowrap` pushed it past the drawer's left edge, half over the dimmed page. Render it as a
+        // BOTTOM SHEET instead: full width (8px gutters), labels allowed to wrap, taller tap targets,
+        // dimmed backdrop, safe-area padding. Desktop keeps the anchored popover.
+        const item: React.CSSProperties = isMobile
+          ? { display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '12px 12px', border: 0, background: 'transparent', borderRadius: 8, fontSize: 14, cursor: 'pointer', color: 'var(--color-foreground,#111827)', textAlign: 'left', whiteSpace: 'normal', lineHeight: 1.3 }
+          : { display: 'flex', alignItems: 'center', gap: 9, width: '100%', padding: '7px 10px', border: 0, background: 'transparent', borderRadius: 6, fontSize: 12, cursor: 'pointer', color: 'var(--color-foreground,#111827)', textAlign: 'left', whiteSpace: 'nowrap' }
         const ico: React.CSSProperties = { width: 18, display: 'inline-flex', justifyContent: 'center', color: 'var(--color-muted-foreground,#6b7280)', flex: '0 0 auto' }
         const close = () => setRowMenu(null)
         const rows = 3 + (isTag ? 0 : 1) + (aiEligible ? 1 : 0)
         const menuH = 30 + rows * 32
         const top = rowMenu.y + menuH > window.innerHeight ? Math.max(8, rowMenu.y - 30 - menuH) : rowMenu.y
+        const box: React.CSSProperties = isMobile
+          ? { position: 'fixed', left: 8, right: 8, bottom: 8, zIndex: 71, paddingBottom: 'calc(6px + env(safe-area-inset-bottom, 0px))', borderRadius: 12, boxShadow: '0 -8px 30px rgba(0,0,0,.28)' }
+          : { position: 'fixed', right: rowMenu.right, top, zIndex: 71, minWidth: 200, maxWidth: 'calc(100vw - 16px)', borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,.18)' }
         return createPortal(
           <>
-            <div data-testid="row-menu-backdrop" onClick={close} style={{ position: 'fixed', inset: 0, zIndex: 70 }} />
-            <div data-testid={`row-menu-${rowMenu.refId}`} role="menu" style={{ position: 'fixed', right: rowMenu.right, top, zIndex: 71, minWidth: 200, maxWidth: 'calc(100vw - 16px)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,.18)', padding: 4 }}>
-              <div style={{ padding: '4px 10px 6px', fontSize: 10, fontWeight: 700, color: 'var(--color-muted-foreground,#6b7280)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 260 }}>{rowMenu.mini ? tr.ecMiniTemplate : rowMenu.label}</div>
+            <div data-testid="row-menu-backdrop" onClick={close} style={{ position: 'fixed', inset: 0, zIndex: 70, background: isMobile ? 'rgba(0,0,0,.35)' : 'transparent' }} />
+            <div data-testid={`row-menu-${rowMenu.refId}`} role="menu" style={{ ...box, background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', border: '1px solid var(--color-border,#e5e7eb)', padding: isMobile ? 6 : 4 }}>
+              {isMobile && <div aria-hidden style={{ width: 36, height: 4, borderRadius: 2, margin: '4px auto 8px', background: 'var(--color-border,#e5e7eb)' }} />}
+              <div style={{ padding: isMobile ? '2px 12px 8px' : '4px 10px 6px', fontSize: isMobile ? 12 : 10, fontWeight: 700, color: 'var(--color-muted-foreground,#6b7280)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: isMobile ? 'none' : 260 }}>{rowMenu.mini ? tr.ecMiniTemplate : rowMenu.label}</div>
               {!isTag && (
                 <button className="melis-ec-mi" data-testid={`config-${rowMenu.refId}`} role="menuitem" style={item} onClick={() => { close(); openConfig(rowMenu.zoneId, { id: rowMenu.refId, label: rowMenu.label }) }}><span style={ico}>⚙</span>{tr.ecConfigurePlugin}</button>
               )}
@@ -2134,16 +2163,25 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
                       <MelisSectionIcon sectionKey={sec.key} size={22} />
                       <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-foreground,#111827)' }}>{sectionLabel(sec.key, sec.label)}</span>
                     </div>
-                    {sec.modules.map((mod) => (
-                      <div key={mod.key} style={{ marginBottom: 12 }}>
+                    {sec.modules.map((mod) => {
+                      // Module "submenu" = accordion panel (Mantis 0011016): closed by default, one open
+                      // at a time; a search query expands every (filtered) module so hits stay visible.
+                      const modKey = `${sec.key}/${mod.key}`
+                      const expanded = q !== '' || pickerOpenModule === modKey
+                      const count = mod.groups.reduce((n, g) => n + g.plugins.length, 0)
+                      return (
+                      <div key={mod.key} style={{ marginBottom: 8 }}>
                         {/* module header — a tinted bar, clearly distinct from the subcategory labels
-                            below it (only shown when the section groups several modules, like legacy) */}
-                        {sec.modules.length > 1 && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: 'var(--color-foreground,#111827)', background: 'color-mix(in srgb, var(--color-primary,#dc2626) 9%, transparent)', borderRadius: 6, padding: '6px 10px', margin: '10px 0 8px' }}>
-                            <span style={{ width: 4, height: 14, borderRadius: 2, background: 'var(--color-primary,#dc2626)' }} />
-                            {mod.label}
-                          </div>
-                        )}
+                            below it; it is the accordion toggle (chevron + plugin count) */}
+                        <button type="button" data-testid={`picker-module-${mod.key}`} aria-expanded={expanded}
+                          onClick={() => setPickerOpenModule((cur) => cur === modKey ? null : modKey)}
+                          style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%', textAlign: 'left', fontSize: 12, fontWeight: 700, color: 'var(--color-foreground,#111827)', background: 'color-mix(in srgb, var(--color-primary,#dc2626) 9%, transparent)', border: 0, borderRadius: 6, padding: '8px 10px', margin: '6px 0 0', cursor: 'pointer', font: 'inherit', fontWeight: 700 }}>
+                          <span style={{ width: 4, height: 14, borderRadius: 2, background: 'var(--color-primary,#dc2626)', flexShrink: 0 }} />
+                          <span style={{ flex: '1 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{mod.label}</span>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--color-muted-foreground,#6b7280)' }}>{count}</span>
+                          <span aria-hidden style={{ display: 'inline-block', transition: 'transform .15s', transform: expanded ? 'rotate(90deg)' : 'none', color: 'var(--color-muted-foreground,#6b7280)' }}>›</span>
+                        </button>
+                        {expanded && <div style={{ padding: '8px 0 0' }}>
                         {mod.groups.map((g) => (
                           <div key={g.id || '_'} style={{ marginBottom: 8 }}>
                             {g.title && <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: .4, textTransform: 'uppercase', color: 'var(--color-muted-foreground,#6b7280)', margin: '4px 4px 6px 4px' }}>{g.title}</div>}
@@ -2165,8 +2203,10 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
                             </div>
                           </div>
                         ))}
+                        </div>}
                       </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 ))}
               </div>
