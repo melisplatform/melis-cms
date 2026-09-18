@@ -61,15 +61,30 @@ type PageTabRegistry = { tabs: Record<string, PageTabComp>; v: number }
 // en haut de l'éditeur) invoque ces hooks pour que chaque onglet (ex. Open Graph de melis-cms-share)
 // persiste ses données SANS bouton propre — sauvegarde centralisée, comme en legacy.
 type PageSaveHook = (idPage: number) => Promise<void>
+/** Bouton modulaire de la barre d'actions : un module (brick) en fournit le rendu, l'éditeur lui
+ * donne la page courante et l'état de chargement pour qu'il se désactive comme les autres. */
+type PageButtonComp = (p: { idPage: number; disabled: boolean }) => JSX.Element | null
+type PageButtonRegistry = { buttons: Record<string, PageButtonComp>; v: number }
 const w = window as unknown as {
   __melisPageTabRegistry?: PageTabRegistry
   __melisRegisterPageTab?: (k: string, c: PageTabComp) => void
   __melisPageSaveHooks?: Record<string, PageSaveHook>
+  __melisPageButtonRegistry?: PageButtonRegistry
+  __melisRegisterPageButton?: (k: string, c: PageButtonComp | null) => void
   __melisRegisterPageSaveHook?: (k: string, hook: PageSaveHook | null) => void
 }
 if (!w.__melisPageTabRegistry) {
   w.__melisPageTabRegistry = { tabs: {}, v: 0 }
   w.__melisRegisterPageTab = (k, c) => { w.__melisPageTabRegistry!.tabs[k] = c; w.__melisPageTabRegistry!.v++; window.dispatchEvent(new CustomEvent('melis:page-tabs-changed')) }
+}
+if (!w.__melisPageButtonRegistry) {
+  w.__melisPageButtonRegistry = { buttons: {}, v: 0 }
+  w.__melisRegisterPageButton = (k, c) => {
+    if (c) w.__melisPageButtonRegistry!.buttons[k] = c
+    else delete w.__melisPageButtonRegistry!.buttons[k]
+    w.__melisPageButtonRegistry!.v++
+    window.dispatchEvent(new CustomEvent('melis:page-buttons-changed'))
+  }
 }
 if (!w.__melisPageSaveHooks) {
   w.__melisPageSaveHooks = {}
@@ -248,6 +263,10 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
   const [unlocking, setUnlocking] = useState(false)
   const [, bumpTabs] = useState(0)
   useEffect(() => { const on = () => bumpTabs((n) => n + 1); window.addEventListener('melis:page-tabs-changed', on); return () => window.removeEventListener('melis:page-tabs-changed', on) }, [])
+  // Idem pour les boutons modulaires : une brick chargée après le montage doit apparaître.
+  const [, bumpButtons] = useState(0)
+  useEffect(() => { const on = () => bumpButtons((n) => n + 1); window.addEventListener('melis:page-buttons-changed', on); return () => window.removeEventListener('melis:page-buttons-changed', on) }, [])
+  const modularButtons = Object.entries(w.__melisPageButtonRegistry?.buttons ?? {})
 
   // Édition prête à être sauvegardée : le canvas d'édition de la page courante a FINI de charger
   // (cf. readyPages, alimenté par le poller) ET les Propriétés/SEO sont chargés. Sinon → boutons off.
@@ -1029,6 +1048,15 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
                 ))}
               </div>
             ))}
+            {/* Boutons fournis par une brick de module : rendus par le module lui-même, désactivés
+                comme les autres tant que l'édition n'est pas chargée. Aucun module installé (ou
+                aucun n'en enregistrant) → registre vide → rien n'est rendu ici. */}
+            {!!modularButtons.length && !!current && !isCreation && (
+              <div style={narrow ? { display: 'contents' } : { display: 'flex', flexWrap: 'nowrap', alignItems: 'center', gap: 8 }}>
+                {!narrow && <div style={{ width: 1, minHeight: 24, alignSelf: 'stretch', background: 'var(--color-border,#e5e7eb)', margin: '0 6px' }} />}
+                {modularButtons.map(([key, Btn]) => <Btn key={key} idPage={Number(current)} disabled={saving || !editionReady} />)}
+              </div>
+            )}
           </div>
           {/* Onglets : wrap sur 2ᵉ ligne sur narrow (tous visibles) plutôt qu'un défilement horizontal
               qui masque les onglets tant que l'utilisateur n'a pas swipé (pattern 6). */}

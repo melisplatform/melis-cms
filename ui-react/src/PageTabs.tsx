@@ -670,6 +670,41 @@ export function HistoricTab({ idPage }: { idPage: number }) {
 // ═══ LANGAGES (modulaire — avec DRAPEAUX) ═══
 type Version = { pageId: number; langId: number; langName: string; locale: string; pageName: string }
 type Langs = { idPage: number; initial: number; versions: Version[]; creatable: Ref[] }
+/**
+ * Actions modulaires de l'onglet Langues : une brick de module en enregistre une, et elle est
+ * rendue SOUS le bouton « Créer » de chaque langue creable. Le module reçoit la langue visée et
+ * `createVersion()` — la création normale de l'éditeur (même endpoint, même ouverture d'onglet,
+ * même rafraîchissement) — pour n'ajouter que ce qui le concerne.
+ *
+ * Registre vide (aucun module installé) → rien n'est rendu, l'onglet reste celui de l'éditeur.
+ */
+export type LangActionContext = {
+  idPage: number
+  locale: string
+  name: string
+  /** Crée la version de langue et renvoie l'id de la page créée (null si la création a échoué). */
+  createVersion: () => Promise<number | null>
+}
+export type LangAction = {
+  label: string
+  icon?: string
+  onSelect: (ctx: LangActionContext) => void | Promise<void>
+}
+type LangActionRegistry = { actions: Record<string, LangAction>; v: number }
+const wLang = window as unknown as {
+  __melisLangActionRegistry?: LangActionRegistry
+  __melisRegisterLangAction?: (k: string, a: LangAction | null) => void
+}
+if (!wLang.__melisLangActionRegistry) {
+  wLang.__melisLangActionRegistry = { actions: {}, v: 0 }
+  wLang.__melisRegisterLangAction = (k, a) => {
+    if (a) wLang.__melisLangActionRegistry!.actions[k] = a
+    else delete wLang.__melisLangActionRegistry!.actions[k]
+    wLang.__melisLangActionRegistry!.v++
+    window.dispatchEvent(new CustomEvent('melis:lang-actions-changed'))
+  }
+}
+
 export function LanguagesTab({ idPage }: { idPage: number }) {
   const tr = peT()
   const narrow = useIsNarrow()
@@ -682,7 +717,7 @@ export function LanguagesTab({ idPage }: { idPage: number }) {
   // Crée une version de langue via l'endpoint LEGACY (même flux que le tool jQuery pagelang.js) :
   // POST pageLangPageId + pageLangLocale → nouvelle page (statut hors ligne). On ouvre ensuite la page
   // créée dans un onglet du shell (comme l'arbre / la création de page React).
-  const createLang = useCallback(async (locale: string) => {
+  const createLang = useCallback(async (locale: string): Promise<number | null> => {
     setCreating(locale); setMsg(null)
     try {
       const r = await legacyPost('/melis/MelisCms/PageLanguages/createNewPageLangVersion', { pageLangPageId: idPage, pageLangLocale: locale })
@@ -693,13 +728,26 @@ export function LanguagesTab({ idPage }: { idPage: number }) {
         const path = `/melis-cms/page/${info.pageid}`
         ;(window as unknown as { __melisOpenTab?: (t: { id: string; label: string; path: string }) => void }).__melisOpenTab?.({ id: path, label: `${info.pageid} - ${(info.name || `Page ${info.pageid}`).toString().trim()}`, path })
         navigate(path)
+
+        return Number(info.pageid)
       } else {
         const t = r.textMessage && !r.textMessage.startsWith('tr_') ? r.textMessage : tr.langCreateFailed
         notify('ko', tr.langVersions, t); setMsg({ ok: false, text: t })
       }
     } catch (e) { notify('ko', tr.langVersions, (e as Error).message); setMsg({ ok: false, text: (e as Error).message }) }
     finally { setCreating(null) }
+
+    return null
   }, [idPage, navigate, tr])
+
+  // Une brick chargée après le montage doit voir son action apparaître.
+  const [, bumpLangActions] = useState(0)
+  useEffect(() => {
+    const on = () => bumpLangActions((n) => n + 1)
+    window.addEventListener('melis:lang-actions-changed', on)
+    return () => window.removeEventListener('melis:lang-actions-changed', on)
+  }, [])
+  const langActions = Object.entries(wLang.__melisLangActionRegistry?.actions ?? {})
   // Ouvre une AUTRE version de langue dans un onglet du shell (même mécanisme que l'arbre).
   const openPage = useCallback((pageId: number, name: string) => {
     const path = `/melis-cms/page/${pageId}`
@@ -768,11 +816,24 @@ export function LanguagesTab({ idPage }: { idPage: number }) {
             <div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)', marginBottom: 10 }}>{tr.createLangHint}</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {d.creatable.map((c) => (
-                <button key={c.id} type="button" style={{ ...smallBtn, height: 30, opacity: creating ? 0.6 : 1 }}
-                  disabled={!!creating} onClick={() => createLang(c.locale)}>
-                  <Flag locale={c.locale} size={16} />
-                  {creating === c.locale ? tr.langCreating : `${tr.createLangBtn} · ${c.name}`}
-                </button>
+                <div key={c.id} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <button type="button" style={{ ...smallBtn, height: 30, opacity: creating ? 0.6 : 1 }}
+                    disabled={!!creating} onClick={() => createLang(c.locale)}>
+                    <Flag locale={c.locale} size={16} />
+                    {creating === c.locale ? tr.langCreating : `${tr.createLangBtn} · ${c.name}`}
+                  </button>
+                  {/* Actions fournies par une brick de module, sous le bouton « Créer » de cette langue. */}
+                  {langActions.map(([key, a]) => (
+                    <button key={key} type="button" style={{ ...smallBtn, height: 30, opacity: creating ? 0.6 : 1 }}
+                      disabled={!!creating}
+                      onClick={() => a.onSelect({ idPage, locale: c.locale, name: c.name, createVersion: () => createLang(c.locale) })}>
+                      {a.icon
+                        ? <span style={{ display: 'inline-flex', width: 16, height: 16, alignItems: 'center' }} dangerouslySetInnerHTML={{ __html: a.icon }} />
+                        : null}
+                      {`${a.label} · ${c.name}`}
+                    </button>
+                  ))}
+                </div>
               ))}
             </div>
           </>

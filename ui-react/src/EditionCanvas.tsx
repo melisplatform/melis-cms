@@ -51,6 +51,46 @@ type PaletteModule = { key: string; label: string; groups: PaletteGroup[] }
 type PaletteSection = { key: string; label: string; modules: PaletteModule[] }
 type Palette = { sections: PaletteSection[] }
 
+/**
+ * Entrées modulaires du menu « ⋯ » d'un bloc.
+ *
+ * Un module (brick) en enregistre une ; l'éditeur la rend et lui passe le bloc concerné, y compris
+ * `applyHtml`, qui écrit un nouveau contenu exactement comme une édition inline (DOM + session de
+ * travail). Le module n'a donc rien à savoir du canvas, et le canvas rien du module.
+ */
+export type BlockMenuContext = {
+  idPage: number
+  zoneId: string
+  refId: string
+  mini: boolean
+  /** Contenu actuel du bloc (HTML). */
+  html: string
+  /** Remplace le contenu du bloc : DOM + éditeur inline + session de travail. */
+  applyHtml: (html: string) => void
+}
+export type BlockMenuItem = {
+  label: string
+  /** SVG inline (optionnel) — sinon une puce neutre. */
+  icon?: string
+  /** Blocs concernés ; par défaut tous. */
+  eligible?: (block: { mini: boolean; isTag: boolean; type: string }) => boolean
+  onSelect: (ctx: BlockMenuContext) => void
+}
+type BlockMenuRegistry = { items: Record<string, BlockMenuItem>; v: number }
+const wBlock = window as unknown as {
+  __melisBlockMenuRegistry?: BlockMenuRegistry
+  __melisRegisterBlockMenuItem?: (k: string, item: BlockMenuItem | null) => void
+}
+if (!wBlock.__melisBlockMenuRegistry) {
+  wBlock.__melisBlockMenuRegistry = { items: {}, v: 0 }
+  wBlock.__melisRegisterBlockMenuItem = (k, item) => {
+    if (item) wBlock.__melisBlockMenuRegistry!.items[k] = item
+    else delete wBlock.__melisBlockMenuRegistry!.items[k]
+    wBlock.__melisBlockMenuRegistry!.v++
+    window.dispatchEvent(new CustomEvent('melis:block-menu-changed'))
+  }
+}
+
 const DEFAULT_TPL = 'MelisFront/dnd-default-tpl'
 const TINY_BASE = '/MelisCore/js/library/tinymce' // the TinyMCE build the legacy Old editor uses (v6.7.0)
 
@@ -275,6 +315,13 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   // melis-ai-community-extensions injects react-bridge.js into the canvas render; when its global is
   // there the row menu offers "Open in Melis AI" (feature-detected — nothing shows if the module is off).
   const [aiBridgeReady, setAiBridgeReady] = useState(false)
+  // Une brick chargée après le montage doit voir son entrée apparaître dans le menu « ⋯ ».
+  const [, bumpBlockMenu] = useState(0)
+  useEffect(() => {
+    const on = () => bumpBlockMenu((n) => n + 1)
+    window.addEventListener('melis:block-menu-changed', on)
+    return () => window.removeEventListener('melis:block-menu-changed', on)
+  }, [])
   const [aiIcon, setAiIcon] = useState('') // the module's own "M" badge SVG, once the bridge is detected
   useEffect(() => {
     if (!aiBridgeReady || aiIcon) return
@@ -1198,6 +1245,32 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
   }, [tree, locate, domReorder, idPage])
 
+  // Contenu courant d'un bloc, et écriture d'un nouveau contenu — ce que reçoit une entrée
+  // modulaire du menu « ⋯ » (ex. « Traduire le bloc »). Écrire passe par le MÊME chemin qu'une
+  // édition inline : l'éditeur TinyMCE vivant s'il y en a un, sinon le DOM, puis setTagContent
+  // dans la session de travail (donc rien n'est publié tant que l'utilisateur ne sauvegarde pas).
+  const blockHtml = useCallback((refId: string): string => {
+    const w = iframeRef.current?.contentWindow as (Window & { tinymce?: { get: (id: string) => { getContent: () => string } | null } }) | undefined
+    const inlineId = 'melis-inline-' + refId.replace(/[^A-Za-z0-9_-]/g, '')
+    let html = ''
+    try { html = w?.tinymce?.get(inlineId)?.getContent() || '' } catch { /* éditeur pas prêt */ }
+
+    return html || cleanEditableHtml(blockContentEl(refId)?.innerHTML || '')
+  }, [blockContentEl])
+
+  const applyBlockHtml = useCallback((refId: string, html: string) => {
+    const w = iframeRef.current?.contentWindow as (Window & { tinymce?: { get: (id: string) => { setContent: (h: string) => void } | null } }) | undefined
+    const inlineId = 'melis-inline-' + refId.replace(/[^A-Za-z0-9_-]/g, '')
+    let done = false
+    try {
+      const ed = w?.tinymce?.get(inlineId)
+      if (ed) { ed.setContent(html); done = true }
+    } catch { /* éditeur pas prêt */ }
+
+    if (!done) { const el = blockContentEl(refId); if (el) el.innerHTML = html }
+    void saveInline(refId, html)
+  }, [blockContentEl, saveInline])
+
   // "Open in Melis AI" for an html-tag / mini-template block — the React counterpart of the legacy
   // "M" handle (melis-ai-community-extensions/html-tag-minitemplate-btn.js), which is injected into
   // the legacy tools box that this canvas hides. Same hand-over that handle uses: the module's
@@ -2037,6 +2110,27 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
                   {tr.ecOpenInMelisAi}
                 </button>
               )}
+              {/* Entrées fournies par une brick de module : le module fournit le libellé, l'icône
+                  et l'action, le canvas lui passe le bloc. Registre vide (aucun module installé)
+                  → aucune entrée, le menu reste celui de l'éditeur. */}
+              {Object.entries(wBlock.__melisBlockMenuRegistry?.items ?? {})
+                .filter(([, it]) => !it.eligible || it.eligible({ mini: !!rowMenu.mini, isTag, type: node?.attrs?.type || 'html' }))
+                .map(([key, it]) => (
+                  <button key={key} className="melis-ec-mi" data-testid={`${key}-${rowMenu.refId}`} role="menuitem" style={item}
+                    onClick={() => {
+                      close()
+                      it.onSelect({
+                        idPage, zoneId: rowMenu.zoneId, refId: rowMenu.refId, mini: !!rowMenu.mini,
+                        html: blockHtml(rowMenu.refId),
+                        applyHtml: (html: string) => applyBlockHtml(rowMenu.refId, html),
+                      })
+                    }}>
+                    {it.icon
+                      ? <span style={{ ...ico, height: 18, alignItems: 'center' }} dangerouslySetInnerHTML={{ __html: it.icon }} />
+                      : <span style={ico}>✦</span>}
+                    {it.label}
+                  </button>
+                ))}
               <button className="melis-ec-mi" data-testid={`width-toggle-${rowMenu.refId}`} role="menuitem" style={item} onClick={() => { close(); setOpenWidth((w) => (w === rowMenu.refId ? null : rowMenu.refId)) }}><span style={ico}>↔</span>{tr.ecResponsiveWidths}</button>
               <button className="melis-ec-mi" data-testid={`duplicate-block-${rowMenu.refId}`} role="menuitem" style={{ ...item, opacity: saving ? .6 : 1, cursor: saving ? 'not-allowed' : 'pointer' }} disabled={saving} onClick={() => { close(); void duplicateBlock(rowMenu.zoneId, rowMenu.refId) }}><span style={ico}><ZoneCopyIcon /></span>{tr.ecDuplicateBlock}</button>
             </div>
