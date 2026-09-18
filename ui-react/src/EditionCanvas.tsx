@@ -1730,6 +1730,8 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   if (!doc) return <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LoadingPill text={tr.ecLoadingEditor} /></div>
 
   const iconBtn: React.CSSProperties = { appearance: 'none', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', borderRadius: 5, width: 22, height: 22, lineHeight: '1', cursor: 'pointer', fontSize: 12, color: 'var(--color-foreground,#111827)' }
+  // The two per-row action buttons (× remove, ⋯ menu): SAME box (Mantis #0011033), glyph centred, no UA padding.
+  const rowActionBtn: React.CSSProperties = { ...iconBtn, width: 26, height: 24, padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flex: '0 0 auto' }
 
   // The current schema's real icon markup for a cell (falls back to the single-column "default").
   const iconFor = (tpl: string): string => {
@@ -1855,7 +1857,9 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
             onDrop={(e) => onDrop(cell.id, i, e)}
             onMouseEnter={() => highlight(r.id, true)}
             onMouseLeave={() => highlight(r.id, false)}
-            style={{ padding: '5px 8px', borderTop: '1px solid var(--color-border,#e5e7eb)', fontSize: 12, cursor: 'grab', background: selected?.refId === r.id ? 'color-mix(in srgb, var(--color-primary,#dc2626) 14%, transparent)' : undefined,
+            // Highlighted when selected in the canvas AND while its ⋯ menu is open (Mantis #0011033): the
+            // menu is a detached popover, the tinted row (same tint as a selected block) says which block it belongs to.
+            style={{ padding: '5px 8px', borderTop: '1px solid var(--color-border,#e5e7eb)', fontSize: 12, cursor: 'grab', background: selected?.refId === r.id || rowMenu?.refId === r.id ? 'color-mix(in srgb, var(--color-primary,#dc2626) 14%, transparent)' : undefined,
               // touch drag (mobile): outline the row the finger is over — the drop target
               outline: touchDrag?.over && touchDrag.over.zoneId === cell.id && touchDrag.over.index === i && touchDrag.refId !== r.id ? '2px solid var(--color-primary,#dc2626)' : undefined, outlineOffset: -2 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }} onClick={() => selectBlock(cell.id, r.id)}>
@@ -1875,10 +1879,15 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
               ) : (
                 <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: selected?.refId === r.id ? 700 : 400 }} title={r.id}>{r.label}</span>
               )}
-              {/* Every per-block action lives in ONE ⋯ menu (configure / Melis AI / widths / duplicate /
-                  remove — see the rowMenu render below): five inline icons per row made the panel
+              {/* The other per-block actions live in ONE ⋯ menu (configure / Melis AI / widths / duplicate —
+                  see the rowMenu render below): five inline icons per row made the panel
                   unreadable, especially in the phone drawer. Classic html/media/textarea blocks are still
                   edited by clicking in them (WYSIWYG); the menu only adds what the row can't do inline. */}
+              {/* Remove is NOT in the ⋯ menu (Mantis #0011033): directly reachable on the row, one click + the
+                  usual confirmation. */}
+              <button data-testid={`remove-${r.id}`} title={tr.ecRemoveFromZone} aria-label={tr.ecRemoveFromZone}
+                onClick={(e) => { e.stopPropagation(); setConfirmRemove({ zoneId: cell.id, refId: r.id, label: r.label }) }}
+                style={{ ...rowActionBtn, color: '#dc2626', borderColor: 'color-mix(in srgb, #dc2626 35%, var(--color-border,#e5e7eb))' }}>×</button>
               <button data-testid={`row-menu-btn-${r.id}`} title={tr.ecMoreActions} aria-haspopup="menu" aria-expanded={rowMenu?.refId === r.id}
                 onClick={(e) => {
                   e.stopPropagation()
@@ -1886,7 +1895,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
                   // anchored by its RIGHT edge to the button (labels vary in width; a left anchor overflowed the viewport)
                   setRowMenu((m) => (m?.refId === r.id ? null : { zoneId: cell.id, refId: r.id, label: r.label, mini: !!r.mini, right: Math.max(8, window.innerWidth - rc.right), y: rc.bottom + 4 }))
                 }}
-                style={{ ...iconBtn, fontWeight: 700, letterSpacing: 1, borderColor: rowMenu?.refId === r.id ? 'var(--color-primary,#dc2626)' : 'var(--color-border,#e5e7eb)', color: rowMenu?.refId === r.id ? 'var(--color-primary,#dc2626)' : 'var(--color-foreground,#111827)' }}>⋯</button>
+                style={{ ...rowActionBtn, fontWeight: 700, borderColor: rowMenu?.refId === r.id ? 'var(--color-primary,#dc2626)' : 'var(--color-border,#e5e7eb)', color: rowMenu?.refId === r.id ? 'var(--color-primary,#dc2626)' : 'var(--color-foreground,#111827)' }}>⋯</button>
             </div>
             {openWidth === r.id && (
               <div data-testid={`widths-${r.id}`} onClick={(e) => e.stopPropagation()} style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6, paddingLeft: 18 }}>
@@ -1921,7 +1930,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--color-background,#fff)' }}>
-      <style>{'.melis-ec-mi:hover{background:color-mix(in srgb, var(--color-foreground,#111827) 7%, transparent)}.melis-ec-mi:disabled{cursor:not-allowed}'}</style>
+      <style>{'.melis-ec-mi:hover,.melis-ec-mi:focus-visible{background:color-mix(in srgb, var(--color-primary,#dc2626) 20%, var(--color-card,#fff))!important;color:var(--color-primary,#dc2626)!important;outline:none}.melis-ec-mi:hover>span,.melis-ec-mi:focus-visible>span{color:inherit!important}.melis-ec-mi:disabled{cursor:not-allowed;background:transparent!important;color:inherit!important}'}</style>
       {/* discreet saving indicator, floated (no header bar) */}
       {saving && <div style={{ position: 'absolute', top: 6, right: 12, zIndex: 5, fontSize: 11, fontWeight: 600, color: 'var(--color-muted-foreground,#6b7280)', background: 'var(--color-card,#fff)', border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 6, padding: '2px 8px' }}>{tr.ecSaving}</div>}
       {/* overflow:hidden — the mobile drawer lives translated off-screen inside this row; never let a
@@ -2004,7 +2013,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
           : { display: 'flex', alignItems: 'center', gap: 9, width: '100%', padding: '7px 10px', border: 0, background: 'transparent', borderRadius: 6, fontSize: 12, cursor: 'pointer', color: 'var(--color-foreground,#111827)', textAlign: 'left', whiteSpace: 'nowrap' }
         const ico: React.CSSProperties = { width: 18, display: 'inline-flex', justifyContent: 'center', color: 'var(--color-muted-foreground,#6b7280)', flex: '0 0 auto' }
         const close = () => setRowMenu(null)
-        const rows = 3 + (isTag ? 0 : 1) + (aiEligible ? 1 : 0)
+        const rows = 2 + (isTag ? 0 : 1) + (aiEligible ? 1 : 0) // widths + duplicate (+ configure, + Melis AI); remove lives on the row
         const menuH = 30 + rows * 32
         const top = rowMenu.y + menuH > window.innerHeight ? Math.max(8, rowMenu.y - 30 - menuH) : rowMenu.y
         const box: React.CSSProperties = isMobile
@@ -2030,7 +2039,6 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
               )}
               <button className="melis-ec-mi" data-testid={`width-toggle-${rowMenu.refId}`} role="menuitem" style={item} onClick={() => { close(); setOpenWidth((w) => (w === rowMenu.refId ? null : rowMenu.refId)) }}><span style={ico}>↔</span>{tr.ecResponsiveWidths}</button>
               <button className="melis-ec-mi" data-testid={`duplicate-block-${rowMenu.refId}`} role="menuitem" style={{ ...item, opacity: saving ? .6 : 1, cursor: saving ? 'not-allowed' : 'pointer' }} disabled={saving} onClick={() => { close(); void duplicateBlock(rowMenu.zoneId, rowMenu.refId) }}><span style={ico}><ZoneCopyIcon /></span>{tr.ecDuplicateBlock}</button>
-              <button className="melis-ec-mi" data-testid={`remove-${rowMenu.refId}`} role="menuitem" style={{ ...item, color: '#dc2626' }} onClick={() => { close(); setConfirmRemove({ zoneId: rowMenu.zoneId, refId: rowMenu.refId, label: rowMenu.label }) }}><span style={{ ...ico, color: '#dc2626' }}>×</span>{tr.ecRemoveFromZone}</button>
             </div>
           </>,
           document.body,
