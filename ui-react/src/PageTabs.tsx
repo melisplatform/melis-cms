@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { peT } from './page-editor-i18n'
 import { useIsNarrow } from './shared/useIsNarrow'
@@ -201,7 +201,33 @@ function fmtDate(s: string | null | undefined): string {
 }
 
 const ANALYTICS_PER_PAGE = 100
-type AData = { visits: number; sessions: number; lastVisit: string | null; recent: { date: string }[]; recentTotal: number; page: number; perPage: number }
+type AData = { visits: number; sessions: number; lastVisit: string | null; recent: { date: string }[]; recentTotal: number; page: number; perPage: number; analyticsKey?: string | null; analyticsMessageKey?: string | null }
+
+// ═══ ONE analytics tab (Mantis #0011034) ═══
+// The « Page Analytics » tab is the ONLY analytics tab of the editor. Its content depends on the
+// analytics module assigned to the page's site (`analyticsKey`, from /cms-page/analytics): a module
+// that ships a native page display registers it on window.__melisAnalyticsPageDisplays[<key>] (cf.
+// the GA brick) and this tab mounts it; no provider registered → this tab's own Melis analytics view,
+// unchanged. Same registry pattern as the site-level `__melisAnalyticsSiteDisplays` (page-analytics
+// brick): re-checked on mount and on 'melis:analytics-page-display-registered' — the provider bundle
+// may arrive AFTER this tab rendered.
+type PageDisplayComp = (p: { idPage: number }) => ReactNode
+declare global {
+  interface Window { __melisAnalyticsPageDisplays?: Record<string, PageDisplayComp> }
+}
+function usePageDisplayComp(key: string | null | undefined): PageDisplayComp | null {
+  const [Comp, setComp] = useState<PageDisplayComp | null>(null)
+  useEffect(() => {
+    if (!key) { setComp(null); return }
+    const lookup = () => (window.__melisAnalyticsPageDisplays || {})[key] || null
+    const check = () => { const c = lookup(); setComp(() => c) }
+    check()
+    window.addEventListener('melis:analytics-page-display-registered', check)
+    return () => window.removeEventListener('melis:analytics-page-display-registered', check)
+  }, [key])
+  return Comp
+}
+
 export function AnalyticsTab({ idPage }: { idPage: number }) {
   const tr = peT()
   const [d, setD] = useState<AData | null>(null)
@@ -217,7 +243,18 @@ export function AnalyticsTab({ idPage }: { idPage: number }) {
       .finally(() => { if (!x) setLoading(false) })
     return () => { x = true }
   }, [idPage, pageNum])
-  if (!d) return <div style={wrap}>{tr.loading}</div>
+  // Provider registered for the module assigned to this page's site (e.g. GA) → its display, else ours.
+  const Provider = usePageDisplayComp(d?.analyticsKey)
+  if (Provider) return <Provider idPage={idPage} />
+  if (!d) return <div style={wrap}>{msg ? <Feedback msg={msg} /> : tr.loading}</div>
+  // Rien de VALIDE n'est assigné au site (jamais configuré, sentinel « aucun module », ou module
+  // désactivé/désinstallé — cf. analyticsMessageKey côté API) : Mantis #0011034, « si rien n'est
+  // configuré, alors rien ne s'affiche » — MÊME message que le legacy, pas le tableau de visites
+  // internes de Melis (qui n'a jamais été un choix possible dans les paramètres du site).
+  if (!d.analyticsKey) {
+    const text = d.analyticsMessageKey === 'tr_meliscms_page_analytics_inactive_module' ? tr.analyticsInactiveModule : tr.analyticsNoModuleSet
+    return <div style={wrap}><p style={{ fontSize: 13, color: 'var(--color-muted-foreground,#6b7280)', margin: 0 }}>{text}</p></div>
+  }
   const total = d.recentTotal ?? d.visits
   const totalPages = Math.max(1, Math.ceil(total / ANALYTICS_PER_PAGE))
   const curPage = Math.min(Math.max(1, pageNum), totalPages)

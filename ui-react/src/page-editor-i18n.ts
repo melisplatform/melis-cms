@@ -60,6 +60,11 @@ const DICT: Record<PeLang, Record<string, string>> = {
     lastVisit: 'Dernière visite',
     recentVisits: 'Visites récentes',
     noVisit: 'Aucune visite enregistrée.',
+    // Mêmes libellés que le legacy (melis-cms-page-analytics/language/fr_FR.interface.php,
+    // tr_meliscms_page_analytics_no_module_set / _inactive_module) — Mantis #0011034 : « si rien
+    // n'est configuré, alors rien ne s'affiche », un seul onglet, même message des deux côtés.
+    analyticsNoModuleSet: 'Pour afficher les données du site veuillez choisir un module analytics pour ce site dans les paramètres.',
+    analyticsInactiveModule: 'Le module analytics pour ce site est désactivé.',
     visitsWord: 'visites',
 
     // ── ScriptsTab ──
@@ -382,6 +387,8 @@ const DICT: Record<PeLang, Record<string, string>> = {
     lastVisit: 'Last visit',
     recentVisits: 'Recent visits',
     noVisit: 'No visit recorded.',
+    analyticsNoModuleSet: 'To display the site data, please select an analytics module for this site in Settings.',
+    analyticsInactiveModule: 'The analytics module for this site is deactivated.',
     visitsWord: 'visits',
 
     // ── ScriptsTab ──
