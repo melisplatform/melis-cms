@@ -312,6 +312,12 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const [panelCollapsed, setPanelCollapsed] = useState(false) // structure panel collapsed to a thin bar
   // Block row "⋯" menu (one place for every per-block action) — anchored at the row button's rect.
   const [rowMenu, setRowMenu] = useState<{ zoneId: string; refId: string; label: string; mini: boolean; right: number; y: number } | null>(null)
+  // Zone-head "⋯" menu — same idea, one level up: a top-level zone header packs its own drag handle
+  // + up/down arrows (when it has a group-mate, cf. hasGroupMate below) ALONGSIDE add-plugin/duplicate/
+  // new-zone/layout-picker, which overflowed/overlapped once more than one zone existed on the page
+  // (screenshot report). Collapsed the same way the block row already was (Mantis #0011033) — remove
+  // stays directly on the row (same "always one click" rule), the rest moves into this popover.
+  const [zoneMenuFor, setZoneMenuFor] = useState<{ cellId: string; label: string; isLeaf: boolean; depth: number; template: string; right: number; y: number } | null>(null)
   // melis-ai-community-extensions injects react-bridge.js into the canvas render; when its global is
   // there the row menu offers "Open in Melis AI" (feature-detected — nothing shows if the module is off).
   const [aiBridgeReady, setAiBridgeReady] = useState(false)
@@ -1812,23 +1818,6 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     return (layouts.find((l) => l.template === t) || layouts.find((l) => l.key === 'default') || layouts[0])?.icon || ''
   }
 
-  const openPicker = (e: React.MouseEvent, cellId: string) => {
-    e.stopPropagation() // don't also trigger the header's select-zone
-    const r = (e.currentTarget as HTMLElement).getBoundingClientRect()
-    setPicker({ cellId, x: Math.max(8, Math.min(r.right - 300, window.innerWidth - 312)), y: r.bottom + 4 })
-  }
-
-  // A compact trigger (current layout icon) that sits in the zone header row; clicking DEPLOYS the full
-  // schema list (popover) instead of flooding every zone with 27 icons.
-  const LayoutTrigger = ({ cell }: { cell: Cell }) => (
-    <div role="button" tabIndex={0} data-testid={`layout-trigger-${cell.id}`} title={tr.ecLayoutTitle}
-      onClick={(e) => openPicker(e, cell.id)}
-      style={{ display: 'inline-flex', alignItems: 'center', gap: 2, height: 18, cursor: saving ? 'not-allowed' : 'pointer', border: '1px solid var(--color-border,#e5e7eb)', borderRadius: 5, padding: '0 3px', background: 'var(--color-card,#fff)', opacity: saving ? .6 : 1 }}>
-      <span className="melis-di melis-di-mini" dangerouslySetInnerHTML={{ __html: iconFor(cell.template) }} />
-      <span style={{ fontSize: 8, color: 'var(--color-muted-foreground,#6b7280)' }}>▾</span>
-    </div>
-  )
-
   // Recursive zone/cell panel. `path` = hierarchical position ("1", "1-2", "1-2-1"…) → the user-facing
   // zone name (the raw zone id is meaningless to the end user; kept in the tooltip). Depth tints the border.
   // NOTE: CellView is CALLED as a plain function `CellView({...})`, NOT rendered as `<CellView/>`.
@@ -1837,9 +1826,6 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   // <input> lose focus per keystroke AND swallowed its onBlur → persistWidths never fired → widths
   // never reached the session (bug). Calling it as a function inlines its JSX (host <div>, stable
   // type) so React reconciles in place: focus kept, onBlur fires. It uses no hooks, so this is safe.
-  // Shared base for the zone-head action buttons (+, duplicate, new-zone, remove) — sized to match
-  // LayoutTrigger's rendered height exactly (18px icon + 1px border top/bottom, no vertical padding).
-  const zoneHeadBtn: React.CSSProperties = { appearance: 'none', border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 5, height: 18, minWidth: 20, padding: '0 5px', lineHeight: '1', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }
   // Same "copy" icon as the top toolbar's Duplicate-page button (Icon name="copy" in CmsPage.tsx) —
   // duplicating a zone should look like the same action, not a generic ⧉ glyph.
   const ZoneCopyIcon = () => (
@@ -1853,12 +1839,18 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     const isLeaf = cell.cells.length === 0
     const isSel = selected?.zoneId === cell.id
     const zoneName = `${tr.ecZonePrefix} ${path}`
+    // ALWAYS collapsed into "⋯" (screenshot report: still crowded even with a single top-level
+    // zone) — same rule as the block row below (Mantis #0011033): only × (remove) stays directly on
+    // the row, add/duplicate/new-zone/layout always live in the popover.
     return (
       <div key={cell.id} data-testid={`zone-${cell.id}`} style={{ marginBottom: depth === 0 ? 12 : 8, marginLeft: depth ? 8 : 0, border: '1px solid var(--color-border,#e5e7eb)', borderLeft: depth ? '3px solid color-mix(in srgb, var(--color-primary,#dc2626) 35%, #e5e7eb)' : '1px solid var(--color-border,#e5e7eb)', borderRadius: 8, overflow: 'hidden', boxShadow: isSel ? '0 0 0 2px var(--color-primary,#dc2626)' : undefined }}>
         <div data-testid={`zone-head-${cell.id}`} onClick={() => selectZone(cell.id)} title={`${tr.ecSelectZone} ${zoneName} (${cell.id})`}
           onDragOver={(e) => { if (depth === 0) e.preventDefault() }}
           onDrop={(e) => { if (depth === 0) onZoneDrop(cell.id, e) }}
-          style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, fontWeight: 600, color: 'var(--color-muted-foreground,#6b7280)', background: isSel ? 'color-mix(in srgb, var(--color-primary,#dc2626) 16%, transparent)' : 'color-mix(in srgb, var(--color-primary,#dc2626) 6%, transparent)', padding: '4px 8px', cursor: 'pointer' }}>
+          // Same tint as "selected" while this zone's "⋯" menu is open (Mantis #0011033 pattern,
+          // already used for the block row below) — the menu is a detached popover, so without this
+          // there's nothing tying it back to which zone it belongs to once more than one is on screen.
+          style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, fontWeight: 600, color: 'var(--color-muted-foreground,#6b7280)', background: isSel || zoneMenuFor?.cellId === cell.id ? 'color-mix(in srgb, var(--color-primary,#dc2626) 16%, transparent)' : 'color-mix(in srgb, var(--color-primary,#dc2626) 6%, transparent)', padding: '4px 8px', cursor: 'pointer' }}>
           {/* Drag handle — shown on EVERY top-level zone (not just ones with a group-mate), so the
               control is always there and predictable. Reordering only has any visible effect within
               the same plugin_referer GROUP (see Cell.groupId/swapZones): a zone with no group-mate
@@ -1888,38 +1880,24 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
             )
           })()}
           <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={cell.id}>{depth ? '▫' : '⛶'} {zoneName}</span>
-          {isLeaf && (
-            <button data-testid={`add-${cell.id}`} title={tr.ecAddPlugin} onClick={(e) => { e.stopPropagation(); openPluginPicker(cell.id) }}
-              style={{ ...zoneHeadBtn, fontSize: 12, fontWeight: 700 }}>+</button>
+          {/* Only a zone duplicateZone itself created (non-empty plugin_referer) is removable — kept
+              OUTSIDE the menu, same "always one click" rule as the block row's × (Mantis #0011033).
+              Everything else (add/duplicate/new-zone/layout) always lives in "⋯". Same box as that
+              block row's × / ⋯ too (rowActionBtn) — sizing these off the old zoneHeadBtn (18px, built
+              for the inline add/duplicate/layout buttons that used to share the row) left the × sat
+              visibly off-centre/undersized next to ⋯ once those were the only two buttons left. */}
+          {cell.removable && (
+            <button data-testid={`remove-zone-${cell.id}`} title={tr.ecRemoveZone}
+              onClick={(e) => { e.stopPropagation(); setConfirmRemoveZone({ zoneId: cell.id, label: zoneName }) }}
+              style={{ ...rowActionBtn, color: '#dc2626', borderColor: 'color-mix(in srgb, #dc2626 35%, var(--color-border,#e5e7eb))', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? .6 : 1 }} disabled={saving}>×</button>
           )}
-          {/* New sibling zone, right below this one — top-level only (a nested sub-cell from a split
-              layout isn't a page-level zone; duplicateZone works on the page's own zone list). The
-              duplicate icon matches the top toolbar's "Duplicate page" button (Icon name="copy" in
-              CmsPage.tsx) rather than a generic ⧉ glyph, and + creates an empty one — both always
-              available, since ANY zone can now spawn a new sibling (no second pre-existing template
-              zone required). */}
-          {depth === 0 && (
-            <>
-              <button data-testid={`duplicate-${cell.id}`} title={tr.ecDuplicateZone}
-                onClick={(e) => { e.stopPropagation(); void duplicateZone(cell.id, true) }}
-                style={{ ...zoneHeadBtn, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? .6 : 1 }} disabled={saving}>
-                <ZoneCopyIcon />
-              </button>
-              <button data-testid={`new-zone-${cell.id}`} title={tr.ecNewZone}
-                onClick={(e) => { e.stopPropagation(); void duplicateZone(cell.id, false) }}
-                style={{ ...zoneHeadBtn, fontSize: 11, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? .6 : 1 }} disabled={saving}>+▭</button>
-              {/* Only a zone duplicateZone itself created (non-empty plugin_referer) — the original
-                  template zone would just get silently recreated on the next render, so it's never
-                  offered here. Destructive → confirm first (see confirmRemoveZone). */}
-              {cell.removable && (
-                <button data-testid={`remove-zone-${cell.id}`} title={tr.ecRemoveZone}
-                  onClick={(e) => { e.stopPropagation(); setConfirmRemoveZone({ zoneId: cell.id, label: zoneName }) }}
-                  style={{ ...zoneHeadBtn, border: '1px solid #fecaca', color: '#dc2626', fontSize: 12, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? .6 : 1 }} disabled={saving}>×</button>
-              )}
-            </>
-          )}
-          {/* compact schema picker — deploys the full list; each cell reconfigurable */}
-          <LayoutTrigger cell={cell} />
+          <button data-testid={`zone-menu-btn-${cell.id}`} title={tr.ecZoneMoreActions} aria-haspopup="menu" aria-expanded={zoneMenuFor?.cellId === cell.id}
+            onClick={(e) => {
+              e.stopPropagation()
+              const rc = (e.currentTarget as HTMLElement).getBoundingClientRect()
+              setZoneMenuFor((m) => (m?.cellId === cell.id ? null : { cellId: cell.id, label: zoneName, isLeaf, depth, template: cell.template, right: Math.max(8, window.innerWidth - rc.right), y: rc.bottom + 4 }))
+            }}
+            style={{ ...rowActionBtn, fontWeight: 700, borderColor: zoneMenuFor?.cellId === cell.id ? 'var(--color-primary,#dc2626)' : 'var(--color-border,#e5e7eb)', color: zoneMenuFor?.cellId === cell.id ? 'var(--color-primary,#dc2626)' : 'var(--color-foreground,#111827)' }}>⋯</button>
         </div>
 
         {/* this cell's own blocks (only meaningful for a leaf; a split cell holds sub-cells instead) */}
@@ -2133,6 +2111,54 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
                 ))}
               <button className="melis-ec-mi" data-testid={`width-toggle-${rowMenu.refId}`} role="menuitem" style={item} onClick={() => { close(); setOpenWidth((w) => (w === rowMenu.refId ? null : rowMenu.refId)) }}><span style={ico}>↔</span>{tr.ecResponsiveWidths}</button>
               <button className="melis-ec-mi" data-testid={`duplicate-block-${rowMenu.refId}`} role="menuitem" style={{ ...item, opacity: saving ? .6 : 1, cursor: saving ? 'not-allowed' : 'pointer' }} disabled={saving} onClick={() => { close(); void duplicateBlock(rowMenu.zoneId, rowMenu.refId) }}><span style={ico}><ZoneCopyIcon /></span>{tr.ecDuplicateBlock}</button>
+            </div>
+          </>,
+          document.body,
+        )
+      })()}
+      {/* Zone-head "⋯" menu (cf. zoneActionsCollapsed) — add/duplicate/new-zone/layout for a top-level
+          zone that no longer has room to show them inline. Same anchored-popover/backdrop mechanics
+          as the block row's ⋯ menu just above. */}
+      {zoneMenuFor && (() => {
+        const item: React.CSSProperties = isMobile
+          ? { display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '12px 12px', border: 0, background: 'transparent', borderRadius: 8, fontSize: 14, cursor: 'pointer', color: 'var(--color-foreground,#111827)', textAlign: 'left', whiteSpace: 'normal', lineHeight: 1.3 }
+          : { display: 'flex', alignItems: 'center', gap: 9, width: '100%', padding: '7px 10px', border: 0, background: 'transparent', borderRadius: 6, fontSize: 12, cursor: 'pointer', color: 'var(--color-foreground,#111827)', textAlign: 'left', whiteSpace: 'nowrap' }
+        const ico: React.CSSProperties = { width: 18, display: 'inline-flex', justifyContent: 'center', color: 'var(--color-muted-foreground,#6b7280)', flex: '0 0 auto' }
+        const close = () => setZoneMenuFor(null)
+        const rows = (zoneMenuFor.isLeaf ? 1 : 0) + (zoneMenuFor.depth === 0 ? 2 : 0) + 1 // add (leaf only) + duplicate/new-zone (top-level only) + layout
+        const menuH = 30 + rows * 32
+        const top = zoneMenuFor.y + menuH > window.innerHeight ? Math.max(8, zoneMenuFor.y - 30 - menuH) : zoneMenuFor.y
+        const box: React.CSSProperties = isMobile
+          ? { position: 'fixed', left: 8, right: 8, bottom: 8, zIndex: 71, paddingBottom: 'calc(6px + env(safe-area-inset-bottom, 0px))', borderRadius: 12, boxShadow: '0 -8px 30px rgba(0,0,0,.28)' }
+          : { position: 'fixed', right: zoneMenuFor.right, top, zIndex: 71, minWidth: 200, maxWidth: 'calc(100vw - 16px)', borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,.18)' }
+        return createPortal(
+          <>
+            <div data-testid="zone-menu-backdrop" onClick={close} style={{ position: 'fixed', inset: 0, zIndex: 70, background: isMobile ? 'rgba(0,0,0,.35)' : 'transparent' }} />
+            <div data-testid={`zone-menu-${zoneMenuFor.cellId}`} role="menu" style={{ ...box, background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', border: '1px solid var(--color-border,#e5e7eb)', padding: isMobile ? 6 : 4 }}>
+              {isMobile && <div aria-hidden style={{ width: 36, height: 4, borderRadius: 2, margin: '4px auto 8px', background: 'var(--color-border,#e5e7eb)' }} />}
+              {/* Same title row as the block row's ⋯ menu — says which zone this popover belongs to. */}
+              <div style={{ padding: isMobile ? '2px 12px 8px' : '4px 10px 6px', fontSize: isMobile ? 12 : 10, fontWeight: 700, color: 'var(--color-muted-foreground,#6b7280)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: isMobile ? 'none' : 260 }}>{zoneMenuFor.label}</div>
+              {zoneMenuFor.isLeaf && (
+                <button className="melis-ec-mi" data-testid={`menu-add-${zoneMenuFor.cellId}`} role="menuitem" style={item} onClick={() => { close(); openPluginPicker(zoneMenuFor.cellId) }}><span style={{ ...ico, fontWeight: 700 }}>+</span>{tr.ecAddPlugin}</button>
+              )}
+              {/* Duplicate / new-zone: top-level only (a nested sub-cell isn't a page-level zone —
+                  same restriction the inline buttons used to carry). */}
+              {zoneMenuFor.depth === 0 && (
+                <>
+                  <button className="melis-ec-mi" data-testid={`menu-duplicate-${zoneMenuFor.cellId}`} role="menuitem" style={{ ...item, opacity: saving ? .6 : 1, cursor: saving ? 'not-allowed' : 'pointer' }} disabled={saving} onClick={() => { close(); void duplicateZone(zoneMenuFor.cellId, true) }}><span style={ico}><ZoneCopyIcon /></span>{tr.ecDuplicateZone}</button>
+                  <button className="melis-ec-mi" data-testid={`menu-new-zone-${zoneMenuFor.cellId}`} role="menuitem" style={{ ...item, opacity: saving ? .6 : 1, cursor: saving ? 'not-allowed' : 'pointer' }} disabled={saving} onClick={() => { close(); void duplicateZone(zoneMenuFor.cellId, false) }}><span style={{ ...ico, fontWeight: 700, fontSize: 11 }}>+▭</span>{tr.ecNewZone}</button>
+                </>
+              )}
+              <button className="melis-ec-mi" data-testid={`menu-layout-${zoneMenuFor.cellId}`} role="menuitem" style={item}
+                onClick={() => {
+                  const x = Math.max(8, Math.min(window.innerWidth - zoneMenuFor.right - 300, window.innerWidth - 312))
+                  const cellId = zoneMenuFor.cellId
+                  close()
+                  setPicker({ cellId, x, y: zoneMenuFor.y })
+                }}>
+                <span className="melis-di melis-di-mini" style={ico} dangerouslySetInnerHTML={{ __html: iconFor(zoneMenuFor.template) }} />
+                {tr.ecLayoutTitle}
+              </button>
             </div>
           </>,
           document.body,
