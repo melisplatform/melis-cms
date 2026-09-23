@@ -658,8 +658,10 @@ function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
       const newId = res?.id || Number(newPlatform)
       navigate(newId ? `${base}/${newId}` : base, { replace: true })
     } catch (e) {
+      // Erreur serveur (ex. chevauchement de plages, 409) : notification seule, pas de bandeau
+      // (le bandeau reste réservé à la validation client, champ par champ).
       const msg = e instanceof Error ? e.message : t('err_save')
-      setError(msg); koNotify(t('title'), msg)
+      koNotify(t('title'), msg)
     } finally { setSaving(false) }
   }
   const hasIssue = (lbl: string) => issues.some((i) => i.label === lbl)
