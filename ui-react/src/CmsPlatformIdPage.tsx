@@ -18,6 +18,7 @@ const MELIS_KEY = 'meliscms_tool_platform_ids'
 // API sub-tabs de l'hôte (la brique ne peut pas importer le contexte React de l'hôte)
 type SubTabW = {
   __melisOpenSubTab?: (section: string, tab: { id: string; label: string; path: string }) => void
+  __melisCloseSubTab?: (section: string, id: string) => void
   __melisUpdateSubTabLabel?: (section: string, id: string, label: string) => void
 }
 
@@ -320,7 +321,9 @@ export default function CmsPlatformIdPage({ active = true }: { active?: boolean 
   // base = route de la liste (pathname sans le segment /:id éventuel)
   const base = effId ? effPath.slice(0, effPath.length - effId.length - 1) : effPath
 
-  if (effId) return <CmsPlatformIdForm id={effId} base={base} />
+  // key : remonte le formulaire à chaque changement d'id (ex. /new → /:id après création) → état
+  // réinitialisé, sous-onglet (ré)ouvert pour le nouvel id et données enregistrées rechargées.
+  if (effId) return <CmsPlatformIdForm key={effId} id={effId} base={base} />
   return <CmsPlatformIdList base={base} />
 }
 
@@ -355,7 +358,7 @@ function CmsPlatformIdList({ base }: { base: string }) {
   const displayCols = narrow ? shownColsList.map((c, i) => ({ ...c, visible: i === 0 })) : shownColsList
   const hasHidden = narrow && shownColsList.length > 1
 
-  const { items, total, loading, hasMore, sentinelRef, sortCol, sortDir, toggleSort, reload, removeLocal } =
+  const { items, total, loading, hasMore, sentinelRef, sortCol, sortDir, toggleSort, removeLocal } =
     useKeysetList<PlatformIdItem>({
       fetcher: (a) => fetchPlatformIds({ ...a, search }),
       deps: [search, tick],
@@ -373,7 +376,15 @@ function CmsPlatformIdList({ base }: { base: string }) {
 
   async function confirmDelete() {
     if (!toDelete) return
-    try { await deletePlatformId(toDelete.id); removeLocal((r) => r.id === toDelete.id); setToDelete(null); reload() }
+    try {
+      await deletePlatformId(toDelete.id); removeLocal((r) => r.id === toDelete.id)
+      // Ferme le sous-onglet d'édition de la plage supprimée s'il était ouvert.
+      ;(window as unknown as SubTabW).__melisCloseSubTab?.(base, `${base}/${toDelete.id}`)
+      setToDelete(null)
+      // tick (et pas seulement reload) : recharge aussi les stats → la plateforme libérée redevient
+      // disponible et « Nouvelle plage » se réactive sans fermer/rouvrir l'outil.
+      setTick((x) => x + 1)
+    }
     catch { setToDelete(null) }
   }
 
@@ -589,7 +600,7 @@ function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
     fetchPlatformIdStats().then((s) => {
       const list = s.availablePlatforms || []
       setAvail(list)
-      if (list.length === 0) navigate(base)
+      if (list.length === 0) { (window as unknown as SubTabW).__melisCloseSubTab?.(base, subTabId); navigate(base) }
       else if (list.length === 1) setNewPlatform(list[0].id)
     }).catch(() => null)
   }, [isEdit]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -631,7 +642,7 @@ function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
     if (iss.length) { setError(t('err_check')); setIssues(iss); return }
     setSaving(true)
     try {
-      await savePlatformId({
+      const res = await savePlatformId({
         id: platformId,
         platformId: isEdit ? null : Number(newPlatform),
         pageStart: ps!, pageCurrent: pc!, pageEnd: pe!,
@@ -639,7 +650,13 @@ function CmsPlatformIdForm({ id, base }: { id: string; base: string }) {
       })
       setSaved(true)
       okNotify(t('title'), t('saved'))
-      setTimeout(() => navigate(base), 500)
+      if (isEdit) { setTimeout(() => navigate(base), 500); return }
+      // Création : le sous-onglet transitoire « Nouvelle plage » est remplacé tout de suite par celui
+      // de la plage créée, rouverte sur ses données enregistrées. replace → « précédent » ne ramène
+      // pas sur /new.
+      ;(window as unknown as SubTabW).__melisCloseSubTab?.(base, subTabId)
+      const newId = res?.id || Number(newPlatform)
+      navigate(newId ? `${base}/${newId}` : base, { replace: true })
     } catch (e) {
       const msg = e instanceof Error ? e.message : t('err_save')
       setError(msg); koNotify(t('title'), msg)
