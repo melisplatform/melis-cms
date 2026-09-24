@@ -21,7 +21,8 @@ use MelisCore\Controller\MelisReactKeysetListTrait;
  *   POST   /melis/react-api/cms-platform-ids/save         → créer / mettre à jour
  *   DELETE /melis/react-api/cms-platform-ids/delete/:id   → supprimer
  *
- * Contraintes : 6 entiers ≥ 0 ; start ≤ current ≤ end pour chaque plage (page et template).
+ * Contraintes : 6 entiers ≥ 0 ; start ≤ current ≤ end pour chaque plage (page et template) ;
+ * aucune plage (page ou template) ne peut chevaucher celle d'une autre plateforme (409).
  */
 class MelisReactApiCmsPlatformIdController extends MelisAbstractActionController
 {
@@ -177,6 +178,9 @@ class MelisReactApiCmsPlatformIdController extends MelisAbstractActionController
                 if (!iterator_to_array($db->query('SELECT pids_id FROM melis_cms_platform_ids WHERE pids_id = ?', [$id]))) {
                     return $this->jsonResponse(['success' => false, 'error' => 'Not found'], 404);
                 }
+                if ($conflict = $this->rangeConflictResponse($db, $id, $pageStart, $pageEnd, $tplStart, $tplEnd)) {
+                    return $conflict;
+                }
                 $db->query(
                     'UPDATE melis_cms_platform_ids SET pids_page_id_start = ?, pids_page_id_current = ?, pids_page_id_end = ?,
                      pids_tpl_id_start = ?, pids_tpl_id_current = ?, pids_tpl_id_end = ? WHERE pids_id = ?',
@@ -196,6 +200,9 @@ class MelisReactApiCmsPlatformIdController extends MelisAbstractActionController
             }
             if (iterator_to_array($db->query('SELECT pids_id FROM melis_cms_platform_ids WHERE pids_id = ?', [$platformId]))) {
                 return $this->jsonResponse(['success' => false, 'error' => 'This platform already has a range'], 409);
+            }
+            if ($conflict = $this->rangeConflictResponse($db, $platformId, $pageStart, $pageEnd, $tplStart, $tplEnd)) {
+                return $conflict;
             }
             $db->query(
                 'INSERT INTO melis_cms_platform_ids (pids_id, pids_page_id_start, pids_page_id_current, pids_page_id_end,
@@ -242,6 +249,36 @@ class MelisReactApiCmsPlatformIdController extends MelisAbstractActionController
             'tplCurrent'  => (int) $r['pids_tpl_id_current'],
             'tplEnd'      => (int) $r['pids_tpl_id_end'],
         ];
+    }
+
+    /**
+     * Refuse une plage qui chevauche celle d'une AUTRE plateforme (pages ou templates) : les IDs
+     * alloués doivent rester uniques entre plateformes (contrôle de l'outil legacy,
+     * MelisPlatformIdsTable::platformIdsRangeIsExist). Chevauchement d'intervalles complet
+     * (start ≤ autreFin ET end ≥ autreDébut) : couvre aussi une plage incluse dans une autre,
+     * que le contrôle legacy (bornes uniquement) laissait passer.
+     */
+    private function rangeConflictResponse($db, int $selfId, int $pageStart, int $pageEnd, int $tplStart, int $tplEnd): ?HttpResponse
+    {
+        $rows = iterator_to_array($db->query(
+            'SELECT p.pids_id, pl.plf_name FROM melis_cms_platform_ids p
+             LEFT JOIN melis_core_platform pl ON pl.plf_id = p.pids_id
+             WHERE p.pids_id <> ?
+               AND ((p.pids_page_id_start <= ? AND p.pids_page_id_end >= ?)
+                 OR (p.pids_tpl_id_start <= ? AND p.pids_tpl_id_end >= ?))',
+            [$selfId, $pageEnd, $pageStart, $tplEnd, $tplStart]
+        ));
+        if (!$rows) {
+            return null;
+        }
+        $names = array_map(fn($r) => (string) ($r['plf_name'] ?? ('#' . $r['pids_id'])), $rows);
+        $msg   = $this->getServiceManager()->get('translator')->translate('tr_meliscms_tool_platform_conflict_error');
+        $msg   = trim(preg_replace('/\s+/', ' ', strip_tags(str_replace(['<br>', '<br/>', '<br />'], ' ', $msg))));
+        return $this->jsonResponse([
+            'success'   => false,
+            'error'     => $msg . ' (' . implode(', ', $names) . ')',
+            'conflicts' => array_map(fn($r) => (int) $r['pids_id'], $rows),
+        ], 409);
     }
 
     private function isAuthenticated(): bool
