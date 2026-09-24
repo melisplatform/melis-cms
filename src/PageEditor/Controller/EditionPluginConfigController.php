@@ -687,7 +687,11 @@ class EditionPluginConfigController extends MelisAbstractActionController
             ]);
 
             $plugin = $sm->get('ControllerPluginManager')->get($pluginName);
-            $updates = ['id' => $pluginId, 'pageId' => $idPage];
+            // A plugin hardcoded in a template gets its parameters (template_path…) from the page
+            // controller, not from the page XML. The canvas sends them back from the plugin's
+            // `.plugin-hardcoded-conf` block (`hc`), decoded like the legacy renderPluginModalAction,
+            // so the form shows the plugin's CURRENT values instead of the config defaults.
+            $updates = array_merge($this->hardcodedConfig(), ['id' => $pluginId, 'pageId' => $idPage]);
             if ($ns !== '') {
                 $updates['melisSite'] = $ns;
                 $updates['siteModule'] = $ns;
@@ -700,6 +704,23 @@ class EditionPluginConfigController extends MelisAbstractActionController
                 $shared->detach($listener, '*', 'melistemplating_plugin_get_datas_db');
             }
         }
+    }
+
+    /**
+     * The hardcoded plugin parameters sent by the canvas (`hc` query param: the serialized content
+     * of the plugin's `.plugin-hardcoded-conf` block), or [] when absent/invalid.
+     *
+     * @return array<string,mixed>
+     */
+    private function hardcodedConfig(): array
+    {
+        $raw = (string) $this->params()->fromQuery('hc', '');
+        if (trim($raw) === '') {
+            return [];
+        }
+        $raw = html_entity_decode(html_entity_decode(trim($raw), ENT_QUOTES), ENT_QUOTES);
+        $conf = @unserialize($raw, ['allowed_classes' => false]);
+        return is_array($conf) ? $conf : [];
     }
 
     /**

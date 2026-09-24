@@ -31,6 +31,9 @@ export type PluginFormProps = {
   tag: string
   /** The plugin's current XML fragment (node.raw) — parse it for prefill. */
   rawXml: string
+  /** Hardcoded plugin parameters (its `.plugin-hardcoded-conf` block, serialized) — a plugin hardcoded in
+   *  a template takes template_path & co. from the page controller, not the page XML. Sent as `hc`. */
+  hc?: string
   accent: string
   onSaved: (changed: boolean) => void
   onCancel: () => void
@@ -106,13 +109,13 @@ const _optionsCache = new Map<string, Promise<PluginOptions>>()
  *  server, once per plugin INSTANCE/page (keyed by pluginId too — a page can hold several instances of
  *  the SAME plugin, e.g. two Sliders, each with its own saved config). `fieldOptions[name]` holds a
  *  field's options; `templateOptions` is a convenience alias for the template_path field. */
-export function fetchFieldOptions(args: { idPage: number; module: string; pluginName: string; pluginId: string }): Promise<PluginOptions> {
+export function fetchFieldOptions(args: { idPage: number; module: string; pluginName: string; pluginId: string; hc?: string }): Promise<PluginOptions> {
   const key = `${args.idPage}|${args.module}|${args.pluginName}|${args.pluginId}`
   let p = _optionsCache.get(key)
   if (!p) {
     p = (async () => {
       try {
-        const q = `idPage=${args.idPage}&module=${encodeURIComponent(args.module)}&pluginName=${encodeURIComponent(args.pluginName)}&pluginId=${encodeURIComponent(args.pluginId)}`
+        const q = `idPage=${args.idPage}&module=${encodeURIComponent(args.module)}&pluginName=${encodeURIComponent(args.pluginName)}&pluginId=${encodeURIComponent(args.pluginId)}` + (args.hc ? `&hc=${encodeURIComponent(args.hc)}` : '')
         const r = await fetch(`/melis/react-api/cms-page/edition/plugin-config/options?${q}`, { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         const res: any = await r.json().catch(() => ({}))
         const fieldOptions = (res?.data?.fieldOptions || {}) as Record<string, Option[]>
@@ -364,7 +367,7 @@ export function usePrefill(ctx: PluginTabContext, name: string) {
     let cancelled = false
     const rawv = readTag(ctx.props.rawXml, name)
     if (rawv) ctx.setValue(name, rawv)
-    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName, pluginId: ctx.props.pluginId }).then((o) => {
+    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName, pluginId: ctx.props.pluginId, hc: ctx.props.hc }).then((o) => {
       if (cancelled) return
       const sv = o.fieldValues[name]
       if (sv !== undefined && sv !== '') ctx.setValue(name, sv)
@@ -437,7 +440,7 @@ export function RemoteSelectField({ ctx, name, label, hint, empty }: { ctx: Plug
   const [options, setOptions] = useState<Option[]>([])
   useEffect(() => {
     let c = false
-    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName, pluginId: ctx.props.pluginId })
+    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName, pluginId: ctx.props.pluginId, hc: ctx.props.hc })
       .then((o) => { if (!c) setOptions(o.fieldOptions[name] || []) })
     return () => { c = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -454,7 +457,7 @@ export function TemplateField({ ctx, name = 'template_path', label, hint }: { ct
   const [options, setOptions] = useState<Option[]>([])
   useEffect(() => {
     let c = false
-    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName, pluginId: ctx.props.pluginId }).then((o) => { if (!c) setOptions(o.templateOptions) })
+    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName, pluginId: ctx.props.pluginId, hc: ctx.props.hc }).then((o) => { if (!c) setOptions(o.templateOptions) })
     return () => { c = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ctx.props.idPage, ctx.props.module, ctx.props.pluginName, ctx.props.pluginId])
@@ -512,7 +515,7 @@ export function CheckboxField({ ctx, name, label, boxLabel, hint }: { ctx: Plugi
     let cancelled = false
     const raw = readTag(ctx.props.rawXml, name)
     if (raw) ctx.setValue(name, raw === '0' ? '0' : '1')
-    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName, pluginId: ctx.props.pluginId }).then((o) => {
+    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName, pluginId: ctx.props.pluginId, hc: ctx.props.hc }).then((o) => {
       if (cancelled) return
       // parseFieldValues only emits a checkbox's name when it was rendered `checked` → presence = on.
       if (Object.prototype.hasOwnProperty.call(o.fieldValues, name)) ctx.setValue(name, '1')
@@ -571,7 +574,7 @@ export function SwitchField({ ctx, name, label, hint }: { ctx: PluginTabContext;
     let cancelled = false
     const raw = readTag(ctx.props.rawXml, name)
     if (raw) ctx.setValue(name, raw === '0' ? '0' : '1')
-    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName, pluginId: ctx.props.pluginId }).then((o) => {
+    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName, pluginId: ctx.props.pluginId, hc: ctx.props.hc }).then((o) => {
       if (cancelled) return
       if (Object.prototype.hasOwnProperty.call(o.fieldValues, name)) ctx.setValue(name, '1')
     })
@@ -605,7 +608,7 @@ export function FieldListField({ ctx, label, hint }: { ctx: PluginTabContext; la
   }
   useEffect(() => {
     let c = false
-    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName, pluginId: ctx.props.pluginId }).then((o) => { if (!c) apply(o.fieldList) })
+    fetchFieldOptions({ idPage: ctx.props.idPage, module: ctx.props.module, pluginName: ctx.props.pluginName, pluginId: ctx.props.pluginId, hc: ctx.props.hc }).then((o) => { if (!c) apply(o.fieldList) })
     return () => { c = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -822,13 +825,13 @@ export type SchemaTab = { id: string; title: string; fields: SchemaField[] }
 const _schemaCache = new Map<string, Promise<SchemaTab[]>>()
 
 /** GET a plugin's declarative config schema (tabs → fields), once per plugin/page (cached promise). */
-export function fetchSchema(args: { idPage: number; module: string; pluginName: string; pluginId: string }): Promise<SchemaTab[]> {
+export function fetchSchema(args: { idPage: number; module: string; pluginName: string; pluginId: string; hc?: string }): Promise<SchemaTab[]> {
   const key = `${args.idPage}|${args.module}|${args.pluginName}|${args.pluginId}`
   let p = _schemaCache.get(key)
   if (!p) {
     p = (async () => {
       try {
-        const q = `idPage=${args.idPage}&module=${encodeURIComponent(args.module)}&pluginName=${encodeURIComponent(args.pluginName)}&pluginId=${encodeURIComponent(args.pluginId)}`
+        const q = `idPage=${args.idPage}&module=${encodeURIComponent(args.module)}&pluginName=${encodeURIComponent(args.pluginName)}&pluginId=${encodeURIComponent(args.pluginId)}` + (args.hc ? `&hc=${encodeURIComponent(args.hc)}` : '')
         const r = await fetch(`/melis/react-api/cms-page/edition/plugin-config/schema?${q}`, { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         const res: any = await r.json().catch(() => ({}))
         return (res?.data?.tabs || []) as SchemaTab[]

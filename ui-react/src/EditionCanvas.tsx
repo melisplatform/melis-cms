@@ -341,7 +341,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   }, [aiBridgeReady, aiIcon])
   const [isMobile, setIsMobile] = useState(false) // real viewport is phone-narrow → panel becomes a drawer
   const [selected, setSelected] = useState<{ zoneId: string; refId: string | null } | null>(null) // canvas→panel locate
-  const [config, setConfig] = useState<{ zoneId: string; ref: { id: string; label: string }; node: DocZone | null; module: string; pluginName: string; tag: string; useIframe: boolean; v: number } | null>(null) // plugin config modal
+  const [config, setConfig] = useState<{ zoneId: string; ref: { id: string; label: string }; node: DocZone | null; module: string; pluginName: string; tag: string; useIframe: boolean; v: number; hc?: string } | null>(null) // plugin config modal
   const [catalog, setCatalog] = useState<Palette | null>(null) // addable-plugins palette (lazy)
   const [pluginPicker, setPluginPicker] = useState<{ cellId: string } | null>(null) // "+" add-plugin modal
   const [pickerQuery, setPickerQuery] = useState('')
@@ -468,7 +468,12 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
           const btn = d.createElement('button')
           btn.className = 'melis-react-cfg'; btn.type = 'button'; btn.textContent = '⚙'
           btn.title = peT().ecConfigurePluginNamed + ' (' + name + ')'
-          btn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openConfigDirectRef.current?.(module, name, pid) })
+          btn.addEventListener('click', (e) => {
+            e.preventDefault(); e.stopPropagation()
+            // The plugin's own hardcoded parameters (template_path…), as the legacy editor sends them.
+            const hcEl = wrap.querySelector(':scope > .plugin-hardcoded-conf') || wrap.querySelector('.plugin-hardcoded-conf')
+            openConfigDirectRef.current?.(module, name, pid, undefined, (hcEl?.textContent || '').trim())
+          })
           // Hovering the ⚙ outlines the plugin's block (like selecting it from the panel), only while hovered.
           btn.addEventListener('mouseenter', () => wrap.classList.add('melis-react-cfg-hl'))
           btn.addEventListener('mouseleave', () => wrap.classList.remove('melis-react-cfg-hl'))
@@ -901,7 +906,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   // Open the config modal for ANY plugin identified DIRECTLY by (module, name, id) — no doc-model lookup.
   // Used by the in-canvas ⚙ icon injected on every module plugin, INCLUDING the template's HARDCODED ones
   // (menu, header/footer…) that live outside any drag'n'drop zone (so they're absent from the panel/model).
-  const openConfigDirect = useCallback((module: string, name: string, id: string, label?: string) => {
+  const openConfigDirect = useCallback((module: string, name: string, id: string, label?: string, hc?: string) => {
     if (!module || !name || !id) return
     // Prefill: a hardcoded plugin may still have a top-level data node in the document (its page-XML
     // config override) — pass it so the native/iframe form prefills from the current values, not defaults.
@@ -909,9 +914,9 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     // Prefer the resolved, translated plugin TITLE (same source as the right panel) over the raw plugin
     // CLASS name — otherwise the in-canvas ⚙ showed the doubled class name (e.g. "FooFooPlugin").
     const nice = label || doc?.pluginTitles?.[id] || name
-    setConfig({ zoneId: '', ref: { id, label: nice }, node, module, pluginName: name, tag: node?.tag || '', useIframe: false, v: Date.now() })
+    setConfig({ zoneId: '', ref: { id, label: nice }, node, module, pluginName: name, tag: node?.tag || '', useIframe: false, v: Date.now(), hc: hc || undefined })
   }, [doc])
-  const openConfigDirectRef = useRef<((module: string, name: string, id: string, label?: string) => void) | null>(null)
+  const openConfigDirectRef = useRef<((module: string, name: string, id: string, label?: string, hc?: string) => void) | null>(null)
   useEffect(() => { openConfigDirectRef.current = openConfigDirect }, [openConfigDirect])
 
   // Config saved (from a React form or the iframe): close, notify, and — if something changed —
@@ -2197,10 +2202,11 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
         const iframeSrc = `/melis/react-api/cms-page/edition/plugin-config?idPage=${idPage}`
           + `&module=${encodeURIComponent(config.module)}&pluginName=${encodeURIComponent(config.pluginName)}`
           + `&pluginId=${encodeURIComponent(config.ref.id)}&theme=${theme}&_=${config.v}`
+          + (config.hc ? `&hc=${encodeURIComponent(config.hc)}` : '')
         const useReact = !config.useIframe
         const isBespoke = hasPluginForm(config.pluginName)
         const formProps = {
-          idPage, module: config.module, pluginName: config.pluginName, pluginId: config.ref.id,
+          idPage, module: config.module, pluginName: config.pluginName, pluginId: config.ref.id, hc: config.hc,
           tag: config.tag, rawXml: config.node?.raw || '', accent,
           onSaved: onConfigSaved, onCancel: () => setConfig(null),
         }
