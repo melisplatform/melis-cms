@@ -229,10 +229,43 @@ class EditionRenderPageController extends MelisAbstractActionController
             // matches nested rows (a `.dnd-plugins-row` inside a column of a `.dnd-plugins-row`), so the
             // top-level side-by-side equal-height above is untouched.
             . '.dnd-plugins-row>[class*="dnd-plugins-col-"]>.dnd-plugins-row{flex:0 0 auto!important;height:auto!important;align-items:flex-start!important;justify-content:flex-start!important}'
+            // Empty-cell placeholder of the "N cols left/right" layouts (0011041). dynamic-dragndrop.css
+            // shrinks it for the LEGACY editor's small side cells (min-height 62/100px): label at top:5%
+            // (-20% for the 4-cols ones) and a 31×40 icon at 25–30% !important. Here every empty cell is a
+            // full drop area, so the label landed on the cell's top border with a tiny icon mid-cell.
+            // Restore the default placeholder (the one every other cell uses: icon 40%, label 49%).
+            . $this->layoutPlaceholderReset()
+            // Doubled dashed frame (0011041): the top-level `.dnd-layout-wrapper` outline (legacy frame
+            // around a zone + its layout toolbar, hidden here) runs 8px outside the cell's own dashed
+            // border → two dashed lines above and below every single-cell zone. Keep it only where it
+            // GROUPS several cells (a real split layout: two columns or two rows).
+            . '.melis-dragdropzone-container>.dnd-layout-wrapper:not(:has(.dnd-plugins-row>[class*="dnd-plugins-col-"]~[class*="dnd-plugins-col-"])):not(:has(.dnd-plugins-row~.dnd-plugins-row)){outline:none!important}'
             . '</style>';
         if (stripos($html, '</head>') !== false) {
             return (string) preg_replace('#</head>#i', $inject . '</head>', $html, 1);
         }
         return $inject . $html;
+    }
+
+    /**
+     * Canvas CSS putting the empty-cell placeholder of the "N cols left/right" layouts back to the
+     * default one (see stripLegacyEdit, 0011041). One more class than dynamic-dragndrop.css's rules,
+     * so these win over its `!important` tops.
+     */
+    private function layoutPlaceholderReset(): string
+    {
+        $layouts = [
+            'dnd-3-cols-1-col-left-w-2-cols-right',
+            'dnd-3-cols-2-cols-left-w-1-col-right',
+            'dnd-4-cols-1-col-left-w-3-cols-right',
+            'dnd-4-cols-3-cols-left-w-1-col-right',
+        ];
+        $sel = static fn (string $pseudo): string => implode(',', array_map(
+            static fn (string $l): string => ".$l .melis-dragdropzone.no-content::$pseudo",
+            $layouts
+        ));
+
+        return $sel('before') . '{top:49%!important}'
+            . $sel('after') . '{top:40%!important;width:200px!important;height:100px!important;font-size:50px!important}';
     }
 }
