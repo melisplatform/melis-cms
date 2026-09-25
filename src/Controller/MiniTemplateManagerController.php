@@ -15,6 +15,17 @@ use Laminas\View\Model\JsonModel;
 
 class MiniTemplateManagerController extends MelisAbstractActionController
 {
+    /**
+     * Outil auquel ce contrôleur appartient (audit DEKRA 7.0) : MelisCoreAuthorizationListener
+     * vérifie canAccess() sur cette clé AVANT le dispatch.
+     */
+    const MELIS_KEY = 'meliscms_mini_template_manager_tool';
+
+    /** Actions partagées avec d'autres outils : une des clés suffit, '@login' = connexion seule. */
+    const TOOL_KEY_MAP = [
+        'createMiniTemplate' => '@login', // bouton IA « enregistrer comme mini-template » de l'éditeur de page
+    ];
+
     public $module = 'meliscms';
     public $tool_key = 'meliscms_mini_template_manager_tool';
     public $form_key = 'mini_template_manager_tool_add_form';
