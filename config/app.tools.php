@@ -2138,14 +2138,21 @@ return array(
                                 array(
                                     'spec' => array(
                                         'name' => 'pageRelation',
-                                        'type' => 'checkbox',
+                                        // Yes/No switch, the platform's control for a boolean (0011068)
+                                        'type' => 'Checkbox',
                                         'options' => array(
                                             'label' => 'tr_meliscms_tree_sites_duplication_page_relation',
                                             'tooltip' => 'tr_meliscms_tree_sites_duplication_page_relation tooltip',
+                                            'checked_value' => 1,
+                                            'unchecked_value' => 0,
+                                            'switchOptions' => array(
+                                                'label-on' => 'tr_meliscore_common_yes',
+                                                'label-off' => 'tr_meliscore_common_no',
+                                                'label' => "<i class='glyphicon glyphicon-resize-horizontal'></i>",
+                                            ),
                                         ),
                                         'attributes' => array(
                                             'id' => 'pageRelation',
-                                            'class' => 'melis-check-box',
                                         ),
                                     ),
                                 ),
@@ -2168,14 +2175,21 @@ return array(
                                 array(
                                     'spec' => array(
                                         'name' => 'use_root',
-                                        'type' => 'checkbox',
+                                        // Yes/No switch, the platform's control for a boolean (0011068)
+                                        'type' => 'Checkbox',
                                         'options' => array(
                                             'label' => 'tr_meliscms_tree_sites_duplication_use_root',
                                             'tooltip' => 'tr_meliscms_tree_sites_duplication_root tooltip',
+                                            'checked_value' => 1,
+                                            'unchecked_value' => 0,
+                                            'switchOptions' => array(
+                                                'label-on' => 'tr_meliscore_common_yes',
+                                                'label-off' => 'tr_meliscore_common_no',
+                                                'label' => "<i class='glyphicon glyphicon-resize-horizontal'></i>",
+                                            ),
                                         ),
                                         'attributes' => array(
                                             'id' => 'use_root',
-                                            'class' => 'use_root_orig_checkbox melis-check-box'
                                         ),
                                     ),
                                 ),
