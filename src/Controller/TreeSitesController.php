@@ -702,7 +702,10 @@ class TreeSitesController extends MelisAbstractActionController
             $form = $factory->createForm($appConfigForm);
 
             $postValues = $this->getRequest()->getPost()->toArray();
-            $postValues['destinationPageId'] = ($postValues['use_root']) ? -1 : $postValues['destinationPageId'];
+            // Yes/No switches post nothing when off (no hidden "0" as the former checkboxes did)
+            $postValues['use_root'] = empty($postValues['use_root']) ? 0 : 1;
+            $postValues['pageRelation'] = empty($postValues['pageRelation']) ? 0 : 1;
+            $postValues['destinationPageId'] = ($postValues['use_root']) ? -1 : ($postValues['destinationPageId'] ?? null);
             $postValues['sourcePageId'] = empty($postValues['sourcePageId']) ? null : $postValues['sourcePageId'];
             $postValues = $melisTool->sanitizePost($postValues);
             $form->setData($postValues);
