@@ -99,6 +99,12 @@ return [
     ],
     'service_manager' => [
         'aliases' => [
+            // OVERRIDES melis-core's own 'ModulesService' alias (loaded earlier, so this later entry
+            // wins on config merge) — see SiteAwareModulesService's own docblock for why: melis-core's
+            // getActiveModules() silently drops every site module (module/MelisSites/*) from
+            // config/melis.module.load.php whenever a new module is activated via the templating/tool
+            // creator wizards, since those site modules never pass through Laminas's own ModuleManager.
+            'ModulesService'                    => \MelisCms\Service\SiteAwareModulesService::class,
             'MelisCmsRights'                    => \MelisCms\Service\MelisCmsRightsService::class,
             'MelisCmsSiteService'               => \MelisCms\Service\MelisCmsSiteService::class,
             'MelisCmsSiteModuleLoadService'     => \MelisCms\Service\MelisCmsSitesModuleLoadService::class,

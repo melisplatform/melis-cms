@@ -485,7 +485,14 @@
 		$body.on("click", 'button[data-inputid="#destinationPageId"]', function() {
 			$('[name="use_root"]').each(function() {
 				if ($(this).is(":checked")) {
-					$(this).prop("checked", false);
+					// "Root" is a Yes/No switch (0011068): switch it off through its API so the
+					// toggle follows, not only the hidden checkbox.
+					var $switch = $(this).closest(".make-switch");
+					if ($switch.length && $.fn.bootstrapSwitch) {
+						$switch.bootstrapSwitch("setState", false);
+					} else {
+						$(this).prop("checked", false);
+					}
 				}
 			});
 			$(".remember-me-cont .cbmask-inner").removeClass("cb-active");

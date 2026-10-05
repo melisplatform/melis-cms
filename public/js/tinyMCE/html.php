@@ -16,6 +16,12 @@
        'image_uploadtab' => false,
        'cleanup' => false,
        'verify_html' => false,
+       // TinyMCE 6: verify_html=false only relaxes element/attribute rules (valid_elements='*[*]'),
+       // NOT parent/child rules — a <link> inside a block <div> is still an invalid child and the
+       // DomParser removes it on editor init / getContent(). AI mini-templates persist their stylesheet
+       // as a <link> INSIDE the html-tag content (react-bridge.js assetTagsFor) so it reaches the front:
+       // allow it, or the design vanishes from the canvas and is never published (Mantis #0010999).
+       'valid_children' => '+body[link],+div[link]',
        'file_picker_types' => 'file image media',
        'file_picker_callback' => 'filePickerCallback',
        'images_upload_url' => '/melis/MelisCore/melisTinyMce/uploadImage',
