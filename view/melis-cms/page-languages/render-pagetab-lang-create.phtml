@@ -13,6 +13,9 @@
                     $form->setAttribute('id', $this->idPage.'_'.$form->getAttribute('id'));
                     $formId = $form->getAttribute('id');
                     $form->get('pageLangLocale')->setAttribute('class', 'dropdown-lang');
+                    // unique per page tab: select2 keys its instance by the element id, so a shared id
+                    // made every newly opened tab destroy the select2 of the previous tabs
+                    $form->get('pageLangLocale')->setAttribute('id', $this->idPage.'_'.$form->get('pageLangLocale')->getAttribute('id'));
                     echo $this->form()->openTag($form);
                     echo $this->formRow($form->get('pageLangPageId'));
                 ?>
