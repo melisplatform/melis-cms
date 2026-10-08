@@ -22,6 +22,12 @@ use MelisCore\Controller\MelisAbstractActionController;
  */
 class GdprBannerController extends MelisAbstractActionController
 {
+    /**
+     * Outil auquel ce contrôleur appartient (audit DEKRA 7.0) : MelisCoreAuthorizationListener
+     * vérifie canAccess() sur cette clé AVANT le dispatch.
+     */
+    const MELIS_KEY = 'melis_core_gdpr';
+
     const MODULE_NAME = 'MelisCmsGdprBanner';
     const LOG_UPDATE = 'UDPATE';
 

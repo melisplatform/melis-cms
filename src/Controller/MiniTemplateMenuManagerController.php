@@ -14,6 +14,12 @@ use Laminas\View\Model\JsonModel;
 use Laminas\Session\Container;
 
 class MiniTemplateMenuManagerController extends MelisAbstractActionController {
+    /**
+     * Outil auquel ce contrôleur appartient (audit DEKRA 7.0) : MelisCoreAuthorizationListener
+     * vérifie canAccess() sur cette clé AVANT le dispatch.
+     */
+    const MELIS_KEY = 'meliscms_mini_template_menu_manager_tool';
+
     public $module = 'meliscms';
     public $tool_key = 'meliscms_mini_template_menu_manager_tool';
     public $form_add_category_key = 'menu_manager_tool_site_add_category';

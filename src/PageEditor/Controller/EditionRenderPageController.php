@@ -164,7 +164,15 @@ class EditionRenderPageController extends MelisAbstractActionController
         // script sits. melis_tinymce.js (which DOES need jQuery) still loads later, client-side, once
         // the page is confirmed ready (ensureMelisEnv) — by then this is already cached, so that step
         // is instant too.
-        $inject = '<script src="/MelisCore/js/library/tinymce/tinymce.min.js"></script>'
+        //
+        // CSRF emitter too: layoutMelis.phtml loads it through its inline scriptMap loader, which the
+        // inline-script strip above removes (it names tinymce/MelisCms). Without it, every back-office
+        // POST made from this canvas (e.g. the AI mini-template bridge's createMiniTemplate) goes out
+        // with no X-Melis-Csrf header and is refused 403 "token-missing". No jQuery dependency; its
+        // own guard makes a second load a no-op. Stamped with the file mtime, as layoutMelis does.
+        $csrfFile = dirname((new \ReflectionClass(\MelisCore\Module::class))->getFileName(), 2) . '/public/js/core/melisCsrf.js';
+        $inject = '<script src="/MelisCore/js/core/melisCsrf.js?v=' . (is_file($csrfFile) ? filemtime($csrfFile) : '0') . '"></script>'
+            . '<script src="/MelisCore/js/library/tinymce/tinymce.min.js"></script>'
             . '<style id="melis-react-clean">'
             . '.melis-plugin-tools-box,.m-plugin-sub-tools,.dnd-plugin-sub-tools,.melis-plugin-title-box,'
             . '.dnd-layout-buttons,.dnd-plugin-title-and-sub-tools,.melis-plugin-indicator,.dnd-layout-indicator,'
