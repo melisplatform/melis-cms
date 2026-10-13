@@ -13,6 +13,7 @@ import { registerMelisCmsProspectsPlugins } from '../../../melis-cms-prospects/u
 import { registerMelisCmsBlogPlugins } from '../../../melis-cms-blog/ui-react/plugin-config/MelisCmsBlogPlugins'
 import { registerMelisCmsUserAccountPlugins } from '../../../melis-cms-user-account/ui-react/plugin-config/MelisCmsUserAccountPlugins'
 import { registerMelisCmsCommentsPlugins } from '../../../melis-cms-comments/ui-react/plugin-config/MelisCmsCommentsPlugins'
+import { registerMelisCommercePlugins } from '../../../melis-commerce/ui-react/plugin-config/MelisCommercePlugins'
 // melis-cms-category2 registers its own plugin AND contributes a category filter tab to the news plugins.
 import { registerMelisCmsCategory2Plugins } from '../../../melis-cms-category2/ui-react/plugin-config/MelisCmsCategory2Plugins'
 // melis-cache-internal contributes a GLOBAL tab ("Cache partiel") shown on every plugin — modular proof.
@@ -25,6 +26,7 @@ registerMelisCmsProspectsPlugins()
 registerMelisCmsBlogPlugins()
 registerMelisCmsUserAccountPlugins()
 registerMelisCmsCommentsPlugins()
+registerMelisCommercePlugins()
 registerMelisCmsCategory2Plugins()
 registerMelisCacheInternalPlugins()
 
