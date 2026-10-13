@@ -745,16 +745,55 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     return tinyConfigsRef.current
   }, [])
 
+  // Live inline editors of this canvas: editor id → its block ref + the content last persisted for it.
+  // Lets the toolbar Save/Publish flush text still being typed (flushInline below).
+  const inlineEdsRef = useRef<Map<string, { refId: string; saved: string }>>(new Map())
+  const trackInline = useCallback((ed: any, refId: string) => {
+    ed.on('init', () => { try { inlineEdsRef.current.set(ed.id, { refId, saved: ed.getContent() }) } catch { /* */ } })
+  }, [])
+
   // Persist an inline WYSIWYG edit (setTagContent). The DOM is already updated by TinyMCE.
   const saveInline = useCallback(async (refId: string, html: string) => {
     setSaving(true)
     try {
       await saveOps([{ op: 'setTagContent', id: refId, content: html }])
+      for (const e of inlineEdsRef.current.values()) if (e.refId === refId) e.saved = html
       // No toast on edits — editing only updates the working session; notifications belong to the
       // top toolbar's Save/Publish (like legacy). Errors below still notify.
       window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh', { detail: { revealPageId: idPage } }))
     } catch (e) { notify('ko', 'MelisCms', errMsg(e)) } finally { setSaving(false) }
   }, [idPage])
+
+  // Mantis #0011120: inline edits are persisted on blur, but clicking the toolbar Save (outside the
+  // canvas iframe) doesn't blur the editor in time — and even when it does, that save races savePage,
+  // which flushes the session into the draft. So before Save/Publish, persist every editor whose content
+  // moved since its last save, then wait for every save still in flight. Throws if the save fails.
+  const flushInline = useCallback(async () => {
+    const tm = (iframeRef.current?.contentWindow as any)?.tinymce
+    const pending: { e: { refId: string; saved: string }; html: string }[] = []
+    if (tm) {
+      for (const [edId, e] of inlineEdsRef.current) {
+        const ed = tm.get(edId)
+        if (!ed || !ed.initialized) continue
+        let html: string
+        try { html = ed.getContent() } catch { continue }
+        if (html !== e.saved) pending.push({ e, html })
+      }
+    }
+    if (pending.length) {
+      await saveOps(pending.map(({ e, html }) => ({ op: 'setTagContent', id: e.refId, content: html })))
+      for (const { e, html } of pending) e.saved = html
+    }
+    await lastSaveRef.current
+  }, [saveOps])
+  useEffect(() => {
+    const onFlush = (ev: Event) => {
+      const detail = (ev as CustomEvent<{ idPage?: number; wait?: Promise<unknown>[] }>).detail
+      if (detail?.idPage === idPage && detail.wait) detail.wait.push(flushInline())
+    }
+    window.addEventListener('melis:cms-flush-edition', onFlush)
+    return () => window.removeEventListener('melis:cms-flush-edition', onFlush)
+  }, [idPage, flushInline])
 
   // Eagerly attach a REAL, live inline editor to EVERY melisTag block on the page at once, as soon as
   // TinyMCE/configs are ready — this is what legacy actually does (plugin.melistagHTML/TEXTAREA/
@@ -811,13 +850,15 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       cfg.init_instance_callback = w.tinyMceCleaner
       cfg.setup = (ed: any) => {
         try { legacySetup?.(ed) } catch { /* legacy setup needs the full BO JS; ignore its failures */ }
+        const rid0 = elIdToRefId.get(ed.id)
+        if (rid0) trackInline(ed, rid0)
         // save on blur; leave the editor attached (removing it mid-blur-dispatch corrupts TinyMCE).
         ed.on('blur', () => { const rid = elIdToRefId.get(ed.id); if (rid) saveInline(rid, ed.getContent()) })
       }
       try { await tinymce.init(cfg) } catch { /* this type's blocks still get a lazy fallback on click */ }
     }
     setTinyReady(true)
-  }, [doc, blockContentEl, ensureTinymce, ensureMelisEnv, loadTinyConfigs, saveInline])
+  }, [doc, blockContentEl, ensureTinymce, ensureMelisEnv, loadTinyConfigs, saveInline, trackInline])
   useEffect(() => { eagerInitInlineRef.current = eagerInitInline; void eagerInitInline() }, [eagerInitInline])
 
   // WYSIWYG in-block editing for classic (html/text/media) plugins — the whole point of WYSIWYG: TinyMCE
@@ -880,6 +921,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       cfg.setup = (ed: any) => {
         try { legacySetup?.(ed) } catch { /* legacy setup needs the full BO JS; ignore its failures */ }
         ed.on('init', () => ed.focus())
+        trackInline(ed, refId)
         // save on blur; leave the editor attached (removing it mid-blur-dispatch corrupts TinyMCE).
         ed.on('blur', () => saveInline(refId, ed.getContent()))
       }
@@ -895,7 +937,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     inlineInitRef.current = { refId, promise: attempt }
     await attempt
     if (inlineInitRef.current?.refId === refId) inlineInitRef.current = null
-  }, [selectBlock, blockContentEl, ensureTinymce, ensureMelisEnv, loadTinyConfigs, saveInline, doc])
+  }, [selectBlock, blockContentEl, ensureTinymce, ensureMelisEnv, loadTinyConfigs, saveInline, trackInline, doc])
   useEffect(() => { editInlineRef.current = editInline }, [editInline])
 
   // ⚙/✎ action on a block. Classic plugins (melisTag html/text/media) → inline WYSIWYG (no modal). Other
