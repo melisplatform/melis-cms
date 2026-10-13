@@ -558,6 +558,15 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     try { if (f) f.src = toolSrc(current) } catch { /* */ }
   }, [current])
 
+  // Template changé au Sauvegarder/Publier : reloadEdition ne recharge que l'iframe legacy (+ Propriétés),
+  // le canvas React (New) restait sur l'ancien template jusqu'au F5 (Mantis #0011122) → le rafraîchir
+  // aussi (melis:cms-canvas-refresh, refetch document + render sans recharger le legacy une 2e fois).
+  const reloadTemplateChange = useCallback(() => {
+    if (!current) return
+    reloadEdition()
+    window.dispatchEvent(new CustomEvent('melis:cms-canvas-refresh', { detail: { idPage: Number(current) } }))
+  }, [current, reloadEdition])
+
   // Recharge UNIQUEMENT l'iframe legacy (la vue « Old » de l'édition), SANS invalider l'état React
   // (Propriétés/SEO/structure/readyPages conservés — le save vient de les figer côté serveur). L'iframe
   // legacy est chargée une seule fois et ne se resynchronise pas seule : après un Sauvegarder/Publier
@@ -610,13 +619,13 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         refreshStructure(current) // rafraîchit le statut/en-tête
         // Template changé → le canvas legacy garde l'ancien template figé (il n'est rendu qu'à
         // l'ouverture) : recharger l'édition pour repartir sur le nouveau template (ticket 0010873).
-        if (String(edit.props.templateId ?? '') !== renderedTplRef.current[current]) reloadEdition()
+        if (String(edit.props.templateId ?? '') !== renderedTplRef.current[current]) reloadTemplateChange()
       } else {
         const fields = errorFields(data)
         notify('ko', (data.textTitle || tr.notifSave).trim(), failMessage(data, fields, tr.saveFailed), fields)
       }
     } catch (e) { notify('ko', tr.notifSave, (e as Error).message) } finally { setSaving(false) }
-  }, [edit, current, editionReady, postLegacyPage, refreshStructure, releaseLock, reloadEdition])
+  }, [edit, current, editionReady, postLegacyPage, refreshStructure, releaseLock, reloadTemplateChange])
 
   // Publier (« Publier ») → publishPage legacy : la chaîne sauvegarde (comme save) PUIS publie
   // (saved→published, page_status=1). Même corps que save (cf. melisCms.js:publishPage).
@@ -636,13 +645,13 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         refreshStructure(current) // en-tête : plus de brouillon, statut publié
         // Template changé → recharger l'édition (le canvas legacy fige le template à l'ouverture) : idem
         // que Sauvegarder, pour que l'utilisateur reparte sur le nouveau template (ticket 0010873).
-        if (String(edit.props.templateId ?? '') !== renderedTplRef.current[current]) reloadEdition()
+        if (String(edit.props.templateId ?? '') !== renderedTplRef.current[current]) reloadTemplateChange()
       } else {
         const fields = errorFields(data)
         notify('ko', (data.textTitle || tr.notifPublish).trim(), failMessage(data, fields, tr.publishFailed), fields)
       }
     } catch (e) { notify('ko', tr.notifPublish, (e as Error).message) } finally { setSaving(false) }
-  }, [edit, current, editionReady, postLegacyPage, refreshStructure, releaseLock, reloadEdition])
+  }, [edit, current, editionReady, postLegacyPage, refreshStructure, releaseLock, reloadTemplateChange])
 
   // Dépublier (switch Publié/Dépublié → OFF) → unpublishPage legacy (GET) : passe page_status=0 dans
   // la version publiée (la page sort du site, sans rien supprimer). Comme melisCms.js:unpublishPage.

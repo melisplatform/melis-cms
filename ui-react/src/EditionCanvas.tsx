@@ -110,6 +110,14 @@ function toCell(n: DocZone, titles: Record<string, string>, depth = 0): Cell {
     groupId: n.attrs?.plugin_referer || (n.id as string),
   }
 }
+/** The top-level drag-drop zone ids the canvas actually rendered (nested layout cells excluded), deduped. */
+function renderedTopZoneIds(d: Document): string[] {
+  const ids = Array.from(d.querySelectorAll('[data-dragdropzone-id]'))
+    .filter((el) => !(el as HTMLElement).parentElement?.closest('[data-dragdropzone-id]'))
+    .map((el) => (el as HTMLElement).getAttribute('data-dragdropzone-id') || '')
+    .filter(Boolean)
+  return Array.from(new Set(ids))
+}
 /** Immutably replace the cell with id === $id via $fn, anywhere in the tree. Tolerates a stray
  *  falsy entry in `cells` (seen crashing drag/reorder in production: "can't access property 'id',
  *  e is undefined") instead of throwing — skip it rather than fail the whole operation. */
@@ -263,6 +271,10 @@ function isDarkTheme(): boolean {
 export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: number; device?: 'desktop' | 'tablet' | 'mobile' }) {
   const [doc, setDoc] = useState<Doc | null>(null)
   const [tree, setTree] = useState<Cell[]>([])
+  // Top-level zone ids the CURRENT canvas render shows (null until it has loaded). The page XML keeps
+  // the zones of a previous template — on purpose, switching back restores their content (legacy does
+  // the same) — so the document alone over-lists after a template change (Mantis #0011122).
+  const [renderedZones, setRenderedZones] = useState<Set<string> | null>(null)
   const [layouts, setLayouts] = useState<Layout[]>([])
   const [err, setErr] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -580,6 +592,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     probeAi()
     // Inject the in-canvas reorder arrows once the fresh render is in the DOM (gone after every reload).
     injectControlsRef.current?.()
+    setRenderedZones(new Set(renderedTopZoneIds(d)))
     // Fresh page: its template drag-drop zones are rendered here but absent from the (empty) document —
     // seed them so the structure panel lists them. The canvas is guaranteed in the DOM now.
     maybeSeedZonesRef.current?.()
@@ -976,11 +989,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const maybeSeedZones = useCallback(async () => {
     const d = iframeRef.current?.contentDocument
     if (!d) return
-    const ids = Array.from(d.querySelectorAll('[data-dragdropzone-id]'))
-      .filter((el) => !(el as HTMLElement).parentElement?.closest('[data-dragdropzone-id]')) // top-level zones only
-      .map((el) => (el as HTMLElement).getAttribute('data-dragdropzone-id') || '')
-      .filter(Boolean)
-    const uniq = Array.from(new Set(ids))
+    const uniq = renderedTopZoneIds(d)
     const known = new Set(treeRef.current.map((c) => c.id))
     const missing = uniq.filter((id) => !known.has(id))
     if (missing.length === 0) return
@@ -995,7 +1004,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
 
   useEffect(() => {
     let cancelled = false
-    setDoc(null); setErr(null); setSelected(null)
+    setDoc(null); setErr(null); setSelected(null); setRenderedZones(null)
     apiGet<Doc>(`edition/document?idPage=${idPage}`).then((d) => {
       if (cancelled) return
       const zoneNodes = (d.nodes || []).filter((n) => n.kind === 'zone' && n.id)
@@ -1749,6 +1758,11 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   const rowActionBtn: React.CSSProperties = { ...iconBtn, width: 26, height: 24, padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flex: '0 0 auto' }
 
   // The current schema's real icon markup for a cell (falls back to the single-column "default").
+  // Panel = only the zones the template renders. MelisDragDropZoneHelper renders a stored zone when
+  // its id OR its plugin_referer (groupId) is a zone the template calls, so added/duplicated zones
+  // (live-patched, no reload) stay listed through their group. Whole groups hide together, so the
+  // group-scoped moves below never mix visible and hidden zones.
+  const visibleTree = renderedZones ? tree.filter((c) => renderedZones.has(c.id) || renderedZones.has(c.groupId)) : tree
   const iconFor = (tpl: string): string => {
     const t = tpl || DEFAULT_TPL
     return (layouts.find((l) => l.template === t) || layouts.find((l) => l.key === 'default') || layouts[0])?.icon || ''
@@ -1796,7 +1810,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
               ▲/▼ alongside it mirror legacy's own dnd-arrow-up/-down click controls (see
               moveZoneDir) — shown per-direction only when a same-group neighbour actually exists
               that way, same as legacy hides them at the first/last position of a group. */}
-          {depth === 0 && tree.length > 1 && (() => {
+          {depth === 0 && visibleTree.length > 1 && (() => {
             const hasGroupMate = tree.some((c) => c.id !== cell.id && c.groupId === cell.groupId)
             const zi = tree.findIndex((c) => c.id === cell.id)
             const hasUp = hasGroupMate && tree.slice(0, zi).some((c) => c.groupId === cell.groupId)
@@ -1964,8 +1978,8 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
                 <button data-testid="panel-collapse" title={isMobile ? tr.ecClosePanel : tr.ecCollapsePanel} onClick={() => setPanelCollapsed(true)}
                   style={{ ...iconBtn, flex: '0 0 auto', width: 26, height: 26 }}>{isMobile ? '✕' : '»'}</button>
               </div>
-              {tree.length === 0 && <div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)', padding: 6 }}>{tr.ecNoZones}</div>}
-              {tree.map((z, i) => CellView({ cell: z, depth: 0, path: String(i + 1) }))}
+              {visibleTree.length === 0 && <div style={{ fontSize: 12, color: 'var(--color-muted-foreground,#6b7280)', padding: 6 }}>{tr.ecNoZones}</div>}
+              {visibleTree.map((z, i) => CellView({ cell: z, depth: 0, path: String(i + 1) }))}
             </>
           )}
         </div>
