@@ -558,6 +558,15 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     try { if (f) f.src = toolSrc(current) } catch { /* */ }
   }, [current])
 
+  // Avant Sauvegarder/Publier : le canvas React persiste en session le texte encore en cours de saisie
+  // dans un éditeur inline (sauvé normalement au blur, qui n'arrive pas à temps — Mantis #0011120) et
+  // on attend ses saves en vol, sinon savePage fige le brouillon sans la dernière frappe.
+  const flushEdition = useCallback(async (idPage: string) => {
+    const wait: Promise<unknown>[] = []
+    window.dispatchEvent(new CustomEvent('melis:cms-flush-edition', { detail: { idPage: Number(idPage), wait } }))
+    await Promise.all(wait)
+  }, [])
+
   // Template changé au Sauvegarder/Publier : reloadEdition ne recharge que l'iframe legacy (+ Propriétés),
   // le canvas React (New) restait sur l'ancien template jusqu'au F5 (Mantis #0011122) → le rafraîchir
   // aussi (melis:cms-canvas-refresh, refetch document + render sans recharger le legacy une 2e fois).
@@ -608,6 +617,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     if (!edit || !current || !editionReady) return
     setSaving(true)
     try {
+      await flushEdition(current)
       const data = await postLegacyPage(`/melis/MelisCms/Page/savePage?idPage=${encodeURIComponent(current)}&fatherPageId=`)
       if (data.success === 1) {
         await runPageSaveHooks(Number(current)) // onglets modulaires (ex. Open Graph) : save transverse
@@ -625,7 +635,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         notify('ko', (data.textTitle || tr.notifSave).trim(), failMessage(data, fields, tr.saveFailed), fields)
       }
     } catch (e) { notify('ko', tr.notifSave, (e as Error).message) } finally { setSaving(false) }
-  }, [edit, current, editionReady, postLegacyPage, refreshStructure, releaseLock, reloadTemplateChange])
+  }, [edit, current, editionReady, postLegacyPage, refreshStructure, releaseLock, reloadTemplateChange, flushEdition])
 
   // Publier (« Publier ») → publishPage legacy : la chaîne sauvegarde (comme save) PUIS publie
   // (saved→published, page_status=1). Même corps que save (cf. melisCms.js:publishPage).
@@ -633,6 +643,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     if (!edit || !current || !editionReady) return
     setSaving(true); setToast(null)
     try {
+      await flushEdition(current)
       const data = await postLegacyPage(`/melis/MelisCms/Page/publishPage?idPage=${encodeURIComponent(current)}`)
       if (data.success === 1) {
         await runPageSaveHooks(Number(current)) // onglets modulaires (ex. Open Graph) : save transverse
@@ -651,7 +662,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         notify('ko', (data.textTitle || tr.notifPublish).trim(), failMessage(data, fields, tr.publishFailed), fields)
       }
     } catch (e) { notify('ko', tr.notifPublish, (e as Error).message) } finally { setSaving(false) }
-  }, [edit, current, editionReady, postLegacyPage, refreshStructure, releaseLock, reloadTemplateChange])
+  }, [edit, current, editionReady, postLegacyPage, refreshStructure, releaseLock, reloadTemplateChange, flushEdition])
 
   // Dépublier (switch Publié/Dépublié → OFF) → unpublishPage legacy (GET) : passe page_status=0 dans
   // la version publiée (la page sort du site, sans rien supprimer). Comme melisCms.js:unpublishPage.
