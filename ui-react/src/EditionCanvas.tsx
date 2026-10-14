@@ -599,6 +599,8 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     // modal needs the BO shell anyway. Provide it here: open the native page picker (pickLink fills the URL).
     const cw = iframeRef.current?.contentWindow as (Window & { melisLinkTree?: unknown }) | null
     if (cw && !cw.melisLinkTree) cw.melisLinkTree = { createTreeModal: () => setLinkPicker(true) }
+    // …and the hand cursor its button lacks here (plain <button> next to TinyMCE's own, which have it).
+    st.textContent += '#mce-link-tree{cursor:pointer}'
     // Fresh page: its template drag-drop zones are rendered here but absent from the (empty) document —
     // seed them so the structure panel lists them. The canvas is guaranteed in the DOM now.
     maybeSeedZonesRef.current?.()
@@ -655,10 +657,19 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   // global init run twice, corrupting whichever editor ends up attaching second (surfaced as internal
   // TinyMCE errors like `selection.getRng()` on an editor whose state got stomped mid-init). Same fix
   // PluginFormKit.tsx's loadTinyMce() already applies for its own (separate) TinyMCE load.
+  // True once the iframe holds the REAL render, fully parsed — not its initial about:blank document, which
+  // exists (readyState "complete") before the render arrives and is thrown away by it. Scripts injected
+  // there were lost, and melis_tinymce.js run there (no jQuery) threw "jQuery is not defined" on some full
+  // loads of the editor (Mantis #0011121). onFrameLoad re-runs eagerInitInline once the render is in.
+  const canvasLoaded = useCallback((): boolean => {
+    const d = iframeRef.current?.contentDocument
+    return !!d && d.readyState === 'complete' && d.URL.includes('/edition/render')
+  }, [])
+
   const ensureTinymce = useCallback((): Promise<any> => {
     const w = iframeRef.current?.contentWindow as (Window & { tinymce?: any }) | undefined
     const d = iframeRef.current?.contentDocument
-    if (!w || !d) return Promise.reject(new Error('canvas not ready'))
+    if (!w || !d || !canvasLoaded()) return Promise.reject(new Error('canvas not ready'))
     if (w.tinymce) return Promise.resolve(w.tinymce)
     if (tinymceLoadRef.current) return tinymceLoadRef.current
     const p = new Promise((resolve, reject) => {
@@ -670,16 +681,16 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     })
     tinymceLoadRef.current = p
     return p
-  }, [])
+  }, [canvasLoaded])
 
   // Load melis_tinymce.js into the render iframe (jQuery is already present there) → provides the Melis env
   // the real config's callbacks reference: `melisTinyMCE.tinyMceActionEvent` (setup), `filePickerCallback`
   // (media library), `tinyMceCleaner` (init). Gone after an iframe reload → re-inject. Same in-flight-promise
   // dedup as ensureTinymce above, same reason.
   const ensureMelisEnv = useCallback((): Promise<any> => {
-    const w = iframeRef.current?.contentWindow as (Window & { melisTinyMCE?: any }) | undefined
+    const w = iframeRef.current?.contentWindow as (Window & { melisTinyMCE?: any; jQuery?: unknown }) | undefined
     const d = iframeRef.current?.contentDocument
-    if (!w || !d) return Promise.reject(new Error('canvas not ready'))
+    if (!w || !d || !canvasLoaded() || !w.jQuery) return Promise.reject(new Error('canvas not ready'))
     if (w.melisTinyMCE) return Promise.resolve(w.melisTinyMCE)
     if (melisEnvLoadRef.current) return melisEnvLoadRef.current
     const p = new Promise((resolve, reject) => {
@@ -691,7 +702,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     })
     melisEnvLoadRef.current = p
     return p
-  }, [])
+  }, [canvasLoaded])
 
   // Fetch the REAL Melis TinyMCE configs (by type: html/textarea/media/tool), once. Same endpoint the
   // legacy uses; same-origin cookie auth (the BO session).
@@ -770,6 +781,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     const w = iframeRef.current?.contentWindow as any
     if (!w) return
     if (!doc) return // nothing to init yet — the [doc] effect below re-runs this once it arrives
+    if (!canvasLoaded()) return // render not in the iframe yet — onFrameLoad re-runs this once it is
     let tinymce: any
     try {
       tinymce = await ensureTinymce()
@@ -817,7 +829,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
       try { await tinymce.init(cfg) } catch { /* this type's blocks still get a lazy fallback on click */ }
     }
     setTinyReady(true)
-  }, [doc, blockContentEl, ensureTinymce, ensureMelisEnv, loadTinyConfigs, saveInline, trackInline])
+  }, [doc, canvasLoaded, blockContentEl, ensureTinymce, ensureMelisEnv, loadTinyConfigs, saveInline, trackInline])
   useEffect(() => { eagerInitInlineRef.current = eagerInitInline; void eagerInitInline() }, [eagerInitInline])
 
   // WYSIWYG in-block editing for classic (html/text/media) plugins — the whole point of WYSIWYG: TinyMCE
