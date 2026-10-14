@@ -114,7 +114,7 @@ export function PropertiesTab({ value, onChange, refs }: { value: PropsData; onC
       <label style={label}>{tr.type} *</label>
       <select style={field} value={value.type} onChange={(e) => set('type', e.target.value)}>{refs.types.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}</select>
       <label style={label}>{tr.template} *</label>
-      <select style={field} value={value.templateId} onChange={(e) => set('templateId', Number(e.target.value))}><option value={0}>—</option>{refs.templates.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.id})</option>)}</select>
+      <select style={field} value={value.templateId} onChange={(e) => set('templateId', Number(e.target.value))}><option value={0}>—</option><option value={-1}>{tr.tplNone}</option>{refs.templates.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.id})</option>)}</select>
       <label style={label}>{tr.langNonEditable}</label>
       <FlagSelect value={value.langId} onChange={() => {}} options={refs.languages} disabled />
       <div style={{ height: 4 }} />

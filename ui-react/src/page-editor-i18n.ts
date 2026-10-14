@@ -26,6 +26,7 @@ const DICT: Record<PeLang, Record<string, string>> = {
 
     // ── FlagSelect (PageTabs) ──
     choose: 'Choisissez',
+    tplNone: 'Aucun', // template « aucun » (page_tpl_id -1, comme le legacy)
 
     // ── PropertiesTab ──
     name: 'Nom',
@@ -354,6 +355,7 @@ const DICT: Record<PeLang, Record<string, string>> = {
 
     // ── FlagSelect (PageTabs) ──
     choose: 'Choose',
+    tplNone: 'None', // "no template" (page_tpl_id -1, as in legacy)
 
     // ── PropertiesTab ──
     name: 'Name',
