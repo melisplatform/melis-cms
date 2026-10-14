@@ -717,6 +717,20 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     } catch (e) { notify('ko', tr.notifDraft, (e as Error).message) } finally { setSaving(false) }
   }, [current])
 
+  // Page supprimée → fermer SON onglet. Fermer l'onglet ne NAVIGUE pas (contrairement au bouton X de la
+  // Topbar). Sans navigation, l'URL resterait sur la page supprimée — dont l'iframe vient d'être retirée
+  // de `opened` → contenu blanc (ticket 0010702). On bascule d'abord vers une autre page encore ouverte
+  // (ou le dashboard s'il n'en reste aucune), PUIS on ferme l'onglet, comme openCreatedPage.
+  const closeDeletedPage = useCallback((idPage: string) => {
+    if (idPage === current) {
+      const rest = openedRef.current.filter((x) => x !== idPage && x !== 'new' && !x.startsWith('new~'))
+      navigate(rest.length ? `/melis-cms/page/${rest[rest.length - 1]}` : '/')
+    }
+    ;(window as unknown as { __melisCloseTab?: (id: string) => void }).__melisCloseTab?.(`/melis-cms/page/${idPage}`)
+    setOpened((o) => o.filter((x) => x !== idPage))
+    setEditionMountedFor((s) => { if (!s.has(idPage)) return s; const n = new Set(s); n.delete(idPage); return n })
+  }, [current, navigate])
+
   // Supprimer la page (« Supprimer page ») → deletePage legacy, puis fermeture de l'onglet + refresh arbre.
   // Suppression EFFECTIVE (appelée par la modal React de confirmation). Ferme l'onglet + refresh arbre.
   const doDelete = useCallback(async () => {
@@ -729,18 +743,26 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
         notify('ok', (data.textTitle || tr.notifDelete).trim(), tr.pageDeleted)
         setDeleteOpen(false)
         window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh'))
-        // Fermer l'onglet ne NAVIGUE pas (contrairement au bouton X de la Topbar). Sans navigation,
-        // l'URL resterait sur la page supprimée — dont l'iframe vient d'être retirée de `opened` →
-        // contenu blanc (ticket 0010702). On bascule d'abord vers une autre page encore ouverte
-        // (ou le dashboard s'il n'en reste aucune), PUIS on ferme l'onglet, comme openCreatedPage.
-        const rest = openedRef.current.filter((x) => x !== current && x !== 'new' && !x.startsWith('new~'))
-        navigate(rest.length ? `/melis-cms/page/${rest[rest.length - 1]}` : '/')
-        ;(window as unknown as { __melisCloseTab?: (id: string) => void }).__melisCloseTab?.(`/melis-cms/page/${current}`)
-        setOpened((o) => o.filter((x) => x !== current))
-        setEditionMountedFor((s) => { if (!s.has(current)) return s; const n = new Set(s); n.delete(current); return n })
+        closeDeletedPage(current)
       } else notify('ko', (data.textTitle || tr.notifDelete).trim(), legacyText(data.textMessage, tr.deleteFailedMsg))
     } catch (e) { notify('ko', tr.notifDelete, (e as Error).message) } finally { setSaving(false) }
-  }, [current, navigate])
+  }, [current, closeDeletedPage])
+
+  // Vue « Old » : « Supprimer page » est le bouton LEGACY de l'iframe (melisCms.js:deletePage) — il ne
+  // ferme que son onglet legacy interne, l'onglet React restait ouvert sur une page blanche (Mantis
+  // #0011126). Le résultat de son XHR nous parvient via le pont __melisToolResult (PluginViewController)
+  // → même fermeture que la suppression native.
+  useEffect(() => {
+    const onResult = (e: MessageEvent) => {
+      const d = e.data as { __melisToolResult?: boolean; url?: string; data?: { success?: number } } | null
+      if (!d || !d.__melisToolResult || d.data?.success !== 1) return
+      const m = (d.url || '').match(/\/Page\/deletePage\?(?:.*&)?idPage=(\d+)/)
+      if (!m || !openedRef.current.includes(m[1])) return
+      window.dispatchEvent(new CustomEvent('melis:cms-tree-refresh'))
+      closeDeletedPage(m[1])
+    }
+    window.addEventListener('message', onResult); return () => window.removeEventListener('message', onResult)
+  }, [closeDeletedPage])
 
   // Nouvelle page (« Nouvelle page ») → route React de création, en enfant de la page courante.
   const openNewPage = useCallback(() => {
