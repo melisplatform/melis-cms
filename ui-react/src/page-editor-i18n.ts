@@ -303,6 +303,7 @@ const DICT: Record<PeLang, Record<string, string>> = {
     ecWidthMobile: 'Largeur mobile %',
     ecRemoveFromZone: 'Retirer de la zone',
     ecDuplicateBlock: 'Dupliquer le mini-template',
+    ecDuplicatePlugin: 'Dupliquer le plugin', // row ⋯ menu of a non-mini-template block (Mantis #0011161)
     ecDuplicateBlockFailed: 'La duplication du bloc a échoué.',
     ecMoreActions: 'Actions du bloc',
     ecOpenInMelisAi: 'Ouvrir dans Melis AI',
@@ -629,6 +630,7 @@ const DICT: Record<PeLang, Record<string, string>> = {
     ecWidthMobile: 'Mobile width %',
     ecRemoveFromZone: 'Remove from zone',
     ecDuplicateBlock: 'Duplicate mini-template',
+    ecDuplicatePlugin: 'Duplicate plugin', // row ⋯ menu of a non-mini-template block (Mantis #0011161)
     ecDuplicateBlockFailed: 'Duplicating the block failed.',
     ecMoreActions: 'Block actions',
     ecOpenInMelisAi: 'Open in Melis AI',

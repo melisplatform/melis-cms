@@ -397,17 +397,67 @@ final class PageContentDocument
     /**
      * Set a zone's own <plugin> references to EXACTLY the given list (in order) — refs
      * not listed are DROPPED (this is how a block is removed from a cell). Nested
-     * sub-zones and unknown items are preserved. Referenced data nodes are left in the
-     * document (orphan, unrendered).
+     * sub-zones and unknown items are preserved. The data node of a dropped block is
+     * removed too once nothing references it any more, as legacy's removePageSessionPlugin
+     * does — it used to stay in the document and reach the draft on Save (Mantis #0011154).
      */
     public function setZoneRefs(string $zoneId, array $refIdsInOrder): void
     {
-        $this->walk($this->nodes, $zoneId, function (array &$n) use ($refIdsInOrder): void {
+        $dropped = [];
+        $this->walk($this->nodes, $zoneId, function (array &$n) use ($refIdsInOrder, &$dropped): void {
             if ($n['kind'] !== 'zone') {
                 return;
             }
+            $before = self::refIdsIn($n['items'], false);
             $n['items'] = self::orderRefs($n['items'], $refIdsInOrder, true);
+            $dropped = array_diff_key($before, self::refIdsIn($n['items'], false));
         });
+        $this->pruneDataNodes($dropped);
+    }
+
+    /**
+     * Ref ids found in a zone's items — direct refs only, or through its nested sub-zones too.
+     *
+     * @param array<int,array<string,mixed>> $items
+     * @return array<string,bool>
+     */
+    private static function refIdsIn(array $items, bool $deep): array
+    {
+        $ids = [];
+        foreach ($items as $item) {
+            $kind = $item['kind'] ?? '';
+            if ($kind === 'ref' && isset($item['ref']['id'])) {
+                $ids[(string) $item['ref']['id']] = true;
+            } elseif ($deep && $kind === 'zone' && is_array($item['items'] ?? null)) {
+                $ids += self::refIdsIn($item['items'], true);
+            }
+        }
+        return $ids;
+    }
+
+    /**
+     * Drop the top-level DATA nodes (kind 'plugin') of the given ids that no zone of the
+     * document references any more. Only ever called with the ids of blocks just removed by
+     * the user — data nodes nothing points at for other reasons (a template's hardcoded
+     * plugins, untouched legacy leftovers) are not considered.
+     *
+     * @param array<string,bool> $ids
+     */
+    private function pruneDataNodes(array $ids): void
+    {
+        if (!$ids) {
+            return;
+        }
+        $referenced = [];
+        foreach ($this->nodes as $n) {
+            if (($n['kind'] ?? '') === 'zone' && is_array($n['items'] ?? null)) {
+                $referenced += self::refIdsIn($n['items'], true);
+            }
+        }
+        $this->nodes = array_values(array_filter($this->nodes, static function ($n) use ($ids, $referenced): bool {
+            $id = (string) ($n['id'] ?? '');
+            return !(($n['kind'] ?? '') === 'plugin' && isset($ids[$id]) && !isset($referenced[$id]));
+        }));
     }
 
     /**
@@ -583,9 +633,8 @@ final class PageContentDocument
      * (plugin_referer="") is refused — MelisDragDropZoneHelper's own "create initial dnd zone"
      * fallback regenerates it on the very next render regardless (the template's own
      * MelisDragDropZone() call still asks for that id), so removing it would silently do nothing
-     * but orphan its content; refusing avoids that footgun. Its own referenced plugin data nodes
-     * are left in the document, same as setZoneRefs (orphan, unrendered) — nothing is physically
-     * deleted, so a mistaken removal loses nothing before the next Save/Publish.
+     * but orphan its content; refusing avoids that footgun. The data nodes of the blocks it held
+     * go with it once nothing else references them, same as setZoneRefs (Mantis #0011154).
      *
      * @return bool true when the zone was removed
      */
@@ -596,7 +645,9 @@ final class PageContentDocument
                 if ((string) ($n['attrs']['plugin_referer'] ?? '') === '') {
                     return false; // original template zone — refuse
                 }
+                $held = self::refIdsIn(is_array($n['items'] ?? null) ? $n['items'] : [], true);
                 array_splice($this->nodes, $i, 1);
+                $this->pruneDataNodes($held);
                 return true;
             }
         }
