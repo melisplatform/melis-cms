@@ -52,11 +52,14 @@ function Node({ node, depth, onPick }: { node: MelisTreeNode; depth: number; onP
   )
 }
 
-export function PagePicker({ value, title, onChange, placeholder }: {
+export function PagePicker({ value, title, onChange, placeholder, inline }: {
   value: number
   title?: string
   onChange: (id: number, title: string) => void
   placeholder?: string
+  /** Tree panel in the normal flow instead of floating: inside a scrolling/clipping container (plugin
+   *  config modal) a floating panel was cut off at the container's edge (Mantis #0011098). */
+  inline?: boolean
 }) {
   const tr = peT()
   const [open, setOpen] = useState(false)
@@ -64,6 +67,12 @@ export function PagePicker({ value, title, onChange, placeholder }: {
   // When only a page id is known (title not supplied, e.g. a prefilled config field), resolve its NAME.
   const [resolvedTitle, setResolvedTitle] = useState<string | undefined>(title)
   const ref = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  // Inline panel: bring it into view inside the scrolling container that now grows with it.
+  useEffect(() => {
+    if (inline && open) panelRef.current?.scrollIntoView({ block: 'nearest' })
+  }, [inline, open, roots])
 
   useEffect(() => {
     if (title) { setResolvedTitle(title); return }
@@ -93,7 +102,7 @@ export function PagePicker({ value, title, onChange, placeholder }: {
         <span style={{ color: 'var(--color-muted-foreground)' }}>▾</span>
       </button>
       {open && (
-        <div style={{ ...box, position: 'absolute', zIndex: 60, top: 40, left: 0, right: 0, maxHeight: 320, overflow: 'auto', boxShadow: '0 8px 24px rgba(0,0,0,.12)', padding: 6 }}>
+        <div ref={panelRef} style={{ ...box, ...(inline ? { marginTop: 4 } : { position: 'absolute', zIndex: 60, top: 40, left: 0, right: 0 }), maxHeight: 320, overflow: 'auto', boxShadow: '0 8px 24px rgba(0,0,0,.12)', padding: 6 }}>
           {roots === null ? (
             <div style={{ padding: 12, fontSize: 13, color: 'var(--color-muted-foreground)' }}>{tr.loading}</div>
           ) : roots.length === 0 ? (
