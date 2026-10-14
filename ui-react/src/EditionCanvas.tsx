@@ -2117,7 +2117,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
                 </button>
               )}
               <button className="melis-ec-mi" data-testid={`width-toggle-${rowMenu.refId}`} role="menuitem" style={item} onClick={() => { close(); setOpenWidth((w) => (w === rowMenu.refId ? null : rowMenu.refId)) }}><span style={ico}>↔</span>{tr.ecResponsiveWidths}</button>
-              <button className="melis-ec-mi" data-testid={`duplicate-block-${rowMenu.refId}`} role="menuitem" style={{ ...item, opacity: saving ? .6 : 1, cursor: saving ? 'not-allowed' : 'pointer' }} disabled={saving} onClick={() => { close(); void duplicateBlock(rowMenu.zoneId, rowMenu.refId) }}><span style={ico}><ZoneCopyIcon /></span>{tr.ecDuplicateBlock}</button>
+              <button className="melis-ec-mi" data-testid={`duplicate-block-${rowMenu.refId}`} role="menuitem" style={{ ...item, opacity: saving ? .6 : 1, cursor: saving ? 'not-allowed' : 'pointer' }} disabled={saving} onClick={() => { close(); void duplicateBlock(rowMenu.zoneId, rowMenu.refId) }}><span style={ico}><ZoneCopyIcon /></span>{rowMenu.mini ? tr.ecDuplicateBlock : tr.ecDuplicatePlugin}</button>
             </div>
           </>,
           document.body,
