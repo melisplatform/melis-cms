@@ -126,6 +126,80 @@ class MelisCmsPageEditionSavePluginSessionListener extends MelisGeneralListener 
             // lowest priority so we can process this algorithm in the background
             -1000
         );
+
+        // Runs BEFORE the plugin rewrites its XML (MelisCmsPluginSaveEditionSessionListener, priority 80):
+        // remember the widths the plugin XML already carries, so the handler above can re-apply them.
+        $this->attachEventListener(
+            $events,
+            'MelisCms',
+            'meliscms_page_savesession_plugin_start',
+            function($event){
+                $params   = $event->getParams();
+                $pageId   = isset($params['idPage']) ? (int) $params['idPage'] : 0;
+                $post     = isset($params['postValues']) ? $params['postValues'] : null;
+                $plugin   = isset($post['melisPluginTag']) ? $post['melisPluginTag'] : null;
+                $pluginId = isset($post['melisPluginId'])  ? $post['melisPluginId']  : null;
+
+                if($pageId && $plugin && $pluginId) {
+                    $this->seedWidthsFromSessionXml($pageId, $plugin, $pluginId);
+                }
+            },
+            1000
+        );
+    }
+
+    /**
+     * Mantis #0011125: a tag plugin (mini-template text…) rebuilds its XML without any width attribute
+     * (MelisFrontTagPlugin::savePluginConfigToXml), relying on the session settings to re-apply them.
+     * Those settings only hold widths resized during the CURRENT edit session: after a Draft + reload the
+     * session is re-seeded from the page XML without them (or with only plugin_container_id, which
+     * setPluginWidthXmlAttribute then completes with 100), so editing the text reset the block to 100%.
+     * When the session doesn't know the widths yet, take them from the plugin XML as it is now.
+     * @param int $pageId
+     * @param string $plugin
+     * @param string $pluginId
+     */
+    private function seedWidthsFromSessionXml($pageId, $plugin, $pluginId)
+    {
+        $pluginXml = isset($_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId]) ?
+            $_SESSION['meliscms']['content-pages'][$pageId][$plugin][$pluginId] : null;
+        if(!is_string($pluginXml) || trim($pluginXml) === '') {
+            return;
+        }
+
+        $settings = array();
+        if(isset($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId])) {
+            $settings = (array) json_decode($_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId]);
+        }
+        // widths already set in this session (resize) win
+        if(isset($settings['width_desktop']) || isset($settings['width_tablet']) || isset($settings['width_mobile'])) {
+            return;
+        }
+
+        $useErrors = libxml_use_internal_errors(true);
+        $xml = simplexml_load_string($pluginXml);
+        libxml_clear_errors();
+        libxml_use_internal_errors($useErrors);
+        if($xml === false) {
+            return;
+        }
+
+        $attributes = $xml->attributes();
+        $widths = array();
+        foreach(array('width_desktop', 'width_tablet', 'width_mobile') as $key) {
+            if(isset($attributes->$key) && (string) $attributes->$key !== '') {
+                $widths[$key] = (string) $attributes->$key;
+            }
+        }
+        if(empty($widths)) {
+            return;
+        }
+
+        if(!isset($settings['plugin_container_id']) && isset($attributes->plugin_container_id)) {
+            $settings['plugin_container_id'] = (string) $attributes->plugin_container_id;
+        }
+
+        $_SESSION['meliscms']['content-pages'][$pageId]['private:melisPluginSettings'][$pluginId] = json_encode(array_merge($settings, $widths));
     }
 
     /**

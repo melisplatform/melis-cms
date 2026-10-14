@@ -129,7 +129,7 @@ export default function NewPageView({ father, visible, onCreated }: { father: st
             <select style={field} value={form.type} onChange={(e) => set('type', e.target.value)}>{refs.types.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}</select>
 
             <label style={label}>{tr.template} *</label>
-            <select style={{ ...field, ...(issues.some((i) => i.label === tr.template) ? { borderColor: '#dc2626' } : {}) }} value={form.templateId} onChange={(e) => set('templateId', Number(e.target.value))}><option value={0}>{tr.choose}</option>{refs.templates.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.id})</option>)}</select>
+            <select style={{ ...field, ...(issues.some((i) => i.label === tr.template) ? { borderColor: '#dc2626' } : {}) }} value={form.templateId} onChange={(e) => set('templateId', Number(e.target.value))}><option value={0}>{tr.choose}</option><option value={-1}>{tr.tplNone}</option>{refs.templates.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.id})</option>)}</select>
 
             <label style={label}>{tr.language} *</label>
             <FlagSelect value={form.langId} onChange={(id) => set('langId', id)} options={refs.languages} placeholder={tr.choose} />

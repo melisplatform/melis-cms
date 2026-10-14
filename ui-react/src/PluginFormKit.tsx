@@ -668,7 +668,7 @@ export function PageField({ ctx, name, label, hint, placeholder }: { ctx: Plugin
   return (
     <Field label={label} error={ctx.error(name)} hint={hint}>
       <div data-testid={`field-${name}`}>
-        <PagePicker value={Number.isFinite(id) ? id : 0} onChange={(pid) => ctx.setValue(name, pid ? String(pid) : '')} placeholder={placeholder} />
+        <PagePicker inline value={Number.isFinite(id) ? id : 0} onChange={(pid) => ctx.setValue(name, pid ? String(pid) : '')} placeholder={placeholder} />
       </div>
     </Field>
   )
