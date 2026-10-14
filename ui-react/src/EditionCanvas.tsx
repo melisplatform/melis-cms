@@ -316,6 +316,7 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
   // A search query overrides it (every matching module is shown expanded, else results would be hidden).
   const [pickerOpenModule, setPickerOpenModule] = useState<string | null>(null)
   const [pagePicker, setPagePicker] = useState<{ value: string; source: Window } | null>(null) // page-select bridge for the config iframe
+  const [linkPicker, setLinkPicker] = useState(false) // TinyMCE link dialog's "Site tree view" (melisLinkTree shim)
   const iframeRef = useRef<HTMLIFrameElement | null>(null)
   const panelRef = useRef<HTMLDivElement | null>(null)
   const [accent, setAccent] = useState<string>('#dc2626') // theme primary: red (platform/light) / blue (studio/dark)
@@ -593,6 +594,11 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     // Inject the in-canvas reorder arrows once the fresh render is in the DOM (gone after every reload).
     injectControlsRef.current?.()
     setRenderedZones(new Set(renderedTopZoneIds(d)))
+    // Mantis #0011121: melis_tinymce.js's "Site tree view" button (link dialog) calls
+    // melisLinkTree.createTreeModal() — legacy findpage.tool.js, absent from this clean render, and its
+    // modal needs the BO shell anyway. Provide it here: open the native page picker (pickLink fills the URL).
+    const cw = iframeRef.current?.contentWindow as (Window & { melisLinkTree?: unknown }) | null
+    if (cw && !cw.melisLinkTree) cw.melisLinkTree = { createTreeModal: () => setLinkPicker(true) }
     // Fresh page: its template drag-drop zones are rendered here but absent from the (empty) document —
     // seed them so the structure panel lists them. The canvas is guaranteed in the DOM now.
     maybeSeedZonesRef.current?.()
@@ -950,6 +956,24 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     window.addEventListener('message', onMsg)
     return () => window.removeEventListener('message', onMsg)
   }, [config, onConfigSaved])
+
+  // "Site tree view" pick → the page's front URL (same endpoint as legacy findpage.tool.js) into the URL
+  // field of the TinyMCE link dialog open in the canvas; input/change events so TinyMCE takes the value.
+  const pickLink = useCallback(async (pageId: number) => {
+    setLinkPicker(false)
+    try {
+      const r = await fetch(`/melis/MelisCms/Page/getPageLink?idPage=${pageId}`, { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      const link = String(((await r.json()) as { link?: string })?.link || '')
+      const d = iframeRef.current?.contentDocument
+      const input = d?.getElementById('mce-link-tree')?.closest('.tox-form__controls-h-stack')?.querySelector('input') as HTMLInputElement | null
+      if (!d || !input || !link) return
+      input.value = link
+      const Ev = (d.defaultView as (Window & typeof globalThis) | null)?.Event || Event
+      input.dispatchEvent(new Ev('input', { bubbles: true }))
+      input.dispatchEvent(new Ev('change', { bubbles: true }))
+      input.focus()
+    } catch (e) { notify('ko', 'MelisCms', errMsg(e)) }
+  }, [])
 
   // A config iframe field asks for a page: open the native React PagePicker and answer back to that iframe.
   useEffect(() => {
@@ -2328,6 +2352,22 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
             <div style={{ padding: 16 }}>
               <PagePicker value={Number(pagePicker.value) || 0}
                 onChange={(id) => { try { pagePicker.source.postMessage({ type: 'melis-page-picked', pageId: String(id) }, '*') } catch { /* iframe gone */ } setPagePicker(null) }} />
+            </div>
+          </div>
+        </div>,
+        document.body,
+      )}
+
+      {/* "Site tree view" of the TinyMCE link dialog (Mantis #0011121) — picks a page, pickLink writes its URL. */}
+      {linkPicker && createPortal(
+        <div data-testid="link-page-picker" style={{ position: 'fixed', inset: 0, zIndex: 92, background: 'rgba(0,0,0,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setLinkPicker(false)}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: 'min(460px, 94vw)', background: 'var(--color-card,#fff)', color: 'var(--color-foreground,#111827)', borderRadius: 12, boxShadow: '0 24px 70px rgba(0,0,0,.45)', overflow: 'visible' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', borderBottom: '1px solid var(--color-border,#e5e7eb)' }}>
+              <span style={{ fontWeight: 700, fontSize: 14 }}>{tr.ecSelectPage}</span>
+              <button onClick={() => setLinkPicker(false)} title={tr.ecClose} style={{ ...iconBtn, marginLeft: 'auto', width: 26, height: 26 }}>✕</button>
+            </div>
+            <div style={{ padding: 16 }}>
+              <PagePicker value={0} onChange={(id) => { void pickLink(id) }} />
             </div>
           </div>
         </div>,
