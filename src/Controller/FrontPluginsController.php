@@ -27,6 +27,17 @@ class FrontPluginsController extends MelisAbstractActionController
     private $subsectionHasNewPlugins = [];
 
     /**
+     * SECURITY (audit CMS-H6) : contrôle du droit d'outil. Ce contrôleur n'héritait d'AUCUNE
+     * méthode `hasAccess` (contrairement à ToolStyleController) — la garde H6 appelait une méthode
+     * inexistante et fatait le forward du menu de plugins en édition. Même mécanisme que les autres
+     * outils melis-cms : MelisCoreRights::canAccess.
+     */
+    private function hasAccess($key)
+    {
+        return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
+    }
+
+    /**
      * @return ViewModel
      */
     public function renderPluginsMenuAction()

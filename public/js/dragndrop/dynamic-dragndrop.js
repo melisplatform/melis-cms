@@ -2,6 +2,14 @@ $(function () {
 	let $body = $("body"),
 		indicatorHoverTimeout;
 
+	// SECURITY (audit FE-H7) : les routes /dnd-* sont hors du scope du patch CSRF XHR de
+	// melisCsrf.js (qui ne pose l'en-tête que sur /melis…) — le jeton est joint explicitement
+	// en champ POST, lu depuis le cookie JS-readable melis_csrf.
+	function dndCsrfToken() {
+		var m = document.cookie.match(/(?:^|;\s*)melis_csrf=([^;]*)/);
+		return m ? decodeURIComponent(m[1]) : "";
+	}
+
 	$body
 		.on(
 			"mouseenter",
@@ -76,11 +84,13 @@ $(function () {
 			.closest(".melis-dragdropzone-container")
 			.prepend(tempLoader.removeClass("hidden"));
 
-		$.get("/dnd-layout", {
+		// SECURITY (audit FE-H7) : POST + jeton — le serveur refuse désormais les mutations en GET.
+		$.post("/dnd-layout", {
 			pageId,
 			dndId,
 			dndTpl,
 			melisSite,
+			melis_csrf: dndCsrfToken(),
 		})
 			.done((res) => {
 				if (res.success) {
@@ -200,12 +210,14 @@ $(function () {
 		// let tempLoader = dndContainer.find("#dnd-loader");
 		// $(this).closest(".melis-dragdropzone-container").prepend(tempLoader.removeClass("hidden"));
 
-		$.get("/dnd-layout", {
+		// SECURITY (audit FE-H7) : POST + jeton — le serveur refuse désormais les mutations en GET.
+		$.post("/dnd-layout", {
 			pageId,
 			dndId,
 			dndTpl,
 			melisSite,
 			addAction: true,
+			melis_csrf: dndCsrfToken(),
 		})
 			.done((res) => {
 				btn.attr("disabled", false);
@@ -293,6 +305,7 @@ $(function () {
 			$.post("/dnd-remove", {
 				pageId,
 				dndId,
+				melis_csrf: dndCsrfToken(), // SECURITY (audit FE-H7)
 			})
 				.done((res) => {
 					// modal confirmation
@@ -533,7 +546,7 @@ $(function () {
 		});
 
 		if (dndIds)
-			$.post("/dnd-update-order", { dndIds, pageId }).always(() => {
+			$.post("/dnd-update-order", { dndIds, pageId, melis_csrf: dndCsrfToken() }).always(() => {
 				// updated
 				if (typeof callback == "function") callback();
 
