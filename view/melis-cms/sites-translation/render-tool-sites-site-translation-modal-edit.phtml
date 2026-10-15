@@ -26,7 +26,8 @@ $data_melisKey = $this->melisKey;
                             <div class="tab-pane active" <?php echo $id ?>>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <h4>Key : <?= $this->transKey; ?></h4>
+                                        <?php /* SECURITY (audit CMS-H4) : transKey vient de la requête — échappé */ ?>
+                                        <h4>Key : <?= $this->escapeHtml($this->transKey); ?></h4>
                                         <br/>
                                     </div>
                                     <div class="col-xs-12 col-md-4">

@@ -27,7 +27,7 @@ class PageDuplicationController extends MelisAbstractActionController
      */
     public function renderPageDuplicateButtonAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         $view = new ViewModel();
@@ -79,6 +79,13 @@ class PageDuplicationController extends MelisAbstractActionController
 
         if ($request->isPost()) {
             $pageId = (int) $request->getPost('id');
+
+            // SECURITY (audit CMS-M5) : droit PAR-PAGE — dupliquer copiait le contenu d'une page
+            // hors périmètre. La copie atterrit sous le même père, couvert par le même droit.
+            if (! $this->getServiceManager()->get('MelisCmsRights')->canAccessPage($pageId)) {
+                return new JsonModel(['success' => 0, 'textTitle' => $title, 'textMessage' => 'tr_meliscms_page_user_access_rights_no_access', 'errors' => [], 'datas' => []]);
+            }
+
             $cachePageId = $pageId;
             $pageService = $this->getServiceManager()->get('MelisEnginePage');
             $pageData    = $pageService->getDatasPage($pageId);

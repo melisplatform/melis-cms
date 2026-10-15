@@ -706,7 +706,11 @@ class ToolTemplateController extends MelisAbstractActionController
                 // apply text limits
                 foreach($tableData[$ctr] as $vKey => $vValue)
                 {
-                    $tableData[$ctr][$vKey] = $melisTool->limitedText($vValue);
+                    // SECURITY (audit CMS-H5) : cellules échappées — tpl_name/tpl_type sont du
+                    // contenu utilisateur que DataTables rend en HTML brut (XSS stocké). Même
+                    // modèle que Sites/Platform/Language. Le markup de confiance (span tpl_type KO,
+                    // statut) est posé APRÈS, sur les valeurs déjà échappées.
+                    $tableData[$ctr][$vKey] = $melisTool->limitedText($melisTool->escapeHtml($vValue));
                 }
 
                 // Turn the text color of Template Type to red if templating module is disabled/not installed

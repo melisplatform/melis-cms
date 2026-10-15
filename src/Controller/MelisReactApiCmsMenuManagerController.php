@@ -215,6 +215,12 @@ class MelisReactApiCmsMenuManagerController extends MelisAbstractActionControlle
         if ($deny = $this->denyUnlessAccess()) { return $deny; }
         if ($denyCap = $this->denyUnlessCan('delete')) { return $denyCap; }
 
+        // SECURITY (audit CMS-H2) : mutation refusée en GET — la garde CSRF globale ignore les
+        // méthodes sûres, un <img src=".../delete/3"> forgé suffisait. Le client appelle en DELETE.
+        if (!in_array($this->getRequest()->getMethod(), ['POST', 'DELETE'], true)) {
+            return $this->jsonResponse(['success' => false, 'error' => 'POST or DELETE required'], 405);
+        }
+
         $catId = (int) $this->params()->fromRoute('id', 0);
         if ($catId <= 0) {
             return $this->jsonResponse(['success' => false, 'error' => 'Invalid ID'], 400);

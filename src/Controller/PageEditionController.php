@@ -32,7 +32,7 @@ class PageEditionController extends MelisAbstractActionController
 	 */
     public function renderPagetabEditionAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
     	$melisKey = $this->params()->fromRoute('melisKey', '');
     	
     	/**
@@ -197,7 +197,7 @@ class PageEditionController extends MelisAbstractActionController
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
 
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $translator = $this->getServiceManager()->get('translator');
 
         $postValues = array();
@@ -242,11 +242,23 @@ class PageEditionController extends MelisAbstractActionController
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
 
+        // SECURITY (audit CMS-H2) : mutation refusée en GET — forgeable par un simple <img>/lien,
+        // la garde CSRF globale ignorant les méthodes sûres. Tous les appelants légitimes sont en POST.
+        if (! $this->getRequest()->isPost()) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'POST required', 'errors' => [], 'datas' => []]);
+        }
+
         $module = $this->getRequest()->getQuery('module', null);
         $pluginName = $this->getRequest()->getQuery('pluginName', '');
-        $pageId = $this->getRequest()->getQuery('pageId', null);
+        $pageId = (int) $this->getRequest()->getQuery('pageId', null);
         $pluginId = $this->getRequest()->getQuery('pluginId', null);
         $pluginTag = $this->getRequest()->getQuery('pluginTag', null);
+
+        // SECURITY (audit CMS-C2) : droit PAR-PAGE — la session d'édition d'une page hors
+        // périmètre n'est pas modifiable.
+        if (! $this->getServiceManager()->get('MelisCmsRights')->canAccessPage((int) $pageId)) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscms_page_user_access_rights_no_access', 'errors' => [], 'datas' => []]);
+        }
         
         $parameters = array(
             'module' => $module,
@@ -369,8 +381,21 @@ class PageEditionController extends MelisAbstractActionController
 			return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
 		}
 
-		$idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+		// SECURITY (audit CMS-H2) : mutation refusée en GET — forgeable par un simple <img>/lien,
+		// la garde CSRF globale ignorant les méthodes sûres. L'appelant légitime est le forward()
+		// de savePage/publishPage (POST), qui réutilise la requête HTTP d'origine.
+		if (! $this->getRequest()->isPost()) {
+			return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'POST required', 'errors' => [], 'datas' => []]);
+		}
+
+		$idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
 		$translator = $this->getServiceManager()->get('translator');
+
+		// SECURITY (audit CMS-C2) : droit PAR-PAGE — le flush session→brouillon était le maillon
+		// qui matérialisait en base les éditions d'une page hors périmètre (IDOR).
+		if (! $this->getServiceManager()->get('MelisCmsRights')->canAccessPage((int) $idPage)) {
+			return new JsonModel(['success' => 0, 'textTitle' => $translator->translate('tr_meliscms_page_user_access_rights'), 'textMessage' => $translator->translate('tr_meliscms_page_user_access_rights_no_access'), 'errors' => [], 'datas' => []]);
+		}
 
 		$eventDatas = array('idPage' => $idPage);
 		$this->getEventManager()->trigger('meliscms_page_saveedition_start', null, $eventDatas);
@@ -429,7 +454,7 @@ class PageEditionController extends MelisAbstractActionController
 	 */
 	public function getTinyTemplatesAction()
     {
-		$idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+		$idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
 		$prefix = $this->params()->fromRoute('prefix', $this->params()->fromQuery('prefix', ''));
         // tinyMCE type
         $type   = $this->params()->fromRoute('type', $this->params()->fromQuery('type', ''));

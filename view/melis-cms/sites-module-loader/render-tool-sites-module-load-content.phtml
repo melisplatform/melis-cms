@@ -94,9 +94,11 @@ $status = '';
                                 <?php
                             }
                             ?>
-                            <input type="hidden" id="<?= $this->siteId ?>_currentEnabledModule" value='<?= json_encode($currentEnabled);?>'>
-                            <input type="hidden" id="<?= $this->siteId ?>_sitesUsingModules" value='<?= json_encode($this->siteNames);?>'>
-                            <input type="hidden" id="<?= $this->siteId ?>_siteModuleName" value='<?= $this->siteModuleName; ?>'>
+                            <?php /* SECURITY (audit CMS-M6) : attributs single-quote — sans JSON_HEX_APOS un
+                                     site_label contenant `'` sortait de l'attribut (XSS stocké) */ ?>
+                            <input type="hidden" id="<?= $this->siteId ?>_currentEnabledModule" value='<?= json_encode($currentEnabled, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);?>'>
+                            <input type="hidden" id="<?= $this->siteId ?>_sitesUsingModules" value='<?= json_encode($this->siteNames, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);?>'>
+                            <input type="hidden" id="<?= $this->siteId ?>_siteModuleName" value='<?= $this->escapeHtml($this->siteModuleName); ?>'>
                         </div>
                     </form>
                 </div>

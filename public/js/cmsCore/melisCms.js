@@ -313,7 +313,8 @@ var melisCms = (function() {
 			typeof idPage === "string" ? idPage : $(this).data("pagenumber");
 
 		$.ajax({
-			type: "GET",
+			// SECURITY (audit CMS-H2) : POST — le serveur refuse désormais les mutations en GET.
+			type: "POST",
 			url: "/melis/MelisCms/Page/unpublishPage?idPage=" + pageNumber,
 			dataType: "json",
 			encode: true,
@@ -380,7 +381,8 @@ var melisCms = (function() {
 			function() {
 				// check if node has children if TRUE then cannot be deleted
 				$.ajax({
-					type: "GET",
+					// SECURITY (audit CMS-H2) : POST — le serveur refuse désormais les mutations en GET.
+					type: "POST",
 					url: "/melis/MelisCms/Page/clearSavedPage?idPage=" + idPage,
 					encode: true,
 				})
@@ -448,6 +450,8 @@ var melisCms = (function() {
 
 					// check if node has children if TRUE then cannot be deleted
 					$.ajax({
+						// SECURITY (audit CMS-H2) : POST — le serveur refuse désormais les mutations en GET.
+						type: "POST",
 						url: "/melis/MelisCms/Page/deletePage?idPage=" + idPage,
 						encode: true,
 					})

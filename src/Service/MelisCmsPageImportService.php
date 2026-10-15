@@ -27,6 +27,34 @@ class MelisCmsPageImportService extends MelisGeneralService
     protected $xmlString;
 
     /**
+     * SECURITY (audit CMS-M9) : l'XML d'import vient d'un fichier UPLOADÉ. Parsers durcis :
+     *   - `LIBXML_NONET` : aucune récupération d'entité par le réseau (SSRF/XXE externe) ;
+     *   - rejet de tout `<!DOCTYPE` : neutralise les entités internes récursives (« billion
+     *     laughs », déni de service) — un import légitime ne déclare jamais de DTD.
+     * Retourne false sur DTD ou XML malformé, comme simplexml_load_string.
+     */
+    private function hasDoctype($xmlString): bool
+    {
+        return (bool) preg_match('/<!DOCTYPE/i', (string) $xmlString);
+    }
+
+    private function safeSimplexml($xmlString)
+    {
+        if ($this->hasDoctype($xmlString)) {
+            return false;
+        }
+        return simplexml_load_string((string) $xmlString, 'SimpleXMLElement', LIBXML_NONET);
+    }
+
+    private function safeLoadXml(\DOMDocument $dom, $xmlString): bool
+    {
+        if ($this->hasDoctype($xmlString)) {
+            return false;
+        }
+        return $dom->loadXML((string) $xmlString, LIBXML_NONET);
+    }
+
+    /**
      * Checks the content of the xml. tables, columns, ids
      * @param $xmlString
      * @param bool $keepPrimaryId
@@ -68,7 +96,7 @@ class MelisCmsPageImportService extends MelisGeneralService
         $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
         $arrayParameters = $this->sendEvent('melis_cms_page_tree_import_import_page_tree_start', $arrayParameters);
 
-        $simpleXml = simplexml_load_string($arrayParameters['xmlString']);
+        $simpleXml = $this->safeSimplexml($arrayParameters['xmlString']); // SECURITY (audit CMS-M9)
         $pages = [];
         $this->getAllPagesRecursivelyAsSimpleXml($simpleXml, $pages);
         $externalTables = $this->simpleXmlToArray($simpleXml->external->tables);
@@ -173,7 +201,7 @@ class MelisCmsPageImportService extends MelisGeneralService
         $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
         $arrayParameters = $this->sendEvent('melis_cms_page_tree_import_import_page_start', $arrayParameters);
 
-        $simpleXml = simplexml_load_string($arrayParameters['xmlString']);
+        $simpleXml = $this->safeSimplexml($arrayParameters['xmlString']); // SECURITY (audit CMS-M9)
         $tables = $simpleXml->tables;
         $tablesArray = $this->simpleXmlToArray($tables);
         $fatherId = $this->simpleXmlToArray($simpleXml)['fatherId'];
@@ -186,6 +214,15 @@ class MelisCmsPageImportService extends MelisGeneralService
         return $arrayParameters['result'];
     }
 
+    /**
+     * SECURITY (audit CMS-C3) : extensions dont le serveur pourrait exécuter le contenu —
+     * jamais recopiées sous public/media (même liste que l'upload TinyMCE de melis-core).
+     */
+    private const IMPORT_FORBIDDEN_EXTENSIONS = [
+        'php', 'php3', 'php4', 'php5', 'php7', 'php8', 'phtml', 'pht', 'phar', 'phps',
+        'cgi', 'pl', 'py', 'sh', 'asp', 'aspx', 'jsp', 'jspx', 'shtml', 'htaccess', 'htpasswd',
+    ];
+
     public function importPageResources($xmlPath)
     {
         $arrayParameters = $this->makeArrayFromParameters(__METHOD__, func_get_args());
@@ -196,12 +233,54 @@ class MelisCmsPageImportService extends MelisGeneralService
         $result = true;
 
         if ($res === true) {
-            $zip->extractTo($_SERVER['DOCUMENT_ROOT'] . '/xml');
-            $zip->close();
+            /**
+             * SECURITY (audit CMS-C3) — trois protections :
+             *   1. Zip-Slip : ZipArchive::extractTo RÉSOUT les `..` des noms d'entrées → une
+             *      archive forgée écrivait n'importe où (webroot comprise). Toute entrée dont
+             *      le nom sort du dossier d'extraction fait échouer l'import.
+             *   2. Extraction dans un sous-dossier UNIQUE (pas de collision/écrasement dans
+             *      /xml), toujours nettoyé, même sans dossier media ou en cas d'erreur.
+             *   3. Les fichiers d'extensions exécutables sont purgés AVANT la recopie vers
+             *      public/media (servie statiquement — un .phtml recopié = exécution de code).
+             */
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $entryName = (string) $zip->getNameIndex($i);
+                if ($entryName === ''
+                    || strpos($entryName, '..') !== false
+                    || strpos($entryName, '\\') !== false
+                    || strpos($entryName, ':') !== false
+                    || $entryName[0] === '/') {
+                    $zip->close();
+                    $arrayParameters['result'] = false;
+                    return $this->sendEvent('melis_cms_page_tree_import_import_page_resources_end', $arrayParameters)['result'];
+                }
+            }
 
-            if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/xml/media')) {
-                $this->recurse_copy($_SERVER['DOCUMENT_ROOT'] . '/xml/media', $_SERVER['DOCUMENT_ROOT'] . '/media');
-                $this->deleteDirectory($_SERVER['DOCUMENT_ROOT'] . '/xml');
+            $extractDir = $_SERVER['DOCUMENT_ROOT'] . '/xml/import_' . bin2hex(random_bytes(8));
+            mkdir($extractDir, 0755, true);
+
+            try {
+                $zip->extractTo($extractDir);
+                $zip->close();
+
+                // Purge des fichiers exécutables, où qu'ils soient dans l'archive extraite.
+                $it = new \RecursiveIteratorIterator(
+                    new \RecursiveDirectoryIterator($extractDir, \FilesystemIterator::SKIP_DOTS),
+                    \RecursiveIteratorIterator::LEAVES_ONLY
+                );
+                foreach ($it as $file) {
+                    /** @var \SplFileInfo $file */
+                    $segments = array_slice(explode('.', strtolower($file->getFilename())), 1);
+                    if (array_intersect($segments, self::IMPORT_FORBIDDEN_EXTENSIONS)) {
+                        @unlink($file->getPathname());
+                    }
+                }
+
+                if (file_exists($extractDir . '/media')) {
+                    $this->recurse_copy($extractDir . '/media', $_SERVER['DOCUMENT_ROOT'] . '/media');
+                }
+            } finally {
+                $this->deleteDirectory($extractDir);
             }
         } else {
             $result = false;
@@ -481,7 +560,7 @@ class MelisCmsPageImportService extends MelisGeneralService
 
             if (!empty($tablesArray[$tableName]->page_content)) {
                 $domtree = new \DOMDocument('1.0', 'UTF-8');
-                $domtree->loadXML((string) $tablesArray[$tableName]->page_content);
+                $this->safeLoadXml($domtree, (string) $tablesArray[$tableName]->page_content); // SECURITY (audit CMS-M9)
                 $tablesArray[$tableName]->page_content = $domtree->saveXML();
             }
 
@@ -719,7 +798,7 @@ class MelisCmsPageImportService extends MelisGeneralService
     {
         libxml_use_internal_errors(true);
 
-        $xml = simplexml_load_string($xmlString);
+        $xml = $this->safeSimplexml($xmlString); // SECURITY (audit CMS-M9)
         if ($xml !== FALSE) {
             $json = json_encode($xml);
             return json_decode($json, TRUE);
@@ -898,7 +977,7 @@ class MelisCmsPageImportService extends MelisGeneralService
     private function getXmlLineNumber($xmlString, $key, $search, $additionalKey = null)
     {
         $doc = new \DOMDocument();
-        $doc->loadXML($xmlString);
+        $this->safeLoadXml($doc, $xmlString); // SECURITY (audit CMS-M9)
         $xpath = new \DOMXPath($doc);
 
         if ($additionalKey) {

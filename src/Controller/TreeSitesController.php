@@ -67,7 +67,7 @@ class TreeSitesController extends MelisAbstractActionController
 	
 	public function checkUserPageTreeAccressAction()
 	{
-	    $idPage = $this->params()->fromQuery('idPage');
+	    $idPage = (int) $this->params()->fromQuery('idPage');
 	    
 	    $response = array(
 	        'isAccessible' => $this->siteTreeAccess($idPage)
@@ -344,6 +344,13 @@ class TreeSitesController extends MelisAbstractActionController
 
 				$idPage = (int) $page['item_datas']['page_id'];
 
+				// SECURITY (audit CMS-H3) : le nom de page est du contenu UTILISATEUR rendu en HTML
+				// par les fancytree du BO (escapeTitles:false) — un nom `<img onerror=…>` s'exécutait
+				// chez TOUS les utilisateurs à chaque affichage de l'arbre (escalade éditeur → admin).
+				// Échappé AVANT le trigger : le markup de confiance qu'un listener ajoute ensuite au
+				// titre (ex. cadenas de verrouillage) reste, lui, fonctionnel.
+				$page['item_name'] = htmlspecialchars((string) $page['item_name'], ENT_QUOTES, 'UTF-8');
+
 				// this trigger allows to modify the title of the tree item
 				$responseData = $this->getEventManager()->trigger('melis_cms_page_tree_items', $this, array_merge(array('idPage' => $idPage), $page));
 
@@ -445,7 +452,7 @@ class TreeSitesController extends MelisAbstractActionController
 
 		// Get the rights of the user
 		$xmlRights = $melisCoreAuth->getAuthRights();
-		$rightsObj = simplexml_load_string($xmlRights);
+		$rightsObj = preg_match('/<!DOCTYPE/i', (string) $xmlRights) ? false : simplexml_load_string((string) $xmlRights, 'SimpleXMLElement', LIBXML_NONET); // SECURITY (audit CMS-M9)
 
 		$rootPages = array();
 		$breadcrumbRightPages = array();
@@ -524,7 +531,7 @@ class TreeSitesController extends MelisAbstractActionController
 
         // Get the rights of the user
         $xmlRights = $melisCoreAuth->getAuthRights();
-        $rightsObj = simplexml_load_string($xmlRights);
+        $rightsObj = preg_match('/<!DOCTYPE/i', (string) $xmlRights) ? false : simplexml_load_string((string) $xmlRights, 'SimpleXMLElement', LIBXML_NONET); // SECURITY (audit CMS-M9)
 
         $sectionId = MelisCmsRightsService::MELISCMS_PREFIX_PAGES;
 
@@ -568,7 +575,7 @@ class TreeSitesController extends MelisAbstractActionController
      */
     public function getPageIdBreadcrumbAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $idPage = ($idPage == 'root')? -1 : $idPage;
         $includeSelf = $this->params()->fromRoute('includeSelf', $this->params()->fromQuery('includeSelf', ''));
         
@@ -605,7 +612,7 @@ class TreeSitesController extends MelisAbstractActionController
     {
         $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
         $xmlRights = $melisCoreAuth->getAuthRights();
-    	$rightsObj = simplexml_load_string($xmlRights);
+    	$rightsObj = preg_match('/<!DOCTYPE/i', (string) $xmlRights) ? false : simplexml_load_string((string) $xmlRights, 'SimpleXMLElement', LIBXML_NONET); // SECURITY (audit CMS-M9)
         $sectionId = MelisCmsRightsService::MELISCMS_PREFIX_PAGES;
         if (empty($rightsObj->$sectionId->id))
             $edit = 0;
@@ -717,6 +724,21 @@ class TreeSitesController extends MelisAbstractActionController
                 $destinationPage = $data['destinationPageId'];
                 $langId = $data['lang_id'];
                 $pageRelation = $data['pageRelation'];
+
+                // SECURITY (audit CMS-M5) : droit PAR-PAGE sur la SOURCE (copier un arbre hors
+                // périmètre = fuite de son contenu) ET la DESTINATION (créer sous un nœud qu'on ne
+                // possède pas = escalade de périmètre). Destination racine (-1) : réservée aux
+                // admins / au droit « toutes les pages » (-1 coché) — isAccessible(-1) est trop
+                // laxiste (vrai dès qu'UN id est coché), d'où isItemRightChecked.
+                $melisCmsRights = $this->getServiceManager()->get('MelisCmsRights');
+                $melisCoreAuth  = $this->getServiceManager()->get('MelisCoreAuth');
+                $identity       = $melisCoreAuth->getIdentity();
+                $destAllowed    = ((int) $destinationPage === -1)
+                    ? (!empty($identity->usr_admin) || $this->getServiceManager()->get('MelisCoreUser')->isItemRightChecked($melisCoreAuth->getAuthRights(), MelisCmsRightsService::MELISCMS_PREFIX_PAGES, '-1'))
+                    : $melisCmsRights->canAccessPage($destinationPage);
+                if (! $melisCmsRights->canAccessPage($duplicateStartingFrom) || ! $destAllowed) {
+                    return new JsonModel(['success' => 0, 'textTitle' => $textTitle, 'textMessage' => $translator->translate('tr_meliscms_page_user_access_rights_no_access'), 'errors' => [], 'datas' => []]);
+                }
 
                 //to check if the destination pageId is existing or not
                 $pageTreeTable = $this->getServiceManager()->get('MelisEngineTablePageTree');

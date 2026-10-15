@@ -442,6 +442,12 @@ class MelisReactApiCmsSitesController extends MelisAbstractActionController
 
             $svc       = $this->getServiceManager()->get('MelisCmsSiteService');
             $siteName  = $svc->generateModuleNameCase($moduleSource);
+            // SECURITY (audit CMS-H7) : même assainissement que le contrôleur legacy
+            // (SitesController::createNewSiteAction) — generateModuleNameCase/cleanString ne retire
+            // ni `.` ni `/` ni `\`, et ce nom devient un CHEMIN de scaffolding (xcopy/mapDirectory) :
+            // un `../../public/x` déposait des fichiers PHP générés hors de module/MelisSites.
+            $siteName = preg_replace('/[^A-Za-z0-9]/', '', (string) $siteName);
+            if ($siteName === '') { return $this->jsonResponse(['success' => false, 'error' => 'Site name required'], 422); }
             $siteLabel = $label !== '' ? $label : $siteName;
             $siteData  = ['site_name' => $siteName, 'site_label' => $siteLabel];
             // DnD (Drag & Drop) render mode : 'bootstrap' si activé, comme le contrôleur legacy.

@@ -65,7 +65,9 @@ class MiniTemplateManagerController extends MelisAbstractActionController
     public function renderMiniTemplateManagerToolAddAction()
     {
         $view = new ViewModel();
-        $view->templateName = $this->params()->fromQuery('templateName', '');
+        // SECURITY (audit CMS-H4) : param réfléchi dans le HTML (id d'élément) — restreint au
+        // charset des noms de mini-templates.
+        $view->templateName = preg_replace('/[^A-Za-z0-9_\-]/', '', (string) $this->params()->fromQuery('templateName', ''));
         return $view;
     }
 
@@ -75,6 +77,8 @@ class MiniTemplateManagerController extends MelisAbstractActionController
     public function renderMiniTemplateManagerToolAddHeaderAction()
     {
         $params = $this->params()->fromQuery();
+        // SECURITY (audit CMS-H4) : param réfléchi dans un <h1> — restreint au charset des noms.
+        $params['templateName'] = preg_replace('/[^A-Za-z0-9_\-]/', '', (string) ($params['templateName'] ?? ''));
         $view = new ViewModel();
         $view->formType = ($params['templateName'] == 'new_template') ? 'create' : 'update';
         $view->templateName = ($params['templateName'] != 'new_template') ? $params['templateName'] : '';
@@ -93,6 +97,14 @@ class MiniTemplateManagerController extends MelisAbstractActionController
         }
 
         $params = $this->params()->fromQuery();
+        // SECURITY (audit CMS-H4) : templateName/module sont réfléchis dans la vue ET concaténés
+        // dans un chemin lu par file_get_contents (lecture de .phtml arbitraire par traversée) —
+        // restreints à leur charset. Ids castés, thumbnail échappé (attribut src).
+        $params['templateName'] = preg_replace('/[^A-Za-z0-9_\-]/', '', (string) ($params['templateName'] ?? ''));
+        $params['module'] = preg_replace('/[^A-Za-z0-9_]/', '', (string) ($params['module'] ?? ''));
+        $params['categoryId'] = (int) ($params['categoryId'] ?? 0);
+        $params['siteId'] = (int) ($params['siteId'] ?? 0);
+        $params['thumbnail'] = htmlspecialchars((string) ($params['thumbnail'] ?? ''), ENT_QUOTES, 'UTF-8');
         $form = $this->getForm($this->module, $this->tool_key, $this->form_key);
         $form->get('miniTemplateSiteModule')->setValueOptions($this->getSiteModules());
 

@@ -940,7 +940,9 @@ var melisPluginEdition = (function ($, window) {
 			translations.tr_meliscms_delete_cms_plugin_modal_content,
 			function () {
 				$.ajax({
-					type: "GET",
+					// SECURITY (audit CMS-H2) : POST — le serveur refuse désormais les mutations en GET.
+					// Les paramètres restent dans l'URL : l'action les lit via getQuery().
+					type: "POST",
 					url:
 						"/melis/MelisCms/PageEdition/removePageSessionPlugin?module=" +
 						melisPluginModuleName +

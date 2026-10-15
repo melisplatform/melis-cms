@@ -31,6 +31,7 @@ class EditionDocumentController extends MelisAbstractActionController
 
         try {
             $idPage = (int) $this->params()->fromQuery('idPage', 0);
+            if ($deny = $this->denyUnlessPageRight($idPage)) { return $deny; } // SECURITY (audit CMS-C1)
             if ($idPage <= 0) {
                 return $this->jsonResponse(['success' => false, 'error' => 'idPage is required'], 400);
             }

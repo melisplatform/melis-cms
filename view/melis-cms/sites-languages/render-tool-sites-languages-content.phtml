@@ -54,7 +54,8 @@ $data_melisKey = $this->melisKey;
                                     <input type="checkbox" class="sites-tool-lang-tab-checkbox" id="cms-sites-lang-checkbox-<?= $language['lang_cms_id'] ?>" name="slang_lang_id[]" data-active="<?= $active ?>" value="<?= $language['lang_cms_id'] ?>" <?= $checked ?>>
                                     <input type="text" class="sites-tool-lang-tab-checkbox-lang" name="to_delete_languages_data[<?= $language['lang_cms_id'] ?>]" value="false" hidden="hidden">
                                 </label>
-                                <span><?= $language['lang_cms_name'] ?></span>
+                                <?php /* SECURITY (audit CMS-M8) : lang_cms_name = saisie utilisateur — échappé */ ?>
+                                <span><?= $this->escapeHtml($language['lang_cms_name']) ?></span>
                             </div>
                         </div>
                     </div>

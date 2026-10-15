@@ -417,6 +417,14 @@ class MelisReactApiCmsMiniTemplateController extends MelisAbstractActionControll
                 return $this->jsonResponse(['success' => false, 'error' => 'Paramètres site et name requis.'], 400);
             }
 
+            // SECURITY (audit CMS-M3) : site/name non validés → `name=../../../x` supprimait un
+            // .phtml ARBITRAIRE via findTemplatePath. REJET (pas de nettoyage silencieux : on ne
+            // supprime jamais « à peu près » un fichier). `name` suit le même motif que le
+            // formulaire de création legacy ; `site` est un nom de module (alphanumérique).
+            if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $name) || !preg_match('/^[A-Za-z0-9_]+$/', $site)) {
+                return $this->jsonResponse(['success' => false, 'error' => 'Paramètres site/name invalides.'], 400);
+            }
+
             /** @var \MelisCms\Service\MelisCmsMiniTemplateService $svc */
             $svc  = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
             $path = $this->findTemplatePath($site, $name);

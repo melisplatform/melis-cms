@@ -31,6 +31,13 @@ class FrontPluginsController extends MelisAbstractActionController
      */
     public function renderPluginsMenuAction()
     {
+        /** SECURITY (audit CMS-H6) : contrôleur sans clé d'outil (UNMAPPED → passait le gate
+         * d'autorisation global de melis-core) — droit de l'outil Pages exigé, comme le reste
+         * de la chaîne d'édition. */
+        if (! $this->hasAccess('meliscms_page')) {
+            return new ViewModel();
+        }
+
         /**
          * Check if cache exist
          */
@@ -83,9 +90,14 @@ class FrontPluginsController extends MelisAbstractActionController
      */
     public function renderPluginsMenuContentAction()
     {
+        /** SECURITY (audit CMS-H6) : droit de l'outil Pages exigé (contrôleur UNMAPPED). */
+        if (! $this->hasAccess('meliscms_page')) {
+            return new JsonModel(['view' => '']);
+        }
+
         $config = $this->getServiceManager()->get('config');
         // $siteModule = $this->params()->fromRoute('siteModule', '');
-        $pageId = $this->params()->fromQuery('pageId');
+        $pageId = (int) $this->params()->fromQuery('pageId');
 
         $pageTreeService = $this->getServiceManager()->get('MelisEngineTree');
         $site = $pageTreeService->getSiteByPageId($pageId);
@@ -148,6 +160,11 @@ class FrontPluginsController extends MelisAbstractActionController
      */
     public function getSessionDataAction()
     {
+        /** SECURITY (audit CMS-H6) : droit de l'outil Pages exigé (contrôleur UNMAPPED). */
+        if (! $this->hasAccess('meliscms_page')) {
+            return new JsonModel(['success' => 0]);
+        }
+
         $success = 1;
         $data    = array();
 
@@ -159,6 +176,13 @@ class FrontPluginsController extends MelisAbstractActionController
 
     public function renderPluginModalAction()
     {
+        /** SECURITY (audit CMS-H6) : droit de l'outil Pages exigé (contrôleur UNMAPPED). */
+        if (! $this->hasAccess('meliscms_page')) {
+            $view = new ViewModel();
+            $view->setTerminal(true);
+            return $view;
+        }
+
         $translator = $this->getServiceManager()->get('translator');
 
         $parameters = $this->getRequest()->getQuery('parameters', array());
@@ -219,6 +243,11 @@ class FrontPluginsController extends MelisAbstractActionController
 
     public function validatePluginModalAction()
     {
+        /** SECURITY (audit CMS-H6) : droit de l'outil Pages exigé (contrôleur UNMAPPED). */
+        if (! $this->hasAccess('meliscms_page')) {
+            return new JsonModel(['success' => 0, 'errors' => ['general' => 'tr_meliscore_microservice_api_key_no_access']]);
+        }
+
         $translator = $this->getServiceManager()->get('translator');
 
         $parameters = $this->getRequest()->getPost()->toArray();
@@ -277,38 +306,9 @@ class FrontPluginsController extends MelisAbstractActionController
         return new JsonModel($result);
     }
 
-    public function checkSessionPageAction()
-    {
-        $container = new Container('meliscms');
-        $pages = $container->getArrayCopy(); //$container['content-pages'];
-
-        //        \Zend\Debug\Debug::dump($pages);
-        print_r($pages);
-
-        die;
-    }
-
-    public function testingAreaAction()
-    {
-        $plugin = 'melisCmsSlider';
-        $pluginId = 'showslider_1507005296';
-
-        $text = '<melisCmsSlider id="showslider_1507009618" plugin_container_id="plugin_container_id_1507009628" plugin_container_id="plugin_container_id_1507009628" plugin_container_id="plugin_container_id_1507009628" plugin_container_id="plugin_container_id_1507009628" plugin_container_id="plugin_container_id_1507009628">	';
-        $pattern = '/\splugin_container_id\=\"(.*?)\"/';
-
-        $replace = $plugin . ' id="' . $pluginId . '" plugin_container_id="this_is_the_id_1823121"';
-
-        $newValue = $text;
-        if (preg_match($pattern, $text)) {
-            $newValue = preg_replace($pattern, '', $text);
-        }
-
-
-        echo trim($newValue);
-
-
-        die;
-    }
+    /* SECURITY (audit CMS-H6) : les endpoints de debug `checkSessionPageAction` (print_r de
+     * TOUTE la session meliscms — contenus d'édition en cours — accessible à tout compte BO)
+     * et `testingAreaAction` ont été supprimés. Ne pas les réintroduire. */
 
     private function putSectionOnPlugins($configurations, $siteModule)
     {

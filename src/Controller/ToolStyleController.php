@@ -322,7 +322,13 @@ class ToolStyleController extends MelisAbstractActionController
 
                 // apply text limits
                 foreach ($tableData[$ctr] as $vKey => $vValue) {
-                    $tableData[$ctr][$vKey] = $vValue;
+                    // SECURITY (audit CMS-H5) : cellules échappées — style_name/style_path sont du
+                    // contenu utilisateur que DataTables rend en HTML brut (XSS stocké). Même modèle
+                    // que Sites/Platform/Language. `style_files` (markup de confiance posé plus haut)
+                    // est exclu ; `style_status` est réécrit en markup de confiance juste en dessous.
+                    if ($vKey !== 'style_files') {
+                        $tableData[$ctr][$vKey] = $melisTool->limitedText($melisTool->escapeHtml($vValue));
+                    }
                     if ($vKey == 'style_status') {
                         $status = '<span class="text-success"><i class="fa fa-fw fa-circle"></i></span>';
                         if (!$vValue) {
@@ -505,8 +511,18 @@ class ToolStyleController extends MelisAbstractActionController
         $errors = array();
         $success = 1;
         $result = array();
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $isNew = $this->params()->fromRoute('isNew', $this->params()->fromQuery('isNew', ''));
+
+        // SECURITY (audit CMS-M4) : aucun contrôle in-contrôleur — le gate global de melis-core ne
+        // couvre pas la route top-level /MelisCms/... (cf. CMS-H1). L'action écrit le style d'une
+        // PAGE : droit de l'outil Pages (flux de sauvegarde de page) + droit par-page.
+        // Clé Pages et non Styles : l'action est forwardée par la chaîne savePage, portée par des
+        // utilisateurs qui n'ont pas forcément l'outil Styles.
+        if (! $this->hasAccess('meliscms_page')
+            || ($idPage > 0 && ! $this->getServiceManager()->get('MelisCmsRights')->canAccessPage($idPage))) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscms_page_user_access_rights_no_access', 'errors' => [], 'datas' => []]);
+        }
         $translator = $this->getServiceManager()->get('translator');
         $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $styleService = $this->getServiceManager()->get('MelisEngineStyle');

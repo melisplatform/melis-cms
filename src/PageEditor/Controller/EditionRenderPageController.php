@@ -40,6 +40,7 @@ class EditionRenderPageController extends MelisAbstractActionController
 
         try {
             $idPage = (int) $this->params()->fromQuery('idPage', 0);
+            if ($deny = $this->denyUnlessPageRight($idPage)) { return $deny; } // SECURITY (audit CMS-C1)
             if ($idPage <= 0) {
                 return $this->html($response, 400, '<!doctype html><meta charset=utf-8><p>idPage is required');
             }

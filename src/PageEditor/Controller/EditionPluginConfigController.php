@@ -59,6 +59,7 @@ class EditionPluginConfigController extends MelisAbstractActionController
 
         try {
             $idPage     = (int) $this->params()->fromQuery('idPage', 0);
+            if ($deny = $this->denyUnlessPageRight($idPage)) { return $deny; } // SECURITY (audit CMS-C1)
             $module     = (string) $this->params()->fromQuery('module', '');
             $pluginName = (string) $this->params()->fromQuery('pluginName', '');
             $pluginId   = (string) $this->params()->fromQuery('pluginId', '');
@@ -102,6 +103,8 @@ class EditionPluginConfigController extends MelisAbstractActionController
         try {
             $payload    = json_decode((string) $this->getRequest()->getContent(), true);
             $idPage     = (int) ($payload['idPage'] ?? 0);
+            if ($deny = $this->denyUnlessPageRight($idPage)) { return $deny; } // SECURITY (audit CMS-C1)
+            if ($deny = $this->denyUnlessPageAction('save')) { return $deny; } // SECURITY (audit CMS-M2)
             $module     = (string) ($payload['module'] ?? '');
             $pluginName = (string) ($payload['pluginName'] ?? '');
             $pluginId   = (string) ($payload['pluginId'] ?? '');
@@ -233,6 +236,7 @@ class EditionPluginConfigController extends MelisAbstractActionController
             $pluginName = (string) $this->params()->fromQuery('pluginName', '');
             $pluginId   = (string) $this->params()->fromQuery('pluginId', '');
             $idPage     = (int) $this->params()->fromQuery('idPage', 0);
+            if ($deny = $this->denyUnlessPageRight($idPage)) { return $deny; } // SECURITY (audit CMS-C1)
 
             $fieldOptions = [];
             $fieldValues  = [];
@@ -297,6 +301,7 @@ class EditionPluginConfigController extends MelisAbstractActionController
             $pluginName = (string) $this->params()->fromQuery('pluginName', '');
             $pluginId   = (string) $this->params()->fromQuery('pluginId', '');
             $idPage     = (int) $this->params()->fromQuery('idPage', 0);
+            if ($deny = $this->denyUnlessPageRight($idPage)) { return $deny; } // SECURITY (audit CMS-C1)
 
             $draftXml = $this->draftContentXml($idPage);
             [$tabs, $tag] = $this->buildTabs($idPage, $module, $pluginName, $pluginId, $draftXml);

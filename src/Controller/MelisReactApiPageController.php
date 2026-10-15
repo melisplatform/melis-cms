@@ -88,6 +88,7 @@ class MelisReactApiPageController extends MelisAbstractActionController
 
         try {
             $idPage = (int) $this->params()->fromQuery('idPage', 0);
+            if ($deny = $this->denyUnlessPageRight($idPage)) { return $deny; } // SECURITY (audit CMS-C1)
             $config = $this->getServiceManager()->get('MelisCoreConfig');
 
             $tabsCfg = $config->getItem('/meliscms/interface/meliscms_page/interface/meliscms_tabs');
@@ -115,6 +116,7 @@ class MelisReactApiPageController extends MelisAbstractActionController
         if ($deny = $this->denyUnlessAccess()) { return $deny; }
         try {
             $idPage = (int) $this->params()->fromQuery('idPage', 0);
+            if ($deny = $this->denyUnlessPageRight($idPage)) { return $deny; } // SECURITY (audit CMS-C1)
             $tree = $this->pageTree($idPage);
             if (!$tree) { return $this->jsonResponse(['success' => false, 'error' => 'Page not found'], 404); }
             $db = $this->db();
@@ -141,6 +143,7 @@ class MelisReactApiPageController extends MelisAbstractActionController
         try {
             $in = $this->jsonBody();
             $idPage = (int) ($in['idPage'] ?? 0);
+            if ($deny = $this->denyUnlessPageRight($idPage)) { return $deny; } // SECURITY (audit CMS-C1)
             if ($idPage <= 0) { return $this->jsonResponse(['success' => false, 'error' => 'idPage requis'], 400); }
             $name = trim((string) ($in['name'] ?? ''));
             $tplId = (int) ($in['templateId'] ?? 0);
@@ -195,6 +198,7 @@ class MelisReactApiPageController extends MelisAbstractActionController
         if ($deny = $this->denyUnlessAccess()) { return $deny; }
         try {
             $idPage = (int) $this->params()->fromQuery('idPage', 0);
+            if ($deny = $this->denyUnlessPageRight($idPage)) { return $deny; } // SECURITY (audit CMS-C1)
             $rows = iterator_to_array($this->db()->query(
                 'SELECT pseo_url, pseo_url_redirect, pseo_url_301, pseo_meta_title, pseo_meta_description, pseo_canonical FROM melis_cms_page_seo WHERE pseo_id = ? LIMIT 1', [$idPage]));
             $r = $rows[0] ?? [];
@@ -218,6 +222,7 @@ class MelisReactApiPageController extends MelisAbstractActionController
         try {
             $in = $this->jsonBody();
             $idPage = (int) ($in['idPage'] ?? 0);
+            if ($deny = $this->denyUnlessPageRight($idPage)) { return $deny; } // SECURITY (audit CMS-C1)
             if ($idPage <= 0) { return $this->jsonResponse(['success' => false, 'error' => 'idPage requis'], 400); }
             $eng  = $this->getServiceManager()->get('MelisEnginePage');
             $seoT = $this->getServiceManager()->get('MelisEngineTablePageSeo');
@@ -263,6 +268,7 @@ class MelisReactApiPageController extends MelisAbstractActionController
         if ($deny = $this->denyUnlessAccess()) { return $deny; }
         try {
             $idPage = (int) $this->params()->fromQuery('idPage', 0);
+            if ($deny = $this->denyUnlessPageRight($idPage)) { return $deny; } // SECURITY (audit CMS-C1)
             $db = $this->db();
             $me = iterator_to_array($db->query('SELECT plang_page_id_initial FROM melis_cms_page_lang WHERE plang_page_id = ? LIMIT 1', [$idPage]));
             $initial = (int) ($me[0]['plang_page_id_initial'] ?? $idPage);
@@ -302,6 +308,7 @@ class MelisReactApiPageController extends MelisAbstractActionController
         if ($deny = $this->denyUnlessAccess()) { return $deny; }
         try {
             $idPage = (int) $this->params()->fromQuery('idPage', 0);
+            if ($deny = $this->denyUnlessPageRight($idPage)) { return $deny; } // SECURITY (audit CMS-C1)
             $db = $this->db();
             $chain = [];
             $cur = $idPage;
@@ -326,6 +333,7 @@ class MelisReactApiPageController extends MelisAbstractActionController
         if ($deny = $this->denyUnlessAccess()) { return $deny; }
         try {
             $idPage = (int) $this->params()->fromQuery('idPage', 0);
+            if ($deny = $this->denyUnlessPageRight($idPage)) { return $deny; } // SECURITY (audit CMS-C1)
             $db = $this->db();
             $siteId = $this->siteIdForPage($idPage);
             $templates = iterator_to_array($db->query(
@@ -557,6 +565,19 @@ class MelisReactApiPageController extends MelisAbstractActionController
                 return $this->jsonResponse(['success' => false, 'error' => 'Forbidden'], 403);
             }
         } catch (\Throwable) {}
+        return null;
+    }
+
+    /**
+     * SECURITY (audit CMS-C1) : droit PAR-PAGE (section `meliscms_pages`), en plus du droit
+     * d'outil — sans lui, changer `idPage` suffisait à lire/modifier propriétés et SEO de
+     * n'importe quelle page hors périmètre (IDOR). Fail-closed via canAccessPage.
+     */
+    private function denyUnlessPageRight(int $idPage): ?HttpResponse
+    {
+        if (!$this->getServiceManager()->get('MelisCmsRights')->canAccessPage($idPage)) {
+            return $this->jsonResponse(['success' => false, 'error' => 'Forbidden (page rights)'], 403);
+        }
         return null;
     }
 

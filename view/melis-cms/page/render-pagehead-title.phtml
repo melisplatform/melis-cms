@@ -11,7 +11,8 @@
 ?>
 <div <?= $id; ?> data-melisKey='<?= $data_melisKey; ?>' class="bg-white content-heading border-bottom page-title" data-pageid="<?= $this->idPage; ?>">
 		<div class="float-left">
-            <h1> <?= $this->idPage . " - " . $title; ?> </h1>
+            <?php /* SECURITY (audit CMS-M8) : page_name = saisie utilisateur, rendue dans le <h1> */ ?>
+            <h1> <?= $this->idPage . " - " . $this->escapeHtml($title); ?> </h1>
 
 			<p>
 			<span class="title">
@@ -26,8 +27,9 @@
 
         		<?= $this->pageCurrentStatus.' ' . $this->lastPublishedDate; ?>
 				<?php
+				/* SECURITY (audit CMS-M8) : prénom/nom du publicateur = saisie utilisateur */
 				if (!empty($this->publishedName))
-					echo ' ' . $this->translate('tr_meliscms_page_By') . ' ' . $this->publishedName;
+					echo ' ' . $this->translate('tr_meliscms_page_By') . ' ' . $this->escapeHtml($this->publishedName);
 				?>
         	</span>
 					<?php

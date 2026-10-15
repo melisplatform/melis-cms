@@ -520,8 +520,11 @@ $(function () {
 							 * depending the selected language
 							 * of the user
 							 */
+							// SECURITY (audit CMS-M8) : langData[2] = lang_cms_name (saisie utilisateur)
+							// — rendu en TEXTE, plus jamais via .html().
 							var label = $("<label/>")
-								.html(langData[2] + "<sup>*</sup>")
+								.text(langData[2])
+								.append($("<sup/>").text("*"))
 								.addClass("err_site-domain-" + this.value);
 							div.append(label);
 							var domainName = "site-domain-" + this.value;
@@ -1106,16 +1109,21 @@ $(function () {
 										sdomMultiLbl.addClass("fieldErrorColor");
 										var lang = sdomMultiLbl.text().slice(0, -1);
 
+										// SECURITY (audit CMS-M8) : lang (nom de langue) et val (domaine saisi,
+										// renvoyé par le serveur) sont des données utilisateur — insérées en
+										// TEXTE (.append(string) interprète le HTML).
 										$("#siteAddAlert").append(
-											lang +
-												" - " +
-												translations.tr_melis_cms_sites_tool_add_step3_domain_error1 +
-												val +
-												translations.tr_melis_cms_sites_tool_add_step3_domain_error2
+											document.createTextNode(
+												lang +
+													" - " +
+													translations.tr_melis_cms_sites_tool_add_step3_domain_error1 +
+													val +
+													translations.tr_melis_cms_sites_tool_add_step3_domain_error2
+											)
 										);
 
 										if (counter != length) {
-											$("#siteAddAlert").append("</br>");
+											$("#siteAddAlert").append($("<br/>"));
 										}
 
 										counter++;

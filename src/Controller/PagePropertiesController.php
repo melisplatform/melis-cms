@@ -29,7 +29,7 @@ class PagePropertiesController extends MelisAbstractActionController
      */
     public function renderPagetabPropertiesAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $pageStyle = null;
 
@@ -130,7 +130,7 @@ class PagePropertiesController extends MelisAbstractActionController
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
 
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $fatherPageId = $this->params()->fromRoute('fatherPageId', $this->params()->fromQuery('fatherPageId', -1));
         $translator = $this->getServiceManager()->get('translator');
 
@@ -398,7 +398,7 @@ class PagePropertiesController extends MelisAbstractActionController
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
 
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $isNew = $this->params()->fromRoute('isNew', $this->params()->fromQuery('isNew', ''));
         $translator = $this->getServiceManager()->get('translator');
 

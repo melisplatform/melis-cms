@@ -12,7 +12,8 @@
         <div class="me-hl col-xs-12 col-sm-8 col-md-9">
             <h1 class="content-heading">
                 <a href="#" class="melis-opentools" data-tool-icon="fa-book" data-tool-name="Sites" data-tool-id="id_meliscms_tool_sites" data-tool-meliskey="meliscms_tool_sites" style="color: #686868;">Sites</a>
-                <site-title-tag>/ <?= $this->siteLabel ?></site-title-tag>
+                <?php /* SECURITY (audit CMS-M6) : site_label = saisie utilisateur (formulaire Sites sans input_filter) — échappé */ ?>
+                <site-title-tag>/ <?= $this->escapeHtml($this->siteLabel) ?></site-title-tag>
             </h1>
             <p><?= $this->translate('tr_meliscms_tool_templates_tpl_site_text') ?> </p>
         </div>

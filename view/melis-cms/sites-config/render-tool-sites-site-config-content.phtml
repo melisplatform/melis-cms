@@ -39,7 +39,8 @@ $data_melisKey = $this->melisKey;
                                     <span class="float-right">
                                         <img src="<?= $this->serverUrl() . '/MelisCms/images/lang-flags/' . $lang['lang_cms_locale'] . '.png' ?>" class="float-right">
                                     </span>
-                                    <span><?= $lang['lang_cms_name'] ?></span>
+                                    <?php /* SECURITY (audit CMS-M8) : lang_cms_name = saisie utilisateur — échappé */ ?>
+                                    <span><?= $this->escapeHtml($lang['lang_cms_name']) ?></span>
                                 </a>
                             </li>
                         <?php endforeach; ?>
@@ -135,7 +136,7 @@ $data_melisKey = $this->melisKey;
                     <?php foreach ($this->activeSiteLangs as $lang) : ?>
                         <div id="<?= $lang['lang_cms_locale']; ?>-config-<?= $this->siteId; ?>" class="tab-pane product-text-tab-content">
                             <div class="bg-white">
-                                <h4 class=""><i class="fa fa-map-marker"></i>  <?= $lang['lang_cms_name']; ?></h4>
+                                <h4 class=""><i class="fa fa-map-marker"></i>  <?= $this->escapeHtml($lang['lang_cms_name']); ?></h4>
                             </div>
                             <div id="cms_domain_<?= $lang['slang_lang_id']; ?>">
                                 <?php
