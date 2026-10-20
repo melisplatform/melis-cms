@@ -9,6 +9,7 @@ import { useSiteTabs, type SiteTabSaveFn } from './site-tab-registry'
 import { useIsNarrow } from './shared/useIsNarrow'
 import { parseSiteSaveErrors, byKey, type SiteFieldError } from './site-errors'
 import { FormErrorBanner, koNotify, okNotify, type FormIssue } from './shared/melis-form-errors'
+import { LangFlag } from './LangFlag'
 
 const MELIS_KEY = 'meliscms_tool_sites'
 function can(cap: string): boolean {
@@ -40,15 +41,9 @@ function FieldError({ messages }: { messages?: string[] }) {
   )
 }
 
-/** Drapeau de langue (image servie par MelisCore, comme dans les autres outils). */
+/** Drapeau de langue — cf. LangFlag (mêmes images que le legacy, code texte si pas d'image). */
 function Flag({ locale }: { locale: string }) {
-  const short = (locale || '').slice(0, 2).toLowerCase()
-  if (!short) return null
-  return (
-    <img src={`/MelisCore/assets/images/lang/${short}.png`} alt="" width={18} height={12}
-      style={{ borderRadius: 2, objectFit: 'cover', boxShadow: '0 0 0 1px rgba(0,0,0,.1)', flexShrink: 0 }}
-      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
-  )
+  return <LangFlag locale={locale} />
 }
 
 // Onglets NATIFS (ordre identique à l'édition legacy). Des modules peuvent AJOUTER des onglets via

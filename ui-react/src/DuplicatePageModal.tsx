@@ -4,6 +4,7 @@ import { PagePicker } from './PagePicker'
 import { duplicateTreePage } from './cms-tree-api'
 import { fetchLanguages, type LangItem } from './cms-language-api'
 import { FormErrorBanner, type FormIssue } from './shared/melis-form-errors'
+import { LangFlag } from './LangFlag'
 
 /* ──────────────────────────────────────────────────────────────────────────
  * Modale « Dupliquer l'arborescence » — remplace en natif React l'outil legacy
@@ -126,19 +127,9 @@ function FieldLabel({ label, tip, required }: { label: string; tip: string; requ
 const RequiredHint = ({ show }: { show: boolean }) =>
   show ? <p style={{ margin: '5px 0 0', fontSize: 11.5, color: 'var(--color-destructive,#c0392b)' }}>{tr('required')}</p> : null
 
-/* ── flags (real PNGs shipped by MelisCore; emoji flags don't render on Windows) ── */
-function localeShort(locale: string): string { return (locale || '').slice(0, 2).toLowerCase() }
+/* ── flags (real PNGs, see LangFlag; emoji flags don't render on Windows) ── */
 function Flag({ locale }: { locale: string }) {
-  return (
-    <img
-      src={`/MelisCore/assets/images/lang/${localeShort(locale)}.png`}
-      alt=""
-      width={20}
-      height={14}
-      style={{ borderRadius: 3, objectFit: 'cover', boxShadow: '0 0 0 1px rgba(0,0,0,.08)', flexShrink: 0 }}
-      onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden' }}
-    />
-  )
+  return <LangFlag locale={locale} size={20} radius={3} />
 }
 
 const CheckIcon = ({ size = 14 }: { size?: number }) => (

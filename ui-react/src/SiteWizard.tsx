@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { fetchSiteMeta, createSite, type SiteLang } from './sites-api'
 import { useIsNarrow } from './shared/useIsNarrow'
 import { FormErrorBanner, koNotify } from './shared/melis-form-errors'
+import { LangFlag } from './LangFlag'
 
 /**
  * Assistant de création de site (brique MelisCms) — reprise FIDÈLE du wizard legacy en 5 étapes :
@@ -24,15 +25,9 @@ const lbl: React.CSSProperties = { display: 'block', fontSize: 13, fontWeight: 6
 const subHint: React.CSSProperties = { fontSize: 12, color: 'var(--color-muted-foreground)', margin: '6px 0 0' }
 const radioRow: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }
 
-/** Drapeau de langue (image servie par MelisCore, comme dans les autres outils). */
+/** Drapeau de langue — cf. LangFlag (mêmes images que le legacy, code texte si pas d'image). */
 function Flag({ locale }: { locale: string }) {
-  const short = (locale || '').slice(0, 2).toLowerCase()
-  if (!short) return null
-  return (
-    <img src={`/MelisCore/assets/images/lang/${short}.png`} alt="" width={18} height={12}
-      style={{ borderRadius: 2, objectFit: 'cover', boxShadow: '0 0 0 1px rgba(0,0,0,.1)', flexShrink: 0 }}
-      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
-  )
+  return <LangFlag locale={locale} />
 }
 
 // Regex de domaine (reprise du legacy sites.tool.js).

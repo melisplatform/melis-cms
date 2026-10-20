@@ -7,6 +7,7 @@ import { useIsNarrow } from './shared/useIsNarrow'
 import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
 import { useDragReorder } from './shared/use-drag-reorder'
 import { fetchSites, deleteSite, minifyAssets, consumeSitesListStale, type SiteItem } from './sites-api'
+import { LangFlag as CmsLangFlag } from './LangFlag'
 
 const MELIS_KEY = 'meliscms_tool_sites'
 
@@ -99,16 +100,9 @@ function SortIcon({ dir }: { dir: 'asc' | 'desc' | null }) {
 }
 const SORTABLE = new Set(['id', 'label', 'name'])
 
-/** Drapeau de langue (image MelisCore /assets/images/lang/<short>.png). en_EN → en, fr_FR → fr. */
+/** Drapeau de langue — cf. LangFlag (mêmes images que le legacy, code texte si pas d'image). */
 function LangFlag({ locale, name }: { locale: string; name: string }) {
-  const short = (locale || '').slice(0, 2).toLowerCase()
-  if (!short) return null
-  return (
-    <img src={`/MelisCore/assets/images/lang/${short}.png`} alt={name} title={name}
-      width={18} height={12}
-      style={{ display: 'inline-block', borderRadius: 2, objectFit: 'cover', boxShadow: '0 0 1px rgba(0,0,0,.3)' }}
-      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
-  )
+  return <CmsLangFlag locale={locale} name={name} />
 }
 
 // ── Colonnes (masquer + réordonner par glisser-déposer, persisté) ──
