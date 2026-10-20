@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { peT } from './page-editor-i18n'
 import { useIsNarrow } from './shared/useIsNarrow'
 import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
+import { LangFlag } from './LangFlag'
 
 /**
  * Contenus NATIFS des onglets de l'éditeur de page CMS.
@@ -32,16 +33,10 @@ export function localeFlag(locale?: string): string {
   return String.fromCodePoint(...[...cc].map((c) => 127397 + c.charCodeAt(0)))
 }
 
-/** Drapeau = VRAIE image (`/MelisCore/assets/images/lang/<xx>.png`) — l'emoji ne s'affiche pas sous
- *  Windows. `<xx>` = 2 premières lettres du locale (en_EN→en, fr_FR→fr). Masqué si l'image manque. */
+/** Drapeau = VRAIE image (l'emoji ne s'affiche pas sous Windows) — cf. LangFlag : mêmes images que le
+ *  legacy, code texte de la langue si le locale n'a pas d'image. */
 export function Flag({ locale, size = 20 }: { locale?: string; size?: number }) {
-  const short = (locale || '').slice(0, 2).toLowerCase()
-  if (!/^[a-z]{2}$/.test(short)) return null
-  return (
-    <img src={`/MelisCore/assets/images/lang/${short}.png`} alt="" width={size} height={Math.round(size * 0.7)}
-      style={{ borderRadius: 3, objectFit: 'cover', boxShadow: '0 0 0 1px rgba(0,0,0,.08)', flexShrink: 0, verticalAlign: 'middle', display: 'inline-block' }}
-      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
-  )
+  return <LangFlag locale={locale} size={size} radius={3} />
 }
 
 // ── styles partagés (full width) ──

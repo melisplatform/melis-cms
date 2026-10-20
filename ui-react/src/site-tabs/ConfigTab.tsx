@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { SiteConfigData, ConfigSection } from '../sites-api'
 import { useIsNarrow } from '../shared/useIsNarrow'
+import { LangFlag } from '../LangFlag'
 
 /**
  * Onglet "Config" : configuration fusionnée (fichier + DB) éditable, sous-onglets Général + langues.
@@ -21,15 +22,9 @@ const pill = (active: boolean): React.CSSProperties => ({
   background: active ? 'color-mix(in srgb, var(--color-primary,#cb4040) 12%, transparent)' : 'transparent',
   color: active ? 'var(--color-primary,#cb4040)' : 'var(--color-foreground)', fontSize: 14, fontWeight: 600, cursor: 'pointer',
 })
-/** Drapeau de langue (image servie par MelisCore, comme dans les autres outils). */
+/** Drapeau de langue — cf. LangFlag (mêmes images que le legacy, code texte si pas d'image). */
 function Flag({ locale }: { locale: string }) {
-  const short = (locale || '').slice(0, 2).toLowerCase()
-  if (!short) return null
-  return (
-    <img src={`/MelisCore/assets/images/lang/${short}.png`} alt="" width={18} height={12}
-      style={{ borderRadius: 2, objectFit: 'cover', boxShadow: '0 0 0 1px rgba(0,0,0,.1)', flexShrink: 0 }}
-      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
-  )
+  return <LangFlag locale={locale} />
 }
 
 const sectionKey = (s: ConfigSection) => (s.langId == null ? 'gen' : String(s.langId))
