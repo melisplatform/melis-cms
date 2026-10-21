@@ -16,7 +16,7 @@ export interface SiteFieldError {
   /** Clé brute renvoyée par le legacy (sert d'ancre pour l'affichage sous le champ). */
   key: string
   /** Onglet de l'éditeur où se trouve le champ. */
-  tab: 'props' | 'domains'
+  tab: 'props' | 'domains' | 'modules'
   /** Environnement (`local`, `prod`…) ou id de langue selon la famille ; null pour `siteprop_`. */
   scope: string | null
   /** Nom du champ legacy (`sdom_domain`, `site_label`, `shome_page_id`…). */
@@ -44,7 +44,8 @@ export function parseSiteSaveErrors(errors: unknown): SiteFieldError[] {
     const home = /^(\d+)_(shome_.+)$/.exec(key)
     const prop = /^siteprop_(.+)$/.exec(key)
 
-    if (home) out.push({ key, tab: 'props', scope: home[1], field: home[2], messages })
+    if (key === 'site_module_load') out.push({ key, tab: 'modules', scope: null, field: key, messages })
+    else if (home) out.push({ key, tab: 'props', scope: home[1], field: home[2], messages })
     else if (dom) out.push({ key, tab: 'domains', scope: dom[1], field: dom[2], messages })
     else if (prop) out.push({ key, tab: 'props', scope: null, field: prop[1], messages })
     // Clé inconnue : on la rattache aux propriétés pour qu'elle reste VISIBLE dans le bandeau.
