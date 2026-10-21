@@ -43,7 +43,7 @@ function toModule(s: string): string {
   return (s || '').replace(/[^a-zA-Z0-9 ]/g, '').split(/\s+/).filter(Boolean).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join('')
 }
 
-interface Props { onCancel: () => void; onCreated: (label: string) => void }
+interface Props { onCancel: () => void; onCreated: (label: string, siteIds: number[]) => void }
 
 // 5 étapes (comme le legacy).
 const STEPS = [
@@ -149,7 +149,7 @@ export default function SiteWizard({ onCancel, onCreated }: Props) {
       // Un nouveau site crée des pages → recharger l'arbre de pages (menu gauche CMS).
       // PageTree écoute cet event (comme après la création d'une page) et reload ses racines.
       window.dispatchEvent(new CustomEvent('melis:cms-page-created', { detail: {} }))
-      onCreated(r.siteLabel || label)
+      onCreated(r.siteLabel || label, r.siteIds ?? [])
     } catch (e) {
       const msg = String((e as Error)?.message ?? e)
       setError(msg); koNotify(tr('Nouveau site', 'New site'), msg)
