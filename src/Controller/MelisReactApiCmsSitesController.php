@@ -505,6 +505,17 @@ class MelisReactApiCmsSitesController extends MelisAbstractActionController
             }
             $siteLanguages['sites_url_setting'] = $urlSetting;
 
+            // Domaines : uniques dans le tunnel ET pas déjà pris par un autre site (comme le wizard legacy,
+            // cf. SitesDomainsController::checkDomainAction) — saveSite() ne le vérifie pas.
+            $conflicts = $this->domainConflicts(array_map(static fn($d) => $d['sdom_domain'], $domainData));
+            if (!empty($conflicts)) {
+                $lines = [];
+                foreach ($conflicts as $locale => $msg) {
+                    $lines[] = count($domainData) > 1 ? $locale . ' - ' . $msg : $msg;
+                }
+                return $this->jsonResponse(['success' => false, 'error' => implode("\n", array_unique($lines)), 'data' => ['conflicts' => $conflicts]], 409);
+            }
+
             $result = $svc->saveSite($siteData, $domainData, $siteLanguages, [], $siteName, $createFile, $isNewSite);
             if (empty($result['success'])) {
                 // saveSite renvoie une CLÉ de traduction (ex. tr_melis_cms_sites_tool_add_create_site_unknown_error)
@@ -525,7 +536,76 @@ class MelisReactApiCmsSitesController extends MelisAbstractActionController
         }
     }
 
+    // ─── POST /cms-sites/check-domains ────────────────────────────────────────
+
+    /**
+     * Vérification des domaines à l'étape « Domaines » du tunnel de création (équivalent de
+     * /melis/MelisCms/SitesDomains/checkDomain appelé par le wizard legacy avant l'étape suivante).
+     *
+     * Body JSON : { domains: { clé (locale|single): domaine } }
+     * Réponse   : { conflicts: { clé: message traduit } } — vide si tout est libre.
+     */
+    public function checkDomainsAction(): HttpResponse
+    {
+        if ($deny = $this->denyUnlessAccess()) { return $deny; }
+        if ($denyCap = $this->denyUnlessCan('create')) { return $denyCap; }
+
+        try {
+            if (!$this->getRequest()->isPost()) {
+                return $this->jsonResponse(['success' => false, 'error' => 'POST required'], 405);
+            }
+            $body    = json_decode($this->getRequest()->getContent(), true) ?? [];
+            $domains = is_array($body['domains'] ?? null) ? $body['domains'] : [];
+            $domains = array_map(static fn($d) => is_scalar($d) ? (string) $d : '', $domains);
+
+            return $this->jsonResponse(['success' => true, 'data' => ['conflicts' => (object) $this->domainConflicts($domains)]]);
+        } catch (\Throwable $e) {
+            return $this->errorResponse($e);
+        }
+    }
+
     // ─── Helpers ──────────────────────────────────────────────────────────────
+
+    /**
+     * Domaines refusés d'un nouveau site, par clé : doublon dans la saisie (« Les noms de domaine
+     * doivent être uniques ») ou domaine déjà utilisé par un site existant, tous environnements
+     * confondus (« Ce domaine est déjà utilisé par le site X. Il ne peut pas être utilisé… »).
+     * Mêmes règles et mêmes traductions que le wizard legacy (sites.tool.js + checkDomainAction).
+     *
+     * @param array<string,string> $domains clé => domaine (les vides sont ignorés)
+     * @return array<string,string> clé => message traduit
+     */
+    private function domainConflicts(array $domains): array
+    {
+        $translator  = $this->getServiceManager()->get('translator');
+        $domainTable = $this->getServiceManager()->get('MelisEngineTableSiteDomain');
+        $siteTable   = $this->getServiceManager()->get('MelisEngineTableSite');
+
+        $conflicts = [];
+        $seen      = [];
+        foreach ($domains as $key => $domain) {
+            $domain = trim((string) $domain);
+            if ($domain === '') { continue; }
+            $norm = strtolower($domain);
+            if (isset($seen[$norm])) {
+                $msg = $translator->translate('tr_melis_cms_sites_tool_add_step3_domain_unique_error');
+                $conflicts[$seen[$norm]] = $msg;
+                $conflicts[(string) $key] = $msg;
+                continue;
+            }
+            $seen[$norm] = (string) $key;
+
+            $dom = $domainTable->getEntryByField('sdom_domain', $domain)->toArray();
+            if (!empty($dom)) {
+                $site = $siteTable->getEntryById($dom[0]['sdom_site_id'])->toArray()[0] ?? [];
+                $conflicts[(string) $key] = $translator->translate('tr_melis_cms_sites_tool_add_step3_domain_error1')
+                    . ($site['site_label'] ?? $site['site_name'] ?? ('#' . $dom[0]['sdom_site_id']))
+                    . $translator->translate('tr_melis_cms_sites_tool_add_step3_domain_error2');
+            }
+        }
+        return $conflicts;
+    }
+
 
     private function isAuthenticated(): bool
     {

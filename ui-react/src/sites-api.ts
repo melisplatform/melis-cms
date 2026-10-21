@@ -110,6 +110,19 @@ export async function createSite(payload: CreateSitePayload): Promise<{ siteIds:
   })
 }
 
+/**
+ * Domaines du tunnel refusés (doublon dans la saisie, ou déjà utilisés par un autre site), comme
+ * le contrôle du wizard legacy avant l'étape suivante. Clé (locale|'single') → message traduit.
+ */
+export async function checkSiteDomains(domains: Record<string, string>): Promise<Record<string, string>> {
+  const data = await apiFetch<{ conflicts: Record<string, string> }>('/melis/react-api/cms-sites/check-domains', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ domains }),
+  })
+  return data.conflicts ?? {}
+}
+
 // ─── Édition d'un site (onglets cœur : Propriétés, Domaines, Langues) ──────────
 //
 // Chargement : couche react-api propre (GET /cms-sites/:id, shape JSON).
