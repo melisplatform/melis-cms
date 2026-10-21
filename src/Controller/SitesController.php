@@ -812,7 +812,7 @@ class SitesController extends MelisAbstractActionController
             /**
              * Try to save the site data's
              */
-            $this->saveSiteDomains($domainData, $errors, $status);
+            $this->saveSiteDomains($siteId, $domainData, $errors, $status);
             $this->saveSiteHomePages($siteHomeData, $data, $errors, $status);
             $this->saveSiteConfig($siteId,$siteConfigTabData);
             $this->saveSiteProperties($siteId, $sitePropData, $errors, $status);
@@ -1126,11 +1126,12 @@ class SitesController extends MelisAbstractActionController
     /**
      * Save site domains
      *
+     * @param $siteId
      * @param $siteDomainData
      * @param $errors
      * @param $status
      */
-    private function saveSiteDomains($siteDomainData, &$errors, &$status)
+    private function saveSiteDomains($siteId, $siteDomainData, &$errors, &$status)
     {
         /**
          * Check if there is data to be process
@@ -1211,6 +1212,14 @@ class SitesController extends MelisAbstractActionController
                                 $currErr[$domainDatum["sdom_env"] . '_' . 'sdom_domain'] = $translator->translate('tr_melis_cms_sites_tool_add_step3_domain_error1') . $siteData['site_label'] . $translator->translate('tr_melis_cms_sites_tool_add_step3_domain_error2');
                                 $errors = array_merge($errors, $currErr);
                                 $status = 0;
+                            }
+                        } elseif (!empty($domainDatum['sdom_id']) && trim($domainDatum['sdom_domain'] ?? '') === '') {
+                            // The domain of another environment was emptied: remove it from the site
+                            // (only a domain of this site — the id comes from the request).
+                            $domainTable = $this->getServiceManager()->get('MelisEngineTableSiteDomain');
+                            $existing = $domainTable->getEntryById((int) $domainDatum['sdom_id'])->current();
+                            if ($existing && (int) $existing->sdom_site_id === (int) $siteId) {
+                                $domainTable->deleteById((int) $domainDatum['sdom_id']);
                             }
                         }
                     }
