@@ -153,7 +153,9 @@ export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Pro
 
   const langById = useMemo(() => Object.fromEntries((data?.languages ?? []).map((l) => [l.id, l])), [data])
   const removedLangIds = useMemo(() => initialActive.filter((id) => !activeLangIds.includes(id)), [initialActive, activeLangIds])
-  const formSnapshot = JSON.stringify([label, dndMode, s404.id, mainPage.id, optLangUrl, activeLangIds, homes, domains, configFields, moduleList])
+  // Domains by value only: their ids are reloaded after a save (0011303) without being an edit.
+  const formSnapshot = JSON.stringify([label, dndMode, s404.id, mainPage.id, optLangUrl, activeLangIds, homes,
+    domains.map((d) => [d.env, d.scheme, d.domain.trim()]), configFields, moduleList])
 
   function toggleLang(id: number) {
     setActiveLangIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id])
