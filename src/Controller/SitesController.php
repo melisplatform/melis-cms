@@ -1164,6 +1164,11 @@ class SitesController extends MelisAbstractActionController
             // Second check if there are duplicates
             if (!$err) {
                 foreach ($siteDomainData as $domainDatum) {
+                    // An empty domain (environment left blank) is not saved, so it can't duplicate another one
+                    if (trim($domainDatum['sdom_domain'] ?? '') === '') {
+                        continue;
+                    }
+
                     if (in_array($domainDatum['sdom_domain'], $domains)) {
                         $err = true;
                         $currErr = array();
