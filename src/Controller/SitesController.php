@@ -1147,7 +1147,12 @@ class SitesController extends MelisAbstractActionController
                 $form = $this->getTool()->getForm('meliscms_tool_sites_domain_form');
                 $form->setData($domainDatum);
 
-                if ($domainDatum['sdom_env'] == getenv('MELIS_PLATFORM')) {
+                // The current platform's domain is mandatory; another environment's domain is optional
+                // but, once filled, must be as valid as in the creation wizard (it gets saved below)
+                $isCurrentEnv = $domainDatum['sdom_env'] == getenv('MELIS_PLATFORM');
+                $isFilled = trim($domainDatum['sdom_domain'] ?? '') !== '';
+
+                if ($isCurrentEnv || $isFilled) {
                     if (!$form->isValid()) {
                         $err = true;
                         $currErr = array();
@@ -1201,7 +1206,7 @@ class SitesController extends MelisAbstractActionController
                             $status = 0;
                         }
                     } else {
-                        if (!empty($domainDatum['sdom_scheme']) && !empty($domainDatum['sdom_domain'])) {
+                        if (!empty($domainDatum['sdom_scheme']) && trim($domainDatum['sdom_domain'] ?? '') !== '') {
                             $siteData = [];
                             $isDomainAvailable = $this->checkDomain($domainDatum, $siteData);
 
