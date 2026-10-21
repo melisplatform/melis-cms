@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { fetchSiteMeta, createSite, type SiteLang } from './sites-api'
+import { fetchSiteMeta, createSite, checkSiteDomains, type SiteLang } from './sites-api'
 import { useIsNarrow } from './shared/useIsNarrow'
 import { FormErrorBanner, koNotify } from './shared/melis-form-errors'
 
@@ -19,6 +19,7 @@ const tr = (fr: string, en: string) => (LANG === 'en' ? en : fr)
 const card: React.CSSProperties = { borderRadius: 12, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-card,#fff)', boxShadow: '0 1px 2px rgba(0,0,0,.04)' }
 const btn: React.CSSProperties = { display: 'inline-flex', alignItems: 'center', gap: 6, height: 36, padding: '0 14px', borderRadius: 8, border: '1px solid var(--color-border,#e5e7eb)', background: 'transparent', cursor: 'pointer', fontSize: 14 }
 const btnPrimary: React.CSSProperties = { ...btn, border: 0, background: 'var(--color-primary,#cb4040)', color: '#fff', fontWeight: 600 }
+const conflictInput: React.CSSProperties = { borderColor: 'var(--color-destructive,#dc2626)' }
 const input: React.CSSProperties = { height: 36, width: '100%', borderRadius: 8, border: '1px solid var(--color-border,#e5e7eb)', background: 'var(--color-background,#fff)', color: 'var(--color-foreground)', padding: '0 10px', fontSize: 14, boxSizing: 'border-box' }
 const lbl: React.CSSProperties = { display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }
 const subHint: React.CSSProperties = { fontSize: 12, color: 'var(--color-muted-foreground)', margin: '6px 0 0' }
@@ -71,6 +72,9 @@ export default function SiteWizard({ onCancel, onCreated }: Props) {
   // Étape 3
   const [singleDomain, setSingleDomain] = useState('')
   const [domainsByLocale, setDomainsByLocale] = useState<Record<string, string>>({})
+  // Domaines refusés par le contrôle de l'étape (clé locale|'single' → message), comme le legacy.
+  const [domainConflicts, setDomainConflicts] = useState<Record<string, string>>({})
+  const [checkingDomains, setCheckingDomains] = useState(false)
   // Étape 4
   const [isCreateNew, setIsCreateNew] = useState(true) // true = nouveau module, false = module existant
   const [moduleName, setModuleName] = useState('')     // nouveau module (alpha)
@@ -114,11 +118,29 @@ export default function SiteWizard({ onCancel, onCreated }: Props) {
     return true
   }
 
-  async function submit() {
-    setSaving(true); setError(null)
-    const domains: Record<string, string> = perLangDomains
+  function wizardDomains(): Record<string, string> {
+    return perLangDomains
       ? Object.fromEntries(selectedLangs.map((l) => [l.locale, (domainsByLocale[l.locale] || '').trim()]))
       : { single: singleDomain.trim() }
+  }
+
+  // Étape Domaines : on ne passe à la suite que si aucun domaine n'est en double ni déjà pris par un
+  // autre site (même contrôle que le wizard legacy ; le create le revérifie côté serveur).
+  async function next() {
+    if (step !== 2) { setStep((s) => s + 1); return }
+    setCheckingDomains(true); setDomainConflicts({})
+    try {
+      const conflicts = await checkSiteDomains(wizardDomains())
+      if (Object.keys(conflicts).length) { setDomainConflicts(conflicts); return }
+      setStep((s) => s + 1)
+    } catch (e) {
+      koNotify(tr('Nouveau site', 'New site'), String((e as Error)?.message ?? e))
+    } finally { setCheckingDomains(false) }
+  }
+
+  async function submit() {
+    setSaving(true); setError(null)
+    const domains = wizardDomains()
     const basePayload = {
       name: isCreateNew ? moduleName.trim() : '',
       label: label.trim(),
@@ -260,16 +282,21 @@ export default function SiteWizard({ onCancel, onCreated }: Props) {
                 {selectedLangs.map((l) => (
                   <div key={l.locale}>
                     <label style={{ ...lbl, display: 'flex', alignItems: 'center', gap: 8 }}><Flag locale={l.locale} />{l.name} <span style={{ color: 'var(--color-muted-foreground)', fontWeight: 400 }}>({l.locale})</span></label>
-                    <input style={input} value={domainsByLocale[l.locale] || ''} onChange={(e) => setDomainsByLocale((d) => ({ ...d, [l.locale]: e.target.value }))} placeholder="exemple.com" />
+                    <input style={{ ...input, ...(domainConflicts[l.locale] ? conflictInput : null) }} value={domainsByLocale[l.locale] || ''} onChange={(e) => { setDomainsByLocale((d) => ({ ...d, [l.locale]: e.target.value })); setDomainConflicts({}) }} placeholder="exemple.com" />
                   </div>
                 ))}
               </>
             ) : (
               <div>
                 <label style={lbl}>{tr('Quel est le domaine de ce site ?', 'What is the domain of this site?')}</label>
-                <input style={input} value={singleDomain} onChange={(e) => setSingleDomain(e.target.value)} placeholder={defaultDomain || 'exemple.com'} />
+                <input style={{ ...input, ...(domainConflicts.single ? conflictInput : null) }} value={singleDomain} onChange={(e) => { setSingleDomain(e.target.value); setDomainConflicts({}) }} placeholder={defaultDomain || 'exemple.com'} />
                 <p style={subHint}>{tr('Le domaine de l’environnement courant (schéma http par défaut, modifiable ensuite).', 'Current environment domain (http scheme by default, editable later).')}</p>
               </div>
+            )}
+            {Object.keys(domainConflicts).length > 0 && (
+              <FormErrorBanner title={Object.entries(domainConflicts)
+                .map(([k, msg]) => perLangDomains ? `${selectedLangs.find((l) => l.locale === k)?.name ?? k} - ${msg}` : msg)
+                .filter((m, i, a) => a.indexOf(m) === i).join('\n')} style={{ whiteSpace: 'pre-line' }} />
             )}
           </div>
         )}
@@ -340,18 +367,18 @@ export default function SiteWizard({ onCancel, onCreated }: Props) {
               v={perLangDomains ? selectedLangs.map((l) => `${l.locale}: ${domainsByLocale[l.locale] || ''}`).join(' · ') : singleDomain} />
             <Row k={tr('Mode Drag & Drop', 'Drag & Drop mode')} v={dndRenderMode ? tr('Oui', 'Yes') : tr('Non', 'No')} />
             {isCreateNew && <Row k={tr('Créer les fichiers', 'Create files')} v={createFile ? tr('Oui', 'Yes') : tr('Non', 'No')} />}
-            {error && <div style={{ marginTop: 6 }}><FormErrorBanner title={error} /></div>}
+            {error && <div style={{ marginTop: 6 }}><FormErrorBanner title={error} style={{ whiteSpace: 'pre-line' }} /></div>}
           </div>
         )}
       </div>
 
       {/* Navigation */}
       <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: narrow ? '100%' : 720 }}>
-        <button style={btn} onClick={() => (step === 0 ? onCancel() : setStep((s) => s - 1))}>
+        <button style={btn} onClick={() => { setDomainConflicts({}); if (step === 0) onCancel(); else setStep((s) => s - 1) }}>
           {step === 0 ? tr('Annuler', 'Cancel') : tr('Précédent', 'Back')}
         </button>
         {step < STEPS.length - 1 ? (
-          <button style={{ ...btnPrimary, opacity: canNext() ? 1 : 0.5, pointerEvents: canNext() ? 'auto' : 'none' }} onClick={() => setStep((s) => s + 1)}>
+          <button style={{ ...btnPrimary, opacity: canNext() && !checkingDomains ? 1 : 0.5, pointerEvents: canNext() && !checkingDomains ? 'auto' : 'none' }} onClick={next}>
             {tr('Suivant', 'Next')} →
           </button>
         ) : (

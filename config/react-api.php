@@ -40,6 +40,17 @@ return [
                                     ],
                                 ],
                             ],
+                            'cms-sites-check-domains' => [
+                                'type'    => 'Segment',
+                                'options' => [
+                                    'route'    => '/cms-sites/check-domains[/]',
+                                    'defaults' => [
+                                        '__NAMESPACE__' => 'MelisCms\Controller',
+                                        'controller'    => 'MelisReactApiCmsSites',
+                                        'action'        => 'checkDomains',
+                                    ],
+                                ],
+                            ],
                             'cms-sites-config' => [
                                 'type'    => 'Segment',
                                 'options' => [
