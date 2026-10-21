@@ -432,13 +432,14 @@ export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Pro
           </div>
           <div>
             <label style={lbl}>{tr('Comment souhaitez-vous refléter la langue dans les URLs du site ?', "How do you want to reflect the language in the site's URLs?")}</label>
+            {/* site_opt_lang_url, as the legacy form and the front read it: 2 = locale after the domain, 1 = nothing. */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }}>
-                <input type="radio" name="optlang" checked={optLangUrl === 1} onChange={() => setOptLangUrl(1)} />
+                <input type="radio" name="optlang" checked={optLangUrl === 2} onChange={() => setOptLangUrl(2)} />
                 {tr('Je veux que la locale apparaisse après mon domaine (ex : www.monsite.com/fr/mapage)', 'I want the locale shown after my domain (ex: www.mysite.com/en/myurl)')}
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }}>
-                <input type="radio" name="optlang" checked={optLangUrl === 2} onChange={() => setOptLangUrl(2)} />
+                <input type="radio" name="optlang" checked={optLangUrl === 1} onChange={() => setOptLangUrl(1)} />
                 {tr('Je ne veux rien, l’URL de ma page sera construite uniquement sur le nom de la page', "I want nothing, my page url will be solely built on the page's name")}
               </label>
             </div>
