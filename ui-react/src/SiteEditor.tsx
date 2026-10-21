@@ -88,7 +88,9 @@ export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Pro
 
   const [mode] = useState<ViewMode>('react') // édition toujours en React (pas de vue Old ici)
   const [saving, setSaving] = useState(false)
-  const [savedAt, setSavedAt] = useState(0)
+  // Form state as last saved: « ✓ Enregistré » shows only while the form still matches it, so a
+  // refused save or any later change hides it.
+  const [savedSnapshot, setSavedSnapshot] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   // Erreurs de validation CLIENT (un item par champ requis manquant) — listées dans le bandeau unifié.
   const [clientIssues, setClientIssues] = useState<FormIssue[]>([])
@@ -148,6 +150,7 @@ export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Pro
 
   const langById = useMemo(() => Object.fromEntries((data?.languages ?? []).map((l) => [l.id, l])), [data])
   const removedLangIds = useMemo(() => initialActive.filter((id) => !activeLangIds.includes(id)), [initialActive, activeLangIds])
+  const formSnapshot = JSON.stringify([label, dndMode, s404.id, mainPage.id, optLangUrl, activeLangIds, homes, domains, configFields, moduleList])
 
   function toggleLang(id: number) {
     setActiveLangIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id])
@@ -204,7 +207,8 @@ export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Pro
     const v = validate()
     if (v.length) { setError(tr('Veuillez corriger les champs suivants :', 'Please check the following fields:')); setClientIssues(v); return }
     if (!data) return
-    setSaving(true); setError(null); setClientIssues([]); setFieldErrors([])
+    setSaving(true); setError(null); setClientIssues([]); setFieldErrors([]); setSavedSnapshot(null)
+    const submitted = formSnapshot
     try {
       const res = await saveSiteEdit({
         id: siteId,
@@ -228,7 +232,9 @@ export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Pro
           if (fn) { try { await fn() } catch { /* l'onglet gère sa propre erreur (toast) */ } }
         }
         onLabel(label.trim() || `Site #${siteId}`)
-        setSavedAt(Date.now())
+        // The header shows the saved label too, not the one loaded when the tab opened.
+        setData((d) => (d ? { ...d, site: { ...d.site, label: label.trim() } } : d))
+        setSavedSnapshot(submitted)
         okNotify(tr('Sites', 'Sites'), tr('Enregistré ✓', 'Saved ✓'))
         onSaved()
       } else {
@@ -264,7 +270,7 @@ export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Pro
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           {/* Pas de toggle New/Old en ÉDITION (uniquement sur la liste). */}
-          {savedAt > 0 && mode === 'react' && <span style={{ fontSize: 12, color: '#15803d' }}>✓ {tr('Enregistré', 'Saved')}</span>}
+          {savedSnapshot !== null && savedSnapshot === formSnapshot && mode === 'react' && <span style={{ fontSize: 12, color: '#15803d' }}>✓ {tr('Enregistré', 'Saved')}</span>}
           {can('edit') && mode === 'react' && (
             <button style={{ ...btnPrimary, opacity: saving ? 0.6 : 1 }} disabled={saving} onClick={submit}>
               {saving ? tr('Enregistrement…', 'Saving…') : tr('Enregistrer', 'Save')}
