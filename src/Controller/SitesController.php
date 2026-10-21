@@ -810,6 +810,19 @@ class SitesController extends MelisAbstractActionController
         $con->beginTransaction();//begin transaction
         try {
             /**
+             * The site's own module must stay in its module loading (module.load.php of the site
+             * module, shared by every site of that module): without it the site can't be displayed.
+             */
+            if ($isAdmin && !empty($moduleList)) {
+                $siteRow = $this->getServiceManager()->get('MelisEngineTableSite')->getEntryById($siteId)->current();
+                $siteModule = $siteRow ? (string) $siteRow->site_name : '';
+                if ($siteModule !== '' && !in_array(strtolower($siteModule), array_map('strtolower', $moduleList), true)) {
+                    $errors['site_module_load'] = sprintf($translator->translate('tr_meliscms_tool_site_module_load_site_module_required'), $siteModule);
+                    $status = 0;
+                }
+            }
+
+            /**
              * Try to save the site data's
              */
             $this->saveSiteDomains($domainData, $errors, $status);

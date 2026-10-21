@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { fetchSite, saveSiteEdit, fetchSiteConfig, fetchSiteModules, type SiteEditData, type SiteConfigData, type SiteModulesData, type SiteModule } from './sites-api'
+import { fetchSite, fetchSites, saveSiteEdit, fetchSiteConfig, fetchSiteModules, type SiteEditData, type SiteConfigData, type SiteModulesData, type SiteModule } from './sites-api'
 import { PagePicker } from './PagePicker'
 import { type ViewMode } from './ViewToggle'
 import { ConfigTab, buildConfigFields } from './site-tabs/ConfigTab'
@@ -181,6 +181,7 @@ export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Pro
       s404_page_id: tr('Page 404', '404 page'),
       site_main_page_id: tr('Page d’accueil principale', 'Main home page'),
       shome_page_id: tr('Page d’accueil', 'Home page'),
+      site_module_load: tr('Chargement de modules', 'Module Loading'),
     }
     const base = NAMES[f.field] ?? f.field
     if (f.field.startsWith('sdom_')) return `${base} (${f.scope})`
@@ -201,14 +202,41 @@ export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Pro
     if (data) {
       const cur = domains.find((d) => d.env === data.currentEnv)
       if (!cur || !cur.domain.trim()) iss.push({ label: `${tr('Domaine', 'Domain')} (${data.currentEnv})`, message: tr('Le domaine de l’environnement courant est requis.', 'The current environment domain is required.') })
+      // Module loading is the site module's own module.load.php: without the site module in it the
+      // site can't be displayed — and with every module off nothing would even be sent to save.
+      if (modulesData?.isAdmin && moduleList.length) {
+        const own = moduleList.find((m) => m.name.toLowerCase() === data.site.name.toLowerCase())
+        if ((own && !own.active) || !moduleList.some((m) => m.active)) {
+          iss.push({ label: tr('Chargement de modules', 'Module Loading'), message: tr(
+            `Le module du site « ${data.site.name} » doit rester activé : sans lui, le site ne peut pas s’afficher.`,
+            `The site's module "${data.site.name}" must stay active: without it the site cannot be displayed.`) })
+        }
+      }
     }
     return iss
   }
 
+  /** Active modules, in loading order, as a comparable key. */
+  const activeKey = (list: SiteModule[]) => list.filter((m) => m.active).map((m) => m.name).join('|')
+
   async function submit() {
     const v = validate()
-    if (v.length) { setError(tr('Veuillez corriger les champs suivants :', 'Please check the following fields:')); setClientIssues(v); return }
+    if (v.length) {
+      setError(tr('Veuillez corriger les champs suivants :', 'Please check the following fields:')); setClientIssues(v)
+      if (v.some((i) => i.label === tr('Chargement de modules', 'Module Loading'))) setTab('modules')
+      return
+    }
     if (!data) return
+    // Changing the module loading changes it for every site of this module (one module.load.php):
+    // ask first, listing those sites — as the Old view does.
+    if (modulesData?.isAdmin && activeKey(moduleList) !== activeKey(activeFirst(modulesData.modules))) {
+      let sites: string[] = []
+      try { sites = (await fetchSites()).items.filter((s) => s.name.toLowerCase() === data.site.name.toLowerCase()).map((s) => `- ${s.label || s.name} (#${s.id})`) } catch { /* list unavailable: ask without it */ }
+      const ok = window.confirm(tr(
+        `Attention aux changements des modules à charger ou de leur ordre : cela impacte tous les sites qui utilisent le module « ${data.site.name} ».\n\nSites utilisant ce module :\n${sites.join('\n')}\n\nModifier le chargement des modules pour tous ces sites ?`,
+        `Please be careful when changing the modules to load or their order: it impacts every site using the module "${data.site.name}".\n\nSites using this module:\n${sites.join('\n')}\n\nChange the module loading for all these sites?`))
+      if (!ok) return
+    }
     setSaving(true); setError(null); setClientIssues([]); setFieldErrors([])
     try {
       const res = await saveSiteEdit({
@@ -233,6 +261,8 @@ export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Pro
           if (fn) { try { await fn() } catch { /* l'onglet gère sa propre erreur (toast) */ } }
         }
         onLabel(label.trim() || `Site #${siteId}`)
+        // The saved module loading is the new reference for the next change confirmation.
+        setModulesData((md) => (md ? { ...md, modules: moduleList } : md))
         setSavedAt(Date.now())
         okNotify(tr('Sites', 'Sites'), tr('Enregistré ✓', 'Saved ✓'))
         onSaved()
