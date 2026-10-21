@@ -73,6 +73,14 @@ interface Props {
   onLoadFail?: () => void
 }
 
+/** Un état domaine par environnement (réutilise l'existant ou défaut http/vide). */
+function domainStates(d: SiteEditData): DomainState[] {
+  return d.environments.map((env) => {
+    const ex = d.domains.find((x) => x.env === env)
+    return ex ? { ...ex } : { id: 0, env, scheme: 'http', domain: '' }
+  })
+}
+
 export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Props) {
   const narrow = useIsNarrow()
   const [data, setData] = useState<SiteEditData | null>(null)
@@ -142,12 +150,7 @@ export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Pro
       const hm: Record<number, { pageId: number; shomeId: number; title: string }> = {}
       for (const h of d.homepages) hm[h.langId] = { pageId: h.pageId, shomeId: h.shomeId, title: titleOf(h.pageId) }
       setHomes(hm)
-      // un état domaine par environnement (réutilise l'existant ou défaut http/vide)
-      const doms: DomainState[] = d.environments.map((env) => {
-        const ex = d.domains.find((x) => x.env === env)
-        return ex ? { ...ex } : { id: 0, env, scheme: 'http', domain: '' }
-      })
-      setDomains(doms)
+      setDomains(domainStates(d))
     }).catch((e) => { setLoadErr(String((e as Error)?.message ?? e)); onLoadFail?.() })
   }, [siteId])
 
@@ -233,6 +236,9 @@ export default function SiteEditor({ siteId, onSaved, onLabel, onLoadFail }: Pro
           if (fn) { try { await fn() } catch { /* l'onglet gère sa propre erreur (toast) */ } }
         }
         onLabel(label.trim() || `Site #${siteId}`)
+        // Take the domains back with their database ids: a domain added here has none yet, and an
+        // emptied one is gone — the next save must not reuse the ids of this form.
+        fetchSite(siteId).then((d) => setDomains(domainStates(d))).catch(() => null)
         setSavedAt(Date.now())
         okNotify(tr('Sites', 'Sites'), tr('Enregistré ✓', 'Saved ✓'))
         onSaved()
