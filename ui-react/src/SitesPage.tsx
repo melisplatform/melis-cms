@@ -142,6 +142,16 @@ export default function SitesPage() {
       return rest
     })
   }
+  // After creation: like the legacy wizard, the new site(s) open in edition — the « Nouveau site »
+  // sub-tab is replaced by one tab per created site, the last one shown (falling back to the list).
+  function onSiteCreated(label: string, siteIds: number[]) {
+    const ids = siteIds.filter((id) => id > 0)
+    setOpen((prev) => {
+      const rest = prev.filter((o) => o.id !== NEW_TAB)
+      return [...rest, ...ids.filter((id) => !rest.some((o) => o.id === id)).map((id) => ({ id, label }))]
+    })
+    setView(ids.length ? { kind: 'edit', id: ids[ids.length - 1] } : { kind: 'list' })
+  }
   function setLabel(id: number, label: string) {
     setOpen((prev) => prev.map((o) => (o.id === id ? { ...o, label } : o)))
   }
@@ -194,7 +204,7 @@ export default function SitesPage() {
         {/* Assistant de création — monté tant que le sous-onglet « Nouveau site » est ouvert (état préservé). */}
         {hasNew && (
           <div style={{ height: '100%', display: view.kind === 'new' ? 'block' : 'none' }}>
-            <SiteWizard onCancel={() => closeTab(NEW_TAB)} onCreated={() => { markSitesListStale(); closeTab(NEW_TAB) }} />
+            <SiteWizard onCancel={() => closeTab(NEW_TAB)} onCreated={(label, ids) => { markSitesListStale(); onSiteCreated(label, ids) }} />
           </div>
         )}
 
