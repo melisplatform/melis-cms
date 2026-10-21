@@ -52,6 +52,18 @@ return [
                                     ],
                                 ],
                             ],
+                            'cms-sites-translations' => [
+                                'type'    => 'Segment',
+                                'options' => [
+                                    'route'       => '/cms-sites/:id/translations[/]',
+                                    'constraints' => ['id' => '[0-9]+'],
+                                    'defaults'    => [
+                                        '__NAMESPACE__' => 'MelisCms\Controller',
+                                        'controller'    => 'MelisReactApiCmsSites',
+                                        'action'        => 'translations',
+                                    ],
+                                ],
+                            ],
                             'cms-sites-modules' => [
                                 'type'    => 'Segment',
                                 'options' => [
