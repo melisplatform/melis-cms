@@ -754,11 +754,20 @@ class SitesController extends MelisAbstractActionController
 
             //collecting data for site domains
             if (strstr($datum,'sdom_')) {
-                $key = substr($datum, (strpos($datum, '_') ?: -1) + 1);
-                if(!empty($domainData[$ctr]))
-                    if(array_key_exists($key, $domainData[$ctr]))
-                        $ctr++;
-                $domainData[$ctr][$key] = $val;
+                // Fields are <env>_sdom_<field>: group them by environment. Grouping by a counter
+                // (new group when a field repeats) mixed environments as soon as one of them lacked
+                // a field — the New view sends no sdom_id for a new domain — so the new domain took
+                // the row id of the next environment's domain.
+                $envPos = strpos($datum, '_sdom_');
+                if ($envPos !== false) {
+                    $domainData[substr($datum, 0, $envPos)][substr($datum, $envPos + 1)] = $val;
+                } else {
+                    $key = substr($datum, (strpos($datum, '_') ?: -1) + 1);
+                    if(!empty($domainData[$ctr]))
+                        if(array_key_exists($key, $domainData[$ctr]))
+                            $ctr++;
+                    $domainData[$ctr][$key] = $val;
+                }
             }
 
             //collecting data for site properties
