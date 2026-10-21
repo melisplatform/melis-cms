@@ -70,7 +70,9 @@ export function TranslationsTab({ siteId, langs }: { siteId: number; langs: Lang
     const texts: Draft['texts'] = {}
     for (const l of langs) {
       const t = r.texts[l.id]
-      texts[l.id] = { mstId: t?.mstId ?? r.mstId, msttId: t?.msttId ?? 0, text: t?.text ?? '' }
+      // Ids of THIS language only: each language has its own row. Borrowing another language's id
+      // made an empty field delete that other language on save.
+      texts[l.id] = { mstId: t?.mstId ?? 0, msttId: t?.msttId ?? 0, text: t?.text ?? '' }
     }
     setDraft({ key: r.key, isNew: false, texts }); setErr(null); setIssues([])
   }
@@ -96,7 +98,9 @@ export function TranslationsTab({ siteId, langs }: { siteId: number; langs: Lang
 
   async function confirmDelete() {
     if (!toDelete) return
-    try { await deleteTranslation(siteId, toDelete.mstId) } catch { /* ignore */ }
+    // « La clé et tous ses textes » : one database row per language to delete.
+    const ids = [...new Set(Object.values(toDelete.texts).map((t) => t.mstId).filter((id) => id > 0))]
+    for (const id of ids) { try { await deleteTranslation(siteId, id) } catch { /* ignore */ } }
     setToDelete(null); load()
   }
 
@@ -128,7 +132,10 @@ export function TranslationsTab({ siteId, langs }: { siteId: number; langs: Lang
                 {!narrow && langs.map((l) => <td key={l.id} style={{ ...td, color: 'var(--color-muted-foreground)' }}>{(r.texts[l.id]?.text || '—').slice(0, 60)}</td>)}
                 <td style={{ ...td, whiteSpace: 'nowrap', textAlign: 'right' }}>
                   <button style={iconBtn} onClick={() => openEdit(r)} title={tr('Éditer', 'Edit')}><PencilIcon /></button>
-                  <button style={{ ...iconBtn, marginLeft: 6, color: 'var(--color-destructive,#ef4444)' }} onClick={() => setToDelete(r)} title={tr('Supprimer', 'Delete')}><TrashIcon /></button>
+                  {/* A key only from module files has no database row to delete (as in legacy). */}
+                  {Object.values(r.texts).some((t) => t.mstId > 0) && (
+                    <button style={{ ...iconBtn, marginLeft: 6, color: 'var(--color-destructive,#ef4444)' }} onClick={() => setToDelete(r)} title={tr('Supprimer', 'Delete')}><TrashIcon /></button>
+                  )}
                 </td>
               </tr>
               {narrow && expandedKeys.has(r.key) && (

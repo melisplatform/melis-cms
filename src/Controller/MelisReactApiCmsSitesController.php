@@ -309,6 +309,39 @@ class MelisReactApiCmsSitesController extends MelisAbstractActionController
         }
     }
 
+    /**
+     * GET /cms-sites/:id/translations — every site translation, ONE ROW PER KEY AND LANGUAGE, full text
+     * (database overrides + module files, as MelisSiteTranslationService merges them). The legacy
+     * DataTable endpoint (getTranslation) keeps a single language per key and cuts texts to 64
+     * characters: fine for its list, not for a per-language editor.
+     */
+    public function translationsAction(): HttpResponse
+    {
+        if ($deny = $this->denyUnlessAccess()) { return $deny; }
+        if ($denyCap = $this->denyUnlessCan('list')) { return $denyCap; }
+
+        try {
+            $siteId = (int) $this->params()->fromRoute('id', 0);
+            if (!$siteId) { return $this->jsonResponse(['success' => false, 'error' => 'Invalid site id'], 422); }
+
+            $rows = [];
+            foreach ((array) $this->getServiceManager()->get('MelisSiteTranslationService')->getSiteTranslation(null, null, $siteId) as $t) {
+                $rows[] = [
+                    'key'    => (string) ($t['mst_key'] ?? ''),
+                    'langId' => (int) ($t['mstt_lang_id'] ?? 0),
+                    'mstId'  => (int) ($t['mst_id'] ?? 0),   // 0 = text from a module file (no database row)
+                    'msttId' => (int) ($t['mstt_id'] ?? 0),
+                    'text'   => (string) ($t['mstt_text'] ?? ''),
+                    'module' => $t['module'] ?? null,
+                ];
+            }
+
+            return $this->jsonResponse(['success' => true, 'data' => $rows]);
+        } catch (\Throwable $e) {
+            return $this->errorResponse($e);
+        }
+    }
+
     /** Transforme une map de config en items éditables : scalaires + tableaux à 1 niveau. */
     private function configItems(array $config): array
     {

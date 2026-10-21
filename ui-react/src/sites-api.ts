@@ -240,27 +240,23 @@ export const getRequiredDependencies = (siteId: number, module: string) =>
 export interface TransText { langId: number; mstId: number; msttId: number; text: string }
 export interface TransKey { mstId: number; key: string; module: string | null; texts: Record<number, TransText> }
 
-/** Liste des traductions du site, regroupées par clé (via le endpoint DataTable legacy). */
+/**
+ * Liste des traductions du site, regroupées par clé. Le modèle legacy stocke UNE ligne par clé ET par
+ * langue (chaque langue a son propre mst_id) : la source renvoie toutes les langues, texte complet
+ * (le endpoint DataTable legacy n'en garde qu'une par clé, tronquée à 64 caractères).
+ */
 export async function fetchTranslations(siteId: number): Promise<TransKey[]> {
-  const body = new URLSearchParams()
-  body.append('draw', '1'); body.append('start', '0'); body.append('length', '10000')
-  body.append('search[value]', ''); body.append('siteId', String(siteId))
-  const res = await fetch('/melis/MelisCms/SitesTranslation/getTranslation', {
-    method: 'POST',
-    headers: { ...XHR_HEADER, 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-    credentials: 'include',
-    body: body.toString(),
-  })
-  const data = await res.json() as { data?: Array<Record<string, unknown>> }
+  const rows = await apiFetch<Array<{ key: string; langId: number; mstId: number; msttId: number; text: string; module: string | null }>>(
+    `/melis/react-api/cms-sites/${siteId}/translations`,
+  )
   const byKey = new Map<string, TransKey>()
-  for (const row of data.data ?? []) {
-    const key = String(row.mst_key ?? '')
-    const mstId = Number(row.mst_id ?? 0)
-    const langId = Number(row.mstt_lang_id ?? 0)
-    if (!byKey.has(key)) byKey.set(key, { mstId, key, module: (row.module as string) ?? null, texts: {} })
-    const tk = byKey.get(key)!
-    if (mstId) tk.mstId = mstId
-    tk.texts[langId] = { langId, mstId, msttId: Number(row.mstt_id ?? 0), text: String(row.mstt_text ?? '') }
+  for (const row of rows) {
+    if (!byKey.has(row.key)) byKey.set(row.key, { mstId: 0, key: row.key, module: row.module ?? null, texts: {} })
+    const tk = byKey.get(row.key)!
+    if (row.mstId && !tk.mstId) tk.mstId = row.mstId
+    if (row.module && !tk.module) tk.module = row.module
+    // Une ligne de la base (mstId > 0) l'emporte sur le texte du fichier de la même langue.
+    if (!tk.texts[row.langId] || row.mstId) tk.texts[row.langId] = { langId: row.langId, mstId: row.mstId, msttId: row.msttId, text: row.text }
   }
   return [...byKey.values()].sort((a, b) => a.key.localeCompare(b.key))
 }
