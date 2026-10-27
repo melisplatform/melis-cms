@@ -27,7 +27,7 @@ class PageSeoController extends MelisAbstractActionController
 	 */
 	public function renderPagetabSeoAction()
 	{
-		$idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+		$idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
 		$melisKey = $this->params()->fromRoute('melisKey', '');
 
 		$seoForm = $this->getSeoPageForm($idPage);
@@ -96,7 +96,7 @@ class PageSeoController extends MelisAbstractActionController
 	 */
 	public function getSeoKeywordsByPageId($pageId)
 	{
-		$pageId = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+		$pageId = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
 		$data = array();
 
 		$seoKeywords = $pageId->getSeoKeywords($pageId);
@@ -116,7 +116,7 @@ class PageSeoController extends MelisAbstractActionController
 			return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
 		}
 
-		$idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+		$idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
 		$translator = $this->getServiceManager()->get('translator');
 
 		$eventDatas = array('idPage' => $idPage);
@@ -264,7 +264,7 @@ class PageSeoController extends MelisAbstractActionController
 			return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
 		}
 
-		$idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+		$idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
 		$translator = $this->getServiceManager()->get('translator');
 
 		$eventDatas = array('idPage' => $idPage);

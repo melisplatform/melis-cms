@@ -10,10 +10,51 @@ use MelisCore\Service\MelisServiceManager;
 class MelisCmsRightsService extends MelisServiceManager implements MelisCoreRightsServiceInterface
 {
 	const MELISCMS_PREFIX_PAGES = 'meliscms_pages';
-	
+
+    /**
+     * SECURITY (audit CMS-C1/C2) : l'utilisateur COURANT a-t-il le droit d'agir sur CETTE page ?
+     *
+     * C'est le contrôle par-page (section allow-list `meliscms_pages` des droits, résolue via le
+     * breadcrumb — `-1` = toutes les pages), qui n'était appliqué qu'à l'AFFICHAGE de l'arbre :
+     * toute la chaîne d'édition (React et legacy) acceptait n'importe quel idPage une fois le
+     * droit d'OUTIL acquis. Point d'entrée unique, fail-closed, bypass admin cohérent avec le
+     * reste de la plateforme.
+     */
+    public function canAccessPage($idPage)
+    {
+        $idPage = (int) $idPage;
+        if ($idPage <= 0) {
+            return false;
+        }
+
+        try {
+            $auth = $this->getServiceManager()->get('MelisCoreAuth');
+            $identity = $auth->getIdentity();
+            if (empty($identity)) {
+                return false;
+            }
+            if (!empty($identity->usr_admin)) {
+                return true;
+            }
+
+            return (bool) $this->isAccessible(
+                $auth->getAuthRights(),
+                self::MELISCMS_PREFIX_PAGES,
+                $idPage
+            );
+        } catch (\Throwable $e) {
+            return false; // fail-closed : un échec de résolution des droits ne donne jamais l'accès
+        }
+    }
+
 	public function isAccessible($xmlRights, $sectionId, $itemId)
     {
-        $rightsObj = simplexml_load_string($xmlRights);
+        // SECURITY (audit CMS-M9) : LIBXML_NONET (pas de fetch réseau d'entité) + rejet DTD
+        // (billion laughs) — un XML de droits légitime ne déclare jamais de DOCTYPE.
+        if (preg_match('/<!DOCTYPE/i', (string) $xmlRights)) {
+            return false;
+        }
+        $rightsObj = simplexml_load_string((string) $xmlRights, 'SimpleXMLElement', LIBXML_NONET);
         if (empty($rightsObj))
             return false;
 
@@ -204,9 +245,9 @@ class MelisCmsRightsService extends MelisServiceManager implements MelisCoreRigh
 			
 		}
 		
-		if (!empty($xml))
+		if (!empty($xml) && !preg_match('/<!DOCTYPE/i', (string) $xml)) // SECURITY (audit CMS-M9)
 		{
-			$rightsObj = simplexml_load_string($xml);
+			$rightsObj = simplexml_load_string((string) $xml, 'SimpleXMLElement', LIBXML_NONET);
 			if (!empty($rightsObj))
 			{
 				$toolsPages  = self::MELISCMS_PREFIX_PAGES;

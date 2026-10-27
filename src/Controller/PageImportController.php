@@ -27,7 +27,7 @@ class PageImportController extends MelisAbstractActionController
      */
     public function renderPageImportModalAction()
     {
-        $pageId = $this->params()->fromQuery('pageId', null);
+        $pageId = (int) $this->params()->fromQuery('pageId', null);
         $max_post = ini_get('post_max_size');
         $max_upload = ini_get('upload_max_filesize');
         $max_size = 0;
@@ -153,7 +153,25 @@ class PageImportController extends MelisAbstractActionController
         $pageImportSvc = $this->getServiceManager()->get('MelisCmsPageImportService');
         $data = $this->getRequest()->getPost()->toArray();
         $formData = json_decode($data['formData'], true);
-        $pageId = $data['pageid'];
+        $pageId = (int) $data['pageid'];
+
+        // SECURITY (audit CMS-C2) : l'import crée des pages SOUS $pageId — droit par-page exigé.
+        if (! $this->getServiceManager()->get('MelisCmsRights')->canAccessPage($pageId)) {
+            return new JsonModel(['success' => 0, 'errors' => [$translator->translate('tr_meliscms_page_user_access_rights_no_access')], 'pagesCount' => 0, 'idsMap' => [], 'keepIds' => false, 'firstPage' => 0]);
+        }
+
+        /**
+         * SECURITY (audit CMS-C3) : `tmp_name` arrive dans le JSON du CLIENT — sans contrainte,
+         * n'importe quel chemin du serveur pouvait être ouvert comme archive. Il doit désigner
+         * le zip déposé par checkImportForm, donc résider dans DOCUMENT_ROOT/xml.
+         */
+        $zipPath = realpath((string) ($formData['page_tree_import']['tmp_name'] ?? ''));
+        $allowedBase = realpath($_SERVER['DOCUMENT_ROOT'] . '/xml');
+        if ($zipPath === false || $allowedBase === false || strpos($zipPath, $allowedBase . DIRECTORY_SEPARATOR) !== 0) {
+            return new JsonModel(['success' => 0, 'errors' => [$translator->translate('tr_melis_cms_page_tree_error_unexpected')], 'pagesCount' => 0, 'idsMap' => [], 'keepIds' => false, 'firstPage' => 0]);
+        }
+        $formData['page_tree_import']['tmp_name'] = $zipPath;
+
         $zip = new ZipArchive;
         $res = $zip->open($formData['page_tree_import']['tmp_name']);
         $success = true;

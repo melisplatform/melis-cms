@@ -31,6 +31,37 @@ trait ReactApiPageGuardTrait
         return null;
     }
 
+    /**
+     * SECURITY (audit CMS-C1) : droit PAR-PAGE (section `meliscms_pages`), en plus du droit
+     * d'outil — sans lui, changer `idPage` dans la requête suffisait à lire/modifier n'importe
+     * quelle page hors du périmètre de l'éditeur (IDOR). Fail-closed via canAccessPage.
+     * À appeler APRÈS denyUnlessAccess, avec l'idPage déjà casté.
+     */
+    private function denyUnlessPageRight(int $idPage): ?HttpResponse
+    {
+        if (!$this->getServiceManager()->get('MelisCmsRights')->canAccessPage($idPage)) {
+            return $this->jsonResponse(['success' => false, 'error' => 'Forbidden (page rights)'], 403);
+        }
+        return null;
+    }
+
+    /**
+     * SECURITY (audit CMS-M2) : capacité d'ACTION (boutons save/publish/unpublish/delete des
+     * interface rights, `MelisCmsRights::isActionButtonActive`) vérifiée SERVEUR — un bouton
+     * retiré en UI restait exécutable par requête directe. Fail-closed.
+     */
+    private function denyUnlessPageAction(string $action): ?HttpResponse
+    {
+        try {
+            if ($this->getServiceManager()->get('MelisCmsRights')->isActionButtonActive($action)) {
+                return null;
+            }
+        } catch (\Throwable) {
+            // échec de résolution des droits → refus, jamais l'inverse
+        }
+        return $this->jsonResponse(['success' => false, 'error' => 'Forbidden (action rights)'], 403);
+    }
+
     private function jsonResponse(array $data, int $status = 200): HttpResponse
     {
         /** @var HttpResponse $response */

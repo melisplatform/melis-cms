@@ -49,7 +49,8 @@
                                         class="imgDisplay float-right"
                                     />
                                 </span>
-                                <span class="mm-lang-name"><?= $language['lang_cms_name']?></span>
+                                <?php /* SECURITY (audit CMS-M8) : lang_cms_name = saisie utilisateur — échappé */ ?>
+                                <span class="mm-lang-name"><?= $this->escapeHtml($language['lang_cms_name'])?></span>
                             </a>
                         </li>
                     <?php } ?>
@@ -63,7 +64,7 @@
                 <?php  foreach ($this->languages as $language): ?>
                     <div id="<?php echo $language['lang_cms_id'].'-mini-template-menu-manager-category' ?>" class="tab-pane product-text-tab-content">
                         <div class="me-heading bg-white ">
-                            <h3 class=""><i class="fa fa-language" aria-hidden="true"></i> <?php echo $language['lang_cms_name'] ?></h3>
+                            <h3 class=""><i class="fa fa-language" aria-hidden="true"></i> <?php echo $this->escapeHtml($language['lang_cms_name']) ?></h3>
                         </div>
                         <div class="product-text-tab-form-content" style="padding-bottom: 0px; padding-right: 0px;">
                             <?php

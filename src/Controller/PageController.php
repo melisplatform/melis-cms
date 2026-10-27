@@ -65,7 +65,7 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPageAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $zoneConfig = $this->params()->fromRoute('zoneconfig', array());
 
@@ -100,7 +100,7 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPagetabAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $zoneConfig = $this->params()->fromRoute('zoneconfig', array());
 
@@ -129,7 +129,7 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPageheadAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         $view = new ViewModel();
@@ -146,7 +146,7 @@ class PageController extends MelisAbstractActionController
     public function renderPageheadTitleAction()
     {
         $datasPageTree = array();
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         $translator = $this->getServiceManager()->get('translator');
@@ -288,7 +288,7 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPageactionAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $page_tpl_id = null;
 
@@ -325,7 +325,7 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPageactionNewAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         $view = new ViewModel();
@@ -341,7 +341,7 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPageactionDeleteAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $melisTree = $this->getServiceManager()->get('MelisEngineTree');
         $children = count($melisTree->getPageChildren($idPage));
@@ -358,7 +358,7 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPageactionSaveAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $idFatherPage = $this->params()->fromRoute('idFatherPage', $this->params()->fromQuery('idFatherPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
@@ -377,7 +377,7 @@ class PageController extends MelisAbstractActionController
     public function renderPageactionClearAction()
     {
         $translator = $this->getServiceManager()->get('translator');
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         $melisEngineSavedPage = $this->getServiceManager()->get('MelisEngineTablePageSaved');
@@ -415,7 +415,7 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPageactionPublishAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         $view = new ViewModel();
@@ -431,7 +431,7 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPageactionCreateAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         $view = new ViewModel();
@@ -447,7 +447,7 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPageactionUnpublishAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         $view = new ViewModel();
@@ -463,7 +463,7 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPageactionPublishunpublishAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         $published = 0;
@@ -494,7 +494,7 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPageactionNotesAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         $view = new ViewModel();
@@ -511,11 +511,17 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPageactionViewAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         $melisTree = $this->getServiceManager()->get('MelisEngineTree');
         $link = $melisTree->getPageLink($idPage, true);
+
+        // SECURITY (audit CMS-M8) : le lien peut venir de pseo_url (stockée, saisie utilisateur) —
+        // seuls http(s) et les chemins relatifs au site passent, jamais javascript:/data:.
+        if (!preg_match('#^(https?://|/)#i', (string) $link)) {
+            $link = '';
+        }
 
         $view = new ViewModel();
         $view->idPage = $idPage;
@@ -531,7 +537,7 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPageactionPreviewAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         $melisPage = $this->getServiceManager()->get('MelisEnginePage');
@@ -561,7 +567,7 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPageactionSeeonlineAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         $melisTree = $this->getServiceManager()->get('MelisEngineTree');
@@ -582,7 +588,7 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPageactionDisplayAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         $view = new ViewModel();
@@ -598,7 +604,7 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPageactionDisplayMobileAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         $view = new ViewModel();
@@ -614,7 +620,7 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPageactionDisplayTabletAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         $view = new ViewModel();
@@ -630,7 +636,7 @@ class PageController extends MelisAbstractActionController
      */
     public function renderPageactionDisplayDesktopAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $melisKey = $this->params()->fromRoute('melisKey', '');
 
         $view = new ViewModel();
@@ -645,7 +651,7 @@ class PageController extends MelisAbstractActionController
      */
     public function checkIdentityAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
 
         $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
         $user = $melisCoreAuth->getIdentity();
@@ -678,7 +684,7 @@ class PageController extends MelisAbstractActionController
      */
     public function savePageAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $fatherPageId = $this->params()->fromRoute('fatherPageId', $this->params()->fromQuery('fatherPageId', ''));
         $translator = $this->getServiceManager()->get('translator');
 
@@ -859,7 +865,13 @@ class PageController extends MelisAbstractActionController
      * @return \Laminas\View\Model\JsonModel
      */
     public function clearSavedPageAction(){
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        // SECURITY (audit CMS-H2) : mutation refusée en GET — forgeable par un simple <img>/lien,
+        // la garde CSRF globale ignorant les méthodes sûres. Tous les appelants légitimes sont en POST.
+        if (! $this->getRequest()->isPost()) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'POST required', 'errors' => [], 'datas' => []]);
+        }
+
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $translator = $this->getServiceManager()->get('translator');
 
         $success = 0;
@@ -946,8 +958,28 @@ class PageController extends MelisAbstractActionController
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
 
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        // SECURITY (audit CMS-H2) : mutation refusée en GET — forgeable par un simple <img>/lien,
+        // la garde CSRF globale ignorant les méthodes sûres. Tous les appelants légitimes sont en POST.
+        if (! $this->getRequest()->isPost()) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'POST required', 'errors' => [], 'datas' => []]);
+        }
+
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $translator = $this->getServiceManager()->get('translator');
+
+        // SECURITY (audit CMS-C2) : droit PAR-PAGE — même contrôle que publishPage/deletePage,
+        // omis ici alors que c'est l'aboutissement de la chaîne d'édition (brouillon → publié).
+        $usrAccess = $this->checkoutUserPageRightsAccess($idPage);
+        if (! $usrAccess['hasAccess']) {
+            return new JsonModel(['success' => 0, 'textTitle' => $translator->translate($usrAccess['textTitle']), 'textMessage' => $translator->translate($usrAccess['textMessage']), 'errors' => [], 'datas' => []]);
+        }
+
+        // SECURITY (audit CMS-M2) : capacité d'action (interface rights) vérifiée serveur — le
+        // bouton Publish retiré en UI restait exécutable par requête directe (le listener ne la
+        // vérifie que sur le flux publishPage, pas sur un appel direct de cette action).
+        if (! $this->getServiceManager()->get('MelisCmsRights')->isActionButtonActive('publish')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => $translator->translate('tr_meliscms_page_error_Your rights don\'t allow you to modify this page'), 'errors' => [], 'datas' => []]);
+        }
 
         $melisPageSavedTable = $this->getServiceManager()->get('MelisEngineTablePageSaved');
         $melisPagePublishedTable = $this->getServiceManager()->get('MelisEngineTablePagePublished');
@@ -1141,8 +1173,26 @@ class PageController extends MelisAbstractActionController
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
 
+        // SECURITY (audit CMS-H2) : mutation refusée en GET — forgeable par un simple <img>/lien,
+        // la garde CSRF globale ignorant les méthodes sûres. Tous les appelants légitimes sont en POST.
+        if (! $this->getRequest()->isPost()) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'POST required', 'errors' => [], 'datas' => []]);
+        }
+
         $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $translator = $this->getServiceManager()->get('translator');
+
+        // SECURITY (audit CMS-C2) : droit PAR-PAGE, omis sur la dépublication.
+        $usrAccess = $this->checkoutUserPageRightsAccess($idPage);
+        if (! $usrAccess['hasAccess']) {
+            return new JsonModel(['success' => 0, 'textTitle' => $translator->translate($usrAccess['textTitle']), 'textMessage' => $translator->translate($usrAccess['textMessage']), 'errors' => [], 'datas' => []]);
+        }
+
+        // SECURITY (audit CMS-M2) : capacité d'action (interface rights) vérifiée serveur.
+        if (! $this->getServiceManager()->get('MelisCmsRights')->isActionButtonActive('unpublish')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => $translator->translate('tr_meliscms_page_error_Your rights don\'t allow you to modify this page'), 'errors' => [], 'datas' => []]);
+        }
+
         $melisPagePublishedTable = $this->getServiceManager()->get('MelisEngineTablePagePublished');
 
         $dataPublished = $melisPagePublishedTable->getEntryById($idPage);
@@ -1202,6 +1252,12 @@ class PageController extends MelisAbstractActionController
      */
     public function unpublishPageAction()
     {
+        // SECURITY (audit CMS-H2) : mutation refusée en GET — forgeable par un simple <img>/lien,
+        // la garde CSRF globale ignorant les méthodes sûres. Tous les appelants légitimes sont en POST.
+        if (! $this->getRequest()->isPost()) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'POST required', 'errors' => [], 'datas' => []]);
+        }
+
         $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $translator = $this->getServiceManager()->get('translator');
 
@@ -1287,9 +1343,28 @@ class PageController extends MelisAbstractActionController
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
 
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        // SECURITY (audit CMS-H2) : mutation refusée en GET — forgeable par un simple <img>/lien,
+        // la garde CSRF globale ignorant les méthodes sûres. Tous les appelants légitimes sont en POST.
+        if (! $this->getRequest()->isPost()) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'POST required', 'errors' => [], 'datas' => []]);
+        }
+
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $translator = $this->getServiceManager()->get('translator');
         $datasPage = null;
+
+        // SECURITY (audit CMS-C2) : droit PAR-PAGE — la suppression d'un ARBRE entier était
+        // possible sur n'importe quelle page hors périmètre.
+        $usrAccess = $this->checkoutUserPageRightsAccess($idPage);
+        if (! $usrAccess['hasAccess']) {
+            return new JsonModel(['success' => 0, 'textTitle' => $translator->translate($usrAccess['textTitle']), 'textMessage' => $translator->translate($usrAccess['textMessage']), 'errors' => [], 'datas' => []]);
+        }
+
+        // SECURITY (audit CMS-M2) : capacité d'action (interface rights) vérifiée serveur — le
+        // listener ne la vérifie que sur le flux deletePage, pas sur un appel direct.
+        if (! $this->getServiceManager()->get('MelisCmsRights')->isActionButtonActive('delete')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => $translator->translate('tr_meliscms_page_error_Your rights don\'t allow you to modify this page'), 'errors' => [], 'datas' => []]);
+        }
 
         $datas = array('idPage' => $idPage);
         $this->getEventManager()->trigger('meliscms_page_delete_page_start', $this, $datas);
@@ -1413,7 +1488,13 @@ class PageController extends MelisAbstractActionController
      */
     public function deletePageAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        // SECURITY (audit CMS-H2) : mutation refusée en GET — forgeable par un simple <img>/lien,
+        // la garde CSRF globale ignorant les méthodes sûres. Tous les appelants légitimes sont en POST.
+        if (! $this->getRequest()->isPost()) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'POST required', 'errors' => [], 'datas' => []]);
+        }
+
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $translator = $this->getServiceManager()->get('translator');
 
         // Checking if user has page access rights
@@ -1516,11 +1597,26 @@ class PageController extends MelisAbstractActionController
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
 
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        // SECURITY (audit CMS-H2) : mutation refusée en GET — forgeable par un simple <img>/lien,
+        // la garde CSRF globale ignorant les méthodes sûres. Tous les appelants légitimes sont en POST.
+        if (! $this->getRequest()->isPost()) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'POST required', 'errors' => [], 'datas' => []]);
+        }
+
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $oldFatherIdPage = $this->params()->fromRoute('oldFatherIdPage', $this->params()->fromQuery('oldFatherIdPage', ''));
         $newFatherIdPage = $this->params()->fromRoute('newFatherIdPage', $this->params()->fromQuery('newFatherIdPage', ''));
         $newPositionIdPage = $this->params()->fromRoute('newPositionIdPage', $this->params()->fromQuery('newPositionIdPage', ''));
         $translator = $this->getServiceManager()->get('translator');
+
+        // SECURITY (audit CMS-C2) : droit PAR-PAGE sur la page déplacée ET sur sa destination
+        // (déplacer une page dans un sous-arbre qu'on ne possède pas = escalade de périmètre).
+        $usrAccess = $this->checkoutUserPageRightsAccess($idPage);
+        $destAccess = $this->checkoutUserPageRightsAccess($newFatherIdPage);
+        if (! $usrAccess['hasAccess'] || ! $destAccess['hasAccess']) {
+            $denied = $usrAccess['hasAccess'] ? $destAccess : $usrAccess;
+            return new JsonModel(['success' => 0, 'textTitle' => $translator->translate($denied['textTitle']), 'textMessage' => $translator->translate($denied['textMessage']), 'errors' => [], 'datas' => []]);
+        }
 
         $eventDatas = array(
             'idPage' => $idPage,
@@ -1629,7 +1725,7 @@ class PageController extends MelisAbstractActionController
      */
     public function pageActionsRightCheckAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $actionwanted = $this->params()->fromRoute('actionwanted', $this->params()->fromQuery('actionwanted', ''));
         $translator = $this->getServiceManager()->get('translator');
 
@@ -1760,7 +1856,7 @@ class PageController extends MelisAbstractActionController
     public function getPageLinkAction()
     {
         $link = array();
-        $idPage = $this->params()->fromQuery('idPage', '');
+        $idPage = (int) $this->params()->fromQuery('idPage', '');
         $absolute = $this->params()->fromQuery('absolute', false);
 
         $melisTree = $this->getServiceManager()->get('MelisEngineTree');
@@ -1871,7 +1967,7 @@ class PageController extends MelisAbstractActionController
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
 
-        $idPage = $this->params()->fromQuery('idPage', '');
+        $idPage = (int) $this->params()->fromQuery('idPage', '');
         if($idPage) {
             $this->updateUrlPage($idPage);
         }

@@ -28,7 +28,7 @@ class PageLanguagesController extends MelisAbstractActionController
      */
     public function renderPagetabLanguagesAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage'));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage'));
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
         $view = new ViewModel();
@@ -45,7 +45,7 @@ class PageLanguagesController extends MelisAbstractActionController
      */
     public function renderPagetabLangListAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage'));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage'));
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
         // Retrieving the list of Page languages
@@ -105,7 +105,7 @@ class PageLanguagesController extends MelisAbstractActionController
      */
     public function renderPagetabLangCreateAction()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage'));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage'));
         $melisKey = $this->params()->fromRoute('melisKey', '');
         // get page versions (by language)
         $pageLangTbl = $this->getServiceManager()->get('MelisEngineTablePageLang');
@@ -166,7 +166,7 @@ class PageLanguagesController extends MelisAbstractActionController
 
     public function convertLanguageByLocale()
     {
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
 
         $cmsPageLangTbl = $this->getServiceManager()->get('MelisEngineTablePageLang');
         $cmsPageLang = $cmsPageLangTbl->getEntryByField('plang_page_id', $idPage)->current();
@@ -419,7 +419,7 @@ class PageLanguagesController extends MelisAbstractActionController
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
 
-        $idPage = $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
+        $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
 
         $cmsPageLangTbl = $this->getServiceManager()->get('MelisEngineTablePageLang');
         $cmsPageLang = $cmsPageLangTbl->getEntryByField('plang_page_id', $idPage)->current();

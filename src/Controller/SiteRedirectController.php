@@ -72,7 +72,7 @@ class SiteRedirectController extends MelisAbstractActionController
      */
     public function renderToolSiteRedirectAddAction()
     {
-        $s301Id = $this->params()->fromQuery('s301Id');
+        $s301Id = (int) $this->params()->fromQuery('s301Id');
         
         $view = new ViewModel();
         $view->s301Id = $s301Id;
@@ -166,6 +166,13 @@ class SiteRedirectController extends MelisAbstractActionController
 
             foreach ($tableData As $key => $val)
             {
+                // SECURITY (audit CMS-H5) : cellules échappées — les URLs 301 sont du contenu
+                // utilisateur que DataTables rend en HTML brut (XSS stocké). Même modèle que
+                // Sites/Platform/Language.
+                foreach ($val as $vKey => $vValue) {
+                    $tableData[$key][$vKey] = $melisTool->limitedText($melisTool->escapeHtml($vValue));
+                }
+
                 $tableData[$key]['DT_RowId'] = $val['s301_id'];
             }
         }
@@ -226,7 +233,8 @@ class SiteRedirectController extends MelisAbstractActionController
        
        foreach($siteTable->fetchAll() as $site){
            $siteName = !empty($site->site_label) ? $site->site_label : $site->site_name;
-           $sites[] = '<option value="'.$site->site_id.'">'. $siteName .'</option>';
+           // SECURITY (audit CMS-M6) : site_label = saisie utilisateur, rendue brute dans l'<option> du filtre.
+           $sites[] = '<option value="'.(int) $site->site_id.'">'. htmlspecialchars((string) $siteName, ENT_QUOTES, 'UTF-8') .'</option>';
        }
        
        $view = new ViewModel();
@@ -312,7 +320,7 @@ class SiteRedirectController extends MelisAbstractActionController
     public function renderToolSiteRedirectGenericFormAction()
     {
         $melisKey = $this->params()->fromRoute('melisKey', '');
-        $s301Id = $this->params()->fromQuery('s301Id');
+        $s301Id = (int) $this->params()->fromQuery('s301Id');
         
         // Getting the Site Redirect Form from Tool config
         $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');

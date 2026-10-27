@@ -24,8 +24,9 @@ if (!empty($this->zoneconfig['conf']['id']))
                             ?>
                             <div class="col-md-4">
                                 <label class="melis-radio-box" for="<?= $id ?>">
-                                    <input type="radio" value="<?= $id.'-'.$val['lang_cms_name'] ?>" name="site_selected_lang" id="<?= $id ?>" required="required"/>
-                                    <?= $val['lang_cms_name']; ?>
+                                    <?php /* SECURITY (audit CMS-M8) : lang_cms_name = saisie utilisateur — échappé (attr + texte) */ ?>
+                                    <input type="radio" value="<?= $this->escapeHtmlAttr($id.'-'.$val['lang_cms_name']) ?>" name="site_selected_lang" id="<?= $this->escapeHtmlAttr($id) ?>" required="required"/>
+                                    <?= $this->escapeHtml($val['lang_cms_name']); ?>
                                     <span class="melis-radio-box-circle"></span>
                                 </label>
                             </div>

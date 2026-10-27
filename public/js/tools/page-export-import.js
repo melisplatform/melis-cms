@@ -224,6 +224,13 @@ $(function(){
                         $body.find('#pageImportConsole').append('<div id="pageImportProcessing"><p>' + translations.tr_melis_cms_page_tree_import_modal_processing + ' <i class="fa fa-spinner fa-spin"></i></p></div>');
                     }
                 }).done(function (data) {
+                    // SECURITY (audit CMS-M8) : valeurs réinjectées dans du HTML (nom du fichier
+                    // uploadé, nom de page relu via .data('pagename')) — échappées avant concaténation.
+                    var escImp = function (v) {
+                        return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
+                            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+                        });
+                    };
                     var btnClose = '<button type="button" id="importPageDoneClose" data-bs-dismiss="modal" class="btn btn-danger pull-left" style="margin-top: -15px; margin-left: -15px;">' + translations.tr_melis_cms_page_tree_import_close + '</button>';
 
                     $body.find('#importPageValidated').css('display', 'none');
@@ -231,13 +238,13 @@ $(function(){
 
                     if (data.success) {
                         idsMap = data.idsMap;
-                        $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + importFormData.page_tree_import.name + '</p>');
+                        $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p>' + translations.tr_melis_cms_page_tree_import_name_of_file + ': ' + escImp(importFormData.page_tree_import.name) + '</p>');
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('<p>' + translations.tr_melis_cms_page_tree_import_result + ': <span style="color: green;">' + translations.tr_melis_cms_page_tree_import_success + '</span></p>');
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append('</br>');
-                        var text = translations.tr_melis_cms_page_tree_import_modal_done + '<br/>' + data.pagesCount + translations.tr_melis_cms_page_tree_import_modal_done2_p + ' ' + $body.find('.pageImportModal').data('pagename') + ' (' + $body.find('.pageImportModal').data('pageid') + ')';
+                        var text = translations.tr_melis_cms_page_tree_import_modal_done + '<br/>' + data.pagesCount + translations.tr_melis_cms_page_tree_import_modal_done2_p + ' ' + escImp($body.find('.pageImportModal').data('pagename')) + ' (' + escImp($body.find('.pageImportModal').data('pageid')) + ')';
 
                         if (data.pagesCount == 1) {
-                            text = translations.tr_melis_cms_page_tree_import_modal_done + '<br/>' + data.pagesCount + translations.tr_melis_cms_page_tree_import_modal_done2_s + ' ' + $body.find('.pageImportModal').data('pagename') + ' (' + $body.find('.pageImportModal').data('pageid') + ')';
+                            text = translations.tr_melis_cms_page_tree_import_modal_done + '<br/>' + data.pagesCount + translations.tr_melis_cms_page_tree_import_modal_done2_s + ' ' + escImp($body.find('.pageImportModal').data('pagename')) + ' (' + escImp($body.find('.pageImportModal').data('pageid')) + ')';
                         }
 
                         $body.find('#importPageDone .tab-content .tab-pane .main-error').append(text);

@@ -48,6 +48,7 @@ class EditionRenderController extends MelisAbstractActionController
             if ($module === '' || $pluginName === '' || $pageId === 0 || $pluginId === '') {
                 return $this->jsonResponse(['success' => false, 'error' => 'module, pluginName, pageId and pluginId are required'], 400);
             }
+            if ($deny = $this->denyUnlessPageRight($pageId)) { return $deny; } // SECURITY (audit CMS-C1)
 
             $sm     = $this->getServiceManager();
             $config = $sm->get('config');
