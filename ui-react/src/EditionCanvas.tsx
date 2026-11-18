@@ -224,6 +224,21 @@ function loadAiIcon(): Promise<string> {
   return aiIconPromise
 }
 
+// Mantis #0011321. In edit mode a tag's `.melis-editable` body holds the FRONT render of the tag
+// (tag.phtml), which wraps the value in its own `<div data-melis-plugin-tag-id="<tag>" class="plugin-width-…">`
+// inside a drag-drop zone. TinyMCE attached to the body as-is → getContent() saved that wrapper as the
+// tag's content → the next render wrapped it again: one more nested wrapper per editing session.
+// Legacy avoids it with moveResponsiveClass() (plugins.edition.js), which unwraps it on load before any
+// editor reads the block. Same here: unwrap EVERY level carrying this tag's own id (also cleans pages
+// already nested by earlier sessions on their next save). The width needs no moving: the
+// `.melis-ui-outlined` box already carries it (copied from the tools-box data attrs in onFrameLoad).
+// Idempotent → a no-op once unwrapped, so it is safe on every blockContentEl() call.
+function unwrapFrontTagWrappers(editable: HTMLElement, tagId: string): void {
+  const own = Array.from(editable.querySelectorAll('div[data-melis-plugin-tag-id]'))
+    .filter((w) => w.getAttribute('data-melis-plugin-tag-id') === tagId)
+  for (const w of own) w.replaceWith(...Array.from(w.childNodes)) // document order: outer first, inner levels move up intact
+}
+
 // A live inline TinyMCE editor leaves data-mce-* attributes, bogus nodes and contenteditable in the
 // editable's DOM — strip them when the block's markup has to be read straight from innerHTML.
 function cleanEditableHtml(html: string): string {
@@ -694,7 +709,9 @@ export default function EditionCanvas({ idPage, device = 'desktop' }: { idPage: 
     // html tags; textarea/media fell back to the whole `melis-ui-outlined` wrapper, so TinyMCE attached
     // to the plugin chrome (or not at all) and a blur-save wrote the tools markup back as the tag content
     // (→ empty/broken in front). `.melis-editable` selects the right body for all three.
-    return (wrap?.querySelector('.melis-editable') as HTMLElement | null) || wrap || null
+    const editable = wrap?.querySelector('.melis-editable') as HTMLElement | null
+    if (editable) unwrapFrontTagWrappers(editable, refId)
+    return editable || wrap || null
   }, [])
 
   // Lazy-load Melis's TinyMCE into the render iframe (its own window; gone after a reload → re-inject).
