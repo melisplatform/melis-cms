@@ -161,6 +161,11 @@ class MelisReactApiCmsMenuManagerController extends MelisAbstractActionControlle
             if (!$catId && $siteId <= 0) {
                 return $this->jsonResponse(['success' => false, 'error' => 'Le site est obligatoire.'], 400);
             }
+            // Mantis #0011571 : un catId inconnu partait en save($data, $catId) → création d'une catégorie
+            // SANS nom (invisible dans l'arbre) + une traduction orpheline pour l'id demandé.
+            if ($catId && !$this->categoryExists($catId)) {
+                return $this->jsonResponse(['success' => false, 'error' => 'Catégorie introuvable.'], 404);
+            }
 
             // Reconstruit le format attendu par MelisCmsMiniTemplateService::saveCategory() :
             // params['site_id'|'cat_id'|'status'|'currentLocale'] + une clé "{langId}_name" par langue.
@@ -227,6 +232,21 @@ class MelisReactApiCmsMenuManagerController extends MelisAbstractActionControlle
         }
 
         try {
+            // Mantis #0011571 : refuser une catégorie inconnue (200 « supprimée » trompeur) et une catégorie
+            // qui contient encore des mini-templates — l'interface le bloque déjà (« Vous ne pouvez supprimer
+            // que des catégories vides »), mais deleteCategory() ne vérifie rien et laissait les liens
+            // melis_cms_mini_tpl_category_template pointer vers une catégorie disparue.
+            if (!$this->categoryExists($catId)) {
+                return $this->jsonResponse(['success' => false, 'error' => 'Catégorie introuvable.'], 404);
+            }
+            if ($this->categoryTemplateCount($catId) > 0) {
+                return $this->jsonResponse([
+                    'success' => false,
+                    'error'   => $this->getServiceManager()->get('translator')
+                        ->translate('tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_error_children'),
+                ], 400);
+            }
+
             // Legacy : $params = POST, dont ['id' => '<catId>-…'] (id du nœud jsTree). Ici l'id est déjà
             // numérique et vient de la route — on le passe sous la même clé pour les listeners.
             $this->getEventManager()->trigger('meliscms_mini_template_menu_manager_delete_category_start', $this, ['id' => $catId]);
@@ -256,6 +276,22 @@ class MelisReactApiCmsMenuManagerController extends MelisAbstractActionControlle
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+    private function categoryExists(int $catId): bool
+    {
+        $db   = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
+        $rows = iterator_to_array($db->query('SELECT mtplc_id FROM melis_cms_mini_tpl_category WHERE mtplc_id = ?', [$catId]));
+        return !empty($rows);
+    }
+
+    private function categoryTemplateCount(int $catId): int
+    {
+        $db   = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
+        $rows = iterator_to_array($db->query(
+            'SELECT COUNT(*) AS n FROM melis_cms_mini_tpl_category_template WHERE mtplct_category_id = ?', [$catId]
+        ));
+        return (int) ($rows[0]['n'] ?? 0);
+    }
 
     /**
      * Nom de catégorie transmis aux listeners *_end (journalisation), même règle que le legacy :

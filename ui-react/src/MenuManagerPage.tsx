@@ -74,7 +74,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     new_title: 'Nouvelle catégorie', edit_title: 'Modifier la catégorie',
     f_site_hint: 'Le site ne peut plus être modifié une fois la catégorie créée.',
     err_site: 'Le site est obligatoire.',
-    f_category_name: 'Category name', f_category_name_hint: 'Un nom par langue (au moins une langue requise).',
+    f_category_name: 'Nom de la catégorie', f_category_name_hint: 'Un nom par langue (au moins une langue requise).', // tr_meliscms_mini_template_form_category_name
     err_save: 'Erreur lors de la sauvegarde', err_move: 'Erreur lors du déplacement — arbre rechargé.',
     err_check: 'Veuillez corriger les champs suivants :',
     err_name: 'Au moins un nom de catégorie est requis.',
@@ -155,6 +155,12 @@ function StatusToggle({ checked, onChange, labelOn, labelOff }: {
     </button>
   )
 }
+
+// Mantis #0011569 : site + langue choisis, gardés au niveau module. L'arbre est démonté quand le
+// formulaire de catégorie s'ouvre ; au retour (après enregistrement) il repartait sur le 1er site,
+// et la catégorie qu'on venait de créer/modifier n'était plus visible.
+let _lastSiteId: number | null = null
+let _lastLocale = ''
 
 function catId(node: TreeNode): number {
   return parseInt(node.id.split('-')[0], 10) || 0
@@ -351,8 +357,10 @@ function MenuManagerTree({ base }: { base: string }) {
   const navigate = useNavigate()
   const [sites, setSites] = useState<SiteOption[]>([])
   const [languages, setLanguages] = useState<LanguageOption[]>([])
-  const [siteId, setSiteId] = useState<number | null>(null)
-  const [locale, setLocale] = useState('')
+  const [siteId, setSiteId] = useState<number | null>(_lastSiteId)
+  const [locale, setLocale] = useState(_lastLocale)
+  useEffect(() => { _lastSiteId = siteId }, [siteId])
+  useEffect(() => { _lastLocale = locale }, [locale])
   const [nodes, setNodes] = useState<TreeNode[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -677,6 +685,8 @@ function CategoryForm({ id, base }: { id: string; base: string }) {
         translations,
       })
       setSaved(true)
+      // Retour à l'arbre sur le site de la catégorie (cf. _lastSiteId).
+      if (siteId) _lastSiteId = siteId
       okNotify(t('title'), t('saved'))
       setTimeout(() => navigate(base), 500)
     } catch (e) {

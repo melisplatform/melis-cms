@@ -111,7 +111,8 @@ return [
                                         ],
                                         'attributes' => [
                                             'id' => 'miniTemplateName',
-                                            'value' => ''
+                                            'value' => '',
+                                            'maxlength' => 100,
                                         ],
                                     ],
                                 ],
@@ -196,7 +197,18 @@ return [
                                                 'messages' => array(\Laminas\Validator\Regex::NOT_MATCH => 'tr_meliscms_mini_template_form_invalid_name'),
                                                 'encoding' => 'UTF-8',
                                             ),
-                                        ]
+                                        ],
+                                        // Mantis #0011568 : le nom devient un nom de fichier — sans plafond, un nom
+                                        // trop long dépasse la limite du système de fichiers (erreur 500).
+                                        [
+                                            'name' => 'StringLength',
+                                            'options' => [
+                                                'max' => 100,
+                                                'messages' => [
+                                                    \Laminas\Validator\StringLength::TOO_LONG => 'tr_meliscms_mini_template_form_name_too_long',
+                                                ],
+                                            ],
+                                        ],
                                     ],
                                     'filters' => [
 

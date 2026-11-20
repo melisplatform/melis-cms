@@ -29,6 +29,9 @@ class MelisReactApiCmsMiniTemplateController extends MelisAbstractActionControll
 
     private const MELIS_KEY = 'meliscms_mini_template_manager_tool';
 
+    /** Longueur max d'un nom de mini-template (= nom de fichier) — Mantis #0011568. */
+    private const NAME_MAX_LENGTH = 100;
+
     // ─── List ─────────────────────────────────────────────────────────────────
 
     public function listAction(): HttpResponse
@@ -44,43 +47,47 @@ class MelisReactApiCmsMiniTemplateController extends MelisAbstractActionControll
             $dir    = strtolower((string) $this->params()->fromQuery('dir', 'asc')) === 'desc' ? 'desc' : 'asc';
             $after  = (string) $this->params()->fromQuery('after', '');
 
-            if ($site === '') {
-                return $this->jsonResponse([
-                    'success' => true,
-                    'data'    => ['items' => [], 'total' => 0, 'nextCursor' => null],
-                ]);
-            }
-
             // Inventaire = fichiers .phtml sur disque (pas de table DB), donc on ne peut pas passer par
             // MelisReactKeysetListTrait (SQL). On reproduit le scan du service SANS l'appeler (spec),
             // puis on trie + pagine en keyset côté PHP sur le tableau en mémoire (contrat identique :
             // items/total/nextCursor → hook useKeysetList inchangé).
-            $names = $this->scanMiniTemplateNames($site);
+            // Mantis #0011569 : site vide = « Tous les sites » → tous les modules (DISTINCTS : plusieurs
+            // sites partagent souvent le même module, qui ne doit être listé qu'une fois), comme l'option
+            // « All » du legacy. Une ligne = (module, nom).
+            $modules = $site !== '' ? [$site] : $this->distinctSiteModules();
+            $rows = [];
+            foreach ($modules as $module) {
+                foreach ($this->scanMiniTemplateNames($module) as $n) {
+                    $rows[] = ['site' => $module, 'name' => (string) $n];
+                }
+            }
 
             // Search filter (sur le nom / chemin affiché = le nom du template).
             if ($search !== '') {
-                $names = array_values(array_filter($names, fn ($n) => strpos(strtolower($n), $search) !== false));
+                $rows = array_values(array_filter($rows, fn ($r) => strpos(strtolower($r['name']), $search) !== false));
             }
 
-            $total = count($names);
+            $total = count($rows);
 
-            // Tri server-side whitelisté. Seul « path » (= nom du template) est triable côté UI.
+            // Tri server-side whitelisté. Seul « path » (= nom du template) est triable côté UI ;
+            // le module départage deux templates de même nom (vue « Tous les sites »).
             $sortAsc = $dir === 'asc';
-            usort($names, function ($a, $b) use ($sortAsc) {
-                $cmp = strcasecmp($a, $b);
-                if ($cmp === 0) { $cmp = strcmp($a, $b); } // tiebreaker stable
-                return $sortAsc ? $cmp : -$cmp;
-            });
+            $cmpRows = function (array $a, array $b): int {
+                $cmp = strcasecmp($a['name'], $b['name']);
+                if ($cmp === 0) { $cmp = strcmp($a['name'], $b['name']); } // tiebreaker stable
+                if ($cmp === 0) { $cmp = strcmp($a['site'], $b['site']); }
+                return $cmp;
+            };
+            usort($rows, fn ($a, $b) => $sortAsc ? $cmpRows($a, $b) : -$cmpRows($a, $b));
 
-            // Keyset : le curseur porte le dernier nom émis ; on reprend STRICTEMENT après.
+            // Keyset : le curseur porte la dernière ligne émise (nom + module) ; on reprend STRICTEMENT après.
             $startIdx = 0;
             if ($after !== '') {
-                $cur = json_decode((string) base64_decode($after, true), true);
-                $lastName = is_array($cur) ? (string) ($cur['v'] ?? '') : '';
-                if ($lastName !== '') {
-                    foreach ($names as $i => $n) {
-                        $c = strcasecmp($n, $lastName);
-                        if ($c === 0) { $c = strcmp($n, $lastName); }
+                $cur  = json_decode((string) base64_decode($after, true), true);
+                $last = is_array($cur) ? ['name' => (string) ($cur['v'] ?? ''), 'site' => (string) ($cur['m'] ?? '')] : null;
+                if ($last !== null && $last['name'] !== '') {
+                    foreach ($rows as $i => $r) {
+                        $c = $cmpRows($r, $last);
                         $strictlyAfter = $sortAsc ? ($c > 0) : ($c < 0);
                         if ($strictlyAfter) { $startIdx = $i; break; }
                         $startIdx = $i + 1;
@@ -88,19 +95,19 @@ class MelisReactApiCmsMiniTemplateController extends MelisAbstractActionControll
                 }
             }
 
-            $paged = array_slice($names, $startIdx, $limit);
+            $paged = array_slice($rows, $startIdx, $limit);
 
             $nextCursor = null;
             if (count($paged) === $limit && ($startIdx + $limit) < $total) {
                 $lastEmitted = $paged[count($paged) - 1];
-                $nextCursor  = base64_encode((string) json_encode(['v' => $lastEmitted]));
+                $nextCursor  = base64_encode((string) json_encode(['v' => $lastEmitted['name'], 'm' => $lastEmitted['site']]));
             }
 
             /** @var \MelisCms\Service\MelisCmsMiniTemplateService $svc */
             $svc   = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
             $items = [];
-            foreach ($paged as $name) {
-                $items[] = $this->formatTemplate($svc, $site, $name);
+            foreach ($paged as $r) {
+                $items[] = $this->formatTemplate($svc, $r['site'], $r['name']);
             }
 
             return $this->jsonResponse([
@@ -187,17 +194,21 @@ class MelisReactApiCmsMiniTemplateController extends MelisAbstractActionControll
                 'SELECT site_name FROM melis_cms_site ORDER BY site_name ASC', []
             ));
 
-            /** @var \MelisCms\Service\MelisCmsMiniTemplateService $svc */
-            $svc       = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
             $total     = 0;
             $siteCount = 0;
 
+            // Mantis #0011569 : les templates appartiennent au MODULE, souvent partagé par plusieurs
+            // sites. Le total compte chaque module une seule fois (sinon 20 fichiers × 11 sites = 220) ;
+            // la carte « Sites » compte les sites dont le module a au moins un template. Même scan que la
+            // liste (scanMiniTemplateNames) → le total est exactement ce que la liste « Tous les sites » affiche.
+            $countByModule = [];
             foreach ($siteRows as $row) {
-                $site  = (string) $row['site_name'];
-                $names = $svc->getMiniTemplates($site);
-                $cnt   = count($names);
-                $total += $cnt;
-                if ($cnt > 0) { $siteCount++; }
+                $site = (string) $row['site_name'];
+                if (!array_key_exists($site, $countByModule)) {
+                    $countByModule[$site] = count($this->scanMiniTemplateNames($site));
+                    $total += $countByModule[$site];
+                }
+                if ($countByModule[$site] > 0) { $siteCount++; }
             }
 
             return $this->jsonResponse([
@@ -307,6 +318,12 @@ class MelisReactApiCmsMiniTemplateController extends MelisAbstractActionControll
             if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $name)) {
                 return $this->jsonResponse(['success' => false, 'error' => 'Nom invalide (lettres, chiffres, underscore ; doit commencer par une lettre ou _).'], 400);
             }
+            // Mantis #0011568 : le nom devient un nom de fichier (.phtml + miniature) — sans plafond, un nom
+            // trop long dépasse la limite du système de fichiers et finit en 500. Même plafond que le
+            // formulaire legacy (StringLength) et que le champ React.
+            if (strlen($name) > self::NAME_MAX_LENGTH) {
+                return $this->jsonResponse(['success' => false, 'error' => $this->translate('tr_meliscms_mini_template_form_name_too_long')], 400);
+            }
 
             /** @var \MelisCms\Service\MelisCmsMiniTemplateService $svc */
             $svc = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
@@ -314,8 +331,29 @@ class MelisReactApiCmsMiniTemplateController extends MelisAbstractActionControll
             $thumbnail = $_FILES['thumbnail'] ?? ['name' => '', 'tmp_name' => '', 'error' => UPLOAD_ERR_NO_FILE];
 
             $currentSite = $oldSite !== '' ? $oldSite : $site;
-            $catId       = isset($_POST['category']) && $_POST['category'] !== '' ? (int) $_POST['category'] : null;
-            $siteId      = $catId ? $this->siteIdFromModule($site) : null;
+
+            // Mantis #0011566 : renommer (ou déplacer vers un autre site) un template sur un nom DÉJÀ pris
+            // écrasait l'autre fichier sans prévenir (updateMiniTemplate() fait un rename()/copy() sur la
+            // cible). Même contrôle que MiniTemplateManagerController::checkUpdateErrors() du legacy.
+            if ($isEdit && ($currentSite !== $site || $oldName !== $name) && $this->templateNameTaken($svc, $site, $name)) {
+                return $this->jsonResponse(['success' => false, 'error' => $this->translate('tr_meliscms_mini_template_manager_tool_form_create_error_file_already_exists')], 400);
+            }
+
+            // Mantis #0011567 : le site du lien catégorie↔template (mtplct_site_id) est celui de la
+            // CATÉGORIE (une catégorie appartient à un seul site), pas « le 1er site du module » : plusieurs
+            // sites partagent souvent un module, et le lien partait alors sur le mauvais site.
+            $catId  = isset($_POST['category']) && $_POST['category'] !== '' ? (int) $_POST['category'] : null;
+            $siteId = null;
+            if ($catId && !$isEdit) {
+                $catSite = $this->categorySite($catId);
+                if ($catSite === null) {
+                    return $this->jsonResponse(['success' => false, 'error' => 'Catégorie introuvable.'], 404);
+                }
+                if ($catSite['module'] !== $site) {
+                    return $this->jsonResponse(['success' => false, 'error' => 'Le site choisi ne correspond pas au site de la catégorie.'], 400);
+                }
+                $siteId = $catSite['id'];
+            }
 
             // Les modules greffent des listeners sur ces événements (ex. MelisAICommunityExtensions,
             // qui déplace les CSS/JS/images générés par l'IA de temp/ vers leur emplacement définitif
@@ -471,14 +509,62 @@ class MelisReactApiCmsMiniTemplateController extends MelisAbstractActionControll
     // ─── Helpers ──────────────────────────────────────────────────────────────
 
     /**
-     * Résout le site_id numérique (melis_cms_site.site_id) depuis son module (site_name).
-     * Utilisé pour lier un mini-template à une catégorie à la création (mtplct_site_id).
+     * Site propriétaire d'une catégorie de mini-templates (melis_cms_mini_tpl_site_category) :
+     * ['id' => site_id, 'module' => site_name], ou null si la catégorie n'existe pas.
+     * Sert à lier un template créé via le « + » d'une catégorie au BON site (Mantis #0011567).
      */
-    private function siteIdFromModule(string $module): ?int
+    private function categorySite(int $catId): ?array
     {
         $db   = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
-        $rows = iterator_to_array($db->query('SELECT site_id FROM melis_cms_site WHERE site_name = ?', [$module]));
-        return !empty($rows) ? (int) $rows[0]['site_id'] : null;
+        $rows = iterator_to_array($db->query(
+            'SELECT s.site_id, s.site_name FROM melis_cms_mini_tpl_category c'
+            . ' JOIN melis_cms_mini_tpl_site_category sc ON sc.mtplsc_category_id = c.mtplc_id'
+            . ' JOIN melis_cms_site s ON s.site_id = sc.mtplsc_site_id'
+            . ' WHERE c.mtplc_id = ?',
+            [$catId]
+        ));
+        return !empty($rows) ? ['id' => (int) $rows[0]['site_id'], 'module' => (string) $rows[0]['site_name']] : null;
+    }
+
+    /** Modules de site distincts (site_name), pour la vue « Tous les sites ». */
+    private function distinctSiteModules(): array
+    {
+        $db   = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
+        $rows = iterator_to_array($db->query('SELECT DISTINCT site_name FROM melis_cms_site ORDER BY site_name ASC', []));
+        return array_values(array_filter(array_map(fn ($r) => (string) $r['site_name'], $rows), fn ($m) => $m !== ''));
+    }
+
+    /**
+     * Un template de ce nom existe-t-il déjà pour ce module ? Même règle que le legacy
+     * (checkUpdateErrors / checkCreateMiniTemplateErrors) : présent dans le dossier public racine,
+     * ou dans le dossier du module sans y avoir été « flaggé » (une version flaggée a été remplacée
+     * par sa copie racine). Mantis #0011566.
+     */
+    private function templateNameTaken(\MelisCms\Service\MelisCmsMiniTemplateService $svc, string $module, string $name): bool
+    {
+        $rootPath = $svc->getRootMiniTemplatePath($module);
+        if (!is_array($rootPath) && file_exists($rootPath . '/' . $name . '.phtml')) {
+            return true;
+        }
+        try {
+            $modulePath = rtrim((string) $this->getServiceManager()->get('MelisCmsSiteService')->getModulePath($module), '/\\')
+                . '/public/miniTemplatesTinyMce';
+            if (file_exists($modulePath . '/' . $name . '.phtml')) {
+                $flagged = $this->getServiceManager()->get('MelisEngineTableFlaggedTemplate')
+                    ->getFlaggedTemplate($module, $name)->current();
+                return empty($flagged);
+            }
+        } catch (\Throwable) {}
+        return false;
+    }
+
+    private function translate(string $key): string
+    {
+        try {
+            return (string) $this->getServiceManager()->get('translator')->translate($key);
+        } catch (\Throwable) {
+            return $key;
+        }
     }
 
     /**

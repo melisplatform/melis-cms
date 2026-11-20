@@ -47,6 +47,15 @@ function currentLang(): Lang {
   const l = (document.documentElement.lang || 'en').toLowerCase()
   return l.startsWith('fr') ? 'fr' : 'en'
 }
+/** Longueur max d'un nom (= nom de fichier), alignée sur l'API et le formulaire legacy — Mantis #0011568. */
+const NAME_MAX = 100
+
+// Mantis #0011569 : plusieurs sites partagent souvent le même module (site_name). Les <select> sont donc
+// indexés par l'ID du site (unique) — indexés par module, 11 options avaient la même valeur et le choix
+// d'un site affichait le 1er site du module. Le module reste la clé envoyée à l'API.
+const moduleOfSite = (sites: MiniTemplateSiteOption[], siteKey: string | null): string =>
+  sites.find((s) => String(s.id) === siteKey)?.module ?? ''
+
 const DICT: Record<Lang, Record<string, string>> = {
   fr: {
     title: 'Mini-Templates', subtitle: 'Blocs HTML réutilisables (TinyMCE)',
@@ -68,6 +77,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_site: 'Site / Module', f_name: 'Nom du template',
     f_name_ph: 'mon_template', f_name_hint: 'Lettres, chiffres et _ uniquement. Doit commencer par une lettre ou _.',
     f_name_invalid: 'Nom invalide (lettres, chiffres, underscore ; commence par lettre ou _).',
+    f_name_too_long: 'Le nom ne peut pas dépasser 100 caractères',
     f_html: 'Contenu HTML', f_html_ph: '<!-- HTML du bloc -->',
     f_thumbnail: 'Miniature (png, jpg, gif)', f_thumbnail_hint: 'Optionnel. Formats acceptés : PNG, JPG, JPEG, GIF.',
     f_thumbnail_change: 'Changer la miniature',
@@ -96,6 +106,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_site: 'Site / Module', f_name: 'Template name',
     f_name_ph: 'my_template', f_name_hint: 'Letters, digits and _ only. Must start with a letter or _.',
     f_name_invalid: 'Invalid name (letters, digits, underscore; starts with letter or _).',
+    f_name_too_long: 'The name cannot be longer than 100 characters',
     f_html: 'HTML content', f_html_ph: '<!-- HTML block -->',
     f_thumbnail: 'Thumbnail (png, jpg, gif)', f_thumbnail_hint: 'Optional. Accepted formats: PNG, JPG, JPEG, GIF.',
     f_thumbnail_change: 'Change thumbnail',
@@ -314,7 +325,8 @@ type ListCache = {
   sortDir: 'asc' | 'desc'
   stats: MiniTemplateStats | null
   sites: MiniTemplateSiteOption[]
-  site: string
+  /** ID du site choisi ('' = tous les sites, null = pas encore initialisé). */
+  siteKey: string | null
   search: string
   searchInput: string
   cols: ColDef[]
@@ -336,7 +348,10 @@ function MiniTemplateList({ base, mode, setMode }: { base: string; mode: ViewMod
 
   const [stats, setStats]             = useState<MiniTemplateStats | null>(_cache?.stats ?? null)
   const [sites, setSites]             = useState<MiniTemplateSiteOption[]>(_cache?.sites ?? [])
-  const [site, setSite]               = useState(_cache?.site ?? '')
+  // ID du site sélectionné (cf. moduleOfSite) : '' = « Tous les sites », null = sites pas encore
+  // chargés (on n'interroge pas l'API tant que le site par défaut n'est pas posé).
+  const [siteKey, setSiteKey]         = useState<string | null>(_cache ? _cache.siteKey : null)
+  const site = moduleOfSite(sites, siteKey)
   const [searchInput, setSearchInput] = useState(_cache?.searchInput ?? '')
   const [search, setSearch]           = useState(_cache?.search ?? '')
   const [cols, setCols]               = useState<ColDef[]>(_cache?.cols ?? loadCols())
@@ -352,9 +367,12 @@ function MiniTemplateList({ base, mode, setMode }: { base: string; mode: ViewMod
   // l'API renvoie une liste vide (nextCursor null), pas de scroll infini parasite.
   const {
     items, total, loading, hasMore, sentinelRef, sortCol, sortDir, toggleSort, reload, removeLocal, snapshot,
+    setSortCol, setSortDir,
   } = useKeysetList<MiniTemplateItem>({
-    fetcher: (a) => fetchMiniTemplates({ ...a, site, search }),
-    deps: [site, search, tick],
+    fetcher: (a) => siteKey === null
+      ? Promise.resolve({ items: [], total: 0, nextCursor: null })
+      : fetchMiniTemplates({ ...a, site, search }),
+    deps: [siteKey, site, search, tick],
     limit: 50,
     defaultSort: 'path',
     defaultDir: 'asc',
@@ -366,8 +384,8 @@ function MiniTemplateList({ base, mode, setMode }: { base: string; mode: ViewMod
 
   // Snapshot cache on unmount (survit au démontage quand un formulaire s'ouvre).
   const snapRef = useRef(snapshot); snapRef.current = snapshot
-  const stateRef = useRef({ stats, sites, site, search, searchInput, cols })
-  stateRef.current = { stats, sites, site, search, searchInput, cols }
+  const stateRef = useRef({ stats, sites, siteKey, search, searchInput, cols })
+  stateRef.current = { stats, sites, siteKey, search, searchInput, cols }
   useEffect(() => () => {
     _cache = { ...snapRef.current(), ...stateRef.current }
   }, [])
@@ -384,17 +402,17 @@ function MiniTemplateList({ base, mode, setMode }: { base: string; mode: ViewMod
   useEffect(() => {
     fetchMiniTemplateSites().then((s) => {
       setSites(s)
-      if (!site && s.length > 0) setSite(s[0].module)
-    }).catch(() => null)
+      setSiteKey((cur) => (cur === null ? (s.length > 0 ? String(s[0].id) : '') : cur))
+    }).catch(() => setSiteKey((cur) => cur ?? ''))
   }, [])
 
   // Réinitialiser les filtres : recherche + site + tri par défaut (chemin asc), puis refetch.
   // Le site revient au PREMIER site (l'état par défaut de la page, cf. l'effet de chargement des
-  // sites), pas à « tous » : sans site sélectionné la liste n'affiche rien, et l'effet qui pose ce
-  // défaut ne tourne qu'au montage.
+  // sites). Mantis #0011569 : le tri revient bien à « chemin croissant » (il restait décroissant).
   function resetFilters() {
     setSearchInput(''); setSearch('')
-    setSite(sites[0]?.module ?? '')
+    setSiteKey(sites[0] ? String(sites[0].id) : '')
+    setSortCol('path'); setSortDir('asc')
     setTick((x) => x + 1)
   }
 
@@ -471,9 +489,9 @@ function MiniTemplateList({ base, mode, setMode }: { base: string; mode: ViewMod
             onKeyDown={(e) => e.key === 'Enter' && setSearch(searchInput.trim())}
             placeholder={t('search')} />
           <select style={{ ...inputCss, height: 36, width: narrow ? '100%' : 'auto', minWidth: narrow ? undefined : 160, flex: narrow ? '1 1 100%' : undefined }}
-            value={site} onChange={(e) => setSite(e.target.value)}>
+            value={siteKey ?? ''} onChange={(e) => setSiteKey(e.target.value)}>
             <option value="">{t('all_sites')}</option>
-            {sites.map((s) => <option key={s.module} value={s.module}>{s.name}</option>)}
+            {sites.map((s) => <option key={s.id} value={String(s.id)}>{s.name}</option>)}
           </select>
           {/* reset_filters : toujours sur sa propre ligne pleine largeur sur narrow — le libellé FR
               est trop long pour partager une ligne 50/50 avec Colonnes/Exporter (cf. skill). */}
@@ -489,8 +507,10 @@ function MiniTemplateList({ base, mode, setMode }: { base: string; mode: ViewMod
 
         {/* Table */}
         <div style={{ ...card, overflow: 'hidden' }}>
-          {!site ? (
-            <div style={{ padding: '48px 16px', textAlign: 'center', fontSize: 14, color: 'var(--color-muted-foreground)' }}>{t('empty_site')}</div>
+          {/* Mantis #0011569 : « Tous les sites » (siteKey '') liste désormais les templates de tous les
+              modules ; seul l'état « sites pas encore chargés » (null) affiche un message d'attente. */}
+          {siteKey === null ? (
+            <div style={{ padding: '48px 16px', textAlign: 'center', fontSize: 14, color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse', ...(narrow ? { tableLayout: 'fixed' } : { minWidth: 480 }) }}>
               <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
@@ -510,6 +530,9 @@ function MiniTemplateList({ base, mode, setMode }: { base: string; mode: ViewMod
                   <tr><td style={{ ...tdCss, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={(hasHidden ? 1 : 0) + visibleCols(displayCols).length + 1}>{t('empty')}</td></tr>
                 ) : items.map((r) => {
                   const rowKey = `${r.site}:${r.name}`
+                  // Vue « Tous les sites » : deux modules peuvent avoir un template du même nom → lien
+                  // d'édition composite site~name (compris par decodeId) pour ouvrir le bon.
+                  const editId = site ? idFor(r.site, r.name) : `${r.site}~${r.name}`
                   return (
                     <Fragment key={rowKey}>
                       <tr>
@@ -526,7 +549,7 @@ function MiniTemplateList({ base, mode, setMode }: { base: string; mode: ViewMod
                         ))}
                         <td style={tdCss}>
                           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-                            {can('edit') && <button style={actionBtn} title={t('edit')} onClick={() => navigate(`${base}/${idFor(r.site, r.name)}`)}><PencilIcon /></button>}
+                            {can('edit') && <button style={actionBtn} title={t('edit')} onClick={() => navigate(`${base}/${editId}`)}><PencilIcon /></button>}
                             {can('delete') && <button style={{ ...actionBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
                           </div>
                         </td>
@@ -547,13 +570,13 @@ function MiniTemplateList({ base, mode, setMode }: { base: string; mode: ViewMod
             </table>
           )}
           {/* Scroll infini : sentinelle observée → charge le lot suivant ; pied = spinner puis compteur final. */}
-          {site && <div ref={sentinelRef} style={{ height: 1 }} />}
-          {site && loading && (
+          {siteKey !== null && <div ref={sentinelRef} style={{ height: 1 }} />}
+          {siteKey !== null && loading && (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px 0', fontSize: 12, color: 'var(--color-muted-foreground)' }}>
               <SpinnerIcon />{t('loading')}
             </div>
           )}
-          {site && !hasMore && items.length > 0 && (
+          {siteKey !== null && !hasMore && items.length > 0 && (
             <div style={{ padding: '10px 16px', textAlign: 'center', fontSize: 12, color: 'var(--color-muted-foreground)' }}>
               {t('count', { n: total })}
             </div>
@@ -730,6 +753,13 @@ function MiniTemplateForm({ id, base, aiOpen = false }: { id: string; base: stri
 
   const [sites, setSites]       = useState<MiniTemplateSiteOption[]>([])
   const [site, setSite]         = useState(editSite)
+  // ID du site affiché dans le <select> (Mantis #0011569 : plusieurs sites partagent un module) ;
+  // `site` (le module) reste la clé envoyée à l'API.
+  const [siteKey, setSiteKey]   = useState('')
+  function pickSite(key: string, opts: MiniTemplateSiteOption[] = sites) {
+    setSiteKey(key)
+    setSite(moduleOfSite(opts, key))
+  }
   // Site propriétaire d'origine (pour oldSite au save) : résolu par nom si l'URL ne le porte pas.
   const [origSite, setOrigSite] = useState(editSite)
   const [name, setName]         = useState(editName)
@@ -760,11 +790,19 @@ function MiniTemplateForm({ id, base, aiOpen = false }: { id: string; base: stri
       setSites(s)
       if (!isEdit && !site) {
         const preselected = siteIdParam ? s.find((o) => String(o.id) === siteIdParam) : undefined
-        if (preselected) setSite(preselected.module)
-        else if (s.length > 0) setSite(s[0].module)
+        if (preselected) pickSite(String(preselected.id), s)
+        else if (s.length > 0) pickSite(String(s[0].id), s)
       }
     }).catch(() => null)
   }, [])
+
+  // Édition : le site propriétaire n'est connu que par son MODULE → afficher le 1er site de ce module
+  // dans le <select> (les sites d'un même module partagent les mêmes templates).
+  useEffect(() => {
+    if (siteKey || !site || sites.length === 0) return
+    const first = sites.find((s) => s.module === site)
+    if (first) setSiteKey(String(first.id))
+  }, [sites, site, siteKey])
 
   // Load existing template HTML on edit. The URL carries only the NAME, so resolve the owning site
   // by name first (search across all sites); legacy site~name URLs already provide `editSite`.
@@ -779,7 +817,7 @@ function MiniTemplateForm({ id, base, aiOpen = false }: { id: string; base: stri
         try {
           const siteOpts = await fetchMiniTemplateSites()
           const seen = new Set<string>()
-          const candidates = [_cache?.site ?? '', ...siteOpts.map((s) => s.module)].filter(Boolean)
+          const candidates = [moduleOfSite(siteOpts, _cache?.siteKey ?? null), ...siteOpts.map((s) => s.module)].filter(Boolean)
           for (const m of candidates) {
             if (seen.has(m)) continue
             seen.add(m)
@@ -828,6 +866,7 @@ function MiniTemplateForm({ id, base, aiOpen = false }: { id: string; base: stri
     if (noSite) iss.push({ label: t('f_site'), message: t('err_site') })
     if (noName) iss.push({ label: t('f_name'), message: t('err_name') })
     else if (nameError) iss.push({ label: t('f_name'), message: t('f_name_invalid') })
+    else if (name.trim().length > NAME_MAX) iss.push({ label: t('f_name'), message: t('f_name_too_long') })
     if (iss.length) { setError(t('err_check')); setIssues(iss); return }
     setSaving(true)
     try {
@@ -890,9 +929,9 @@ function MiniTemplateForm({ id, base, aiOpen = false }: { id: string; base: stri
               <div style={{ marginBottom: 16 }}>
                 <label style={lbl}>{t('f_site')}</label>
                 <select style={{ ...inputCss, borderColor: siteError ? '#fca5a5' : undefined }}
-                  value={site} onChange={(e) => { setSite(e.target.value); if (e.target.value) setSiteError(false) }}>
+                  value={siteKey} onChange={(e) => { pickSite(e.target.value); if (e.target.value) setSiteError(false) }}>
                   <option value="">{t('select_site')}</option>
-                  {sites.map((s) => <option key={s.module} value={s.module}>{s.name}</option>)}
+                  {sites.map((s) => <option key={s.id} value={String(s.id)}>{s.name}</option>)}
                 </select>
                 {siteError && <p style={{ ...hint, color: '#b91c1c' }}>{t('err_site')}</p>}
               </div>
@@ -900,7 +939,7 @@ function MiniTemplateForm({ id, base, aiOpen = false }: { id: string; base: stri
                 <label style={lbl}>{t('f_name')}</label>
                 <input style={{ ...inputCss, borderColor: (nameError || nameRequired) ? '#fca5a5' : undefined }}
                   value={name} onChange={(e) => onNameChange(e.target.value)}
-                  placeholder={t('f_name_ph')} maxLength={128} autoComplete="off" />
+                  placeholder={t('f_name_ph')} maxLength={NAME_MAX} autoComplete="off" />
                 {nameRequired
                   ? <p style={{ ...hint, color: '#b91c1c' }}>{t('err_name')}</p>
                   : nameError
