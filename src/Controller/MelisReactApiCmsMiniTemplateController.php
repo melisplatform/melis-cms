@@ -307,6 +307,18 @@ class MelisReactApiCmsMiniTemplateController extends MelisAbstractActionControll
             if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $name)) {
                 return $this->jsonResponse(['success' => false, 'error' => 'Nom invalide (lettres, chiffres, underscore ; doit commencer par une lettre ou _).'], 400);
             }
+            // Mantis #0011564 : seul le nouveau nom était contrôlé — site, oldSite et oldName partaient tels
+            // quels vers les chemins de fichiers (« ../ » = écriture / déplacement hors du dossier). Même règle
+            // que item/delete pour les sites ; un ancien nom peut contenir « - » (templates livrés).
+            if (!preg_match('/^[A-Za-z0-9_]+$/', $site)
+                || ($oldSite !== '' && !preg_match('/^[A-Za-z0-9_]+$/', $oldSite))
+                || ($oldName !== '' && !preg_match('/^[A-Za-z0-9_-]+$/', $oldName))) {
+                return $this->jsonResponse(['success' => false, 'error' => 'Paramètres site/name invalides.'], 400);
+            }
+            // Mantis #0011565 : le HTML est enregistré en .phtml, exécuté comme PHP à la demande de son URL.
+            if (strpos($html, '<?') !== false) {
+                return $this->jsonResponse(['success' => false, 'error' => $this->getServiceManager()->get('translator')->translate('tr_meliscms_mini_template_error_php_code')], 400);
+            }
 
             /** @var \MelisCms\Service\MelisCmsMiniTemplateService $svc */
             $svc = $this->getServiceManager()->get('MelisCmsMiniTemplateService');

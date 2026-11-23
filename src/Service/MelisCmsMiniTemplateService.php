@@ -44,6 +44,20 @@ class MelisCmsMiniTemplateService extends MelisGeneralService
 
         // initialize variables
         $translator = $this->getServiceManager()->get('translator');
+
+        // Mantis #0011564 / #0011565: checked BEFORE any path is built (getRootMiniTemplatePath() already
+        // runs mkdir) — a "../" in the module or name wrote outside public/miniTemplatesTinyMce, and PHP
+        // tags in the HTML were executed when the .phtml was requested.
+        if ($inputError = $this->checkMiniTemplateInput([$module], [$arrayParameters['name']], (string) $arrayParameters['html'])) {
+            $arrayParameters['results'] = [
+                'success' => 0,
+                'errors'  => [$inputError['field'] => ['error' => $inputError['error'], 'label' => $inputError['label']]],
+                'data'    => ['module' => $module, 'template_name' => $arrayParameters['name'], 'thumbnail' => ''],
+            ];
+            $arrayParameters = $this->sendEvent('meliscms_mini_template_service_create_template_end', $arrayParameters);
+            return $arrayParameters['results'];
+        }
+
         //$path = $this->getModuleMiniTemplatePath($module);
         $path = $this->getRootMiniTemplatePath($module);
         $thumbnail = '';
@@ -136,6 +150,26 @@ class MelisCmsMiniTemplateService extends MelisGeneralService
         $translator = $this->getServiceManager()->get('translator');
         $siteTable = $this->getServiceManager()->get('MelisEngineTableSite');
         $table = $this->getServiceManager()->get('MelisCmsMiniTplCategoryTemplateTable');
+
+        // Mantis #0011564 / #0011565: current and new module/name and the HTML are checked BEFORE any path
+        // is built or any file renamed/copied ("../" in oldSite/oldName moved files outside the folder).
+        if ($inputError = $this->checkMiniTemplateInput(
+            [$current_data['miniTemplateSiteModule'] ?? '', $new_data['miniTemplateSiteModule'] ?? ''],
+            [$current_data['miniTemplateName'] ?? '', $new_data['miniTemplateName'] ?? ''],
+            (string) ($new_data['miniTemplateHtml'] ?? '')
+        )) {
+            $arrayParameters['results'] = [
+                'success' => 0,
+                'errors'  => [['error' => $inputError['error'], 'label' => $inputError['label']]],
+                'data'    => [
+                    'module'        => $new_data['miniTemplateSiteModule'] ?? '',
+                    'template_name' => $new_data['miniTemplateName'] ?? '',
+                    'thumbnail'     => '',
+                ],
+            ];
+            $arrayParameters = $this->sendEvent('meliscms_mini_template_service_update_template_end', $arrayParameters);
+            return $arrayParameters['results'];
+        }
 
         $current_module = $current_data['miniTemplateSiteModule'];
         //$current_site_path = $this->getModuleMiniTemplatePath($current_module);
@@ -1242,6 +1276,46 @@ class MelisCmsMiniTemplateService extends MelisGeneralService
         $mime = $finfo->file($tmp_path);
 
         return $mimeToExt[$mime] ?? null;
+    }
+
+    /**
+     * Mantis #0011564 / #0011565 — input checks shared by createMiniTemplate() and updateMiniTemplate()
+     * (React API and legacy actions both go through them):
+     *  - a module is a site module name: letters, digits, underscore only (no "/" or ".", so no "../");
+     *  - a template name is a file name: letters, digits, "_" and "-" (shipped templates use "-");
+     *  - the HTML must not contain "<?": the template is saved as .phtml and, when its URL is requested
+     *    with a back-office session, MelisAssetManager runs it as PHP.
+     * Returns null when everything is valid, else ['field', 'error', 'label'].
+     */
+    private function checkMiniTemplateInput(array $modules, array $names, string $html): ?array
+    {
+        $translator = $this->getServiceManager()->get('translator');
+        foreach ($modules as $module) {
+            if (!is_string($module) || !preg_match('/^[A-Za-z0-9_]+$/', $module)) {
+                return [
+                    'field' => 'miniTemplateSiteModule',
+                    'error' => $translator->translate('tr_meliscms_mini_template_error_invalid_site_or_name'),
+                    'label' => $translator->translate('tr_meliscms_mini_template_error'),
+                ];
+            }
+        }
+        foreach ($names as $name) {
+            if (!is_string($name) || !preg_match('/^[A-Za-z0-9_-]+$/', $name)) {
+                return [
+                    'field' => 'miniTemplateName',
+                    'error' => $translator->translate('tr_meliscms_mini_template_error_invalid_site_or_name'),
+                    'label' => $translator->translate('tr_meliscms_mini_template_error'),
+                ];
+            }
+        }
+        if (strpos($html, '<?') !== false) {
+            return [
+                'field' => 'miniTemplateHtml',
+                'error' => $translator->translate('tr_meliscms_mini_template_error_php_code'),
+                'label' => $translator->translate('tr_meliscms_mini_template_error'),
+            ];
+        }
+        return null;
     }
 
     private function createPhtmlFile($filename, $html)

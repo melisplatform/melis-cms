@@ -854,6 +854,8 @@ return array(
     'tr_meliscms_mini_template_error_category_atleast_one_provided' => 'Champ requis dans au moins une langue',
     'tr_meliscms_mini_template_no_data' => 'Aucune donnée disponible',
     'tr_meliscms_mini_template_error' => 'Erreur',
+    'tr_meliscms_mini_template_error_invalid_site_or_name' => 'Site ou nom de mini-template invalide',
+    'tr_meliscms_mini_template_error_php_code' => 'Le code PHP (« <? ») n\'est pas autorisé dans un mini-template',
     'tr_meliscms_mini_template_menu_manager_save_category' => 'Enregistrer la catégorie',
     'tr_meliscms_mini_template_menu_manager_save_mini_template' => 'Enregistrer le mini template',
     'tr_meliscms_mini_template_menu_manager_js_tree_loading' => 'Chargement',
