@@ -663,8 +663,8 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     } catch (e) { notify('ko', tr.notifPublish, (e as Error).message) } finally { setSaving(false) }
   }, [edit, current, editionReady, postLegacyPage, refreshStructure, releaseLock, reloadEdition])
 
-  // Dépublier (switch Publié/Dépublié → OFF) → unpublishPage legacy (POST — audit CMS-H2, le serveur
-  // refuse les mutations en GET) : passe page_status=0 dans la version publiée (la page sort du site,
+  // Dépublier (switch Publié/Dépublié → OFF) → unpublishPage legacy (mutation : POST exigé) :
+  // passe page_status=0 dans la version publiée (la page sort du site,
   // sans rien supprimer). Comme melisCms.js:unpublishPage.
   const doUnpublish = useCallback(async () => {
     if (!current) return
@@ -693,7 +693,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     if (!current) return
     setSaving(true); setToast(null)
     try {
-      const res = await fetch(`/melis/MelisCms/Page/clearSavedPage?idPage=${encodeURIComponent(current)}`, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' }) // POST : audit CMS-H2
+      const res = await fetch(`/melis/MelisCms/Page/clearSavedPage?idPage=${encodeURIComponent(current)}`, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
       const data = await res.json().catch(() => ({})) as LegacyResp
       if (data.success === 1) {
         // clearSavedPage renvoie un textTitle/textMessage = clés `tr_...` NON traduites (traduites côté
@@ -723,7 +723,7 @@ export default function CmsPage({ active = true }: { active?: boolean }) {
     if (!current) return
     setSaving(true)
     try {
-      const res = await fetch(`/melis/MelisCms/Page/deletePage?idPage=${encodeURIComponent(current)}`, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' }) // POST : audit CMS-H2
+      const res = await fetch(`/melis/MelisCms/Page/deletePage?idPage=${encodeURIComponent(current)}`, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
       const data = await res.json().catch(() => ({})) as LegacyResp
       if (data.success === 1) {
         notify('ok', (data.textTitle || tr.notifDelete).trim(), tr.pageDeleted)

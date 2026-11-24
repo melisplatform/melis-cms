@@ -80,8 +80,7 @@ class PageDuplicationController extends MelisAbstractActionController
         if ($request->isPost()) {
             $pageId = (int) $request->getPost('id');
 
-            // SECURITY (audit CMS-M5) : droit PAR-PAGE — dupliquer copiait le contenu d'une page
-            // hors périmètre. La copie atterrit sous le même père, couvert par le même droit.
+            // Droit par page. La copie atterrit sous le même père, couvert par le même droit.
             if (! $this->getServiceManager()->get('MelisCmsRights')->canAccessPage($pageId)) {
                 return new JsonModel(['success' => 0, 'textTitle' => $title, 'textMessage' => 'tr_meliscms_page_user_access_rights_no_access', 'errors' => [], 'datas' => []]);
             }

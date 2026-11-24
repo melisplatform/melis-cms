@@ -65,8 +65,7 @@ class MiniTemplateManagerController extends MelisAbstractActionController
     public function renderMiniTemplateManagerToolAddAction()
     {
         $view = new ViewModel();
-        // SECURITY (audit CMS-H4) : param réfléchi dans le HTML (id d'élément) — restreint au
-        // charset des noms de mini-templates.
+        // Paramètre restreint au charset des noms de mini-templates.
         $view->templateName = preg_replace('/[^A-Za-z0-9_\-]/', '', (string) $this->params()->fromQuery('templateName', ''));
         return $view;
     }
@@ -77,7 +76,7 @@ class MiniTemplateManagerController extends MelisAbstractActionController
     public function renderMiniTemplateManagerToolAddHeaderAction()
     {
         $params = $this->params()->fromQuery();
-        // SECURITY (audit CMS-H4) : param réfléchi dans un <h1> — restreint au charset des noms.
+        // Paramètre restreint au charset des noms.
         $params['templateName'] = preg_replace('/[^A-Za-z0-9_\-]/', '', (string) ($params['templateName'] ?? ''));
         $view = new ViewModel();
         $view->formType = ($params['templateName'] == 'new_template') ? 'create' : 'update';
@@ -91,15 +90,13 @@ class MiniTemplateManagerController extends MelisAbstractActionController
      */
     public function renderMiniTemplateManagerToolAddBodyFormAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_mini_template_manager_tool')) {
             return new ViewModel();
         }
 
         $params = $this->params()->fromQuery();
-        // SECURITY (audit CMS-H4) : templateName/module sont réfléchis dans la vue ET concaténés
-        // dans un chemin lu par file_get_contents (lecture de .phtml arbitraire par traversée) —
-        // restreints à leur charset. Ids castés, thumbnail échappé (attribut src).
+        // templateName/module restreints à leur charset, ids castés, thumbnail échappé.
         $params['templateName'] = preg_replace('/[^A-Za-z0-9_\-]/', '', (string) ($params['templateName'] ?? ''));
         $params['module'] = preg_replace('/[^A-Za-z0-9_]/', '', (string) ($params['module'] ?? ''));
         $params['categoryId'] = (int) ($params['categoryId'] ?? 0);
@@ -170,7 +167,7 @@ class MiniTemplateManagerController extends MelisAbstractActionController
      */
     public function getMiniTemplatesAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_mini_template_manager_tool')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -257,7 +254,7 @@ class MiniTemplateManagerController extends MelisAbstractActionController
      */
     public function createMiniTemplateAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_mini_template_manager_tool')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -340,7 +337,7 @@ class MiniTemplateManagerController extends MelisAbstractActionController
      */
     public function updateMiniTemplateAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_mini_template_manager_tool')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -473,7 +470,7 @@ class MiniTemplateManagerController extends MelisAbstractActionController
      */
     public function deleteMiniTemplateAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_mini_template_manager_tool')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }

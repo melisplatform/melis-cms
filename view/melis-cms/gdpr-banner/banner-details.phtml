@@ -13,7 +13,6 @@ $data_melisKey = $this->melisKey;
                 <ul class="nav nav-tabs product-text-tab">
                     <?php foreach($this->languages as $idx => $lang) :?>
                         <li class="nav-item mcms-gdpr-banner-lang">
-                            <?php /* SECURITY (audit CMS-M8) : lang_cms_name = saisie utilisateur (StripTags garde les guillemets) — échappé */ ?>
                             <a class="nav-link clearfix mcms-gdpr-banner-language" data-bs-toggle="tab" data-bs-target="#<?= $this->escapeHtmlAttr($lang['lang_cms_name']); ?>-banner-details" id="cms-gdpr-lang-<?= (int) $lang['lang_cms_id']; ?>" href="#<?= $this->escapeHtmlAttr($lang['lang_cms_name']); ?>-banner-details" aria-expanded="true" data-lang-id="<?= (int) $lang['lang_cms_id'] ?>">
                                 <span><?= $this->escapeHtml($lang['lang_cms_name']) ?></span>
 

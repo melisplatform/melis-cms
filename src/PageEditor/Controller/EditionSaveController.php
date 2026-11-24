@@ -47,8 +47,8 @@ class EditionSaveController extends MelisAbstractActionController
         try {
             $payload = json_decode((string) $this->getRequest()->getContent(), true);
             $idPage = (int) ($payload['idPage'] ?? 0);
-            if ($deny = $this->denyUnlessPageRight($idPage)) { return $deny; } // SECURITY (audit CMS-C1)
-            if ($deny = $this->denyUnlessPageAction('save')) { return $deny; } // SECURITY (audit CMS-M2)
+            if ($deny = $this->denyUnlessPageRight($idPage)) { return $deny; }
+            if ($deny = $this->denyUnlessPageAction('save')) { return $deny; }
             $ops = is_array($payload['ops'] ?? null) ? $payload['ops'] : [];
             if ($idPage <= 0) {
                 return $this->jsonResponse(['success' => false, 'error' => 'idPage is required'], 400);
@@ -166,9 +166,7 @@ class EditionSaveController extends MelisAbstractActionController
                         // edit a text/html block's content (its config). CDATA handled in the model.
                         $id = (string) ($op['id'] ?? '');
                         if ($id !== '') {
-                            // SECURITY (audit CMS-M1) : le canvas d'édition rend ce HTML en same-origin
-                            // dans le BO — un <script> posté ici (hors TinyMCE, qui n'en produit pas)
-                            // s'exécutait chez tout éditeur/admin ouvrant la page (vol de session).
+                            // Contenu filtré avant stockage (voir sanitizeTagHtml).
                             $doc->setTagContent($id, $this->sanitizeTagHtml((string) ($op['content'] ?? '')));
                             $applied++;
                         }
@@ -392,12 +390,9 @@ class EditionSaveController extends MelisAbstractActionController
     }
 
     /**
-     * SECURITY (audit CMS-M1) : neutralise ce qui EXÉCUTE du JS dans le HTML d'un bloc tag —
-     * `<script>`, handlers inline (`on*=`), URI `javascript:`. Le canvas d'édition
-     * (edition/render) est une page same-origin chargée dans le BO : sans ce filtre, un
-     * contenu forgé posté directement sur l'op `setTagContent` (TinyMCE n'émet rien de tout
-     * ça) s'exécutait avec la session de tout éditeur/admin ouvrant la page. Le HTML riche
-     * légitime (balises, styles, iframes d'embed) passe inchangé.
+     * Retire du HTML d'un bloc tag ce qui exécute du JS — `<script>`, handlers inline
+     * (`on*=`), URI `javascript:`. Le HTML riche (balises, styles, iframes d'embed)
+     * passe inchangé.
      */
     private function sanitizeTagHtml(string $html): string
     {

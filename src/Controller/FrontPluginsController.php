@@ -27,10 +27,8 @@ class FrontPluginsController extends MelisAbstractActionController
     private $subsectionHasNewPlugins = [];
 
     /**
-     * SECURITY (audit CMS-H6) : contrôle du droit d'outil. Ce contrôleur n'héritait d'AUCUNE
-     * méthode `hasAccess` (contrairement à ToolStyleController) — la garde H6 appelait une méthode
-     * inexistante et fatait le forward du menu de plugins en édition. Même mécanisme que les autres
-     * outils melis-cms : MelisCoreRights::canAccess.
+     * Contrôle du droit d'outil, même mécanisme que les autres outils melis-cms :
+     * MelisCoreRights::canAccess.
      */
     private function hasAccess($key)
     {
@@ -42,9 +40,7 @@ class FrontPluginsController extends MelisAbstractActionController
      */
     public function renderPluginsMenuAction()
     {
-        /** SECURITY (audit CMS-H6) : contrôleur sans clé d'outil (UNMAPPED → passait le gate
-         * d'autorisation global de melis-core) — droit de l'outil Pages exigé, comme le reste
-         * de la chaîne d'édition. */
+        /** Droit de l'outil Pages exigé, comme le reste de la chaîne d'édition. */
         if (! $this->hasAccess('meliscms_page')) {
             return new ViewModel();
         }
@@ -101,7 +97,7 @@ class FrontPluginsController extends MelisAbstractActionController
      */
     public function renderPluginsMenuContentAction()
     {
-        /** SECURITY (audit CMS-H6) : droit de l'outil Pages exigé (contrôleur UNMAPPED). */
+        /** Droit de l'outil Pages exigé. */
         if (! $this->hasAccess('meliscms_page')) {
             return new JsonModel(['view' => '']);
         }
@@ -171,7 +167,7 @@ class FrontPluginsController extends MelisAbstractActionController
      */
     public function getSessionDataAction()
     {
-        /** SECURITY (audit CMS-H6) : droit de l'outil Pages exigé (contrôleur UNMAPPED). */
+        /** Droit de l'outil Pages exigé. */
         if (! $this->hasAccess('meliscms_page')) {
             return new JsonModel(['success' => 0]);
         }
@@ -187,7 +183,7 @@ class FrontPluginsController extends MelisAbstractActionController
 
     public function renderPluginModalAction()
     {
-        /** SECURITY (audit CMS-H6) : droit de l'outil Pages exigé (contrôleur UNMAPPED). */
+        /** Droit de l'outil Pages exigé. */
         if (! $this->hasAccess('meliscms_page')) {
             $view = new ViewModel();
             $view->setTerminal(true);
@@ -254,7 +250,7 @@ class FrontPluginsController extends MelisAbstractActionController
 
     public function validatePluginModalAction()
     {
-        /** SECURITY (audit CMS-H6) : droit de l'outil Pages exigé (contrôleur UNMAPPED). */
+        /** Droit de l'outil Pages exigé. */
         if (! $this->hasAccess('meliscms_page')) {
             return new JsonModel(['success' => 0, 'errors' => ['general' => 'tr_meliscore_microservice_api_key_no_access']]);
         }
@@ -316,10 +312,6 @@ class FrontPluginsController extends MelisAbstractActionController
 
         return new JsonModel($result);
     }
-
-    /* SECURITY (audit CMS-H6) : les endpoints de debug `checkSessionPageAction` (print_r de
-     * TOUTE la session meliscms — contenus d'édition en cours — accessible à tout compte BO)
-     * et `testingAreaAction` ont été supprimés. Ne pas les réintroduire. */
 
     private function putSectionOnPlugins($configurations, $siteModule)
     {

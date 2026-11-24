@@ -66,8 +66,7 @@ export function fetchPageTitle(id: number): Promise<string> {
 /**
  * Deletes a page (legacy endpoint):
  *   POST /melis/MelisCms/Page/deletePage?idPage=<id>
- * SECURITY (audit CMS-H2) : POST — le serveur refuse désormais les mutations en GET
- * (les paramètres restent dans l'URL, l'action les lit via fromQuery).
+ * Mutation : POST exigé (les paramètres restent dans l'URL, l'action les lit via fromQuery).
  * Returns the server's success flag + notification texts.
  */
 export async function deletePage(
@@ -128,8 +127,7 @@ export async function searchTreePages(value: string): Promise<number[][]> {
 /**
  * Reorders / re-parents a page (legacy endpoint):
  *   POST /melis/MelisCms/Page/movePage?idPage=&oldFatherIdPage=&newFatherIdPage=&newPositionIdPage=
- * SECURITY (audit CMS-H2) : POST — le serveur refuse désormais les mutations en GET
- * (les paramètres restent dans l'URL, l'action les lit via fromQuery).
+ * Mutation : POST exigé (les paramètres restent dans l'URL, l'action les lit via fromQuery).
  * Fathers are page ids, or -1 for the (virtual) root level. newPositionIdPage is the 1-based
  * insert position among the destination's children (siblings excluding the moved page).
  */
@@ -229,8 +227,8 @@ export async function fetchTreeNodes(nodeId: number): Promise<MelisTreeNode[]> {
         n.locked = true
         n.title = n.title.replace(/^\s*<i\b[^>]*\bfa-lock\b[^>]*><\/i>\s*/i, '').trim()
       }
-      // SECURITY (audit CMS-H3) : le serveur échappe désormais les noms de pages (le fancytree
-      // legacy rend les titres en HTML). React rend du TEXTE : on décode les entités pour ne pas
+      // Le serveur renvoie les noms de pages échappés (le fancytree legacy rend les titres
+      // en HTML). React rend du TEXTE : on décode les entités pour ne pas
       // afficher `&amp;` & co. (le markup listener type cadenas, non échappé, est déjà retiré).
       if (typeof n.title === 'string' && n.title.includes('&')) {
         const el = document.createElement('textarea')

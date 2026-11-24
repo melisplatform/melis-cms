@@ -2,9 +2,7 @@ $(function () {
 	let $body = $("body"),
 		indicatorHoverTimeout;
 
-	// SECURITY (audit FE-H7) : les routes /dnd-* sont hors du scope du patch CSRF XHR de
-	// melisCsrf.js (qui ne pose l'en-tête que sur /melis…) — le jeton est joint explicitement
-	// en champ POST, lu depuis le cookie JS-readable melis_csrf.
+	// Jeton CSRF joint en champ POST, lu depuis le cookie melis_csrf.
 	function dndCsrfToken() {
 		var m = document.cookie.match(/(?:^|;\s*)melis_csrf=([^;]*)/);
 		return m ? decodeURIComponent(m[1]) : "";
@@ -84,7 +82,7 @@ $(function () {
 			.closest(".melis-dragdropzone-container")
 			.prepend(tempLoader.removeClass("hidden"));
 
-		// SECURITY (audit FE-H7) : POST + jeton — le serveur refuse désormais les mutations en GET.
+		// POST + jeton CSRF.
 		$.post("/dnd-layout", {
 			pageId,
 			dndId,
@@ -210,7 +208,7 @@ $(function () {
 		// let tempLoader = dndContainer.find("#dnd-loader");
 		// $(this).closest(".melis-dragdropzone-container").prepend(tempLoader.removeClass("hidden"));
 
-		// SECURITY (audit FE-H7) : POST + jeton — le serveur refuse désormais les mutations en GET.
+		// POST + jeton CSRF.
 		$.post("/dnd-layout", {
 			pageId,
 			dndId,
@@ -305,7 +303,7 @@ $(function () {
 			$.post("/dnd-remove", {
 				pageId,
 				dndId,
-				melis_csrf: dndCsrfToken(), // SECURITY (audit FE-H7)
+				melis_csrf: dndCsrfToken(),
 			})
 				.done((res) => {
 					// modal confirmation

@@ -4,7 +4,7 @@ if (!empty($this->zoneconfig['conf']['id']))
     $id = ' id="' .$this->zoneconfig['conf']['id'] . '"';
 
 ?>
-<?php /* SECURITY (audit CMS-M8) : page_name = saisie utilisateur, dans un attribut (relu par page-export-import.js) */ ?>
+<?php /* data-pagename relu par page-export-import.js */ ?>
 <div class="modal-content pageImportModal" <?= $id; ?> data-melisKey="<?= $this->melisKey; ?>" data-pageid="<?= (int) $this->pageId ?>" data-pagename="<?= $this->escapeHtmlAttr($this->pageName) ?>">
     <div class="modal-body padding-none">
         <div class="wizard">

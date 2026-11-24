@@ -166,8 +166,7 @@ class SiteRedirectController extends MelisAbstractActionController
 
             foreach ($tableData As $key => $val)
             {
-                // SECURITY (audit CMS-H5) : cellules échappées — les URLs 301 sont du contenu
-                // utilisateur que DataTables rend en HTML brut (XSS stocké). Même modèle que
+                // Cellules échappées (rendues en HTML par DataTables). Même modèle que
                 // Sites/Platform/Language.
                 foreach ($val as $vKey => $vValue) {
                     $tableData[$key][$vKey] = $melisTool->limitedText($melisTool->escapeHtml($vValue));
@@ -233,7 +232,7 @@ class SiteRedirectController extends MelisAbstractActionController
        
        foreach($siteTable->fetchAll() as $site){
            $siteName = !empty($site->site_label) ? $site->site_label : $site->site_name;
-           // SECURITY (audit CMS-M6) : site_label = saisie utilisateur, rendue brute dans l'<option> du filtre.
+           // site_label échappé (rendu dans l'<option> du filtre).
            $sites[] = '<option value="'.(int) $site->site_id.'">'. htmlspecialchars((string) $siteName, ENT_QUOTES, 'UTF-8') .'</option>';
        }
        

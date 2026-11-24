@@ -118,7 +118,6 @@
 
 								// check if node has children if TRUE then cannot be deleted
 								$.ajax({
-									// SECURITY (audit CMS-H2) : POST — le serveur refuse désormais les mutations en GET.
 									type: "POST",
 									url: "/melis/MelisCms/Page/deletePage?idPage=" + idPage,
 									encode: true,
@@ -428,7 +427,6 @@
 						};
 
 						$.ajax({
-							// SECURITY (audit CMS-H2) : POST — le serveur refuse désormais les mutations en GET.
 							// Les paramètres restent dans l'URL : movePageAction les lit via fromQuery.
 							type: "POST",
 							url: "/melis/MelisCms/Page/movePage?" + $.param(datastring),

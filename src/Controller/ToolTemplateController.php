@@ -706,10 +706,9 @@ class ToolTemplateController extends MelisAbstractActionController
                 // apply text limits
                 foreach($tableData[$ctr] as $vKey => $vValue)
                 {
-                    // SECURITY (audit CMS-H5) : cellules échappées — tpl_name/tpl_type sont du
-                    // contenu utilisateur que DataTables rend en HTML brut (XSS stocké). Même
-                    // modèle que Sites/Platform/Language. Le markup de confiance (span tpl_type KO,
-                    // statut) est posé APRÈS, sur les valeurs déjà échappées.
+                    // Cellules échappées (rendues en HTML par DataTables). Même modèle que
+                    // Sites/Platform/Language. Le markup (span tpl_type KO, statut) est posé
+                    // après, sur les valeurs déjà échappées.
                     $tableData[$ctr][$vKey] = $melisTool->limitedText($melisTool->escapeHtml($vValue));
                 }
 

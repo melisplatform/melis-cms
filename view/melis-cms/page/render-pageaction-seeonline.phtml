@@ -5,7 +5,7 @@
 	$data_melisKey = $this->melisKey;
 ?>
 <li<?= $id; ?> data-melisKey='<?= $data_melisKey; ?>'>
-	<?php /* SECURITY (audit CMS-M8) : le lien vient de pseo_url (stockée) — échappé, schéma filtré au contrôleur */ ?>
+	<?php /* Lien issu de pseo_url, échappé ; schéma filtré au contrôleur */ ?>
 	<a class="" href="<?= $this->escapeHtmlAttr($this->link); ?>" target="_blank">
 	    <span class="fa fa-cloud-upload"></span>
 		<span><?php echo $this->translate('tr_meliscms_page_actions_See Online') ?></span>

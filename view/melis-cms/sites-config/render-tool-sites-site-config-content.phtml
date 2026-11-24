@@ -39,7 +39,6 @@ $data_melisKey = $this->melisKey;
                                     <span class="float-right">
                                         <img src="<?= $this->serverUrl() . '/MelisCms/images/lang-flags/' . $lang['lang_cms_locale'] . '.png' ?>" class="float-right">
                                     </span>
-                                    <?php /* SECURITY (audit CMS-M8) : lang_cms_name = saisie utilisateur — échappé */ ?>
                                     <span><?= $this->escapeHtml($lang['lang_cms_name']) ?></span>
                                 </a>
                             </li>

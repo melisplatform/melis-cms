@@ -192,7 +192,7 @@ class PageEditionController extends MelisAbstractActionController
      */
     public function savePageSessionPluginAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_page')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -237,13 +237,12 @@ class PageEditionController extends MelisAbstractActionController
      */
     public function removePageSessionPluginAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_page')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
 
-        // SECURITY (audit CMS-H2) : mutation refusée en GET — forgeable par un simple <img>/lien,
-        // la garde CSRF globale ignorant les méthodes sûres. Tous les appelants légitimes sont en POST.
+        // Mutation : POST exigé (tous les appelants sont en POST).
         if (! $this->getRequest()->isPost()) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'POST required', 'errors' => [], 'datas' => []]);
         }
@@ -254,8 +253,7 @@ class PageEditionController extends MelisAbstractActionController
         $pluginId = $this->getRequest()->getQuery('pluginId', null);
         $pluginTag = $this->getRequest()->getQuery('pluginTag', null);
 
-        // SECURITY (audit CMS-C2) : droit PAR-PAGE — la session d'édition d'une page hors
-        // périmètre n'est pas modifiable.
+        // Droit par page requis pour modifier la session d'édition.
         if (! $this->getServiceManager()->get('MelisCmsRights')->canAccessPage((int) $pageId)) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscms_page_user_access_rights_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -376,14 +374,13 @@ class PageEditionController extends MelisAbstractActionController
 	 */
 	public function saveEditionAction()
 	{
-		/** @INFO: Access check (tool right) — CWE-862 */
+		/** @INFO: Access check (tool right) */
 		if (! $this->hasAccess('meliscms_page')) {
 			return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
 		}
 
-		// SECURITY (audit CMS-H2) : mutation refusée en GET — forgeable par un simple <img>/lien,
-		// la garde CSRF globale ignorant les méthodes sûres. L'appelant légitime est le forward()
-		// de savePage/publishPage (POST), qui réutilise la requête HTTP d'origine.
+		// Mutation : POST exigé. L'appelant est le forward() de savePage/publishPage (POST),
+		// qui réutilise la requête HTTP d'origine.
 		if (! $this->getRequest()->isPost()) {
 			return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'POST required', 'errors' => [], 'datas' => []]);
 		}
@@ -391,8 +388,7 @@ class PageEditionController extends MelisAbstractActionController
 		$idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
 		$translator = $this->getServiceManager()->get('translator');
 
-		// SECURITY (audit CMS-C2) : droit PAR-PAGE — le flush session→brouillon était le maillon
-		// qui matérialisait en base les éditions d'une page hors périmètre (IDOR).
+		// Droit par page requis avant d'enregistrer la session d'édition en brouillon.
 		if (! $this->getServiceManager()->get('MelisCmsRights')->canAccessPage((int) $idPage)) {
 			return new JsonModel(['success' => 0, 'textTitle' => $translator->translate('tr_meliscms_page_user_access_rights'), 'textMessage' => $translator->translate('tr_meliscms_page_user_access_rights_no_access'), 'errors' => [], 'datas' => []]);
 		}

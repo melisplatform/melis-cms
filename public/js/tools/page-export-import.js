@@ -224,7 +224,7 @@ $(function(){
                         $body.find('#pageImportConsole').append('<div id="pageImportProcessing"><p>' + translations.tr_melis_cms_page_tree_import_modal_processing + ' <i class="fa fa-spinner fa-spin"></i></p></div>');
                     }
                 }).done(function (data) {
-                    // SECURITY (audit CMS-M8) : valeurs réinjectées dans du HTML (nom du fichier
+                    // Valeurs insérées dans du HTML (nom du fichier
                     // uploadé, nom de page relu via .data('pagename')) — échappées avant concaténation.
                     var escImp = function (v) {
                         return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {

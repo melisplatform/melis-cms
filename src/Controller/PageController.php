@@ -517,8 +517,8 @@ class PageController extends MelisAbstractActionController
         $melisTree = $this->getServiceManager()->get('MelisEngineTree');
         $link = $melisTree->getPageLink($idPage, true);
 
-        // SECURITY (audit CMS-M8) : le lien peut venir de pseo_url (stockée, saisie utilisateur) —
-        // seuls http(s) et les chemins relatifs au site passent, jamais javascript:/data:.
+        // Le lien peut venir de pseo_url (saisie utilisateur) : seuls http(s) et les chemins
+        // relatifs au site sont acceptés.
         if (!preg_match('#^(https?://|/)#i', (string) $link)) {
             $link = '';
         }
@@ -865,8 +865,7 @@ class PageController extends MelisAbstractActionController
      * @return \Laminas\View\Model\JsonModel
      */
     public function clearSavedPageAction(){
-        // SECURITY (audit CMS-H2) : mutation refusée en GET — forgeable par un simple <img>/lien,
-        // la garde CSRF globale ignorant les méthodes sûres. Tous les appelants légitimes sont en POST.
+        // Mutation : POST exigé (tous les appelants sont en POST).
         if (! $this->getRequest()->isPost()) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'POST required', 'errors' => [], 'datas' => []]);
         }
@@ -958,8 +957,7 @@ class PageController extends MelisAbstractActionController
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
 
-        // SECURITY (audit CMS-H2) : mutation refusée en GET — forgeable par un simple <img>/lien,
-        // la garde CSRF globale ignorant les méthodes sûres. Tous les appelants légitimes sont en POST.
+        // Mutation : POST exigé (tous les appelants sont en POST).
         if (! $this->getRequest()->isPost()) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'POST required', 'errors' => [], 'datas' => []]);
         }
@@ -967,16 +965,13 @@ class PageController extends MelisAbstractActionController
         $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $translator = $this->getServiceManager()->get('translator');
 
-        // SECURITY (audit CMS-C2) : droit PAR-PAGE — même contrôle que publishPage/deletePage,
-        // omis ici alors que c'est l'aboutissement de la chaîne d'édition (brouillon → publié).
+        // Droit par page, même contrôle que publishPage/deletePage.
         $usrAccess = $this->checkoutUserPageRightsAccess($idPage);
         if (! $usrAccess['hasAccess']) {
             return new JsonModel(['success' => 0, 'textTitle' => $translator->translate($usrAccess['textTitle']), 'textMessage' => $translator->translate($usrAccess['textMessage']), 'errors' => [], 'datas' => []]);
         }
 
-        // SECURITY (audit CMS-M2) : capacité d'action (interface rights) vérifiée serveur — le
-        // bouton Publish retiré en UI restait exécutable par requête directe (le listener ne la
-        // vérifie que sur le flux publishPage, pas sur un appel direct de cette action).
+        // Capacité d'action (interface rights) vérifiée côté serveur.
         if (! $this->getServiceManager()->get('MelisCmsRights')->isActionButtonActive('publish')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => $translator->translate('tr_meliscms_page_error_Your rights don\'t allow you to modify this page'), 'errors' => [], 'datas' => []]);
         }
@@ -1173,8 +1168,7 @@ class PageController extends MelisAbstractActionController
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
 
-        // SECURITY (audit CMS-H2) : mutation refusée en GET — forgeable par un simple <img>/lien,
-        // la garde CSRF globale ignorant les méthodes sûres. Tous les appelants légitimes sont en POST.
+        // Mutation : POST exigé (tous les appelants sont en POST).
         if (! $this->getRequest()->isPost()) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'POST required', 'errors' => [], 'datas' => []]);
         }
@@ -1182,13 +1176,13 @@ class PageController extends MelisAbstractActionController
         $idPage = (int) $this->params()->fromRoute('idPage', $this->params()->fromQuery('idPage', ''));
         $translator = $this->getServiceManager()->get('translator');
 
-        // SECURITY (audit CMS-C2) : droit PAR-PAGE, omis sur la dépublication.
+        // Droit par page.
         $usrAccess = $this->checkoutUserPageRightsAccess($idPage);
         if (! $usrAccess['hasAccess']) {
             return new JsonModel(['success' => 0, 'textTitle' => $translator->translate($usrAccess['textTitle']), 'textMessage' => $translator->translate($usrAccess['textMessage']), 'errors' => [], 'datas' => []]);
         }
 
-        // SECURITY (audit CMS-M2) : capacité d'action (interface rights) vérifiée serveur.
+        // Capacité d'action (interface rights) vérifiée côté serveur.
         if (! $this->getServiceManager()->get('MelisCmsRights')->isActionButtonActive('unpublish')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => $translator->translate('tr_meliscms_page_error_Your rights don\'t allow you to modify this page'), 'errors' => [], 'datas' => []]);
         }
@@ -1252,8 +1246,7 @@ class PageController extends MelisAbstractActionController
      */
     public function unpublishPageAction()
     {
-        // SECURITY (audit CMS-H2) : mutation refusée en GET — forgeable par un simple <img>/lien,
-        // la garde CSRF globale ignorant les méthodes sûres. Tous les appelants légitimes sont en POST.
+        // Mutation : POST exigé (tous les appelants sont en POST).
         if (! $this->getRequest()->isPost()) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'POST required', 'errors' => [], 'datas' => []]);
         }
@@ -1343,8 +1336,7 @@ class PageController extends MelisAbstractActionController
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
 
-        // SECURITY (audit CMS-H2) : mutation refusée en GET — forgeable par un simple <img>/lien,
-        // la garde CSRF globale ignorant les méthodes sûres. Tous les appelants légitimes sont en POST.
+        // Mutation : POST exigé (tous les appelants sont en POST).
         if (! $this->getRequest()->isPost()) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'POST required', 'errors' => [], 'datas' => []]);
         }
@@ -1353,15 +1345,13 @@ class PageController extends MelisAbstractActionController
         $translator = $this->getServiceManager()->get('translator');
         $datasPage = null;
 
-        // SECURITY (audit CMS-C2) : droit PAR-PAGE — la suppression d'un ARBRE entier était
-        // possible sur n'importe quelle page hors périmètre.
+        // Droit par page requis pour supprimer l'arbre.
         $usrAccess = $this->checkoutUserPageRightsAccess($idPage);
         if (! $usrAccess['hasAccess']) {
             return new JsonModel(['success' => 0, 'textTitle' => $translator->translate($usrAccess['textTitle']), 'textMessage' => $translator->translate($usrAccess['textMessage']), 'errors' => [], 'datas' => []]);
         }
 
-        // SECURITY (audit CMS-M2) : capacité d'action (interface rights) vérifiée serveur — le
-        // listener ne la vérifie que sur le flux deletePage, pas sur un appel direct.
+        // Capacité d'action (interface rights) vérifiée côté serveur.
         if (! $this->getServiceManager()->get('MelisCmsRights')->isActionButtonActive('delete')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => $translator->translate('tr_meliscms_page_error_Your rights don\'t allow you to modify this page'), 'errors' => [], 'datas' => []]);
         }
@@ -1488,8 +1478,7 @@ class PageController extends MelisAbstractActionController
      */
     public function deletePageAction()
     {
-        // SECURITY (audit CMS-H2) : mutation refusée en GET — forgeable par un simple <img>/lien,
-        // la garde CSRF globale ignorant les méthodes sûres. Tous les appelants légitimes sont en POST.
+        // Mutation : POST exigé (tous les appelants sont en POST).
         if (! $this->getRequest()->isPost()) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'POST required', 'errors' => [], 'datas' => []]);
         }
@@ -1597,8 +1586,7 @@ class PageController extends MelisAbstractActionController
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
 
-        // SECURITY (audit CMS-H2) : mutation refusée en GET — forgeable par un simple <img>/lien,
-        // la garde CSRF globale ignorant les méthodes sûres. Tous les appelants légitimes sont en POST.
+        // Mutation : POST exigé (tous les appelants sont en POST).
         if (! $this->getRequest()->isPost()) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'POST required', 'errors' => [], 'datas' => []]);
         }
@@ -1609,8 +1597,7 @@ class PageController extends MelisAbstractActionController
         $newPositionIdPage = $this->params()->fromRoute('newPositionIdPage', $this->params()->fromQuery('newPositionIdPage', ''));
         $translator = $this->getServiceManager()->get('translator');
 
-        // SECURITY (audit CMS-C2) : droit PAR-PAGE sur la page déplacée ET sur sa destination
-        // (déplacer une page dans un sous-arbre qu'on ne possède pas = escalade de périmètre).
+        // Droit par page sur la page déplacée et sur sa destination.
         $usrAccess = $this->checkoutUserPageRightsAccess($idPage);
         $destAccess = $this->checkoutUserPageRightsAccess($newFatherIdPage);
         if (! $usrAccess['hasAccess'] || ! $destAccess['hasAccess']) {

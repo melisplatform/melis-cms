@@ -32,9 +32,7 @@ trait ReactApiPageGuardTrait
     }
 
     /**
-     * SECURITY (audit CMS-C1) : droit PAR-PAGE (section `meliscms_pages`), en plus du droit
-     * d'outil — sans lui, changer `idPage` dans la requête suffisait à lire/modifier n'importe
-     * quelle page hors du périmètre de l'éditeur (IDOR). Fail-closed via canAccessPage.
+     * Droit par page (section `meliscms_pages`) en plus du droit de l'outil, via canAccessPage.
      * À appeler APRÈS denyUnlessAccess, avec l'idPage déjà casté.
      */
     private function denyUnlessPageRight(int $idPage): ?HttpResponse
@@ -46,9 +44,8 @@ trait ReactApiPageGuardTrait
     }
 
     /**
-     * SECURITY (audit CMS-M2) : capacité d'ACTION (boutons save/publish/unpublish/delete des
-     * interface rights, `MelisCmsRights::isActionButtonActive`) vérifiée SERVEUR — un bouton
-     * retiré en UI restait exécutable par requête directe. Fail-closed.
+     * Capacité d'action (boutons save/publish/unpublish/delete des interface rights,
+     * `MelisCmsRights::isActionButtonActive`) vérifiée côté serveur.
      */
     private function denyUnlessPageAction(string $action): ?HttpResponse
     {

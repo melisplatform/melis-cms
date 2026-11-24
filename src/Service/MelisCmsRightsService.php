@@ -12,13 +12,11 @@ class MelisCmsRightsService extends MelisServiceManager implements MelisCoreRigh
 	const MELISCMS_PREFIX_PAGES = 'meliscms_pages';
 
     /**
-     * SECURITY (audit CMS-C1/C2) : l'utilisateur COURANT a-t-il le droit d'agir sur CETTE page ?
+     * L'utilisateur COURANT a-t-il le droit d'agir sur CETTE page ?
      *
-     * C'est le contrôle par-page (section allow-list `meliscms_pages` des droits, résolue via le
-     * breadcrumb — `-1` = toutes les pages), qui n'était appliqué qu'à l'AFFICHAGE de l'arbre :
-     * toute la chaîne d'édition (React et legacy) acceptait n'importe quel idPage une fois le
-     * droit d'OUTIL acquis. Point d'entrée unique, fail-closed, bypass admin cohérent avec le
-     * reste de la plateforme.
+     * Contrôle par page (section allow-list `meliscms_pages` des droits, résolue via le
+     * breadcrumb — `-1` = toutes les pages), en plus du droit de l'outil. Point d'entrée
+     * unique ; les admins ont accès à tout, comme dans le reste de la plateforme.
      */
     public function canAccessPage($idPage)
     {
@@ -43,14 +41,14 @@ class MelisCmsRightsService extends MelisServiceManager implements MelisCoreRigh
                 $idPage
             );
         } catch (\Throwable $e) {
-            return false; // fail-closed : un échec de résolution des droits ne donne jamais l'accès
+            return false; // échec de résolution des droits : accès refusé
         }
     }
 
 	public function isAccessible($xmlRights, $sectionId, $itemId)
     {
-        // SECURITY (audit CMS-M9) : LIBXML_NONET (pas de fetch réseau d'entité) + rejet DTD
-        // (billion laughs) — un XML de droits légitime ne déclare jamais de DOCTYPE.
+        // LIBXML_NONET (pas de fetch réseau d'entité) + rejet DTD — un XML de droits
+        // légitime ne déclare jamais de DOCTYPE.
         if (preg_match('/<!DOCTYPE/i', (string) $xmlRights)) {
             return false;
         }
@@ -245,7 +243,7 @@ class MelisCmsRightsService extends MelisServiceManager implements MelisCoreRigh
 			
 		}
 		
-		if (!empty($xml) && !preg_match('/<!DOCTYPE/i', (string) $xml)) // SECURITY (audit CMS-M9)
+		if (!empty($xml) && !preg_match('/<!DOCTYPE/i', (string) $xml))
 		{
 			$rightsObj = simplexml_load_string((string) $xml, 'SimpleXMLElement', LIBXML_NONET);
 			if (!empty($rightsObj))
