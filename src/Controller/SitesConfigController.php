@@ -41,7 +41,7 @@ class SitesConfigController extends MelisAbstractActionController
      */
     public function renderToolSitesSiteConfigContentAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_tool_sites')) {
             return new ViewModel();
         }
@@ -245,7 +245,7 @@ class SitesConfigController extends MelisAbstractActionController
         return $toolSvc;
     }
 
-    /** @INFO: Tool access check (CWE-862). */
+    /** @INFO: Tool access check. */
     private function hasAccess($key)
     {
         return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);

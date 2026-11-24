@@ -21,7 +21,7 @@ class SiteRedirectController extends MelisAbstractActionController
 {
     const TOOL_KEY = 'meliscms_tool_site_301';
 
-    /** @INFO: Tool access check (CWE-862). */
+    /** @INFO: Tool access check. */
     private function hasAccess($key)
     {
         return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
@@ -113,7 +113,7 @@ class SiteRedirectController extends MelisAbstractActionController
      */
     public function getSiteRedirectAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_tool_site_301')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -354,7 +354,7 @@ class SiteRedirectController extends MelisAbstractActionController
      */
     public function saveSiteRedirectAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_tool_site_301')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -489,7 +489,7 @@ class SiteRedirectController extends MelisAbstractActionController
      * @return \Laminas\View\Model\JsonModel
      */
     public function deleteSiteRedirectAction(){
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_tool_site_301')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
