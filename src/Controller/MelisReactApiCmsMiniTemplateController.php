@@ -246,12 +246,9 @@ class MelisReactApiCmsMiniTemplateController extends MelisAbstractActionControll
             if ($site === '' || $name === '') {
                 return $this->jsonResponse(['success' => false, 'error' => 'Paramètres site et name requis.'], 400);
             }
-            // Sécurité : $name compose un chemin de fichier .phtml → on n'accepte qu'un segment de
-            // chemin simple (pas de « / », « \ » ni « .. »), donc pas de traversée de répertoire.
-            // ⚠ PAS la regex de saveAction (`^[a-zA-Z_][a-zA-Z0-9_]*$`) : elle interdit le tiret, or
-            // les mini-templates livrés en ont tous un (« 2-cols-paragraph »…) — les lire renvoyait
-            // 400, d'où un aperçu vide dans le dialogue IA alors que le legacy, qui ne valide rien
-            // en lecture, les affichait. Ici on lit un fichier, la garde anti-traversée suffit.
+            // $name compose un chemin de fichier .phtml : seul un segment simple est accepté.
+            // Le tiret est autorisé (contrairement à saveAction) : les mini-templates livrés en ont
+            // un (« 2-cols-paragraph »…).
             if (!preg_match('/^[A-Za-z0-9_-]+$/', $name)) {
                 return $this->jsonResponse(['success' => false, 'error' => 'Nom de template invalide.'], 400);
             }

@@ -12,14 +12,12 @@ use MelisCore\Service\MelisCoreModulesService;
  *
  * getActiveModules() reads $this->getServiceManager()->get('ModuleManager')->getLoadedModules() —
  * Laminas's OWN module registry, populated only from config/application.config.php's `modules`
- * list. Site modules (module/MelisSites/*, e.g. BioCardia/Dekra/ClubThermal) are NOT in that list:
+ * list. Site modules (module/MelisSites/*) are NOT in that list:
  * they're loaded through Melis's own custom bootstrap (MelisModuleManager reading
  * config/melis.module.load.php directly), a path Laminas's ModuleManager never sees. So every time
  * a new module is activated, getActiveModules() returns an incomplete list missing every site
  * module, and createModuleLoader() overwrites melis.module.load.php with that incomplete list —
- * silently dropping BioCardia/Dekra/ClubThermal and breaking their plugin resolution platform-wide
- * (confirmed live: this exact sequence happened twice in one session, each fixed by manually
- * re-adding the site modules back into melis.module.load.php).
+ * silently dropping the site modules and breaking their plugin resolution platform-wide.
  *
  * Fix: after the normal resolution, add back any module/MelisSites/* directory not already present
  * — generic (any current or future site), not a hardcoded list of today's three sites.

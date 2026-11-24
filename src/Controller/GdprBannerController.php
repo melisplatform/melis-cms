@@ -23,15 +23,15 @@ use MelisCore\Controller\MelisAbstractActionController;
 class GdprBannerController extends MelisAbstractActionController
 {
     /**
-     * Outil auquel ce contrôleur appartient (audit DEKRA 7.0) : MelisCoreAuthorizationListener
-     * vérifie canAccess() sur cette clé AVANT le dispatch.
+     * Outil auquel ce contrôleur appartient : MelisCoreAuthorizationListener
+     * vérifie canAccess() sur cette clé avant le dispatch.
      */
     const MELIS_KEY = 'melis_core_gdpr';
 
     const MODULE_NAME = 'MelisCmsGdprBanner';
     const LOG_UPDATE = 'UDPATE';
 
-    /** @INFO: Tool access check (CWE-862). */
+    /** @INFO: Tool access check. */
     private function hasAccess($key)
     {
         return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
@@ -118,7 +118,7 @@ class GdprBannerController extends MelisAbstractActionController
      */
     public function bannerDetailsAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('melis_core_gdpr')) {
             return new ViewModel();
         }
@@ -163,7 +163,7 @@ class GdprBannerController extends MelisAbstractActionController
      */
     public function saveBannerAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('melis_core_gdpr')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }

@@ -82,8 +82,7 @@ class MelisReactApiPageController extends MelisAbstractActionController
         // NB : l'éditeur de page ne s'ouvre pas via une clé de menu `meliscms_page` mais via
         // l'arbre du site avec des droits PAR-PAGE (section usr_rights `meliscms_pages`).
         // La structure ne renvoie que le CHROME (labels/icônes d'onglets+boutons) → on exige
-        // Exige l'accès à l'outil Pages (canAccess), pas seulement une session — sinon n'importe quel
-        // utilisateur BO pouvait lire/écrire les propriétés/SEO de n'importe quelle page.
+        // l'accès à l'outil Pages (canAccess), pas seulement une session.
         if ($deny = $this->denyUnlessAccess()) { return $deny; }
 
         try {
