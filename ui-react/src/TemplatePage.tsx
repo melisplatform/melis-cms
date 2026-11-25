@@ -522,8 +522,15 @@ function TemplateForm({ id, base }: { id: string; base: string }) {
     e.preventDefault()
     if (!isNew && !item) return
     setSaveErr(''); setIssues([]); setSaved(false)
-    // Validation client → un item par champ fautif, listé dans le bandeau (pattern unifié).
-    if (!name.trim()) { setIssues([{ label: t('field_name'), message: t('err_required') }]); setSaveErr(t('err_check')); return }
+    // Validation client → un item par champ fautif, listé dans le bandeau (pattern unifié). Same
+    // required fields as the server, for creation and edition (Mantis #0011562 / #0011563).
+    const missing: { label: string; message: string }[] = []
+    if (!name.trim()) missing.push({ label: t('field_name'), message: t('err_required') })
+    if (!siteId) missing.push({ label: t('field_site'), message: t('err_required') })
+    if (!layout.trim()) missing.push({ label: t('field_layout'), message: t('err_required') })
+    if (!controller.trim()) missing.push({ label: t('field_ctrl'), message: t('err_required') })
+    if (!action.trim()) missing.push({ label: t('field_action'), message: t('err_required') })
+    if (missing.length) { setIssues(missing); setSaveErr(t('err_check')); return }
     setSaving(true)
     try {
       const savedId = await saveTemplate({ id: isNew ? 0 : item!.id, name, type, siteId, websiteFolder, layout, controller, action, phpPath })
@@ -531,7 +538,8 @@ function TemplateForm({ id, base }: { id: string; base: string }) {
       if (isNew) navigate(`${base}/${savedId}`) // création → bascule sur l'édition du template créé
       else setSaved(true)
     } catch (e) {
-      setSaveErr(String(e))
+      // the server message as is (it was shown as "Error: …")
+      setSaveErr(e instanceof Error ? e.message : String(e))
       koNotify(t('title'), t('save_err'))
     } finally {
       setSaving(false)
@@ -557,7 +565,7 @@ function TemplateForm({ id, base }: { id: string; base: string }) {
       </div>
 
       {/* Form */}
-      <form id="template-edit-form" onSubmit={handleSubmit} style={{ flex: 1, padding: narrow ? 14 : 24, display: 'flex', flexDirection: 'column', gap: narrow ? 16 : 24, maxWidth: 720 }}>
+      <form id="template-edit-form" onSubmit={handleSubmit} noValidate style={{ flex: 1, padding: narrow ? 14 : 24, display: 'flex', flexDirection: 'column', gap: narrow ? 16 : 24, maxWidth: 720 }}>
         {/* Bandeau d'erreur unifié (validation client + erreur serveur), en tête de formulaire. */}
         <FormErrorBanner title={saveErr || undefined} issues={issues} />
         {/* Informations de base */}
@@ -565,7 +573,7 @@ function TemplateForm({ id, base }: { id: string; base: string }) {
           <p style={sectionTitle}>{t('field_name')} / {t('field_type')} / {t('field_site')}</p>
           <div>
             <label style={labelCss}>{t('field_name')}</label>
-            <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box', ...(issues.some((i) => i.label === t('field_name')) ? { borderColor: '#dc2626' } : {}) }} value={name} onChange={(e) => setName(e.target.value)} required />
+            <input style={{ ...inputCss, width: '100%', boxSizing: 'border-box', ...(issues.some((i) => i.label === t('field_name')) ? { borderColor: '#dc2626' } : {}) }} value={name} onChange={(e) => setName(e.target.value)} />
           </div>
           <div style={{ display: 'flex', flexDirection: narrow ? 'column' : 'row', gap: 12 }}>
             <div style={{ flex: 1 }}>

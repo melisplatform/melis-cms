@@ -27,6 +27,7 @@ class MelisReactApiCmsLanguageController extends MelisAbstractActionController
 {
     use CapabilityGuardTrait;
     use MelisReactKeysetListTrait;
+    use ReactApiToolLogTrait;
 
     private const MELIS_KEY = 'meliscms_tool_language';
 
@@ -151,11 +152,15 @@ class MelisReactApiCmsLanguageController extends MelisAbstractActionController
                     return $this->jsonResponse(['success' => false, 'error' => 'Not found'], 404);
                 }
                 $db->query('UPDATE melis_cms_lang SET lang_cms_locale = ?, lang_cms_name = ? WHERE lang_cms_id = ?', [$locale, $name, $id]);
+                $this->logToolAction('meliscms_language_update_end', 'CMS_LANGUAGE_UPDATE', $id,
+                    'tr_meliscms_tool_language', 'tr_meliscms_tool_language_prompts_edit_success');
                 return $this->jsonResponse(['success' => true, 'data' => ['id' => $id]]);
             }
 
             $db->query('INSERT INTO melis_cms_lang (lang_cms_locale, lang_cms_name) VALUES (?, ?)', [$locale, $name]);
             $newId = (int) iterator_to_array($db->query('SELECT LAST_INSERT_ID() AS id', []))[0]['id'];
+            $this->logToolAction('meliscms_language_new_end', 'CMS_LANGUAGE_ADD', $newId,
+                'tr_meliscms_tool_language', 'tr_meliscms_tool_language_add_success');
             return $this->jsonResponse(['success' => true, 'data' => ['id' => $newId]], 201);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);
@@ -182,6 +187,8 @@ class MelisReactApiCmsLanguageController extends MelisAbstractActionController
                 return $this->jsonResponse(['success' => false, 'error' => 'Not found'], 404);
             }
             $db->query('DELETE FROM melis_cms_lang WHERE lang_cms_id = ?', [$id]);
+            $this->logToolAction('meliscms_language_delete_end', 'CMS_LANGUAGE_DELETE', $id,
+                'tr_meliscms_tool_language', 'tr_meliscms_tool_language_delete_success');
             return $this->jsonResponse(['success' => true, 'data' => null]);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);

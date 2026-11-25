@@ -43,7 +43,7 @@ function currentLang(): Lang {
 }
 const DICT: Record<Lang, Record<string, string>> = {
   fr: {
-    title: 'Platforms IDs', subtitle: 'Plages d’ID de pages et templates par plateforme',
+    title: 'IDs plateformes', subtitle: 'Plages d’ID de pages et templates par plateforme',
     new: 'Nouvelle plage', search: 'Rechercher une plage…',
     empty: 'Aucune plage trouvée', count: '{n} plages — fin de la liste',
     kpi_total: 'Total',
@@ -68,7 +68,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     no_access: 'Vous n’avez pas les droits pour consulter cette liste.',
   },
   en: {
-    title: 'Platforms IDs', subtitle: 'Page & template ID ranges per platform',
+    title: 'Platform IDs', subtitle: 'Page & template ID ranges per platform',
     new: 'New range', search: 'Search a range…',
     empty: 'No range found', count: '{n} ranges — end of list',
     kpi_total: 'Total',

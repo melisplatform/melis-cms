@@ -334,11 +334,10 @@ function RedirectList({ base }: { base: string }) {
   }
 
   function testRedirect(r: RedirectItem) {
-    // On ouvre la NOUVELLE url (la destination), pas l'ancienne — parité avec le legacy, dont le
-    // handler lit `td:nth-child(4)` = colonne s301_new_url (la variable y est trompeusement nommée
-    // `oldUrl`). « Tester » = vérifier que la cible de la redirection répond bien.
-    if (!r.newUrl) return
-    const path = r.newUrl.startsWith('/') ? r.newUrl : '/' + r.newUrl
+    // « Tester » opens the OLD url on the site's domain, so the browser goes through the redirect
+    // itself and lands on the new url (Mantis #0009351: it opened the new url, which proved nothing).
+    if (!r.oldUrl) return
+    const path = r.oldUrl.startsWith('/') ? r.oldUrl : '/' + r.oldUrl
     // URL RELATIVE par défaut → hérite du schéma (http/https) ET du domaine courants, comme le legacy.
     // Le schéma du BO fait foi, pas celui — parfois périmé (http vs https) — de melis_cms_site_domain.
     // On ne bascule sur le domaine absolu (baseUrl) QUE si la redirection vise un AUTRE domaine que
