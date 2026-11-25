@@ -16,8 +16,8 @@ use Laminas\View\Model\JsonModel;
 class MiniTemplateManagerController extends MelisAbstractActionController
 {
     /**
-     * Outil auquel ce contrôleur appartient (audit DEKRA 7.0) : MelisCoreAuthorizationListener
-     * vérifie canAccess() sur cette clé AVANT le dispatch.
+     * Outil auquel ce contrôleur appartient : MelisCoreAuthorizationListener
+     * vérifie canAccess() sur cette clé avant le dispatch.
      */
     const MELIS_KEY = 'meliscms_mini_template_manager_tool';
 
@@ -30,7 +30,7 @@ class MiniTemplateManagerController extends MelisAbstractActionController
     public $tool_key = 'meliscms_mini_template_manager_tool';
     public $form_key = 'mini_template_manager_tool_add_form';
 
-    /** @INFO: Tool access check (CWE-862). */
+    /** @INFO: Tool access check. */
     private function hasAccess($key)
     {
         return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
@@ -87,7 +87,7 @@ class MiniTemplateManagerController extends MelisAbstractActionController
      */
     public function renderMiniTemplateManagerToolAddBodyFormAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_mini_template_manager_tool')) {
             return new ViewModel();
         }
@@ -158,7 +158,7 @@ class MiniTemplateManagerController extends MelisAbstractActionController
      */
     public function getMiniTemplatesAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_mini_template_manager_tool')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -245,7 +245,7 @@ class MiniTemplateManagerController extends MelisAbstractActionController
      */
     public function createMiniTemplateAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_mini_template_manager_tool')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -328,7 +328,7 @@ class MiniTemplateManagerController extends MelisAbstractActionController
      */
     public function updateMiniTemplateAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_mini_template_manager_tool')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -461,7 +461,7 @@ class MiniTemplateManagerController extends MelisAbstractActionController
      */
     public function deleteMiniTemplateAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_mini_template_manager_tool')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -471,9 +471,8 @@ class MiniTemplateManagerController extends MelisAbstractActionController
         $mtpl_service = $this->getServiceManager()->get('MelisCmsMiniTemplateService');
         //$path = $site_service->getModulePath($data['module']) . '/public/miniTemplatesTinyMce';
 
-        // Sécurité : module/template composent un chemin de fichier .phtml passé à unlink() → seul
-        // un identifiant simple est accepté (même règle que la création), sinon une chaîne de
-        // traversée (« ../../… ») permettrait de supprimer un .phtml arbitraire hors du dossier.
+        // module/template composent un chemin de fichier .phtml : seul un identifiant simple est
+        // accepté (même règle que la création).
         $nameRe = '/^[A-Za-z_][A-Za-z0-9_]*$/';
         if (empty($data['template']) || !preg_match($nameRe, (string) $data['template'])
             || (!empty($data['module']) && !preg_match($nameRe, (string) $data['module']))) {

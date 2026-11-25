@@ -24,7 +24,7 @@ class SitesModuleLoaderController extends MelisAbstractActionController
      */
     public function getDependentsAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_tool_sites')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -58,7 +58,7 @@ class SitesModuleLoaderController extends MelisAbstractActionController
 
     public function getRequiredDependenciesAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_tool_sites')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -120,7 +120,7 @@ class SitesModuleLoaderController extends MelisAbstractActionController
      * @return void|ViewModel
      */
     public function renderToolSitesModuleLoadContentAction() {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_tool_sites')) {
             return new ViewModel();
         }
@@ -194,7 +194,7 @@ class SitesModuleLoaderController extends MelisAbstractActionController
         return $toolSvc;
     }
 
-    /** @INFO: Tool access check (CWE-862). */
+    /** @INFO: Tool access check. */
     private function hasAccess($key)
     {
         return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);

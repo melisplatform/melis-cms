@@ -41,7 +41,7 @@ class SitesDomainsController extends MelisAbstractActionController
      * @return void|ViewModel
      */
     public function renderToolSitesDomainsContentAction() {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_tool_sites')) {
             return new ViewModel();
         }
@@ -74,7 +74,7 @@ class SitesDomainsController extends MelisAbstractActionController
 
     public function checkDomainAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_tool_sites')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -127,7 +127,7 @@ class SitesDomainsController extends MelisAbstractActionController
         return $toolSvc;
     }
 
-    /** @INFO: Tool access check (CWE-862). */
+    /** @INFO: Tool access check. */
     private function hasAccess($key)
     {
         return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);

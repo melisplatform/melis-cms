@@ -363,7 +363,7 @@ class SitesController extends MelisAbstractActionController
      */
     public function getSiteDataAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_tool_sites')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -445,7 +445,7 @@ class SitesController extends MelisAbstractActionController
      */
     public function createNewSiteAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_tool_sites')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -623,10 +623,8 @@ class SitesController extends MelisAbstractActionController
                 //field the site data
                 if (!empty($siteData)) {
                     $siteName = (!empty($siteData['site_name'])) ? $cmsSiteSrv->generateModuleNameCase($siteData['site_name']) : '';
-                    // Sécurité : $siteName sert de nom de MODULE et construit des chemins (mkdir/copy du
-                    // squelette SiteSample, écriture de config). generateModuleNameCase/cleanString ne
-                    // retirent PAS « . » « / » « \ » → on force ici un identifiant strictement
-                    // alphanumérique pour empêcher toute traversée de répertoire hors module/MelisSites.
+                    // $siteName sert de nom de module et construit des chemins (squelette SiteSample,
+                    // config) : identifiant strictement alphanumérique.
                     $siteName = preg_replace('/[^A-Za-z0-9]/', '', (string) $siteName);
                     $siteLabel = (!empty($siteData['site_label'])) ? $siteData['site_label'] : $siteName;
                     $siteData['site_label'] = $siteLabel;
@@ -713,7 +711,7 @@ class SitesController extends MelisAbstractActionController
      */
     public function saveSiteAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_tool_sites')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -953,7 +951,7 @@ class SitesController extends MelisAbstractActionController
      */
     public function deleteSiteAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_tool_sites')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -1707,7 +1705,7 @@ class SitesController extends MelisAbstractActionController
      */
     public function deleteSiteDomainPlatformAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_tool_sites')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -1759,7 +1757,7 @@ class SitesController extends MelisAbstractActionController
             $melisEngineCacheSystem->deleteCacheByPrefix($preFix, $cacheConfig);
     }
 
-    /** @INFO: Tool access check (CWE-862). */
+    /** @INFO: Tool access check. */
     private function hasAccess($key)
     {
         return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
