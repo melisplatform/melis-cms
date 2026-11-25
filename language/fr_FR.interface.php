@@ -49,8 +49,8 @@ return array(
     'tr_melis_cms_page_analytics_tool_table' => 'Site analytics tool table',
 
     'tr_meliscms_delete_saved_page_title' => 'Effacer la version sauvegardée',
-    'tr_meliscms_delete_saved_use_publish_version_confirmation_msg' => 'Etes-vous sûr de vouloir effacer la version sauvegardée et revenir à la version publiée?',
-    'tr_meliscms_delete_saved_use_tpl_default_confirmation_msg' => 'Etes-vous sûr de vouloir effacer la version sauvegardée et revenir à la version du template?',
+    'tr_meliscms_delete_saved_use_publish_version_confirmation_msg' => 'Êtes-vous sûr de vouloir effacer la version sauvegardée et revenir à la version publiée?',
+    'tr_meliscms_delete_saved_use_tpl_default_confirmation_msg' => 'Êtes-vous sûr de vouloir effacer la version sauvegardée et revenir à la version du template?',
     'tr_meliscms_delete_saved_success_title' => 'Effacer la sauvegarde',
     'tr_meliscms_delete_saved_success' => 'La sauvegarde a été supprimée avec succès',
     'tr_meliscms_delete_no_saved_page' => 'Cette page n\'a pas d\'édition en cours',
@@ -62,7 +62,7 @@ return array(
     'tr_meliscms_page_tab_edition_Edition_Page not editable' => 'Cette page n\'est pas éditable',
 
     'tr_meliscms_page_success_delete_Delete page' => 'Suppression page',
-    'tr_meliscms_page_success_delete_Are you sure you want to delete this page' => 'Etes-vous sûr de vouloir supprimer cette page ?',
+    'tr_meliscms_page_success_delete_Are you sure you want to delete this page' => 'Êtes-vous sûr de vouloir supprimer cette page ?',
 
     'tr_meliscms_page_new_page' => 'Nouvelle page',
     'tr_meliscms_page_success_Page' => 'Page',
@@ -149,7 +149,7 @@ return array(
     'tr_tool_template_fm_update_content_error' => 'Impossible de mettre à jour le template',
 
     'tr_tool_template_fm_delete_title' => 'Supprimer un template',
-    'tr_tool_template_fm_delete_confirm' => 'Etes-vous sûr de vouloir supprimer ce template?',
+    'tr_tool_template_fm_delete_confirm' => 'Êtes-vous sûr de vouloir supprimer ce template?',
     'tr_tool_template_fm_delete_content' => 'Le template a été supprimé',
 
     // Site Tool
@@ -174,11 +174,11 @@ return array(
     'tr_meliscms_tool_site_edit_failed' => 'Impossible de mettre à jour le site, veuillez réessayer',
 
     'tr_meliscms_tool_site_delete_confirm_title' => 'Supprimer le site',
-    'tr_meliscms_tool_site_delete_confirm' => 'Etes-vous sûr de vouloir supprimer ce site ?',
+    'tr_meliscms_tool_site_delete_confirm' => 'Êtes-vous sûr de vouloir supprimer ce site ?',
 
     'tr_meliscms_tool_site_env_delete_confirm_title' => 'Supprimer l\'environnement',
     'tr_meliscms_tool_site_delete_env title' => 'Supprimer le domaine de cette plateforme',
-    'tr_meliscms_tool_site_env_delete_confirm' => 'Etes-vous sûr de vouloir supprimer cet environnement?',
+    'tr_meliscms_tool_site_env_delete_confirm' => 'Êtes-vous sûr de vouloir supprimer cet environnement?',
 
     'tr_meliscms_tool_site_delete_env' => 'Supprimer l\'environnement',
 
@@ -341,7 +341,7 @@ return array(
     'tr_meliscms_tool_platform_invalid' => 'Plateforme invalide',
 
     // Delete Messages
-    'tr_meliscms_tool_platform_ids_confirm_msg' => 'Etes-vous sûr de vouloir supprimer cette plage d\'IDs ?',
+    'tr_meliscms_tool_platform_ids_confirm_msg' => 'Êtes-vous sûr de vouloir supprimer cette plage d\'IDs ?',
     'tr_meliscms_tool_platform_ids_deleted_title' => 'ID plateformes',
     'tr_meliscms_tool_platform_ids_delete_success_msg' => 'Plage d\'IDs de la plateforme supprimée avec succès',
     // Platform Id validation Messages
@@ -401,7 +401,7 @@ return array(
     'meliscms_tool_site_301_value_too_long_255' => 'Valeur trop longue, elle doit être de moins de 255 caractères',
     'meliscms_tool_site_301_value_empty' => 'Le champ est requis et ne peut être vide',
     'meliscms_tool_site_301_old_url_exist' => 'L\'ancienne URL existe déjà pour ce site',
-    'meliscms_tool_site_301_delete_confirm_msg' => 'Etes-vous sûr de vouloir supprimer cette redirection 301?',
+    'meliscms_tool_site_301_delete_confirm_msg' => 'Êtes-vous sûr de vouloir supprimer cette redirection 301?',
     'tr_meliscms_tool_site_301_s301_new_url_mismatch' => 'Le domaine de la nouvelle URL ne correspond pas au domaine du site',
 
     // Tool Sitetree view modal
@@ -444,7 +444,7 @@ return array(
     'tr_meliscms_tool_styles_save_fail' => 'Echec de la sauvegarde des détails du style',
     'tr_meliscms_tool_styles_save_success' => 'Le style a été sauvegardé avec succès',
     'tr_meliscms_tool_styles_delete_title' => 'Supprimer le style',
-    'tr_meliscms_tool_styles_delete_details' => 'Etes-vous sûr de vouloir supprimer ce style ?',
+    'tr_meliscms_tool_styles_delete_details' => 'Êtes-vous sûr de vouloir supprimer ce style ?',
     'tr_meliscms_tool_styles_delete_fail' => 'Echec de la suppression du style',
     'tr_meliscms_tool_styles_delete_success' => 'Le style a été supprimé avec succès',
     'tr_meliscms_tool_styles_save_page_style_fail' => 'Echec de l\'ajout du style',
@@ -585,7 +585,7 @@ return array(
     'tr_melis_cms_sites_module_load_no_access' => 'Vous avez besoin d\'un niveau de droits d\'administrateur pour modifier cette section.',
     'tr_melis_cms_sites_module_no_module_to_load' => 'Ce site n\'a pas de module à charger.',
     'tr_meliscms_tool_site_module_load_update_title' => "Activation/Désactivation des modules des sites",
-    'tr_meliscms_tool_site_module_load_update_confirm' => "Attention aux changements des modules à charger ou leur ordre, celà impactera tous les sites qui utilisent ces modules. <br><br> Les sites utilisant ces modules sont les suivants : <br> %s <br> <br>Etes-vous sûr de vouloir modifier le chargement des modules pour tous les sites utilisant ces modules ?",
+    'tr_meliscms_tool_site_module_load_update_confirm' => "Attention aux changements des modules à charger ou leur ordre, celà impactera tous les sites qui utilisent ces modules. <br><br> Les sites utilisant ces modules sont les suivants : <br> %s <br> <br>Êtes-vous sûr de vouloir modifier le chargement des modules pour tous les sites utilisant ces modules ?",
     'tr_meliscms_tool_site_module_load_site_module_required' => 'Le module du site « %s » doit rester activé : sans lui, le site ne peut pas s\'afficher.',
     'tr_meliscms_tool_site_module_load_no_rights' => 'Les droits sur votre système de fichiers (<p class="module-rights-err"><b>%s</b></p>) ne vous autorisent pas à modifier les fichiers.',
     'tr_melis_cms_sites_module_loading_activate_module_with_prerequisites_notice_confirmation' => "<br/>Voulez-vous activer ces modules aussi ?",
@@ -639,7 +639,7 @@ return array(
     'tr_melis_site_translation_empty_language' => 'Sélectionnez la langue',
     'tr_melis_site_translation_empty_text' => 'Veuillez insérer un texte de traduction',
     'tr_melis_site_translation_delete_success' => 'La traduction a bien été supprimée',
-    'tr_melis_site_translation_delete_confirm' => 'Etes-vous sûr de vouloir supprimer cette traduction ?',
+    'tr_melis_site_translation_delete_confirm' => 'Êtes-vous sûr de vouloir supprimer cette traduction ?',
     'tr_melis_site_translation_site' => 'Site',
     'tr_melis_site_translation_text_col' => 'Texte',
     'tr_melis_site_translation_key_col' => 'Clef',
@@ -793,7 +793,7 @@ return array(
     'tr_meliscms_mini_template_manager_tool_form_update' => 'Editer',
 
     'tr_meliscms_mini_template_manager_tool_delete_modal_title' => 'Supprimer le mini-template',
-    'tr_meliscms_mini_template_manager_tool_delete_modal_text' => 'Etes-vous sûr(e) de vouloir supprimer ce mini-template ? <br> Cette action supprimera les fichiers, le lien à la catégorie et ne peut pas être annulé ensuite.',
+    'tr_meliscms_mini_template_manager_tool_delete_modal_text' => 'Êtes-vous sûr(e) de vouloir supprimer ce mini-template ? <br> Cette action supprimera les fichiers, le lien à la catégorie et ne peut pas être annulé ensuite.',
     'tr_meliscms_mini_template_manager_tool_delete_modal_confirm' => 'Confirmer',
     'tr_meliscms_mini_template_manager_tool_delete_modal_cancel' => 'Annuler',
     'tr_melis_cms_mini_template_manager_tool_delete_no_permission_image' => 'Vous n\'avez pas les droits pour supprimer cette image. Veuillez contacter l\'administrateur pour obtenir de l\'aide.',
@@ -842,7 +842,7 @@ return array(
     'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_minitemplate' => 'Supprimer le mini-template',
     'tr_meliscms_mini_template_menu_manager_tool_jstree_loading' => 'Chargement',
     'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_title' => 'Supprimer la catégorie',
-    'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_text' => 'Etes-vous sûr(e) de vouloir supprimer cette catégorie ?',
+    'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_text' => 'Êtes-vous sûr(e) de vouloir supprimer cette catégorie ?',
     'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_error' => 'Une erreur est survenue lors de la suppression de la catégorie',
     'tr_meliscms_mini_template_menu_manager_tool_jstree_delete_category_error_children' => 'Vous ne pouvez supprimer que des catégories vides',
 
@@ -881,7 +881,7 @@ return array(
     'tr_meliscms_mini_template_form_invalid_category_name' => 'Ce champ ne peut contenir que des lettres et nombres',
     'tr_meliscms_mini_template_menu_manager_plugins_table_remove' => 'Retirer',
     'tr_meliscms_mini_template_menu_manager_remove_plugin' => 'Retirer le mini-template',
-    'tr_meliscms_mini_template_menu_manager_remove_plugin_text' => 'Etes-vous sûr(e) de vouloir retirer ce mini-template de la catégorie?',
+    'tr_meliscms_mini_template_menu_manager_remove_plugin_text' => 'Êtes-vous sûr(e) de vouloir retirer ce mini-template de la catégorie?',
 
     'tr_meliscms_page_export_modal_handler' => 'Import/Export pages',
     'tr_meliscms_page_import_modal' => 'Modal d\'import',

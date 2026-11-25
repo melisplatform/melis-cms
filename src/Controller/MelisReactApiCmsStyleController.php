@@ -29,6 +29,7 @@ class MelisReactApiCmsStyleController extends MelisAbstractActionController
 {
     use CapabilityGuardTrait;
     use MelisReactKeysetListTrait;
+    use ReactApiToolLogTrait;
 
     private const MELIS_KEY = 'meliscms_tool_styles';
 
@@ -195,6 +196,8 @@ class MelisReactApiCmsStyleController extends MelisAbstractActionController
                     'UPDATE melis_cms_style SET style_site_id = ?, style_name = ?, style_status = ?, style_path = ? WHERE style_id = ?',
                     [$siteId, $name, $status, $path, $id]
                 );
+                $this->logToolAction('meliscms_style_save_details_end', 'CMS_STYLE_DETAILS_UPDATE', $id,
+                    'tr_meliscms_tool_styles', 'tr_meliscms_tool_styles_save_success');
                 return $this->jsonResponse(['success' => true, 'data' => ['id' => $id]]);
             }
 
@@ -203,6 +206,8 @@ class MelisReactApiCmsStyleController extends MelisAbstractActionController
                 [$siteId, $name, $status, $path]
             );
             $newId = (int) iterator_to_array($db->query('SELECT LAST_INSERT_ID() AS id', []))[0]['id'];
+            $this->logToolAction('meliscms_style_save_details_end', 'CMS_STYLE_DETAILS_ADD', $newId,
+                'tr_meliscms_tool_styles', 'tr_meliscms_tool_styles_save_success');
             return $this->jsonResponse(['success' => true, 'data' => ['id' => $newId]], 201);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);
@@ -229,6 +234,8 @@ class MelisReactApiCmsStyleController extends MelisAbstractActionController
                 return $this->jsonResponse(['success' => false, 'error' => 'Not found'], 404);
             }
             $db->query('DELETE FROM melis_cms_style WHERE style_id = ?', [$id]);
+            $this->logToolAction('meliscms_style_delete_end', 'CMS_STYLE_DELETE', $id,
+                'tr_meliscms_tool_styles', 'tr_meliscms_tool_styles_delete_success');
             return $this->jsonResponse(['success' => true, 'data' => null]);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);

@@ -28,6 +28,7 @@ class MelisReactApiCmsPlatformIdController extends MelisAbstractActionController
 {
     use CapabilityGuardTrait;
     use MelisReactKeysetListTrait;
+    use ReactApiToolLogTrait;
 
     private const MELIS_KEY = 'meliscms_tool_platform_ids';
 
@@ -186,20 +187,23 @@ class MelisReactApiCmsPlatformIdController extends MelisAbstractActionController
                      pids_tpl_id_start = ?, pids_tpl_id_current = ?, pids_tpl_id_end = ? WHERE pids_id = ?',
                     array_merge($vals, [$id])
                 );
+                $this->logToolAction('meliscms_platform_IDs_save_end', 'CMS_PLATFORM_IDS_UPDATE', $id,
+                    'tr_meliscms_tool_platform_ids', 'tr_meliscms_tool_platform_update_success');
                 return $this->jsonResponse(['success' => true, 'data' => ['id' => $id]]);
             }
 
             // CRÉATION : une plage est rattachée à une plateforme EXISTANTE encore sans plage
             // (relation 1:1 pids_id = plf_id). On ne peut donc créer que pour une plateforme « absente ».
+            // Messages in French like the other site tools (Mantis #0011563).
             $platformId = (int) ($body['platformId'] ?? 0);
             if ($platformId <= 0) {
-                return $this->jsonResponse(['success' => false, 'error' => 'Platform is required'], 400);
+                return $this->jsonResponse(['success' => false, 'error' => 'La plateforme est obligatoire.'], 400);
             }
             if (!iterator_to_array($db->query('SELECT plf_id FROM melis_core_platform WHERE plf_id = ?', [$platformId]))) {
-                return $this->jsonResponse(['success' => false, 'error' => 'Unknown platform'], 400);
+                return $this->jsonResponse(['success' => false, 'error' => 'Plateforme introuvable.'], 400);
             }
             if (iterator_to_array($db->query('SELECT pids_id FROM melis_cms_platform_ids WHERE pids_id = ?', [$platformId]))) {
-                return $this->jsonResponse(['success' => false, 'error' => 'This platform already has a range'], 409);
+                return $this->jsonResponse(['success' => false, 'error' => 'Cette plateforme a déjà une plage d\'identifiants.'], 409);
             }
             if ($conflict = $this->rangeConflictResponse($db, $platformId, $pageStart, $pageEnd, $tplStart, $tplEnd)) {
                 return $conflict;
@@ -209,6 +213,8 @@ class MelisReactApiCmsPlatformIdController extends MelisAbstractActionController
                  pids_tpl_id_start, pids_tpl_id_current, pids_tpl_id_end) VALUES (?, ?, ?, ?, ?, ?, ?)',
                 array_merge([$platformId], $vals)
             );
+            $this->logToolAction('meliscms_platform_IDs_save_end', 'CMS_PLATFORM_IDS_ADD', $platformId,
+                'tr_meliscms_tool_platform_ids', 'tr_meliscms_tool_platform_add_success');
             return $this->jsonResponse(['success' => true, 'data' => ['id' => $platformId]], 201);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);
@@ -235,6 +241,8 @@ class MelisReactApiCmsPlatformIdController extends MelisAbstractActionController
                 return $this->jsonResponse(['success' => false, 'error' => 'Not found'], 404);
             }
             $db->query('DELETE FROM melis_cms_platform_ids WHERE pids_id = ?', [$id]);
+            $this->logToolAction('meliscms_platform_IDs_delete_end', 'CMS_PLATFORM_IDS_DELETE', $id,
+                'tr_meliscms_tool_platform_ids', 'tr_meliscms_tool_platform_ids_delete_success_msg');
             return $this->jsonResponse(['success' => true, 'data' => null]);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);

@@ -26,6 +26,7 @@ class MelisReactApiTemplateController extends MelisAbstractActionController
 {
     use CapabilityGuardTrait;
     use MelisReactKeysetListTrait;
+    use ReactApiToolLogTrait;
 
     /** melisKey de l'outil — utilisé par le garde de droits (cf. denyUnlessAccess). */
     private const MELIS_KEY = 'meliscms_tool_templates';
@@ -203,12 +204,19 @@ class MelisReactApiTemplateController extends MelisAbstractActionController
             $isNew = $id <= 0;
             if ($denyCap = $this->denyUnlessCan($isNew ? 'create' : 'edit')) { return $denyCap; }
 
+            // Same checks for creation AND edition (Mantis #0011562: the edit skipped them -> empty
+            // site = 500, empty layout/controller/action saved, unknown type saved as ZF2), with
+            // French messages like the other site tools (Mantis #0011563).
             $name = trim((string) ($body['name'] ?? ''));
             if ($name === '') {
-                return $this->jsonResponse(['success' => false, 'error' => 'Name is required'], 400);
+                return $this->jsonResponse(['success' => false, 'error' => 'Le nom est obligatoire.'], 400);
             }
 
-            $type          = in_array($body['type'] ?? '', ['ZF2', 'PHP', 'TWG'], true) ? $body['type'] : 'ZF2';
+            $rawType = strtoupper(trim((string) ($body['type'] ?? '')));
+            if ($rawType !== '' && !in_array($rawType, ['ZF2', 'PHP', 'TWG'], true)) {
+                return $this->jsonResponse(['success' => false, 'error' => 'Type de template inconnu (ZF2, PHP ou TWG).'], 400);
+            }
+            $type          = $rawType !== '' ? $rawType : 'ZF2';
             $siteId        = ((int) ($body['siteId'] ?? 0)) ?: null;
             $websiteFolder = trim((string) ($body['websiteFolder'] ?? ''));
             $layout        = trim((string) ($body['layout'] ?? ''));
@@ -218,23 +226,24 @@ class MelisReactApiTemplateController extends MelisAbstractActionController
 
             $db = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
 
+            // Site obligatoire (tpl_site_id NOT NULL) et existant ; layout + contrôleur + action obligatoires.
+            if (!$siteId) {
+                return $this->jsonResponse(['success' => false, 'error' => 'Le site est obligatoire.'], 400);
+            }
+            $siteRow = $this->getServiceManager()->get('MelisEngineTableSite')->getEntryById((int) $siteId)->current();
+            if (empty($siteRow)) {
+                return $this->jsonResponse(['success' => false, 'error' => 'Site introuvable.'], 400);
+            }
+            if ($layout === '' || $controller === '' || $action === '') {
+                return $this->jsonResponse(['success' => false, 'error' => 'Le layout, le contrôleur et l\'action sont obligatoires.'], 400);
+            }
+
             // Le dossier du site (tpl_zf2_website_folder) suit TOUJOURS le site — pas un champ éditable
             // (comme le tool legacy, où il est dérivé de site_name). Vaut pour création ET édition.
-            if ($siteId) {
-                $siteRow = $this->getServiceManager()->get('MelisEngineTableSite')->getEntryById((int) $siteId)->current();
-                if (!empty($siteRow->site_name)) { $websiteFolder = $siteRow->site_name; }
-            }
+            if (!empty($siteRow->site_name)) { $websiteFolder = $siteRow->site_name; }
 
             // ─── CRÉATION ─────────────────────────────────────────────────────────
             if ($isNew) {
-                // Validation métier (comme le tool legacy) : site obligatoire (tpl_site_id NOT NULL) ;
-                // le type Laminas (ZF2) requiert layout + contrôleur + action.
-                if (!$siteId) {
-                    return $this->jsonResponse(['success' => false, 'error' => 'Site is required'], 400);
-                }
-                if ($layout === '' || $controller === '' || $action === '') {
-                    return $this->jsonResponse(['success' => false, 'error' => 'Layout, controller and action are required'], 400);
-                }
 
                 // tpl_id alloué depuis le compteur de la plateforme courante (comme ToolTemplateController).
                 $pidsTable = $this->getServiceManager()->get('MelisEngineTablePlatformIds');
@@ -266,6 +275,8 @@ class MelisReactApiTemplateController extends MelisAbstractActionController
                 ]);
                 // Incrémenter le compteur de la plateforme (comme le legacy).
                 $pidsTable->save(['pids_tpl_id_current' => $newId + 1], $pids->pids_id);
+                $this->logToolAction('meliscms_template_savenew_end', 'CMS_TEMPLATE_ADD', $newId,
+                    'tr_tool_templates_modal_tab_text_add', 'tr_tool_template_fm_new_content');
 
                 return $this->jsonResponse(['success' => true, 'data' => ['id' => $newId]]);
             }
@@ -282,6 +293,8 @@ class MelisReactApiTemplateController extends MelisAbstractActionController
                  WHERE tpl_id = ?',
                 [$name, $type, $siteId, $websiteFolder, $layout, $controller, $action, $phpPath, $id]
             );
+            $this->logToolAction('meliscms_template_save_end', 'CMS_TEMPLATE_UPDATE', $id,
+                'tr_tool_template_fm_update_title', 'tr_tool_template_fm_update_content');
 
             return $this->jsonResponse(['success' => true, 'data' => ['id' => $id]]);
         } catch (\Throwable $e) {
@@ -313,6 +326,8 @@ class MelisReactApiTemplateController extends MelisAbstractActionController
                 return $this->jsonResponse(['success' => false, 'error' => 'Not found'], 404);
             }
             $db->query('DELETE FROM melis_cms_template WHERE tpl_id = ?', [$id]);
+            $this->logToolAction('meliscms_template_delete_end', 'CMS_TEMPLATE_DELETE', $id,
+                'tr_tool_template_fm_update_title', 'tr_tool_template_fm_delete_content');
             return $this->jsonResponse(['success' => true, 'data' => null]);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);

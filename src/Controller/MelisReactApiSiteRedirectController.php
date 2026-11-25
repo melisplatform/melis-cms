@@ -31,6 +31,7 @@ class MelisReactApiSiteRedirectController extends MelisAbstractActionController
 {
     use CapabilityGuardTrait;
     use MelisReactKeysetListTrait;
+    use ReactApiToolLogTrait;
 
     /** melisKey de l'outil — utilisé par le garde de droits (cf. denyUnlessAccess). */
     private const MELIS_KEY = 'meliscms_tool_site_301';
@@ -221,6 +222,10 @@ class MelisReactApiSiteRedirectController extends MelisAbstractActionController
             if (mb_strlen($oldUrl) > 255 || mb_strlen($newUrl) > 255) {
                 return $this->jsonResponse(['success' => false, 'error' => 'Une URL dépasse 255 caractères.'], 400);
             }
+            // Same old and new URL = a redirect loop (Mantis #0009351).
+            if (mb_strtolower(rtrim($oldUrl, '/')) === mb_strtolower(rtrim($newUrl, '/'))) {
+                return $this->jsonResponse(['success' => false, 'error' => 'La nouvelle URL doit être différente de l\'ancienne (boucle de redirection).'], 400);
+            }
 
             $db = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
 
@@ -246,6 +251,8 @@ class MelisReactApiSiteRedirectController extends MelisAbstractActionController
                     'UPDATE melis_cms_site_301 SET s301_site_id = ?, s301_old_url = ?, s301_new_url = ? WHERE s301_id = ?',
                     [$siteId, $oldUrl, $newUrl, $id]
                 );
+                $this->logToolAction('meliscalendar_save_site_redirect_end', 'CMS_SITE_REDIRECT_UPDATE', $id,
+                    'tr_meliscms_tool_site_301_edit_site_redirect', 'meliscms_tool_site_301_edit_success');
                 return $this->jsonResponse(['success' => true, 'data' => ['id' => $id]]);
             }
 
@@ -254,6 +261,8 @@ class MelisReactApiSiteRedirectController extends MelisAbstractActionController
                 [$siteId, $oldUrl, $newUrl]
             );
             $newId = (int) iterator_to_array($db->query('SELECT LAST_INSERT_ID() AS id', []))[0]['id'];
+            $this->logToolAction('meliscalendar_save_site_redirect_end', 'CMS_SITE_REDIRECT_ADD', $newId,
+                'tr_meliscms_tool_site_301_add_site_redirect', 'meliscms_tool_site_301_add_success');
 
             return $this->jsonResponse(['success' => true, 'data' => ['id' => $newId]], 201);
         } catch (\Throwable $e) {
@@ -285,6 +294,8 @@ class MelisReactApiSiteRedirectController extends MelisAbstractActionController
                 return $this->jsonResponse(['success' => false, 'error' => 'Not found'], 404);
             }
             $db->query('DELETE FROM melis_cms_site_301 WHERE s301_id = ?', [$id]);
+            $this->logToolAction('meliscalendar_delete_site_redirect_end', 'CMS_SITE_REDIRECT_DELETE', $id,
+                'tr_meliscms_tool_site_301_delete_site_redirect', 'meliscms_tool_site_301_delete_success');
             return $this->jsonResponse(['success' => true, 'data' => null]);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);
