@@ -16,7 +16,7 @@ use Laminas\ServiceManager\ServiceManager;
  * `MelisDragDropZone(` calls = the `<parent>_1`..`_N` sub-zones it renders). That
  * count is the single authority `applyLayout()` needs, and it doubles as the
  * allow-list: only a template present here (so, a real schema) can be applied —
- * `cols()` returns null for anything else, blocking arbitrary template injection.
+ * `cols()` returns null for anything else.
  *
  * Pure read of config + view files; no session, no DB.
  */

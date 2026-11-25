@@ -15,8 +15,8 @@ use Laminas\Session\Container;
 
 class MiniTemplateMenuManagerController extends MelisAbstractActionController {
     /**
-     * Outil auquel ce contrôleur appartient (audit DEKRA 7.0) : MelisCoreAuthorizationListener
-     * vérifie canAccess() sur cette clé AVANT le dispatch.
+     * Outil auquel ce contrôleur appartient : MelisCoreAuthorizationListener
+     * vérifie canAccess() sur cette clé avant le dispatch.
      */
     const MELIS_KEY = 'meliscms_mini_template_menu_manager_tool';
 
@@ -24,7 +24,7 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
     public $tool_key = 'meliscms_mini_template_menu_manager_tool';
     public $form_add_category_key = 'menu_manager_tool_site_add_category';
 
-    /** @INFO: Tool access check (CWE-862). */
+    /** @INFO: Tool access check. */
     private function hasAccess($key)
     {
         return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
@@ -122,7 +122,7 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
      * @return JsonModel
      */
     public function getMiniTemplatesAction() {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_mini_template_menu_manager_tool')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -202,7 +202,7 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
      * @return ViewModel
      */
     public function renderMenuManagerToolAddCategoryBodyPropertiesFormAction() {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_mini_template_menu_manager_tool')) {
             return new ViewModel();
         }
@@ -269,7 +269,7 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
      * @return JsonModel
      */
     public function getTreeAction() {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_mini_template_menu_manager_tool')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -286,7 +286,7 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
      * @return JsonModel
      */
     public function saveCategoryAction() {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_mini_template_menu_manager_tool')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -361,7 +361,7 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
      * @return JsonModel
      */
     public function deleteCategoryAction() {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_mini_template_menu_manager_tool')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -399,7 +399,7 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
      * @return JsonModel
      */
     public function saveTreeAction() {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_mini_template_menu_manager_tool')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -419,7 +419,7 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
      * @return JsonModel
      */
     public function reorderMiniTemplatesAction() {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_mini_template_menu_manager_tool')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -453,7 +453,7 @@ class MiniTemplateMenuManagerController extends MelisAbstractActionController {
      * @return JsonModel
      */
     public function removePluginFromCategoryAction() {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('meliscms_mini_template_menu_manager_tool')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
