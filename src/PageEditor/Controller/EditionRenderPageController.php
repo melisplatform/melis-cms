@@ -126,7 +126,9 @@ class EditionRenderPageController extends MelisAbstractActionController
     {
         // <script src="…/MelisCms/js/…"></script>  and any tinymce script
         $html = (string) preg_replace('#<script\b[^>]*\bsrc="[^"]*/MelisCms/js/[^"]*"[^>]*>\s*</script>#i', '', $html);
-        $html = (string) preg_replace('#<script\b[^>]*\bsrc="[^"]*tinymce[^"]*"[^>]*>\s*</script>#i', '', $html);
+        // …but NOT mini-template assets: /miniTemplatesTinyMce/… also matches "tinymce" (case-insensitive),
+        // which silently dropped AI mini-template JS (e.g. an Owl slider's init) from the canvas.
+        $html = (string) preg_replace('#<script\b[^>]*\bsrc="(?![^"]*/miniTemplatesTinyMce/)[^"]*tinymce[^"]*"[^>]*>\s*</script>#i', '', $html);
         // Edit-mode CSS (drag-drop / jquery-ui chrome styling) — display uses the SITE css only. EXCEPT
         // `dynamic-dragndrop.css`: it carries the empty drag-drop ZONE look (pale background + the "+"
         // add-hint icon + placeholder) that must match the LEGACY editor. Keep it so the React canvas'
